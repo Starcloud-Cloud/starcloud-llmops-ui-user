@@ -63,7 +63,7 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                             imageStyleData?.variableList?.some((value: any) => value?.field === 'SUB_TITLE')) && (
                             <>
                                 <div className="flex items-center gap-4 min-h-[32px]">
-                                    <span className="w-[112px]">图片标题生成</span>
+                                    <span>图片标题生成</span>
                                     <Switch
                                         checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
                                         onChange={(e) => {

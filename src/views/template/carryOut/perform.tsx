@@ -203,7 +203,18 @@ function Perform({
                                     <Grid container spacing={1}>
                                         {item.variable?.variables?.map((el: any, i: number) =>
                                             el.isShow ? (
-                                                <Grid item key={i} md={el.style === 'JSON' ? 12 : el.style === 'TEXTAREA' ? 6 : 3} xs={12}>
+                                                <Grid
+                                                    item
+                                                    key={i}
+                                                    md={
+                                                        el.style === 'JSON'
+                                                            ? 12
+                                                            : el.style === 'TEXTAREA' || el.style === 'MATERIAL'
+                                                            ? 6
+                                                            : 3
+                                                    }
+                                                    xs={12}
+                                                >
                                                     <FormExecute item={el} onChange={(e: any) => variableChange({ e, steps, i })} />
                                                 </Grid>
                                             ) : null
@@ -213,8 +224,20 @@ function Perform({
                                                 el.isShow ? (
                                                     <Grid
                                                         item
-                                                        lg={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 3}
-                                                        md={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 3}
+                                                        lg={
+                                                            el.field === 'prompt'
+                                                                ? 12
+                                                                : el.style === 'TEXTAREA' || el.style === 'MATERIAL'
+                                                                ? 6
+                                                                : 3
+                                                        }
+                                                        md={
+                                                            el.field === 'prompt'
+                                                                ? 12
+                                                                : el.style === 'TEXTAREA' || el.style === 'MATERIAL'
+                                                                ? 6
+                                                                : 3
+                                                        }
                                                         xs={12}
                                                         key={i}
                                                     >

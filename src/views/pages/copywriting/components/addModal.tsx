@@ -617,6 +617,7 @@ const AddModal = () => {
                             <Box
                                 onClick={() => {
                                     if (!searchParams.get('uid')) {
+                                        setCurrent(0);
                                         setSplitValue(item.appUid);
                                     }
                                 }}
@@ -634,6 +635,9 @@ const AddModal = () => {
                 <div className="p-4 border border-solid border-black/30 rounded-lg mb-[20px]">
                     <Steps
                         current={current}
+                        onChange={(current) => {
+                            setCurrent(current);
+                        }}
                         items={[
                             {
                                 icon: <HomeOutlined rev={undefined} />,
@@ -645,374 +649,392 @@ const AddModal = () => {
                         ]}
                     />
                 </div>
-                {current === 0 && (
-                    <div className="flex justify-space-between items-center">
-                        <div className="w-[400px]">
-                            <div className="text-lg font-bold">{splitList?.find((item) => item.appUid === splitValue)?.appName}</div>
-                            <div className="text-xs mt-[10px]">{splitList?.find((item) => item.appUid === splitValue)?.description}</div>
+                <div className="min-h-[500px]">
+                    {current === 0 && (
+                        <div className="flex justify-space-between items-center">
+                            <div className="w-[400px]">
+                                <div className="text-lg font-bold">{splitList?.find((item) => item.appUid === splitValue)?.appName}</div>
+                                <div className="text-xs mt-[10px]">
+                                    {splitList?.find((item) => item.appUid === splitValue)?.description}
+                                </div>
+                            </div>
+                            <div>{/* <Goods /> */}</div>
                         </div>
-                        <div> </div>
-                    </div>
-                )}
-                {current === 1 && (
-                    <>
-                        <Row gutter={20}>
-                            {valueList
-                                ?.find((el) => el.code === 'VariableActionHandler')
-                                ?.variableList?.map((item: any, de: number) => (
-                                    <Col key={item?.field} xs={24} sm={12} lg={6}>
-                                        <Form
-                                            item={item}
-                                            index={de}
-                                            changeValue={(data: any) => {
-                                                const newList = _.cloneDeep(valueList);
-                                                const num = valueList?.findIndex((item) => item.code === 'VariableActionHandler');
-                                                newList[num].variableList[data?.index].value = data.value;
-                                                setValueList(newList);
-                                            }}
-                                            flag={false}
-                                        />
-                                    </Col>
-                                ))}
-                        </Row>
-                        <CreateVariable
-                            rows={valueList?.find((item) => item.code === 'VariableActionHandler')?.variableList}
-                            setRows={(data: any[]) =>
-                                setValues(
-                                    'variableList',
-                                    data,
-                                    valueList?.findIndex((item) => item.code === 'VariableActionHandler')
-                                )
-                            }
-                        />
-                    </>
-                )}
-                {current === 2 && (
-                    <Collapse
-                        bordered={false}
-                        style={{ background: 'transparent' }}
-                        items={valueList
-                            ?.filter((item) => item.code !== 'VariableActionHandler')
-                            ?.map((el: any, index: number) => {
-                                return {
-                                    key: index,
-                                    style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
-                                    label: (
-                                        <div className="relative">
-                                            <span className="text-[18px] font-[600]">
-                                                {index + 1 + '.'} {el?.name}
-                                            </span>
-                                            {verifyItem(el)?.flag && (
-                                                <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
-                                            )}
-                                        </div>
-                                    ),
-                                    children: (
-                                        <>
-                                            {(el.code === 'CustomActionHandler' ||
-                                                el.code === 'ParagraphActionHandler' ||
-                                                el.code === 'TitleActionHandler') && (
-                                                <>
-                                                    <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
-                                                    <div>
-                                                        <Radio.Group
-                                                            value={el.model}
-                                                            onChange={(e) => {
-                                                                if (valueList.find((item) => item.code === 'VariableActionHandler')) {
-                                                                    setValues('model', e.target.value, index + 1);
-                                                                } else {
-                                                                    setValues('model', e.target.value, index);
-                                                                }
-                                                            }}
-                                                        >
-                                                            {modeList?.map((item) =>
-                                                                el?.code === 'ParagraphActionHandler' ? (
-                                                                    item.label !== '随机获取' && (
+                    )}
+                    {current === 1 && (
+                        <>
+                            <Row gutter={20}>
+                                <Col md={24} lg={10}>
+                                    <Row gutter={10}>
+                                        {valueList
+                                            ?.find((el) => el.code === 'VariableActionHandler')
+                                            ?.variableList?.map((item: any, de: number) => (
+                                                <Col key={item?.field} span={24}>
+                                                    <Form
+                                                        item={item}
+                                                        index={de}
+                                                        changeValue={(data: any) => {
+                                                            const newList = _.cloneDeep(valueList);
+                                                            const num = valueList?.findIndex(
+                                                                (item) => item.code === 'VariableActionHandler'
+                                                            );
+                                                            newList[num].variableList[data?.index].value = data.value;
+                                                            setValueList(newList);
+                                                        }}
+                                                        flag={false}
+                                                    />
+                                                </Col>
+                                            ))}
+                                    </Row>
+                                </Col>
+                                <Col md={24} lg={14}>
+                                    <CreateVariable
+                                        rows={valueList?.find((item) => item.code === 'VariableActionHandler')?.variableList}
+                                        setRows={(data: any[]) =>
+                                            setValues(
+                                                'variableList',
+                                                data,
+                                                valueList?.findIndex((item) => item.code === 'VariableActionHandler')
+                                            )
+                                        }
+                                    />
+                                </Col>
+                            </Row>
+                        </>
+                    )}
+                    {current === 2 && (
+                        <Collapse
+                            bordered={false}
+                            style={{ background: 'transparent' }}
+                            items={valueList
+                                ?.filter((item) => item.code !== 'VariableActionHandler')
+                                ?.map((el: any, index: number) => {
+                                    return {
+                                        key: index,
+                                        style: { marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' },
+                                        label: (
+                                            <div className="relative">
+                                                <span className="text-[18px] font-[600]">
+                                                    {index + 1 + '.'} {el?.name}
+                                                </span>
+                                                {verifyItem(el)?.flag && (
+                                                    <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
+                                                )}
+                                            </div>
+                                        ),
+                                        children: (
+                                            <>
+                                                {(el.code === 'CustomActionHandler' ||
+                                                    el.code === 'ParagraphActionHandler' ||
+                                                    el.code === 'TitleActionHandler') && (
+                                                    <>
+                                                        <div className="text-[16px] mb-[10px] font-[600]">1. 生成模式</div>
+                                                        <div>
+                                                            <Radio.Group
+                                                                value={el.model}
+                                                                onChange={(e) => {
+                                                                    if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                        setValues('model', e.target.value, index + 1);
+                                                                    } else {
+                                                                        setValues('model', e.target.value, index);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {modeList?.map((item) =>
+                                                                    el?.code === 'ParagraphActionHandler' ? (
+                                                                        item.label !== '随机获取' && (
+                                                                            <Radio key={item.value} value={item.value}>
+                                                                                {item.label}
+                                                                            </Radio>
+                                                                        )
+                                                                    ) : (
                                                                         <Radio key={item.value} value={item.value}>
                                                                             {item.label}
                                                                         </Radio>
                                                                     )
-                                                                ) : (
-                                                                    <Radio key={item.value} value={item.value}>
-                                                                        {item.label}
-                                                                    </Radio>
-                                                                )
-                                                            )}
-                                                        </Radio.Group>
-                                                    </div>
-                                                    <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
-                                                        <span className="font-[600] text-[#673ab7]">Tips：</span>
-                                                        {el.model === 'RANDOM'
-                                                            ? '从参考内容中随机获取一条内容使用'
-                                                            : el.model === 'AI_PARODY'
-                                                            ? '从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
-                                                            : '直接让AI生成内容，要求越详细越好'}
-                                                    </div>
-                                                    {el.model !== 'AI_CUSTOM' && (
-                                                        <>
-                                                            <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
-                                                            <CreateTable
-                                                                tableData={el?.referList}
-                                                                sourceList={sourceList}
-                                                                code={el?.code}
-                                                                setTableData={(data) => {
-                                                                    if (valueList.find((item) => item.code === 'VariableActionHandler')) {
-                                                                        setValues('referList', data, index + 1);
-                                                                    } else {
-                                                                        setValues('referList', data, index);
-                                                                    }
-                                                                }}
-                                                                params={params}
-                                                            />
-                                                        </>
-                                                    )}
-                                                    {el.model !== 'RANDOM' && (
-                                                        <>
-                                                            <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">
-                                                                {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
-                                                            </div>
-                                                            <CreateVariables
-                                                                pre={pre}
-                                                                model={el?.model}
-                                                                value={el?.requirement}
-                                                                setValue={(data: string) => {
-                                                                    if (valueList.find((item) => item.code === 'VariableActionHandler')) {
-                                                                        setValues('requirement', data, index + 1);
-                                                                    } else {
-                                                                        setValues('requirement', data, index);
-                                                                    }
-                                                                }}
-                                                            />
-                                                        </>
-                                                    )}
-                                                    {el.code === 'ParagraphActionHandler' && (
-                                                        <>
-                                                            <div className="relative mt-[20px]">
-                                                                <InputNumber
-                                                                    status={!el?.paragraphCount ? 'error' : ''}
-                                                                    size="large"
-                                                                    className="w-[300px] bg-[#f8fafc]"
-                                                                    min={1}
-                                                                    value={el?.paragraphCount}
-                                                                    onChange={(data) => {
+                                                                )}
+                                                            </Radio.Group>
+                                                        </div>
+                                                        <div className="p-[10px] inline-block rounded-md text-[12px] mt-[5px]">
+                                                            <span className="font-[600] text-[#673ab7]">Tips：</span>
+                                                            {el.model === 'RANDOM'
+                                                                ? '从参考内容中随机获取一条内容使用'
+                                                                : el.model === 'AI_PARODY'
+                                                                ? '从参考内容中随机获取几条内容作为参考，并用AI进行仿写'
+                                                                : '直接让AI生成内容，要求越详细越好'}
+                                                        </div>
+                                                        {el.model !== 'AI_CUSTOM' && (
+                                                            <>
+                                                                <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
+                                                                <CreateTable
+                                                                    tableData={el?.referList}
+                                                                    sourceList={sourceList}
+                                                                    code={el?.code}
+                                                                    setTableData={(data) => {
                                                                         if (
                                                                             valueList.find((item) => item.code === 'VariableActionHandler')
                                                                         ) {
-                                                                            setValues('paragraphCount', data, index + 1);
+                                                                            setValues('referList', data, index + 1);
                                                                         } else {
-                                                                            setValues('paragraphCount', data, index);
+                                                                            setValues('referList', data, index);
+                                                                        }
+                                                                    }}
+                                                                    params={params}
+                                                                />
+                                                            </>
+                                                        )}
+                                                        {el.model !== 'RANDOM' && (
+                                                            <>
+                                                                <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">
+                                                                    {el.model !== 'AI_CUSTOM' ? 3 : 2}. 文案生成要求
+                                                                </div>
+                                                                <CreateVariables
+                                                                    pre={pre}
+                                                                    model={el?.model}
+                                                                    value={el?.requirement}
+                                                                    setValue={(data: string) => {
+                                                                        if (
+                                                                            valueList.find((item) => item.code === 'VariableActionHandler')
+                                                                        ) {
+                                                                            setValues('requirement', data, index + 1);
+                                                                        } else {
+                                                                            setValues('requirement', data, index);
                                                                         }
                                                                     }}
                                                                 />
-                                                                <span
-                                                                    style={{ color: !el?.paragraphCount ? '#f44336' : '#000' }}
-                                                                    className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
-                                                                >
-                                                                    文案段落数量
-                                                                </span>
-                                                            </div>
-                                                            {!el?.paragraphCount && (
-                                                                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
-                                                                    文案段落数量必填
-                                                                </span>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                </>
-                                            )}
-                                            {el.code === 'AssembleActionHandler' && (
-                                                <>
-                                                    <div className="relative">
-                                                        <TextArea
-                                                            status={!el?.requirement ? 'error' : ''}
-                                                            defaultValue={el?.requirement}
-                                                            onBlur={(data) => {
+                                                            </>
+                                                        )}
+                                                        {el.code === 'ParagraphActionHandler' && (
+                                                            <>
+                                                                <div className="relative mt-[20px]">
+                                                                    <InputNumber
+                                                                        status={!el?.paragraphCount ? 'error' : ''}
+                                                                        size="large"
+                                                                        className="w-[300px] bg-[#f8fafc]"
+                                                                        min={1}
+                                                                        value={el?.paragraphCount}
+                                                                        onChange={(data) => {
+                                                                            if (
+                                                                                valueList.find(
+                                                                                    (item) => item.code === 'VariableActionHandler'
+                                                                                )
+                                                                            ) {
+                                                                                setValues('paragraphCount', data, index + 1);
+                                                                            } else {
+                                                                                setValues('paragraphCount', data, index);
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <span
+                                                                        style={{ color: !el?.paragraphCount ? '#f44336' : '#000' }}
+                                                                        className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                                    >
+                                                                        文案段落数量
+                                                                    </span>
+                                                                </div>
+                                                                {!el?.paragraphCount && (
+                                                                    <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                                        文案段落数量必填
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                    </>
+                                                )}
+                                                {el.code === 'AssembleActionHandler' && (
+                                                    <>
+                                                        <div className="relative">
+                                                            <TextArea
+                                                                status={!el?.requirement ? 'error' : ''}
+                                                                defaultValue={el?.requirement}
+                                                                onBlur={(data) => {
+                                                                    if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                        setValues('requirement', data.target.value, index + 1);
+                                                                    } else {
+                                                                        setValues('requirement', data.target.value, index);
+                                                                    }
+                                                                }}
+                                                                rows={10}
+                                                            />
+                                                            <span
+                                                                style={{ color: !el?.requirement ? '#f44336' : '#000' }}
+                                                                className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                            >
+                                                                文案拼接配置
+                                                            </span>
+                                                        </div>
+                                                        {!el?.requirement && (
+                                                            <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                                文案拼接配置必填
+                                                            </span>
+                                                        )}
+                                                    </>
+                                                )}
+                                                {el.code === 'PosterActionHandler' && (
+                                                    <>
+                                                        <CreateTab
+                                                            mode={el?.mode}
+                                                            setModel={(data) => {
                                                                 if (valueList.find((item) => item.code === 'VariableActionHandler')) {
-                                                                    setValues('requirement', data.target.value, index + 1);
+                                                                    setValues('mode', data, index + 1);
                                                                 } else {
-                                                                    setValues('requirement', data.target.value, index);
+                                                                    setValues('mode', data, index);
                                                                 }
                                                             }}
-                                                            rows={10}
+                                                            imageStyleData={el?.styleList}
+                                                            setImageStyleData={(data) => {
+                                                                if (valueList.find((item) => item.code === 'VariableActionHandler')) {
+                                                                    setValues('styleList', data, index + 1);
+                                                                } else {
+                                                                    setValues('styleList', data, index);
+                                                                }
+                                                            }}
+                                                            focuActive={focuActive}
+                                                            setFocuActive={setFocuActive}
+                                                            digui={() => {
+                                                                const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
+                                                                if (!newData || newData?.every((i: any) => !i)) {
+                                                                    return 1;
+                                                                }
+                                                                return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                                            }}
                                                         />
-                                                        <span
-                                                            style={{ color: !el?.requirement ? '#f44336' : '#000' }}
-                                                            className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
-                                                        >
-                                                            文案拼接配置
-                                                        </span>
-                                                    </div>
-                                                    {!el?.requirement && (
-                                                        <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
-                                                            文案拼接配置必填
-                                                        </span>
-                                                    )}
-                                                </>
-                                            )}
-                                            {el.code === 'PosterActionHandler' && (
-                                                <>
-                                                    <CreateTab
-                                                        mode={el?.mode}
-                                                        setModel={(data) => {
-                                                            if (valueList.find((item) => item.code === 'VariableActionHandler')) {
-                                                                setValues('mode', data, index + 1);
-                                                            } else {
-                                                                setValues('mode', data, index);
-                                                            }
-                                                        }}
-                                                        imageStyleData={el?.styleList}
-                                                        setImageStyleData={(data) => {
-                                                            if (valueList.find((item) => item.code === 'VariableActionHandler')) {
-                                                                setValues('styleList', data, index + 1);
-                                                            } else {
-                                                                setValues('styleList', data, index);
-                                                            }
-                                                        }}
-                                                        focuActive={focuActive}
-                                                        setFocuActive={setFocuActive}
-                                                        digui={() => {
-                                                            const newData = el?.styleList?.map((i: any) => i.name.split(' ')[1]);
-                                                            if (!newData || newData?.every((i: any) => !i)) {
-                                                                return 1;
-                                                            }
-                                                            return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
-                                                        }}
-                                                    />
-                                                </>
-                                            )}
-                                        </>
-                                    )
-                                };
-                            })}
-                    />
-                )}
-                {current === 3 && (
-                    <>
-                        <div className="flex flex-wrap gap-[10px] max-h-[300px] overflow-y-auto shadow">
-                            <Modal open={imageOpen} footer={null} onCancel={() => setImageOpen(false)}>
-                                <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
-                            </Modal>
-                            <div>
-                                <Upload {...testProps}>
-                                    <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                        <PlusOutlined rev={undefined} />
-                                        <div style={{ marginTop: 8 }}>Upload</div>
-                                    </div>
-                                </Upload>
+                                                    </>
+                                                )}
+                                            </>
+                                        )
+                                    };
+                                })}
+                        />
+                    )}
+                    {current === 3 && (
+                        <>
+                            <div className="flex flex-wrap gap-[10px] max-h-[300px] overflow-y-auto shadow">
+                                <Modal open={imageOpen} footer={null} onCancel={() => setImageOpen(false)}>
+                                    <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
+                                </Modal>
+                                <div>
+                                    <Upload {...testProps}>
+                                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                            <PlusOutlined rev={undefined} />
+                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                        </div>
+                                    </Upload>
+                                </div>
                             </div>
-                        </div>
-                        <Button
-                            onClick={() => {
-                                if (!testImageList || testImageList.length === 0) {
-                                    dispatch(
-                                        openSnackbar({
-                                            open: true,
-                                            message: '没有上传测试图片',
-                                            variant: 'alert',
-                                            alert: {
-                                                color: 'error'
-                                            },
-                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                            transition: 'SlideDown',
-                                            close: false
-                                        })
-                                    );
-                                    return false;
-                                }
-                                if (searchParams.get('uid')) {
-                                    setTestOpen(true);
-                                    try {
-                                        schemeExample({
-                                            uid: searchParams.get('uid'),
-                                            ...params,
-                                            type: params.type ? 'SYSTEM' : 'USER',
-                                            configuration: {
-                                                ...splitList.filter((item) => item.appUid === splitValue)[0],
-                                                steps: valueList?.map((item) => {
-                                                    if (item?.model === 'RANDOM') {
-                                                        return {
-                                                            ...item,
-                                                            variableList: [],
-                                                            requirement: ''
-                                                        };
-                                                    } else if (item?.model === 'AI_CUSTOM') {
-                                                        return {
-                                                            ...item,
-                                                            referList: []
-                                                        };
-                                                    } else {
-                                                        return item;
-                                                    }
-                                                })
-                                            },
-                                            useImages: testImageList
-                                                ?.map((item: any, i: number) => {
-                                                    if (item?.response?.data?.url) {
-                                                        return item?.response?.data?.url;
-                                                    } else {
-                                                        return undefined;
-                                                    }
-                                                })
-                                                ?.filter((item) => item)
-                                        })
-                                            .then((res) => {
-                                                setTestOpen(false);
-                                                getList();
-                                                timer.current[0] = setInterval(() => {
-                                                    if (
-                                                        plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                                            return (
-                                                                item?.pictureStatus !== 'executing' &&
-                                                                item?.pictureStatus !== 'init' &&
-                                                                item?.copyWritingStatus !== 'executing' &&
-                                                                item?.copyWritingStatus !== 'init'
-                                                            );
-                                                        })
-                                                    ) {
-                                                        clearInterval(timer.current[0]);
-                                                    }
-                                                    getLists(1);
-                                                }, 3000);
+                            <Button
+                                onClick={() => {
+                                    if (!testImageList || testImageList.length === 0) {
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '没有上传测试图片',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'error'
+                                                },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                transition: 'SlideDown',
+                                                close: false
                                             })
-                                            .catch((err) => {
-                                                setTestOpen(false);
-                                            });
-                                    } catch (err) {
-                                        setTestOpen(false);
+                                        );
+                                        return false;
                                     }
-                                } else {
-                                    dispatch(
-                                        openSnackbar({
-                                            open: true,
-                                            message: '保存之后才能测试生成',
-                                            variant: 'alert',
-                                            alert: {
-                                                color: 'error'
-                                            },
-                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                            transition: 'SlideDown',
-                                            close: false
-                                        })
-                                    );
-                                }
-                            }}
-                            loading={testOpen}
-                            className="mt-[20px]"
-                            type="primary"
-                        >
-                            测试生成
-                        </Button>
-                        <div onScroll={handleScroll} ref={scrollRef} className="h-[600px] overflow-auto shadow-lg mt-[20px]">
-                            <Row gutter={20} className="h-[fit-content] w-full">
-                                {planList.map((item, index: number) => (
-                                    <Col key={index} span={6} className="inline-block">
-                                        <Goods item={item} setBusinessUid={item.setBusinessUid} setDetailOpen={() => {}} />
-                                    </Col>
-                                ))}
-                            </Row>
-                        </div>
-                    </>
-                )}
+                                    if (searchParams.get('uid')) {
+                                        setTestOpen(true);
+                                        try {
+                                            schemeExample({
+                                                uid: searchParams.get('uid'),
+                                                ...params,
+                                                type: params.type ? 'SYSTEM' : 'USER',
+                                                configuration: {
+                                                    ...splitList.filter((item) => item.appUid === splitValue)[0],
+                                                    steps: valueList?.map((item) => {
+                                                        if (item?.model === 'RANDOM') {
+                                                            return {
+                                                                ...item,
+                                                                variableList: [],
+                                                                requirement: ''
+                                                            };
+                                                        } else if (item?.model === 'AI_CUSTOM') {
+                                                            return {
+                                                                ...item,
+                                                                referList: []
+                                                            };
+                                                        } else {
+                                                            return item;
+                                                        }
+                                                    })
+                                                },
+                                                useImages: testImageList
+                                                    ?.map((item: any, i: number) => {
+                                                        if (item?.response?.data?.url) {
+                                                            return item?.response?.data?.url;
+                                                        } else {
+                                                            return undefined;
+                                                        }
+                                                    })
+                                                    ?.filter((item) => item)
+                                            })
+                                                .then((res) => {
+                                                    setTestOpen(false);
+                                                    getList();
+                                                    timer.current[0] = setInterval(() => {
+                                                        if (
+                                                            plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                                                return (
+                                                                    item?.pictureStatus !== 'executing' &&
+                                                                    item?.pictureStatus !== 'init' &&
+                                                                    item?.copyWritingStatus !== 'executing' &&
+                                                                    item?.copyWritingStatus !== 'init'
+                                                                );
+                                                            })
+                                                        ) {
+                                                            clearInterval(timer.current[0]);
+                                                        }
+                                                        getLists(1);
+                                                    }, 3000);
+                                                })
+                                                .catch((err) => {
+                                                    setTestOpen(false);
+                                                });
+                                        } catch (err) {
+                                            setTestOpen(false);
+                                        }
+                                    } else {
+                                        dispatch(
+                                            openSnackbar({
+                                                open: true,
+                                                message: '保存之后才能测试生成',
+                                                variant: 'alert',
+                                                alert: {
+                                                    color: 'error'
+                                                },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                transition: 'SlideDown',
+                                                close: false
+                                            })
+                                        );
+                                    }
+                                }}
+                                loading={testOpen}
+                                className="mt-[20px]"
+                                type="primary"
+                            >
+                                测试生成
+                            </Button>
+                            <div onScroll={handleScroll} ref={scrollRef} className="h-[600px] overflow-auto shadow-lg mt-[20px]">
+                                <Row gutter={20} className="h-[fit-content] w-full">
+                                    {planList.map((item, index: number) => (
+                                        <Col key={index} span={6} className="inline-block">
+                                            <Goods item={item} setBusinessUid={item.setBusinessUid} setDetailOpen={() => {}} />
+                                        </Col>
+                                    ))}
+                                </Row>
+                            </div>
+                        </>
+                    )}
+                </div>
                 <div className="my-[20px] flex justify-center gap-2">
                     <Button type="primary" onClick={() => setCurrent(current - 1)} disabled={current === 0}>
                         上一步

@@ -88,7 +88,7 @@ function CreateDetail() {
     const [from, setFrom] = useState('');
     //类型 模型类型
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModel, setAiModel] = useState('gpt-3.5-turbo-1106');
+    const [aiModel, setAiModel] = useState<undefined | string>(undefined);
     //数组方法封装
     const changeArr = (data: any[], setData: (data: any) => void, index: number, flag: boolean) => {
         const newData = _.cloneDeep(data);
@@ -256,6 +256,12 @@ function CreateDetail() {
             });
         });
         detailRef.current = _.cloneDeep(newValue);
+        if (newValue?.workflowConfig?.steps?.length === 1) {
+            setAiModel(
+                newValue?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
+                    'gpt-3.5-turbo-1106'
+            );
+        }
         setDetail(newValue);
     };
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
@@ -425,6 +431,17 @@ function CreateDetail() {
     };
     const permissions = useUserStore((state) => state.permissions);
     const { Option } = Select;
+
+    //检测 model
+    useEffect(() => {
+        if (detail?.workflowConfig.steps?.length === 1) {
+            setAiModel(detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.find((item: any) => item.field === 'model')?.value);
+        }
+    }, [
+        detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables[
+            detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.findIndex((el: any) => el?.field === 'model')
+        ]?.value
+    ]);
     return (
         <Card>
             <CardHeader
@@ -518,7 +535,8 @@ function CreateDetail() {
                                     name: detail?.name,
                                     description: detail?.description,
                                     category: detail?.category,
-                                    tags: detail?.tags
+                                    tags: detail?.tags,
+                                    example: detail?.example
                                 }}
                                 basisPre={basisPre}
                                 sort={detail?.sort}
@@ -556,7 +574,7 @@ function CreateDetail() {
                                         </Box>
                                     </Box>
                                 </Box>
-                                {appModels.aiModel && (
+                                {detail?.workflowConfig?.steps?.length === 1 && (
                                     <div className="flex items-center">
                                         <Popover
                                             title="模型介绍"
@@ -574,6 +592,7 @@ function CreateDetail() {
                                         <Select
                                             style={{ width: 100, height: 23 }}
                                             bordered={false}
+                                            disabled={true}
                                             className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
                                             rootClassName="modelSelect"
                                             popupClassName="modelSelectPopup"
@@ -587,7 +606,7 @@ function CreateDetail() {
                                                 setAiModel(value);
                                             }}
                                         >
-                                            {appModels.aiModel.map((item: any) => (
+                                            {appModels?.aiModel?.map((item: any) => (
                                                 <Option key={item.value} value={item.value}>
                                                     {item.label}
                                                 </Option>
@@ -663,7 +682,7 @@ function CreateDetail() {
                                         </Box>
                                     </Box>
                                 </Box>
-                                {appModels.aiModel && (
+                                {detail?.workflowConfig?.steps?.length === 1 && (
                                     <div className="flex items-center">
                                         <Popover
                                             title="模型介绍"
@@ -681,6 +700,7 @@ function CreateDetail() {
                                         <Select
                                             style={{ width: 100, height: 23 }}
                                             bordered={false}
+                                            disabled={true}
                                             className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
                                             rootClassName="modelSelect"
                                             popupClassName="modelSelectPopup"
@@ -694,7 +714,7 @@ function CreateDetail() {
                                                 setAiModel(value);
                                             }}
                                         >
-                                            {appModels.aiModel.map((item: any) => (
+                                            {appModels?.aiModel?.map((item: any) => (
                                                 <Option key={item.value} value={item.value}>
                                                     {item.label}
                                                 </Option>

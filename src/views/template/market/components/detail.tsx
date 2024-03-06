@@ -50,8 +50,8 @@ function Deatail() {
     //类型 模型类型
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModels, setAiModels] = useState<string>('gpt-3.5-turbo-1106');
-    const aimodeRef = useRef('gpt-3.5-turbo-1106');
+    const [aiModels, setAiModels] = useState<string | undefined>(undefined);
+    const aimodeRef: any = useRef(undefined);
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     const loadingsRef: any = useRef([]);
@@ -243,44 +243,16 @@ function Deatail() {
             });
         }
         const setPlholder = (res: any) => {
-            const newRes = _.cloneDeep(res);
-            if (newRes.isFavorite) {
+            const result = _.cloneDeep(res);
+            if (result.isFavorite) {
                 setActive(true);
             }
-            const result = {
-                ...newRes,
-                workflowConfig: {
-                    ...newRes.workflowConfig,
-                    steps: newRes.workflowConfig.steps.map((item: any) => {
-                        return {
-                            ...item,
-                            flowStep: {
-                                ...item.flowStep,
-                                response: {
-                                    ...item.flowStep.response,
-                                    defaultValue: item.flowStep.response.answer,
-                                    answer: ''
-                                }
-                            },
-                            variable: item.variable
-                                ? {
-                                      variables: item.variable?.variables.map((el: any) => {
-                                          if (el.value) {
-                                              return {
-                                                  ...el,
-                                                  defaultValue: el.value,
-                                                  value: ''
-                                              };
-                                          } else {
-                                              return el;
-                                          }
-                                      })
-                                  }
-                                : null
-                        };
-                    })
-                }
-            };
+            if (result?.workflowConfig?.steps?.length === 1) {
+                aimodeRef.current =
+                    result?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
+                    'gpt-3.5-turbo-1106';
+                setAiModels(aimodeRef.current);
+            }
             detailRef.current = result;
             setDetailData(detailRef.current);
         };
@@ -469,7 +441,7 @@ function Deatail() {
                 >
                     {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton> */}
-                {appModels.aiModel && (
+                {detailData?.workflowConfig?.steps?.length === 1 && (
                     <div className="flex items-center">
                         <Popover
                             title="模型介绍"
@@ -500,7 +472,7 @@ function Deatail() {
                                 setAiModels(value);
                             }}
                         >
-                            {appModels.aiModel.map((item: any) => (
+                            {appModels?.aiModel?.map((item: any) => (
                                 <Option key={item.value} value={item.value}>
                                     {item.label}
                                 </Option>

@@ -92,7 +92,6 @@ const VariableModal = ({
     };
     useEffect(() => {
         if (title === '编辑变量') {
-            console.log(itemData);
             setContent(itemData);
             setOptions(itemData.options);
         }
@@ -224,7 +223,7 @@ const VariableModal = ({
                 )}
             </DialogContent>
             <DialogActions>
-                <Button color="secondary" onClick={handleSave}>
+                <Button disabled={itemData?.group === 'SYSTEM'} color="secondary" onClick={handleSave}>
                     {t('myApp.confirm')}
                 </Button>
             </DialogActions>

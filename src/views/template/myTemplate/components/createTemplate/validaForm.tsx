@@ -297,24 +297,18 @@ const Valida = ({
                                                     >
                                                         <SettingsIcon />
                                                     </IconButton>
-                                                    {row?.group !== 'SYSTEM' ? (
-                                                        <>
-                                                            <Popconfirm
-                                                                title={t('myApp.del')}
-                                                                description={t('myApp.delDesc')}
-                                                                onConfirm={() => delModal(i, index)}
-                                                                onCancel={() => {}}
-                                                                okText={t('myApp.confirm')}
-                                                                cancelText={t('myApp.cancel')}
-                                                            >
-                                                                <IconButton color="error">
-                                                                    <DeleteIcon />
-                                                                </IconButton>
-                                                            </Popconfirm>
-                                                        </>
-                                                    ) : (
-                                                        '-'
-                                                    )}
+                                                    <Popconfirm
+                                                        title={t('myApp.del')}
+                                                        description={t('myApp.delDesc')}
+                                                        onConfirm={() => delModal(i, index)}
+                                                        onCancel={() => {}}
+                                                        okText={t('myApp.confirm')}
+                                                        cancelText={t('myApp.cancel')}
+                                                    >
+                                                        <IconButton color="error">
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                    </Popconfirm>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

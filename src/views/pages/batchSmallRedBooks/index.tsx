@@ -188,7 +188,11 @@ const BatcSmallRedBooks = () => {
             );
             return false;
         }
-        if (schemesList && schemesList?.length > 0 && schemesList?.some((item) => !item.value)) {
+        if (
+            schemeRef.current &&
+            schemeRef.current?.length > 0 &&
+            schemeRef.current?.some((item: any) => !item.value && !item.defaultValue)
+        ) {
             dispatch(
                 openSnackbar({
                     open: true,
@@ -204,6 +208,14 @@ const BatcSmallRedBooks = () => {
             );
             return false;
         }
+        const newList = _.cloneDeep(schemeRef.current);
+        newList.forEach((item: any) => {
+            if (item.defaultValue && !item.value) {
+                item.value = item.defaultValue;
+            }
+        });
+        schemeRef.current = newList;
+        setSchemeList(schemeRef.current);
         const newData = _.cloneDeep(detailData);
         newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUid = targetKeys;
@@ -224,7 +236,7 @@ const BatcSmallRedBooks = () => {
                         total: undefined,
                         randomType: undefined,
                         imageStyleList: undefined,
-                        variableList: schemesList
+                        variableList: schemeRef.current
                     },
                     type: 'XHS',
 
@@ -273,7 +285,7 @@ const BatcSmallRedBooks = () => {
                         total: undefined,
                         randomType: undefined,
                         imageStyleList: undefined,
-                        variableList: schemesList
+                        variableList: schemeRef.current
                     },
                     type: 'XHS'
                 });
@@ -488,7 +500,7 @@ const BatcSmallRedBooks = () => {
                                     </div>
                                     {schemesList?.map((item, de) => (
                                         <Form
-                                            key={item?.field}
+                                            key={item?.field + item?.value}
                                             item={item}
                                             index={de}
                                             changeValue={(data: any) => {

@@ -16,7 +16,7 @@ interface Tabs {
 }
 const CreateTab = ({ mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
     return (
-        <div>
+        <div className="h-[800px] overflow-y-auto overflow-x-hidden">
             <div className="flex items-center gap-4 min-h-[32px]">
                 <span>海报生成模式</span>
                 <Switch

@@ -25,8 +25,6 @@ interface Variable {
 }
 
 const CreateVariable = ({ rows, setRows }: Variable) => {
-    console.log(rows);
-
     const [title, setTitle] = useState('');
     const [variableOpen, setVariableOpen] = useState(false);
     const [varIndex, setVarIndex] = useState(-1);
@@ -114,7 +112,7 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                                                 okText={t('myApp.confirm')}
                                                 cancelText={t('myApp.cancel')}
                                             >
-                                                <IconButton color="error">
+                                                <IconButton disabled={row.group === 'SYSTEM'} color="error">
                                                     <Delete />
                                                 </IconButton>
                                             </Popconfirm>

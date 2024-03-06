@@ -231,7 +231,7 @@ const plansDefault = (value: number) => [
         active: false,
         icon: <DirectionsBoatTwoToneIcon fontSize="large" />,
         title: '企业版',
-        description: '拥有企业个性化的AI模型和系统',
+        description: '拥有企业个性化的AI模型和矩阵系统',
         price: '专属顾问',
         monthPrice: '专属顾问',
         yearPrice: '专属顾问',
@@ -300,12 +300,10 @@ const planListDefault = (value: number) => [
     {
         keyword: 'business',
         value: [
-            '模型定制，打造符合企业特定需求（如文风、规则）的AI生成系统', // 0
-            '企业可以用API方式接入MoFaAI能力，将AI嵌入现有系统', // 1
-            '私有的企业知识库存储空间', // 2
-            '按需提供企业所需的数据接入和发布方式', // 3
-            '定制化的联网查询/企业数据查询', // 4
-            '个性化域名' // 6
+            '创作方案定制，打造符合企业特定需求（如文风、规则）的矩阵系统', // 0
+            '企业可以用API方式接入，将AI嵌入现有系统', // 1
+            '按需提供企业所需的数据接入和发布方式', // 2
+            '更多定制化能力' // 3
         ]
     }
 ];

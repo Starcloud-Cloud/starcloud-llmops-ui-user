@@ -177,7 +177,7 @@ const plansDefault = (value: number) => [
         monthPrice: '免费',
         yearPrice: '免费',
         des: '适用于新用户体验',
-        permission: [0, 1, 3, 4, 5, 6],
+        permission: [0, 1, 2, 5, 6],
         btnText: '免费使用'
     },
     {
@@ -189,7 +189,7 @@ const plansDefault = (value: number) => [
         monthPrice: 59,
         yearPrice: 599,
         preMonthPrice: 49.91,
-        des: '适用于普通用户',
+        des: '适用于普通博主',
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         btnText: <div>立即购买</div>,
         btnTextNew: true,
@@ -205,7 +205,7 @@ const plansDefault = (value: number) => [
         monthPrice: 199,
         yearPrice: 1999,
         preMonthPrice: 166.58,
-        des: '适用于专业卖家',
+        des: '适用于专业博主',
         permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         btnText: '立即购买',
         monthCode: 'plus_month',
@@ -244,57 +244,85 @@ const planListDefault = (value: number) => [
     {
         keyword: 'free',
         value: [
-            '账号管理数量：3个', // 0
+            <div className="flex items-center">
+                <span>矩阵豆：10</span>
+                <Tooltip title={'用来AI创作图文笔记'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            'AI创作一次生成数量：3',
+            '账号管理数量：3', // 0
             '账号分组数量：0', // 1
-            '账号云同步：无', // 2
-            '一键检查账号状态：有', // 3
+            '账号云同步', // 2
+            '一键检查账号状态', // 3
             '一键发布次数/天：6次/天',
             '每次发布账号数上限：3', // 4
-            '定时发布：有', // 4
-            '数据中心（数据聚合）：无', // 4
-            '评论管理：无' // 4
+            '定时发布', // 4
+            '数据中心（数据聚合）', // 4
+            '评论管理' // 4
         ]
     },
     {
         keyword: 'basic',
         value: [
+            <div className="flex items-center">
+                <span>矩阵豆：{value === 1 ? 300 : 3600}</span>
+                <Tooltip title={'用来AI创作图文笔记'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            'AI创作一次裂变数量：8',
             '账号管理数量：10',
             '账号分组数量：3',
-            '账号云同步：有',
-            '一键检查账号状态：有',
+            '账号云同步',
+            '一键检查账号状态',
             '一键发布次数/天：20次/天',
             '每次发布账号数上限：10',
-            '定时发布：有',
-            '数据中心（数据聚合）：有',
-            '评论管理：有'
+            '定时发布',
+            '数据中心（数据聚合）',
+            '评论管理'
         ]
     },
     {
         keyword: 'plus',
         value: [
+            <div className="flex items-center">
+                <span>矩阵豆：{value === 1 ? 1000 : 12000}</span>
+                <Tooltip title={'用来AI创作图文笔记'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            'AI创作一次裂变数量：16',
             '账号管理数量：30',
             '账号分组数量：10',
-            '账号云同步：有',
-            '一键检查账号状态：有',
+            '账号云同步',
+            '一键检查账号状态',
             '一键发布次数/天：不限',
             '每次发布账号数上限：30',
-            '定时发布：有',
-            '数据中心（数据聚合）：有',
-            '评论管理：有'
+            '定时发布',
+            '数据中心（数据聚合）',
+            '评论管理'
         ]
     },
     {
         keyword: 'pro',
         value: [
+            <div className="flex items-center">
+                <span>矩阵豆：{value === 1 ? 2500 : 30000}</span>
+                <Tooltip title={'用来AI创作图文笔记'}>
+                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+                </Tooltip>
+            </div>,
+            'AI创作一次裂变数量：32',
             '账号管理数量：80',
             '账号分组数量：30',
-            '账号云同步：有',
-            '一键检查账号状态：有',
+            '账号云同步',
+            '一键检查账号状态',
             '一键发布次数/天：不限',
             '每次发布账号数上限：50',
-            '定时发布：有',
-            '数据中心（数据聚合）：有',
-            '评论管理：有'
+            '定时发布',
+            '数据中心（数据聚合）',
+            '评论管理'
         ]
     },
     {
@@ -437,6 +465,7 @@ const Price1 = () => {
                                         marketPrice: sku.marketPrice / 100,
                                         unitName: item.unitName,
                                         isSubscribe: sku.subscribeConfig?.isSubscribe,
+                                        subscribeMoney: sku.subscribeConfig?.price / 100,
                                         skus: item.skus.filter((item: any) => item.properties[0].remark === 'MONTH')
                                     });
                                 }
@@ -461,6 +490,7 @@ const Price1 = () => {
                                         marketPrice: sku.marketPrice / 100,
                                         unitName: item.unitName,
                                         isSubscribe: sku.subscribeConfig?.isSubscribe,
+                                        subscribeMoney: sku.subscribeConfig?.price / 100,
                                         skus: item.skus.filter((item: any) => item.properties[0].remark === 'YEAR')
                                     });
                                 }
@@ -721,7 +751,7 @@ const Price1 = () => {
                             加油包购买
                         </span> */}
                     </div>
-                    <Grid container spacing={gridSpacing} columns={20} className="flex justify-center min-h-[1000px]">
+                    <Grid container spacing={gridSpacing} columns={20} className="flex justify-center">
                         {plans.map((plan, index) => {
                             const darkBorder =
                                 theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
@@ -822,6 +852,7 @@ const Price1 = () => {
                                                                 select: value,
                                                                 payId: plan.id,
                                                                 isSubscribe: plan?.isSubscribe,
+                                                                subscribeMoney: plan?.subscribeMoney,
                                                                 skus: plan.skus
                                                             });
                                                             handleClick(index, plan.id);
@@ -833,7 +864,7 @@ const Price1 = () => {
                                                             {plan?.isSubscribe && (
                                                                 <div>
                                                                     <Tag className="ml-1" color="#f50">
-                                                                        订阅优惠10元
+                                                                        订阅优惠{plan.payPrice - plan.subscribeMoney}元
                                                                     </Tag>
                                                                 </div>
                                                             )}

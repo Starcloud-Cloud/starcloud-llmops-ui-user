@@ -182,8 +182,8 @@ const RedBookTaskList: React.FC = () => {
             planPage({
                 ...pageVO,
                 ...query,
-                startTime: query.createTime ? query.createTime[0]?.valueOf() : undefined,
-                endTime: query.createTime ? query.createTime[1]?.valueOf() : undefined,
+                startTime: query.createTime ? dayjs(query.createTime[0]).format('YYYY-MM-DD') + ' 00:00:00' : undefined,
+                endTime: query.createTime ? dayjs(query.createTime[1]).format('YYYY-MM-DD') + ' 23:59:59' : undefined,
                 createTime: undefined
             }).then((res) => {
                 const fetchedRows = res.list;
@@ -328,17 +328,7 @@ const RedBookTaskList: React.FC = () => {
                                     pageVO.sortField = orderBy;
                                     pageVO.asc = order === 'asc';
                                 }
-                                planPage({ ...pageVO })
-                                    .then((res) => {
-                                        setLoading(false);
-                                        const fetchedRows = res.list;
-                                        setRows([...fetchedRows]);
-                                        setTotal(res?.page?.total);
-                                    })
-                                    .catch((error) => {
-                                        setLoading(false);
-                                        console.error(error);
-                                    });
+                                forceUpdate();
                             }}
                             variant="contained"
                         >

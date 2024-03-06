@@ -15,27 +15,29 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                         size="small"
                         sx={mt}
                         label={item.label}
-                        value={item.value}
+                        defaultValue={item.value}
+                        placeholder={item.defaultValue}
                         id={item.field}
                         required
                         name={item.field}
                         InputLabelProps={{ shrink: true }}
-                        error={!item.value && open && !flag}
-                        helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
-                        onChange={(e) => {
+                        error={!item.value && !item.defaultValue && open && !flag}
+                        helperText={!item.value && !item.defaultValue && open && !flag ? `${item.label}是必填项` : ''}
+                        onBlur={(e) => {
                             setOpen(true);
                             changeValue({ index, value: e.target.value });
                         }}
                         fullWidth
                     />
                 </>
-            ) : item.style === 'TEXTAREA' ? (
+            ) : item.style === 'TEXTAREA' || item.style === 'MATERIAL' ? (
                 <TextField
                     color="secondary"
                     size="small"
                     sx={mt}
                     label={item.label}
-                    value={item.value}
+                    defaultValue={item.value}
+                    placeholder={item.defaultValue}
                     id={item.field}
                     required
                     name={item.field}
@@ -43,9 +45,9 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     minRows={3}
                     maxRows={3}
                     InputLabelProps={{ shrink: true }}
-                    error={!item.value && open && !flag}
-                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
-                    onChange={(e) => {
+                    error={!item.value && !item.defaultValue && open && !flag}
+                    helperText={!item.value && !item.defaultValue && open && !flag ? `${item.label}是必填项` : ''}
+                    onBlur={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });
                     }}
@@ -57,14 +59,15 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     size="small"
                     color="secondary"
                     value={item.value}
+                    placeholder={item.defaultValue}
                     InputLabelProps={{ shrink: true }}
                     select
                     required
                     id={item.field}
                     name={item.field}
                     label={item.label}
-                    error={!item.value && open && !flag}
-                    helperText={!item.value && open && !flag ? `${item.label}是必填项` : ''}
+                    error={!item.value && !item.defaultValue && open && !flag}
+                    helperText={!item.value && !item.defaultValue && open && !flag ? `${item.label}是必填项` : ''}
                     onChange={(e) => {
                         setOpen(true);
                         changeValue({ index, value: e.target.value });

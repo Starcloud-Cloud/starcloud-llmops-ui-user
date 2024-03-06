@@ -88,6 +88,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
             defaultValue: '',
             description: '',
             style: 'INPUT',
+            group: 'PARAMS',
             isShow: true
         },
         validationSchema,
@@ -142,7 +143,8 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         { label: t('myApp.input'), value: 'INPUT' },
         { label: t('myApp.textarea'), value: 'TEXTAREA' },
         { label: t('myApp.json_textarea'), value: 'JSON' },
-        { label: t('myApp.select'), value: 'SELECT' }
+        { label: t('myApp.select'), value: 'SELECT' },
+        { label: t('myApp.material'), value: 'MATERIAL' }
     ];
     //关闭弹窗
     const handleClose = () => {
@@ -259,9 +261,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     }, []);
     useEffect(() => {
         setallvalidas(
-            config?.steps.map((item: any) => {
-                return item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value);
-            })
+            config?.steps.map((item: any) => item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value))
         );
     }, [expanded]);
 
@@ -497,28 +497,32 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                             </Box>
                         </Box>
                         {expanded[index] && <Divider />}
-                        <Box sx={{ display: expanded[index] ? 'block' : 'none' }}>
-                            <Valida
-                                key={item.field}
-                                variable={item.variable?.variables}
-                                variables={item.flowStep.variable?.variables}
-                                responent={item.flowStep.response}
-                                buttonLabel={item.buttonLabel}
-                                basisChange={basisChange}
-                                index={index}
-                                allvalida={allvalida[index]}
-                                fields={item.field}
-                                setModal={(i) => {
-                                    setModal(i);
-                                }}
-                                setOpen={setOpen}
-                                setTitle={setTitle}
-                                editChange={editChange}
-                                statusChange={statusChange}
-                                editModal={editModal}
-                                delModal={delModal}
-                            />
-                        </Box>
+                        {expanded[index] && (
+                            <Box
+                            // sx={{ display: expanded[index] ? 'block' : 'none' }}
+                            >
+                                <Valida
+                                    key={item.field}
+                                    variable={item.variable?.variables}
+                                    variables={item.flowStep.variable?.variables}
+                                    responent={item.flowStep.response}
+                                    buttonLabel={item.buttonLabel}
+                                    basisChange={basisChange}
+                                    index={index}
+                                    allvalida={allvalida[index]}
+                                    fields={item.field}
+                                    setModal={(i) => {
+                                        setModal(i);
+                                    }}
+                                    setOpen={setOpen}
+                                    setTitle={setTitle}
+                                    editChange={editChange}
+                                    statusChange={statusChange}
+                                    editModal={editModal}
+                                    delModal={delModal}
+                                />
+                            </Box>
+                        )}
                     </SubCard>
                     <Box textAlign="center" fontSize="25px" fontWeight={600} mt={1}>
                         |
@@ -628,7 +632,16 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                             InputLabelProps={{ shrink: true }}
                             helperText={' '}
                         />
-                        <FormControl fullWidth sx={{ mt: 2 }}>
+                        {detail?.type === 'MEDIA_MATRIX' && (
+                            <FormControl fullWidth sx={{ mt: 2 }}>
+                                <InputLabel>变量分组</InputLabel>
+                                <Select onChange={formik.handleChange} name="group" value={formik.values.group} label="变量分组">
+                                    <MenuItem value={'SYSTEM'}>系统变量</MenuItem>
+                                    <MenuItem value={'PARAMS'}>通用变量</MenuItem>
+                                </Select>
+                            </FormControl>
+                        )}
+                        <FormControl fullWidth sx={{ mt: detail?.type === 'MEDIA_MATRIX' ? 4 : 2 }}>
                             <InputLabel>{t('myApp.type')}</InputLabel>
                             <Select onChange={formik.handleChange} name="style" value={formik.values.style} label={t('myApp.type')}>
                                 {typeList.map((el: any) => (
@@ -677,7 +690,6 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        disabled={row?.group === 'SYSTEM'}
                         autoFocus
                         onClick={() => {
                             formik.handleSubmit();

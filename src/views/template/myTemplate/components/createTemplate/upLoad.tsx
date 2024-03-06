@@ -168,11 +168,12 @@ function Upload({
             title: '微信群聊',
             icon: 'qiyeweixin',
             desc: '在微信群聊中提供机器人服务',
-            // enable: true,
+            enable: false,
             chat: true,
             enableValue: false,
-            comingSoon: false,
-            type: 5,
+            comingSoon: true,
+            type: 2,
+            // type: 5,
             action: [
                 {
                     title: '创建群聊',
@@ -1048,7 +1049,8 @@ function Upload({
                         </Grid>
                     )}
                     {upLoadList.map((item) =>
-                        item.title === '微信群聊' || item.title === '微信公众号' ? (
+                        // item.title === '微信群聊' ||
+                        item.title === '微信公众号' ? (
                             mode === 'CHAT' && (
                                 <Grid key={item.title} flex={1} item md={6} xs={12}>
                                     <SubCard

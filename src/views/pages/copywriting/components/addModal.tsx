@@ -34,6 +34,7 @@ import CreateVariables from './spliceCmponents/variables';
 import CreateTab from './spliceCmponents/tab';
 import Goods from '../../batchSmallRedBooks/good';
 import { getContentPage } from 'api/redBook';
+import SelectApp from './selectApp';
 import Form from '../../smallRedBook/components/form';
 const AddModal = () => {
     const { TextArea } = Input;
@@ -342,10 +343,11 @@ const AddModal = () => {
     const [modeList, setModeList] = useState<any[]>([]);
     useEffect(() => {
         appList().then((res) => {
-            setSplitList(res);
-            if (!searchParams.get('uid')) {
-                setSplitValue(res[0]?.appUid);
-            }
+            setAppLIst(res);
+            // setSplitList(res);
+            // if (!searchParams.get('uid')) {
+            //     setSplitValue(res[0]?.appUid);
+            // }
         });
     }, []);
     const [changeFalg, setChangeFalg] = useState(false);
@@ -439,7 +441,12 @@ const AddModal = () => {
     }, [queryPage.pageNo]);
 
     const [current, setCurrent] = useState(0);
-    const [variableLists, setvariableLists] = useState<any[]>([]);
+    //选择应用
+    const [appOpen, setAppOpen] = useState(false);
+    const [AppList, setAppLIst] = useState<any[]>([]);
+    const handleOk = (data: any) => {
+        console.log(data);
+    };
     return (
         <MainCard content={false}>
             <CardContent>
@@ -603,6 +610,15 @@ const AddModal = () => {
                 />
                 <Divider />
                 <div className="text-[18px] font-[600]">创作方式</div>
+                <div className="my-[20px]">
+                    <TextField
+                        fullWidth
+                        color="secondary"
+                        InputLabelProps={{ shrink: true }}
+                        value={params.name}
+                        onClick={() => setAppOpen(true)}
+                    />
+                </div>
                 <div className="my-[20px] flex gap-2 flex-wrap">
                     {splitList?.map((item) => (
                         <SubCard
@@ -1043,6 +1059,7 @@ const AddModal = () => {
                         下一步
                     </Button>
                 </div>
+                {appOpen && <SelectApp open={appOpen} imageTypeList={AppList} handleClose={() => setAppOpen(false)} handleOk={handleOk} />}
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">

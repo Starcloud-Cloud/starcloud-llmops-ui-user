@@ -102,7 +102,7 @@ const BatcSmallRedBooks = () => {
 
     //批次分页
     const [batchTotal, setBathTotal] = useState(0);
-    const [batchPage, setBatchPage] = useState({ page: 1, pageSize: 10 });
+    const [batchPage, setBatchPage] = useState({ page: 1, pageSize: 100 });
     const [batchUid, setBatchUid] = useState('');
     const [bathList, setBathList] = useState<any[]>([]);
     const [batchOpen, setbatchOpen] = useState(false);

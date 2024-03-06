@@ -12,6 +12,7 @@ import { DetailModal } from '../../redBookContentList/component/detailModal';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import GradeIcon from '@mui/icons-material/Grade';
 import { batchPages } from 'api/redBook/batchIndex';
+import dayjs from 'dayjs';
 
 const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (data: boolean) => void }) => {
     const location = useLocation();
@@ -156,7 +157,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         <Select labelId="batch" value={batch} label="创作批次" onChange={(e: any) => setBatch(e.target.value)}>
                             {batchList?.map((item: any) => (
                                 <MenuItem key={item.batch} value={item.batch}>
-                                    {item.batch}（{item.totalCount}）
+                                    {dayjs(item.startTime).format('YYYY-MM-DD hh:mm:ss')}（{item.totalCount}）
                                 </MenuItem>
                             ))}
                         </Select>

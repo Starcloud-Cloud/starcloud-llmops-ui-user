@@ -70,7 +70,7 @@ function FormExecute({ item, onChange }: any) {
                     }}
                     fullWidth
                 />
-            ) : item.style === 'TEXTAREA' || item.style === 'MATERIAL' ? (
+            ) : item.style === 'TEXTAREA' || item.style === 'MATERIAL' || item.style === 'JSON' ? (
                 <TextField
                     sx={mt}
                     size="small"

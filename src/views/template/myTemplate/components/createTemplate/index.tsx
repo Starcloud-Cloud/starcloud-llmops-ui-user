@@ -503,8 +503,21 @@ function CreateDetail() {
                             </MenuItem>
                             <MenuItem
                                 onClick={() => {
-                                    copy(searchParams.get('uid') as string).then((res) => {
+                                    copy({ uid: searchParams.get('uid') }).then((res) => {
                                         if (res) {
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '复制成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                    transition: 'SlideDown',
+                                                    close: false
+                                                })
+                                            );
                                             setDelAnchorEl(null);
                                             navigate('/my-app');
                                         }

@@ -55,8 +55,8 @@ export const del = (uid: string) => {
     return request.delete({ url: `/llm/app/delete/${uid}` });
 };
 //复制应用
-export const copy = (uid: string) => {
-    return request.post({ url: `/llm/app/copy/${uid}` });
+export const copy = (data: any) => {
+    return request.post({ url: `/llm/app/copy`, data });
 };
 //应用类型
 export const metadata = () => {

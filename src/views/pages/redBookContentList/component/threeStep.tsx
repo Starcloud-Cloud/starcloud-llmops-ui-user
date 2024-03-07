@@ -16,7 +16,7 @@ import { Tooltip } from '@mui/material';
 import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
 
-export const ThreeStep = ({ data }: { data: any }) => {
+export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     // const [images, setImages] = React.useState<any[]>([]);
@@ -145,19 +145,21 @@ export const ThreeStep = ({ data }: { data: any }) => {
                     overflow: 'hidden'
                 }}
                 extra={
-                    <>
-                        <Button onClick={doRetry}>重新生成</Button>
-                        <Divider type="vertical" />
-                        {!editType ? (
-                            <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
-                                编辑
-                            </Button>
-                        ) : (
-                            <Button type="primary" onClick={handleModify}>
-                                保存
-                            </Button>
-                        )}
-                    </>
+                    !show && (
+                        <>
+                            <Button onClick={doRetry}>重新生成</Button>
+                            <Divider type="vertical" />
+                            {!editType ? (
+                                <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
+                                    编辑
+                                </Button>
+                            ) : (
+                                <Button type="primary" onClick={handleModify}>
+                                    保存
+                                </Button>
+                            )}
+                        </>
+                    )
                 }
             >
                 <div className="w-full grid grid-cols-3 h-full">

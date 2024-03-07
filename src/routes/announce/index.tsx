@@ -25,7 +25,7 @@ const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookConten
 export default function ThemeRoutes() {
     MainRoutes.children = [...MainRoutes.children, ...useRouteStore((state) => state.addRouters)];
     return useRoutes([
-        { path: '/', element: <PagesLanding /> },
+        // { path: '/', element: <PagesLanding /> },
         // { path: '/subscribe', element: <PagesPrice /> },
         // { path: '/web-view/orderRecord', element: <OrderRecord /> },
         // { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },

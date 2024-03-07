@@ -10,7 +10,7 @@ export const getTenant = () => {
     } else if (hostname === 'cn-test.juzhen.hotsalestar.com' || hostname === 'juzhen.mofaai.com.cn') {
         return ENUM_TENANT.ANNOUNCE;
     } else {
-        return ENUM_TENANT.AI;
+        return ENUM_TENANT.ANNOUNCE;
     }
 };
 

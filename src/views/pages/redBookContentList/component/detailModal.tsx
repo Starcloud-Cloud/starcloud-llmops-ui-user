@@ -26,9 +26,10 @@ type IAddAiModalProps = {
     open: boolean;
     handleClose: () => void;
     businessUid: string;
+    show?: boolean;
 };
 
-export const DetailModal = ({ open, handleClose, businessUid }: IAddAiModalProps) => {
+export const DetailModal = ({ open, handleClose, businessUid, show }: IAddAiModalProps) => {
     const [detail, setDetail] = useState(null);
 
     useEffect(() => {
@@ -63,7 +64,7 @@ export const DetailModal = ({ open, handleClose, businessUid }: IAddAiModalProps
                         p: 2
                     }}
                 >
-                    <ThreeStep data={detail} />
+                    <ThreeStep data={detail} show={show} />
                 </CardContent>
             </MainCard>
         </Modal>

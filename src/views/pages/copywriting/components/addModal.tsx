@@ -21,7 +21,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { UploadProps, Upload, Button, Divider, Image, TreeSelect, Input, Modal, Collapse, Steps } from 'antd';
 import { PlusOutlined, HomeOutlined, ContainerOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
-import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeExample, appList } from 'api/redBook/copywriting';
+import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeExample, appList, getExample } from 'api/redBook/copywriting';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
@@ -35,6 +35,7 @@ import CreateTab from './spliceCmponents/tab';
 import Goods from '../../batchSmallRedBooks/good';
 import { getContentPage } from 'api/redBook';
 import SelectApp from './selectApp';
+import { DetailModal } from '../../redBookContentList/component/detailModal';
 import Form from '../../smallRedBook/components/form';
 const AddModal = () => {
     const { TextArea } = Input;
@@ -75,14 +76,11 @@ const AddModal = () => {
             setModeList(res.generateMode);
         });
     }, []);
-    const [oneLoading, setOneLoading] = useState(false);
     const valueListRef: any = useRef(null);
     useEffect(() => {
         if (searchParams.get('uid')) {
-            setChangeFalg(true);
             schemeGet(searchParams.get('uid')).then((res) => {
                 if (res) {
-                    setOneLoading(true);
                     setParams({
                         name: res.name,
                         category: res.category,
@@ -91,18 +89,16 @@ const AddModal = () => {
                         description: res.description,
                         mode: res.mode
                     });
-                    setSplitValue(res.configuration?.appUid);
                     valueListRef.current = res.configuration?.steps;
                     setValueList(valueListRef.current);
+                    appDataRef.current = res.configuration;
+                    setAppData(appDataRef.current);
                 }
             });
         } else {
-            setOneLoading(true);
             setTableData(tableList);
         }
     }, []);
-    const [rows, setRows] = useState<any[]>([]);
-    const [summaryOpen, setSummaryOpen] = useState(false);
     const [pre, setPre] = useState(1);
 
     //测试
@@ -170,9 +166,7 @@ const AddModal = () => {
         if (!params.name) {
             setTitleOpen(true);
             setCategoryOpen(true);
-            setTagOpen(true);
             setPre(pre + 1);
-            setSummaryOpen(true);
             dispatch(
                 openSnackbar({
                     open: true,
@@ -191,34 +185,11 @@ const AddModal = () => {
         if (!params.category) {
             setTitleOpen(true);
             setCategoryOpen(true);
-            setTagOpen(true);
             setPre(pre + 1);
-            setSummaryOpen(true);
             dispatch(
                 openSnackbar({
                     open: true,
                     message: '类目必选',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (!params.tags || params.tags?.length === 0) {
-            setTitleOpen(true);
-            setCategoryOpen(true);
-            setTagOpen(true);
-            setPre(pre + 1);
-            setSummaryOpen(true);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '标签最少输入一个',
                     variant: 'alert',
                     alert: {
                         color: 'error'
@@ -252,7 +223,7 @@ const AddModal = () => {
                 ...params,
                 type: params.type ? 'SYSTEM' : 'USER',
                 configuration: {
-                    ...splitList.filter((item) => item.appUid === splitValue)[0],
+                    ...appData,
                     steps: valueList?.map((item) => {
                         if (item?.model === 'RANDOM') {
                             return {
@@ -294,7 +265,7 @@ const AddModal = () => {
             ...params,
             type: params.type ? 'SYSTEM' : 'USER',
             configuration: {
-                ...splitList.filter((item) => item.appUid === splitValue)[0],
+                ...appData,
                 steps: valueList?.map((item) => {
                     if (item?.model === 'RANDOM') {
                         return {
@@ -333,9 +304,6 @@ const AddModal = () => {
         });
     };
 
-    //自定义内容拼接
-    const [splitValue, setSplitValue] = useState<any>(null);
-    const [splitList, setSplitList] = useState<any[]>([]);
     //选中应用之后需要循环的数据
     const [valueList, setValueList] = useState<any[]>([]);
 
@@ -344,24 +312,8 @@ const AddModal = () => {
     useEffect(() => {
         appList().then((res) => {
             setAppLIst(res);
-            // setSplitList(res);
-            // if (!searchParams.get('uid')) {
-            //     setSplitValue(res[0]?.appUid);
-            // }
         });
     }, []);
-    const [changeFalg, setChangeFalg] = useState(false);
-    useEffect(() => {
-        if (splitValue) {
-            if (!changeFalg) {
-                valueListRef.current = splitList.filter((item) => item.appUid === splitValue)[0]?.steps;
-                setValueList(splitList.filter((item) => item.appUid === splitValue)[0]?.steps);
-            }
-        } else {
-            valueListRef.current = [];
-            setValueList([]);
-        }
-    }, [splitValue]);
     const setValues = (key: string, data: any, index: number) => {
         const newData = _.cloneDeep(valueListRef.current);
         newData[index] = {
@@ -444,9 +396,28 @@ const AddModal = () => {
     //选择应用
     const [appOpen, setAppOpen] = useState(false);
     const [AppList, setAppLIst] = useState<any[]>([]);
+    //选中的值
+    const [appData, setAppData] = useState<any>(null);
+    const appDataRef = useRef<any>(null);
     const handleOk = (data: any) => {
-        console.log(data);
+        appDataRef.current = data;
+        setAppData(appDataRef.current);
+        setAppOpen(false);
+        setCurrent(0);
+        valueListRef.current = data?.steps;
+        setValueList(valueListRef.current);
     };
+    const [goodList, setGoodList] = useState<any[]>([]);
+    useEffect(() => {
+        if (appData?.example) {
+            const newList = appData?.example?.split(', ');
+            getExample(newList).then((res) => {
+                setGoodList(res);
+            });
+        }
+    }, [appData?.example]);
+    const [businessUid, setBusinessUid] = useState('');
+    const [detailOpen, setDetailOpen] = useState(false);
     return (
         <MainCard content={false}>
             <CardContent>
@@ -524,13 +495,7 @@ const AddModal = () => {
                         </div>
                     </Grid>
                     <Grid item md={12} sm={12}>
-                        <FormControl
-                            key={params.tags}
-                            error={(!params.tags || params.tags.length === 0) && tagOpen}
-                            color="secondary"
-                            size="small"
-                            fullWidth
-                        >
+                        <FormControl key={params.tags} color="secondary" size="small" fullWidth>
                             <Autocomplete
                                 sx={{ mt: 2 }}
                                 multiple
@@ -566,7 +531,6 @@ const AddModal = () => {
                                                 });
                                             }
                                         }}
-                                        error={(!params.tags || params.tags.length === 0) && tagOpen}
                                         color="secondary"
                                         {...param}
                                         label="标签"
@@ -574,9 +538,6 @@ const AddModal = () => {
                                     />
                                 )}
                             />
-                            <FormHelperText>
-                                {(!params.tags || params.tags.length === 0) && tagOpen ? '标签最少输入一个' : ''}
-                            </FormHelperText>
                         </FormControl>
                     </Grid>
                     {permissions.includes('creative:scheme:publish') && (
@@ -610,44 +571,20 @@ const AddModal = () => {
                 />
                 <Divider />
                 <div className="text-[18px] font-[600]">创作方式</div>
-                <div className="my-[20px]">
-                    <TextField
-                        fullWidth
-                        color="secondary"
-                        InputLabelProps={{ shrink: true }}
-                        value={params.name}
-                        onClick={() => setAppOpen(true)}
-                    />
-                </div>
-                <div className="my-[20px] flex gap-2 flex-wrap">
-                    {splitList?.map((item) => (
-                        <SubCard
-                            key={item?.appUid}
-                            sx={{
-                                mb: 1,
-                                cursor: searchParams.get('uid') ? 'not-allowed' : 'pointer',
-                                borderColor: splitValue === item.appUid ? '#673ab7' : 'rgba(230,230,231,1)'
-                            }}
-                            contentSX={{ p: '10px !important', width: '200px' }}
-                        >
-                            <Box
-                                onClick={() => {
-                                    if (!searchParams.get('uid')) {
-                                        setCurrent(0);
-                                        setSplitValue(item.appUid);
-                                    }
-                                }}
-                            >
-                                <Typography variant="h4" mb={1}>
-                                    {item.appName}
-                                </Typography>
-                                <Typography height="48px" className="line-clamp-3" color="#697586" fontSize="12px">
-                                    {item?.description}
-                                </Typography>
-                            </Box>
-                        </SubCard>
-                    ))}
-                </div>
+                <TextField
+                    className="my-[20px]"
+                    label="创作方式"
+                    size="small"
+                    color="secondary"
+                    InputLabelProps={{ shrink: true }}
+                    value={appData?.appName}
+                    disabled={searchParams.get('uid') ? true : false}
+                    onClick={() => {
+                        if (!searchParams.get('uid')) {
+                            setAppOpen(true);
+                        }
+                    }}
+                />
                 <div className="p-4 border border-solid border-black/30 rounded-lg mb-[20px]">
                     <Steps
                         current={current}
@@ -667,14 +604,30 @@ const AddModal = () => {
                 </div>
                 <div className="min-h-[500px]">
                     {current === 0 && (
-                        <div className="flex justify-space-between items-center">
+                        <div className="flex justify-between gap-10 flex-1">
                             <div className="w-[400px]">
-                                <div className="text-lg font-bold">{splitList?.find((item) => item.appUid === splitValue)?.appName}</div>
-                                <div className="text-xs mt-[10px]">
-                                    {splitList?.find((item) => item.appUid === splitValue)?.description}
-                                </div>
+                                <div className="text-lg font-bold">{appData?.appName}</div>
+                                <div className="text-xs mt-[10px]">{appData?.description}</div>
                             </div>
-                            <div>{/* <Goods /> */}</div>
+                            <div className="w-[60%]">
+                                {goodList?.length > 0 && (
+                                    <>
+                                        <div className="text-[20px] font-bold mb-[10px]">生成示例</div>
+                                        <Row gutter={16}>
+                                            {goodList?.map((item) => (
+                                                <Col span={8} key={item?.businessUid}>
+                                                    <Goods
+                                                        item={item}
+                                                        setBusinessUid={setBusinessUid}
+                                                        setDetailOpen={setDetailOpen}
+                                                        show={true}
+                                                    />
+                                                </Col>
+                                            ))}
+                                        </Row>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     )}
                     {current === 1 && (
@@ -964,7 +917,7 @@ const AddModal = () => {
                                                 ...params,
                                                 type: params.type ? 'SYSTEM' : 'USER',
                                                 configuration: {
-                                                    ...splitList.filter((item) => item.appUid === splitValue)[0],
+                                                    ...appData,
                                                     steps: valueList?.map((item) => {
                                                         if (item?.model === 'RANDOM') {
                                                             return {
@@ -1060,6 +1013,9 @@ const AddModal = () => {
                     </Button>
                 </div>
                 {appOpen && <SelectApp open={appOpen} imageTypeList={AppList} handleClose={() => setAppOpen(false)} handleOk={handleOk} />}
+                {detailOpen && (
+                    <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} show={true} />
+                )}
                 <Divider />
                 <CardActions>
                     <Grid container justifyContent="flex-end">

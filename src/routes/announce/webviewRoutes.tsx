@@ -13,6 +13,7 @@ const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList'
 const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/components/addModal')));
 const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
 const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
+const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -24,6 +25,7 @@ const WebviewRoutes = {
         </AuthGuard>
     ),
     children: [
+        { path: '/', element: <PagesLanding /> },
         { path: '/subscribe', element: <PagesPrice /> },
         { path: '/web-view/orderRecord', element: <OrderRecord /> },
         { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },

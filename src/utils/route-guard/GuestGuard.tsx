@@ -20,11 +20,7 @@ const GuestGuard = ({ children }: GuardProps) => {
 
     useEffect(() => {
         if (isLoggedIn) {
-            if (getPermission(ENUM_PERMISSION.APP_HOME)) {
-                navigate(DASHBOARD_PATH, { replace: true });
-            } else {
-                // navigate('/', { replace: true });
-            }
+            navigate(DASHBOARD_PATH, { replace: true });
         }
     }, [isLoggedIn, navigate]);
 

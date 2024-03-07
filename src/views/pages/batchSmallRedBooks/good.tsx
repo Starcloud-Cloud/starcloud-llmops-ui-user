@@ -10,7 +10,7 @@ import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { failureRetry } from 'api/redBook/batchIndex';
 import './index.scss';
-const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
+const Goods = ({ item, setBusinessUid, setDetailOpen, show }: any) => {
     const navigate = useNavigate();
     const [likeOpen, setLikeOpen] = useState(item?.liked);
     //执行按钮
@@ -156,55 +156,59 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                         }}
                     >
                         <div className="flex justify-between items-start">
-                            <div className="line-clamp-2 h-[40px] text-[14px] font-bold">{item.copyWritingTitle}</div>
-                            {likeOpen ? (
-                                <GradeIcon
-                                    onClick={async (e: any) => {
-                                        e.stopPropagation();
-                                        const result = await contentUnlike({ businessUid: item.businessUid });
-                                        if (result) {
-                                            setLikeOpen(false);
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '取消点赞成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                        }
-                                    }}
-                                    sx={{ color: '#ecc94b99' }}
-                                />
-                            ) : (
-                                <GradeOutlinedIcon
-                                    onClick={async (e: any) => {
-                                        e.stopPropagation();
-                                        const result = await contentLike({ businessUid: item.businessUid });
-                                        if (result) {
-                                            setLikeOpen(true);
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '点赞成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                        }
-                                    }}
-                                    sx={{ color: '#0003' }}
-                                />
+                            <div className="line-clamp-2 h-[35px] text-[14px] font-bold">{item.copyWritingTitle}</div>
+                            {!show && (
+                                <div>
+                                    {likeOpen ? (
+                                        <GradeIcon
+                                            onClick={async (e: any) => {
+                                                e.stopPropagation();
+                                                const result = await contentUnlike({ businessUid: item.businessUid });
+                                                if (result) {
+                                                    setLikeOpen(false);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '取消点赞成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideDown',
+                                                            close: false
+                                                        })
+                                                    );
+                                                }
+                                            }}
+                                            sx={{ color: '#ecc94b99' }}
+                                        />
+                                    ) : (
+                                        <GradeOutlinedIcon
+                                            onClick={async (e: any) => {
+                                                e.stopPropagation();
+                                                const result = await contentLike({ businessUid: item.businessUid });
+                                                if (result) {
+                                                    setLikeOpen(true);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '点赞成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideDown',
+                                                            close: false
+                                                        })
+                                                    );
+                                                }
+                                            }}
+                                            sx={{ color: '#0003' }}
+                                        />
+                                    )}
+                                </div>
                             )}
                         </div>
                         <Popover
@@ -221,26 +225,30 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                                 </div>
                             }
                         >
-                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[85px]">{item.copyWritingContent}</div>
+                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[77px]">{item.copyWritingContent}</div>
                         </Popover>
-                        <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
-                            <div>
-                                <span className="font-[600]">状态：</span>
-                                {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
-                            </div>
-                            <div>
-                                <span className="font-[600]">耗时：</span>
-                                {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
-                            </div>
-                            <div>
-                                <span className="font-[600]">张数/字数：</span>
-                                {item.pictureNum}
-                            </div>
-                        </div>
-                        <div className="text-[#15273799] text-[12px]">
-                            <span className="font-[600]">时间：</span>
-                            {formatDate(item.pictureStartTime)}-{formatDate(item.pictureEndTime)}
-                        </div>
+                        {!show && (
+                            <>
+                                <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                    <div>
+                                        <span className="font-[600]">状态：</span>
+                                        {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                    </div>
+                                    <div>
+                                        <span className="font-[600]">耗时：</span>
+                                        {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
+                                    </div>
+                                    <div>
+                                        <span className="font-[600]">张数/字数：</span>
+                                        {item.pictureNum}
+                                    </div>
+                                </div>
+                                <div className="text-[#15273799] text-[12px]">
+                                    <span className="font-[600]">时间：</span>
+                                    {formatDate(item.pictureStartTime)}-{formatDate(item.pictureEndTime)}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </>
             )}

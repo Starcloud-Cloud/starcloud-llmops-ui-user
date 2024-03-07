@@ -298,7 +298,9 @@ const Record: React.FC = () => {
                                     <TableRow hover key={row.id}>
                                         {/* <TableCell align="center">{row.id}</TableCell> */}
                                         <TableCell align="center">{row.no}</TableCell>
-                                        <TableCell align="center">{row?.items?.[0]?.spuName}</TableCell>
+                                        <TableCell align="center">
+                                            {row?.items?.[0]?.spuName} - {row?.items?.[0]?.properties?.[0]?.valueName}
+                                        </TableCell>
                                         {/* <TableCell align="center">{row.body}</TableCell> */}
                                         <TableCell align="center">{(row?.payPrice / 100).toFixed(2)}</TableCell>
                                         <TableCell align="center">{transformValue(row.status)}</TableCell>

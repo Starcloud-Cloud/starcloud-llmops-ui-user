@@ -49,7 +49,6 @@ const AddModal = () => {
         mode: 'CUSTOM_IMAGE_TEXT'
     });
     const [titleOpen, setTitleOpen] = useState(false);
-    const [tagOpen, setTagOpen] = useState(false);
     const [categoryOpen, setCategoryOpen] = useState(false);
     const changeParams = (data: any) => {
         setParams({
@@ -100,7 +99,6 @@ const AddModal = () => {
         }
     }, []);
     const [pre, setPre] = useState(1);
-
     //测试
     const [testOpen, setTestOpen] = useState(false);
     //测试图片上传
@@ -137,22 +135,22 @@ const AddModal = () => {
         if (item.code === 'CustomActionHandler' || item.code === 'TitleActionHandler' || item.code === 'ParagraphActionHandler') {
             if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.referList?.length === 0) {
                 flag = true;
-                content = '参考来源最少一个';
+                content = '创作配置 参考来源最少一个';
             } else if (item.model === 'AI_CUSTOM' && !item.requirement) {
                 flag = true;
-                content = '文案生成要求必填';
+                content = '创作配置 文案生成要求必填';
             } else if (item.code === 'ParagraphActionHandler' && !item.paragraphCount) {
                 flag = true;
-                content = '文案段落数量必填';
+                content = '创作配置 文案段落数量必填';
             } else {
                 flag = false;
             }
         } else if (item.code === 'AssembleActionHandler' && !item.requirement) {
             flag = true;
-            content = '文案拼接配置必填';
+            content = '创作配置 文案拼接配置必填';
         } else if (item.code === 'PosterActionHandler' && item?.styleList?.some((el: any) => el?.templateList.some((i: any) => !i.id))) {
             flag = true;
-            content = '风格必选';
+            content = '创作配置 风格必选';
         } else {
             flag = false;
         }
@@ -162,7 +160,7 @@ const AddModal = () => {
         };
     };
     //保存
-    const handleSave = () => {
+    const handleSave = (flag?: boolean) => {
         if (!params.name) {
             setTitleOpen(true);
             setCategoryOpen(true);
@@ -201,11 +199,12 @@ const AddModal = () => {
             );
             return false;
         }
-        if (valueList?.some((item) => verifyItem(item).flag)) {
+        if (valueList[0]?.variableList?.some((item: any) => !item.defaultValue && !item.value)) {
+            setCurrent(1);
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '创作方式有未填项',
+                    message: '基础信息每个变量必须要有默认值或者值',
                     variant: 'alert',
                     alert: {
                         color: 'error'
@@ -215,6 +214,30 @@ const AddModal = () => {
                     close: false
                 })
             );
+            return false;
+        }
+        if (
+            valueList?.some((item) => {
+                if (verifyItem(item).flag) {
+                    setCurrent(2);
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: verifyItem(item).content,
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            transition: 'SlideDown',
+                            close: false
+                        })
+                    );
+                }
+
+                return verifyItem(item).flag;
+            })
+        ) {
             return false;
         }
         if (searchParams.get('uid')) {
@@ -286,7 +309,12 @@ const AddModal = () => {
         }).then((res) => {
             if (res) {
                 setTableList([]);
-                navigate('/copywriting');
+                if (flag) {
+                    navigate('/copywritingModal?uid=' + res);
+                    exeTest(res);
+                } else {
+                    navigate('/copywriting');
+                }
                 dispatch(
                     openSnackbar({
                         open: true,
@@ -418,9 +446,72 @@ const AddModal = () => {
     }, [appData?.example]);
     const [businessUid, setBusinessUid] = useState('');
     const [detailOpen, setDetailOpen] = useState(false);
+    //测试生成
+    const exeTest = (uid?: string) => {
+        setTestOpen(true);
+        try {
+            schemeExample({
+                uid: uid || searchParams.get('uid'),
+                ...params,
+                type: params.type ? 'SYSTEM' : 'USER',
+                configuration: {
+                    ...appData,
+                    steps: valueList?.map((item) => {
+                        if (item?.model === 'RANDOM') {
+                            return {
+                                ...item,
+                                variableList: [],
+                                requirement: ''
+                            };
+                        } else if (item?.model === 'AI_CUSTOM') {
+                            return {
+                                ...item,
+                                referList: []
+                            };
+                        } else {
+                            return item;
+                        }
+                    })
+                },
+                useImages: testImageList
+                    ?.map((item: any, i: number) => {
+                        if (item?.response?.data?.url) {
+                            return item?.response?.data?.url;
+                        } else {
+                            return undefined;
+                        }
+                    })
+                    ?.filter((item) => item)
+            })
+                .then((res) => {
+                    setTestOpen(false);
+                    getList();
+                    timer.current[0] = setInterval(() => {
+                        if (
+                            plabListRef.current.slice(0, 20)?.every((item: any) => {
+                                return (
+                                    item?.pictureStatus !== 'executing' &&
+                                    item?.pictureStatus !== 'init' &&
+                                    item?.copyWritingStatus !== 'executing' &&
+                                    item?.copyWritingStatus !== 'init'
+                                );
+                            })
+                        ) {
+                            clearInterval(timer.current[0]);
+                        }
+                        getLists(1);
+                    }, 3000);
+                })
+                .catch((err) => {
+                    setTestOpen(false);
+                });
+        } catch (err) {
+            setTestOpen(false);
+        }
+    };
     return (
         <MainCard content={false}>
-            <CardContent>
+            <CardContent className="pb-[72px]">
                 <SubCard
                     sx={{ mb: 3 }}
                     contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
@@ -570,10 +661,10 @@ const AddModal = () => {
                     }}
                 />
                 <Divider />
-                <div className="text-[18px] font-[600]">创作方式</div>
+                <div className="text-[18px] font-[600]">创作模版</div>
                 <TextField
                     className="my-[20px]"
-                    label="创作方式"
+                    label="创作模版"
                     size="small"
                     color="secondary"
                     InputLabelProps={{ shrink: true }}
@@ -589,7 +680,9 @@ const AddModal = () => {
                     <Steps
                         current={current}
                         onChange={(current) => {
-                            setCurrent(current);
+                            if (appData) {
+                                setCurrent(current);
+                            }
                         }}
                         items={[
                             {
@@ -604,27 +697,30 @@ const AddModal = () => {
                 </div>
                 <div className="min-h-[500px]">
                     {current === 0 && (
-                        <div className="flex justify-between gap-10 flex-1">
-                            <div className="w-[400px]">
+                        <div className="flex justify-between flex-1">
+                            <div className="w-[400px] flex items-center flex-col">
                                 <div className="text-lg font-bold">{appData?.appName}</div>
                                 <div className="text-xs mt-[10px]">{appData?.description}</div>
                             </div>
+                            <div className="w-[1px] bg-black/20 mx-[5px]"></div>
                             <div className="w-[60%]">
                                 {goodList?.length > 0 && (
                                     <>
-                                        <div className="text-[20px] font-bold mb-[10px]">生成示例</div>
-                                        <Row gutter={16}>
-                                            {goodList?.map((item) => (
-                                                <Col span={8} key={item?.businessUid}>
-                                                    <Goods
-                                                        item={item}
-                                                        setBusinessUid={setBusinessUid}
-                                                        setDetailOpen={setDetailOpen}
-                                                        show={true}
-                                                    />
-                                                </Col>
-                                            ))}
-                                        </Row>
+                                        <div className="text-[20px] font-bold mb-[10px] text-center">生成示例</div>
+                                        <div className="flex justify-center">
+                                            <Row gutter={16}>
+                                                {goodList?.map((item) => (
+                                                    <Col span={12} key={item?.businessUid}>
+                                                        <Goods
+                                                            item={item}
+                                                            setBusinessUid={setBusinessUid}
+                                                            setDetailOpen={setDetailOpen}
+                                                            show={true}
+                                                        />
+                                                    </Col>
+                                                ))}
+                                            </Row>
+                                        </div>
                                     </>
                                 )}
                             </div>
@@ -910,80 +1006,9 @@ const AddModal = () => {
                                         return false;
                                     }
                                     if (searchParams.get('uid')) {
-                                        setTestOpen(true);
-                                        try {
-                                            schemeExample({
-                                                uid: searchParams.get('uid'),
-                                                ...params,
-                                                type: params.type ? 'SYSTEM' : 'USER',
-                                                configuration: {
-                                                    ...appData,
-                                                    steps: valueList?.map((item) => {
-                                                        if (item?.model === 'RANDOM') {
-                                                            return {
-                                                                ...item,
-                                                                variableList: [],
-                                                                requirement: ''
-                                                            };
-                                                        } else if (item?.model === 'AI_CUSTOM') {
-                                                            return {
-                                                                ...item,
-                                                                referList: []
-                                                            };
-                                                        } else {
-                                                            return item;
-                                                        }
-                                                    })
-                                                },
-                                                useImages: testImageList
-                                                    ?.map((item: any, i: number) => {
-                                                        if (item?.response?.data?.url) {
-                                                            return item?.response?.data?.url;
-                                                        } else {
-                                                            return undefined;
-                                                        }
-                                                    })
-                                                    ?.filter((item) => item)
-                                            })
-                                                .then((res) => {
-                                                    setTestOpen(false);
-                                                    getList();
-                                                    timer.current[0] = setInterval(() => {
-                                                        if (
-                                                            plabListRef.current.slice(0, 20)?.every((item: any) => {
-                                                                return (
-                                                                    item?.pictureStatus !== 'executing' &&
-                                                                    item?.pictureStatus !== 'init' &&
-                                                                    item?.copyWritingStatus !== 'executing' &&
-                                                                    item?.copyWritingStatus !== 'init'
-                                                                );
-                                                            })
-                                                        ) {
-                                                            clearInterval(timer.current[0]);
-                                                        }
-                                                        getLists(1);
-                                                    }, 3000);
-                                                })
-                                                .catch((err) => {
-                                                    setTestOpen(false);
-                                                });
-                                        } catch (err) {
-                                            setTestOpen(false);
-                                        }
+                                        exeTest();
                                     } else {
-                                        dispatch(
-                                            openSnackbar({
-                                                open: true,
-                                                message: '保存之后才能测试生成',
-                                                variant: 'alert',
-                                                alert: {
-                                                    color: 'error'
-                                                },
-                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                transition: 'SlideDown',
-                                                close: false
-                                            })
-                                        );
+                                        handleSave(true);
                                     }
                                 }}
                                 loading={testOpen}
@@ -1004,27 +1029,26 @@ const AddModal = () => {
                         </>
                     )}
                 </div>
-                <div className="my-[20px] flex justify-center gap-2">
-                    <Button type="primary" onClick={() => setCurrent(current - 1)} disabled={current === 0}>
-                        上一步
-                    </Button>
-                    <Button type="primary" onClick={() => setCurrent(current + 1)} disabled={current === 3}>
-                        下一步
-                    </Button>
-                </div>
+                {appData && (
+                    <div className="my-[20px] flex justify-center gap-2">
+                        <Button type="primary" onClick={() => setCurrent(current - 1)} disabled={current === 0}>
+                            上一步
+                        </Button>
+                        <Button type="primary" onClick={() => setCurrent(current + 1)} disabled={current === 3}>
+                            下一步
+                        </Button>
+                    </div>
+                )}
                 {appOpen && <SelectApp open={appOpen} imageTypeList={AppList} handleClose={() => setAppOpen(false)} handleOk={handleOk} />}
                 {detailOpen && (
                     <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} show={true} />
                 )}
-                <Divider />
-                <CardActions>
-                    <Grid container justifyContent="flex-end">
-                        <Button className="w-[100px]" size="large" type="primary" onClick={handleSave}>
-                            保存
-                        </Button>
-                    </Grid>
-                </CardActions>
             </CardContent>
+            <div className="fixed bottom-0 w-[calc(100%-24px)] p-4 flex justify-end z-[1000] bg-white">
+                <Button className="w-[100px]" size="large" type="primary" onClick={() => handleSave()}>
+                    保存
+                </Button>
+            </div>
         </MainCard>
     );
 };

@@ -256,20 +256,20 @@ const BatcSmallRedBooks = () => {
                         close: false
                     })
                 );
-                if (flag) {
-                    planExecute({ uid: searchParams.get('uid') })
-                        .then((res) => {
-                            if (res) {
-                                batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                    setBathTotal(res.total);
-                                    setBathList(res.list);
-                                });
-                            }
-                        })
-                        .catch((err) => {
-                            setExeDisabled(false);
+                planExecute({ uid: searchParams.get('uid') })
+                    .then((res) => {
+                        batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+                            setBathTotal(res.total);
+                            setBathList(res.list);
                         });
-                }
+                    })
+                    .catch((err) => {
+                        batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+                            setBathTotal(res.total);
+                            setBathList(res.list);
+                        });
+                        setExeDisabled(false);
+                    });
             } catch (err) {
                 setExeDisabled(false);
             }
@@ -304,16 +304,20 @@ const BatcSmallRedBooks = () => {
                     })
                 );
                 navigate('/batchSmallRedBook?uid=' + res);
-                if (flag) {
-                    planExecute({ uid: res }).then((result) => {
-                        if (result) {
-                            batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathTotal(res.total);
-                                setBathList(res.list);
-                            });
-                        }
+                planExecute({ uid: res })
+                    .then((result) => {
+                        batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+                            setBathTotal(res.total);
+                            setBathList(res.list);
+                        });
+                    })
+                    .catch((err) => {
+                        batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+                            setBathTotal(res.total);
+                            setBathList(res.list);
+                        });
+                        setExeDisabled(false);
                     });
-                }
             } catch (err) {
                 setExeDisabled(false);
             }
@@ -321,8 +325,6 @@ const BatcSmallRedBooks = () => {
     };
     //页面滚动
     const scrollRef: any = useRef(null);
-    const [successCount, setSuccessCount] = useState(0);
-    const [errorCount, setErrorCount] = useState(0);
     const [total, setTotal] = useState(0);
     const [planList, setPlanList] = useState<any[]>([]);
     const plabListRef: any = useRef(null);
@@ -353,8 +355,6 @@ const BatcSmallRedBooks = () => {
             planUid: searchParams.get('uid') || uidRef.current
         }).then((res) => {
             setTotal(res.total);
-            setSuccessCount(res.successCount);
-            setErrorCount(res.errorCount);
             plabListRef.current = [...plabListRef.current, ...res.list];
             setPlanList(plabListRef.current);
             setbatchOpen(false);
@@ -368,8 +368,6 @@ const BatcSmallRedBooks = () => {
             planUid: searchParams.get('uid') || uidRef.current
         }).then((res) => {
             setTotal(res.total);
-            setSuccessCount(res.successCount);
-            setErrorCount(res.errorCount);
             const newList = _.cloneDeep(plabListRef.current);
             newList.splice((queryRef.current.pageNo - 1) * queryRef.current.pageSize, queryRef.current.pageSize, ...res.list);
             plabListRef.current = newList;
@@ -607,7 +605,7 @@ const BatcSmallRedBooks = () => {
                     </div>
                 </Col>
                 <Col span={18} className="overflow-hidden">
-                    {/* {planList?.length === 0 ? (
+                    {planList?.length === 0 ? (
                         <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
                             <div className="text-center">
                                 <img
@@ -619,89 +617,89 @@ const BatcSmallRedBooks = () => {
                                 <div>在左侧输入你的创意吧</div>
                             </div>
                         </div>
-                    ) : ( */}
-                    <>
-                        <Collapse
-                            onChange={(e: any) => {
-                                timer.current?.map((item: any) => {
-                                    clearInterval(item);
-                                });
-                                timer.current = [];
-                                plabListRef.current = [];
-                                setPlanList([]);
-                                if (e.length > 0) {
-                                    setbatchOpen(true);
-                                    queryRef.current = {
-                                        pageNo: 1,
-                                        pageSize: 20
-                                    };
-                                    setQueryPage(queryRef.current);
-                                    setBatchUid(e[0]);
-                                    if (bathList?.find((item) => item.batch == e[0])?.status === 'SUCCESS') {
-                                        getList(e[0]);
-                                    } else {
-                                        getList(e[0]);
-                                        timer.current[0] = setInterval(() => {
-                                            if (
-                                                plabListRef.current?.length === 0 ||
-                                                plabListRef.current.slice(0, 1)?.every((item: any) => {
-                                                    return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
-                                                })
-                                            ) {
-                                                clearInterval(timer.current[0]);
-                                                return;
-                                            }
-                                            getLists(1, e[0]);
-                                        }, 3000);
+                    ) : (
+                        <>
+                            <Collapse
+                                onChange={(e: any) => {
+                                    timer.current?.map((item: any) => {
+                                        clearInterval(item);
+                                    });
+                                    timer.current = [];
+                                    plabListRef.current = [];
+                                    setPlanList([]);
+                                    if (e.length > 0) {
+                                        setbatchOpen(true);
+                                        queryRef.current = {
+                                            pageNo: 1,
+                                            pageSize: 20
+                                        };
+                                        setQueryPage(queryRef.current);
+                                        setBatchUid(e[0]);
+                                        if (bathList?.find((item) => item.batch == e[0])?.status === 'SUCCESS') {
+                                            getList(e[0]);
+                                        } else {
+                                            getList(e[0]);
+                                            timer.current[0] = setInterval(() => {
+                                                if (
+                                                    plabListRef.current?.length === 0 ||
+                                                    plabListRef.current.slice(0, 1)?.every((item: any) => {
+                                                        return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
+                                                    })
+                                                ) {
+                                                    clearInterval(timer.current[0]);
+                                                    return;
+                                                }
+                                                getLists(1, e[0]);
+                                            }, 3000);
+                                        }
                                     }
-                                }
-                            }}
-                            items={bathList?.map((item) => {
-                                return {
-                                    key: item.batch,
-                                    label: (
-                                        <div className="w-full flex justify-between items-center text-sm pr-[20px]">
-                                            <div className="">
-                                                <span className="font-[600]">生成时间：</span>
-                                                {dayjs(item?.startTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.batch}）
+                                }}
+                                items={bathList?.map((item) => {
+                                    return {
+                                        key: item.batch,
+                                        label: (
+                                            <div className="w-full flex justify-between items-center text-sm pr-[20px]">
+                                                <div className="">
+                                                    <span className="font-[600]">生成时间：</span>
+                                                    {dayjs(item?.startTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.batch}）
+                                                </div>
+                                                <div>
+                                                    <span className="font-[600]">生成成功数：</span>
+                                                    {item?.successCount}&nbsp;&nbsp;
+                                                    <span className="font-[600]">生成失败数：</span>
+                                                    {item?.failureCount}&nbsp;&nbsp;
+                                                    <span className="font-[600]">生成总数：</span>
+                                                    {item?.totalCount}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <span className="font-[600]">生成成功数：</span>
-                                                {item?.successCount}&nbsp;&nbsp;
-                                                <span className="font-[600]">生成失败数：</span>
-                                                {item?.failureCount}&nbsp;&nbsp;
-                                                <span className="font-[600]">生成总数：</span>
-                                                {item?.totalCount}
-                                            </div>
-                                        </div>
-                                    ),
-                                    children: (
-                                        <Spin spinning={batchOpen}>
-                                            <div
-                                                className="h-[1000px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
-                                                ref={scrollRef}
-                                                onScroll={handleScroll}
-                                            >
-                                                <Row gutter={20} className="h-[fit-content] w-full">
-                                                    {planList.map((item, index: number) => (
-                                                        <Col key={index} xs={12} md={12} xl={8} xxl={6} className="inline-block">
-                                                            <Goods
-                                                                item={item}
-                                                                setBusinessUid={setBusinessUid}
-                                                                setDetailOpen={setDetailOpen}
-                                                            />
-                                                        </Col>
-                                                    ))}
-                                                </Row>
-                                            </div>
-                                        </Spin>
-                                    )
-                                };
-                            })}
-                            accordion
-                        />
-                    </>
-                    {/* )} */}
+                                        ),
+                                        children: (
+                                            <Spin spinning={batchOpen}>
+                                                <div
+                                                    className="h-[1000px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
+                                                    ref={scrollRef}
+                                                    onScroll={handleScroll}
+                                                >
+                                                    <Row gutter={20} className="h-[fit-content] w-full">
+                                                        {planList.map((item, index: number) => (
+                                                            <Col key={index} xs={12} md={12} xl={8} xxl={6} className="inline-block">
+                                                                <Goods
+                                                                    item={item}
+                                                                    setBusinessUid={setBusinessUid}
+                                                                    setDetailOpen={setDetailOpen}
+                                                                />
+                                                            </Col>
+                                                        ))}
+                                                    </Row>
+                                                </div>
+                                            </Spin>
+                                        )
+                                    };
+                                })}
+                                accordion
+                            />
+                        </>
+                    )}
                 </Col>
             </Row>
             {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}

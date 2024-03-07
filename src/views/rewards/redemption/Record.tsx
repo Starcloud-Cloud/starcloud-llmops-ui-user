@@ -101,6 +101,7 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 
 const headCells = [
     { id: 'title', numeric: false, disablePadding: false, label: '权益名称' },
+    { id: 'levelName', numeric: false, disablePadding: false, label: '等级名称' },
     { id: 'status', numeric: false, disablePadding: false, label: '权益状态' },
     { id: 'benefitsList', numeric: false, disablePadding: false, label: '创作额度' },
     { id: 'validStartTime', numeric: true, disablePadding: false, label: '到账时间' },
@@ -310,6 +311,9 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                     >
                                         <TableCell align="center" sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
                                             {row?.title}
+                                        </TableCell>
+                                        <TableCell align="center" sx={{ pl: 3 }} padding="checkbox" component="th" id={labelId} scope="row">
+                                            {row?.levelName}
                                         </TableCell>
                                         <TableCell align="center">{handleTransformState(row?.status)}</TableCell>
                                         <TableCell align="center">

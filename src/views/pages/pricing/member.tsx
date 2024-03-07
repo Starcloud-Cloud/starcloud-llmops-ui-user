@@ -203,21 +203,21 @@ const plansDefault = (value: number) => [
         monthCode: 'basic_month',
         yearCode: 'basic_year'
     },
-    {
-        keyword: 'plus',
-        active: false,
-        icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
-        title: '高级版',
-        description: value === 1 ? '10000魔法豆，1000点作图' : '120000魔法豆，12000点作图',
-        monthPrice: 199,
-        yearPrice: 1999,
-        preMonthPrice: 166.58,
-        des: '适用于专业卖家',
-        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        btnText: '立即购买',
-        monthCode: 'plus_month',
-        yearCode: 'plus_year'
-    },
+    // {
+    //     keyword: 'plus',
+    //     active: false,
+    //     icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
+    //     title: '高级版',
+    //     description: value === 1 ? '10000魔法豆，1000点作图' : '120000魔法豆，12000点作图',
+    //     monthPrice: 199,
+    //     yearPrice: 1999,
+    //     preMonthPrice: 166.58,
+    //     des: '适用于专业卖家',
+    //     permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    //     btnText: '立即购买',
+    //     monthCode: 'plus_month',
+    //     yearCode: 'plus_year'
+    // },
     {
         keyword: 'pro',
         active: false,
@@ -232,19 +232,19 @@ const plansDefault = (value: number) => [
         btnText: '立即购买',
         monthCode: 'pro_month',
         yearCode: 'pro_year'
-    },
-    {
-        keyword: 'business',
-        active: false,
-        icon: <DirectionsBoatTwoToneIcon fontSize="large" />,
-        title: '企业版',
-        description: '拥有企业个性化的AI模型和系统',
-        price: '专属顾问',
-        monthPrice: '专属顾问',
-        yearPrice: '专属顾问',
-        permission: [0, 1, 2, 3, 4, 5],
-        btnText: '扫码咨询'
     }
+    // {
+    //     keyword: 'business',
+    //     active: false,
+    //     icon: <DirectionsBoatTwoToneIcon fontSize="large" />,
+    //     title: '企业版',
+    //     description: '拥有企业个性化的AI模型和系统',
+    //     price: '专属顾问',
+    //     monthPrice: '专属顾问',
+    //     yearPrice: '专属顾问',
+    //     permission: [0, 1, 2, 3, 4, 5],
+    //     btnText: '扫码咨询'
+    // }
 ];
 
 const planListDefault = (value: number) => [
@@ -425,7 +425,7 @@ let interval: any;
 
 const Price1 = () => {
     const [planList, setPlanList] = useState<any[]>(planListDefault(1));
-    const [plans, setPlans] = useState<any[]>([]);
+    const [plans, setPlans] = useState<any[]>(plansDefault(1));
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
     const [openDialog, setOpenDialog] = useState(false);

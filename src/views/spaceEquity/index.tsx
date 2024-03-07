@@ -156,7 +156,7 @@ const SpaceEquity = () => {
     const [inviteLinkOpen, setInviteLinkOpen] = useState(false);
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const addMember = () => {
-        if (all_detail?.allDetail?.levels[0]?.levelConfig?.usableTeamUsers > tableData?.length) {
+        if (all_detail?.allDetail?.levels[0]?.levelConfigDTO?.usableTeamUsers > tableData?.length) {
             setInviteLinkOpen(true);
         } else {
             setOpenUpgradeModel(true);
@@ -517,7 +517,7 @@ const SpaceEquity = () => {
                     </Box>
                     {all_detail?.allDetail?.id === user?.adminUserId && (
                         <div className="flex items-center">
-                            （{tableData?.length + ' / ' + (all_detail?.allDetail?.levels[0]?.levelConfig?.usableTeamUsers || 0)}）
+                            （{tableData?.length + ' / ' + (all_detail?.allDetail?.levels[0]?.levelConfigDTO?.usableTeamUsers || 0)}）
                             <div
                                 onClick={addMember}
                                 className="py-2 px-6 text-[#7C5CFC] text-sm bg-[#fff] rounded-lg cursor-pointer lg:text-xs shrink-0 hover:opacity-80"

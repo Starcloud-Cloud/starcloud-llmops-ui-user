@@ -51,7 +51,7 @@ export default function FormDialogNew({
     const theme = useTheme();
     const { totalList } = myChat();
     const [botOpen, setBotOpen] = useState(false);
-    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfig?.usableBasicBot || 0;
+    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableBasicBot || 0;
 
     const { user } = useUserStore();
 

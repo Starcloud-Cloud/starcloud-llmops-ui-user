@@ -148,7 +148,7 @@ const TermSearch = () => {
     //导出
     const handleExport = async () => {
         const { month, market } = queryAsin;
-        const result = await KeywordMetadataExtendAsin({
+        const result = await exportExtendAsin({
             ...pageQuery,
             ...searchResult,
             excludeKeywords: searchResult?.excludeKeywords ? searchResult.excludeKeywords.split(',') : undefined,
@@ -160,11 +160,12 @@ const TermSearch = () => {
             originAsinList: queryAsin.asinList,
             filterDeletedKeywords: false
         });
-        const { url } = result.items;
+        console.log(result);
+
         const link = document.createElement('a');
-        link.href = url;
+        link.href = window.URL.createObjectURL(result);
         link.target = '_blank';
-        link.download = `拓展流量词.xlsx`;
+        link.download = `拓展流量词.xls`;
         link.click();
     };
     return (

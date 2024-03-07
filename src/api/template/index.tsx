@@ -25,9 +25,9 @@ export const delMarket = (uid: any) => {
 export const userBenefits = async () => {
     const res = await request.get({ url: '/llm/auth/user/all_detail' });
     const { rights, levels } = res;
-    const { levelName, levelId, levelConfig } = levels?.[0];
+    const { levelName, levelId, levelConfigDTO } = levels?.[0];
 
-    return { benefits: rights, userLevelName: levelName, userLevel: vipSwitch(levelId), levelConfig };
+    return { benefits: rights, userLevelName: levelName, userLevel: vipSwitch(levelId), levelConfigDTO };
 };
 //获取分类
 export const categories = () => {
@@ -53,6 +53,10 @@ export const appPage = (params: { pageNo: number; pageSize: number; mode?: strin
 //删除应用
 export const del = (uid: string) => {
     return request.delete({ url: `/llm/app/delete/${uid}` });
+};
+//复制应用
+export const copy = (uid: string) => {
+    return request.post({ url: `/llm/app/copy/${uid}` });
 };
 //应用类型
 export const metadata = () => {

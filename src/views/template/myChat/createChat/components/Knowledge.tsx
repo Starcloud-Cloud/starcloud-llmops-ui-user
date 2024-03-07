@@ -1166,9 +1166,9 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 color={'secondary'}
                                 size={'small'}
                                 onClick={() => {
-                                    if (allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument === -1) {
+                                    if (allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableBotDocument === -1) {
                                         setDocumentVisible(true);
-                                    } else if (documentList.length < allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument) {
+                                    } else if (documentList.length < allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableBotDocument) {
                                         setDocumentVisible(true);
                                     } else {
                                         setBotOpen(true);
@@ -1626,10 +1626,10 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                             color={'secondary'}
                                             sx={{ mt: 3 }}
                                             onClick={() => {
-                                                if (allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument === -1) {
+                                                if (allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableBotDocument === -1) {
                                                     setDocumentVisible(true);
                                                 } else if (
-                                                    documentList.length < allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument
+                                                    documentList.length < allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableBotDocument
                                                 ) {
                                                     setDocumentVisible(true);
                                                 } else {
@@ -1670,7 +1670,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 <UpgradeModel
                                     open={botOpen}
                                     handleClose={() => setBotOpen(false)}
-                                    title={`添加文档个数(${allDetail?.allDetail?.levels[0]?.levelConfig?.usableBotDocument})已用完`}
+                                    title={`添加文档个数(${allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableBotDocument})已用完`}
                                     from="usableBotDocument_0"
                                 />
                             )}

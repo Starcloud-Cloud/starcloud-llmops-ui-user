@@ -687,7 +687,7 @@ const AddModal = () => {
                         items={[
                             {
                                 icon: <HomeOutlined rev={undefined} />,
-                                title: '应用说明'
+                                title: '模版说明'
                             },
                             { icon: <ContainerOutlined rev={undefined} />, title: '基础信息' },
                             { icon: <SettingOutlined rev={undefined} />, title: '创作配置' },
@@ -696,19 +696,19 @@ const AddModal = () => {
                     />
                 </div>
                 <div className="min-h-[500px]">
-                    {current === 0 && (
-                        <div className="flex justify-between flex-1">
-                            <div className="w-[400px] flex items-center flex-col">
+                    {current === 0 && appData && (
+                        <div className="flex">
+                            <div className="w-[40%] flex items-center flex-col">
                                 <div className="text-lg font-bold">{appData?.appName}</div>
                                 <div className="text-xs mt-[10px]">{appData?.description}</div>
                             </div>
-                            <div className="w-[1px] bg-black/20 mx-[5px]"></div>
-                            <div className="w-[60%]">
+                            <div className="w-[1px] bg-black/20 mx-[40px]"></div>
+                            <div className="flex-1 w-[60%]">
                                 {goodList?.length > 0 && (
                                     <>
                                         <div className="text-[20px] font-bold mb-[10px] text-center">生成示例</div>
                                         <div className="flex justify-center">
-                                            <Row gutter={16}>
+                                            <Row gutter={16} className="max-w-[600px]">
                                                 {goodList?.map((item) => (
                                                     <Col span={12} key={item?.businessUid}>
                                                         <Goods
@@ -728,6 +728,10 @@ const AddModal = () => {
                     )}
                     {current === 1 && (
                         <>
+                            <div className="mb-[10px] font-bold text-[16px]">
+                                模版基础信息
+                                <span className="text-xs font-[400] text-black/50">（为了更好的创作内容，请填写AI模版中需要的字段）</span>
+                            </div>
                             <Row gutter={20}>
                                 <Col md={24} lg={10}>
                                     <Row gutter={10}>
@@ -1044,7 +1048,7 @@ const AddModal = () => {
                     <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} show={true} />
                 )}
             </CardContent>
-            <div className="fixed bottom-0 w-[calc(100%-24px)] p-4 flex justify-end z-[1000] bg-white">
+            <div className="fixed bottom-0 w-full p-4 flex justify-end z-[1000] bg-white border-t border-solid border-black/10">
                 <Button className="w-[100px]" size="large" type="primary" onClick={() => handleSave()}>
                     保存
                 </Button>

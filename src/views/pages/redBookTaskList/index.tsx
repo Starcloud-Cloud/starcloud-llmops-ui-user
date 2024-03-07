@@ -315,26 +315,6 @@ const RedBookTaskList: React.FC = () => {
                             新建创作计划
                         </Button>
                     </div>
-                    <div className="flex justify-end mt-1">
-                        <Button
-                            className="ml-1"
-                            size="small"
-                            color="secondary"
-                            startIcon={<ReplayIcon />}
-                            onClick={() => {
-                                setLoading(true);
-                                const pageVO: any = { pageNo: page + 1, pageSize: rowsPerPage };
-                                if (orderBy) {
-                                    pageVO.sortField = orderBy;
-                                    pageVO.asc = order === 'asc';
-                                }
-                                forceUpdate();
-                            }}
-                            variant="contained"
-                        >
-                            更新列表
-                        </Button>
-                    </div>
                 </div>
             }
             // secondary={

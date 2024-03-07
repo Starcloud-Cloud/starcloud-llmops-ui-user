@@ -11,6 +11,9 @@ import { contentPage, singleAdd } from 'api/redBook/task';
 import { DetailModal } from '../../redBookContentList/component/detailModal';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import GradeIcon from '@mui/icons-material/Grade';
+import { batchPages } from 'api/redBook/batchIndex';
+import dayjs from 'dayjs';
+
 const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (data: boolean) => void }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -77,6 +80,8 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
     };
     const [valueList, setValueList] = useState<any[]>([]);
     const [values, setValue] = useState<string | null[]>([]);
+    const [batch, setBatch] = useState('');
+    const [batchList, setBatchList] = useState<any[]>([]);
     const [addCurrent, setAddCurrent] = useState(1);
     const [addPageSize, setAddPageSize] = useState(10);
     const [addTotal, setAddTotal] = useState(0);
@@ -85,6 +90,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         const result = await contentPage({
             pageNo: addCurrent,
             pageSize: addPageSize,
+            batch,
             status: 'execute_success',
             claim: false,
             planUid: values
@@ -92,12 +98,18 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         setLoading(false);
         setAddTable(result.list);
         setAddTotal(result.total);
+        batchPages({ pageNo: 1, pageSize: 100, planUid: values }).then((res) => {
+            setBatchList(res.list);
+        });
     };
+    useEffect(() => {
+        setBatch('');
+    }, [values]);
     useEffect(() => {
         if (addOpen) {
             getAddList();
         }
-    }, [addOpen, addCurrent, addPageSize, values]);
+    }, [addOpen, addCurrent, addPageSize, values, batch]);
     useEffect(() => {
         planPage({ pageNo: 1, pageSize: 10000 }).then((res) => {
             setValueList(res?.list);
@@ -135,7 +147,17 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         <Select labelId="plans" value={values} label="创作计划" onChange={(e: any) => setValue(e.target.value)}>
                             {valueList?.map((item: any) => (
                                 <MenuItem key={item.uid} value={item.uid}>
-                                    {item.name}（{item.successCount}）
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={{ ml: 2, mb: 2, width: '300px' }} color="secondary" size="small">
+                        <InputLabel id="batch">创作批次</InputLabel>
+                        <Select labelId="batch" value={batch} label="创作批次" onChange={(e: any) => setBatch(e.target.value)}>
+                            {batchList?.map((item: any) => (
+                                <MenuItem key={item.batch} value={item.batch}>
+                                    {dayjs(item.startTime).format('YYYY-MM-DD hh:mm:ss')}（{item.totalCount}）
                                 </MenuItem>
                             ))}
                         </Select>

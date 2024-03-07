@@ -76,7 +76,9 @@ const VariableModal = ({
         };
         setOptions(newList);
     };
-    const [content, setContent] = useState<any>({});
+    const [content, setContent] = useState<any>({
+        style: 'INPUT'
+    });
     const [fieldOpen, setFidldOpen] = useState(false);
     const [labelOpen, setLabelOpen] = useState(false);
     const addVariable = () => {
@@ -180,7 +182,7 @@ const VariableModal = ({
                 />
                 <FormControl color="secondary" size="small" fullWidth sx={{ mt: 2 }}>
                     <InputLabel>{t('myApp.type')}</InputLabel>
-                    <Select onChange={handleChange} name="style" defaultValue={'INPUT'} value={content.style} label={t('myApp.type')}>
+                    <Select onChange={handleChange} name="style" value={content.style} label={t('myApp.type')}>
                         {typeList.map((el: any) => (
                             <MenuItem key={el.value} value={el.value}>
                                 {el.label}
@@ -221,7 +223,7 @@ const VariableModal = ({
                 )}
             </DialogContent>
             <DialogActions>
-                <Button color="secondary" onClick={handleSave}>
+                <Button disabled={itemData?.group === 'SYSTEM'} color="secondary" onClick={handleSave}>
                     {t('myApp.confirm')}
                 </Button>
             </DialogActions>

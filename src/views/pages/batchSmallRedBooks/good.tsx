@@ -7,9 +7,11 @@ import { contentLike, contentUnlike } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useState, memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { failureRetry } from 'api/redBook/batchIndex';
 import './index.scss';
-const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
+const Goods = ({ item, setBusinessUid, setDetailOpen, show }: any) => {
+    const navigate = useNavigate();
     const [likeOpen, setLikeOpen] = useState(item?.liked);
     //执行按钮
     const handleTransfer = (key: string, errMessage: string, count?: number) => {
@@ -36,7 +38,16 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                     </Popover>
                 );
             case 'execute_error_finished':
-                return (
+                return errMessage?.indexOf('权益不足') !== -1 && !count ? (
+                    <span
+                        onClick={() => {
+                            navigate('/subscribe');
+                        }}
+                        className="!mr-0 cursor-pointer text-[#673ab7] hover:underline font-[500]"
+                    >
+                        权益不足，去升级
+                    </span>
+                ) : (
                     <Popover
                         content={
                             <div>
@@ -45,9 +56,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                         }
                         title="失败原因"
                     >
-                        <span className="!mr-0 cursor-pointer" color="red">
-                            执行失败
-                        </span>
+                        <span className="!mr-0 cursor-pointer">执行失败</span>
                     </Popover>
                 );
         }
@@ -69,7 +78,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                         />
                         {(item.copyWritingStatus === 'executing' || item.copyWritingStatus === 'execute_error') && (
                             <div className="absolute top-0 right-0 left-0 bottom-0 flex flex-col gap-2 justify-center items-center z-1000">
-                                <Progress type="circle" percent={Math.floor((item?.currentStepIndex / item?.totalStep) * 100 ) } />
+                                <Progress type="circle" percent={Math.floor((item?.currentStepIndex / item?.totalStep) * 100)} />
                                 <Popover content={'执行到第几步/总步数'}>
                                     <div className="font-[500] cursor-pointer">
                                         {item?.currentStepIndex}/{item?.totalStep}
@@ -147,55 +156,59 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                         }}
                     >
                         <div className="flex justify-between items-start">
-                            <div className="line-clamp-2 h-[37px] text-[14px] font-bold">{item.copyWritingTitle}</div>
-                            {likeOpen ? (
-                                <GradeIcon
-                                    onClick={async (e: any) => {
-                                        e.stopPropagation();
-                                        const result = await contentUnlike({ businessUid: item.businessUid });
-                                        if (result) {
-                                            setLikeOpen(false);
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '取消点赞成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                        }
-                                    }}
-                                    sx={{ color: '#ecc94b99' }}
-                                />
-                            ) : (
-                                <GradeOutlinedIcon
-                                    onClick={async (e: any) => {
-                                        e.stopPropagation();
-                                        const result = await contentLike({ businessUid: item.businessUid });
-                                        if (result) {
-                                            setLikeOpen(true);
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '点赞成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                        }
-                                    }}
-                                    sx={{ color: '#0003' }}
-                                />
+                            <div className="line-clamp-2 h-[35px] text-[14px] font-bold">{item.copyWritingTitle}</div>
+                            {!show && (
+                                <div>
+                                    {likeOpen ? (
+                                        <GradeIcon
+                                            onClick={async (e: any) => {
+                                                e.stopPropagation();
+                                                const result = await contentUnlike({ businessUid: item.businessUid });
+                                                if (result) {
+                                                    setLikeOpen(false);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '取消点赞成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideDown',
+                                                            close: false
+                                                        })
+                                                    );
+                                                }
+                                            }}
+                                            sx={{ color: '#ecc94b99' }}
+                                        />
+                                    ) : (
+                                        <GradeOutlinedIcon
+                                            onClick={async (e: any) => {
+                                                e.stopPropagation();
+                                                const result = await contentLike({ businessUid: item.businessUid });
+                                                if (result) {
+                                                    setLikeOpen(true);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '点赞成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideDown',
+                                                            close: false
+                                                        })
+                                                    );
+                                                }
+                                            }}
+                                            sx={{ color: '#0003' }}
+                                        />
+                                    )}
+                                </div>
                             )}
                         </div>
                         <Popover
@@ -212,26 +225,30 @@ const Goods = ({ item, setBusinessUid, setDetailOpen }: any) => {
                                 </div>
                             }
                         >
-                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[75px]">{item.copyWritingContent}</div>
+                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[77px]">{item.copyWritingContent}</div>
                         </Popover>
-                        <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
-                            <div>
-                                <span className="font-[600]">状态：</span>
-                                {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
-                            </div>
-                            <div>
-                                <span className="font-[600]">耗时：</span>
-                                {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
-                            </div>
-                            <div>
-                                <span className="font-[600]">张数/字数：</span>
-                                {item.pictureNum}
-                            </div>
-                        </div>
-                        <div className="text-[#15273799] text-[12px]">
-                            <span className="font-[600]">时间：</span>
-                            {formatDate(item.pictureStartTime)}-{formatDate(item.pictureEndTime)}
-                        </div>
+                        {!show && (
+                            <>
+                                <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                    <div>
+                                        <span className="font-[600]">状态：</span>
+                                        {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                    </div>
+                                    <div>
+                                        <span className="font-[600]">耗时：</span>
+                                        {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
+                                    </div>
+                                    <div>
+                                        <span className="font-[600]">张数/字数：</span>
+                                        {item.pictureNum}
+                                    </div>
+                                </div>
+                                <div className="text-[#15273799] text-[12px]">
+                                    <span className="font-[600]">时间：</span>
+                                    {formatDate(item.pictureStartTime)}-{formatDate(item.pictureEndTime)}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </>
             )}

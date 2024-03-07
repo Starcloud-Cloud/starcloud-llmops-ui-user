@@ -1,4 +1,4 @@
-import { Popover, Input, Tooltip, Popconfirm } from 'antd';
+import { Tooltip, Popconfirm } from 'antd';
 import {
     Box,
     Chip,
@@ -16,36 +16,28 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import { Error, Add, Delete, Settings } from '@mui/icons-material';
 import { t } from 'hooks/web/useI18n';
-import { useEffect, useRef, useState, memo } from 'react';
+import { useState, memo } from 'react';
 import _ from 'lodash-es';
 import VariableModal from '../variableModal';
 interface Variable {
-    pre: number;
-    model: string;
-    value: any;
-    setValue: (data: any) => void;
     rows: any[];
     setRows: (data: any[]) => void;
 }
 
-const CreateVariable = ({ pre, model, value, setValue, rows, setRows }: Variable) => {
-    const { TextArea } = Input;
-    const iptRef: any = useRef(null);
-    const [demandOpen, setDemandOpen] = useState(false);
-    useEffect(() => {
-        if (pre > 1) {
-            setDemandOpen(true);
-        }
-    }, [pre]);
-
+const CreateVariable = ({ rows, setRows }: Variable) => {
     const [title, setTitle] = useState('');
     const [variableOpen, setVariableOpen] = useState(false);
     const [varIndex, setVarIndex] = useState(-1);
     const [itemData, setItemData] = useState<any>({});
     const saveContent = (data: any) => {
         if (title === '增加变量') {
-            setRows([...rows, data]);
-            setVariableOpen(false);
+            if (rows) {
+                setRows([...rows, data]);
+                setVariableOpen(false);
+            } else {
+                setRows([data]);
+                setVariableOpen(false);
+            }
         } else {
             const newList = _.cloneDeep(rows);
             newList[varIndex] = data;
@@ -55,60 +47,6 @@ const CreateVariable = ({ pre, model, value, setValue, rows, setRows }: Variable
     };
     return (
         <>
-            <div className="mt-[20px] mb-[10px] text-[14px] font-[600] flex items-end">
-                文案生成要求
-                <span className="text-[12px] text-[#15273799]">（对生成的文案内容就行自定义要求，直接告诉AI你想怎么改文案）</span>
-                <Popover
-                    placement="top"
-                    title="可以这样提要求"
-                    content={
-                        <div>
-                            <div>把品牌替换为 "xxxxxx"</div>
-                            <div>把价格替换为 "20-50元"</div>
-                            <div>使用更夸张的表达方式</div>
-                        </div>
-                    }
-                >
-                    <Error sx={{ cursor: 'pointer', fontSize: '16px' }} fontSize="small" />
-                </Popover>
-            </div>
-            <TextArea
-                status={demandOpen && !value && model === 'AI_CUSTOM' ? 'error' : ''}
-                ref={iptRef}
-                style={{ height: '200px' }}
-                value={value}
-                onChange={(e) => {
-                    setDemandOpen(true);
-                    setValue(e.target.value);
-                }}
-            />
-            {demandOpen && !value && model === 'AI_CUSTOM' && (
-                <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>
-            )}
-            <Box mb={1}>
-                <div className="text-xs my-[10px] font-[600]">点击变量，增加到文案生成要求</div>
-                {rows.length > 0 &&
-                    rows?.map((item, index: number) => (
-                        <Tooltip key={index} placement="top" title={t('market.fields')}>
-                            <Chip
-                                sx={{ mr: 1, mt: 1 }}
-                                size="small"
-                                color="primary"
-                                onClick={() => {
-                                    const newVal = _.cloneDeep(value);
-                                    if (newVal) {
-                                        const part1 = newVal?.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
-                                        const part2 = newVal?.slice(iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
-                                        setValue(`${part1}{${item.field}}${part2}`);
-                                    } else {
-                                        setValue(`{${item.field}}`);
-                                    }
-                                }}
-                                label={item.field}
-                            ></Chip>
-                        </Tooltip>
-                    ))}
-            </Box>
             <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
@@ -143,7 +81,7 @@ const CreateVariable = ({ pre, model, value, setValue, rows, setRows }: Variable
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.length > 0 &&
+                            {rows?.length > 0 &&
                                 rows?.map((row: any, i: number) => (
                                     <TableRow hover key={row.field}>
                                         <TableCell>{row.field}</TableCell>
@@ -174,7 +112,7 @@ const CreateVariable = ({ pre, model, value, setValue, rows, setRows }: Variable
                                                 okText={t('myApp.confirm')}
                                                 cancelText={t('myApp.cancel')}
                                             >
-                                                <IconButton color="error">
+                                                <IconButton disabled={row.group === 'SYSTEM'} color="error">
                                                     <Delete />
                                                 </IconButton>
                                             </Popconfirm>

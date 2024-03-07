@@ -38,6 +38,7 @@ export interface Anyevent {
         description: string;
         category: string;
         tags: string[];
+        example?: string;
     };
     appModel: { label: string; value: string }[] | undefined;
     sort: undefined | string;

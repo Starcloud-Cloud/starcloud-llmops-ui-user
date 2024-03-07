@@ -72,12 +72,10 @@ export interface TableEnhancedCreateDataType {
 
 const headCells = [
     { id: 'title', numeric: false, disablePadding: false, label: '方案名称' },
-    { id: ' mode', numeric: false, disablePadding: false, label: '创作方式' },
+    { id: ' mode', numeric: false, disablePadding: false, label: '创作模式' },
     { id: 'endpoint', numeric: false, disablePadding: false, label: '是否公开' },
     { id: 'score', numeric: false, disablePadding: false, label: '类目' },
     { id: 'status', numeric: false, disablePadding: false, label: ' 方案标签' },
-    { id: 'example', numeric: false, disablePadding: false, label: ' 文案示例', width: 200 },
-    { id: 'imageExample', numeric: false, disablePadding: false, label: ' 图片示例' },
     { id: 'creator', numeric: false, disablePadding: false, label: ' 创作者' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '创建时间' },
     { id: 'updateTime', numeric: false, disablePadding: false, label: '更新时间' },
@@ -477,15 +475,7 @@ const Copywriting: React.FC = () => {
                                             <span className="line-clamp-1 w-[200px] mx-auto">{row.name}</span>
                                         </Tooltip>
                                     </TableCell>
-                                    <TableCell align="center">
-                                        <span className="line-clamp-1 w-[200px] mx-auto">
-                                            {row.mode === 'RANDOM_IMAGE_TEXT'
-                                                ? '随机图文生成'
-                                                : row.mode === 'PRACTICAL_IMAGE_TEXT'
-                                                ? '干货文生成'
-                                                : '自定义内容拼接'}
-                                        </span>
-                                    </TableCell>
+                                    <TableCell align="center">{row?.appName}</TableCell>
                                     {permissions.includes('creative:scheme:publish') && (
                                         <TableCell align="center">
                                             <div className="flex items-center justify-center">
@@ -502,51 +492,6 @@ const Copywriting: React.FC = () => {
                                                 <Tag color="processing" key={item}>
                                                     {item}
                                                 </Tag>
-                                            ))}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <div className=" min-w-[200px]">
-                                            {row?.copyWritingExample?.map((item: any) => (
-                                                <Popover
-                                                    key={index}
-                                                    placement="top"
-                                                    content={
-                                                        <div className="w-[500px]">
-                                                            <div className="text-[16px] font-[600]">{item.title}</div>
-                                                            <div className="mt-[10px]">{item.content}</div>
-                                                        </div>
-                                                    }
-                                                >
-                                                    <div key={item.title} className="mb-[10px]">
-                                                        {item.title}
-                                                    </div>
-                                                </Popover>
-                                            ))}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <div className="flex gap-2">
-                                            {row?.imageExample?.map((item: any, index: number) => (
-                                                <Popover
-                                                    key={index}
-                                                    placement="top"
-                                                    content={
-                                                        <div className="flex gap-2">
-                                                            {item?.templateList?.map((el: any) => (
-                                                                <Image
-                                                                    key={el?.example}
-                                                                    width={50}
-                                                                    height={50}
-                                                                    src={el?.example}
-                                                                    preview={false}
-                                                                />
-                                                            ))}
-                                                        </div>
-                                                    }
-                                                >
-                                                    <Image width={50} height={50} src={item?.templateList[0]?.example} preview={false} />
-                                                </Popover>
                                             ))}
                                         </div>
                                     </TableCell>

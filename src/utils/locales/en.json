@@ -779,7 +779,8 @@
     "categoryVaid": "Categories Is Required",
     "delApp": "Delete App",
     "json_textarea": " JSON_Textarea",
-    "json": " JSON_Textarea"
+    "json": " JSON_Textarea",
+    "material": "MaterialWarehouse"
   },
   "voiceStyles": {
     "affectionate": "affectionate",

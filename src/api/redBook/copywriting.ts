@@ -43,5 +43,9 @@ export const noteDetail = (data: any) => {
 };
 //自定义内容拼接生成
 export const appList = () => {
-    return request.get({ url: `/llm/creative/scheme/appList/CUSTOM_IMAGE_TEXT` });
+    return request.get({ url: `/llm/creative/scheme/appGroupList` });
+};
+
+export const getExample = (data: any) => {
+    return request.post({ url: `/llm/xhs/content/getExample`, data });
 };

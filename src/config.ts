@@ -8,7 +8,7 @@ import { getTenant, ENUM_TENANT } from 'utils/permission';
 // like '/berry-material-react/react/default'
 export const BASE_PATH = '';
 
-export const DASHBOARD_PATH = getTenant() === ENUM_TENANT.AI ? '/appMarket' : '/copywriting';
+export const DASHBOARD_PATH = getTenant() === ENUM_TENANT.AI ? '/appMarket' : '/';
 export const HORIZONTAL_MAX_ITEM = 6;
 
 const config: ConfigProps = {

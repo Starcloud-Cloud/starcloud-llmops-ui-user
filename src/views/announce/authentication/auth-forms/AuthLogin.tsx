@@ -69,6 +69,8 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const urlInviteCode = query.get('q');
+    const [refreshCount, setRefreshCount] = useState(0);
+    const [needRefresh, setNeedRefresh] = useState(false);
 
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
@@ -111,6 +113,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
 
     const intervalIdRef = useRef<ReturnType<typeof setInterval> | null>(null); // 使用ref存储定时器id
     const isClearedRef = useRef(false); // 用来跟踪是否已经清除了定时器
+    const setTimeOutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // 用来跟踪是否已经清除了定时器
     const [qsState, setQs] = useState(false);
 
     useEffect(() => {
@@ -119,11 +122,20 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             (async () => {
                 const res = await LoginApi.getQRcode({ inviteCode });
                 if (res) {
+                    setNeedRefresh(false);
                     setQrurl(res?.url);
                     setTicket(res?.ticket);
                     if (intervalIdRef.current) {
                         clearInterval(intervalIdRef.current as unknown as number);
                     }
+                    if (setTimeOutRef.current) {
+                        clearTimeout(setTimeOutRef.current);
+                    } else {
+                        setTimeOutRef.current = setTimeout(() => {
+                            setNeedRefresh(true);
+                        }, 1000 * 60 * 3);
+                    }
+
                     isClearedRef.current = false;
                 }
             })();
@@ -133,8 +145,14 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             }
             isClearedRef.current = true;
         }
+        return () => {
+            if (setTimeOutRef.current) {
+                clearTimeout(setTimeOutRef.current);
+            }
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open, inviteCode, qsState]);
+    }, [open, inviteCode, qsState, refreshCount]);
+
     useEffect(() => {
         const polling = async () => {
             const res = await LoginApi.qRcodeLogin({ ticket, inviteCode });
@@ -142,7 +160,6 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                 return;
             }
             const expires = (res.data.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
-            console.log(res, 'res');
             jsCookie.set('token', res.data.accessToken, {
                 expires
             });
@@ -169,7 +186,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                 clearInterval(intervalIdRef.current as unknown as number);
             }
         };
-    }, [ticket, isLoggedIn, login, inviteCode, open]);
+    }, [ticket, isLoggedIn, login, inviteCode, open, refreshCount]);
 
     return (
         <div className="relative">
@@ -425,13 +442,38 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                     </Grid>
                     <div className="flex justify-center mt-5 h-[233] w-[233]">
                         {checked ? (
-                            <img
-                                className="border rounded border-[#e0e0e098] border-solid"
-                                height="233"
-                                width="233"
-                                src={qrUrl || 'https://via.placeholder.com/200'}
-                                alt="QR code"
-                            />
+                            <div className="relative flex justify-center items-center">
+                                <img
+                                    className="border rounded border-[#e0e0e098] border-solid"
+                                    height="233"
+                                    width="233"
+                                    src={qrUrl || 'https://via.placeholder.com/200'}
+                                    alt="QR code"
+                                />
+                                {needRefresh && (
+                                    <div className="absolute flex justify-center items-center bg-black bg-opacity-50 left-0 top-0 w-[233px] h-[233px]">
+                                        <svg
+                                            onClick={() => setRefreshCount((pre) => pre + 1)}
+                                            className="absolute flex justify-center items-center cursor-pointer"
+                                            viewBox="0 0 1024 1024"
+                                            version="1.1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            p-id="1918"
+                                            width="48"
+                                            height="48"
+                                        >
+                                            <path
+                                                d="M938.336973 255.26894c-16.685369-6.020494-35.090879 2.752226-40.939358 19.437594l-24.770032 69.493701c-29.070385-65.537376-74.998152-123.162103-133.48295-166.337645-185.947253-137.611288-450.848984-100.112212-590.180413 83.942886C81.534688 350.908785 52.980346 460.653788 68.805644 570.742819c15.825298 110.605073 74.48211 208.481102 164.789518 275.394591 75.686209 55.904586 164.273476 83.082815 252.172686 83.082815 128.494541 0 255.26894-57.624727 338.007727-166.853687 36.639006-48.335965 61.581052-102.348396 74.48211-160.833193 3.78431-17.373425-7.224593-34.402822-24.426004-38.187133-17.201411-3.78431-34.402822 7.052579-38.187133 24.426004-10.836889 49.36805-31.994625 95.123803-62.957164 135.891147-118.173694 156.016798-342.996136 187.839409-500.90509 70.869814-76.546279-56.592642-126.086343-139.33143-139.503444-232.907106-13.417101-93.059634 10.664875-185.775239 67.77356-261.11742C318.05409 144.491853 542.704519 112.497228 700.785486 229.466823c57.280699 42.315471 100.112212 100.972283 123.334117 167.197715l-110.261045-43.003528c-16.513355-6.364522-35.090879 1.720141-41.627415 18.233496-6.536536 16.513355 1.720141 35.090879 18.233496 41.627415l162.38132 63.473207c3.78431 1.548127 7.740635 2.236183 11.69696 2.236183 0.516042 0 1.032085-0.172014 1.548127-0.172014 1.204099 0.172014 2.408198 0.688056 3.612296 0.688056 13.245087 0 25.630102-8.256677 30.274483-21.32975l57.796741-161.693264C963.623047 279.694944 955.022342 261.289434 938.336973 255.26894z"
+                                                fill="#FFF"
+                                                p-id="1919"
+                                            ></path>
+                                        </svg>
+                                        <div className="absolute flex justify-center items-center cursor-pointer bottom-[70px] text-[#FFF]">
+                                            已过期 点击刷新
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <img
                                 className="border rounded border-[#e0e0e098] border-solid"

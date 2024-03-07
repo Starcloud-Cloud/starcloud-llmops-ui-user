@@ -184,7 +184,7 @@ const plansDefault = (value: number) => [
         keyword: 'basic',
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
-        title: '基础版',
+        title: '个人版',
         description: value === 1 ? '3000魔法豆，300点作图' : '36000魔法豆，3600点作图',
         monthPrice: 59,
         yearPrice: 599,
@@ -203,21 +203,21 @@ const plansDefault = (value: number) => [
         monthCode: 'basic_month',
         yearCode: 'basic_year'
     },
-    {
-        keyword: 'plus',
-        active: false,
-        icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
-        title: '高级版',
-        description: value === 1 ? '10000魔法豆，1000点作图' : '120000魔法豆，12000点作图',
-        monthPrice: 199,
-        yearPrice: 1999,
-        preMonthPrice: 166.58,
-        des: '适用于专业卖家',
-        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        btnText: '立即购买',
-        monthCode: 'plus_month',
-        yearCode: 'plus_year'
-    },
+    // {
+    //     keyword: 'plus',
+    //     active: false,
+    //     icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
+    //     title: '高级版',
+    //     description: value === 1 ? '10000魔法豆，1000点作图' : '120000魔法豆，12000点作图',
+    //     monthPrice: 199,
+    //     yearPrice: 1999,
+    //     preMonthPrice: 166.58,
+    //     des: '适用于专业卖家',
+    //     permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    //     btnText: '立即购买',
+    //     monthCode: 'plus_month',
+    //     yearCode: 'plus_year'
+    // },
     {
         keyword: 'pro',
         active: false,
@@ -232,19 +232,19 @@ const plansDefault = (value: number) => [
         btnText: '立即购买',
         monthCode: 'pro_month',
         yearCode: 'pro_year'
-    },
-    {
-        keyword: 'business',
-        active: false,
-        icon: <DirectionsBoatTwoToneIcon fontSize="large" />,
-        title: '企业版',
-        description: '拥有企业个性化的AI模型和系统',
-        price: '专属顾问',
-        monthPrice: '专属顾问',
-        yearPrice: '专属顾问',
-        permission: [0, 1, 2, 3, 4, 5],
-        btnText: '扫码咨询'
     }
+    // {
+    //     keyword: 'business',
+    //     active: false,
+    //     icon: <DirectionsBoatTwoToneIcon fontSize="large" />,
+    //     title: '企业版',
+    //     description: '拥有企业个性化的AI模型和系统',
+    //     price: '专属顾问',
+    //     monthPrice: '专属顾问',
+    //     yearPrice: '专属顾问',
+    //     permission: [0, 1, 2, 3, 4, 5],
+    //     btnText: '扫码咨询'
+    // }
 ];
 
 const planListDefault = (value: number) => [
@@ -425,7 +425,7 @@ let interval: any;
 
 const Price1 = () => {
     const [planList, setPlanList] = useState<any[]>(planListDefault(1));
-    const [plans, setPlans] = useState<any[]>([]);
+    const [plans, setPlans] = useState<any[]>(plansDefault(1));
     const { isLoggedIn } = useAuth();
     const theme = useTheme();
     const [openDialog, setOpenDialog] = useState(false);
@@ -437,7 +437,7 @@ const Price1 = () => {
     const [showTrial, setShowTrial] = useState(false);
     const [tabs, setTabs] = useState<any[]>([]);
 
-    const [value, setValue] = useState<any>();
+    const [value, setValue] = useState<any>('');
 
     const [open, setOpen] = React.useState(false);
     const [openSign, setOpenSign] = React.useState(false);
@@ -810,7 +810,7 @@ const Price1 = () => {
         }
     };
 
-    console.log('plans', plans);
+    console.log('value', value);
     return (
         <div>
             <HeaderWrapper id="vip">
@@ -876,9 +876,9 @@ const Price1 = () => {
                                             </Grid>
 
                                             <Grid item xs={12}>
-                                                {index === 1 || index === 2 || index === 3 ? (
+                                                {['basic', 'plus', 'pro'].includes(plan.keyword) ? (
                                                     <div className="text-sm text-center text-[#d7d7d7] line-through">
-                                                        ￥{plan?.marketPrice}/{plan?.unitName}
+                                                        ￥{plan?.marketPrice}/{value?.toString()?.includes('-') ? '年' : '月'}
                                                     </div>
                                                 ) : (
                                                     <div className="h-[24px]"></div>
@@ -896,10 +896,12 @@ const Price1 = () => {
                                                         }
                                                     }}
                                                 >
-                                                    {(index === 1 || index === 2 || index === 3) && <span>￥</span>}
+                                                    {['basic', 'plus', 'pro'].includes(plan.keyword) && <span>￥</span>}
                                                     {plan.payPrice}
-                                                    {(index === 1 || index === 2 || index === 3) && (
-                                                        <span className="text-[#aaa]">/{plan?.unitName}</span>
+                                                    {['basic', 'plus', 'pro'].includes(plan.keyword) && (
+                                                        <span className="text-[#aaa]">
+                                                            /{value?.toString()?.includes('-') ? '年' : '月'}
+                                                        </span>
                                                     )}
                                                 </Typography>
                                                 <div className="text-[#aaa] text-sm text-center">{plan?.des}</div>

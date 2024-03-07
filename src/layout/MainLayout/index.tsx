@@ -495,110 +495,121 @@ const MainLayout = () => {
     // }, []);
     return (
         <ListingProvider>
-            <div className="flex flex-col">
-                {timeOutObj && (
-                    <div className="flex justify-center bg-[#f4f6f8] py-1">
-                        <div className="flex items-center">
-                            {timeOutObj?.type === 1 ? (
-                                <span className="text-sm">
-                                    当前套餐即将过期，{timeOutObj?.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
-                                </span>
-                            ) : timeOutObj?.type === 2 ? (
-                                <span className="text-sm">
-                                    当前魔法豆将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
-                                </span>
-                            ) : (
-                                <span className="text-sm">当前魔法豆不足{timeOutObj?.num}，为避免影响正常使用，请尽快购买升级</span>
-                            )}
-                            <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
-                                立即续费
-                            </Button>
-                            <div className="flex items-center" onClick={() => setTimeOutObj(null)}>
-                                <CloseIcon className="text-base ml-3 cursor-pointer" />
+            <div className="w-full">
+                <div className="w-full">
+                    <img
+                        src={require('../../assets/images/header/present.jpeg')}
+                        className="cursor-pointer w-full"
+                        onClick={() => {
+                            navigate('/subscribe');
+                        }}
+                    />
+                </div>
+                <div className="flex flex-col">
+                    {timeOutObj && (
+                        <div className="flex justify-center bg-[#f4f6f8] py-1">
+                            <div className="flex items-center">
+                                {timeOutObj?.type === 1 ? (
+                                    <span className="text-sm">
+                                        当前套餐即将过期，{timeOutObj?.time}天后套餐将自动调整为免费版，为避免影响正常使用，请尽快续费
+                                    </span>
+                                ) : timeOutObj?.type === 2 ? (
+                                    <span className="text-sm">
+                                        当前魔法豆将在{timeOutObj?.time}天后过期，为避免影响正常使用，请尽快购买升级
+                                    </span>
+                                ) : (
+                                    <span className="text-sm">当前魔法豆不足{timeOutObj?.num}，为避免影响正常使用，请尽快购买升级</span>
+                                )}
+                                <Button size="small" type="primary" className="ml-4" onClick={() => navigate('/subscribe')}>
+                                    立即续费
+                                </Button>
+                                <div className="flex items-center" onClick={() => setTimeOutObj(null)}>
+                                    <CloseIcon className="text-base ml-3 cursor-pointer" />
+                                </div>
                             </div>
                         </div>
+                    )}
+                    <div className="relative flex-1">
+                        <Box sx={{ display: 'flex' }}>
+                            <CssBaseline />
+                            {/* header */}
+                            <AppBar
+                                enableColorOnDark
+                                position="absolute"
+                                color="inherit"
+                                elevation={0}
+                                sx={{ bgcolor: theme.palette.background.default }}
+                            >
+                                {header}
+                            </AppBar>
+
+                            {/* horizontal menu-list bar */}
+                            {layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd && <HorizontalBar />}
+
+                            {/* drawer */}
+                            {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
+
+                            {/* main content */}
+                            <Main theme={theme} open={drawerOpen} layout={layout}>
+                                {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
+                                {!isLarge ? (
+                                    <Container
+                                        className={`max-w-[1300px] h-full ${isMobile && '!px-0'}`}
+                                        {...(!container && { sx: { px: { xs: 0 } } })}
+                                    >
+                                        {/* breadcrumb */}
+                                        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                                        <Outlet />
+                                    </Container>
+                                ) : (
+                                    <Container
+                                        maxWidth={false}
+                                        className={`h-full ${isMobile && '!px-0'}`}
+                                        {...(!container && { sx: { px: { xs: 0 } } })}
+                                    >
+                                        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+                                        <Outlet />
+                                    </Container>
+                                )}
+                                {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL) && <ChatLink navigate={navigate} />}
+                                {phoneOpne && (
+                                    <Phone
+                                        phoneOpne={phoneOpne}
+                                        title="绑定手机号"
+                                        submitText="绑定"
+                                        onClose={() => {
+                                            storage.set('phonenumber', '1', { exp: 60 * 60 * 24 });
+                                            setPhoneOpen(false);
+                                        }}
+                                        emits={async () => {
+                                            setPhoneOpen(false);
+                                            const result = await getUserInfo();
+                                            setuse(result);
+                                        }}
+                                    />
+                                )}
+                                {newUserVipOpen && (
+                                    <NewUserVip
+                                        onClose={() => {
+                                            const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
+                                            localStorage.setItem(`newUserVipEndTime-${allDetail?.allDetail.id}`, newUserVipEndTime);
+                                            setNewUserVipOpen(false);
+                                        }}
+                                    />
+                                )}
+                                {openInvite && (
+                                    <InviteUser
+                                        onClose={() => {
+                                            // 由3天改成不展示
+                                            const inviteUserVipEndTime = dayjs().add(999, 'y').format('YYYY-MM-DD HH:mm:ss');
+                                            localStorage.setItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`, inviteUserVipEndTime);
+                                            setOpenInvite(false);
+                                        }}
+                                    />
+                                )}
+                            </Main>
+                        </Box>
                     </div>
-                )}
-                <div className="relative flex-1">
-                    <Box sx={{ display: 'flex' }}>
-                        <CssBaseline />
-                        {/* header */}
-                        <AppBar
-                            enableColorOnDark
-                            position="absolute"
-                            color="inherit"
-                            elevation={0}
-                            sx={{ bgcolor: theme.palette.background.default }}
-                        >
-                            {header}
-                        </AppBar>
-
-                        {/* horizontal menu-list bar */}
-                        {layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd && <HorizontalBar />}
-
-                        {/* drawer */}
-                        {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
-
-                        {/* main content */}
-                        <Main theme={theme} open={drawerOpen} layout={layout}>
-                            {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
-                            {!isLarge ? (
-                                <Container
-                                    className={`max-w-[1300px] h-full ${isMobile && '!px-0'}`}
-                                    {...(!container && { sx: { px: { xs: 0 } } })}
-                                >
-                                    {/* breadcrumb */}
-                                    <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                                    <Outlet />
-                                </Container>
-                            ) : (
-                                <Container
-                                    maxWidth={false}
-                                    className={`h-full ${isMobile && '!px-0'}`}
-                                    {...(!container && { sx: { px: { xs: 0 } } })}
-                                >
-                                    <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
-                                    <Outlet />
-                                </Container>
-                            )}
-                            {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL) && <ChatLink navigate={navigate} />}
-                            {phoneOpne && (
-                                <Phone
-                                    phoneOpne={phoneOpne}
-                                    title="绑定手机号"
-                                    submitText="绑定"
-                                    onClose={() => {
-                                        storage.set('phonenumber', '1', { exp: 60 * 60 * 24 });
-                                        setPhoneOpen(false);
-                                    }}
-                                    emits={async () => {
-                                        setPhoneOpen(false);
-                                        const result = await getUserInfo();
-                                        setuse(result);
-                                    }}
-                                />
-                            )}
-                            {newUserVipOpen && (
-                                <NewUserVip
-                                    onClose={() => {
-                                        const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
-                                        localStorage.setItem(`newUserVipEndTime-${allDetail?.allDetail.id}`, newUserVipEndTime);
-                                        setNewUserVipOpen(false);
-                                    }}
-                                />
-                            )}
-                            {openInvite && (
-                                <InviteUser
-                                    onClose={() => {
-                                        // 由3天改成不展示
-                                        const inviteUserVipEndTime = dayjs().add(999, 'y').format('YYYY-MM-DD HH:mm:ss');
-                                        localStorage.setItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`, inviteUserVipEndTime);
-                                        setOpenInvite(false);
-                                    }}
-                                />
-                            )}
-                        </Main>
-                    </Box>
                 </div>
             </div>
         </ListingProvider>

@@ -17,7 +17,7 @@ import {
     Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Popover, Radio, Tag, Button as AntButton, Descriptions } from 'antd';
+import { Popover, Radio, Tag, Button as AntButton, Descriptions, Badge } from 'antd';
 
 // project imports
 import { gridSpacing } from 'store/constant';
@@ -926,6 +926,35 @@ const Price1 = () => {
                                                             {plan.btnText}
                                                         </Button>
                                                     </Popover>
+                                                ) : plan.title === '个人版' && !value.toString()?.includes('-') ? (
+                                                    <Badge count={'买3送1'} className="w-full" offset={[-30, 0]}>
+                                                        <Button
+                                                            className={'w-4/5'}
+                                                            variant={plan.active ? 'contained' : 'outlined'}
+                                                            onClick={() => {
+                                                                setCurrentSelect({
+                                                                    title: plan.title,
+                                                                    select: value,
+                                                                    payId: plan.id,
+                                                                    isSubscribe: plan?.isSubscribe,
+                                                                    skus: plan.skus
+                                                                });
+                                                                handleClick(index, plan.id);
+                                                            }}
+                                                            color="secondary"
+                                                        >
+                                                            <div className="flex flex-col justify-center items-center">
+                                                                <div> {plan.btnText}</div>
+                                                                {plan?.isSubscribe && (
+                                                                    <div className="flex justify-center items-center">
+                                                                        <Tag color="#f50" className="!mr-0">
+                                                                            订阅优惠10元
+                                                                        </Tag>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </Button>
+                                                    </Badge>
                                                 ) : (
                                                     <Button
                                                         className={'w-4/5'}
@@ -942,11 +971,11 @@ const Price1 = () => {
                                                         }}
                                                         color="secondary"
                                                     >
-                                                        <div className="flex flex-col">
+                                                        <div className="flex flex-col justify-center items-center">
                                                             <div> {plan.btnText}</div>
                                                             {plan?.isSubscribe && (
-                                                                <div>
-                                                                    <Tag className="ml-1" color="#f50">
+                                                                <div className="flex justify-center items-center">
+                                                                    <Tag color="#f50" className="!mr-0">
                                                                         订阅优惠10元
                                                                     </Tag>
                                                                 </div>

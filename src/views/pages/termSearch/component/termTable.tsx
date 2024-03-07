@@ -15,6 +15,7 @@ const TermTable = ({
     total,
     tableData,
     type,
+    handleExport,
     setPageQuery,
     getExtended
 }: {
@@ -24,6 +25,7 @@ const TermTable = ({
     total: number;
     tableData: any[];
     type: number;
+    handleExport: () => void;
     setPageQuery: (data: any) => void;
     getExtended: (data: number) => void;
 }) => {
@@ -572,11 +574,12 @@ const TermTable = ({
             tableRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [JSON.stringify(tableData)]);
+
     return (
         <div ref={tableRef}>
             <div className="sticky top-0 z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
                 <div>
-                    <Button>导出</Button>
+                    <Button onClick={handleExport}>导出</Button>
                     <Button className="mx-[10px]" onClick={() => setOpen(true)} disabled={selectedRowKeys.length === 0}>
                         加入词库
                     </Button>

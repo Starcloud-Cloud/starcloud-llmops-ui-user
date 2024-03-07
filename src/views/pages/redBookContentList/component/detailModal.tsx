@@ -20,7 +20,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import React from 'react';
 import { ThreeStep } from './threeStep';
-import { getContentDetail } from 'api/redBook';
+import { getContentDetail, getContentDetail1 } from 'api/redBook';
 
 type IAddAiModalProps = {
     open: boolean;
@@ -33,11 +33,19 @@ export const DetailModal = ({ open, handleClose, businessUid, show }: IAddAiModa
     const [detail, setDetail] = useState(null);
 
     useEffect(() => {
-        getContentDetail(businessUid).then((res) => {
-            if (res) {
-                setDetail(res);
-            }
-        });
+        if (show) {
+            getContentDetail1(businessUid).then((res) => {
+                if (res) {
+                    setDetail(res);
+                }
+            });
+        } else {
+            getContentDetail(businessUid).then((res) => {
+                if (res) {
+                    setDetail(res);
+                }
+            });
+        }
     }, [businessUid]);
 
     return (

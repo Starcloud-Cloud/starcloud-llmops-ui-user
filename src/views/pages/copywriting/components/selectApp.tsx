@@ -65,7 +65,7 @@ const SelectApp = ({
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title="选择应用"
+                title="创作模版"
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">

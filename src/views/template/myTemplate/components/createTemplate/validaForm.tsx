@@ -99,7 +99,8 @@ const Valida = ({
     }, [allvalida]);
     const typeList = [
         { label: t('myApp.input'), value: 'INPUT' },
-        { label: t('myApp.textarea'), value: 'TEXTAREA' }
+        { label: t('myApp.textarea'), value: 'TEXTAREA' },
+        { label: 'JSON 类型', value: 'JSON' }
     ];
     const fn = (data: any[]) => {
         const Data: Record<string, any> = {};
@@ -355,25 +356,6 @@ const Valida = ({
                         <Typography fontSize="16px">{t('myApp.stepStyle')}</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <FormControl fullWidth>
-                            <InputLabel id="responent">{t('myApp.responent')}</InputLabel>
-                            <Select
-                                color="secondary"
-                                onChange={(e) => {
-                                    basisChange({ e: e.target, index, i: 0, flag: false });
-                                }}
-                                name="res"
-                                labelId="responent"
-                                value={responent.style}
-                                label={t('myApp.responent')}
-                            >
-                                {typeList.map((item, i) => (
-                                    <MenuItem key={i} value={item.value}>
-                                        {item.label}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
                         <TextField
                             required
                             name="buttonLabel"
@@ -386,6 +368,75 @@ const Valida = ({
                             value={buttonLabel}
                             sx={{ mt: 2 }}
                         />
+                    </AccordionDetails>
+                </Accordion>
+                <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content4" id="panel1a-header4">
+                        <Typography fontSize="16px">响应类型</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <FormControl fullWidth>
+                            <InputLabel color="secondary" id="responent">
+                                响应类型
+                            </InputLabel>
+                            <Select
+                                color="secondary"
+                                onChange={(e) => {
+                                    basisChange({ e: e.target, index, i: 0, flag: false });
+                                }}
+                                name="type"
+                                labelId="responent"
+                                value={responent.type}
+                                label="响应类型"
+                            >
+                                <MenuItem value={'TEXT'}>文本类型</MenuItem>
+                                <MenuItem value={'JSON'}>JSON 类型</MenuItem>
+                            </Select>
+                        </FormControl>
+                        {responent.type && (
+                            <FormControl className="mt-[16px]" color="secondary" fullWidth>
+                                <InputLabel color="secondary" id="responent">
+                                    {t('myApp.responent')}
+                                </InputLabel>
+                                <Select
+                                    color="secondary"
+                                    onChange={(e) => {
+                                        basisChange({ e: e.target, index, i: 0, flag: false });
+                                    }}
+                                    name="res"
+                                    labelId="responent"
+                                    value={responent.style}
+                                    label={t('myApp.responent')}
+                                >
+                                    {typeList.map((item, i) => (
+                                        <MenuItem
+                                            disabled={
+                                                item.value === 'JSON' && responent.type === 'TEXT'
+                                                    ? true
+                                                    : (item.value === 'INPUT' || item.value === 'TEXTAREA') && responent.type === 'JSON'
+                                                    ? true
+                                                    : false
+                                            }
+                                            key={i}
+                                            value={item.value}
+                                        >
+                                            {item.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        )}
+                        {responent.type === 'JSON' && (
+                            <TextArea
+                                key={responent?.output?.jsonSchema}
+                                defaultValue={responent?.output?.jsonSchema}
+                                className="mt-[16px]"
+                                style={{ height: '200px' }}
+                                onBlur={(e) => {
+                                    basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
+                                }}
+                            />
+                        )}
                     </AccordionDetails>
                 </Accordion>
             </form>

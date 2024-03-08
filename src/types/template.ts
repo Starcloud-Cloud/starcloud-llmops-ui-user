@@ -60,7 +60,7 @@ export type Rows = {
 export interface Validas {
     variable: Rows[];
     variables: Rows[];
-    responent: { style: string };
+    responent: { style: string; type?: string; output?: { jsonSchema?: string } };
     buttonLabel: string;
     index: number;
     fields: string;

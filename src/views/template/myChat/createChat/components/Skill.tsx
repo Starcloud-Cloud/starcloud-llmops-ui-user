@@ -243,7 +243,7 @@ const WorkflowCreateModal = ({
     const [page, setPage] = useState(1);
     const [skillUpgradeOnline, setSkillUpgradeOnline] = useState(false);
     const allDetail = useAllDetail();
-    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfig?.usableSkillPlugin || 0;
+    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableSkillPlugin || 0;
 
     useEffect(() => {
         (async () => {
@@ -494,7 +494,7 @@ export const Skill = ({ chatBotInfo, setChatBotInfo }: { chatBotInfo: IChatInfo;
     const [skillCountVisible, setSkillCountVisible] = useState(false);
     const forceUpdate = () => setCount((pre) => pre + 1);
     const allDetail = useAllDetail();
-    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfig?.usableSkillPlugin || 0;
+    const totalNum = allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableSkillPlugin || 0;
 
     useEffect(() => {
         getSkillList(appId || '').then((res) => {

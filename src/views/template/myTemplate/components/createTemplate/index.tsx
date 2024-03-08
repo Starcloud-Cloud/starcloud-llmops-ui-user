@@ -344,6 +344,17 @@ function CreateDetail() {
         } else {
             if (e.name === 'res') {
                 oldValue.workflowConfig.steps[index].flowStep.response.style = e.value;
+            } else if (e.name === 'type') {
+                oldValue.workflowConfig.steps[index].flowStep.response.type = e.value;
+                if (e.value !== 'JSON') {
+                    oldValue.workflowConfig.steps[index].flowStep.response.output = undefined;
+                }
+            } else if (e.name === 'output') {
+                if (oldValue.workflowConfig.steps[index].flowStep.response.output) {
+                    oldValue.workflowConfig.steps[index].flowStep.response.output.jsonSchema = e.value;
+                } else {
+                    oldValue.workflowConfig.steps[index].flowStep.response.output = { jsonSchema: e.value };
+                }
             } else {
                 if (values) {
                     oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].value = e.value;

@@ -248,7 +248,9 @@ function Perform({
                                     </Grid>
                                 </form>
                                 <Box my={1}>
-                                    {item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'INPUT' ? (
+                                    {item.flowStep.response.style === 'TEXTAREA' ||
+                                    item.flowStep.response.style === 'INPUT' ||
+                                    item.flowStep.response.style === 'JSON' ? (
                                         // <>
                                         //     <Typography color="#697586" ml={1} mb={-1.5} display="flex" alignItems="center">
                                         //         <AutoAwesomeIcon fontSize="small" />
@@ -332,8 +334,16 @@ function Perform({
                                                 value={item.flowStep.response.answer}
                                                 placeholder={item.flowStep.response.defaultValue}
                                                 multiline
-                                                minRows={item.flowStep.response.style === 'TEXTAREA' ? 5 : 1}
-                                                maxRows={item.flowStep.response.style === 'TEXTAREA' ? 7 : 2}
+                                                minRows={
+                                                    item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'JSON'
+                                                        ? 5
+                                                        : 1
+                                                }
+                                                maxRows={
+                                                    item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'JSON'
+                                                        ? 7
+                                                        : 2
+                                                }
                                             />
                                             {item.flowStep.response.answer && isShows[steps] && (
                                                 <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">

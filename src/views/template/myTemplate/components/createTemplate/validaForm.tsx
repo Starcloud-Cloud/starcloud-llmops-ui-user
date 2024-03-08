@@ -389,8 +389,7 @@ const Valida = ({
                                 value={responent.type}
                                 label="响应类型"
                             >
-                                <MenuItem value={'SELECT'}>下拉框</MenuItem>
-                                <MenuItem value={'TEXT'}>文本框</MenuItem>
+                                <MenuItem value={'TEXT'}>文本类型</MenuItem>
                                 <MenuItem value={'JSON'}>JSON 类型</MenuItem>
                             </Select>
                         </FormControl>

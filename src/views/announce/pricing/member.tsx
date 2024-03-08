@@ -862,7 +862,7 @@ const Price1 = () => {
                                                         <div className="flex flex-col">
                                                             <div> {plan.btnText}</div>
                                                             {plan?.isSubscribe && (
-                                                                <div>
+                                                                <div className="flex justify-center items-center">
                                                                     <Tag className="ml-1" color="#f50">
                                                                         订阅优惠{plan.payPrice - plan.subscribeMoney}元
                                                                     </Tag>

@@ -635,7 +635,7 @@ const BatcSmallRedBooks = () => {
                         </div>
                     </Col>
                     <Col span={18} className="overflow-hidden">
-                        {planList?.length === 0 ? (
+                        {bathList?.length === 0 ? (
                             <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
                                 <div className="text-center">
                                     <img

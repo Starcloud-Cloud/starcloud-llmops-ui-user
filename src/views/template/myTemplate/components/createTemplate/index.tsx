@@ -15,7 +15,7 @@ import {
     Typography
 } from '@mui/material';
 import { Image, Select, Popover } from 'antd';
-import { ArrowBack, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
+import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
 import { executeApp } from 'api/template/fetch';
@@ -32,7 +32,7 @@ import Arrange from './arrange';
 import Basis from './basis';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import Upload from './upLoad';
-import { del } from 'api/template';
+import { del, copy } from 'api/template';
 import marketStore from 'store/market';
 import useUserStore from 'store/user';
 import _ from 'lodash-es';
@@ -499,6 +499,36 @@ function CreateDetail() {
                                 </ListItemIcon>
                                 <Typography variant="inherit" noWrap>
                                     {t('myApp.delApp')}
+                                </Typography>
+                            </MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    copy({ uid: searchParams.get('uid') }).then((res) => {
+                                        if (res) {
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '复制成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                    transition: 'SlideDown',
+                                                    close: false
+                                                })
+                                            );
+                                            setDelAnchorEl(null);
+                                            navigate('/my-app');
+                                        }
+                                    });
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <ContentPaste color="secondary" />
+                                </ListItemIcon>
+                                <Typography variant="inherit" noWrap>
+                                    复制应用
                                 </Typography>
                             </MenuItem>
                         </Menu>

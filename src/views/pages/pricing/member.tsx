@@ -548,7 +548,8 @@ const Price1 = () => {
                                         marketPrice: sku.marketPrice / 100,
                                         unitName: item.unitName,
                                         isSubscribe: sku.subscribeConfig?.isSubscribe,
-                                        skus: item.skus.filter((item: any) => item.properties[0].remark === 'MONTH')
+                                        skus: item.skus.filter((item: any) => item.properties[0].remark === 'MONTH'),
+                                        subscribeMoney: sku.subscribeConfig?.price / 100
                                     });
                                 }
                             }
@@ -572,7 +573,8 @@ const Price1 = () => {
                                         marketPrice: sku.marketPrice / 100,
                                         unitName: item.unitName,
                                         isSubscribe: sku.subscribeConfig?.isSubscribe,
-                                        skus: item.skus.filter((item: any) => item.properties[0].remark === 'YEAR')
+                                        skus: item.skus.filter((item: any) => item.properties[0].remark === 'YEAR'),
+                                        subscribeMoney: sku.subscribeConfig?.price / 100
                                     });
                                 }
                             }
@@ -937,7 +939,8 @@ const Price1 = () => {
                                                                     select: value,
                                                                     payId: plan.id,
                                                                     isSubscribe: plan?.isSubscribe,
-                                                                    skus: plan.skus
+                                                                    skus: plan.skus,
+                                                                    subscribeMoney: plan?.subscribeMoney
                                                                 });
                                                                 handleClick(index, plan.id);
                                                             }}
@@ -948,7 +951,7 @@ const Price1 = () => {
                                                                 {plan?.isSubscribe && (
                                                                     <div className="flex justify-center items-center">
                                                                         <Tag color="#f50" className="!mr-0">
-                                                                            订阅优惠10元
+                                                                            订阅优惠{plan.payPrice - plan.subscribeMoney}元
                                                                         </Tag>
                                                                     </div>
                                                                 )}

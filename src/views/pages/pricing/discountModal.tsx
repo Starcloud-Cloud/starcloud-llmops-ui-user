@@ -208,7 +208,7 @@ export function DiscountModal({
                                                 <div className="flex justify-center items-center">
                                                     <span>订阅</span>
                                                     <Tag className="ml-1" color="#f50">
-                                                        立减10元
+                                                        立减{currentSelect?.totalPrice / 100 - currentSelect?.subscribeMoney}元
                                                     </Tag>
                                                 </div>
                                             }

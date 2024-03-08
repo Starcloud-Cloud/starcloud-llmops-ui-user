@@ -796,7 +796,7 @@ const Price1 = () => {
                                             <Grid item xs={12}>
                                                 {index === 1 || index === 2 || index === 3 ? (
                                                     <div className="text-sm text-center text-[#d7d7d7] line-through">
-                                                        ￥{plan?.marketPrice}/{plan?.unitName}
+                                                        ￥{plan?.marketPrice}/{value?.toString()?.includes('-') ? '年' : '月'}
                                                     </div>
                                                 ) : (
                                                     <div className="h-[24px]"></div>

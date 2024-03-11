@@ -61,3 +61,19 @@ export const failureRetry = (uid: any) => {
 export const batchPages = (data: any) => {
     return request.get({ url: `/llm/creative/batch/page`, params: data });
 };
+//获取素材元数据
+export const metadata = () => {
+    return request.get({ url: `/llm/creative/material/metadata` });
+};
+//获取表头数据
+export const materialTemplate = (type: any) => {
+    return request.get({ url: `/llm/material/template/${type}` });
+};
+//导入素材
+export const materialImport = (data: any) => {
+    return request.upload({ url: `/llm/material/import`, data });
+};
+//查询导入结果
+export const materialResilt = (parseUid: any) => {
+    return request.get({ url: `/llm/material/result/${parseUid}` });
+};

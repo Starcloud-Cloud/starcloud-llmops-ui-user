@@ -46,9 +46,6 @@ export const InviteMatrix = () => {
         <div className="bg-white p-4 rounded">
             <div className="mt-3">
                 <p className="text-black text-2xl">邀请有奖</p>
-                <p className="text-black text-lg">
-                    单次邀请可获取<span className="text-[#693af4]">5</span>个矩阵豆
-                </p>
             </div>
             <Row gutter={24}>
                 <Col span={12}>
@@ -71,7 +68,8 @@ export const InviteMatrix = () => {
                         bordered={false}
                         title="推广素材"
                         style={{
-                            boxShadow: 'none'
+                            boxShadow: 'none',
+                            backgroundColor: '#f5f5f5'
                         }}
                         extra={
                             <svg
@@ -104,14 +102,14 @@ export const InviteMatrix = () => {
                                 <ContentCopyIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
+                        <div className="w-[300px] mx-auto mt-5">
+                            <Button type="primary" block onClick={copyCode}>
+                                复制链接及信息
+                            </Button>
+                        </div>
                     </Card>
                 </Col>
             </Row>
-            <div className="w-[300px] mx-auto mt-5">
-                <Button type="primary" block onClick={copyCode}>
-                    复制链接及信息
-                </Button>
-            </div>
         </div>
     );
 };

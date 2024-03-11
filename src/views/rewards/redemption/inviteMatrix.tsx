@@ -43,16 +43,22 @@ export const InviteMatrix = () => {
     }, []);
 
     return (
-        <div>
+        <div className="bg-white p-4 rounded">
             <div className="mt-3">
-                <p className="text-black text-xl">邀请有奖</p>
+                <p className="text-black text-2xl">邀请有奖</p>
                 <p className="text-black text-lg">
                     单次邀请可获取<span className="text-[#693af4]">5</span>个矩阵豆
                 </p>
             </div>
             <Row gutter={24}>
                 <Col span={12}>
-                    <Card title="拉新规则" bordered={false}>
+                    <Card
+                        title="拉新规则"
+                        bordered={false}
+                        style={{
+                            boxShadow: 'none'
+                        }}
+                    >
                         <div>
                             <p className="text-base">分享二维码，邀请新人成功注册，新用户获得1天试用版。</p>
                             <p className="ml-2">-邀请好友需为之前从未注册过魔法矩阵的新用户。</p>
@@ -62,8 +68,11 @@ export const InviteMatrix = () => {
                 </Col>
                 <Col span={12}>
                     <Card
-                        title="推广素材"
                         bordered={false}
+                        title="推广素材"
+                        style={{
+                            boxShadow: 'none'
+                        }}
                         extra={
                             <svg
                                 onClick={() => handleRadomWord()}

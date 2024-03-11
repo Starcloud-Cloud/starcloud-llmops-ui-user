@@ -11,7 +11,7 @@ export const InviteMatrix = () => {
     const [word, setWord] = React.useState('');
     const { use } = infoStore();
     const copyCode = () => {
-        copy(word + window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
+        copy(word + '\n' + window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
         dispatch(
             openSnackbar({
                 open: true,
@@ -57,9 +57,9 @@ export const InviteMatrix = () => {
                         }}
                     >
                         <div>
-                            <p className="text-base">分享二维码，邀请新人成功注册，新用户获得1天试用版。</p>
+                            <p className="text-base">分享邀请链接，邀请新人成功注册!</p>
                             <p className="ml-2">-邀请好友需为之前从未注册过魔法矩阵的新用户。</p>
-                            <p className="ml-2">-用户每成功邀请1位好友注册，可获得1天个人版会员。</p>
+                            <p className="ml-2">-用户每成功邀请1位好友注册，可获得5点矩阵豆。</p>
                         </div>
                     </Card>
                 </Col>
@@ -94,14 +94,10 @@ export const InviteMatrix = () => {
                         }
                     >
                         <span>{word}</span>
-                        <span className="text-[#693af4]">
+                        <div className="text-[#693af4]">
                             {window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
-                        </span>
-                        <Tooltip arrow placement="top" title={<Box sx={{ p: 0.5, fontSize: '14px' }}>复制</Box>}>
-                            <IconButton size="small" onClick={copyCode}>
-                                <ContentCopyIcon fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
+                        </div>
+
                         <div className="w-[300px] mx-auto mt-5">
                             <Button type="primary" block onClick={copyCode}>
                                 复制链接及信息

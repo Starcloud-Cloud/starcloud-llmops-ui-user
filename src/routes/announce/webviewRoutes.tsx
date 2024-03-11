@@ -14,6 +14,7 @@ const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/com
 const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
 const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
 const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
+const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -27,6 +28,7 @@ const WebviewRoutes = {
     children: [
         { path: '/', element: <PagesLanding /> },
         { path: '/subscribe', element: <PagesPrice /> },
+        { path: '/web-view/exchange', element: <Redemption /> },
         { path: '/web-view/orderRecord', element: <OrderRecord /> },
         { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
         //AI媒体分发嵌入

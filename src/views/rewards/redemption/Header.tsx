@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 // assets
 import Card3 from 'assets/images/cards/card-3.jpg';
 import wechat1 from 'assets/images/landing/wechat.png';
+import wechat2 from 'assets/images/landing/wechat_2.png';
 
 import { styled } from '@mui/system';
 import { redeemBenefits } from 'api/rewards';
@@ -14,6 +15,7 @@ import { useState } from 'react';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
+import { ENUM_PERMISSION, ENUM_TENANT, getPermission, getTenant } from 'utils/permission';
 
 const CustomMainCard = styled(MainCard)({
     '& .MuiCardContent-root': {
@@ -75,7 +77,7 @@ const RedemptionHeader = () => {
                     fontSize: { xs: '0.875rem !important', md: '1rem !important', xl: '1rem !important' }
                 }
             }}
-            title="注册即获取基础权益：10魔法豆 5点作图"
+            title={`注册即获取基础权益：${getPermission(ENUM_PERMISSION.EXCHANGE_SHOW_COUNT)}`}
         >
             <Card>
                 <CardMedia image={Card3} title="Card 3">
@@ -101,7 +103,7 @@ const RedemptionHeader = () => {
                                         fontSize: { xs: '1.2rem', md: '2.125rem', xl: '2.125rem', marginTop: '30px' }
                                     }}
                                 >
-                                    {t('redemption.title')}
+                                    {getPermission(ENUM_PERMISSION.EXCHANGE_SHOW_LABEL)}
                                 </Typography>
                             </Grid>
                             <Grid
@@ -187,7 +189,7 @@ const RedemptionHeader = () => {
                                     >
                                         <CardMedia
                                             component="img"
-                                            image={wechat1}
+                                            image={getTenant() === ENUM_TENANT.AI ? wechat1 : wechat2}
                                             title="QR Code"
                                             sx={{ width: '100px', height: '100px' }}
                                         />

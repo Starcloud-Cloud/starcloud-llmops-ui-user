@@ -49,7 +49,7 @@ export interface GetUserBenefitsPageRes {
 // };
 
 export const getUserBenefitsPage = (pageVO: any): Promise<GetUserBenefitsPageRes> => {
-    return request.get({ url: `/llm/rights/u/page?pageNo=${pageVO.pageNo}&pageSize=${pageVO.pageSize}` });
+    return request.get({ url: `/llm/rights/u/page?pageNo=${pageVO.pageNo}&pageSize=${pageVO.pageSize}&bizId=${pageVO.bizId}` });
 };
 
 // 响应接口

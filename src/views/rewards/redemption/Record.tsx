@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Chip, Modal } from '@mui/material';
+import { Chip, FormControl, Grid, InputAdornment, InputLabel, MenuItem, Modal, Select } from '@mui/material';
 
 // material-ui
 import {
@@ -25,6 +25,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import { getUserBenefitsPage } from 'api/rewards';
 import { Fragment, useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
+import { getDict } from 'api/common';
+import ClearIcon from '@mui/icons-material/Clear';
 
 type TableEnhancedCreateDataType = {
     benefitsName: string;
@@ -158,12 +160,14 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
     const [page, setPage] = useState(0);
     const [dense] = useState(false);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [names, setNames] = useState<any[]>([]);
+    const [bizId, setBizId] = useState<any>('');
 
     const [total, setTotal] = useState(0);
 
     useEffect(() => {
         const fetchPageData = async () => {
-            const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
+            const pageVO = { pageNo: page + 1, pageSize: rowsPerPage, bizId };
             getUserBenefitsPage(pageVO)
                 .then((res) => {
                     // Once the data is fetched, map it and update rows state
@@ -183,7 +187,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
         };
 
         fetchPageData();
-    }, [page, rowsPerPage]);
+    }, [page, rowsPerPage, bizId]);
 
     // Add a new state for rows
     const [rows, setRows] = useState<any[]>([]);
@@ -251,6 +255,14 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
         }
     };
 
+    useEffect(() => {
+        (async () => {
+            const list = await getDict();
+            const options = list?.filter((v: any) => v.dictType === 'user_rights_biz_type');
+            setNames(options);
+        })();
+    }, []);
+
     return (
         <Modal
             open={open}
@@ -278,6 +290,37 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                 }
             >
                 <TableContainer>
+                    <div className="p-2">
+                        <FormControl fullWidth size="small">
+                            <InputLabel id="fromScene">权益名称</InputLabel>
+                            <Select
+                                className="w-[200px]"
+                                value={bizId}
+                                onChange={(e) => {
+                                    const { value } = e.target;
+                                    setBizId(value);
+                                }}
+                                endAdornment={
+                                    bizId && (
+                                        <InputAdornment className="mr-[10px]" position="end">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => {
+                                                    setBizId('');
+                                                }}
+                                            >
+                                                <ClearIcon className="text-sm" />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }
+                            >
+                                {names.map((item) => (
+                                    <MenuItem value={item.value}>{item.label}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </div>
                     <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                         <EnhancedTableHead
                             numSelected={selected.length}
@@ -358,6 +401,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                     labelRowsPerPage="每页行数"
+                    labelDisplayedRows={({ from, to, count }) => `${from}-${to} 共 ${count}条`}
                 />
             </MainCard>
         </Modal>

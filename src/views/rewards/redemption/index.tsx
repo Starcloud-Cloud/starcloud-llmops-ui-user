@@ -5,12 +5,14 @@ import BottomCards from './BottomCards';
 import Header from './Header';
 import MiddleCards from './MiddleCards';
 import Record from './Record';
+import { InviteMatrix } from './inviteMatrix';
+import { ENUM_TENANT, getTenant } from 'utils/permission';
 const Redemption = () => {
     const [openRecord, setOpenRecord] = useState(false); // 新增的状态
     const handleOpenRecord = () => setOpenRecord(true); // 新增的打开函数
     const handleCloseRecord = () => setOpenRecord(false); // 新增的关闭函数
     return (
-        <Grid>
+        <Grid className="bg-[#f5f5f5] min-h-screen">
             <Header />
             <Typography variant="h3" textAlign="center" sx={{ my: 3 }}>
                 {t('redemption.obtain')}
@@ -24,8 +26,14 @@ const Redemption = () => {
                 {'查看权益记录 >'}
             </Typography>
             {openRecord && <Record open={openRecord} handleClose={handleCloseRecord} />}
-            <MiddleCards />
-            <BottomCards />
+            {getTenant() === ENUM_TENANT.AI ? (
+                <>
+                    <MiddleCards />
+                    <BottomCards />
+                </>
+            ) : (
+                <InviteMatrix />
+            )}
         </Grid>
     );
 };

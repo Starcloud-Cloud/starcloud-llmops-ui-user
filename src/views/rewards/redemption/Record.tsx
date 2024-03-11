@@ -291,11 +291,15 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
             >
                 <TableContainer>
                     <div className="p-2">
-                        <FormControl fullWidth size="small">
-                            <InputLabel id="fromScene">权益名称</InputLabel>
+                        <FormControl fullWidth>
+                            <InputLabel id="bizId-label">权益名称</InputLabel>
                             <Select
-                                className="w-[200px]"
+                                labelId="bizId-label"
+                                id="bizIdt"
+                                label="bizId"
                                 value={bizId}
+                                className="w-[300px]"
+                                size="small"
                                 onChange={(e) => {
                                     const { value } = e.target;
                                     setBizId(value);

@@ -1,14 +1,16 @@
 import { TextField, FormControl, InputLabel, Select, MenuItem, Chip, FormHelperText, Autocomplete } from '@mui/material';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Upload, UploadProps, Button, InputNumber, Radio, Modal, Image } from 'antd';
-import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Input } from 'antd';
+import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
+import type { TableProps } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Form from '../../smallRedBook/components/form';
-import { schemeList } from 'api/redBook/batchIndex';
+import Forms from '../../smallRedBook/components/form';
+import axios from 'utils/axios/index';
+import { schemeList, materialTemplate, metadata, materialImport, materialResilt } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const Lefts = ({
@@ -38,10 +40,18 @@ const Lefts = ({
     const [mockData, setMockData] = useState<any[]>([]);
     const [preform, setPerform] = useState(1);
     useEffect(() => {
-        schemeList().then((res: any) => {
-            setMockData(res);
-        });
-    }, []);
+        if (detailData?.targetKeys) {
+            if (preform > 1) {
+                changeBasis('tags', mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.tags);
+                setSchemeLists(mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.variableList);
+            } else {
+                setPerform(preform + 1);
+            }
+        } else {
+            changeBasis('tags', []);
+        }
+    }, [detailData?.targetKeys]);
+
     //上传图片
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
@@ -66,25 +76,22 @@ const Lefts = ({
             console.log('Dropped files', e.dataTransfer.files);
         }
     };
-    useEffect(() => {
-        if (detailData?.targetKeys) {
-            if (preform > 1) {
-                changeBasis('tags', mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.tags);
-                setSchemeLists(mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.variableList);
-            } else {
-                setPerform(preform + 1);
-            }
-        } else {
-            changeBasis('tags', []);
-        }
-    }, [detailData?.targetKeys]);
+    //批量上传素材
+    const [zoomOpen, setZoomOpen] = useState(false); //下载弹框
+    const [downLoadUrl, setDownLoadUrl] = useState(''); //下载的地址
+    const [tableLoading, setTableLoading] = useState(false);
+    const tableRef = useRef<any[]>([]);
+    const [tableData, setTableData] = useState<any[]>([]);
+    const [columns, setColumns] = useState<any[]>([]);
+    //上传素材弹框
+    const [uploadOpen, setUploadOpen] = useState(false);
+    const [parseUid, setParseUid] = useState(''); //上传之后获取的 uid
     //更改基础信息
     const changeBasis = (name: string, value: any) => {
         const newData = _.cloneDeep(detailData);
         newData[name] = value;
         setDetailData(newData);
     };
-
     //保存
     const handleSaveClick = (flag: boolean) => {
         if (!detailData?.name) {
@@ -164,8 +171,125 @@ const Lefts = ({
         const newData = _.cloneDeep(detailData);
         newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUid = detailData?.targetKeys;
-        handleSave({ flag, newData });
+        handleSave({ flag, newData, tableData });
     };
+
+    //获取表头数据
+    const getTableHeader = async () => {
+        // const res = await metadata();
+        const result = await materialTemplate('bookList');
+        const newList = result?.fieldDefine?.map((item: any) => {
+            return {
+                title: item.desc,
+                align: 'center',
+                width: 200,
+                dataIndex: item.fieldName,
+                type: item.type
+            };
+        });
+        setColumns([
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button onClick={() => handleEdit(row, index)} size="small" type="link">
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ]);
+        setDownLoadUrl(result?.templateUrl);
+    };
+    //下载模板
+    const handleDownLoad = async () => {
+        const res = await axios.download({ url: downLoadUrl });
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(res);
+        downloadLink.download = '批量导入模板.xls';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    };
+    //导入文件
+    const fileInputRef = useRef(null);
+    const handleFileSelect = async (event: any) => {
+        event.preventDefault();
+        const files = event.target.files;
+        if (!files.length) return;
+        const selectedFile = files[0];
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        const result = await materialImport(formData);
+        setTableLoading(true);
+        setUploadOpen(false);
+        setParseUid(result?.data);
+    };
+    //获取导出结果
+    const timer: any = useRef(null);
+    const getImportResult = () => {
+        clearInterval(timer.current);
+        timer.current = setInterval(() => {
+            materialResilt(parseUid).then((result) => {
+                if (result?.complete) {
+                    setTableLoading(false);
+                    clearInterval(timer.current);
+                    tableRef.current = result?.materialDTOList;
+                    setTableData(tableRef.current);
+                }
+            });
+        }, 2000);
+    };
+    //删除
+    const handleDel = (index: number) => {
+        const newList = JSON.parse(JSON.stringify(tableRef.current));
+        newList.splice(index, 1);
+        tableRef.current = newList;
+        setTableData(tableRef.current);
+    };
+    const [form] = Form.useForm();
+    const formRef = useRef(form);
+    //编辑
+    const [editOpen, setEditOpen] = useState(false);
+    const [rowIndex, setRowIndex] = useState(0);
+    const handleEdit = (row: any, index: number) => {
+        form.setFieldsValue(row);
+        setRowIndex(index);
+        setEditOpen(true);
+    };
+    useEffect(() => {
+        if (parseUid) {
+            getImportResult();
+        }
+        return () => {
+            clearInterval(timer.current);
+        };
+    }, [parseUid]);
+    useEffect(() => {
+        if (detailData?.creativeMaterialList) {
+            tableRef.current = detailData?.creativeMaterialList;
+            setTableData(tableRef.current);
+        }
+        getTableHeader();
+        schemeList().then((res: any) => {
+            setMockData(res);
+        });
+    }, []);
     return (
         <>
             <div
@@ -233,9 +357,6 @@ const Lefts = ({
                             )}
                         </div>
                         <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
-                            <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
-                                <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
-                            </Modal>
                             <div>
                                 <Upload {...props}>
                                     <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
@@ -245,37 +366,50 @@ const Lefts = ({
                                 </Upload>
                             </div>
                         </div>
-                        <div>
-                            <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
-                            <div className="text-[14px] font-[600] mt-[10px]">
-                                {mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.name}
-                                <span
-                                    onClick={() => {
-                                        navigate(
-                                            `/copywritingModal?uid=${
-                                                mockData?.filter((val) => val?.uid === detailData?.targetKeys)[0]?.uid
-                                            }`
-                                        );
-                                    }}
-                                    className=" ml-[10px] text-[12px] font-[400] cursor-pointer text-[#673ab7] border-b border-solid border-[#673ab7]"
-                                >
-                                    查看方案
-                                </span>
+                        <div className="flex justify-between items-center mt-[20px] mb-[10px]">
+                            <div className="flex gap-2">
+                                <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                                    批量导入
+                                </Button>
+                                <Button size="small" type="primary">
+                                    选择已有素材
+                                </Button>
                             </div>
-                            {schemesList?.map((item: any, de) => (
-                                <Form
-                                    key={item?.field + item?.value}
-                                    item={item}
-                                    index={de}
-                                    changeValue={(data: any) => {
-                                        const newData = _.cloneDeep(schemesList);
-                                        newData[de].value = data.value;
-                                        setSchemeLists(newData);
-                                    }}
-                                    flag={false}
-                                />
-                            ))}
+                            <Button
+                                onClick={() => setZoomOpen(true)}
+                                type="primary"
+                                shape="circle"
+                                icon={<ZoomInOutlined rev={undefined} />}
+                            ></Button>
                         </div>
+                        <Table loading={tableLoading} size="small" virtual columns={columns} dataSource={tableData} />
+                        <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
+                        <div className="text-[14px] font-[600] mt-[10px]">
+                            {mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.name}
+                            <span
+                                onClick={() => {
+                                    navigate(
+                                        `/copywritingModal?uid=${mockData?.filter((val) => val?.uid === detailData?.targetKeys)[0]?.uid}`
+                                    );
+                                }}
+                                className=" ml-[10px] text-[12px] font-[400] cursor-pointer text-[#673ab7] border-b border-solid border-[#673ab7]"
+                            >
+                                查看方案
+                            </span>
+                        </div>
+                        {schemesList?.map((item: any, de) => (
+                            <Forms
+                                key={item?.field + item?.value}
+                                item={item}
+                                index={de}
+                                changeValue={(data: any) => {
+                                    const newData = _.cloneDeep(schemesList);
+                                    newData[de].value = data.value;
+                                    setSchemeLists(newData);
+                                }}
+                                flag={false}
+                            />
+                        ))}
                         <div className="text-[18px] font-[600] mt-[20px]">4. 标签</div>
                         <FormControl
                             key={detailData?.tags}
@@ -366,6 +500,64 @@ const Lefts = ({
                     保存并开始生成
                 </Button>
             </div>
+            <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
+                <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
+            </Modal>
+            <Modal width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
+                <Table size="small" virtual columns={columns} dataSource={tableData} />
+            </Modal>
+            <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
+                <p>
+                    支持以 XLS 文件形式批量导入页面元素，导入文件将自动刷新列表页。
+                    <span className="text-[#673ab7] cursor-pointer" onClick={handleDownLoad}>
+                        下载导入 XLS 模板
+                    </span>
+                </p>
+                <div className="flex justify-center mt-[20px]">
+                    <div className="relative">
+                        <Button type="primary">上传 XLS</Button>
+                        <input
+                            className="opacity-0 w-[85px] h-[32px] absolute top-0 left-0 cursor-pointer"
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".xls"
+                            onChange={handleFileSelect}
+                        />
+                    </div>
+                </div>
+            </Modal>
+            <Modal
+                title="编辑"
+                open={editOpen}
+                onCancel={() => {
+                    form.resetFields();
+                    setEditOpen(false);
+                }}
+                onOk={async () => {
+                    const result = await form.validateFields();
+                    const newList = [...tableRef.current];
+                    newList.splice(rowIndex, 1, result);
+                    tableRef.current = newList;
+                    setTableData(tableRef.current);
+                    setEditOpen(false);
+                }}
+            >
+                <Form ref={formRef} form={form} labelCol={{ span: 6 }}>
+                    {columns?.map(
+                        (item, index) =>
+                            item.title !== '操作' && (
+                                <Form.Item
+                                    key={index}
+                                    label={item.title}
+                                    name={item.dataIndex}
+                                    rules={[{ required: true, message: `${item.title}是必填的` }]}
+                                >
+                                    <Input />
+                                </Form.Item>
+                            )
+                    )}
+                </Form>
+            </Modal>
         </>
     );
 };

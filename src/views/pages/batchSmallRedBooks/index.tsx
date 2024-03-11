@@ -86,7 +86,7 @@ const BatcSmallRedBooks = () => {
         total: 5
     });
     const [exedisabled, setExeDisabled] = useState(false);
-    const handleSave = async ({ flag, newData }: { flag: boolean; newData: any }) => {
+    const handleSave = async ({ flag, newData, tableData }: { flag: boolean; newData: any; tableData: any[] }) => {
         if (flag) {
             setExeDisabled(true);
             plabListRef.current = [];
@@ -101,6 +101,7 @@ const BatcSmallRedBooks = () => {
                     tags: newData?.tags,
                     configuration: {
                         ...newData,
+                        creativeMaterialList: tableData,
                         total: undefined,
                         randomType: undefined,
                         imageStyleList: undefined,
@@ -155,6 +156,7 @@ const BatcSmallRedBooks = () => {
                     tags: newData?.tags,
                     configuration: {
                         ...newData,
+                        creativeMaterialList: tableData,
                         total: undefined,
                         randomType: undefined,
                         imageStyleList: undefined,

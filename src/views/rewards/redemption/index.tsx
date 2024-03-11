@@ -12,7 +12,7 @@ const Redemption = () => {
     const handleOpenRecord = () => setOpenRecord(true); // 新增的打开函数
     const handleCloseRecord = () => setOpenRecord(false); // 新增的关闭函数
     return (
-        <Grid>
+        <Grid className="bg-[#f5f5f5]">
             <Header />
             <Typography variant="h3" textAlign="center" sx={{ my: 3 }}>
                 {t('redemption.obtain')}

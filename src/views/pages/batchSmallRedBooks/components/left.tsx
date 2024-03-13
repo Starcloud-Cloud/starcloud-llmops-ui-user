@@ -1,8 +1,7 @@
 import { TextField, FormControl, InputLabel, Select, MenuItem, Chip, FormHelperText, Autocomplete } from '@mui/material';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
 import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Input } from 'antd';
-import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
-import type { TableProps } from 'antd';
+import { PlusOutlined, LoadingOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import type { RadioChangeEvent } from 'antd';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
@@ -75,6 +74,16 @@ const Lefts = ({
         onDrop(e) {
             console.log('Dropped files', e.dataTransfer.files);
         }
+    };
+    const [uploadLoading, setUploadLoading] = useState(false);
+    const propShow: UploadProps = {
+        name: 'image',
+        showUploadList: false,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 1
     };
     //批量上传素材
     const [zoomOpen, setZoomOpen] = useState(false); //下载弹框
@@ -177,17 +186,33 @@ const Lefts = ({
     //获取表头数据
     const getTableHeader = async () => {
         // const res = await metadata();
-        const result = await materialTemplate('bookList');
+        const result = await materialTemplate('picture');
         const newList = result?.fieldDefine?.map((item: any) => {
             return {
                 title: item.desc,
                 align: 'center',
                 width: 200,
                 dataIndex: item.fieldName,
+                render: (_: any, row: any) => (
+                    <div className="flex justify-center items-center gap-2">
+                        {item.type === 'image' ? (
+                            <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
+                ),
                 type: item.type
             };
         });
         setColumns([
+            {
+                title: '序号',
+                align: 'center',
+                width: 70,
+                fixed: true,
+                render: (_: any, row: any, index: number) => <span>{index + 1}</span>
+            },
             ...newList,
             {
                 title: '操作',
@@ -285,6 +310,8 @@ const Lefts = ({
             tableRef.current = detailData?.creativeMaterialList;
             setTableData(tableRef.current);
         }
+    }, [detailData?.creativeMaterialList]);
+    useEffect(() => {
         getTableHeader();
         schemeList().then((res: any) => {
             setMockData(res);
@@ -382,7 +409,14 @@ const Lefts = ({
                                 icon={<ZoomInOutlined rev={undefined} />}
                             ></Button>
                         </div>
-                        <Table loading={tableLoading} size="small" virtual columns={columns} dataSource={tableData} />
+                        <Table
+                            rowKey={(record, index) => String(index)}
+                            loading={tableLoading}
+                            size="small"
+                            virtual
+                            columns={columns}
+                            dataSource={tableData}
+                        />
                         <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
                         <div className="text-[14px] font-[600] mt-[10px]">
                             {mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.name}
@@ -504,7 +538,14 @@ const Lefts = ({
                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
             </Modal>
             <Modal width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
-                <Table size="small" virtual columns={columns} dataSource={tableData} />
+                <Table
+                    rowKey={(record, index) => String(index)}
+                    loading={tableLoading}
+                    size="small"
+                    virtual
+                    columns={columns}
+                    dataSource={tableData}
+                />
             </Modal>
             <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
                 <p>
@@ -527,6 +568,7 @@ const Lefts = ({
                 </div>
             </Modal>
             <Modal
+                zIndex={9000}
                 title="编辑"
                 open={editOpen}
                 onCancel={() => {
@@ -552,7 +594,39 @@ const Lefts = ({
                                     name={item.dataIndex}
                                     rules={[{ required: true, message: `${item.title}是必填的` }]}
                                 >
-                                    <Input />
+                                    {item.type === 'image' ? (
+                                        <Upload
+                                            {...propShow}
+                                            listType="picture-card"
+                                            onChange={(info) => {
+                                                if (info.file.status === 'uploading') {
+                                                    setUploadLoading(true);
+                                                    return;
+                                                }
+                                                if (info?.file?.status === 'done') {
+                                                    console.log();
+                                                    setUploadLoading(false);
+                                                    form.setFieldValue(item.dataIndex, info?.file?.response?.data?.url);
+                                                }
+                                            }}
+                                        >
+                                            {form.getFieldsValue()[item.dataIndex] ? (
+                                                <Image
+                                                    preview={false}
+                                                    width={102}
+                                                    height={102}
+                                                    src={form.getFieldsValue()[item.dataIndex]}
+                                                />
+                                            ) : (
+                                                <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                                    {uploadLoading ? <LoadingOutlined rev={undefined} /> : <PlusOutlined rev={undefined} />}
+                                                    <div style={{ marginTop: 8 }}>Upload</div>
+                                                </div>
+                                            )}
+                                        </Upload>
+                                    ) : (
+                                        <Input />
+                                    )}
                                 </Form.Item>
                             )
                     )}

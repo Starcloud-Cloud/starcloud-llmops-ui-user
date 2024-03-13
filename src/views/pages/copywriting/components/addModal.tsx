@@ -12,7 +12,7 @@ import {
     Box,
     Typography
 } from '@mui/material';
-import { InputNumber, Radio, Row, Col } from 'antd';
+import { InputNumber, Radio, Row, Col, Select } from 'antd';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import MainCard from 'ui-component/cards/MainCard';
 import SubCard from 'ui-component/cards/SubCard';
@@ -40,6 +40,7 @@ import Form from '../../smallRedBook/components/form';
 const AddModal = () => {
     const { TextArea } = Input;
     const { Panel } = Collapse;
+    const { Option } = Select;
     const permissions = useUserStore((state) => state.permissions);
     const { tableList, setTableList } = copywriting();
     const location = useLocation();
@@ -61,6 +62,7 @@ const AddModal = () => {
     const [categoryList, setCategoryList] = useState<any[]>([]);
     //参考来源列表
     const [sourceList, setSourceList] = useState<any[]>([]);
+    const [materialTypeList, setmaterialTypeList] = useState<any[]>([]);
 
     const [tableData, setTableData] = useState<any[]>([]);
     //新增文案与风格
@@ -73,6 +75,7 @@ const AddModal = () => {
         schemeMetadata().then((res) => {
             setCategoryList(res.category);
             setSourceList(res.refersSource);
+            setmaterialTypeList(res.materialType);
             setModeList(res.generateMode);
         });
     }, []);
@@ -117,8 +120,6 @@ const AddModal = () => {
         },
         maxCount: 20,
         onChange(info) {
-            console.log(info);
-
             setTestImageList(info.fileList);
         },
         onPreview: (file) => {
@@ -137,26 +138,24 @@ const AddModal = () => {
             if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.referList?.length === 0) {
                 flag = true;
                 content = '创作配置 参考来源最少一个';
-                setCurrent(2);
             } else if (item.model === 'AI_CUSTOM' && !item.requirement) {
                 flag = true;
                 content = '创作配置 文案生成要求必填';
-                setCurrent(2);
             } else if (item.code === 'ParagraphActionHandler' && !item.paragraphCount) {
                 flag = true;
                 content = '创作配置 文案段落数量必填';
-                setCurrent(2);
             } else {
                 flag = false;
             }
         } else if (item.code === 'AssembleActionHandler' && !item.requirement) {
             flag = true;
             content = '创作配置 文案拼接配置必填';
-            setCurrent(2);
         } else if (item.code === 'PosterActionHandler' && item?.styleList?.some((el: any) => el?.templateList.some((i: any) => !i.id))) {
             flag = true;
             content = '图片生成 风格必选';
-            setCurrent(3);
+        } else if (item.code === 'MaterialActionHandler' && !item.materialType) {
+            flag = true;
+            content = '创作配置 资料库必选';
         } else {
             flag = false;
         }
@@ -238,8 +237,12 @@ const AddModal = () => {
                             close: false
                         })
                     );
+                    if (verifyItem(item).content === '图片生成 风格必选') {
+                        setCurrent(3);
+                    } else {
+                        setCurrent(2);
+                    }
                 }
-
                 return verifyItem(item).flag;
             })
         ) {
@@ -797,7 +800,8 @@ const AddModal = () => {
                             {valueList?.map(
                                 (el, index) =>
                                     el?.code !== 'VariableActionHandler' &&
-                                    el?.code !== 'PosterActionHandler' && (
+                                    el?.code !== 'PosterActionHandler' &&
+                                    el?.code !== 'MaterialActionHandler' && (
                                         <Panel
                                             style={{ marginBottom: 20, background: '#fafafa', border: '1px solod #d9d9d9' }}
                                             header={
@@ -805,7 +809,7 @@ const AddModal = () => {
                                                     <span className="text-[18px] font-[600]">
                                                         {index + '.'} {el?.name}
                                                     </span>
-                                                    {verifyItem(el)?.flag && (
+                                                    {verifyItem(el).flag && (
                                                         <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
                                                     )}
                                                 </div>
@@ -813,6 +817,23 @@ const AddModal = () => {
                                             key={index}
                                         >
                                             <>
+                                                {/* {el.code === 'MaterialActionHandler' && (
+                                                    <Select
+                                                        className="w-[200px] border border-solid border-[#d9d9d9] rounded-[6px]"
+                                                        size="large"
+                                                        value={el.materialType}
+                                                        onChange={(data) => {
+                                                            console.log(data);
+                                                            setValues('materialType', data, index);
+                                                        }}
+                                                    >
+                                                        {materialTypeList.map((i: any) => (
+                                                            <Option key={i.value} value={i.value}>
+                                                                {i.label}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                )} */}
                                                 {(el.code === 'CustomActionHandler' ||
                                                     el.code === 'ParagraphActionHandler' ||
                                                     el.code === 'TitleActionHandler') && (

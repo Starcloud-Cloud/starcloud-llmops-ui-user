@@ -1,6 +1,7 @@
-import { FormControl, InputLabel, Select, MenuItem, FormHelperText, TextField } from '@mui/material';
-import { DeleteOutlined } from '@ant-design/icons';
-import { Image, Row, Col, Switch, Input } from 'antd';
+import { FormControl, FormHelperText, TextField } from '@mui/material';
+import { Input, Popover, Tree, Image, Row, Col, Switch, Menu } from 'antd';
+import type { TreeDataNode } from 'antd';
+import type { MenuProps } from 'antd';
 import { useEffect, useState } from 'react';
 import _ from 'lodash-es';
 import Form from 'views/pages/smallRedBook/components/form';
@@ -8,6 +9,56 @@ import { SelectTemplateModal } from './SelectTemplateModal';
 
 import React from 'react';
 import { getImageTemplateTypes } from 'api/template';
+const treeData: TreeDataNode[] = [
+    {
+        title: 'parent 1',
+        key: '0-0',
+        children: [
+            {
+                title: 'parent 1-0',
+                key: '0-0-0',
+                children: [
+                    {
+                        title: 'leaf',
+                        key: '0-0-0-0'
+                    },
+                    {
+                        title: 'leaf',
+                        key: '0-0-0-1'
+                    },
+                    {
+                        title: 'leaf',
+                        key: '0-0-0-2'
+                    }
+                ]
+            },
+            {
+                title: 'parent 1-1',
+                key: '0-0-1',
+                children: [
+                    {
+                        title: 'leaf',
+                        key: '0-0-1-0'
+                    }
+                ]
+            },
+            {
+                title: 'parent 1-2',
+                key: '0-0-2',
+                children: [
+                    {
+                        title: 'leaf',
+                        key: '0-0-2-0'
+                    },
+                    {
+                        title: 'leaf',
+                        key: '0-0-2-1'
+                    }
+                ]
+            }
+        ]
+    }
+];
 const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; imageStyleData: any; setData: (data: any) => void }) => {
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
@@ -36,7 +87,62 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
             setCurrentTemp(data);
         }
     }, [imageStyleData, tempList]);
-
+    const { TextArea } = Input;
+    const [perOpen, setPerOpen] = useState(false);
+    const [tipValue, setTipValue] = useState('');
+    const items: MenuProps['items'] = [
+        {
+            label: 'Navigation Three - Submenu',
+            key: 'SubMenu',
+            children: [
+                {
+                    label: (
+                        <div
+                            onMouseEnter={() => {
+                                setTipValue('1111111111');
+                            }}
+                            className="w-full flex justify-between items-center"
+                        >
+                            <div>Setting</div>
+                            <div>我是描述</div>
+                        </div>
+                    ),
+                    key: 'setting:1'
+                },
+                {
+                    label: (
+                        <div
+                            onMouseEnter={() => {
+                                setTipValue('222222');
+                            }}
+                            className="w-full flex justify-between items-center"
+                        >
+                            <div>Setting</div>
+                            <div>我是描述</div>
+                        </div>
+                    ),
+                    key: 'setting:10'
+                },
+                {
+                    label: 'Option 2',
+                    key: 'setting:2'
+                },
+                {
+                    label: 'Option 3',
+                    key: 'setting:3'
+                },
+                {
+                    label: 'Option 4',
+                    key: 'setting:4'
+                }
+            ]
+        }
+    ];
+    useEffect(() => {
+        if (!perOpen) {
+            setTipValue('');
+        }
+    }, [perOpen]);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -114,8 +220,8 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                             {imageStyleData?.variableList?.map(
                                 (el: any, index: number) =>
                                     el.style === 'INPUT' && (
-                                        <Col key={index} sm={12} xs={24} md={6}>
-                                            <Form
+                                        <Col key={index} sm={12} xs={24}>
+                                            {/* <Form
                                                 flag={true}
                                                 index={index}
                                                 changeValue={(data: any) => {
@@ -124,7 +230,53 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                                     setData(newData);
                                                 }}
                                                 item={el}
-                                            />
+                                            /> */}
+                                            <Popover
+                                                trigger="click"
+                                                arrow={false}
+                                                placement="bottom"
+                                                open={perOpen}
+                                                onOpenChange={() => setPerOpen(false)}
+                                                content={
+                                                    <div className="w-[80vh] max-w-[800px] flex items-stretch gap-2">
+                                                        <Tree
+                                                            showLine
+                                                            //   switcherIcon={<DownOutlined />}
+                                                            defaultExpandedKeys={['0-0-0']}
+                                                            onSelect={(selectedKeys, info) => {
+                                                                console.log('selected', selectedKeys, info);
+                                                            }}
+                                                            treeData={treeData}
+                                                        />
+                                                        {/* <Menu
+                                                            onClick={(data) => {
+                                                                console.log(data);
+                                                            }}
+                                                            className="flex-1"
+                                                            defaultSelectedKeys={['1']}
+                                                            mode="inline"
+                                                            items={items}
+                                                        /> */}
+                                                        <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4">
+                                                            {tipValue}
+                                                        </div>
+                                                    </div>
+                                                }
+                                            >
+                                                <div className="flex items-stretch">
+                                                    <TextArea className="rounded-r-[0px]" allowClear />
+                                                    <div
+                                                        onClick={(e) => {
+                                                            setPerOpen(true);
+                                                            e.stopPropagation();
+                                                        }}
+                                                        className="w-[50px] flex justify-center items-center border border-solid border-[#d9d9d9] ml-[-4px] bg-[#f8fafc] rounded-r-[6px] cursor-pointer"
+                                                        style={{ borderLeft: 'none' }}
+                                                    >
+                                                        fx
+                                                    </div>
+                                                </div>
+                                            </Popover>
                                         </Col>
                                     )
                             )}

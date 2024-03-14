@@ -49,3 +49,6 @@ export const appList = () => {
 export const getExample = (data: any) => {
     return request.post({ url: `/llm/xhs/content/getExample`, data });
 };
+export const schemeOptions = (data: any) => {
+    return request.post({ url: `llm/creative/scheme/options?appUid=${data}` });
+};

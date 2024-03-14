@@ -6,6 +6,7 @@ import _ from 'lodash-es';
 import StyleTabs from '../styleTabs';
 import { memo } from 'react';
 interface Tabs {
+    schemaList?: any[];
     mode: string;
     setModel: (data: any) => void;
     imageStyleData: any;
@@ -14,7 +15,7 @@ interface Tabs {
     setFocuActive: (data: any) => void;
     digui: () => number;
 }
-const CreateTab = ({ mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
+const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
     return (
         <div className="h-[800px] overflow-y-auto overflow-x-hidden">
             <div className="flex items-center gap-4 min-h-[32px]">
@@ -141,6 +142,7 @@ const CreateTab = ({ mode, setModel, imageStyleData, setImageStyleData, focuActi
                                     </div>
                                 </div>
                                 <StyleTabs
+                                    schemaList={schemaList}
                                     imageStyleData={item?.templateList}
                                     typeList={[]}
                                     setDetailData={(data: any) => {

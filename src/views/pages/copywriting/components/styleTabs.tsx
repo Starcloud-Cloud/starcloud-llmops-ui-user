@@ -5,10 +5,12 @@ import EditStyle from '../../batchSmallRedBooks/components/EditStyle';
 import _ from 'lodash-es';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const StyleTabs = ({
+    schemaList,
     typeList,
     imageStyleData,
     setDetailData
 }: {
+    schemaList?: any[];
     typeList: any[];
     imageStyleData: any[];
     setDetailData: (data: any) => void;
@@ -77,6 +79,7 @@ const StyleTabs = ({
                         closable: i === 0 ? false : true,
                         children: (
                             <EditStyle
+                                schemaList={schemaList}
                                 imageStyleData={item}
                                 setData={(data: any) => {
                                     const newData = _.cloneDeep(imageStyleData);

@@ -503,6 +503,8 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                             >
                                 <Valida
                                     key={item.field}
+                                    title={item.name}
+                                    handler={item?.flowStep?.handler}
                                     variable={item.variable?.variables}
                                     variables={item.flowStep.variable?.variables}
                                     responent={item.flowStep.response}
@@ -636,8 +638,18 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                             <FormControl fullWidth sx={{ mt: 2 }}>
                                 <InputLabel>变量分组</InputLabel>
                                 <Select onChange={formik.handleChange} name="group" value={formik.values.group} label="变量分组">
-                                    <MenuItem value={'SYSTEM'}>系统变量</MenuItem>
-                                    <MenuItem value={'PARAMS'}>通用变量</MenuItem>
+                                    <MenuItem value={'ADVANCED'}>
+                                        <div className="w-full flex justify-between items-end">
+                                            <div>高级变量</div>
+                                            <div className="text-xs text-black/50">只有管理员在创作方案可编辑删除</div>
+                                        </div>
+                                    </MenuItem>
+                                    <MenuItem value={'PARAMS'}>
+                                        <div className="w-full flex justify-between items-end">
+                                            <div>通用变量</div>
+                                            <div className="text-xs text-black/50">所有人都在创作方案可编辑删除</div>
+                                        </div>
+                                    </MenuItem>
                                 </Select>
                             </FormControl>
                         )}
@@ -690,6 +702,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                 </DialogContent>
                 <DialogActions>
                     <Button
+                        disabled={row?.group === 'SYSTEM'}
                         autoFocus
                         onClick={() => {
                             formik.handleSubmit();

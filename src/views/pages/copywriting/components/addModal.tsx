@@ -21,7 +21,16 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { UploadProps, Upload, Button, Divider, Image, TreeSelect, Input, Modal, Collapse, Steps } from 'antd';
 import { PlusOutlined, HomeOutlined, ContainerOutlined, SettingOutlined, FileImageOutlined, UserOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
-import { schemeCreate, schemeGet, schemeModify, schemeMetadata, schemeExample, appList, getExample } from 'api/redBook/copywriting';
+import {
+    schemeCreate,
+    schemeGet,
+    schemeModify,
+    schemeMetadata,
+    schemeExample,
+    appList,
+    getExample,
+    schemeOptions
+} from 'api/redBook/copywriting';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
@@ -147,7 +156,7 @@ const AddModal = () => {
             } else {
                 flag = false;
             }
-        } else if (item.code === 'AssembleActionHandler' && !item.requirement) {
+        } else if (item.code === 'AssembleActionHandler' && !item.content) {
             flag = true;
             content = '创作配置 文案拼接配置必填';
         } else if (item.code === 'PosterActionHandler' && item?.styleList?.some((el: any) => el?.templateList.some((i: any) => !i.id))) {
@@ -444,11 +453,16 @@ const AddModal = () => {
         setValueList(valueListRef.current);
     };
     const [goodList, setGoodList] = useState<any[]>([]);
+    //json schema
+    const [schemaList, setSchemaList] = useState<any[]>([]);
     useEffect(() => {
         if (appData?.example) {
             const newList = appData?.example?.split(', ');
             getExample(newList).then((res) => {
                 setGoodList(res);
+            });
+            schemeOptions(appData?.appUid).then((res) => {
+                setSchemaList(res);
             });
         }
     }, [appData?.example]);
@@ -807,7 +821,7 @@ const AddModal = () => {
                                             header={
                                                 <div className="relative">
                                                     <span className="text-[18px] font-[600]">
-                                                        {index + '.'} {el?.name}
+                                                        {index - 1 + '.'} {el?.name}
                                                     </span>
                                                     {verifyItem(el).flag && (
                                                         <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
@@ -930,22 +944,41 @@ const AddModal = () => {
                                                 {el.code === 'AssembleActionHandler' && (
                                                     <>
                                                         <div className="relative">
-                                                            <TextArea
-                                                                status={!el?.requirement ? 'error' : ''}
-                                                                defaultValue={el?.requirement}
+                                                            <Input
+                                                                size="large"
+                                                                status={!el?.title ? 'error' : ''}
+                                                                defaultValue={el?.title}
                                                                 onBlur={(data) => {
-                                                                    setValues('requirement', data.target.value, index);
+                                                                    setValues('title', data.target.value, index);
+                                                                }}
+                                                            />
+                                                            <span
+                                                                style={{ color: !el?.title ? '#f44336' : '#000' }}
+                                                                className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                                                            >
+                                                                标题
+                                                            </span>
+                                                        </div>
+                                                        {!el?.title && (
+                                                            <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">标题必填</span>
+                                                        )}
+                                                        <div className="relative mt-[20px]">
+                                                            <TextArea
+                                                                status={!el?.content ? 'error' : ''}
+                                                                defaultValue={el?.content}
+                                                                onBlur={(data) => {
+                                                                    setValues('content', data.target.value, index);
                                                                 }}
                                                                 rows={10}
                                                             />
                                                             <span
-                                                                style={{ color: !el?.requirement ? '#f44336' : '#000' }}
+                                                                style={{ color: !el?.content ? '#f44336' : '#000' }}
                                                                 className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
                                                             >
                                                                 文案拼接配置
                                                             </span>
                                                         </div>
-                                                        {!el?.requirement && (
+                                                        {!el?.content && (
                                                             <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
                                                                 文案拼接配置必填
                                                             </span>
@@ -963,6 +996,7 @@ const AddModal = () => {
                             <>
                                 <CreateTab
                                     mode={valueList?.find((item: any) => item?.code === 'PosterActionHandler')?.mode}
+                                    schemaList={schemaList}
                                     setModel={(data) => {
                                         setValues(
                                             'mode',

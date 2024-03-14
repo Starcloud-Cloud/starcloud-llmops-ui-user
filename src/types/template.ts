@@ -47,6 +47,7 @@ export interface Anyevent {
     setDetail_icon: (data: any) => void;
 }
 export type Rows = {
+    name: string;
     field: string;
     group: string;
     label: string;
@@ -58,9 +59,11 @@ export type Rows = {
     description: string;
 };
 export interface Validas {
+    title?: string;
+    handler?: string;
     variable: Rows[];
     variables: Rows[];
-    responent: { style: string; type?: string; output?: { jsonSchema?: string } };
+    responent: { readOnly?: boolean; style: string; type?: string; output?: { jsonSchema?: string } };
     buttonLabel: string;
     index: number;
     fields: string;

@@ -1,7 +1,8 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
-import { Input, Popover, Tree, Image, Row, Col, Switch, Menu } from 'antd';
+import { Input, Popover, Tree, Image, Row, Col, Menu, Switch, Select } from 'antd';
 import type { TreeDataNode } from 'antd';
 import type { MenuProps } from 'antd';
+import { DownOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import _ from 'lodash-es';
 import Form from 'views/pages/smallRedBook/components/form';
@@ -15,7 +16,13 @@ const treeData: TreeDataNode[] = [
         key: '0-0',
         children: [
             {
-                title: 'parent 1-0',
+                title: (
+                    <div className="flex items-center gap-2">
+                        <Input className="flex-1" size="small" />
+                        <Select className="flex-1" size="small"></Select>
+                        <PlusCircleOutlined rev={undefined} />
+                    </div>
+                ),
                 key: '0-0-0',
                 children: [
                     {
@@ -59,7 +66,17 @@ const treeData: TreeDataNode[] = [
         ]
     }
 ];
-const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; imageStyleData: any; setData: (data: any) => void }) => {
+const EditStyle = ({
+    schemaList,
+    typeList,
+    imageStyleData,
+    setData
+}: {
+    schemaList?: any[];
+    typeList: any[];
+    imageStyleData: any;
+    setData: (data: any) => void;
+}) => {
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
     const [tempList, setTempList] = React.useState<any>([]);
@@ -90,59 +107,43 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
     const { TextArea } = Input;
     const [perOpen, setPerOpen] = useState(false);
     const [tipValue, setTipValue] = useState('');
-    const items: MenuProps['items'] = [
-        {
-            label: 'Navigation Three - Submenu',
-            key: 'SubMenu',
-            children: [
-                {
-                    label: (
-                        <div
-                            onMouseEnter={() => {
-                                setTipValue('1111111111');
-                            }}
-                            className="w-full flex justify-between items-center"
-                        >
-                            <div>Setting</div>
-                            <div>我是描述</div>
-                        </div>
-                    ),
-                    key: 'setting:1'
-                },
-                {
-                    label: (
-                        <div
-                            onMouseEnter={() => {
-                                setTipValue('222222');
-                            }}
-                            className="w-full flex justify-between items-center"
-                        >
-                            <div>Setting</div>
-                            <div>我是描述</div>
-                        </div>
-                    ),
-                    key: 'setting:10'
-                },
-                {
-                    label: 'Option 2',
-                    key: 'setting:2'
-                },
-                {
-                    label: 'Option 3',
-                    key: 'setting:3'
-                },
-                {
-                    label: 'Option 4',
-                    key: 'setting:4'
-                }
-            ]
-        }
-    ];
+    const [items, setItem] = useState<any[]>([]);
     useEffect(() => {
         if (!perOpen) {
             setTipValue('');
         }
     }, [perOpen]);
+    const convertSchemaToJson = (schema: any): any => {
+        const result = [];
+
+        if (schema.title && schema.description) {
+            result.push({ label: schema.title, description: schema.description });
+        }
+
+        if (schema.properties) {
+            for (const key in schema.properties) {
+                const property = schema.properties[key];
+                if (property.title && property.description) {
+                    result.push({ label: property.title, description: property.description });
+                }
+                if (property.items && property.items.title && property.items.description) {
+                    result.push({ label: property.items.title, description: property.items.description });
+                }
+            }
+        }
+
+        return result;
+    };
+    useEffect(() => {
+        const newList = schemaList?.map((item) => ({
+            label: item.name,
+            key: item.code,
+            description: item.description,
+            children: convertSchemaToJson(JSON.parse(item.outJsonSchema))
+        }));
+        console.log(newList);
+        setItem(newList as any[]);
+    }, []);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -239,24 +240,56 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                                 onOpenChange={() => setPerOpen(false)}
                                                 content={
                                                     <div className="w-[80vh] max-w-[800px] flex items-stretch gap-2">
-                                                        <Tree
+                                                        {/* <Tree
+                                                            className="flex-1"
                                                             showLine
-                                                            //   switcherIcon={<DownOutlined />}
-                                                            defaultExpandedKeys={['0-0-0']}
+                                                            blockNode
+                                                            switcherIcon={<DownOutlined rev={undefined} />}
+                                                            defaultExpandAll={true}
                                                             onSelect={(selectedKeys, info) => {
                                                                 console.log('selected', selectedKeys, info);
                                                             }}
                                                             treeData={treeData}
-                                                        />
-                                                        {/* <Menu
+                                                        /> */}
+                                                        <Menu
                                                             onClick={(data) => {
-                                                                console.log(data);
+                                                                setPerOpen(false);
+                                                                const newData = _.cloneDeep(imageStyleData);
+                                                                newData.variableList[index].value = data.key;
+                                                                setData(newData);
                                                             }}
                                                             className="flex-1"
-                                                            defaultSelectedKeys={['1']}
+                                                            defaultSelectedKeys={[]}
                                                             mode="inline"
-                                                            items={items}
-                                                        /> */}
+                                                            items={items?.map((item: any, index: number) => ({
+                                                                key: item.label,
+                                                                label: (
+                                                                    <div
+                                                                        onMouseEnter={() => {
+                                                                            setTipValue(item.description);
+                                                                        }}
+                                                                        className="w-full flex justify-between items-center"
+                                                                    >
+                                                                        <div>{item.label}</div>
+                                                                        <div className="text-xs text-black/50">{item.description}</div>
+                                                                    </div>
+                                                                ),
+                                                                children: item?.children?.map((el: any, i: number) => ({
+                                                                    key: el.label,
+                                                                    label: (
+                                                                        <div
+                                                                            onMouseEnter={() => {
+                                                                                setTipValue(el.description);
+                                                                            }}
+                                                                            className="w-full flex justify-between items-center"
+                                                                        >
+                                                                            <div>{el.label}</div>
+                                                                            <div className="text-xs text-black/50">{el.description}</div>
+                                                                        </div>
+                                                                    )
+                                                                }))
+                                                            }))}
+                                                        />
                                                         <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4">
                                                             {tipValue}
                                                         </div>
@@ -264,7 +297,17 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                                                 }
                                             >
                                                 <div className="flex items-stretch">
-                                                    <TextArea className="rounded-r-[0px]" allowClear />
+                                                    <TextArea
+                                                        key={el.value}
+                                                        defaultValue={el.value}
+                                                        onBlur={(e) => {
+                                                            const newData = _.cloneDeep(imageStyleData);
+                                                            newData.variableList[index].value = e.target.value;
+                                                            setData(newData);
+                                                        }}
+                                                        className="rounded-r-[0px]"
+                                                        allowClear
+                                                    />
                                                     <div
                                                         onClick={(e) => {
                                                             setPerOpen(true);

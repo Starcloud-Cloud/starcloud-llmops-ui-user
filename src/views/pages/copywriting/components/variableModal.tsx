@@ -223,7 +223,7 @@ const VariableModal = ({
                 )}
             </DialogContent>
             <DialogActions>
-                <Button disabled={itemData?.group === 'SYSTEM'} color="secondary" onClick={handleSave}>
+                <Button disabled={itemData?.group === 'ADVANCED'} color="secondary" onClick={handleSave}>
                     {t('myApp.confirm')}
                 </Button>
             </DialogActions>

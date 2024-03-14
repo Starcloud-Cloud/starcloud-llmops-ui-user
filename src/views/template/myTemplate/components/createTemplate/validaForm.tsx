@@ -75,6 +75,8 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
     borderTop: '1px solid rgba(0, 0, 0, .125)'
 }));
 const Valida = ({
+    title,
+    handler,
     variable,
     variables,
     responent,
@@ -134,67 +136,69 @@ const Valida = ({
             <form>
                 <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content1" id="panel1a-header1">
-                        {formik.values.prompt ? (
+                        {handler === 'VariableActionHandler' || handler === 'MaterialActionHandler' || formik.values.prompt ? (
                             <CheckCircleIcon fontSize="small" color="success" />
                         ) : (
                             <CancelIcon fontSize="small" color="error" />
                         )}
                         <Typography ml={2} fontSize="16px">
-                            {t('market.prompt')}
+                            {handler === 'VariableActionHandler' || handler === 'MaterialActionHandler' ? '变量' : t('market.prompt')}
                         </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        {variables?.map((el: any, i: number) => (
-                            <Grid item md={12} xs={12} key={i}>
-                                {el.field === 'prompt' && (
-                                    <>
-                                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                                            <Box display="flex" alignItems="center">
-                                                <Typography mr={1} variant="h5">
-                                                    {t('market.' + el.field)}
-                                                </Typography>
-                                                <Tooltip placement="top" title={t('market.promptDesc')}>
-                                                    <ErrorIcon fontSize="small" />
-                                                </Tooltip>
-                                            </Box>
-                                            <Box>
-                                                <FormControlLabel
-                                                    label="是否显示"
-                                                    control={
-                                                        <Switch
-                                                            name="promptisShow"
-                                                            onChange={(e) => {
-                                                                basisChange({ e: e.target, index, i, flag: true });
-                                                            }}
-                                                            checked={el.isShow}
+                        {variables?.map(
+                            (el: any, i: number) =>
+                                handler !== 'AssembleActionHandler' && (
+                                    <Grid item md={12} xs={12} key={i}>
+                                        {el.field === 'prompt' && (
+                                            <>
+                                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                    <Box display="flex" alignItems="center">
+                                                        <Typography mr={1} variant="h5">
+                                                            {t('market.' + el.field)}
+                                                        </Typography>
+                                                        <Tooltip placement="top" title={t('market.promptDesc')}>
+                                                            <ErrorIcon fontSize="small" />
+                                                        </Tooltip>
+                                                    </Box>
+                                                    <Box>
+                                                        <FormControlLabel
+                                                            label="是否显示"
+                                                            control={
+                                                                <Switch
+                                                                    name="promptisShow"
+                                                                    onChange={(e) => {
+                                                                        basisChange({ e: e.target, index, i, flag: true });
+                                                                    }}
+                                                                    checked={el.isShow}
+                                                                />
+                                                            }
                                                         />
-                                                    }
+                                                    </Box>
+                                                </Box>
+                                                <TextArea
+                                                    className="mt-[16px]"
+                                                    status={formik.touched[el.field] && Boolean(formik.errors[el.field]) ? 'error' : ''}
+                                                    ref={iptRef}
+                                                    style={{ height: '200px' }}
+                                                    value={formik.values[el.field]}
+                                                    name={el.field}
+                                                    onChange={(e) => {
+                                                        formik.handleChange(e);
+                                                        clearTimeout(timeoutRef.current);
+                                                        timeoutRef.current = setTimeout(() => {
+                                                            basisChange({ e: e.target, index, i, flag: false, values: true });
+                                                        }, 300);
+                                                    }}
                                                 />
-                                            </Box>
-                                        </Box>
-                                        <TextArea
-                                            className="mt-[16px]"
-                                            status={formik.touched[el.field] && Boolean(formik.errors[el.field]) ? 'error' : ''}
-                                            ref={iptRef}
-                                            style={{ height: '200px' }}
-                                            value={formik.values[el.field]}
-                                            name={el.field}
-                                            onChange={(e) => {
-                                                formik.handleChange(e);
-                                                clearTimeout(timeoutRef.current);
-                                                timeoutRef.current = setTimeout(() => {
-                                                    basisChange({ e: e.target, index, i, flag: false, values: true });
-                                                }, 300);
-                                            }}
-                                        />
-                                        {formik.touched[el.field] && formik.errors[el.field] ? (
-                                            <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
-                                                {String(formik.errors[el.field])}
-                                            </span>
-                                        ) : (
-                                            <span className="text-[12px] mt-[5px] ml-[5px]">{el.description}</span>
-                                        )}
-                                        {/* <TextField
+                                                {formik.touched[el.field] && formik.errors[el.field] ? (
+                                                    <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
+                                                        {String(formik.errors[el.field])}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[12px] mt-[5px] ml-[5px]">{el.description}</span>
+                                                )}
+                                                {/* <TextField
                                             color="secondary"
                                             sx={{ mt: 2 }}
                                             inputRef={iptRef}
@@ -223,23 +227,24 @@ const Valida = ({
                                             fullWidth
                                         /> */}
 
-                                        <Box mb={1}>
-                                            {variable?.map((item) => (
-                                                <Tooltip key={item.field} placement="top" title={t('market.fields')}>
-                                                    <Chip
-                                                        sx={{ mr: 1, mt: 1 }}
-                                                        size="small"
-                                                        color="primary"
-                                                        onClick={() => changePrompt(item.field, i)}
-                                                        label={item.field}
-                                                    ></Chip>
-                                                </Tooltip>
-                                            ))}
-                                        </Box>
-                                    </>
-                                )}
-                            </Grid>
-                        ))}
+                                                <Box mb={1}>
+                                                    {variable?.map((item) => (
+                                                        <Tooltip key={item.field} placement="top" title={t('market.fields')}>
+                                                            <Chip
+                                                                sx={{ mr: 1, mt: 1 }}
+                                                                size="small"
+                                                                color="primary"
+                                                                onClick={() => changePrompt(item.field, i)}
+                                                                label={item.field}
+                                                            ></Chip>
+                                                        </Tooltip>
+                                                    ))}
+                                                </Box>
+                                            </>
+                                        )}
+                                    </Grid>
+                                )
+                        )}
                         <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
@@ -306,7 +311,7 @@ const Valida = ({
                                                         okText={t('myApp.confirm')}
                                                         cancelText={t('myApp.cancel')}
                                                     >
-                                                        <IconButton color="error">
+                                                        <IconButton disabled={row.group === 'SYSTEM'} color="error">
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </Popconfirm>
@@ -319,81 +324,86 @@ const Valida = ({
                         </MainCard>
                     </AccordionDetails>
                 </Accordion>
-                <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content2" id="panel1a-header2">
-                        {variables.every((value) => {
-                            if (value.field !== 'prompt') {
-                                return value.value;
-                            } else {
-                                return true;
-                            }
-                        }) ? (
-                            <CheckCircleIcon fontSize="small" color="success" />
-                        ) : (
-                            <CancelIcon fontSize="small" color="error" />
-                        )}
-
-                        <Typography ml={2} fontSize="16px">
-                            {t('market.model')}
-                        </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        {variables?.map((el: any, i: number) => (
-                            <Grid item md={12} xs={12} key={i + 'variables'}>
-                                {el.field !== 'prompt' && el.field !== 'n' && (
-                                    <FormExecute
-                                        formik={formik}
-                                        item={el}
-                                        onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
-                                    />
+                {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && (
+                    <>
+                        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content2" id="panel1a-header2">
+                                {variables.every((value) => {
+                                    if (value.field !== 'prompt') {
+                                        return value.value;
+                                    } else {
+                                        return true;
+                                    }
+                                }) ? (
+                                    <CheckCircleIcon fontSize="small" color="success" />
+                                ) : (
+                                    <CancelIcon fontSize="small" color="error" />
                                 )}
-                            </Grid>
-                        ))}
-                    </AccordionDetails>
-                </Accordion>
-                <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content3" id="panel1a-header3">
-                        <Typography fontSize="16px">{t('myApp.stepStyle')}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <TextField
-                            required
-                            name="buttonLabel"
-                            fullWidth
-                            label={t('myApp.exeLabel')}
-                            variant="outlined"
-                            onChange={(e) => {
-                                editChange({ num: index, label: e.target.name, value: e.target.value });
-                            }}
-                            value={buttonLabel}
-                            sx={{ mt: 2 }}
-                        />
-                    </AccordionDetails>
-                </Accordion>
-                <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content4" id="panel1a-header4">
-                        <Typography fontSize="16px">响应类型</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <FormControl fullWidth>
-                            <InputLabel color="secondary" id="responent">
-                                响应类型
-                            </InputLabel>
-                            <Select
-                                color="secondary"
-                                onChange={(e) => {
-                                    basisChange({ e: e.target, index, i: 0, flag: false });
-                                }}
-                                name="type"
-                                labelId="responent"
-                                value={responent.type}
-                                label="响应类型"
-                            >
-                                <MenuItem value={'TEXT'}>文本类型</MenuItem>
-                                <MenuItem value={'JSON'}>JSON 类型</MenuItem>
-                            </Select>
-                        </FormControl>
-                        {responent.type && (
+
+                                <Typography ml={2} fontSize="16px">
+                                    {t('market.model')}
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                {variables?.map((el: any, i: number) => (
+                                    <Grid item md={12} xs={12} key={i + 'variables'}>
+                                        {el.field !== 'prompt' && el.field !== 'n' && (
+                                            <FormExecute
+                                                formik={formik}
+                                                item={el}
+                                                onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
+                                            />
+                                        )}
+                                    </Grid>
+                                ))}
+                            </AccordionDetails>
+                        </Accordion>
+                        {handler !== 'AssembleActionHandler' && (
+                            <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+                                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content3" id="panel1a-header3">
+                                    <Typography fontSize="16px">{t('myApp.stepStyle')}</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <TextField
+                                        required
+                                        name="buttonLabel"
+                                        fullWidth
+                                        label={t('myApp.exeLabel')}
+                                        variant="outlined"
+                                        onChange={(e) => {
+                                            editChange({ num: index, label: e.target.name, value: e.target.value });
+                                        }}
+                                        value={buttonLabel}
+                                        sx={{ mt: 2 }}
+                                    />
+                                </AccordionDetails>
+                            </Accordion>
+                        )}
+                        <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content4" id="panel1a-header4">
+                                <Typography fontSize="16px">响应类型</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <FormControl fullWidth>
+                                    <InputLabel color="secondary" id="responent">
+                                        响应类型
+                                    </InputLabel>
+                                    <Select
+                                        disabled={responent?.readOnly ? true : false}
+                                        color="secondary"
+                                        onChange={(e) => {
+                                            basisChange({ e: e.target, index, i: 0, flag: false });
+                                        }}
+                                        name="type"
+                                        labelId="responent"
+                                        value={responent.type}
+                                        label="响应类型"
+                                    >
+                                        <MenuItem value={'TEXT'}>文本类型</MenuItem>
+                                        <MenuItem value={'JSON'}>JSON 类型</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                {/* {responent.type && (
                             <FormControl className="mt-[16px]" color="secondary" fullWidth>
                                 <InputLabel color="secondary" id="responent">
                                     {t('myApp.responent')}
@@ -425,20 +435,23 @@ const Valida = ({
                                     ))}
                                 </Select>
                             </FormControl>
-                        )}
-                        {responent.type === 'JSON' && (
-                            <TextArea
-                                key={responent?.output?.jsonSchema}
-                                defaultValue={responent?.output?.jsonSchema}
-                                className="mt-[16px]"
-                                style={{ height: '200px' }}
-                                onBlur={(e) => {
-                                    basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
-                                }}
-                            />
-                        )}
-                    </AccordionDetails>
-                </Accordion>
+                        )} */}
+                                {responent.type === 'JSON' && (
+                                    <TextArea
+                                        disabled={responent?.readOnly ? true : false}
+                                        key={responent?.output?.jsonSchema}
+                                        defaultValue={responent?.output?.jsonSchema}
+                                        className="mt-[16px]"
+                                        style={{ height: '200px' }}
+                                        onBlur={(e) => {
+                                            basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
+                                        }}
+                                    />
+                                )}
+                            </AccordionDetails>
+                        </Accordion>
+                    </>
+                )}
             </form>
         </Box>
     );

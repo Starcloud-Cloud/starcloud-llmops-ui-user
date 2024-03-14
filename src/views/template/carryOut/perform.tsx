@@ -316,35 +316,39 @@ function Perform({
                                         //     </Box>
                                         // </>
                                         <>
-                                            <TextField
-                                                sx={{ mt: 2 }}
-                                                inputRef={(el) => (mdRef.current[steps] = el)}
-                                                fullWidth
-                                                color="secondary"
-                                                InputLabelProps={{ shrink: true }}
-                                                label={
-                                                    <Box display="flex" alignItems="center">
-                                                        <AutoAwesome fontSize="small" />
-                                                        {t('myApp.execuent')}
-                                                    </Box>
-                                                }
-                                                onChange={(e) => {
-                                                    changeanswer({ value: e.target.value, index: steps });
-                                                }}
-                                                value={item.flowStep.response.answer}
-                                                placeholder={item.flowStep.response.defaultValue}
-                                                multiline
-                                                minRows={
-                                                    item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'JSON'
-                                                        ? 5
-                                                        : 1
-                                                }
-                                                maxRows={
-                                                    item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'JSON'
-                                                        ? 7
-                                                        : 2
-                                                }
-                                            />
+                                            {item?.flowStep?.response?.isShow && (
+                                                <TextField
+                                                    sx={{ mt: 2 }}
+                                                    inputRef={(el) => (mdRef.current[steps] = el)}
+                                                    fullWidth
+                                                    color="secondary"
+                                                    InputLabelProps={{ shrink: true }}
+                                                    label={
+                                                        <Box display="flex" alignItems="center">
+                                                            <AutoAwesome fontSize="small" />
+                                                            {t('myApp.execuent')}
+                                                        </Box>
+                                                    }
+                                                    onChange={(e) => {
+                                                        changeanswer({ value: e.target.value, index: steps });
+                                                    }}
+                                                    value={item.flowStep.response.answer}
+                                                    placeholder={item.flowStep.response.defaultValue}
+                                                    multiline
+                                                    minRows={
+                                                        item.flowStep.response.style === 'TEXTAREA' ||
+                                                        item.flowStep.response.style === 'JSON'
+                                                            ? 5
+                                                            : 1
+                                                    }
+                                                    maxRows={
+                                                        item.flowStep.response.style === 'TEXTAREA' ||
+                                                        item.flowStep.response.style === 'JSON'
+                                                            ? 7
+                                                            : 2
+                                                    }
+                                                />
+                                            )}
                                             {item.flowStep.response.answer && isShows[steps] && (
                                                 <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
                                                     <Box>

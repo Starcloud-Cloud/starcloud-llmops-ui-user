@@ -38,17 +38,18 @@ const Lefts = ({
     //2.文案模板
     const [mockData, setMockData] = useState<any[]>([]);
     const [preform, setPerform] = useState(1);
+    //判断上传的类型
+    const [materialType, setMaterialType] = useState('');
     useEffect(() => {
         if (detailData?.targetKeys) {
-            if (preform > 1) {
-                changeBasis('tags', mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.tags);
-                setSchemeLists(mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.variableList);
-            } else {
-                setPerform(preform + 1);
-            }
+            changeBasis('tags', mockData.find((value) => value.uid === detailData?.targetKeys)?.tags);
+            setSchemeLists(mockData.find((value) => value.uid === detailData?.targetKeys)?.variableList);
+            setMaterialType(mockData.find((value) => value.uid === detailData?.targetKeys)?.materialType);
         } else {
             changeBasis('tags', []);
         }
+        console.log(mockData);
+        console.log(detailData?.targetKeys);
     }, [detailData?.targetKeys]);
 
     //上传图片
@@ -180,13 +181,23 @@ const Lefts = ({
         const newData = _.cloneDeep(detailData);
         newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUid = detailData?.targetKeys;
-        handleSave({ flag, newData, tableData });
+        const pictureList = newData.imageUrlList.map((item: any) => {
+            return {
+                desc: item,
+                fieldName: 'pictureUrl',
+                type: 'image'
+            };
+        });
+        if (materialType !== 'picture') {
+            newData.imageUrlList = [];
+        }
+        handleSave({ flag, newData, tableData: materialType === 'picture' ? pictureList : tableData });
     };
 
     //获取表头数据
     const getTableHeader = async () => {
         // const res = await metadata();
-        const result = await materialTemplate('picture');
+        const result = await materialTemplate(materialType);
         const newList = result?.fieldDefine?.map((item: any) => {
             return {
                 title: item.desc,
@@ -312,7 +323,11 @@ const Lefts = ({
         }
     }, [detailData?.creativeMaterialList]);
     useEffect(() => {
-        getTableHeader();
+        if (materialType) {
+            getTableHeader();
+        }
+    }, [materialType]);
+    useEffect(() => {
         schemeList().then((res: any) => {
             setMockData(res);
         });
@@ -368,55 +383,62 @@ const Lefts = ({
                 {detailData?.targetKeys && (
                     <>
                         <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">2. 批量上传素材图片</div>
-                        <div className="text-[12px] font-[500] flex items-center justify-between">
-                            <div>图片总量：{imageList?.length}</div>
-                            {imageList?.length > 0 && (
-                                <Button
-                                    danger
-                                    onClick={() => {
-                                        setImageList([]);
-                                    }}
-                                    size="small"
-                                    type="text"
-                                >
-                                    全部清除
-                                </Button>
-                            )}
-                        </div>
-                        <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
-                            <div>
-                                <Upload {...props}>
-                                    <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                        <PlusOutlined rev={undefined} />
-                                        <div style={{ marginTop: 8 }}>Upload</div>
+                        {materialType === 'picture' ? (
+                            <>
+                                <div className="text-[12px] font-[500] flex items-center justify-between">
+                                    <div>图片总量：{imageList?.length}</div>
+                                    {imageList?.length > 0 && (
+                                        <Button
+                                            danger
+                                            onClick={() => {
+                                                setImageList([]);
+                                            }}
+                                            size="small"
+                                            type="text"
+                                        >
+                                            全部清除
+                                        </Button>
+                                    )}
+                                </div>
+                                <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
+                                    <div>
+                                        <Upload {...props}>
+                                            <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                                <PlusOutlined rev={undefined} />
+                                                <div style={{ marginTop: 8 }}>Upload</div>
+                                            </div>
+                                        </Upload>
                                     </div>
-                                </Upload>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-center mt-[20px] mb-[10px]">
-                            <div className="flex gap-2">
-                                <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
-                                    批量导入
-                                </Button>
-                                <Button size="small" type="primary">
-                                    选择已有素材
-                                </Button>
-                            </div>
-                            <Button
-                                onClick={() => setZoomOpen(true)}
-                                type="primary"
-                                shape="circle"
-                                icon={<ZoomInOutlined rev={undefined} />}
-                            ></Button>
-                        </div>
-                        <Table
-                            rowKey={(record, index) => String(index)}
-                            loading={tableLoading}
-                            size="small"
-                            virtual
-                            columns={columns}
-                            dataSource={tableData}
-                        />
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex justify-between items-center mb-[10px]">
+                                    <div className="flex gap-2">
+                                        <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                                            批量导入
+                                        </Button>
+                                        <Button size="small" type="primary">
+                                            选择已有素材
+                                        </Button>
+                                    </div>
+                                    <Button
+                                        onClick={() => setZoomOpen(true)}
+                                        type="primary"
+                                        shape="circle"
+                                        icon={<ZoomInOutlined rev={undefined} />}
+                                    ></Button>
+                                </div>
+                                <Table
+                                    rowKey={(record, index) => String(index)}
+                                    loading={tableLoading}
+                                    size="small"
+                                    virtual
+                                    columns={columns}
+                                    dataSource={tableData}
+                                />
+                            </>
+                        )}
                         <div className="text-[18px] font-[600] mt-[20px]">3. 方案参数</div>
                         <div className="text-[14px] font-[600] mt-[10px]">
                             {mockData.filter((value) => value.uid === detailData?.targetKeys)[0]?.name}

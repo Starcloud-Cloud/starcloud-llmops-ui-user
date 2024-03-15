@@ -641,13 +641,19 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                                     <MenuItem value={'ADVANCED'}>
                                         <div className="w-full flex justify-between items-end">
                                             <div>高级变量</div>
-                                            <div className="text-xs text-black/50">只有管理员在创作方案可编辑删除</div>
+                                            <div className="text-xs text-black/50">创建者在配置页面可编辑删除，普通用户不能编辑删除</div>
                                         </div>
                                     </MenuItem>
                                     <MenuItem value={'PARAMS'}>
                                         <div className="w-full flex justify-between items-end">
                                             <div>通用变量</div>
-                                            <div className="text-xs text-black/50">所有人都在创作方案可编辑删除</div>
+                                            <div className="text-xs text-black/50">所有用户都可编辑删除</div>
+                                        </div>
+                                    </MenuItem>
+                                    <MenuItem disabled={true} value={'SYSTEM'}>
+                                        <div className="w-full flex justify-between items-end">
+                                            <div>系统变量</div>
+                                            <div className="text-xs text-black/50">所有用户都不可编辑删除</div>
                                         </div>
                                     </MenuItem>
                                 </Select>

@@ -18,7 +18,7 @@ interface Tabs {
 const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
     return (
         <div className="h-[800px] overflow-y-auto overflow-x-hidden">
-            <div className="flex items-center gap-4 min-h-[32px]">
+            {/* <div className="flex items-center gap-4 min-h-[32px]">
                 <span>海报生成模式</span>
                 <Switch
                     checked={mode === 'SEQUENCE' ? true : false}
@@ -33,7 +33,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                     }}
                 />
                 <span className="text-[#673ab7]">{mode === 'SEQUENCE' ? '顺序生成' : '随机生成'}</span>
-            </div>
+            </div> */}
             <div className="flex items-end mb-[20px]">
                 <Button
                     onClick={() => {
@@ -51,7 +51,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                     name: '首图',
                                     model: '',
                                     titleGenerateMode: 'DEFAULT',
-                                    mode: 'SEQUENCE',
+                                    // mode: 'SEQUENCE',
                                     variableList: []
                                 }
                             ]

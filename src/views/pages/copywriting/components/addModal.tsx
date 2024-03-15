@@ -438,6 +438,7 @@ const AddModal = () => {
     }, [queryPage.pageNo]);
 
     const [current, setCurrent] = useState(0);
+    const [hadleCode, setHandleCode] = useState('');
     //选择应用
     const [appOpen, setAppOpen] = useState(false);
     const [AppList, setAppLIst] = useState<any[]>([]);
@@ -461,7 +462,7 @@ const AddModal = () => {
             getExample(newList).then((res) => {
                 setGoodList(res);
             });
-            schemeOptions(appData?.appUid).then((res) => {
+            schemeOptions({ appUid: appData?.appUid, stepCode: '海报生成' }).then((res) => {
                 setSchemaList(res);
             });
         }
@@ -535,10 +536,23 @@ const AddModal = () => {
     const [stepItem, setStepItem] = useState<any[]>([]);
     useEffect(() => {
         if (appData) {
-            if (appData?.steps?.findIndex((item: any) => item?.code === 'PosterActionHandler') !== -1) {
+            if (
+                appData?.steps?.findIndex((item: any) => item?.code === 'PosterActionHandler') !== -1 &&
+                appData?.steps?.findIndex((item: any) => item?.code === 'VariableActionHandler') !== -1
+            ) {
                 setStepItem([
                     { icon: <HomeOutlined rev={undefined} />, title: '模版说明' },
                     { icon: <ContainerOutlined rev={undefined} />, title: '基础信息' },
+                    { icon: <SettingOutlined rev={undefined} />, title: '创作配置' },
+                    { icon: <FileImageOutlined rev={undefined} />, title: '图片生成' },
+                    { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
+                ]);
+            } else if (
+                appData?.steps?.findIndex((item: any) => item?.code === 'PosterActionHandler') !== -1 &&
+                appData?.steps?.findIndex((item: any) => item?.code === 'VariableActionHandler') === -1
+            ) {
+                setStepItem([
+                    { icon: <HomeOutlined rev={undefined} />, title: '模版说明' },
                     { icon: <SettingOutlined rev={undefined} />, title: '创作配置' },
                     { icon: <FileImageOutlined rev={undefined} />, title: '图片生成' },
                     { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
@@ -734,7 +748,7 @@ const AddModal = () => {
                     </div>
                 )}
                 <div className="min-h-[500px]">
-                    {current === 0 && appData && (
+                    {stepItem[current]?.title === '模版说明' && appData && (
                         <div className="flex">
                             <div className="w-[40%] flex items-center flex-col">
                                 <div className="text-lg font-bold">{appData?.appName}</div>
@@ -764,7 +778,7 @@ const AddModal = () => {
                             </div>
                         </div>
                     )}
-                    {current === 1 && (
+                    {stepItem[current]?.title === '基础信息' && (
                         <>
                             <div className="mb-[10px] font-bold text-[16px]">
                                 模版基础信息
@@ -809,7 +823,7 @@ const AddModal = () => {
                             </Row>
                         </>
                     )}
-                    {current === 2 && (
+                    {stepItem[current]?.title === '创作配置' && (
                         <Collapse bordered={false} style={{ background: 'transparent' }}>
                             {valueList?.map(
                                 (el, index) =>
@@ -821,7 +835,10 @@ const AddModal = () => {
                                             header={
                                                 <div className="relative">
                                                     <span className="text-[18px] font-[600]">
-                                                        {index - 1 + '.'} {el?.name}
+                                                        {appData?.steps?.find((item: any) => item?.code === 'VariableActionHandler')
+                                                            ? index - 1
+                                                            : index + '.'}{' '}
+                                                        {el?.name}
                                                     </span>
                                                     {verifyItem(el).flag && (
                                                         <span className="text-[#ff4d4f] ml-[10px]">（{verifyItem(el)?.content}）</span>
@@ -991,97 +1008,41 @@ const AddModal = () => {
                             )}
                         </Collapse>
                     )}
-                    {current === 3 &&
-                        (valueList?.find((item: any) => item?.code === 'PosterActionHandler') ? (
-                            <>
-                                <CreateTab
-                                    mode={valueList?.find((item: any) => item?.code === 'PosterActionHandler')?.mode}
-                                    schemaList={schemaList}
-                                    setModel={(data) => {
-                                        setValues(
-                                            'mode',
-                                            data,
-                                            valueList?.findIndex((item: any) => item?.code === 'PosterActionHandler')
-                                        );
-                                    }}
-                                    imageStyleData={valueList?.find((item: any) => item?.code === 'PosterActionHandler')?.styleList}
-                                    setImageStyleData={(data) => {
-                                        setValues(
-                                            'styleList',
-                                            data,
-                                            valueList?.findIndex((item: any) => item?.code === 'PosterActionHandler')
-                                        );
-                                    }}
-                                    focuActive={focuActive}
-                                    setFocuActive={setFocuActive}
-                                    digui={() => {
-                                        const newData = valueList
-                                            ?.find((item: any) => item?.code === 'PosterActionHandler')
-                                            ?.styleList?.map((i: any) => i.name.split(' ')[1]);
-                                        if (!newData || newData?.every((i: any) => !i)) {
-                                            return 1;
-                                        }
-                                        return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
-                                    }}
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <div className="flex flex-wrap gap-[10px] max-h-[300px] overflow-y-auto shadow">
-                                    <Modal open={imageOpen} footer={null} onCancel={() => setImageOpen(false)}>
-                                        <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
-                                    </Modal>
-                                    <div>
-                                        <Upload {...testProps}>
-                                            <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                                <PlusOutlined rev={undefined} />
-                                                <div style={{ marginTop: 8 }}>Upload</div>
-                                            </div>
-                                        </Upload>
-                                    </div>
-                                </div>
-                                <Button
-                                    onClick={() => {
-                                        if (!testImageList || testImageList.length === 0) {
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '没有上传测试图片',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'error'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                            return false;
-                                        }
-                                        if (searchParams.get('uid')) {
-                                            exeTest();
-                                        } else {
-                                            handleSave(true);
-                                        }
-                                    }}
-                                    loading={testOpen}
-                                    className="mt-[20px]"
-                                    type="primary"
-                                >
-                                    测试生成
-                                </Button>
-                                <div onScroll={handleScroll} ref={scrollRef} className="h-[600px] overflow-auto shadow-lg mt-[20px]">
-                                    <Row gutter={20} className="h-[fit-content] w-full">
-                                        {planList.map((item, index: number) => (
-                                            <Col key={index} span={6} className="inline-block">
-                                                <Goods item={item} setBusinessUid={item.setBusinessUid} setDetailOpen={() => {}} />
-                                            </Col>
-                                        ))}
-                                    </Row>
-                                </div>
-                            </>
-                        ))}
-                    {current === 4 && (
+                    {stepItem[current]?.title === '图片生成' && (
+                        <>
+                            <CreateTab
+                                mode={valueList?.find((item: any) => item?.code === 'PosterActionHandler')?.mode}
+                                schemaList={schemaList}
+                                setModel={(data) => {
+                                    setValues(
+                                        'mode',
+                                        data,
+                                        valueList?.findIndex((item: any) => item?.code === 'PosterActionHandler')
+                                    );
+                                }}
+                                imageStyleData={valueList?.find((item: any) => item?.code === 'PosterActionHandler')?.styleList}
+                                setImageStyleData={(data) => {
+                                    setValues(
+                                        'styleList',
+                                        data,
+                                        valueList?.findIndex((item: any) => item?.code === 'PosterActionHandler')
+                                    );
+                                }}
+                                focuActive={focuActive}
+                                setFocuActive={setFocuActive}
+                                digui={() => {
+                                    const newData = valueList
+                                        ?.find((item: any) => item?.code === 'PosterActionHandler')
+                                        ?.styleList?.map((i: any) => i.name.split(' ')[1]);
+                                    if (!newData || newData?.every((i: any) => !i)) {
+                                        return 1;
+                                    }
+                                    return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                }}
+                            />
+                        </>
+                    )}
+                    {stepItem[current]?.title === '生成测试' && (
                         <>
                             <div className="flex flex-wrap gap-[10px] max-h-[300px] overflow-y-auto shadow">
                                 <Modal open={imageOpen} footer={null} onCancel={() => setImageOpen(false)}>

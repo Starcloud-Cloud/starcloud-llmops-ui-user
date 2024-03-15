@@ -326,58 +326,60 @@ const Valida = ({
                 </Accordion>
                 {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && (
                     <>
-                        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content2" id="panel1a-header2">
-                                {variables.every((value) => {
-                                    if (value.field !== 'prompt') {
-                                        return value.value;
-                                    } else {
-                                        return true;
-                                    }
-                                }) ? (
-                                    <CheckCircleIcon fontSize="small" color="success" />
-                                ) : (
-                                    <CancelIcon fontSize="small" color="error" />
-                                )}
-
-                                <Typography ml={2} fontSize="16px">
-                                    {t('market.model')}
-                                </Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                {variables?.map((el: any, i: number) => (
-                                    <Grid item md={12} xs={12} key={i + 'variables'}>
-                                        {el.field !== 'prompt' && el.field !== 'n' && (
-                                            <FormExecute
-                                                formik={formik}
-                                                item={el}
-                                                onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
-                                            />
-                                        )}
-                                    </Grid>
-                                ))}
-                            </AccordionDetails>
-                        </Accordion>
                         {handler !== 'AssembleActionHandler' && (
-                            <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content3" id="panel1a-header3">
-                                    <Typography fontSize="16px">{t('myApp.stepStyle')}</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <TextField
-                                        required
-                                        name="buttonLabel"
-                                        fullWidth
-                                        label={t('myApp.exeLabel')}
-                                        variant="outlined"
-                                        onChange={(e) => {
-                                            editChange({ num: index, label: e.target.name, value: e.target.value });
-                                        }}
-                                        value={buttonLabel}
-                                        sx={{ mt: 2 }}
-                                    />
-                                </AccordionDetails>
-                            </Accordion>
+                            <>
+                                <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content2" id="panel1a-header2">
+                                        {variables.every((value) => {
+                                            if (value.field !== 'prompt') {
+                                                return value.value;
+                                            } else {
+                                                return true;
+                                            }
+                                        }) ? (
+                                            <CheckCircleIcon fontSize="small" color="success" />
+                                        ) : (
+                                            <CancelIcon fontSize="small" color="error" />
+                                        )}
+
+                                        <Typography ml={2} fontSize="16px">
+                                            {t('market.model')}
+                                        </Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        {variables?.map((el: any, i: number) => (
+                                            <Grid item md={12} xs={12} key={i + 'variables'}>
+                                                {el.field !== 'prompt' && el.field !== 'n' && (
+                                                    <FormExecute
+                                                        formik={formik}
+                                                        item={el}
+                                                        onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
+                                                    />
+                                                )}
+                                            </Grid>
+                                        ))}
+                                    </AccordionDetails>
+                                </Accordion>
+                                <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content3" id="panel1a-header3">
+                                        <Typography fontSize="16px">{t('myApp.stepStyle')}</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <TextField
+                                            required
+                                            name="buttonLabel"
+                                            fullWidth
+                                            label={t('myApp.exeLabel')}
+                                            variant="outlined"
+                                            onChange={(e) => {
+                                                editChange({ num: index, label: e.target.name, value: e.target.value });
+                                            }}
+                                            value={buttonLabel}
+                                            sx={{ mt: 2 }}
+                                        />
+                                    </AccordionDetails>
+                                </Accordion>
+                            </>
                         )}
                         <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content4" id="panel1a-header4">

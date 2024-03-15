@@ -300,10 +300,12 @@ const Lefts = ({
     };
     const [form] = Form.useForm();
     const formRef = useRef(form);
+    const [title, setTitle] = useState('');
     //编辑
     const [editOpen, setEditOpen] = useState(false);
     const [rowIndex, setRowIndex] = useState(0);
     const handleEdit = (row: any, index: number) => {
+        setTitle('编辑');
         form.setFieldsValue(row);
         setRowIndex(index);
         setEditOpen(true);
@@ -560,6 +562,17 @@ const Lefts = ({
                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
             </Modal>
             <Modal width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
+                <div className="flex justify-end my-[20px]">
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setTitle('新增');
+                            setEditOpen(true);
+                        }}
+                    >
+                        新增
+                    </Button>
+                </div>
                 <Table
                     rowKey={(record, index) => String(index)}
                     loading={tableLoading}
@@ -591,7 +604,7 @@ const Lefts = ({
             </Modal>
             <Modal
                 zIndex={9000}
-                title="编辑"
+                title={title}
                 open={editOpen}
                 onCancel={() => {
                     form.resetFields();
@@ -600,16 +613,24 @@ const Lefts = ({
                 onOk={async () => {
                     const result = await form.validateFields();
                     const newList = [...tableRef.current];
-                    newList.splice(rowIndex, 1, result);
-                    tableRef.current = newList;
-                    setTableData(tableRef.current);
+                    if (title === '编辑') {
+                        newList.splice(rowIndex, 1, result);
+                        tableRef.current = newList;
+                        setTableData(tableRef.current);
+                    } else {
+                        newList.unshift(result);
+                        tableRef.current = newList;
+                        setTableData(tableRef.current);
+                    }
+
                     setEditOpen(false);
                 }}
             >
                 <Form ref={formRef} form={form} labelCol={{ span: 6 }}>
                     {columns?.map(
                         (item, index) =>
-                            item.title !== '操作' && (
+                            item.title !== '操作' &&
+                            item.title !== '序号' && (
                                 <Form.Item
                                     key={index}
                                     label={item.title}

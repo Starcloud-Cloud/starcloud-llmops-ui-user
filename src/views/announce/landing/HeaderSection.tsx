@@ -117,7 +117,7 @@ const HeaderSection = () => {
 
     useEffect(() => {
         (async () => {
-            const response = await fetch(`${process.env.MOFA_PUSH_CLIENT_URL}/latest-mac.yml`);
+            const response = await fetch(`${process.env.REACT_APP_MOFA_PUSH_CLIENT_URL}/latest-mac.yml`);
             const text = await response.text();
             let match = text.match(/url: (https?:\/\/[^\s]+)/g);
             let secondUrl = match && match[0].replace('url: ', '');

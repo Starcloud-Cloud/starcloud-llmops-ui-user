@@ -22,7 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import MainCard from 'ui-component/cards/MainCard';
 import { Close } from '@mui/icons-material';
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import imgLoading from 'assets/images/picture/loading.gif';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -39,6 +39,8 @@ interface Table {
 const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Table) => {
     const [current, setCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+    const tableRef = useRef<any>(null);
+    // const [columns,setColumns] = useState<any[]>([])
     const columns: ColumnsType<any> = [
         {
             title: '参考标题',
@@ -376,7 +378,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                 pagination={{
                     current,
                     pageSize,
-                    total: tableData.length,
+                    total: tableData?.length || 0,
                     showSizeChanger: true,
                     pageSizeOptions: [20, 50, 100],
                     onChange: (data) => {

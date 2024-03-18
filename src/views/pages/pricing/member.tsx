@@ -455,6 +455,7 @@ const Price1 = () => {
     const [beanProducts, setBeanProducts] = useState<any[]>([]);
     const [newUserProducts, setNewUserProducts] = useState<any[]>([]);
     const [activeProduct, setActiveProduct] = useState<any[]>([]);
+    const [payType, setPayType] = useState(1);
 
     const { width } = useWindowSize();
     const myRef = React.useRef<any>(null);
@@ -620,7 +621,7 @@ const Price1 = () => {
     const onRefresh = async () => {
         const resOrder = await submitOrder({
             id: order.payOrderId,
-            channelCode: 'alipay_pc',
+            channelCode: payType === 1 ? 'alipay_pc' : 'wx_native',
             channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
             displayMode: 'qr_code'
         });
@@ -645,7 +646,8 @@ const Price1 = () => {
     };
 
     // type之前用来判断是否是签约，现在用来判断折扣码类型
-    const handleCreateOrder = async (payId?: number, discountCode?: number, type?: number) => {
+    const handleCreateOrder = async (payId?: number, discountCode?: number, type?: number, payType = 1) => {
+        setPayType(payType);
         if (!isLoggedIn) {
             setOpenDialog(true);
             setTimeout(() => {
@@ -679,7 +681,7 @@ const Price1 = () => {
                 setOrder(res);
                 const resOrder = await submitOrder({
                     id: res.payOrderId,
-                    channelCode: 'alipay_pc',
+                    channelCode: payType === 1 ? 'alipay_pc' : 'wx_native',
                     channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
                     displayMode: 'qr_code'
                 });

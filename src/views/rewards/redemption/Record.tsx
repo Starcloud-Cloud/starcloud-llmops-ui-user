@@ -27,6 +27,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { getDict } from 'api/common';
 import ClearIcon from '@mui/icons-material/Clear';
+import { ENUM_TENANT, getTenant } from 'utils/permission';
 
 type TableEnhancedCreateDataType = {
     benefitsName: string;
@@ -292,14 +293,30 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                 <TableContainer>
                     <div className="p-2">
                         <FormControl fullWidth>
-                            <InputLabel id="bizId-label">权益名称</InputLabel>
+                            <InputLabel
+                                size="small"
+                                id="columnId"
+                                sx={{
+                                    width: '150px',
+                                    '& .Mui-focused': {
+                                        background: '#f8fafc',
+                                        paddingRight: '2px'
+                                    },
+                                    '& .MuiInputLabel-sizeSmall': {
+                                        background: '#f8fafc',
+                                        paddingRight: '2px'
+                                    }
+                                }}
+                            >
+                                权益名称
+                            </InputLabel>
                             <Select
+                                size="small"
+                                id="columnId"
                                 labelId="bizId-label"
-                                id="bizIdt"
                                 label="bizId"
                                 value={bizId}
                                 className="w-[300px]"
-                                size="small"
                                 onChange={(e) => {
                                     const { value } = e.target;
                                     setBizId(value);
@@ -363,18 +380,20 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                             {row?.levelName}
                                         </TableCell>
                                         <TableCell align="center">{handleTransformState(row?.status)}</TableCell>
-                                        <TableCell align="center">
-                                            <Fragment key={1}>
-                                                魔法豆 · {row?.magicBeanInit} <br />
-                                            </Fragment>
-                                            <Fragment key={2}>图片 · {row?.magicImageInit}</Fragment>
-                                            {/* {row.benefitsList.map((benefit, id) => (
-                                                <Fragment key={id}>
-                                                    {benefit}
-                                                    <br />
+                                        {getTenant() === ENUM_TENANT.AI ? (
+                                            <TableCell align="center">
+                                                <Fragment key={1}>
+                                                    魔法豆 · {row?.magicBeanInit} <br />
                                                 </Fragment>
-                                            ))} */}
-                                        </TableCell>
+                                                <Fragment key={2}>图片 · {row?.magicImageInit}</Fragment>
+                                            </TableCell>
+                                        ) : (
+                                            <TableCell align="center">
+                                                <Fragment key={1}>
+                                                    矩阵豆 · {row?.matrixBeanInit || 0} <br />
+                                                </Fragment>
+                                            </TableCell>
+                                        )}
                                         <TableCell align="center">{formatTime(row?.validStartTime)}</TableCell>
                                         {/* <TableCell align="center">
                                             {row.validity} {row.validityUnit === 'MONTH' ? '月' : row.validityUnit === 'WEEK' ? '周' : '年'}

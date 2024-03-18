@@ -77,7 +77,7 @@ const RedemptionHeader = () => {
                     fontSize: { xs: '0.875rem !important', md: '1rem !important', xl: '1rem !important' }
                 }
             }}
-            title={`注册即获取基础权益：${getPermission(ENUM_PERMISSION.EXCHANGE_SHOW_COUNT)}`}
+            // title={`注册即获取基础权益：${getPermission(ENUM_PERMISSION.EXCHANGE_SHOW_COUNT)}`}
         >
             <Card>
                 <CardMedia image={Card3} title="Card 3">

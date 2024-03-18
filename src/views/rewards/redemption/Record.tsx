@@ -297,15 +297,8 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                 size="small"
                                 id="columnId"
                                 sx={{
-                                    width: '150px',
-                                    '& .Mui-focused': {
-                                        background: '#f8fafc',
-                                        paddingRight: '2px'
-                                    },
-                                    '& .MuiInputLabel-sizeSmall': {
-                                        background: '#f8fafc',
-                                        paddingRight: '2px'
-                                    }
+                                    width: '60px',
+                                    background: '#f8fafc'
                                 }}
                             >
                                 权益名称

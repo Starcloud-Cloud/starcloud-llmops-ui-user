@@ -318,8 +318,8 @@ const BatcSmallRedBooks = () => {
                                         src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
                                         alt=""
                                     />
-                                    <div className="font-[500] text-[20px] text-[#1b2337] my-[8px]">魔法AI创作计划</div>
-                                    <div>在左侧输入你的创意吧</div>
+                                    <div className="font-[500] text-[20px] text-[#1b2337] my-[8px]">魔法创作计划</div>
+                                    <div>在左侧输入你的创意，保存并开始生成吧</div>
                                 </div>
                             </div>
                         ) : (

@@ -112,6 +112,8 @@ const EditStyle = ({
         }
     }, [perOpen]);
     const convertSchemaToLabelTitleArray = (schema: any) => {
+        console.log(schema);
+
         const result: any = [];
 
         const processProperties = (properties: any, parentName = '') => {
@@ -131,24 +133,36 @@ const EditStyle = ({
         if (schema.properties) {
             processProperties(schema.properties);
         }
-
         return result;
     };
+    const getJSON = (item: any) => {
+        let obj: any = {};
+        try {
+            obj = {
+                ...JSON.parse(item.inJsonSchema),
+                properties: {
+                    ...JSON.parse(item.inJsonSchema).properties,
+                    ...JSON.parse(item.outJsonSchema)
+                }
+            };
+        } catch (err) {
+            obj = {};
+        }
+        return obj;
+    };
     useEffect(() => {
-        const newList = schemaList?.map((item) => ({
-            label: item.name,
-            key: item.code,
-            description: item.description,
-            children: item.inJsonSchema
-                ? convertSchemaToLabelTitleArray({
-                      ...JSON.parse(item.inJsonSchema),
-                      properties: {
-                          ...JSON.parse(item.inJsonSchema).properties,
-                          ...JSON.parse(item.outJsonSchema)
-                      }
-                  })
-                : convertSchemaToLabelTitleArray(JSON.parse(item.outJsonSchema))
-        }));
+        const newList = schemaList?.map((item) => {
+            return {
+                label: item.name,
+                key: item.code,
+                description: item.description,
+                children: item.inJsonSchema
+                    ? convertSchemaToLabelTitleArray(getJSON(item))
+                    : item.outJsonSchema
+                    ? convertSchemaToLabelTitleArray(JSON.parse(item.outJsonSchema))
+                    : []
+            };
+        });
         setItem(newList as any[]);
     }, []);
     const wrapperRef: any = useRef(null);

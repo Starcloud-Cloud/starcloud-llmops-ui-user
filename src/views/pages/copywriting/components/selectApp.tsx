@@ -89,7 +89,7 @@ const SelectApp = ({
                                             onClick={() => setCurrent(v?.appUid)}
                                         >
                                             <div className="text-[16px] font-bold">{v?.appName}</div>
-                                            <div className="text-[12px] text-black/40 my-2 line-clamp-3">{v?.description}</div>
+                                            <div className="text-[12px] h-[37px] text-black/40 my-2 line-clamp-2">{v?.description}</div>
                                             <div>
                                                 步骤数：<span>{v?.stepCount || '-'}</span>
                                             </div>

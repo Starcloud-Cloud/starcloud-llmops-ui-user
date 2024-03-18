@@ -93,6 +93,7 @@ const HeaderSection = () => {
         window.scrollTo(0, window.innerHeight - 80);
     };
 
+    console.log(releaseDate, 'releaseDate');
     const headerSX = { fontSize: { xs: '1rem', sm: '2rem', md: '2rem', lg: '2rem' } };
 
     const HeaderAnimationImagememo = useMemo(
@@ -129,7 +130,7 @@ const HeaderSection = () => {
             if (version) {
                 setVersion(version);
             }
-            let matchReleaseDate = text.match(/releaseDate: "([^"]+)/);
+            let matchReleaseDate = text.match(/releaseDate: '([^']+)/);
             let releaseDate = matchReleaseDate && matchReleaseDate[1];
             if (releaseDate) {
                 setReleaseDate(releaseDate);

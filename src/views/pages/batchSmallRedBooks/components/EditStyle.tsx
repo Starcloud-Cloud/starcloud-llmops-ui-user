@@ -168,10 +168,12 @@ const EditStyle = ({
     const wrapperRef: any = useRef(null);
     const [popoverWidth, setPopoverWidth] = useState(null);
     useEffect(() => {
+        console.log(11111111);
+
         if (wrapperRef.current) {
             setPopoverWidth(wrapperRef.current?.offsetWidth);
         }
-    }, [wrapperRef]);
+    }, [wrapperRef.current]);
     //输入框的节点
     const inputList: any = useRef([]);
     return (
@@ -264,6 +266,9 @@ const EditStyle = ({
                                                             <Menu
                                                                 onClick={(data) => {
                                                                     const newData = _.cloneDeep(imageStyleData);
+                                                                    if (!newData.variableList[index].value) {
+                                                                        newData.variableList[index].value = '';
+                                                                    }
                                                                     const part1 = newData.variableList[index].value.slice(
                                                                         0,
                                                                         inputList?.current[index]?.resizableTextArea?.textArea

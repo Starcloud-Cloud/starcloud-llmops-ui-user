@@ -37,19 +37,21 @@ const BatcSmallRedBooks = () => {
         });
         schemeRef.current = res.configuration?.variableList ? res.configuration?.variableList : [];
         setSchemeList(schemeRef.current);
-        setImageList(
-            res.configuration?.imageUrlList?.map((item: any) => {
-                return {
-                    uid: uuidv4(),
-                    thumbUrl: item,
-                    response: {
-                        data: {
-                            url: item
+        if (res.configuration?.creativeMaterialList?.findIndex((item: any) => item.type === 'picture') !== -1) {
+            setImageList(
+                res.configuration?.creativeMaterialList?.map((item: any) => {
+                    return {
+                        uid: uuidv4(),
+                        thumbUrl: item?.pictureUrl,
+                        response: {
+                            data: {
+                                url: item?.pictureUrl
+                            }
                         }
-                    }
-                };
-            })
-        );
+                    };
+                })
+            );
+        }
     };
 
     //批次分页

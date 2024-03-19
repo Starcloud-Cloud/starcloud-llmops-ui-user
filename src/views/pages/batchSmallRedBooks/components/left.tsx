@@ -150,18 +150,16 @@ const Lefts = ({
         });
         setSchemeLists(newList);
         const newData = _.cloneDeep(detailData);
-        newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUid = detailData?.targetKeys;
-        const pictureList = newData.imageUrlList.map((item: any) => {
-            return {
-                desc: item,
-                fieldName: 'pictureUrl',
-                type: 'image'
-            };
-        });
-        if (materialType !== 'picture') {
-            newData.imageUrlList = [];
-        }
+        const pictureList = imageList
+            ?.map((item: any) => item?.response?.data?.url)
+            ?.filter((el: any) => el)
+            ?.map((item: any) => {
+                return {
+                    pictureUrl: item,
+                    type: 'picture'
+                };
+            });
         handleSave({ flag, newData, tableData: materialType === 'picture' ? pictureList : tableData });
     };
 

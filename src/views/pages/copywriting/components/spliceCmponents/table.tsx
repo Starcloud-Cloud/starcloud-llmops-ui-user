@@ -42,7 +42,7 @@ interface Table {
 const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, params }: Table) => {
     const [current, setCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const tableRef = useRef<any>(null);
+    const tableRef = useRef<any>(tableData);
     const [columns, setColumns] = useState<ColumnsType<any>>([]);
     // const columns: ColumnsType<any> = [
     //     {
@@ -164,12 +164,18 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
         const newList = result?.fieldDefine?.map((item: any) => ({
             title: item.desc,
             align: 'center',
-            width: 200,
+            minWidth: 200,
             dataIndex: item.fieldName,
             render: (_: any, row: any) => (
-                <div className="flex justify-center items-center gap-2">
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
                     {item.type === 'image' ? (
                         <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                    ) : item.fieldName === 'source' ? (
+                        row[item.fieldName] === 'OTHER' ? (
+                            sourceList?.find((item) => item.value === 'OTHER')?.label
+                        ) : (
+                            sourceList?.find((item) => item.value === 'SMALL_RED_BOOK')?.label
+                        )
                     ) : (
                         row[item.fieldName]
                     )}
@@ -191,33 +197,9 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
                             color="secondary"
                             size="small"
                             onClick={() => {
+                                setTitle('编辑');
+                                form.setFieldsValue(row);
                                 setRowIndex(index);
-                                setAccoutQuery({
-                                    ...row,
-                                    fileList: row?.imageList?.map((item: any) => {
-                                        return {
-                                            uid: uuidv4(),
-                                            percent: 100,
-                                            thumbUrl: item?.url,
-                                            response: {
-                                                data: {
-                                                    url: item?.url
-                                                }
-                                            }
-                                        };
-                                    })
-                                });
-                                setImageContent(
-                                    row?.imageList?.map((item: any) => {
-                                        return item.title;
-                                    })
-                                );
-                                setImageSubContent(
-                                    row?.imageList?.map((item: any) => {
-                                        return item.subTitle;
-                                    })
-                                );
-                                setAddTitle(code === 'TitleActionHandler' ? '编辑参考标题' : '编辑参考内容');
                                 setAddOpen(true);
                             }}
                         >
@@ -225,9 +207,10 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
                         </Buttons>
                         <Buttons
                             onClick={() => {
-                                const newList = JSON.parse(JSON.stringify(tableData));
-                                newList.splice(rowIndex, 1);
-                                setTableData(newList);
+                                const newList = JSON.parse(JSON.stringify(tableRef.current));
+                                newList.splice(index, 1);
+                                tableRef.current = newList;
+                                setTableData(tableRef.current);
                             }}
                             color="error"
                             size="small"
@@ -246,6 +229,18 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
     const [form] = Form.useForm();
     const formOk = (data: any) => {
         console.log(data);
+        const newList = _.cloneDeep(tableData || []);
+        if (title === '新增') {
+            newList.push(data);
+            tableRef.current = newList;
+            setTableData(tableRef.current);
+            setAddOpen(false);
+        } else {
+            newList.splice(rowIndex, 1, data);
+            tableRef.current = newList;
+            setTableData(tableRef.current);
+            setAddOpen(false);
+        }
     };
     const changeAccoutQuery = (data: { name: string; value: number | string | string[] }) => {
         setAccoutQuery({
@@ -304,7 +299,6 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
             <div className="flex justify-end">
                 <Button
                     onClick={() => {
-                        // setAddTitle(code === 'TitleActionHandler' ? '新增参考标题' : '新增参考内容');
                         setTitle('新增');
                         setAddOpen(true);
                     }}
@@ -335,16 +329,18 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
                 columns={columns}
                 dataSource={tableData}
             />
-            <FormModal
-                title={title}
-                editOpen={addOpen}
-                setEditOpen={setAddOpen}
-                columns={columns}
-                form={form}
-                formOk={formOk}
-                sourceList={sourceList}
-                materialType={materialType}
-            />
+            {addOpen && (
+                <FormModal
+                    title={title}
+                    editOpen={addOpen}
+                    setEditOpen={setAddOpen}
+                    columns={columns}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={sourceList}
+                    materialType={materialType}
+                />
+            )}
             {/* <Modals open={addOpen} onClose={() => setAddOpen(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
                 <MainCard
                     style={{

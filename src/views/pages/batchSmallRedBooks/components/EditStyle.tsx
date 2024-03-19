@@ -8,6 +8,7 @@ import { SelectTemplateModal } from './SelectTemplateModal';
 
 import React from 'react';
 import { getImageTemplateTypes } from 'api/template';
+const { SubMenu } = Menu;
 const treeData: TreeDataNode[] = [
     {
         title: 'parent 1',
@@ -103,19 +104,14 @@ const EditStyle = ({
         }
     }, [imageStyleData, tempList]);
     const { TextArea } = Input;
-    const [perOpen, setPerOpen] = useState(false);
+    const [perOpen, setPerOpen] = useState<any[]>([]);
     const [tipValue, setTipValue] = useState('');
     const [items, setItem] = useState<any[]>([]);
     useEffect(() => {
-        if (!perOpen) {
-            setTipValue('');
-        }
-    }, [perOpen]);
+        setTipValue('');
+    }, [JSON.stringify(perOpen)]);
     const convertSchemaToLabelTitleArray = (schema: any) => {
-        console.log(schema);
-
         const result: any = [];
-
         const processProperties = (properties: any, parentName = '') => {
             for (const key in properties) {
                 const property = properties[key];
@@ -150,30 +146,119 @@ const EditStyle = ({
         }
         return obj;
     };
-    useEffect(() => {
-        const newList = schemaList?.map((item) => {
-            return {
-                label: item.name,
-                key: item.code,
-                description: item.description,
-                children: item.inJsonSchema
-                    ? convertSchemaToLabelTitleArray(getJSON(item))
-                    : item.outJsonSchema
-                    ? convertSchemaToLabelTitleArray(JSON.parse(item.outJsonSchema))
-                    : []
-            };
+    function getjsonschma(json: any) {
+        const arr: any = [];
+        for (const key in json.properties) {
+            const property = json.properties[key];
+            if (property.type === 'object') {
+                const convertedProperty = getjsonschma(property);
+                arr.push(convertedProperty);
+            } else if (property.type === 'array') {
+                arr.push(
+                    ...Object.values(property)
+                        ?.filter((item) => typeof item === 'object')
+                        ?.map((item, index) => ({
+                            key: key,
+                            label: `${key}[${index}]`,
+                            title: property?.title,
+                            desc: property?.description,
+                            children: getjsonschma(item)
+                        }))
+                );
+            } else if (property.type === 'list') {
+                arr.push(
+                    ...Object.values(property)
+                        ?.filter((item) => typeof item === 'object')
+                        ?.map((item, index) => ({
+                            key: key,
+                            label: `${key}.(*)`,
+                            title: property?.title,
+                            desc: property?.description,
+                            children: getjsonschma(item)
+                        }))
+                );
+            } else {
+                arr.push({
+                    key,
+                    label: key,
+                    title: property?.title,
+                    desc: property?.description
+                });
+            }
+        }
+        return arr;
+    }
+    function renderMenuItems(data: any) {
+        return data.map((item: any, index: number) => {
+            if (item.children && item.children.length > 0) {
+                return (
+                    <SubMenu title={item.label} key={item.key}>
+                        {renderMenuItems(item.children)}
+                    </SubMenu>
+                );
+            } else {
+                return (
+                    <Menu.Item
+                        onClick={(data: any) => {
+                            const newData = _.cloneDeep(imageStyleData);
+                            if (!newData.variableList[index].value) {
+                                newData.variableList[index].value = '';
+                            }
+                            const part1 = newData.variableList[index].value.slice(
+                                0,
+                                inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart
+                            );
+                            const part2 = newData.variableList[index].value.slice(
+                                inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart
+                            );
+                            newData.variableList[index].value = `${part1}{{${data?.keyPath[1]}.${data?.keyPath[0]}}}${part2}`;
+                            const newData1 = _.cloneDeep(perOpen);
+                            newData1[index] = false;
+                            setPerOpen(newData1);
+                            setData(newData);
+                        }}
+                        key={item.key}
+                    >
+                        <div
+                            onMouseEnter={() => {
+                                setTipValue(item.title);
+                            }}
+                            className="w-full flex justify-between items-center"
+                        >
+                            <div>{item.label}</div>
+                            <div className="text-xs text-black/50">{item.desc}</div>
+                        </div>
+                    </Menu.Item>
+                );
+            }
         });
+    }
+    useEffect(() => {
+        const newList = schemaList
+            ?.filter((item) => item.inJsonSchema || item.outJsonSchema)
+            ?.map((item) => {
+                return {
+                    label: item.name,
+                    key: item.code,
+                    description: item.description,
+                    children: item.inJsonSchema
+                        ? getjsonschma(getJSON(item))
+                        : item.outJsonSchema
+                        ? getjsonschma(JSON.parse(item.outJsonSchema))
+                        : []
+                };
+            });
+        console.log(newList);
+
         setItem(newList as any[]);
     }, []);
     const wrapperRef: any = useRef(null);
     const [popoverWidth, setPopoverWidth] = useState(null);
     useEffect(() => {
-        console.log(11111111);
-
         if (wrapperRef.current) {
             setPopoverWidth(wrapperRef.current?.offsetWidth);
         }
-    }, [wrapperRef.current]);
+    }, [wrapperRef]);
     //输入框的节点
     const inputList: any = useRef([]);
     return (
@@ -254,65 +339,33 @@ const EditStyle = ({
                                 (el: any, index: number) =>
                                     el.style === 'INPUT' && (
                                         <Col key={index} sm={12} xs={24}>
-                                            <div ref={wrapperRef}>
+                                            <div>
                                                 <Popover
                                                     trigger="click"
                                                     arrow={false}
                                                     placement="bottom"
-                                                    open={perOpen}
-                                                    onOpenChange={() => setPerOpen(false)}
+                                                    open={perOpen[index]}
+                                                    onOpenChange={() => {
+                                                        const newData = _.cloneDeep(perOpen);
+                                                        newData[index] = false;
+                                                        setPerOpen(newData);
+                                                    }}
                                                     content={
                                                         <div style={{ width: popoverWidth + 'px' }} className={'flex items-stretch gap-2'}>
                                                             <Menu
-                                                                onClick={(data) => {
-                                                                    const newData = _.cloneDeep(imageStyleData);
-                                                                    if (!newData.variableList[index].value) {
-                                                                        newData.variableList[index].value = '';
-                                                                    }
-                                                                    const part1 = newData.variableList[index].value.slice(
-                                                                        0,
-                                                                        inputList?.current[index]?.resizableTextArea?.textArea
-                                                                            ?.selectionStart
-                                                                    );
-                                                                    const part2 = newData.variableList[index].value.slice(
-                                                                        inputList?.current[index]?.resizableTextArea?.textArea
-                                                                            ?.selectionStart
-                                                                    );
-                                                                    newData.variableList[
-                                                                        index
-                                                                    ].value = `${part1}{{${data?.keyPath[1]}.${data?.keyPath[0]}}}${part2}`;
-                                                                    setPerOpen(false);
-                                                                    setData(newData);
-                                                                }}
                                                                 className="flex-1 h-[300px] overflow-y-auto"
                                                                 defaultSelectedKeys={[]}
                                                                 mode="inline"
-                                                                items={items?.map((item: any, index: number) => ({
-                                                                    key: item.label,
-                                                                    label: item.label,
-                                                                    children: item?.children?.map((el: any, i: number) => ({
-                                                                        key: el.label,
-                                                                        label: (
-                                                                            <div
-                                                                                onMouseEnter={() => {
-                                                                                    setTipValue(el.label);
-                                                                                }}
-                                                                                className="w-full flex justify-between items-center"
-                                                                            >
-                                                                                <div>{el.label}</div>
-                                                                                <div className="text-xs text-black/50">{el.title}</div>
-                                                                            </div>
-                                                                        )
-                                                                    }))
-                                                                }))}
-                                                            />
+                                                            >
+                                                                {renderMenuItems(items)}
+                                                            </Menu>
                                                             <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4">
                                                                 {tipValue}
                                                             </div>
                                                         </div>
                                                     }
                                                 >
-                                                    <div className="flex items-stretch">
+                                                    <div ref={wrapperRef} className="flex items-stretch">
                                                         <TextArea
                                                             rows={1}
                                                             value={el.value}
@@ -327,7 +380,9 @@ const EditStyle = ({
                                                         />
                                                         <div
                                                             onClick={(e) => {
-                                                                setPerOpen(true);
+                                                                const newData = _.cloneDeep(perOpen);
+                                                                newData[index] = true;
+                                                                setPerOpen(newData);
                                                                 e.stopPropagation();
                                                             }}
                                                             className="w-[50px] flex justify-center items-center border border-solid border-[#d9d9d9] ml-[-4px] bg-[#f8fafc] rounded-r-[6px] cursor-pointer"

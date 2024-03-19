@@ -144,7 +144,7 @@ const AddModal = () => {
         let content = '';
         let flag;
         if (item.code === 'CustomActionHandler' || item.code === 'TitleActionHandler' || item.code === 'ParagraphActionHandler') {
-            if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.referList?.length === 0) {
+            if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.materialList?.length === 0) {
                 flag = true;
                 content = '创作配置 参考来源最少一个';
             } else if (item.model === 'AI_CUSTOM' && !item.requirement) {
@@ -274,7 +274,7 @@ const AddModal = () => {
                         } else if (item?.model === 'AI_CUSTOM') {
                             return {
                                 ...item,
-                                referList: []
+                                materialList: []
                             };
                         } else {
                             return item;
@@ -316,7 +316,7 @@ const AddModal = () => {
                     } else if (item?.model === 'AI_CUSTOM') {
                         return {
                             ...item,
-                            referList: []
+                            materialList: []
                         };
                     } else {
                         return item;
@@ -489,7 +489,7 @@ const AddModal = () => {
                         } else if (item?.model === 'AI_CUSTOM') {
                             return {
                                 ...item,
-                                referList: []
+                                materialList: []
                             };
                         } else {
                             return item;
@@ -906,12 +906,12 @@ const AddModal = () => {
                                                             <>
                                                                 <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
                                                                 <CreateTable
-                                                                    tableData={el?.referList}
+                                                                    tableData={el?.materialList}
                                                                     sourceList={sourceList}
                                                                     code={el?.code}
                                                                     materialType={el?.materialType}
                                                                     setTableData={(data: any) => {
-                                                                        setValues('referList', data, index);
+                                                                        setValues('materialList', data, index);
                                                                     }}
                                                                     params={params}
                                                                 />

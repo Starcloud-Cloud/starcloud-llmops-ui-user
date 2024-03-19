@@ -411,6 +411,11 @@ export function DiscountModal({
                                                     : handleCreateOrder(currentSelect.payId, discountCode, discountCodeType, 1)
                                             }
                                             className="w-[200px] mt-4 bg-[#049fe8]"
+                                            sx={{
+                                                '&:hover': {
+                                                    backgroundColor: '#049fe8'
+                                                }
+                                            }}
                                             startIcon={
                                                 <svg
                                                     viewBox="0 0 1024 1024"
@@ -441,6 +446,11 @@ export function DiscountModal({
                                             <Button
                                                 onClick={() => handleCreateOrder(currentSelect.payId, discountCode, discountCodeType, 2)}
                                                 className="w-[200px] mt-4 ml-3 bg-[#2ac446]"
+                                                sx={{
+                                                    '&:hover': {
+                                                        backgroundColor: '#2ac446'
+                                                    }
+                                                }}
                                                 startIcon={
                                                     <svg
                                                         viewBox="0 0 1024 1024"

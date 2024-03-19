@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 // material-ui
 import { Button, CardContent, CardProps, Divider, Grid, IconButton, Modal, Tab, Tabs } from '@mui/material';
-import { Input, Popover, Radio, RadioChangeEvent, Tag } from 'antd';
+import { Badge, Input, Popover, Radio, RadioChangeEvent, Tag } from 'antd';
 
 const { Search } = Input;
 
@@ -244,13 +244,39 @@ export function DiscountModal({
                                         <div className="flex justify-between items-center w-full mb-3">
                                             <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
                                             {!value ? (
-                                                <span>
-                                                    <Radio.Group onChange={handleRadio} value={selectCode}>
-                                                        {currentSelect.skus.map((v: any, index: number) => (
-                                                            <Radio value={v.id}>{v.properties[0].valueName}</Radio>
-                                                        ))}
+                                                <div className="flex">
+                                                    <Radio.Group onChange={handleRadio} value={selectCode} className="flex">
+                                                        {currentSelect.skus.map((v: any, index: number) => {
+                                                            if (currentSelect?.title.includes('个人版')) {
+                                                                if (v.properties[0].valueName.includes('3月')) {
+                                                                    return (
+                                                                        <div className="w-[110px]">
+                                                                            <Badge count={'送1个月'}>
+                                                                                <div className="pr-4">
+                                                                                    <Radio value={v.id}>{v.properties[0].valueName}</Radio>
+                                                                                </div>
+                                                                            </Badge>
+                                                                        </div>
+                                                                    );
+                                                                } else if (v.properties[0].valueName.includes('6月')) {
+                                                                    return (
+                                                                        <div className="w-[105px]">
+                                                                            <Badge count={'送2个月'}>
+                                                                                <div className="pr-4">
+                                                                                    <Radio value={v.id}>{v.properties[0].valueName}</Radio>
+                                                                                </div>
+                                                                            </Badge>
+                                                                        </div>
+                                                                    );
+                                                                } else {
+                                                                    return <Radio value={v.id}>{v.properties[0].valueName}</Radio>;
+                                                                }
+                                                            } else {
+                                                                return <Radio value={v.id}>{v.properties[0].valueName}</Radio>;
+                                                            }
+                                                        })}
                                                     </Radio.Group>
-                                                </span>
+                                                </div>
                                             ) : (
                                                 <span className="text-sm text-[#868A91]">月付</span>
                                             )}
@@ -411,6 +437,11 @@ export function DiscountModal({
                                                     : handleCreateOrder(currentSelect.payId, discountCode, discountCodeType, 1)
                                             }
                                             className="w-[200px] mt-4 bg-[#049fe8]"
+                                            sx={{
+                                                '&:hover': {
+                                                    backgroundColor: '#049fe8'
+                                                }
+                                            }}
                                             startIcon={
                                                 <svg
                                                     viewBox="0 0 1024 1024"
@@ -441,6 +472,11 @@ export function DiscountModal({
                                             <Button
                                                 onClick={() => handleCreateOrder(currentSelect.payId, discountCode, discountCodeType, 2)}
                                                 className="w-[200px] mt-4 ml-3 bg-[#2ac446]"
+                                                sx={{
+                                                    '&:hover': {
+                                                        backgroundColor: '#2ac446'
+                                                    }
+                                                }}
                                                 startIcon={
                                                     <svg
                                                         viewBox="0 0 1024 1024"

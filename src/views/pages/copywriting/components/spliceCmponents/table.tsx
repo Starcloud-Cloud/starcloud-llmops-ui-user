@@ -1,4 +1,4 @@
-import { Table, Button, Tag, Image, Upload, UploadProps, Input } from 'antd';
+import { Table, Button, Form, Image, Upload, UploadProps, Input } from 'antd';
 import {
     Button as Buttons,
     Modal as Modals,
@@ -28,278 +28,126 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { noteDetail } from 'api/redBook/copywriting';
 import { getAccessToken } from 'utils/auth';
+import { materialTemplate } from 'api/redBook/batchIndex';
+import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 interface Table {
     code?: string;
+    materialType?: string;
     tableData: any[];
     sourceList: any[];
     setTableData: (data: any) => void;
     //弹框
     params: any;
 }
-const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Table) => {
+const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, params }: Table) => {
     const [current, setCurrent] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const tableRef = useRef<any>(null);
-    // const [columns,setColumns] = useState<any[]>([])
-    const columns: ColumnsType<any> = [
-        {
-            title: '参考标题',
-            align: 'center',
-            dataIndex: 'title'
-        },
-        {
-            title: '参考标签',
-            align: 'center',
-            render: (_, row) =>
-                row?.tagList?.map((item: string) => (
-                    <Tag color="blue" key={item}>
-                        {item}
-                    </Tag>
-                ))
-        },
-        {
-            title: '参考内容',
-            align: 'center',
-            width: '30%',
-            dataIndex: 'content',
-            render: (_, row) => <div className="line-clamp-3">{row.content}</div>
-        },
-        {
-            title: '参考图片',
-            align: 'center',
-            render: (_, row) => (
-                <div className="flex wrap gap-2">
-                    {row.imageList?.map((item: any, index: number) => (
-                        <Image className="mr-[5px]" key={index} width={30} height={30} preview={false} src={item.url} />
-                    ))}
-                </div>
-            )
-        },
-        {
-            title: '参考来源',
-            align: 'center',
-            width: 100,
-            render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
-        },
-        {
-            title: '参考链接地址',
-            align: 'center',
-            dataIndex: 'link',
-            key: 'link'
-        },
-        {
-            title: '操作',
-            align: 'center',
-            width: 140,
-            key: 'action',
-            render: (_, row, index) => (
-                <div className="whitespace-nowrap">
-                    <Buttons
-                        color="secondary"
-                        size="small"
-                        onClick={() => {
-                            setRowIndex(index);
-                            setAccoutQuery({
-                                ...row,
-                                fileList: row?.imageList?.map((item: any) => {
-                                    return {
-                                        uid: uuidv4(),
-                                        percent: 100,
-                                        thumbUrl: item?.url,
-                                        response: {
-                                            data: {
-                                                url: item?.url
-                                            }
-                                        }
-                                    };
-                                })
-                            });
-                            setImageContent(
-                                row?.imageList?.map((item: any) => {
-                                    return item.title;
-                                })
-                            );
-                            setImageSubContent(
-                                row?.imageList?.map((item: any) => {
-                                    return item.subTitle;
-                                })
-                            );
-                            setAddTitle(code === 'TitleActionHandler' ? '编辑参考标题' : '编辑参考内容');
-                            setAddOpen(true);
-                        }}
-                    >
-                        编辑
-                    </Buttons>
-                    <Buttons
-                        onClick={() => {
-                            const newList = JSON.parse(JSON.stringify(tableData));
-                            newList.splice(rowIndex, 1);
-                            setTableData(newList);
-                        }}
-                        color="error"
-                        size="small"
-                    >
-                        删除
-                    </Buttons>
-                </div>
-            )
-        }
-    ];
-    const titColumns: ColumnsType<any> = [
-        {
-            title: '参考标题',
-            align: 'center',
-            dataIndex: 'title'
-        },
-        {
-            title: '参考来源',
-            align: 'center',
-            width: '20%',
-            render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
-        },
-        {
-            title: '参考链接地址',
-            align: 'center',
-            width: '30%',
-            dataIndex: 'link',
-            key: 'link'
-        },
-        {
-            title: '操作',
-            width: 140,
-            key: 'action',
-            render: (_, row, index) => (
-                <div className="whitespace-nowrap">
-                    <Buttons
-                        color="secondary"
-                        size="small"
-                        onClick={() => {
-                            setRowIndex(index);
-                            setAccoutQuery({
-                                ...row,
-                                fileList: row?.imageList?.map((item: any) => {
-                                    return {
-                                        uid: uuidv4(),
-                                        percent: 100,
-                                        thumbUrl: item?.url,
-                                        response: {
-                                            data: {
-                                                url: item?.url
-                                            }
-                                        }
-                                    };
-                                })
-                            });
-                            setImageContent(
-                                row?.imageList?.map((item: any) => {
-                                    return item.title;
-                                })
-                            );
-                            setImageSubContent(
-                                row?.imageList?.map((item: any) => {
-                                    return item.subTitle;
-                                })
-                            );
-                            setAddTitle(code === 'TitleActionHandler' ? '编辑参考标题' : '编辑参考内容');
-                            setAddOpen(true);
-                        }}
-                    >
-                        编辑
-                    </Buttons>
-                    <Buttons
-                        onClick={() => {
-                            const newList = JSON.parse(JSON.stringify(tableData));
-                            newList.splice(rowIndex, 1);
-                            setTableData(newList);
-                        }}
-                        color="error"
-                        size="small"
-                    >
-                        删除
-                    </Buttons>
-                </div>
-            )
-        }
-    ];
-    const otherColumns: ColumnsType<any> = [
-        {
-            title: '参考内容',
-            align: 'center',
-            dataIndex: 'content',
-            render: (_, row) => <div className="line-clamp-3">{row.content}</div>
-        },
-        {
-            title: '参考来源',
-            width: '20%',
-            align: 'center',
-            render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
-        },
-        {
-            title: '参考链接地址',
-            align: 'center',
-            width: '30%',
-            dataIndex: 'link',
-            key: 'link'
-        },
-        {
-            title: '操作',
-            width: 140,
-            align: 'center',
-            key: 'action',
-            render: (_, row, index) => (
-                <div className="whitespace-nowrap">
-                    <Buttons
-                        color="secondary"
-                        size="small"
-                        onClick={() => {
-                            setRowIndex(index);
-                            setAccoutQuery({
-                                ...row,
-                                fileList: row?.imageList?.map((item: any) => {
-                                    return {
-                                        uid: uuidv4(),
-                                        percent: 100,
-                                        thumbUrl: item?.url,
-                                        response: {
-                                            data: {
-                                                url: item?.url
-                                            }
-                                        }
-                                    };
-                                })
-                            });
-                            setImageContent(
-                                row?.imageList?.map((item: any) => {
-                                    return item.title;
-                                })
-                            );
-                            setImageSubContent(
-                                row?.imageList?.map((item: any) => {
-                                    return item.subTitle;
-                                })
-                            );
-                            setAddTitle(code === 'TitleActionHandler' ? '编辑参考标题' : '编辑参考内容');
-                            setAddOpen(true);
-                        }}
-                    >
-                        编辑
-                    </Buttons>
-                    <Buttons
-                        onClick={() => {
-                            const newList = JSON.parse(JSON.stringify(tableData));
-                            newList.splice(rowIndex, 1);
-                            setTableData(newList);
-                        }}
-                        color="error"
-                        size="small"
-                    >
-                        删除
-                    </Buttons>
-                </div>
-            )
-        }
-    ];
-    const [addOpen, setAddOpen] = useState(false);
+    const tableRef = useRef<any>(tableData);
+    const [columns, setColumns] = useState<ColumnsType<any>>([]);
+    // const columns: ColumnsType<any> = [
+    //     {
+    //         title: '参考标题',
+    //         align: 'center',
+    //         dataIndex: 'title'
+    //     },
+    //     {
+    //         title: '参考标签',
+    //         align: 'center',
+    //         render: (_, row) =>
+    //             row?.tagList?.map((item: string) => (
+    //                 <Tag color="blue" key={item}>
+    //                     {item}
+    //                 </Tag>
+    //             ))
+    //     },
+    //     {
+    //         title: '参考内容',
+    //         align: 'center',
+    //         width: '30%',
+    //         dataIndex: 'content',
+    //         render: (_, row) => <div className="line-clamp-3">{row.content}</div>
+    //     },
+    //     {
+    //         title: '参考图片',
+    //         align: 'center',
+    //         render: (_, row) => (
+    //             <div className="flex wrap gap-2">
+    //                 {row.imageList?.map((item: any, index: number) => (
+    //                     <Image className="mr-[5px]" key={index} width={30} height={30} preview={false} src={item.url} />
+    //                 ))}
+    //             </div>
+    //         )
+    //     },
+    //     {
+    //         title: '参考来源',
+    //         align: 'center',
+    //         width: 100,
+    //         render: (_, row) => <div>{sourceList?.filter((item: any) => item.value === row.source)[0]?.label}</div>
+    //     },
+    //     {
+    //         title: '参考链接地址',
+    //         align: 'center',
+    //         dataIndex: 'link',
+    //         key: 'link'
+    //     },
+    //     {
+    //         title: '操作',
+    //         align: 'center',
+    //         width: 140,
+    //         key: 'action',
+    //         render: (_, row, index) => (
+    //             <div className="whitespace-nowrap">
+    //                 <Buttons
+    //                     color="secondary"
+    //                     size="small"
+    //                     onClick={() => {
+    //                         setRowIndex(index);
+    //                         setAccoutQuery({
+    //                             ...row,
+    //                             fileList: row?.imageList?.map((item: any) => {
+    //                                 return {
+    //                                     uid: uuidv4(),
+    //                                     percent: 100,
+    //                                     thumbUrl: item?.url,
+    //                                     response: {
+    //                                         data: {
+    //                                             url: item?.url
+    //                                         }
+    //                                     }
+    //                                 };
+    //                             })
+    //                         });
+    //                         setImageContent(
+    //                             row?.imageList?.map((item: any) => {
+    //                                 return item.title;
+    //                             })
+    //                         );
+    //                         setImageSubContent(
+    //                             row?.imageList?.map((item: any) => {
+    //                                 return item.subTitle;
+    //                             })
+    //                         );
+    //                         setAddTitle(code === 'TitleActionHandler' ? '编辑参考标题' : '编辑参考内容');
+    //                         setAddOpen(true);
+    //                     }}
+    //                 >
+    //                     编辑
+    //                 </Buttons>
+    //                 <Buttons
+    //                     onClick={() => {
+    //                         const newList = JSON.parse(JSON.stringify(tableData));
+    //                         newList.splice(rowIndex, 1);
+    //                         setTableData(newList);
+    //                     }}
+    //                     color="error"
+    //                     size="small"
+    //                 >
+    //                     删除
+    //                 </Buttons>
+    //             </div>
+    //         )
+    //     }
+    // ];
     const [addTitle, setAddTitle] = useState('');
     const [rowIndex, setRowIndex] = useState(0);
     const [accoutQuery, setAccoutQuery] = useState<any>({});
@@ -310,6 +158,90 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
     const [linkLoading, setLinkLoading] = useState(false);
     const [imageConent, setImageContent] = useState<any[]>([]);
     const [imageSubConent, setImageSubContent] = useState<any[]>([]);
+    //获取表头数据
+    const getHeader = async () => {
+        const result = await materialTemplate(materialType);
+        const newList = result?.fieldDefine?.map((item: any) => ({
+            title: item.desc,
+            align: 'center',
+            minWidth: 200,
+            dataIndex: item.fieldName,
+            render: (_: any, row: any) => (
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    {item.type === 'image' ? (
+                        <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                    ) : item.fieldName === 'source' ? (
+                        row[item.fieldName] === 'OTHER' ? (
+                            sourceList?.find((item) => item.value === 'OTHER')?.label
+                        ) : (
+                            sourceList?.find((item) => item.value === 'SMALL_RED_BOOK')?.label
+                        )
+                    ) : (
+                        row[item.fieldName]
+                    )}
+                </div>
+            ),
+            type: item.type
+        }));
+        setColumns([
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 140,
+                dataIndex: 'action',
+                key: 'action',
+                render: (_, row, index) => (
+                    <div className="whitespace-nowrap">
+                        <Buttons
+                            color="secondary"
+                            size="small"
+                            onClick={() => {
+                                setTitle('编辑');
+                                form.setFieldsValue(row);
+                                setRowIndex(index);
+                                setAddOpen(true);
+                            }}
+                        >
+                            编辑
+                        </Buttons>
+                        <Buttons
+                            onClick={() => {
+                                const newList = JSON.parse(JSON.stringify(tableRef.current));
+                                newList.splice(index, 1);
+                                tableRef.current = newList;
+                                setTableData(tableRef.current);
+                            }}
+                            color="error"
+                            size="small"
+                        >
+                            删除
+                        </Buttons>
+                    </div>
+                )
+            }
+        ]);
+    };
+    //弹框
+    const [addOpen, setAddOpen] = useState(false);
+    const [title, setTitle] = useState('');
+    //form 表单
+    const [form] = Form.useForm();
+    const formOk = (data: any) => {
+        console.log(data);
+        const newList = _.cloneDeep(tableData || []);
+        if (title === '新增') {
+            newList.push(data);
+            tableRef.current = newList;
+            setTableData(tableRef.current);
+            setAddOpen(false);
+        } else {
+            newList.splice(rowIndex, 1, data);
+            tableRef.current = newList;
+            setTableData(tableRef.current);
+            setAddOpen(false);
+        }
+    };
     const changeAccoutQuery = (data: { name: string; value: number | string | string[] }) => {
         setAccoutQuery({
             ...accoutQuery,
@@ -327,6 +259,9 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
             setImageSubContent([]);
         }
     }, [addOpen]);
+    useEffect(() => {
+        getHeader();
+    }, []);
     const props: UploadProps = {
         name: 'image',
         listType: 'picture-card',
@@ -364,7 +299,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
             <div className="flex justify-end">
                 <Button
                     onClick={() => {
-                        setAddTitle(code === 'TitleActionHandler' ? '新增参考标题' : '新增参考内容');
+                        setTitle('新增');
                         setAddOpen(true);
                     }}
                     className="mb-[20px]"
@@ -391,10 +326,22 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                 rowKey={'title'}
                 scroll={{ y: 500 }}
                 size="small"
-                columns={!code ? columns : code === 'TitleActionHandler' ? titColumns : otherColumns}
+                columns={columns}
                 dataSource={tableData}
             />
-            <Modals open={addOpen} onClose={() => setAddOpen(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
+            {addOpen && (
+                <FormModal
+                    title={title}
+                    editOpen={addOpen}
+                    setEditOpen={setAddOpen}
+                    columns={columns}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={sourceList}
+                    materialType={materialType}
+                />
+            )}
+            {/* <Modals open={addOpen} onClose={() => setAddOpen(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
                 <MainCard
                     style={{
                         position: 'absolute',
@@ -725,7 +672,7 @@ const CreateTable = ({ code, tableData, sourceList, setTableData, params }: Tabl
                         </Grid>
                     </CardActions>
                 </MainCard>
-            </Modals>
+            </Modals> */}
         </>
     );
 };

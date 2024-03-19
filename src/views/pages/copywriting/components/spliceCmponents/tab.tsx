@@ -45,13 +45,13 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                             name: `风格 ${digui()}`,
                             key: digui().toString(),
                             id: digui().toString(),
+                            enable: true,
                             templateList: [
                                 {
                                     key: '1',
                                     name: '首图',
                                     model: '',
                                     titleGenerateMode: 'DEFAULT',
-                                    // mode: 'SEQUENCE',
                                     variableList: []
                                 }
                             ]
@@ -116,7 +116,18 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                             variant="standard"
                                         />
                                     )}
-                                    <div>
+                                    <div className="flex gap-2 items-center">
+                                        <div className="flex gap-2 items-center">
+                                            <span className="text-xs">是否生效</span>
+                                            <Switch
+                                                checked={item?.enable}
+                                                onChange={(data) => {
+                                                    const newData = _.cloneDeep(imageStyleData);
+                                                    newData[i].enable = data;
+                                                    setImageStyleData(newData);
+                                                }}
+                                            />
+                                        </div>
                                         <Popover
                                             zIndex={9999}
                                             content={

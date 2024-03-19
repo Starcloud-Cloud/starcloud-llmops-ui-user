@@ -56,9 +56,9 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
             align: 'center',
             dataIndex: 'pictureContent',
             render: (_, row) => (
-                <div className="flex justify-center flex-wrap">
+                <div className="w-[200px] overflow-x-auto flex gap-2">
                     {row.pictureContent.map((item: any) => (
-                        <div className="w-[50px] h-[50px] mr-[10px]">
+                        <div className="w-[50px] h-[50px]">
                             <Image width={50} height={50} preview={false} src={item.url} />
                         </div>
                     ))}

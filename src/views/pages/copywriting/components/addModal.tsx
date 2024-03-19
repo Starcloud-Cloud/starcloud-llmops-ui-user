@@ -706,8 +706,8 @@ const AddModal = () => {
                     sx={{ mt: 2 }}
                     fullWidth
                     multiline
-                    minRows={4}
-                    maxRows={6}
+                    minRows={2}
+                    maxRows={4}
                     size="small"
                     color="secondary"
                     InputLabelProps={{ shrink: true }}
@@ -719,21 +719,23 @@ const AddModal = () => {
                     }}
                 />
                 <Divider />
-                <div className="text-[18px] font-[600]">创作模版</div>
-                <TextField
-                    className="my-[20px]"
-                    label="创作模版"
-                    size="small"
-                    color="secondary"
-                    InputLabelProps={{ shrink: true }}
-                    value={appData?.appName}
-                    disabled={searchParams.get('uid') ? true : false}
-                    onClick={() => {
-                        if (!searchParams.get('uid')) {
-                            setAppOpen(true);
-                        }
-                    }}
-                />
+                <div className="text-[18px] font-[600]">方案创作</div>
+                <div className="flex gap-2 items-end my-[20px]">
+                    <TextField
+                        label="创作模版"
+                        size="small"
+                        color="secondary"
+                        InputLabelProps={{ shrink: true }}
+                        value={appData?.appName}
+                        disabled={searchParams.get('uid') ? true : false}
+                        onClick={() => {
+                            if (!searchParams.get('uid')) {
+                                setAppOpen(true);
+                            }
+                        }}
+                    />
+                    <div className="text-xs text-black/50">选择创作模版后，进行具体的方案配置</div>
+                </div>
                 {stepItem?.length > 0 && (
                     <div className="p-4 border border-solid border-black/30 rounded-lg mb-[20px]">
                         <Steps
@@ -907,7 +909,8 @@ const AddModal = () => {
                                                                     tableData={el?.referList}
                                                                     sourceList={sourceList}
                                                                     code={el?.code}
-                                                                    setTableData={(data) => {
+                                                                    materialType={el?.materialType}
+                                                                    setTableData={(data: any) => {
                                                                         setValues('referList', data, index);
                                                                     }}
                                                                     params={params}

@@ -12,6 +12,7 @@ import axios from 'utils/axios/index';
 import { schemeList, materialTemplate, metadata, materialImport, materialResilt } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import FormModal from './formModal';
 const Lefts = ({
     detailData,
     setDetailData,
@@ -34,7 +35,6 @@ const Lefts = ({
     const navigate = useNavigate();
     const [valueOpen, setValueOpen] = useState(false);
     const [targetKeysOpen, settargetKeysOpen] = useState(false);
-    const [tagOpen, setTagOpen] = useState(false);
     //2.文案模板
     const [mockData, setMockData] = useState<any[]>([]);
     const [preform, setPerform] = useState(1);
@@ -48,8 +48,6 @@ const Lefts = ({
         } else {
             changeBasis('tags', []);
         }
-        console.log(mockData);
-        console.log(detailData?.targetKeys);
     }, [detailData?.targetKeys]);
 
     //上传图片
@@ -75,16 +73,6 @@ const Lefts = ({
         onDrop(e) {
             console.log('Dropped files', e.dataTransfer.files);
         }
-    };
-    const [uploadLoading, setUploadLoading] = useState(false);
-    const propShow: UploadProps = {
-        name: 'image',
-        showUploadList: false,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
-        headers: {
-            Authorization: 'Bearer ' + getAccessToken()
-        },
-        maxCount: 1
     };
     //批量上传素材
     const [zoomOpen, setZoomOpen] = useState(false); //下载弹框
@@ -138,23 +126,6 @@ const Lefts = ({
             );
             return false;
         }
-        if (detailData?.targetKeys && (!detailData?.tags || detailData?.tags?.length === 0)) {
-            setTagOpen(true);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '标签必填',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
         if (schemesList?.length > 0 && schemesList?.some((item: any) => !item.value && !item.defaultValue)) {
             dispatch(
                 openSnackbar({
@@ -179,18 +150,16 @@ const Lefts = ({
         });
         setSchemeLists(newList);
         const newData = _.cloneDeep(detailData);
-        newData.imageUrlList = imageList.map((item: any) => item?.response?.data?.url)?.filter((el: any) => el);
         newData.schemeUid = detailData?.targetKeys;
-        const pictureList = newData.imageUrlList.map((item: any) => {
-            return {
-                desc: item,
-                fieldName: 'pictureUrl',
-                type: 'image'
-            };
-        });
-        if (materialType !== 'picture') {
-            newData.imageUrlList = [];
-        }
+        const pictureList = imageList
+            ?.map((item: any) => item?.response?.data?.url)
+            ?.filter((el: any) => el)
+            ?.map((item: any) => {
+                return {
+                    pictureUrl: item,
+                    type: 'picture'
+                };
+            });
         handleSave({ flag, newData, tableData: materialType === 'picture' ? pictureList : tableData });
     };
 
@@ -299,7 +268,6 @@ const Lefts = ({
         setTableData(tableRef.current);
     };
     const [form] = Form.useForm();
-    const formRef = useRef(form);
     const [title, setTitle] = useState('');
     //编辑
     const [editOpen, setEditOpen] = useState(false);
@@ -309,6 +277,19 @@ const Lefts = ({
         form.setFieldsValue(row);
         setRowIndex(index);
         setEditOpen(true);
+    };
+    const formOk = (result: any) => {
+        const newList = [...tableRef.current];
+        if (title === '编辑') {
+            newList.splice(rowIndex, 1, result);
+            tableRef.current = newList;
+            setTableData(tableRef.current);
+        } else {
+            newList.unshift(result);
+            tableRef.current = newList;
+            setTableData(tableRef.current);
+        }
+        setEditOpen(false);
     };
     useEffect(() => {
         if (parseUid) {
@@ -384,7 +365,9 @@ const Lefts = ({
                 </FormControl>
                 {detailData?.targetKeys && (
                     <>
-                        <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">2. 批量上传素材图片</div>
+                        <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">
+                            2. {materialType === 'picture' ? '批量上传素材图片' : '批量上传素材'}
+                        </div>
                         {materialType === 'picture' ? (
                             <>
                                 <div className="text-[12px] font-[500] flex items-center justify-between">
@@ -469,13 +452,7 @@ const Lefts = ({
                             />
                         ))}
                         <div className="text-[18px] font-[600] mt-[20px]">4. 标签</div>
-                        <FormControl
-                            key={detailData?.tags}
-                            error={(!detailData?.tags || detailData?.tags?.length === 0) && tagOpen}
-                            color="secondary"
-                            size="small"
-                            fullWidth
-                        >
+                        <FormControl key={detailData?.tags} color="secondary" size="small" fullWidth>
                             <Autocomplete
                                 sx={{ mt: 2 }}
                                 multiple
@@ -491,7 +468,6 @@ const Lefts = ({
                                     ))
                                 }
                                 onChange={(e: any, newValue) => {
-                                    setTagOpen(true);
                                     changeBasis('tags', newValue);
                                 }}
                                 renderInput={(param) => (
@@ -506,7 +482,6 @@ const Lefts = ({
                                                 changeBasis('tags', newValue);
                                             }
                                         }}
-                                        error={(!detailData?.tags || detailData?.tags?.length === 0) && tagOpen}
                                         color="secondary"
                                         {...param}
                                         label="标签"
@@ -514,9 +489,6 @@ const Lefts = ({
                                     />
                                 )}
                             />
-                            <FormHelperText>
-                                {(!detailData?.tags || detailData?.tags?.length === 0) && tagOpen ? '标签最少输入一个' : ''}
-                            </FormHelperText>
                         </FormControl>
 
                         <div className="text-[18px] font-[600] my-[20px]">5. 批量生成参数</div>
@@ -545,7 +517,7 @@ const Lefts = ({
                     </>
                 )}
             </div>
-            <div className="z-100 absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] pb-0 w-[100%]">
+            <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] pb-0 w-[100%]">
                 <Button className="w-full" icon={<SaveOutlined rev={undefined} />} onClick={() => handleSaveClick(false)} type="primary">
                     保存配置
                 </Button>
@@ -602,79 +574,9 @@ const Lefts = ({
                     </div>
                 </div>
             </Modal>
-            <Modal
-                zIndex={9000}
-                title={title}
-                open={editOpen}
-                onCancel={() => {
-                    form.resetFields();
-                    setEditOpen(false);
-                }}
-                onOk={async () => {
-                    const result = await form.validateFields();
-                    const newList = [...tableRef.current];
-                    if (title === '编辑') {
-                        newList.splice(rowIndex, 1, result);
-                        tableRef.current = newList;
-                        setTableData(tableRef.current);
-                    } else {
-                        newList.unshift(result);
-                        tableRef.current = newList;
-                        setTableData(tableRef.current);
-                    }
-
-                    setEditOpen(false);
-                }}
-            >
-                <Form ref={formRef} form={form} labelCol={{ span: 6 }}>
-                    {columns?.map(
-                        (item, index) =>
-                            item.title !== '操作' &&
-                            item.title !== '序号' && (
-                                <Form.Item
-                                    key={index}
-                                    label={item.title}
-                                    name={item.dataIndex}
-                                    rules={[{ required: true, message: `${item.title}是必填的` }]}
-                                >
-                                    {item.type === 'image' ? (
-                                        <Upload
-                                            {...propShow}
-                                            listType="picture-card"
-                                            onChange={(info) => {
-                                                if (info.file.status === 'uploading') {
-                                                    setUploadLoading(true);
-                                                    return;
-                                                }
-                                                if (info?.file?.status === 'done') {
-                                                    console.log();
-                                                    setUploadLoading(false);
-                                                    form.setFieldValue(item.dataIndex, info?.file?.response?.data?.url);
-                                                }
-                                            }}
-                                        >
-                                            {form.getFieldsValue()[item.dataIndex] ? (
-                                                <Image
-                                                    preview={false}
-                                                    width={102}
-                                                    height={102}
-                                                    src={form.getFieldsValue()[item.dataIndex]}
-                                                />
-                                            ) : (
-                                                <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                                    {uploadLoading ? <LoadingOutlined rev={undefined} /> : <PlusOutlined rev={undefined} />}
-                                                    <div style={{ marginTop: 8 }}>Upload</div>
-                                                </div>
-                                            )}
-                                        </Upload>
-                                    ) : (
-                                        <Input />
-                                    )}
-                                </Form.Item>
-                            )
-                    )}
-                </Form>
-            </Modal>
+            {editOpen && (
+                <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
+            )}
         </>
     );
 };

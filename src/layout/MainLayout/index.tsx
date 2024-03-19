@@ -384,16 +384,13 @@ const MainLayout = () => {
         }
     };
     const [act, setAct] = useState(0);
+    const hasMarketVideo = localStorage.getItem(`marketVideo-${allDetail?.allDetail?.id}`);
     useEffect(() => {
-        // userVip = setInterval(() => {
-        //     handleShowNewUserVip();
-        // }, 3 * 1000);
-        // () => {
-        //     clearInterval(userVip);
-        //};
         if (allDetail?.allDetail) {
             if (allDetail?.allDetail?.isNewUser) {
-                handleShowNewUserVip();
+                if (hasMarketVideo) {
+                    handleShowNewUserVip();
+                }
             } else {
                 const dateTime = localStorage.getItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`);
                 if (dateTime) {
@@ -407,7 +404,7 @@ const MainLayout = () => {
                 }
             }
         }
-    }, [location.pathname, allDetail]);
+    }, [location.pathname, allDetail, hasMarketVideo]);
 
     useEffect(() => {
         (async () => {

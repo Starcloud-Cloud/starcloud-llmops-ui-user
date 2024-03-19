@@ -110,27 +110,6 @@ const EditStyle = ({
     useEffect(() => {
         setTipValue('');
     }, [JSON.stringify(perOpen)]);
-    const convertSchemaToLabelTitleArray = (schema: any) => {
-        const result: any = [];
-        const processProperties = (properties: any, parentName = '') => {
-            for (const key in properties) {
-                const property = properties[key];
-                const label = parentName ? `${parentName}.${key}` : key;
-                if (property.type === 'object' && property.properties) {
-                    processProperties(property.properties, label);
-                } else if (property.type === 'array' && property.items && property.items.properties) {
-                    processProperties(property.items.properties, label);
-                } else {
-                    result.push({ label: label, title: property.title });
-                }
-            }
-        };
-
-        if (schema.properties) {
-            processProperties(schema.properties);
-        }
-        return result;
-    };
     const getJSON = (item: any) => {
         let obj: any = {};
         try {
@@ -146,7 +125,7 @@ const EditStyle = ({
         }
         return obj;
     };
-    function getjsonschma(json: any) {
+    function getjsonschma(json: any, jsonType?: string) {
         const arr: any = [];
         for (const key in json.properties) {
             const property = json.properties[key];
@@ -158,7 +137,7 @@ const EditStyle = ({
                     ...Object.values(property)
                         ?.filter((item) => typeof item === 'object')
                         ?.map((item, index) => ({
-                            key: key,
+                            key: `${key}[${index}]`,
                             label: `${key}[${index}]`,
                             title: property?.title,
                             desc: property?.description,
@@ -174,7 +153,7 @@ const EditStyle = ({
                             label: `${key}.(*)`,
                             title: property?.title,
                             desc: property?.description,
-                            children: getjsonschma(item)
+                            children: getjsonschma(item, '*')
                         }))
                 );
             } else {
@@ -182,18 +161,19 @@ const EditStyle = ({
                     key,
                     label: key,
                     title: property?.title,
-                    desc: property?.description
+                    desc: property?.description,
+                    type: jsonType
                 });
             }
         }
         return arr;
     }
-    function renderMenuItems(data: any) {
-        return data.map((item: any, index: number) => {
+    function renderMenuItems(data: any, index: number) {
+        return data.map((item: any) => {
             if (item.children && item.children.length > 0) {
                 return (
                     <SubMenu title={item.label} key={item.key}>
-                        {renderMenuItems(item.children)}
+                        {renderMenuItems(item.children, index)}
                     </SubMenu>
                 );
             } else {
@@ -211,7 +191,10 @@ const EditStyle = ({
                             const part2 = newData.variableList[index].value.slice(
                                 inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart
                             );
-                            newData.variableList[index].value = `${part1}{{${data?.keyPath[1]}.${data?.keyPath[0]}}}${part2}`;
+                            newData.variableList[index].value =
+                                item?.type === '*'
+                                    ? `${part1}{{${data?.keyPath[1]}.list('${data?.keyPath[0]}')}}${part2}`
+                                    : `${part1}{{${data?.keyPath[1]}.${data?.keyPath[0]}}}${part2}`;
                             const newData1 = _.cloneDeep(perOpen);
                             newData1[index] = false;
                             setPerOpen(newData1);
@@ -221,7 +204,7 @@ const EditStyle = ({
                     >
                         <div
                             onMouseEnter={() => {
-                                setTipValue(item.title);
+                                setTipValue(item.desc);
                             }}
                             className="w-full flex justify-between items-center"
                         >
@@ -248,8 +231,6 @@ const EditStyle = ({
                         : []
                 };
             });
-        console.log(newList);
-
         setItem(newList as any[]);
     }, []);
     const wrapperRef: any = useRef(null);
@@ -357,7 +338,7 @@ const EditStyle = ({
                                                                 defaultSelectedKeys={[]}
                                                                 mode="inline"
                                                             >
-                                                                {renderMenuItems(items)}
+                                                                {renderMenuItems(items, index)}
                                                             </Menu>
                                                             <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4">
                                                                 {tipValue}

@@ -42,7 +42,7 @@ const MaintenanceUnderConstruction = Loadable(lazy(() => import('views/pages/mai
 // landing & contact-us routing
 const PagesContactUS = Loadable(lazy(() => import('views/pages/contact-us')));
 const PagesFaqs = Loadable(lazy(() => import('views/pages/saas-pages/Faqs')));
-const PagesPrivacyPolicy = Loadable(lazy(() => import('views/pages/saas-pages/PrivacyPolicy')));
+const PagesPrivacyPolicy = Loadable(lazy(() => import('views/announce/saas-pages/PrivacyPolicy')));
 const PostTask = Loadable(lazy(() => import('views/pages/postTask')));
 // interface NavItemType {
 //     id: string;

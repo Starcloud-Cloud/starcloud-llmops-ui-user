@@ -21,7 +21,7 @@ import imgMain from 'assets/images/auth/img-a2-login.svg';
 // import imgMain from 'assets/images/auth/des.png';
 
 // carousel items
-const items: AuthSliderProps[] = [
+export const items: AuthSliderProps[] = [
     {
         title: '多平台账号登录',
         description: '支持小红书等多个主流内容创作平台等多个账号同时登录；保存长时间在线状态；一站式管理您多平台账号，提高内容运营效率'

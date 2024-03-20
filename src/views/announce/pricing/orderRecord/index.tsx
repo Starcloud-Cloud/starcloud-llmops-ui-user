@@ -68,6 +68,7 @@ const headCells = [
     { id: 'subject', numeric: false, disablePadding: false, label: '商品标题' },
     // { id: 'body', numeric: false, disablePadding: false, label: '商品描述' },
     { id: 'amount', numeric: false, disablePadding: false, label: '支付金额(元)' },
+    { id: 'payChannelCode', numeric: false, disablePadding: false, label: '支付方式' },
     { id: 'status', numeric: false, disablePadding: false, label: '支付状态' },
     { id: 'createTime', numeric: false, disablePadding: false, label: '支付时间' },
     { id: 'operate', numeric: false, disablePadding: false, label: '操作' }
@@ -239,7 +240,7 @@ const Record: React.FC = () => {
     const handlePay = async (row: any) => {
         const resOrder = await submitOrder({
             id: row.payOrderId,
-            channelCode: 'alipay_pc',
+            channelCode: row.payChannelCode,
             channelExtras: { qr_pay_mode: '4', qr_code_width: 250 },
             displayMode: 'qr_code'
         });
@@ -303,6 +304,7 @@ const Record: React.FC = () => {
                                         </TableCell>
                                         {/* <TableCell align="center">{row.body}</TableCell> */}
                                         <TableCell align="center">{(row?.payPrice / 100).toFixed(2)}</TableCell>
+                                        <TableCell align="center">{row.payChannelCode.startsWith('wx') ? '微信' : '支付宝'}</TableCell>
                                         <TableCell align="center">{transformValue(row.status)}</TableCell>
                                         <TableCell align="center">
                                             {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}

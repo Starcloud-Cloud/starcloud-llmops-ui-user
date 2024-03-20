@@ -563,10 +563,6 @@ function TemplateMarket() {
                 handleClose={() => {
                     setOpenMarketVideo(false);
                     localStorage.setItem(`marketVideo-${allDetail?.allDetail?.id}`, 'true');
-                    const hasNewUser = localStorage.getItem(`newUserVipEndTime-${allDetail?.allDetail.id}`);
-                    if (allDetail?.allDetail?.isNewUser && !hasNewUser) {
-                        setNewUserVipOpen(true);
-                    }
                 }}
             />
             {newUserVipOpen && (

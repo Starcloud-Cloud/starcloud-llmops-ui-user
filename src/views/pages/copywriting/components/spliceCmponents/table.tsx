@@ -60,8 +60,10 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
                     ) : item.fieldName === 'source' ? (
                         row[item.fieldName] === 'OTHER' ? (
                             sourceList?.find((item) => item.value === 'OTHER')?.label
-                        ) : (
+                        ) : row[item.fieldName] === 'SMALL_RED_BOOK' ? (
                             sourceList?.find((item) => item.value === 'SMALL_RED_BOOK')?.label
+                        ) : (
+                            row[item.fieldName]
                         )
                     ) : (
                         row[item.fieldName]

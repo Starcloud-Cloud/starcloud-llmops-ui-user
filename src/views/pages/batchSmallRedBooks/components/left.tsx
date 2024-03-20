@@ -74,6 +74,20 @@ const Lefts = ({
             console.log('Dropped files', e.dataTransfer.files);
         }
     };
+    const props1: UploadProps = {
+        showUploadList: false,
+        accept: '.zip',
+        beforeUpload: async (file, fileList) => {
+            try {
+                const result = await materialImport({ file });
+                setTableLoading(true);
+                setUploadOpen(false);
+                setParseUid(result?.data);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
+        }
+    };
     //批量上传素材
     const [zoomOpen, setZoomOpen] = useState(false); //下载弹框
     const [downLoadUrl, setDownLoadUrl] = useState(''); //下载的地址
@@ -178,7 +192,7 @@ const Lefts = ({
                         {item.type === 'image' ? (
                             <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
                         ) : (
-                            row[item.fieldName]
+                            <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
                         )}
                     </div>
                 ),
@@ -563,14 +577,16 @@ const Lefts = ({
                 </p>
                 <div className="flex justify-center mt-[20px]">
                     <div className="relative">
-                        <Button type="primary">上传 ZIP</Button>
-                        <input
+                        <Upload {...props1}>
+                            <Button type="primary">上传 ZIP</Button>
+                        </Upload>
+                        {/* <input
                             className="opacity-0 w-[85px] h-[32px] absolute top-0 left-0 cursor-pointer"
                             ref={fileInputRef}
                             type="file"
                             accept=".zip"
                             onChange={handleFileSelect}
-                        />
+                        /> */}
                     </div>
                 </div>
             </Modal>

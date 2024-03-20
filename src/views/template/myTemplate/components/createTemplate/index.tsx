@@ -471,10 +471,14 @@ function CreateDetail() {
     const [rows, setRows] = useState<any[]>([]);
     //删除
     const handleDel = (index: number) => {
-        // const newList = JSON.parse(JSON.stringify(tableRef.current));
-        // newList.splice(index, 1);
-        // tableRef.current = newList;
-        // setTableData(tableRef.current);
+        const newValue = _.cloneDeep(detailRef.current);
+        const newList =
+            newValue.workflowConfig.steps[step].variable.variables[
+                newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+            ].value;
+        newList.splice(index, 1);
+        detailRef.current = newValue;
+        setDetail(detailRef.current);
     };
     const [form] = Form.useForm();
     const [title, setTitle] = useState('');
@@ -493,8 +497,6 @@ function CreateDetail() {
             newValue.workflowConfig.steps[step].variable.variables[
                 newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
             ].value;
-        console.log(newList);
-
         if (title === '编辑') {
             newList.splice(rowIndex, 1, result);
         } else {
@@ -520,6 +522,14 @@ function CreateDetail() {
                             <div className="flex justify-center items-center flex-wrap break-all gap-2">
                                 {item.type === 'image' ? (
                                     <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                                ) : item.fieldName === 'source' ? (
+                                    row[item.fieldName] === 'OTHER' ? (
+                                        refersSource?.find((item) => item.value === 'OTHER')?.label
+                                    ) : row[item.fieldName] === 'SMALL_RED_BOOK' ? (
+                                        refersSource?.find((item) => item.value === 'SMALL_RED_BOOK')?.label
+                                    ) : (
+                                        row[item.fieldName]
+                                    )
                                 ) : (
                                     row[item.fieldName]
                                 )}

@@ -22,8 +22,6 @@ export const changeJSONValue = (value: string) => {
     return parsedJson;
 };
 function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle }: any) {
-    console.log(columns);
-
     const mt = {
         marginTop: 2
     };

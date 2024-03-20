@@ -43,7 +43,7 @@ const FormModal = ({
     }, []);
     return (
         <Modal
-            zIndex={!materialType ? 9000 : 1}
+            zIndex={!materialType ? 9000 : 1000}
             title={title}
             open={editOpen}
             onCancel={() => {

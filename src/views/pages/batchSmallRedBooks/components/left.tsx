@@ -563,12 +563,12 @@ const Lefts = ({
                 </p>
                 <div className="flex justify-center mt-[20px]">
                     <div className="relative">
-                        <Button type="primary">上传 XLS</Button>
+                        <Button type="primary">上传 ZIP</Button>
                         <input
                             className="opacity-0 w-[85px] h-[32px] absolute top-0 left-0 cursor-pointer"
                             ref={fileInputRef}
                             type="file"
-                            accept=".xls"
+                            accept=".zip"
                             onChange={handleFileSelect}
                         />
                     </div>

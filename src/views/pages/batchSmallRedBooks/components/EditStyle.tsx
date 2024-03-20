@@ -5,66 +5,10 @@ import { PlusCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import _ from 'lodash-es';
 import { SelectTemplateModal } from './SelectTemplateModal';
-
 import React from 'react';
 import { getImageTemplateTypes } from 'api/template';
+import VariableInput from './variableInput';
 const { SubMenu } = Menu;
-const treeData: TreeDataNode[] = [
-    {
-        title: 'parent 1',
-        key: '0-0',
-        children: [
-            {
-                title: (
-                    <div className="flex items-center gap-2">
-                        <Input className="flex-1" size="small" />
-                        <Select className="flex-1" size="small"></Select>
-                        <PlusCircleOutlined rev={undefined} />
-                    </div>
-                ),
-                key: '0-0-0',
-                children: [
-                    {
-                        title: 'leaf',
-                        key: '0-0-0-0'
-                    },
-                    {
-                        title: 'leaf',
-                        key: '0-0-0-1'
-                    },
-                    {
-                        title: 'leaf',
-                        key: '0-0-0-2'
-                    }
-                ]
-            },
-            {
-                title: 'parent 1-1',
-                key: '0-0-1',
-                children: [
-                    {
-                        title: 'leaf',
-                        key: '0-0-1-0'
-                    }
-                ]
-            },
-            {
-                title: 'parent 1-2',
-                key: '0-0-2',
-                children: [
-                    {
-                        title: 'leaf',
-                        key: '0-0-2-0'
-                    },
-                    {
-                        title: 'leaf',
-                        key: '0-0-2-1'
-                    }
-                ]
-            }
-        ]
-    }
-];
 const EditStyle = ({
     schemaList,
     typeList,
@@ -103,145 +47,24 @@ const EditStyle = ({
             setCurrentTemp(data);
         }
     }, [imageStyleData, tempList]);
-    const { TextArea } = Input;
     const [perOpen, setPerOpen] = useState<any[]>([]);
-    const [tipValue, setTipValue] = useState('');
     const [items, setItem] = useState<any[]>([]);
+
     useEffect(() => {
-        setTipValue('');
-    }, [JSON.stringify(perOpen)]);
-    const getJSON = (item: any) => {
-        let obj: any = {};
-        try {
-            obj = {
-                ...JSON.parse(item.inJsonSchema),
-                properties: {
-                    ...JSON.parse(item.inJsonSchema).properties,
-                    ...JSON.parse(item.outJsonSchema)
-                }
-            };
-        } catch (err) {
-            obj = {};
-        }
-        return obj;
-    };
-    function getjsonschma(json: any, jsonType?: string) {
-        const arr: any = [];
-        for (const key in json.properties) {
-            const property = json.properties[key];
-            if (property.type === 'object') {
-                const convertedProperty = getjsonschma(property);
-                arr.push(convertedProperty);
-            } else if (property.type === 'array') {
-                arr.push(
-                    ...Object.values(property)
-                        ?.filter((item) => typeof item === 'object')
-                        ?.map((item, index) => ({
-                            key: `${key}[${index}]`,
-                            label: `${key}[${index}]`,
-                            title: property?.title,
-                            desc: property?.description,
-                            children: getjsonschma(item)
-                        }))
-                );
-            } else if (property.type === 'list') {
-                arr.push(
-                    ...Object.values(property)
-                        ?.filter((item) => typeof item === 'object')
-                        ?.map((item, index) => ({
-                            key: key,
-                            label: `${key}.(*)`,
-                            title: property?.title,
-                            desc: property?.description,
-                            children: getjsonschma(item, '*')
-                        }))
-                );
-            } else {
-                arr.push({
-                    key,
-                    label: key,
-                    title: property?.title,
-                    desc: property?.description,
-                    type: jsonType
-                });
-            }
-        }
-        return arr;
-    }
-    function renderMenuItems(data: any, index: number) {
-        return data.map((item: any) => {
-            if (item.children && item.children.length > 0) {
-                return (
-                    <SubMenu title={item.label} key={item.key}>
-                        {renderMenuItems(item.children, index)}
-                    </SubMenu>
-                );
-            } else {
-                return (
-                    <Menu.Item
-                        onClick={(data: any) => {
-                            const newData = _.cloneDeep(imageStyleData);
-                            if (!newData.variableList[index].value) {
-                                newData.variableList[index].value = '';
-                            }
-                            const part1 = newData.variableList[index].value.slice(
-                                0,
-                                inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart
-                            );
-                            const part2 = newData.variableList[index].value.slice(
-                                inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart
-                            );
-                            newData.variableList[index].value =
-                                item?.type === '*'
-                                    ? `${part1}{{${data?.keyPath[1]}.list('${data?.keyPath[0]}')}}${part2}`
-                                    : `${part1}{{${data?.keyPath[1]}.${data?.keyPath[0]}}}${part2}`;
-                            const newData1 = _.cloneDeep(perOpen);
-                            newData1[index] = false;
-                            setPerOpen(newData1);
-                            setData(newData);
-                        }}
-                        key={item.key}
-                    >
-                        <div
-                            onMouseEnter={() => {
-                                setTipValue(item.desc);
-                            }}
-                            className="w-full flex justify-between items-center"
-                        >
-                            <div>{item.label}</div>
-                            <div className="text-xs text-black/50">{item.desc}</div>
-                        </div>
-                    </Menu.Item>
-                );
-            }
-        });
-    }
-    useEffect(() => {
-        const newList = schemaList
-            ?.filter((item) => item.inJsonSchema || item.outJsonSchema)
-            ?.map((item) => {
-                return {
-                    label: item.name,
-                    key: item.code,
-                    description: item.description,
-                    children: item.inJsonSchema
-                        ? getjsonschma(getJSON(item))
-                        : item.outJsonSchema
-                        ? getjsonschma(JSON.parse(item.outJsonSchema))
-                        : []
-                };
-            });
-        setItem(newList as any[]);
+        setItem(schemaList as any[]);
     }, []);
+    const handleMenu = ({ index, newValue }: any) => {
+        const newData = _.cloneDeep(imageStyleData);
+        newData.variableList[index].value = newValue;
+        setData(newData);
+    };
     const wrapperRef: any = useRef(null);
-    const [popoverWidth, setPopoverWidth] = useState(null);
+    const [popoverWidth, setPopoverWidth] = useState(undefined);
     useEffect(() => {
         if (wrapperRef.current) {
             setPopoverWidth(wrapperRef.current?.offsetWidth);
         }
     }, [wrapperRef]);
-    //输入框的节点
-    const inputList: any = useRef([]);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -316,67 +139,31 @@ const EditStyle = ({
                             </>
                         )}
                         <Row className="items-center mt-[20px]" gutter={20}>
-                            {imageStyleData?.variableList?.map(
-                                (el: any, index: number) =>
-                                    el.style === 'INPUT' && (
-                                        <Col key={index} sm={12} xs={24}>
-                                            <div>
-                                                <Popover
-                                                    trigger="click"
-                                                    arrow={false}
-                                                    placement="bottom"
-                                                    open={perOpen[index]}
-                                                    onOpenChange={() => {
-                                                        const newData = _.cloneDeep(perOpen);
-                                                        newData[index] = false;
-                                                        setPerOpen(newData);
-                                                    }}
-                                                    content={
-                                                        <div style={{ width: popoverWidth + 'px' }} className={'flex items-stretch gap-2'}>
-                                                            <Menu
-                                                                className="flex-1 h-[300px] overflow-y-auto"
-                                                                defaultSelectedKeys={[]}
-                                                                mode="inline"
-                                                            >
-                                                                {renderMenuItems(items, index)}
-                                                            </Menu>
-                                                            <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4">
-                                                                {tipValue}
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                >
-                                                    <div ref={wrapperRef} className="flex items-stretch">
-                                                        <TextArea
-                                                            rows={1}
-                                                            value={el.value}
-                                                            ref={(ref) => (inputList.current[index] = ref)}
-                                                            onChange={(e) => {
-                                                                const newData = _.cloneDeep(imageStyleData);
-                                                                newData.variableList[index].value = e.target.value;
-                                                                setData(newData);
-                                                            }}
-                                                            className="rounded-r-[0px]"
-                                                            allowClear
-                                                        />
-                                                        <div
-                                                            onClick={(e) => {
-                                                                const newData = _.cloneDeep(perOpen);
-                                                                newData[index] = true;
-                                                                setPerOpen(newData);
-                                                                e.stopPropagation();
-                                                            }}
-                                                            className="w-[50px] flex justify-center items-center border border-solid border-[#d9d9d9] ml-[-4px] bg-[#f8fafc] rounded-r-[6px] cursor-pointer"
-                                                            style={{ borderLeft: 'none' }}
-                                                        >
-                                                            fx
-                                                        </div>
-                                                    </div>
-                                                </Popover>
-                                            </div>
-                                        </Col>
-                                    )
-                            )}
+                            {imageStyleData?.variableList?.map((el: any, index: number) => (
+                                <Col key={index} sm={12} xs={24} className="mb-[20px]">
+                                    <div className="w-full" ref={wrapperRef}>
+                                        <VariableInput
+                                            open={perOpen[index]}
+                                            setOpen={(flag) => {
+                                                const newData = _.cloneDeep(perOpen);
+                                                newData[index] = flag;
+                                                setPerOpen(newData);
+                                            }}
+                                            popoverWidth={popoverWidth}
+                                            handleMenu={handleMenu}
+                                            items={items}
+                                            index={index}
+                                            title={el?.label}
+                                            value={el.value}
+                                            setValue={(value) => {
+                                                const newData = _.cloneDeep(imageStyleData);
+                                                newData.variableList[index].value = value;
+                                                setData(newData);
+                                            }}
+                                        />
+                                    </div>
+                                </Col>
+                            ))}
                         </Row>
                         <div className="float-right">
                             <div className="text-[12px]">风格示例图</div>

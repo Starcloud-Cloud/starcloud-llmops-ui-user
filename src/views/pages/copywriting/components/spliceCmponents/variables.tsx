@@ -2,13 +2,17 @@ import { Popover, Input } from 'antd';
 import { Error } from '@mui/icons-material';
 import { useEffect, useRef, useState } from 'react';
 import _ from 'lodash-es';
+import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
 interface Variable {
     pre: number;
     model: string;
+    schemaList: any[];
     value: any;
     setValue: (data: any) => void;
 }
-const Variables = ({ pre, model, value, setValue }: Variable) => {
+const Variables = ({ pre, model, schemaList, value, setValue }: Variable) => {
+    console.log(schemaList);
+
     const { TextArea } = Input;
     const iptRef: any = useRef(null);
     const [demandOpen, setDemandOpen] = useState(false);
@@ -17,6 +21,19 @@ const Variables = ({ pre, model, value, setValue }: Variable) => {
             setDemandOpen(true);
         }
     }, [pre]);
+    const [open, setOpen] = useState(false);
+    const handleMenu = ({ index, newValue }: any) => {
+        let newData = _.cloneDeep(value);
+        newData = newValue;
+        setValue(newData);
+    };
+    const widthRef: any = useRef(null);
+    const [popoverWidth, setPopoverWidth] = useState(undefined);
+    useEffect(() => {
+        if (widthRef.current) {
+            setPopoverWidth(widthRef.current?.offsetWidth);
+        }
+    }, [widthRef]);
     return (
         <>
             <div className="mt-[20px] mb-[10px] text-[14px] font-[600] flex items-end">
@@ -36,7 +53,23 @@ const Variables = ({ pre, model, value, setValue }: Variable) => {
                     <Error sx={{ cursor: 'pointer', fontSize: '16px' }} fontSize="small" />
                 </Popover>
             </div>
-            <TextArea
+            <div className="w-full" ref={widthRef}>
+                <VariableInput
+                    open={open}
+                    setOpen={setOpen}
+                    popoverWidth={popoverWidth}
+                    handleMenu={handleMenu}
+                    items={schemaList}
+                    index={undefined}
+                    value={value}
+                    row={6}
+                    setValue={(value) => {
+                        setDemandOpen(true);
+                        setValue(value);
+                    }}
+                />
+            </div>
+            {/* <TextArea
                 status={demandOpen && !value && model === 'AI_CUSTOM' ? 'error' : ''}
                 ref={iptRef}
                 style={{ height: '200px' }}
@@ -48,7 +81,7 @@ const Variables = ({ pre, model, value, setValue }: Variable) => {
             />
             {demandOpen && !value && model === 'AI_CUSTOM' && (
                 <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">文案生成要求必填</span>
-            )}
+            )} */}
         </>
     );
 };

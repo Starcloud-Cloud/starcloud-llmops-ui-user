@@ -385,15 +385,11 @@ const MainLayout = () => {
     };
     const [act, setAct] = useState(0);
     useEffect(() => {
-        // userVip = setInterval(() => {
-        //     handleShowNewUserVip();
-        // }, 3 * 1000);
-        // () => {
-        //     clearInterval(userVip);
-        //};
         if (allDetail?.allDetail) {
             if (allDetail?.allDetail?.isNewUser) {
-                handleShowNewUserVip();
+                setTimeout(() => {
+                    handleShowNewUserVip();
+                }, 1000 * 60 * 3);
             } else {
                 const dateTime = localStorage.getItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`);
                 if (dateTime) {
@@ -446,7 +442,9 @@ const MainLayout = () => {
                     !use?.mobile &&
                     JSON.stringify(twoUser) !== JSON.stringify(allDetail?.allDetail?.rights)
                 ) {
-                    setPhoneOpen(true);
+                    setTimeout(() => {
+                        setPhoneOpen(true);
+                    }, 1000 * 60 * 6);
                 } else {
                     setPhoneOpen(false);
                 }
@@ -597,7 +595,8 @@ const MainLayout = () => {
                                         }}
                                     />
                                 )}
-                                {openInvite && (
+                                {/* 老用户不展示了 */}
+                                {/* {openInvite && (
                                     <InviteUser
                                         onClose={() => {
                                             // 由3天改成不展示
@@ -606,7 +605,7 @@ const MainLayout = () => {
                                             setOpenInvite(false);
                                         }}
                                     />
-                                )}
+                                )} */}
                             </Main>
                         </Box>
                     </div>

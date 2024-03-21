@@ -25,6 +25,7 @@ const FormModal = ({
     sourceList?: any[];
     materialType?: string;
 }) => {
+    console.log(columns);
     const { TextArea } = Input;
     const [uploadLoading, setUploadLoading] = useState(false);
     const [linkLoading, setLinkLoading] = useState(false);
@@ -43,7 +44,7 @@ const FormModal = ({
     }, []);
     return (
         <Modal
-            zIndex={!materialType ? 9000 : 1000}
+            zIndex={!materialType ? 9000 : 1100}
             title={title}
             open={editOpen}
             onCancel={() => {

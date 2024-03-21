@@ -16,16 +16,22 @@ const StyleTabs = ({
     setDetailData: (data: any) => void;
 }) => {
     const [activeKey, setActiveKey] = useState('0');
-    const newTabIndex = useRef(1);
     const onChange = (newActiveKey: string) => {
         setActiveKey(newActiveKey);
+    };
+    const digui = () => {
+        const newData = imageStyleData.map((i: any) => i.name.split(' ')[1]);
+        if (!newData || newData?.every((i: any) => !i)) {
+            return 1;
+        }
+        return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
     };
     const add = () => {
         const newPanes = _.cloneDeep(imageStyleData);
         newPanes.push({
             id: '',
-            name: `图片 ${newTabIndex.current++}`,
-            key: newTabIndex.current.toString(),
+            name: `图片 ${digui()}`,
+            key: digui().toString(),
             titleGenerateMode: 'DEFAULT',
             variableList: []
         });

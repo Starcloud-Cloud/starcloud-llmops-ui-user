@@ -126,7 +126,6 @@ function CreateDetail() {
                     aiModel,
                     conversationUid
                 });
-
                 const contentData = _.cloneDeep(detailRef.current);
                 contentData.workflowConfig.steps[index].flowStep.response.answer = '';
                 detailRef.current = _.cloneDeep(contentData);
@@ -265,6 +264,7 @@ function CreateDetail() {
                     'gpt-3.5-turbo-1106'
             );
         }
+        getStepMater();
         setDetail(newValue);
     };
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
@@ -467,8 +467,8 @@ function CreateDetail() {
     //素材类型的请求接口
     const [step, setStep] = useState(0);
     const [materialType, setMaterialType] = useState('');
+    const refersSourceRef = useRef<any>(null);
     const [refersSource, setRefersSource] = useState<any[]>([]);
-    const [rows, setRows] = useState<any[]>([]);
     //删除
     const handleDel = (index: number) => {
         const newValue = _.cloneDeep(detailRef.current);
@@ -512,68 +512,95 @@ function CreateDetail() {
     useEffect(() => {
         if (materialType) {
             materialTemplate(materialType).then((res) => {
-                const newList = res?.fieldDefine?.map((item: any) => {
-                    return {
-                        title: item.desc,
-                        align: 'center',
-                        width: 200,
-                        dataIndex: item.fieldName,
-                        render: (_: any, row: any) => (
-                            <div className="flex justify-center items-center flex-wrap break-all gap-2">
-                                {item.type === 'image' ? (
-                                    <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
-                                ) : item.fieldName === 'source' ? (
-                                    row[item.fieldName] === 'OTHER' ? (
-                                        refersSource?.find((item) => item.value === 'OTHER')?.label
-                                    ) : row[item.fieldName] === 'SMALL_RED_BOOK' ? (
-                                        refersSource?.find((item) => item.value === 'SMALL_RED_BOOK')?.label
-                                    ) : (
-                                        row[item.fieldName]
-                                    )
-                                ) : (
-                                    row[item.fieldName]
-                                )}
-                            </div>
-                        ),
-                        type: item.type
-                    };
-                });
-                setRows([
-                    ...newList,
-                    {
-                        title: '操作',
-                        align: 'center',
-                        width: 100,
-                        fixed: 'right',
-                        render: (_: any, row: any, index: number) => (
-                            <div className="flex justify-center">
-                                <Button onClick={() => handleEdit(row, index)} size="small" type="link">
-                                    编辑
-                                </Button>
-                                <Popconfirm
-                                    title="提示"
-                                    description="请再次确认是否删除？"
-                                    okText="确认"
-                                    cancelText="取消"
-                                    onConfirm={() => handleDel(index)}
-                                >
-                                    <Button size="small" type="link" danger>
-                                        删除
-                                    </Button>
-                                </Popconfirm>
-                            </div>
-                        )
-                    }
-                ]);
+                stepMarRef.current[step] = getHeader(res?.fieldDefine);
+                setStepMaterial(stepMarRef.current);
                 setPerform(perform + 1);
             });
         }
     }, [materialType]);
+    //获取数据表头
+    const getHeader = (data: any) => {
+        const newList = data.map((item: any) => ({
+            title: item.desc,
+            align: 'center',
+            width: 200,
+            dataIndex: item.fieldName,
+            render: (_: any, row: any) => (
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    {item.type === 'image' ? (
+                        <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                    ) : item.fieldName === 'source' ? (
+                        <>
+                            {row[item.fieldName] === 'OTHER'
+                                ? refersSourceRef.current?.find((item: any) => item.value === 'OTHER')?.label
+                                : row[item.fieldName] === 'SMALL_RED_BOOK'
+                                ? refersSourceRef.current?.find((item: any) => item.value === 'SMALL_RED_BOOK')?.label
+                                : row[item.fieldName]}
+                        </>
+                    ) : (
+                        row[item.fieldName]
+                    )}
+                </div>
+            ),
+            type: item.type
+        }));
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button onClick={() => handleEdit(row, index)} size="small" type="link">
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
     useEffect(() => {
         schemeMetadata().then((res) => {
-            setRefersSource(res.refersSource);
+            refersSourceRef.current = res.refersSource;
+            setRefersSource(refersSourceRef.current);
         });
     }, []);
+    //获取哪个步骤有素材
+    const stepMarRef = useRef<any[]>([]);
+    const [stepMaterial, setStepMaterial] = useState<any[]>([]);
+    const getStepMater = async () => {
+        const arr: any[] = [];
+        const newList = detailRef.current?.workflowConfig?.steps.map((item: any) => {
+            const arr = item?.variable?.variables;
+            return arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value;
+        });
+        const allper = newList?.map(async (el: any, index: number) => {
+            if (el) {
+                const res = await materialTemplate(el);
+                arr[index] = getHeader(res?.fieldDefine);
+            }
+        });
+        await Promise.all(allper);
+        stepMarRef.current = arr;
+        setStepMaterial(stepMarRef?.current);
+    };
+    const getTableData = (index: number) => {
+        const newList = stepMarRef.current;
+        newList?.splice(index + 1, 0, undefined);
+    };
     return (
         <Card>
             <CardHeader
@@ -785,8 +812,9 @@ function CreateDetail() {
                                 <Perform
                                     key={perform}
                                     isShows={isShows}
-                                    columns={rows}
+                                    columns={stepMaterial}
                                     setEditOpen={setEditOpen}
+                                    setStep={setStep}
                                     setTitle={setTitle}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeConfigs={changeConfigs}
@@ -817,6 +845,7 @@ function CreateDetail() {
                                 basisChange={basisChange}
                                 statusChange={statusChange}
                                 changeConfigs={changeConfigs}
+                                getTableData={getTableData}
                             />
                         )}
                     </Grid>
@@ -895,8 +924,9 @@ function CreateDetail() {
                             {detail && value === 1 && (
                                 <Perform
                                     key={perform}
-                                    columns={rows}
+                                    columns={stepMaterial}
                                     setEditOpen={setEditOpen}
+                                    setStep={setStep}
                                     setTitle={setTitle}
                                     isShows={isShows}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
@@ -949,7 +979,7 @@ function CreateDetail() {
                     materialType={materialType}
                     editOpen={editOpen}
                     setEditOpen={setEditOpen}
-                    columns={rows}
+                    columns={stepMaterial[step]}
                     form={form}
                     formOk={formOk}
                     sourceList={refersSource}

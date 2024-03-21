@@ -13,7 +13,8 @@ const VariableInput = ({
     row,
     title,
     value,
-    setValue
+    setValue,
+    styles = {}
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
@@ -25,6 +26,7 @@ const VariableInput = ({
     value?: any;
     row?: number;
     setValue: (data: any) => void;
+    styles?: any;
 }) => {
     const inputList: any = useRef([]);
     const [tipValue, setTipValue] = useState('');
@@ -88,6 +90,10 @@ const VariableInput = ({
         >
             <div className="flex items-stretch relative">
                 <TextArea
+                    // style={{
+                    //     border: '1px solid red'
+                    // }}
+                    style={styles}
                     rows={row || 1}
                     value={value}
                     ref={(ref) => (inputList.current[index] = ref)}

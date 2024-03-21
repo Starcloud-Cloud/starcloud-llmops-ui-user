@@ -29,6 +29,8 @@ import 'react-horizontal-scrolling-menu/dist/styles.css';
 import { useAllDetail } from '../../../contexts/JWTContext';
 import market from 'assets/images/landing/pre-apps/market.jpg';
 import { MarketVideoModel } from './MarketVideoModel';
+import { NewUserVip } from '../../../ui-component/new-user-vip/index';
+import dayjs from 'dayjs';
 interface MarketList {
     name: string;
     tags: string[];
@@ -340,6 +342,7 @@ function TemplateMarket() {
     const [value, setValue] = useState(0);
     const [collectList, setCollectList] = useState<any[]>([]);
     const [openMarketVideo, setOpenMarketVideo] = useState(false);
+    const [newUserVipOpen, setNewUserVipOpen] = useState(false);
 
     useEffect(() => {
         favoriteList({}).then((res) => {
@@ -562,6 +565,15 @@ function TemplateMarket() {
                     localStorage.setItem(`marketVideo-${allDetail?.allDetail?.id}`, 'true');
                 }}
             />
+            {newUserVipOpen && (
+                <NewUserVip
+                    onClose={() => {
+                        const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
+                        localStorage.setItem(`newUserVipEndTime-${allDetail?.allDetail.id}`, newUserVipEndTime);
+                        setNewUserVipOpen(false);
+                    }}
+                />
+            )}
         </Box>
         // </Box>
     );

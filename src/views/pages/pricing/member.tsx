@@ -842,7 +842,7 @@ const Price1 = () => {
                             const darkBorder =
                                 theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary[200] + 75;
                             return (
-                                <Grid item xs={20} sm={10} md={4} key={index}>
+                                <Grid item xs={20} sm={12} md={5} key={index}>
                                     <MainCard
                                         boxShadow
                                         sx={{
@@ -1011,6 +1011,11 @@ const Price1 = () => {
                                                             color="secondary"
                                                         >
                                                             {item.properties[0].valueName}
+                                                            {item.properties[0].remark === 'NEW_USER' && (
+                                                                <Tag color="#f50" className="!mr-0">
+                                                                    9.9元
+                                                                </Tag>
+                                                            )}
                                                         </Button>
                                                     </Grid>
                                                 ))}

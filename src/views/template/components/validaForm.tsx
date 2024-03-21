@@ -21,7 +21,7 @@ export const changeJSONValue = (value: string) => {
     } catch (error) {}
     return parsedJson;
 };
-function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle }: any) {
+function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle, setStep }: any) {
     const mt = {
         marginTop: 2
     };
@@ -131,6 +131,7 @@ function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle }: an
                             size="small"
                             type="primary"
                             onClick={() => {
+                                setStep();
                                 setTitle('新增');
                                 setEditOpen(true);
                             }}

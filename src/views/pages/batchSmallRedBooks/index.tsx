@@ -273,12 +273,49 @@ const BatcSmallRedBooks = () => {
             }, 3000);
         }
     }, [queryPage.pageNo]);
+    useEffect(() => {
+        if (bathList?.length !== 0) {
+            const bathId = bathList[0].batch;
+
+            timer.current?.map((item: any) => {
+                clearInterval(item);
+            });
+            timer.current = [];
+            plabListRef.current = [];
+            setPlanList([]);
+            setbatchOpen(true);
+            queryRef.current = {
+                pageNo: 1,
+                pageSize: 20
+            };
+            setQueryPage(queryRef.current);
+            setBatchUid(bathId);
+            if (bathList?.find((item) => item.batch == bathId)?.status === 'SUCCESS') {
+                getList(bathId);
+            } else {
+                getList(bathId);
+                timer.current[0] = setInterval(() => {
+                    if (
+                        plabListRef.current?.length === 0 ||
+                        plabListRef.current.slice(0, 1)?.every((item: any) => {
+                            return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
+                        })
+                    ) {
+                        clearInterval(timer.current[0]);
+                        return;
+                    }
+                    getLists(1, bathId);
+                }, 3000);
+            }
+        }
+    }, [bathList]);
     //变量
     const [schemesList, setSchemeList] = useState<any[]>([]);
     const schemeRef: any = useRef(null);
 
     const [detailOpen, setDetailOpen] = useState(false);
     const [businessUid, setBusinessUid] = useState('');
+
     return (
         <MainCard content={false}>
             <CardContent className="pb-[72px]">
@@ -361,6 +398,7 @@ const BatcSmallRedBooks = () => {
                                             }
                                         }
                                     }}
+                                    defaultActiveKey={bathList[0]?.batch}
                                     items={bathList?.map((item) => {
                                         return {
                                             key: item.batch,

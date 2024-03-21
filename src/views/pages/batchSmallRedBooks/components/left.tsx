@@ -1,6 +1,6 @@
 import { TextField, FormControl, InputLabel, Select, MenuItem, Chip, FormHelperText, Autocomplete } from '@mui/material';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Input } from 'antd';
+import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Progress } from 'antd';
 import { PlusOutlined, LoadingOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import type { RadioChangeEvent } from 'antd';
 import { getAccessToken } from 'utils/auth';
@@ -8,8 +8,7 @@ import _ from 'lodash-es';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Forms from '../../smallRedBook/components/form';
-import axios from 'utils/axios/index';
-import { schemeList, materialTemplate, metadata, materialImport, materialResilt } from 'api/redBook/batchIndex';
+import { schemeList, materialTemplate, metadata, materialImport, materialExport, materialResilt } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import FormModal from './formModal';
@@ -78,19 +77,24 @@ const Lefts = ({
         showUploadList: false,
         accept: '.zip',
         beforeUpload: async (file, fileList) => {
+            setUploadLoading(true);
             try {
                 const result = await materialImport({ file });
+                perRef.current = 100;
+                setPercent(perRef.current);
                 setTableLoading(true);
                 setUploadOpen(false);
                 setParseUid(result?.data);
+                setUploadLoading(false);
+                return false;
             } catch (error) {
                 console.error('Error uploading file:', error);
+                setUploadLoading(false);
             }
         }
     };
     //批量上传素材
     const [zoomOpen, setZoomOpen] = useState(false); //下载弹框
-    const [downLoadUrl, setDownLoadUrl] = useState(''); //下载的地址
     const [tableLoading, setTableLoading] = useState(false);
     const tableRef = useRef<any[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);
@@ -233,32 +237,21 @@ const Lefts = ({
                 )
             }
         ]);
-        setDownLoadUrl(result?.templateUrl);
     };
     //下载模板
     const handleDownLoad = async () => {
-        const res = await axios.download({ url: downLoadUrl });
+        const res = await materialExport(materialType);
         const downloadLink = document.createElement('a');
         downloadLink.href = window.URL.createObjectURL(res);
-        downloadLink.download = '批量导入模板.xls';
+        downloadLink.download = materialType + '.zip';
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
     };
     //导入文件
-    const fileInputRef = useRef(null);
-    const handleFileSelect = async (event: any) => {
-        event.preventDefault();
-        const files = event.target.files;
-        if (!files.length) return;
-        const selectedFile = files[0];
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        const result = await materialImport(formData);
-        setTableLoading(true);
-        setUploadOpen(false);
-        setParseUid(result?.data);
-    };
+    const [uploadLoading, setUploadLoading] = useState(false);
+    const perRef = useRef<number>(0);
+    const [percent, setPercent] = useState(0);
     //获取导出结果
     const timer: any = useRef(null);
     const getImportResult = () => {
@@ -329,6 +322,20 @@ const Lefts = ({
             setMockData(res);
         });
     }, []);
+    const timer1: any = useRef(null);
+    useEffect(() => {
+        if (uploadLoading) {
+            timer1.current = setInterval(() => {
+                if (percent < 100) {
+                    perRef.current += 30;
+                    setPercent(perRef.current);
+                }
+            }, 20);
+        } else {
+            clearInterval(timer1.current);
+            setPercent(0);
+        }
+    }, [uploadLoading]);
     return (
         <>
             <div
@@ -576,19 +583,13 @@ const Lefts = ({
                     </span>
                 </p>
                 <div className="flex justify-center mt-[20px]">
-                    <div className="relative">
+                    <div>
                         <Upload {...props1}>
                             <Button type="primary">上传 ZIP</Button>
                         </Upload>
-                        {/* <input
-                            className="opacity-0 w-[85px] h-[32px] absolute top-0 left-0 cursor-pointer"
-                            ref={fileInputRef}
-                            type="file"
-                            accept=".zip"
-                            onChange={handleFileSelect}
-                        /> */}
                     </div>
                 </div>
+                {uploadLoading && <Progress size="small" percent={percent} />}
             </Modal>
             {editOpen && (
                 <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />

@@ -607,22 +607,28 @@ const AddModal = () => {
                 const convertedProperty = getjsonschma(property);
                 arr.push(convertedProperty);
             } else if (property.type === 'array') {
-                arr.push(
-                    ...arrList.map((item: number, index: number) => ({
-                        key: `${key}[${index}]`,
-                        label: `${key}[${index}]`,
-                        title: property?.title,
-                        desc: property?.description,
-                        children: getjsonschma(property?.items)
-                    })),
-                    {
-                        key: key,
-                        label: `${key}.list.(*)`,
-                        title: property?.title,
-                        desc: property?.description,
-                        children: getjsonschma(property?.items, '*')
-                    }
-                );
+                arr.push({
+                    key: key + 'index',
+                    label: key,
+                    title: property?.title,
+                    desc: property?.description,
+                    children: [
+                        ...arrList.map((item: number, index: number) => ({
+                            key: `${key}[${index}]`,
+                            label: `${key}[${index}]`,
+                            title: property?.title,
+                            desc: property?.description,
+                            children: getjsonschma(property?.items)
+                        })),
+                        {
+                            key: key,
+                            label: `${key}.list.(*)`,
+                            title: property?.title,
+                            desc: property?.description,
+                            children: getjsonschma(property?.items, '*')
+                        }
+                    ]
+                });
             } else {
                 arr.push({
                     key,

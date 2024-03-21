@@ -30,7 +30,8 @@ function Perform({
     changeConfigs,
     columns,
     setEditOpen,
-    setTitle
+    setTitle,
+    setStep
 }: any) {
     const refs = useRef<any>([]);
     //点击全部执行
@@ -211,7 +212,7 @@ function Perform({
                                                         item
                                                         key={i}
                                                         md={
-                                                            el.style === 'JSON' || el.style === 'TABLE'
+                                                            el.style === 'JSON' || el.style === 'MATERIAL'
                                                                 ? 12
                                                                 : el.style === 'TEXTAREA'
                                                                 ? 6
@@ -221,9 +222,10 @@ function Perform({
                                                     >
                                                         <FormExecute
                                                             item={el}
-                                                            columns={columns}
+                                                            columns={columns[steps]}
                                                             setEditOpen={setEditOpen}
                                                             setTitle={setTitle}
+                                                            setStep={() => setStep(steps)}
                                                             onChange={(e: any) => {
                                                                 variableChange({
                                                                     e,
@@ -428,6 +430,7 @@ function Perform({
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
+        JSON.stringify(prevProps?.columns) === JSON.stringify(nextProps?.columns) &&
         JSON.stringify(prevProps?.loadings) === JSON.stringify(nextProps?.loadings) &&
         JSON.stringify(prevProps?.isDisables) === JSON.stringify(nextProps?.isDisables) &&
         JSON.stringify(prevProps?.isShows) === JSON.stringify(nextProps?.isShows)

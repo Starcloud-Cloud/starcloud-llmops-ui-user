@@ -64,7 +64,7 @@ const EditStyle = ({
         if (wrapperRef.current) {
             setPopoverWidth(wrapperRef.current?.offsetWidth);
         }
-    }, [wrapperRef]);
+    }, [wrapperRef, currentTemp?.name]);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">

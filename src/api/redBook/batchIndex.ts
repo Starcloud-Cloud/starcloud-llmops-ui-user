@@ -73,6 +73,10 @@ export const materialTemplate = (type: any) => {
 export const materialImport = (data: any) => {
     return request.upload({ url: `/llm/material/import`, data });
 };
+//下载素材
+export const materialExport = (data: any) => {
+    return request.download({ url: `/llm/material/export/${data}` });
+};
 //查询导入结果
 export const materialResilt = (parseUid: any) => {
     return request.get({ url: `/llm/material/result/${parseUid}` });

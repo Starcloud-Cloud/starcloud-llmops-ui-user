@@ -26,7 +26,7 @@ const WebviewRoutes = {
         </AuthGuard>
     ),
     children: [
-        { path: '/', element: <PagesLanding /> },
+        // { path: '/', element: <PagesLanding /> },
         { path: '/subscribe', element: <PagesPrice /> },
         { path: '/web-view/exchange', element: <Redemption /> },
         { path: '/web-view/orderRecord', element: <OrderRecord /> },

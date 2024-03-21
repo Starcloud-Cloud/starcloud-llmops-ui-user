@@ -44,6 +44,7 @@ import useRouteStore from 'store/router';
 import { DASHBOARD_PATH } from 'config';
 import { format } from 'date-fns';
 import dayjs from 'dayjs';
+import useAuth from 'hooks/useAuth';
 
 // styles
 const HeaderImage = styled('img')(({ theme }) => ({
@@ -88,6 +89,8 @@ const HeaderSection = () => {
     const [version, setVersion] = useState('');
     const [macDownload, setMacDownload] = useState('');
     const [releaseDate, setReleaseDate] = useState('');
+    const { isLoggedIn } = useAuth();
+    console.log('🚀 ~ HeaderSection ~ isLoggedIn:', isLoggedIn);
 
     const handleScroll = () => {
         window.scrollTo(0, window.innerHeight - 80);
@@ -139,6 +142,10 @@ const HeaderSection = () => {
     }, []);
 
     const macClientDownload = async () => {
+        if (!isLoggedIn) {
+            navigate('/login');
+            return;
+        }
         window.open(macDownload);
     };
 

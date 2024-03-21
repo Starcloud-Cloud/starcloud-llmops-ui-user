@@ -1,5 +1,6 @@
 import { TextField, MenuItem } from '@mui/material';
 import { useState, memo } from 'react';
+import { Table, Button } from 'antd';
 import { t } from 'i18next';
 import _ from 'lodash-es';
 export const verifyJSON = (value: any) => {
@@ -20,7 +21,7 @@ export const changeJSONValue = (value: string) => {
     } catch (error) {}
     return parsedJson;
 };
-function FormExecute({ item, onChange }: any) {
+function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle }: any) {
     const mt = {
         marginTop: 2
     };
@@ -70,7 +71,7 @@ function FormExecute({ item, onChange }: any) {
                     }}
                     fullWidth
                 />
-            ) : item.style === 'TEXTAREA' || item.style === 'MATERIAL' || item.style === 'JSON' ? (
+            ) : item.style === 'JSON' ? (
                 <TextField
                     sx={mt}
                     size="small"
@@ -123,11 +124,30 @@ function FormExecute({ item, onChange }: any) {
                         </MenuItem>
                     ))}
                 </TextField>
-            ) : null}
+            ) : (
+                <div>
+                    <div className="flex justify-end">
+                        <Button
+                            size="small"
+                            type="primary"
+                            onClick={() => {
+                                setTitle('新增');
+                                setEditOpen(true);
+                            }}
+                        >
+                            新增
+                        </Button>
+                    </div>
+                    <Table rowKey={(_, index) => String(index)} columns={columns} dataSource={item.value} />
+                </div>
+            )}
         </>
     );
 }
 const arePropsEqual = (prevProps: any, nextProps: any) => {
-    return JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item);
+    return (
+        JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item) &&
+        JSON.stringify(prevProps?.columns) === JSON.stringify(nextProps?.columns)
+    );
 };
 export default memo(FormExecute, arePropsEqual);

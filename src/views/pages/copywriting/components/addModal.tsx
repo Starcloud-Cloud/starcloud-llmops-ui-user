@@ -46,6 +46,7 @@ import { getContentPage } from 'api/redBook';
 import SelectApp from './selectApp';
 import { DetailModal } from '../../redBookContentList/component/detailModal';
 import Form from '../../smallRedBook/components/form';
+import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
 const AddModal = () => {
     const { TextArea } = Input;
     const { Panel } = Collapse;
@@ -144,7 +145,7 @@ const AddModal = () => {
         let content = '';
         let flag;
         if (item.code === 'CustomActionHandler' || item.code === 'TitleActionHandler' || item.code === 'ParagraphActionHandler') {
-            if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.referList?.length === 0) {
+            if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.materialList?.length === 0) {
                 flag = true;
                 content = '创作配置 参考来源最少一个';
             } else if (item.model === 'AI_CUSTOM' && !item.requirement) {
@@ -274,7 +275,7 @@ const AddModal = () => {
                         } else if (item?.model === 'AI_CUSTOM') {
                             return {
                                 ...item,
-                                referList: []
+                                materialList: []
                             };
                         } else {
                             return item;
@@ -316,7 +317,7 @@ const AddModal = () => {
                     } else if (item?.model === 'AI_CUSTOM') {
                         return {
                             ...item,
-                            referList: []
+                            materialList: []
                         };
                     } else {
                         return item;
@@ -463,7 +464,21 @@ const AddModal = () => {
                 setGoodList(res);
             });
             schemeOptions({ appUid: appData?.appUid, stepCode: '海报生成' }).then((res) => {
-                setSchemaList(res);
+                const newList = res
+                    ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
+                    ?.map((item: any) => {
+                        return {
+                            label: item.name,
+                            key: item.code,
+                            description: item.description,
+                            children: item.inJsonSchema
+                                ? getjsonschma(getJSON(item))
+                                : item.outJsonSchema
+                                ? getjsonschma(JSON.parse(item.outJsonSchema))
+                                : []
+                        };
+                    });
+                setSchemaList(newList);
             });
         }
     }, [appData?.example]);
@@ -489,7 +504,7 @@ const AddModal = () => {
                         } else if (item?.model === 'AI_CUSTOM') {
                             return {
                                 ...item,
-                                referList: []
+                                materialList: []
                             };
                         } else {
                             return item;
@@ -567,6 +582,68 @@ const AddModal = () => {
             }
         }
     }, [appData]);
+
+    const getJSON = (item: any) => {
+        let obj: any = {};
+        try {
+            obj = {
+                ...JSON.parse(item.inJsonSchema),
+                properties: {
+                    ...JSON.parse(item.inJsonSchema).properties,
+                    ...JSON.parse(item.outJsonSchema)
+                }
+            };
+        } catch (err) {
+            obj = {};
+        }
+        return obj;
+    };
+    function getjsonschma(json: any, jsonType?: string) {
+        const arr: any = [];
+        const arrList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        for (const key in json.properties) {
+            const property = json.properties[key];
+            if (property.type === 'object') {
+                const convertedProperty = getjsonschma(property);
+                arr.push(convertedProperty);
+            } else if (property.type === 'array') {
+                arr.push(
+                    ...arrList.map((item: number, index: number) => ({
+                        key: `${key}[${index}]`,
+                        label: `${key}[${index}]`,
+                        title: property?.title,
+                        desc: property?.description,
+                        children: getjsonschma(property?.items)
+                    })),
+                    {
+                        key: key,
+                        label: `${key}.list.(*)`,
+                        title: property?.title,
+                        desc: property?.description,
+                        children: getjsonschma(property?.items, '*')
+                    }
+                );
+            } else {
+                arr.push({
+                    key,
+                    label: key,
+                    title: property?.title,
+                    desc: property?.description,
+                    type: jsonType
+                });
+            }
+        }
+        return arr;
+    }
+    const [valOpen, setValOpen] = useState(false);
+    const [conOpen, setConOpen] = useState(false);
+    const widthRef: any = useRef(null);
+    const [popoverWidth, setPopoverWidth] = useState(undefined);
+    useEffect(() => {
+        if (widthRef.current) {
+            setPopoverWidth(widthRef.current?.offsetWidth);
+        }
+    }, [widthRef]);
     return (
         <MainCard content={false}>
             <CardContent className="pb-[72px]">
@@ -906,12 +983,12 @@ const AddModal = () => {
                                                             <>
                                                                 <div className="text-[16px] mt-[20px] mb-[10px] font-[600]">2.参考文案</div>
                                                                 <CreateTable
-                                                                    tableData={el?.referList}
+                                                                    tableData={el?.materialList}
                                                                     sourceList={sourceList}
                                                                     code={el?.code}
                                                                     materialType={el?.materialType}
                                                                     setTableData={(data: any) => {
-                                                                        setValues('referList', data, index);
+                                                                        setValues('materialList', data, index);
                                                                     }}
                                                                     params={params}
                                                                 />
@@ -926,6 +1003,7 @@ const AddModal = () => {
                                                                     pre={pre}
                                                                     model={el?.model}
                                                                     value={el?.requirement}
+                                                                    schemaList={schemaList}
                                                                     setValue={(data: string) => {
                                                                         setValues('requirement', data, index);
                                                                     }}
@@ -963,26 +1041,43 @@ const AddModal = () => {
                                                 )}
                                                 {el.code === 'AssembleActionHandler' && (
                                                     <>
-                                                        <div className="relative">
-                                                            <Input
+                                                        <div ref={widthRef} className="w-full relative">
+                                                            {/* <Input
                                                                 size="large"
                                                                 status={!el?.title ? 'error' : ''}
                                                                 defaultValue={el?.title}
                                                                 onBlur={(data) => {
                                                                     setValues('title', data.target.value, index);
                                                                 }}
+                                                            /> */}
+                                                            <VariableInput
+                                                                open={valOpen}
+                                                                setOpen={setValOpen}
+                                                                popoverWidth={popoverWidth}
+                                                                handleMenu={({ i, newValue }) => {
+                                                                    let newData = _.cloneDeep(el?.title);
+                                                                    newData = newValue;
+                                                                    setValues('title', newData, index);
+                                                                }}
+                                                                title="标题"
+                                                                items={schemaList}
+                                                                index={undefined}
+                                                                value={el?.title}
+                                                                setValue={(value) => {
+                                                                    setValues('title', value, index);
+                                                                }}
                                                             />
-                                                            <span
+                                                            {/* <span
                                                                 style={{ color: !el?.title ? '#f44336' : '#000' }}
                                                                 className=" block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
                                                             >
                                                                 标题
-                                                            </span>
+                                                            </span> */}
                                                         </div>
                                                         {!el?.title && (
                                                             <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">标题必填</span>
                                                         )}
-                                                        <div className="relative mt-[20px]">
+                                                        {/* <div className="relative mt-[20px]">
                                                             <TextArea
                                                                 status={!el?.content ? 'error' : ''}
                                                                 defaultValue={el?.content}
@@ -997,7 +1092,28 @@ const AddModal = () => {
                                                             >
                                                                 文案拼接配置
                                                             </span>
+                                                        </div> */}
+                                                        <div ref={widthRef} className="w-full mt-[20px]">
+                                                            <VariableInput
+                                                                open={conOpen}
+                                                                setOpen={setConOpen}
+                                                                popoverWidth={popoverWidth}
+                                                                handleMenu={({ i, newValue }) => {
+                                                                    let newData = _.cloneDeep(el?.content);
+                                                                    newData = newValue;
+                                                                    setValues('content', newData, index);
+                                                                }}
+                                                                title="文案拼接配置"
+                                                                row={6}
+                                                                items={schemaList}
+                                                                index={undefined}
+                                                                value={el?.content}
+                                                                setValue={(value) => {
+                                                                    setValues('content', value, index);
+                                                                }}
+                                                            />
                                                         </div>
+
                                                         {!el?.content && (
                                                             <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">
                                                                 文案拼接配置必填

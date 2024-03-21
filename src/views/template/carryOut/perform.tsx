@@ -27,7 +27,10 @@ function Perform({
     changeanswer,
     history = false,
     isShows,
-    changeConfigs
+    changeConfigs,
+    columns,
+    setEditOpen,
+    setTitle
 }: any) {
     const refs = useRef<any>([]);
     //点击全部执行
@@ -201,50 +204,52 @@ function Perform({
                                 </Box>
                                 <form>
                                     <Grid container spacing={1}>
-                                        {item.variable?.variables?.map((el: any, i: number) =>
-                                            el.isShow ? (
-                                                <Grid
-                                                    item
-                                                    key={i}
-                                                    md={
-                                                        el.style === 'JSON'
-                                                            ? 12
-                                                            : el.style === 'TEXTAREA' || el.style === 'MATERIAL'
-                                                            ? 6
-                                                            : 3
-                                                    }
-                                                    xs={12}
-                                                >
-                                                    <FormExecute item={el} onChange={(e: any) => variableChange({ e, steps, i })} />
-                                                </Grid>
-                                            ) : null
-                                        )}
-                                        {item.flowStep?.variable?.variables.length !== 0 &&
-                                            item.flowStep?.variable?.variables?.map((el: any, i: number) =>
-                                                el.isShow ? (
+                                        {item.variable?.variables?.map(
+                                            (el: any, i: number) =>
+                                                el.isShow && (
                                                     <Grid
                                                         item
-                                                        lg={
-                                                            el.field === 'prompt'
-                                                                ? 12
-                                                                : el.style === 'TEXTAREA' || el.style === 'MATERIAL'
-                                                                ? 6
-                                                                : 3
-                                                        }
+                                                        key={i}
                                                         md={
-                                                            el.field === 'prompt'
+                                                            el.style === 'JSON' || el.style === 'TABLE'
                                                                 ? 12
-                                                                : el.style === 'TEXTAREA' || el.style === 'MATERIAL'
+                                                                : el.style === 'TEXTAREA'
                                                                 ? 6
                                                                 : 3
                                                         }
+                                                        xs={12}
+                                                    >
+                                                        <FormExecute
+                                                            item={el}
+                                                            columns={columns}
+                                                            setEditOpen={setEditOpen}
+                                                            setTitle={setTitle}
+                                                            onChange={(e: any) => {
+                                                                variableChange({
+                                                                    e,
+                                                                    steps,
+                                                                    i,
+                                                                    type: e.name === 'MATERIAL_TYPE' ? e.value : undefined
+                                                                });
+                                                            }}
+                                                        />
+                                                    </Grid>
+                                                )
+                                        )}
+                                        {item.flowStep?.variable?.variables?.map(
+                                            (el: any, i: number) =>
+                                                el.isShow && (
+                                                    <Grid
+                                                        item
+                                                        lg={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 3}
+                                                        md={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 3}
                                                         xs={12}
                                                         key={i}
                                                     >
                                                         <FormExecute item={el} onChange={(e: any) => promptChange({ e, steps, i })} />
                                                     </Grid>
-                                                ) : null
-                                            )}
+                                                )
+                                        )}
                                     </Grid>
                                 </form>
                                 <Box my={1}>

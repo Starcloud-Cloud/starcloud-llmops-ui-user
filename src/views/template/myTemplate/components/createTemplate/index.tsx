@@ -1,6 +1,6 @@
 import {
     Box,
-    Button,
+    Button as Buttons,
     Card,
     CardHeader,
     Chip,
@@ -14,7 +14,7 @@ import {
     Tabs,
     Typography
 } from '@mui/material';
-import { Image, Select, Popover } from 'antd';
+import { Image, Select, Popover, Form, Popconfirm, Button } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -37,6 +37,9 @@ import marketStore from 'store/market';
 import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+import { materialTemplate } from 'api/redBook/batchIndex';
+import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
+import { schemeMetadata } from 'api/redBook/copywriting';
 interface Items {
     label: string;
     value: string;
@@ -288,10 +291,18 @@ function CreateDetail() {
             icon: data
         });
     };
+
     //设置执行的步骤
-    const exeChange = ({ e, steps, i }: any) => {
+    const exeChange = ({ e, steps, i, type }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        if (type) {
+            newValue.workflowConfig.steps[steps].variable.variables[
+                newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+            ].value = [];
+            setStep(steps);
+            setMaterialType(type);
+        }
         detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
@@ -453,19 +464,129 @@ function CreateDetail() {
             detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.findIndex((el: any) => el?.field === 'model')
         ]?.value
     ]);
+    //素材类型的请求接口
+    const [step, setStep] = useState(0);
+    const [materialType, setMaterialType] = useState('');
+    const [refersSource, setRefersSource] = useState<any[]>([]);
+    const [rows, setRows] = useState<any[]>([]);
+    //删除
+    const handleDel = (index: number) => {
+        const newValue = _.cloneDeep(detailRef.current);
+        const newList =
+            newValue.workflowConfig.steps[step].variable.variables[
+                newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+            ].value;
+        newList.splice(index, 1);
+        detailRef.current = newValue;
+        setDetail(detailRef.current);
+    };
+    const [form] = Form.useForm();
+    const [title, setTitle] = useState('');
+    //编辑
+    const [editOpen, setEditOpen] = useState(false);
+    const [rowIndex, setRowIndex] = useState(0);
+    const handleEdit = (row: any, index: number) => {
+        setTitle('编辑');
+        form.setFieldsValue(row);
+        setRowIndex(index);
+        setEditOpen(true);
+    };
+    const formOk = (result: any) => {
+        const newValue = _.cloneDeep(detailRef.current);
+        const newList =
+            newValue.workflowConfig.steps[step].variable.variables[
+                newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+            ].value;
+        if (title === '编辑') {
+            newList.splice(rowIndex, 1, result);
+        } else {
+            newList.unshift(result);
+        }
+        newValue.workflowConfig.steps[step].variable.variables[
+            newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+        ].value = newList;
+        detailRef.current = newValue;
+        setDetail(detailRef.current);
+        setEditOpen(false);
+    };
+    useEffect(() => {
+        if (materialType) {
+            materialTemplate(materialType).then((res) => {
+                const newList = res?.fieldDefine?.map((item: any) => {
+                    return {
+                        title: item.desc,
+                        align: 'center',
+                        width: 200,
+                        dataIndex: item.fieldName,
+                        render: (_: any, row: any) => (
+                            <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                                {item.type === 'image' ? (
+                                    <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                                ) : item.fieldName === 'source' ? (
+                                    row[item.fieldName] === 'OTHER' ? (
+                                        refersSource?.find((item) => item.value === 'OTHER')?.label
+                                    ) : row[item.fieldName] === 'SMALL_RED_BOOK' ? (
+                                        refersSource?.find((item) => item.value === 'SMALL_RED_BOOK')?.label
+                                    ) : (
+                                        row[item.fieldName]
+                                    )
+                                ) : (
+                                    row[item.fieldName]
+                                )}
+                            </div>
+                        ),
+                        type: item.type
+                    };
+                });
+                setRows([
+                    ...newList,
+                    {
+                        title: '操作',
+                        align: 'center',
+                        width: 100,
+                        fixed: 'right',
+                        render: (_: any, row: any, index: number) => (
+                            <div className="flex justify-center">
+                                <Button onClick={() => handleEdit(row, index)} size="small" type="link">
+                                    编辑
+                                </Button>
+                                <Popconfirm
+                                    title="提示"
+                                    description="请再次确认是否删除？"
+                                    okText="确认"
+                                    cancelText="取消"
+                                    onConfirm={() => handleDel(index)}
+                                >
+                                    <Button size="small" type="link" danger>
+                                        删除
+                                    </Button>
+                                </Popconfirm>
+                            </div>
+                        )
+                    }
+                ]);
+                setPerform(perform + 1);
+            });
+        }
+    }, [materialType]);
+    useEffect(() => {
+        schemeMetadata().then((res) => {
+            setRefersSource(res.refersSource);
+        });
+    }, []);
     return (
         <Card>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={
-                    <Button
+                    <Buttons
                         variant="contained"
                         startIcon={<ArrowBack />}
                         color="secondary"
                         onClick={() => navigate('/template/createCenter')}
                     >
                         {t('myApp.back')}
-                    </Button>
+                    </Buttons>
                 }
                 title={<Typography variant="h3">{detail?.name}</Typography>}
                 action={
@@ -543,9 +664,9 @@ function CreateDetail() {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                        <Button variant="contained" color="secondary" autoFocus onClick={saveDetail}>
+                        <Buttons variant="contained" color="secondary" autoFocus onClick={saveDetail}>
                             {t('myApp.save')}
-                        </Button>
+                        </Buttons>
                     </>
                 }
             ></CardHeader>
@@ -664,6 +785,9 @@ function CreateDetail() {
                                 <Perform
                                     key={perform}
                                     isShows={isShows}
+                                    columns={rows}
+                                    setEditOpen={setEditOpen}
+                                    setTitle={setTitle}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeConfigs={changeConfigs}
                                     changeSon={changeData}
@@ -771,6 +895,9 @@ function CreateDetail() {
                             {detail && value === 1 && (
                                 <Perform
                                     key={perform}
+                                    columns={rows}
+                                    setEditOpen={setEditOpen}
+                                    setTitle={setTitle}
                                     isShows={isShows}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeConfigs={changeConfigs}
@@ -814,6 +941,18 @@ function CreateDetail() {
                     open={tokenOpen}
                     handleClose={() => setTokenOpen(false)}
                     title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+                />
+            )}
+            {editOpen && (
+                <FormModal
+                    title={title}
+                    materialType={materialType}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={rows}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={refersSource}
                 />
             )}
         </Card>

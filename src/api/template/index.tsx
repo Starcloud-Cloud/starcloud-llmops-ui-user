@@ -202,3 +202,8 @@ export const xhsApp = (uid: any) => {
 export const getImageTemplateTypes = () => {
     return request.get({ url: `/llm/creative/scheme/templateGroupByType` });
 };
+
+// 获取template json
+export const getImageTemplateJSON = (templateId: string) => {
+    return request.get({ url: `/llm/creative/scheme/posterTemplate?templateId=${templateId}` });
+};

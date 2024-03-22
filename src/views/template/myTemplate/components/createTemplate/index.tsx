@@ -510,6 +510,7 @@ function CreateDetail() {
         detailRef.current = newValue;
         setDetail(detailRef.current);
         setEditOpen(false);
+        form.resetFields();
     };
     useEffect(() => {
         if (materialType) {

@@ -69,7 +69,6 @@ const EditStyle = ({
         }
     }, [imageStyleData, tempList]);
     const [perOpen, setPerOpen] = useState<any[]>([]);
-    const [textOpen, setTextOpen] = useState<any[]>([]);
     const [items, setItem] = useState<any[]>([]);
 
     useEffect(() => {
@@ -181,42 +180,43 @@ const EditStyle = ({
                                                 </div>
                                             </>
                                         ) : (
-                                            imageStyleData?.variableList
-                                                .filter((el: any) => el.type === 'IMAGE')
-                                                ?.map((el: any, index: number) => (
-                                                    <div
-                                                        className="w-[50%] p-3"
-                                                        ref={wrapperRef}
-                                                        onClick={() => setCurrentElementId(el.field)}
-                                                    >
-                                                        <VariableInput
-                                                            styles={
-                                                                currentElementId === el.field
-                                                                    ? {
-                                                                          border: '1px solid #673ab7'
-                                                                      }
-                                                                    : {}
-                                                            }
-                                                            open={perOpen[index]}
-                                                            setOpen={(flag) => {
-                                                                const newData = _.cloneDeep(perOpen);
-                                                                newData[index] = flag;
-                                                                setPerOpen(newData);
-                                                            }}
-                                                            popoverWidth={popoverWidth}
-                                                            handleMenu={handleMenu}
-                                                            items={items}
-                                                            index={index}
-                                                            title={el?.label}
-                                                            value={el.value}
-                                                            setValue={(value) => {
-                                                                const newData = _.cloneDeep(imageStyleData);
-                                                                newData.variableList[index].value = value;
-                                                                setData(newData);
-                                                            }}
-                                                        />
-                                                    </div>
-                                                ))
+                                            imageStyleData?.variableList?.map(
+                                                (el: any, index: number) =>
+                                                    el.type === 'IMAGE' && (
+                                                        <div
+                                                            className="w-[50%] p-3"
+                                                            ref={wrapperRef}
+                                                            onClick={() => setCurrentElementId(el.field)}
+                                                        >
+                                                            <VariableInput
+                                                                styles={
+                                                                    currentElementId === el.field
+                                                                        ? {
+                                                                              border: '1px solid #673ab7'
+                                                                          }
+                                                                        : {}
+                                                                }
+                                                                open={perOpen[index]}
+                                                                setOpen={(flag) => {
+                                                                    const newData = _.cloneDeep(perOpen);
+                                                                    newData[index] = flag;
+                                                                    setPerOpen(newData);
+                                                                }}
+                                                                popoverWidth={popoverWidth}
+                                                                handleMenu={handleMenu}
+                                                                items={items}
+                                                                index={index}
+                                                                title={el?.label}
+                                                                value={el.value}
+                                                                setValue={(value) => {
+                                                                    const newData = _.cloneDeep(imageStyleData);
+                                                                    newData.variableList[index].value = value;
+                                                                    setData(newData);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )
+                                            )
                                         )}
                                     </div>
                                 </div>
@@ -254,38 +254,43 @@ const EditStyle = ({
                                         )}
                                     </div>
                                     <div className="flex flex-wrap">
-                                        {imageStyleData?.variableList
-                                            .filter((el: any) => el.type === 'TEXT')
-                                            ?.map((el: any, index: number) => (
-                                                <div className="w-[50%] p-3" ref={wrapperRef} onClick={() => setCurrentElementId(el.field)}>
-                                                    <VariableInput
-                                                        styles={
-                                                            currentElementId === el.field
-                                                                ? {
-                                                                      border: '1px solid #673ab7'
-                                                                  }
-                                                                : {}
-                                                        }
-                                                        open={textOpen[index]}
-                                                        setOpen={(flag) => {
-                                                            const newData = _.cloneDeep(textOpen);
-                                                            newData[index] = flag;
-                                                            setTextOpen(newData);
-                                                        }}
-                                                        popoverWidth={popoverWidth}
-                                                        handleMenu={handleMenu}
-                                                        items={items}
-                                                        index={index}
-                                                        title={el?.label}
-                                                        value={el.value}
-                                                        setValue={(value) => {
-                                                            const newData = _.cloneDeep(imageStyleData);
-                                                            newData.variableList[index].value = value;
-                                                            setData(newData);
-                                                        }}
-                                                    />
-                                                </div>
-                                            ))}
+                                        {imageStyleData?.variableList?.map(
+                                            (el: any, index: number) =>
+                                                el.type === 'TEXT' && (
+                                                    <div
+                                                        className="w-[50%] p-3"
+                                                        ref={wrapperRef}
+                                                        onClick={() => setCurrentElementId(el.field)}
+                                                    >
+                                                        <VariableInput
+                                                            styles={
+                                                                currentElementId === el.field
+                                                                    ? {
+                                                                          border: '1px solid #673ab7'
+                                                                      }
+                                                                    : {}
+                                                            }
+                                                            open={perOpen[index]}
+                                                            setOpen={(flag) => {
+                                                                const newData = _.cloneDeep(perOpen);
+                                                                newData[index] = flag;
+                                                                setPerOpen(newData);
+                                                            }}
+                                                            popoverWidth={popoverWidth}
+                                                            handleMenu={handleMenu}
+                                                            items={items}
+                                                            index={index}
+                                                            title={el?.label}
+                                                            value={el.value}
+                                                            setValue={(value) => {
+                                                                const newData = _.cloneDeep(imageStyleData);
+                                                                newData.variableList[index].value = value;
+                                                                setData(newData);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )
+                                        )}
                                     </div>
                                 </div>
                             </div>

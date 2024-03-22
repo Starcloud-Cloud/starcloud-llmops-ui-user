@@ -463,6 +463,8 @@ const AddModal = () => {
             getExample(newList).then((res) => {
                 setGoodList(res);
             });
+        }
+        if (appData) {
             schemeOptions({ appUid: appData?.appUid, stepCode: '海报生成' }).then((res) => {
                 const newList = res
                     ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
@@ -628,12 +630,12 @@ const AddModal = () => {
                         label: `${key}.list.(*)`,
                         title: property?.title,
                         desc: property?.description,
-                        children: getjsonschma(property?.items, '*')
+                        children: getjsonschma(property?.items, `${name}.${key}`, '*')
                     }
                 );
             } else {
                 arr.push({
-                    key,
+                    key: jsonType ? name + '[' + key + ']' : name + '.' + key,
                     label: key,
                     title: property?.title,
                     desc: property?.description,

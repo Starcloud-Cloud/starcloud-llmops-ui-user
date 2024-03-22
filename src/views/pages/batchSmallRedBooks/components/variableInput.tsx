@@ -48,10 +48,7 @@ const VariableInput = ({
                             }
                             const part1 = newValue.slice(0, inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
                             const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
-                            newValue =
-                                item?.type === '*'
-                                    ? `${part1}{{${data?.keyPath[1]}.list('${data?.keyPath[0]}')}}${part2}`
-                                    : `${part1}{{${data?.keyPath[1]}.${data?.keyPath[0]}}}${part2}`;
+                            newValue = `${part1}{{${data?.key}}}${part2}`;
                             setOpen(false);
                             handleMenu({ index, newValue });
                         }}

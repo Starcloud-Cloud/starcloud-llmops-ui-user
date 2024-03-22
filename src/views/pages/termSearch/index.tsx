@@ -10,7 +10,13 @@ import TermTable from './component/termTable';
 import _ from 'lodash-es';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
-import { KeywordMetadataExtendPrepare, KeywordMetadataExtendAsin, KeywordMetadataPage, exportExtendAsin } from 'api/listing/termSerch';
+import {
+    KeywordMetadataExtendPrepare,
+    KeywordMetadataExtendAsin,
+    KeywordMetadataPage,
+    exportExtendAsin,
+    userRighsLimitUsedCount
+} from 'api/listing/termSerch';
 const TermSearch = () => {
     const { Option } = Select;
     const handleClose = (index: number) => {
@@ -29,6 +35,11 @@ const TermSearch = () => {
     });
     const [asinData, setAsinData] = useState<any>({});
     const getAsin = async () => {
+        // 获取权限
+
+        const usedResult = await userRighsLimitUsedCount({ levelRightCode: 'listingQuery' });
+        console.log('🚀 ~ getAsin ~ result:', usedResult);
+
         if (queryAsin.asinList.length === 0) {
             dispatch(
                 openSnackbar({

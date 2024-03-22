@@ -43,7 +43,7 @@ export const noteDetail = (data: any) => {
 };
 //自定义内容拼接生成
 export const appList = () => {
-    return request.get({ url: `/llm/creative/scheme/appGroupList` });
+    return request.get({ url: `/llm/creative/scheme/schemeTemplateList` });
 };
 
 export const getExample = (data: any) => {

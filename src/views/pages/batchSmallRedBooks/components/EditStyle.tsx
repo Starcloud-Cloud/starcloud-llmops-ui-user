@@ -22,6 +22,8 @@ const EditStyle = ({
     imageStyleData: any;
     setData: (data: any) => void;
 }) => {
+    console.log('schemaList', typeList, imageStyleData, schemaList);
+
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
     const [tempList, setTempList] = React.useState<any>([]);

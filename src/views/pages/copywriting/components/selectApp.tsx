@@ -24,15 +24,15 @@ const SelectApp = ({
 
     useEffect(() => {
         const menus = imageTypeList?.map((item: any) => ({
-            label: `${item.name}(${item.appConfigurationList.length})`,
+            label: `${item.name}(${item.templateList.length})`,
             value: item.code,
             key: item.code,
-            list: item.appConfigurationList
+            list: item.templateList
         }));
         menus?.forEach((item) => {
             if (item.value === 'ALL') {
-                item.label = `${item.label?.split('(')[0]}(${imageTypeList?.map((el) => el.appConfigurationList)?.flat()?.length})`;
-                item.list = imageTypeList?.map((el) => el.appConfigurationList)?.flat();
+                item.label = `${item.label?.split('(')[0]}(${imageTypeList?.map((el) => el.templateList)?.flat()?.length})`;
+                item.list = imageTypeList?.map((el) => el.templateList)?.flat();
             }
         });
         setMenuList(menus);
@@ -46,6 +46,8 @@ const SelectApp = ({
         setType([item?.props?.value]);
         setTemplateList(templates);
     };
+
+    console.log('templateList', templateList);
 
     return (
         <Modal

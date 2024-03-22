@@ -257,6 +257,16 @@ function CreateDetail() {
                 el.field = el.field.toUpperCase();
             });
         });
+        newValue?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            if (
+                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                arr?.find((el: any) => el.field === 'REFERS') &&
+                arr?.find((el: any) => el.field === 'REFERS')?.value
+            ) {
+                arr.find((el: any) => el.field === 'REFERS').value = JSON.parse(arr?.find((el: any) => el.field === 'REFERS')?.value);
+            }
+        });
         detailRef.current = _.cloneDeep(newValue);
         if (newValue?.workflowConfig?.steps?.length === 1) {
             setAiModel(
@@ -395,9 +405,20 @@ function CreateDetail() {
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const saveDetail = () => {
-        if (detail.name && detail.category) {
+        const details = _.cloneDeep(detailRef.current);
+        details?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            if (
+                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                arr?.find((el: any) => el.field === 'REFERS') &&
+                arr?.find((el: any) => el.field === 'REFERS')?.value
+            ) {
+                arr.find((el: any) => el.field === 'REFERS').value = JSON.stringify(arr?.find((el: any) => el.field === 'REFERS')?.value);
+            }
+        });
+        if (details.name && details.category) {
             if (searchParams.get('uid')) {
-                appModify(detail).then((res) => {
+                appModify(details).then((res) => {
                     if (res.data) {
                         setSaveState(saveState + 1);
                         dispatch(
@@ -414,7 +435,7 @@ function CreateDetail() {
                     }
                 });
             } else {
-                appCreate(detail).then((res) => {
+                appCreate(details).then((res) => {
                     if (res.data) {
                         navigate('/createApp?uid=' + res.data.uid);
                         getList(res.data.uid);
@@ -529,7 +550,7 @@ function CreateDetail() {
             width: 200,
             dataIndex: item.fieldName,
             render: (_: any, row: any) => (
-                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                <div className="flex justify-center items-center flex-wrap break-all line-clamp-5 gap-2">
                     {item.type === 'image' ? (
                         <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
                     ) : item.fieldName === 'source' ? (

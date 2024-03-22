@@ -607,28 +607,30 @@ const AddModal = () => {
                 const convertedProperty = getjsonschma(property);
                 arr.push(convertedProperty);
             } else if (property.type === 'array') {
-                arr.push({
-                    key: key + 'index',
-                    label: key,
-                    title: property?.title,
-                    desc: property?.description,
-                    children: [
-                        ...arrList.map((item: number, index: number) => ({
-                            key: `${key}[${index}]`,
-                            label: `${key}[${index}]`,
-                            title: property?.title,
-                            desc: property?.description,
-                            children: getjsonschma(property?.items)
-                        })),
-                        {
-                            key: key,
-                            label: `${key}.list.(*)`,
-                            title: property?.title,
-                            desc: property?.description,
-                            children: getjsonschma(property?.items, '*')
-                        }
-                    ]
-                });
+                arr.push(
+                    {
+                        key: key + 'index',
+                        label: key,
+                        title: property?.title,
+                        desc: property?.description,
+                        children: [
+                            ...arrList.map((item: number, index: number) => ({
+                                key: `${key}[${index}]`,
+                                label: `${key}[${index}]`,
+                                title: property?.title,
+                                desc: property?.description,
+                                children: getjsonschma(property?.items)
+                            }))
+                        ]
+                    },
+                    {
+                        key: key,
+                        label: `${key}.list.(*)`,
+                        title: property?.title,
+                        desc: property?.description,
+                        children: getjsonschma(property?.items, '*')
+                    }
+                );
             } else {
                 arr.push({
                     key,
@@ -836,7 +838,7 @@ const AddModal = () => {
                         />
                     </div>
                 )}
-                <div className="min-h-[500px]">
+                <div>
                     {stepItem[current]?.title === '模版说明' && appData && (
                         <div className="flex">
                             <div className="w-[40%] flex items-center flex-col">

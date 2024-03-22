@@ -101,43 +101,47 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show }: any) => {
                     <div className="relative">
                         <Skeleton
                             paragraph={false}
-                            className="mt-[20px]"
+                            className="mt-[10px] h-[44px]"
                             active={item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? true : false}
                         />
-                        <Skeleton
-                            paragraph={false}
-                            className="mt-[20px]"
-                            active={item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? true : false}
-                        />
-                        <Skeleton
-                            paragraph={false}
-                            className="mt-[10px]"
-                            active={item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? true : false}
-                        />
-                        <Skeleton
-                            paragraph={false}
-                            className="mt-[10px] mb-[15px]"
-                            active={item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? true : false}
-                        />
+                        <div className="h-[88px]">
+                            <Skeleton
+                                paragraph={false}
+                                className="mt-[10px]"
+                                active={item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? true : false}
+                            />
+                            <Skeleton
+                                paragraph={false}
+                                className="mt-[10px]"
+                                active={item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? true : false}
+                            />
+                            <Skeleton
+                                paragraph={false}
+                                className="mt-[10px] mb-[15px]"
+                                active={item.copyWritingStatus === 'init' || item.copyWritingStatus === 'executing' ? true : false}
+                            />
+                        </div>
                         <div className="absolute right-1 top-0">
                             {handleTransfer(item.copyWritingStatus, item.copyWritingErrorMsg)}
                             {item.copyWritingStatus === 'execute_error' && <span>({item.copyWritingRetryCount})</span>}
                         </div>
-                        <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
-                            <div>
-                                <span className="font-[600]">状态：</span>
-                                {handleTransfer(item.pictureStatus, item.pictureErrorMsg, item.copyWritingRetryCount)}
-                            </div>
-                            <div>
-                                <span className="font-[600]">耗时：</span>
-                                {(item.pictureExecuteTime / 1000)?.toFixed(2) || 0}S
-                            </div>
-                            <div>
-                                <span className="font-[600]">张数/字数：</span>
-                                {item.pictureNum}
+                        <div className="line-clamp-1">
+                            <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                <div className=" whitespace-nowrap">
+                                    <span className="font-[600]">状态：</span>
+                                    {handleTransfer(item.pictureStatus, item.pictureErrorMsg, item.copyWritingRetryCount)}
+                                </div>
+                                <div className=" whitespace-nowrap">
+                                    <span className="font-[600]">耗时：</span>
+                                    {(item.pictureExecuteTime / 1000)?.toFixed(2) || 0}S
+                                </div>
+                                <div className=" whitespace-nowrap">
+                                    <span className="font-[600]">张数/字数：</span>
+                                    {item.pictureNum}
+                                </div>
                             </div>
                         </div>
-                        <div className="text-[#15273799] text-[12px]">
+                        <div className="text-[#15273799] text-[12px] line-clamp-1">
                             <span className="font-[600]">时间：</span>
                             {item.pictureStartTime && item.pictureEndTime
                                 ? formatDate(item.pictureStartTime) + '-' + formatDate(item.pictureEndTime)
@@ -156,7 +160,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show }: any) => {
                         }}
                     >
                         <div className="flex justify-between items-start">
-                            <div className="line-clamp-2 h-[35px] text-[14px] font-bold">{item.copyWritingTitle}</div>
+                            <div className="line-clamp-2 h-[44px] text-[14px] font-bold">{item.copyWritingTitle}</div>
                             {!show && (
                                 <div>
                                     {likeOpen ? (
@@ -225,25 +229,27 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show }: any) => {
                                 </div>
                             }
                         >
-                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[77px]">{item.copyWritingContent}</div>
+                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[88px]">{item.copyWritingContent}</div>
                         </Popover>
                         {!show && (
                             <>
-                                <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
-                                    <div>
-                                        <span className="font-[600]">状态：</span>
-                                        {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
-                                    </div>
-                                    <div>
-                                        <span className="font-[600]">耗时：</span>
-                                        {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
-                                    </div>
-                                    <div>
-                                        <span className="font-[600]">张数/字数：</span>
-                                        {item.pictureNum}
+                                <div className="line-clamp-1">
+                                    <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                        <div className=" whitespace-nowrap">
+                                            <span className="font-[600]">状态：</span>
+                                            {handleTransfer(item.pictureStatus, item.pictureErrorMsg)}
+                                        </div>
+                                        <div className=" whitespace-nowrap">
+                                            <span className="font-[600]">耗时：</span>
+                                            {(item.pictureExecuteTime / 1000)?.toFixed(2)}S
+                                        </div>
+                                        <div className=" whitespace-nowrap">
+                                            <span className="font-[600]">张数/字数：</span>
+                                            {item.pictureNum}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="text-[#15273799] text-[12px]">
+                                <div className="text-[#15273799] text-[12px] line-clamp-1">
                                     <span className="font-[600]">时间：</span>
                                     {formatDate(item.pictureStartTime)}-{formatDate(item.pictureEndTime)}
                                 </div>

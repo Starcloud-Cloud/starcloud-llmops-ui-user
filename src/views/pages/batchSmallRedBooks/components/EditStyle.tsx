@@ -22,8 +22,6 @@ const EditStyle = ({
     imageStyleData: any;
     setData: (data: any) => void;
 }) => {
-    console.log('schemaList', typeList, imageStyleData, schemaList);
-
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
     const [tempList, setTempList] = React.useState<any>([]);
@@ -69,6 +67,7 @@ const EditStyle = ({
         }
     }, [imageStyleData, tempList]);
     const [perOpen, setPerOpen] = useState<any[]>([]);
+    const [textOpen, setTextOpen] = useState<any[]>([]);
     const [items, setItem] = useState<any[]>([]);
 
     useEffect(() => {
@@ -264,11 +263,11 @@ const EditStyle = ({
                                                                   }
                                                                 : {}
                                                         }
-                                                        open={perOpen[index]}
+                                                        open={textOpen[index]}
                                                         setOpen={(flag) => {
-                                                            const newData = _.cloneDeep(perOpen);
+                                                            const newData = _.cloneDeep(textOpen);
                                                             newData[index] = flag;
-                                                            setPerOpen(newData);
+                                                            setTextOpen(newData);
                                                         }}
                                                         popoverWidth={popoverWidth}
                                                         handleMenu={handleMenu}

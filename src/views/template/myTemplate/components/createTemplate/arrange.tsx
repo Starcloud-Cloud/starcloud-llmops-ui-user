@@ -250,9 +250,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         }
     };
     const addStep = (step: any, index: number) => {
-        if (step?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')) {
-            getTableData(index);
-        }
+        getTableData(index);
         const newStep = _.cloneDeep(step);
         stepEtch(index + 1, newStep.name, config.steps, newStep, index);
     };

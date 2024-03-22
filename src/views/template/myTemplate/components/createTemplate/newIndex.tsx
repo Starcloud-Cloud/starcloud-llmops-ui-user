@@ -11,17 +11,17 @@ import {
     Menu,
     MenuItem,
     Tab,
-    Tabs,
+    // Tabs,
     Typography
 } from '@mui/material';
-import { Image, Select, Popover, Form, Popconfirm, Button } from 'antd';
+import { Tabs, Image, Select, Popover, Form, Popconfirm, Button } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
 import { executeApp } from 'api/template/fetch';
 import { appCreate, appModify, getApp, getRecommendApp } from 'api/template/index';
 import { t } from 'hooks/web/useI18n';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -40,6 +40,7 @@ import { PermissionUpgradeModal } from 'views/template/myChat/createChat/compone
 import { materialTemplate } from 'api/redBook/batchIndex';
 import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 import { schemeMetadata } from 'api/redBook/copywriting';
+import MyAppProvider from './indexContext';
 interface Items {
     label: string;
     value: string;
@@ -49,23 +50,7 @@ interface AppModels {
     language?: Items[];
     type?: Items[];
 }
-export function TabPanel({ children, value, index, ...other }: TabsProps) {
-    return (
-        <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
-            {value === index && (
-                <Box sx={{ p: 2 }}>
-                    <Box>{children}</Box>
-                </Box>
-            )}
-        </div>
-    );
-}
-export function a11yProps(index: number) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`
-    };
-}
+
 function CreateDetail() {
     const categoryList = marketStore((state) => state.categoryList);
     //路由跳转
@@ -434,14 +419,11 @@ function CreateDetail() {
             }
         } else {
             setBasisPre(basisPre + 1);
-            setValue(0);
+            setValue('0');
         }
     };
     //tabs
-    const [value, setValue] = useState(0);
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-        setValue(newValue);
-    };
+    const [value, setValue] = useState('0');
     // 删除按钮的menu
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const delOpen = Boolean(delAnchorEl);
@@ -487,8 +469,8 @@ function CreateDetail() {
     const [editOpen, setEditOpen] = useState(false);
     const [rowIndex, setRowIndex] = useState(0);
     const handleEdit = (row: any, index: number, i?: number) => {
-        if (i) setStep(i);
         setTitle('编辑');
+        if (i) setStep(i);
         form.setFieldsValue(row);
         setRowIndex(index);
         setEditOpen(true);
@@ -574,37 +556,6 @@ function CreateDetail() {
             }
         ];
     };
-    const getHeaders = (data: any, i?: number) => {
-        const newList = data;
-        newList?.splice(newList?.length - 1, 1);
-        return [
-            ...newList,
-            {
-                title: '操作',
-                align: 'center',
-                width: 100,
-                fixed: 'right',
-                render: (_: any, row: any, index: number) => (
-                    <div className="flex justify-center">
-                        <Button onClick={() => handleEdit(row, index, i)} size="small" type="link">
-                            编辑
-                        </Button>
-                        <Popconfirm
-                            title="提示"
-                            description="请再次确认是否删除？"
-                            okText="确认"
-                            cancelText="取消"
-                            onConfirm={() => handleDel(index, i)}
-                        >
-                            <Button size="small" type="link" danger>
-                                删除
-                            </Button>
-                        </Popconfirm>
-                    </div>
-                )
-            }
-        ];
-    };
     useEffect(() => {
         schemeMetadata().then((res) => {
             refersSourceRef.current = res.refersSource;
@@ -623,416 +574,402 @@ function CreateDetail() {
         const allper = newList?.map(async (el: any, index: number) => {
             if (el) {
                 const res = await materialTemplate(el);
-                arr[index] = getHeader(res?.fieldDefine, index);
+                arr[index] = getHeader(res?.fieldDefine, step);
             }
         });
         await Promise.all(allper);
-        console.log(arr);
-
         stepMarRef.current = arr;
         setStepMaterial(stepMarRef?.current);
     };
     const getTableData = (index: number) => {
         const newList = stepMarRef.current;
-        console.log(newList);
         newList?.splice(index + 1, 0, undefined);
-        const ccc = newList?.map((el: any, i: number) => {
-            if (el) {
-                return getHeaders(el, i);
-            }
-            return undefined;
-        });
-        console.log(ccc);
-        stepMarRef.current = ccc;
-        setStepMaterial(stepMarRef.current);
     };
     return (
-        <Card>
-            <CardHeader
-                sx={{ padding: 2 }}
-                avatar={
-                    <Buttons
-                        variant="contained"
-                        startIcon={<ArrowBack />}
-                        color="secondary"
-                        onClick={() => navigate('/template/createCenter')}
-                    >
-                        {t('myApp.back')}
-                    </Buttons>
-                }
-                title={<Typography variant="h3">{detail?.name}</Typography>}
-                action={
-                    <>
-                        {searchParams.get('uid') && (
-                            <IconButton
-                                aria-label="more"
-                                id="long-button"
-                                aria-controls={delOpen ? 'long-menu' : undefined}
-                                aria-expanded={delOpen ? 'true' : undefined}
-                                aria-haspopup="true"
-                                onClick={(e) => {
-                                    setDelAnchorEl(e.currentTarget);
-                                }}
-                            >
-                                <MoreVert />
-                            </IconButton>
-                        )}
-                        <Menu
-                            id="del-menu"
-                            MenuListProps={{
-                                'aria-labelledby': 'del-button'
-                            }}
-                            anchorEl={delAnchorEl}
-                            open={delOpen}
-                            onClose={() => {
-                                setDelAnchorEl(null);
-                            }}
+        <MyAppProvider>
+            <Card>
+                <CardHeader
+                    sx={{ padding: 2 }}
+                    avatar={
+                        <Buttons
+                            variant="contained"
+                            startIcon={<ArrowBack />}
+                            color="secondary"
+                            onClick={() => navigate('/template/createCenter')}
                         >
-                            <MenuItem
-                                onClick={() => {
-                                    del(searchParams.get('uid') as string).then((res) => {
-                                        if (res) {
-                                            setDelAnchorEl(null);
-                                            navigate('/my-app');
-                                        }
-                                    });
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <Delete color="error" />
-                                </ListItemIcon>
-                                <Typography variant="inherit" noWrap>
-                                    {t('myApp.delApp')}
-                                </Typography>
-                            </MenuItem>
-                            <MenuItem
-                                onClick={() => {
-                                    copy({ uid: searchParams.get('uid') }).then((res) => {
-                                        if (res) {
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '复制成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                            setDelAnchorEl(null);
-                                            navigate('/my-app');
-                                        }
-                                    });
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <ContentPaste color="secondary" />
-                                </ListItemIcon>
-                                <Typography variant="inherit" noWrap>
-                                    复制应用
-                                </Typography>
-                            </MenuItem>
-                        </Menu>
-                        <Buttons variant="contained" color="secondary" autoFocus onClick={saveDetail}>
-                            {t('myApp.save')}
+                            {t('myApp.back')}
                         </Buttons>
-                    </>
-                }
-            ></CardHeader>
-            <Divider />
-            <Tabs value={value} onChange={handleChange}>
-                <Tab label={t('myApp.basis')} {...a11yProps(0)} />
-                <Tab label={t('myApp.arrangement')} {...a11yProps(1)} />
-                {searchParams.get('uid') && <Tab label="应用分析" {...a11yProps(2)} />}
-                {searchParams.get('uid') && (
-                    <Tab
-                        label={
-                            <Box display="flex" alignItems="center">
-                                {t('myApp.upload')}
-                                {flag && <ErrorOutline color="warning" sx={{ fontSize: '14px' }} />}
-                            </Box>
-                        }
-                        {...a11yProps(3)}
-                    />
-                )}
-            </Tabs>
-            <TabPanel value={value} index={0}>
-                <Grid container spacing={2}>
-                    <Grid item lg={6}>
-                        {detail && (
-                            <Basis
-                                ref={basis}
-                                initialValues={{
-                                    name: detail?.name,
-                                    description: detail?.description,
-                                    category: detail?.category,
-                                    tags: detail?.tags,
-                                    example: detail?.example
+                    }
+                    title={<Typography variant="h3">{detail?.name}</Typography>}
+                    action={
+                        <>
+                            {searchParams.get('uid') && (
+                                <IconButton
+                                    aria-label="more"
+                                    id="long-button"
+                                    aria-controls={delOpen ? 'long-menu' : undefined}
+                                    aria-expanded={delOpen ? 'true' : undefined}
+                                    aria-haspopup="true"
+                                    onClick={(e) => {
+                                        setDelAnchorEl(e.currentTarget);
+                                    }}
+                                >
+                                    <MoreVert />
+                                </IconButton>
+                            )}
+                            <Menu
+                                id="del-menu"
+                                MenuListProps={{
+                                    'aria-labelledby': 'del-button'
                                 }}
-                                basisPre={basisPre}
-                                sort={detail?.sort}
-                                type={detail?.type}
-                                appModel={appModels?.type}
-                                setValues={setData}
-                                setDetail_icon={setDetail_icon}
-                            />
-                        )}
-                    </Grid>
-                    <Grid item lg={6}>
-                        <Typography variant="h5" fontSize="1rem" mb={1}>
-                            {t('market.debug')}
-                        </Typography>
-                        <Card elevation={2} sx={{ p: 2 }}>
-                            <div className="flex justify-between items-center">
-                                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                                    {detail?.icon && (
-                                        <Image
-                                            preview={false}
-                                            height={60}
-                                            className="rounded-lg overflow-hidden"
-                                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                anchorEl={delAnchorEl}
+                                open={delOpen}
+                                onClose={() => {
+                                    setDelAnchorEl(null);
+                                }}
+                            >
+                                <MenuItem
+                                    onClick={() => {
+                                        del(searchParams.get('uid') as string).then((res) => {
+                                            if (res) {
+                                                setDelAnchorEl(null);
+                                                navigate('/my-app');
+                                            }
+                                        });
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <Delete color="error" />
+                                    </ListItemIcon>
+                                    <Typography variant="inherit" noWrap>
+                                        {t('myApp.delApp')}
+                                    </Typography>
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={() => {
+                                        copy({ uid: searchParams.get('uid') }).then((res) => {
+                                            if (res) {
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '复制成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                        transition: 'SlideDown',
+                                                        close: false
+                                                    })
+                                                );
+                                                setDelAnchorEl(null);
+                                                navigate('/my-app');
+                                            }
+                                        });
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <ContentPaste color="secondary" />
+                                    </ListItemIcon>
+                                    <Typography variant="inherit" noWrap>
+                                        复制应用
+                                    </Typography>
+                                </MenuItem>
+                            </Menu>
+                            <Buttons variant="contained" color="secondary" autoFocus onClick={saveDetail}>
+                                {t('myApp.save')}
+                            </Buttons>
+                        </>
+                    }
+                ></CardHeader>
+                <Divider />
+                <div className="p-4">
+                    <Tabs accessKey={value} onChange={setValue}>
+                        <Tabs.TabPane tab=" 基础设置" key="0">
+                            <Grid container spacing={2}>
+                                <Grid item lg={6}>
+                                    {detail && (
+                                        <Basis
+                                            ref={basis}
+                                            initialValues={{
+                                                name: detail?.name,
+                                                description: detail?.description,
+                                                category: detail?.category,
+                                                tags: detail?.tags,
+                                                example: detail?.example
+                                            }}
+                                            basisPre={basisPre}
+                                            sort={detail?.sort}
+                                            type={detail?.type}
+                                            appModel={appModels?.type}
+                                            setValues={setData}
+                                            setDetail_icon={setDetail_icon}
                                         />
                                     )}
-                                    <Box>
-                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                            {detail?.name}
+                                </Grid>
+                                <Grid item lg={6}>
+                                    <Typography variant="h5" fontSize="1rem" mb={1}>
+                                        {t('market.debug')}
+                                    </Typography>
+                                    <Card elevation={2} sx={{ p: 2 }}>
+                                        <div className="flex justify-between items-center">
+                                            <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                                                {detail?.icon && (
+                                                    <Image
+                                                        preview={false}
+                                                        height={60}
+                                                        className="rounded-lg overflow-hidden"
+                                                        src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                                    />
+                                                )}
+                                                <Box>
+                                                    <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                        {detail?.name}
+                                                    </Typography>
+                                                    <Box>
+                                                        <span>#{detail?.category}</span>
+                                                        {detail?.tags?.map((el: any) => (
+                                                            <Chip
+                                                                key={el}
+                                                                sx={{ marginLeft: 1 }}
+                                                                size="small"
+                                                                label={el}
+                                                                variant="outlined"
+                                                            />
+                                                        ))}
+                                                    </Box>
+                                                </Box>
+                                            </Box>
+                                            {detail?.workflowConfig?.steps?.length === 1 && (
+                                                <div className="flex items-center">
+                                                    <Popover
+                                                        title="模型介绍"
+                                                        content={
+                                                            <>
+                                                                <div>
+                                                                    -
+                                                                    默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
+                                                                </div>
+                                                                <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                                            </>
+                                                        }
+                                                    >
+                                                        <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
+                                                    </Popover>
+                                                    <Select
+                                                        style={{ width: 100, height: 23 }}
+                                                        bordered={false}
+                                                        disabled={true}
+                                                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                                        rootClassName="modelSelect"
+                                                        popupClassName="modelSelectPopup"
+                                                        value={aiModel}
+                                                        onChange={(value) => {
+                                                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                                                setOpenUpgradeModel(true);
+                                                                return;
+                                                            }
+                                                            setPerform(perform + 1);
+                                                            setAiModel(value);
+                                                        }}
+                                                    >
+                                                        {appModels?.aiModel?.map((item: any) => (
+                                                            <Option key={item.value} value={item.value}>
+                                                                {item.label}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <Divider sx={{ my: 1 }} />
+                                        <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                                            {detail?.description}
                                         </Typography>
-                                        <Box>
-                                            <span>#{detail?.category}</span>
-                                            {detail?.tags?.map((el: any) => (
-                                                <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                            ))}
-                                        </Box>
-                                    </Box>
-                                </Box>
-                                {detail?.workflowConfig?.steps?.length === 1 && (
-                                    <div className="flex items-center">
-                                        <Popover
-                                            title="模型介绍"
-                                            content={
-                                                <>
-                                                    <div>
-                                                        - 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
-                                                    </div>
-                                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
-                                                </>
-                                            }
-                                        >
-                                            <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
-                                        </Popover>
-                                        <Select
-                                            style={{ width: 100, height: 23 }}
-                                            bordered={false}
-                                            disabled={true}
-                                            className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                            rootClassName="modelSelect"
-                                            popupClassName="modelSelectPopup"
-                                            value={aiModel}
-                                            onChange={(value) => {
-                                                if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                                    setOpenUpgradeModel(true);
-                                                    return;
-                                                }
-                                                setPerform(perform + 1);
-                                                setAiModel(value);
+                                        <Perform
+                                            key={perform}
+                                            isShows={isShows}
+                                            columns={stepMaterial}
+                                            setEditOpen={setEditOpen}
+                                            setStep={setStep}
+                                            setTitle={setTitle}
+                                            config={_.cloneDeep(detail?.workflowConfig)}
+                                            changeConfigs={changeConfigs}
+                                            changeSon={changeData}
+                                            loadings={loadings}
+                                            isDisables={isDisables}
+                                            variableChange={exeChange}
+                                            changeanswer={changeanswer}
+                                            promptChange={promptChange}
+                                            isallExecute={(flag: boolean) => {
+                                                isAllExecute = flag;
                                             }}
-                                        >
-                                            {appModels?.aiModel?.map((item: any) => (
-                                                <Option key={item.value} value={item.value}>
-                                                    {item.label}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </div>
-                                )}
-                            </div>
-                            <Divider sx={{ my: 1 }} />
-                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                                {detail?.description}
-                            </Typography>
-                            {detail && value === 0 && (
-                                <Perform
-                                    key={perform}
-                                    isShows={isShows}
-                                    columns={stepMaterial}
-                                    setEditOpen={setEditOpen}
-                                    setStep={setStep}
-                                    setMaterialType={setMaterialType}
-                                    setTitle={setTitle}
-                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
-                                    changeConfigs={changeConfigs}
-                                    changeSon={changeData}
-                                    loadings={loadings}
-                                    isDisables={isDisables}
-                                    variableChange={exeChange}
-                                    changeanswer={changeanswer}
-                                    promptChange={promptChange}
-                                    isallExecute={(flag: boolean) => {
-                                        isAllExecute = flag;
-                                    }}
-                                    source="myApp"
-                                />
-                            )}
-                        </Card>
-                    </Grid>
-                </Grid>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                <Grid container spacing={2}>
-                    <Grid item lg={6} sx={{ width: '100%' }}>
-                        {detail?.workflowConfig && (
-                            <Arrange
-                                detail={detail}
-                                config={_.cloneDeep(detail.workflowConfig)}
-                                editChange={editChange}
-                                basisChange={basisChange}
-                                statusChange={statusChange}
-                                changeConfigs={changeConfigs}
-                                getTableData={getTableData}
-                            />
-                        )}
-                    </Grid>
-                    <Grid item lg={6}>
-                        <Typography variant="h5" fontSize="1rem" mb={1}>
-                            {t('market.debug')}
-                        </Typography>
-                        <Card elevation={2} sx={{ p: 2 }}>
-                            <div className="flex justify-between items-center">
-                                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                                    {detail?.icon && (
-                                        <Image
-                                            preview={false}
-                                            height={60}
-                                            className="rounded-lg overflow-hidden"
-                                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                            source="myApp"
+                                        />
+                                    </Card>
+                                </Grid>
+                            </Grid>
+                        </Tabs.TabPane>
+                        <Tabs.TabPane tab="流程编排" key="1">
+                            <Grid container spacing={2}>
+                                <Grid item lg={6} sx={{ width: '100%' }}>
+                                    {detail?.workflowConfig && (
+                                        <Arrange
+                                            detail={detail}
+                                            config={detail?.workflowConfig}
+                                            editChange={editChange}
+                                            basisChange={basisChange}
+                                            statusChange={statusChange}
+                                            changeConfigs={changeConfigs}
+                                            getTableData={getTableData}
                                         />
                                     )}
-                                    <Box>
-                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                            {detail?.name}
+                                </Grid>
+                                <Grid item lg={6}>
+                                    <Typography variant="h5" fontSize="1rem" mb={1}>
+                                        {t('market.debug')}
+                                    </Typography>
+                                    <Card elevation={2} sx={{ p: 2 }}>
+                                        <div className="flex justify-between items-center">
+                                            <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                                                {detail?.icon && (
+                                                    <Image
+                                                        preview={false}
+                                                        height={60}
+                                                        className="rounded-lg overflow-hidden"
+                                                        src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                                    />
+                                                )}
+                                                <Box>
+                                                    <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                        {detail?.name}
+                                                    </Typography>
+                                                    <Box>
+                                                        <span>#{detail?.category}</span>
+                                                        {detail?.tags?.map((el: any) => (
+                                                            <Chip
+                                                                key={el}
+                                                                sx={{ marginLeft: 1 }}
+                                                                size="small"
+                                                                label={el}
+                                                                variant="outlined"
+                                                            />
+                                                        ))}
+                                                    </Box>
+                                                </Box>
+                                            </Box>
+                                            {detail?.workflowConfig?.steps?.length === 1 && (
+                                                <div className="flex items-center">
+                                                    <Popover
+                                                        title="模型介绍"
+                                                        content={
+                                                            <>
+                                                                <div>
+                                                                    -
+                                                                    默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
+                                                                </div>
+                                                                <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                                            </>
+                                                        }
+                                                    >
+                                                        <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
+                                                    </Popover>
+                                                    <Select
+                                                        style={{ width: 100, height: 23 }}
+                                                        bordered={false}
+                                                        disabled={true}
+                                                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                                        rootClassName="modelSelect"
+                                                        popupClassName="modelSelectPopup"
+                                                        value={aiModel}
+                                                        onChange={(value) => {
+                                                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                                                setOpenUpgradeModel(true);
+                                                                return;
+                                                            }
+                                                            setPerform(perform + 1);
+                                                            setAiModel(value);
+                                                        }}
+                                                    >
+                                                        {appModels?.aiModel?.map((item: any) => (
+                                                            <Option key={item.value} value={item.value}>
+                                                                {item.label}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <Divider sx={{ my: 1 }} />
+                                        <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                                            {detail?.description}
                                         </Typography>
-                                        <Box>
-                                            <span>#{detail?.category}</span>
-                                            {detail?.tags?.map((el: any) => (
-                                                <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                            ))}
-                                        </Box>
-                                    </Box>
-                                </Box>
-                                {detail?.workflowConfig?.steps?.length === 1 && (
-                                    <div className="flex items-center">
-                                        <Popover
-                                            title="模型介绍"
-                                            content={
-                                                <>
-                                                    <div>
-                                                        - 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
-                                                    </div>
-                                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
-                                                </>
-                                            }
-                                        >
-                                            <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
-                                        </Popover>
-                                        <Select
-                                            style={{ width: 100, height: 23 }}
-                                            bordered={false}
-                                            disabled={true}
-                                            className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                            rootClassName="modelSelect"
-                                            popupClassName="modelSelectPopup"
-                                            value={aiModel}
-                                            onChange={(value) => {
-                                                if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                                    setOpenUpgradeModel(true);
-                                                    return;
-                                                }
-                                                setPerform(perform + 1);
-                                                setAiModel(value);
+                                        <Perform
+                                            key={perform}
+                                            columns={stepMaterial}
+                                            setEditOpen={setEditOpen}
+                                            setStep={setStep}
+                                            setTitle={setTitle}
+                                            isShows={isShows}
+                                            config={detail?.workflowConfig}
+                                            changeConfigs={changeConfigs}
+                                            changeSon={changeData}
+                                            changeanswer={changeanswer}
+                                            loadings={loadings}
+                                            isDisables={isDisables}
+                                            variableChange={exeChange}
+                                            promptChange={promptChange}
+                                            isallExecute={(flag: boolean) => {
+                                                isAllExecute = flag;
                                             }}
-                                        >
-                                            {appModels?.aiModel?.map((item: any) => (
-                                                <Option key={item.value} value={item.value}>
-                                                    {item.label}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </div>
-                                )}
-                            </div>
-                            <Divider sx={{ my: 1 }} />
-                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                                {detail?.description}
-                            </Typography>
-                            {detail && value === 1 && (
-                                <Perform
-                                    key={perform}
-                                    columns={stepMaterial}
-                                    setEditOpen={setEditOpen}
-                                    setStep={setStep}
-                                    setMaterialType={setMaterialType}
-                                    setTitle={setTitle}
-                                    isShows={isShows}
-                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
-                                    changeConfigs={changeConfigs}
-                                    changeSon={changeData}
-                                    changeanswer={changeanswer}
-                                    loadings={loadings}
-                                    isDisables={isDisables}
-                                    variableChange={exeChange}
-                                    promptChange={promptChange}
-                                    isallExecute={(flag: boolean) => {
-                                        isAllExecute = flag;
-                                    }}
-                                    source="myApp"
+                                            source="myApp"
+                                        />
+                                    </Card>
+                                </Grid>
+                            </Grid>
+                        </Tabs.TabPane>
+                        {detailRef.current?.uid && searchParams.get('uid') && (
+                            <Tabs.TabPane tab="应用分析" key="2">
+                                <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
+                            </Tabs.TabPane>
+                        )}
+                        {searchParams.get('uid') && (
+                            <Tabs.TabPane tab="应用发布" key="3">
+                                <Upload
+                                    appUid={searchParams.get('uid') as string}
+                                    saveState={saveState}
+                                    saveDetail={saveDetail}
+                                    getStatus={getStatus}
                                 />
-                            )}
-                        </Card>
-                    </Grid>
-                </Grid>
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                {value === 2 && detailRef.current?.uid && searchParams.get('uid') && (
-                    <ApplicationAnalysis appUid={detail?.uid} value={value} type="APP_ANALYSIS" />
+                            </Tabs.TabPane>
+                        )}
+                    </Tabs>
+                </div>
+                {openUpgradeModel && (
+                    <PermissionUpgradeModal from={'upgradeGpt4_0'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
                 )}
-            </TabPanel>
-            <TabPanel value={value} index={3}>
-                {value === 3 && searchParams.get('uid') && (
-                    <Upload
-                        appUid={searchParams.get('uid') as string}
-                        saveState={saveState}
-                        saveDetail={saveDetail}
-                        getStatus={getStatus}
+                {tokenOpen && (
+                    <PermissionUpgradeModal
+                        from={from}
+                        open={tokenOpen}
+                        handleClose={() => setTokenOpen(false)}
+                        title={'当前魔法豆不足，升级会员，立享五折优惠！'}
                     />
                 )}
-            </TabPanel>
-            {openUpgradeModel && (
-                <PermissionUpgradeModal from={'upgradeGpt4_0'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
-            )}
-            {tokenOpen && (
-                <PermissionUpgradeModal
-                    from={from}
-                    open={tokenOpen}
-                    handleClose={() => setTokenOpen(false)}
-                    title={'当前魔法豆不足，升级会员，立享五折优惠！'}
-                />
-            )}
-            {editOpen && (
-                <FormModal
-                    title={title}
-                    materialType={materialType}
-                    editOpen={editOpen}
-                    setEditOpen={setEditOpen}
-                    columns={stepMaterial[step]}
-                    form={form}
-                    formOk={formOk}
-                    sourceList={refersSource}
-                />
-            )}
-        </Card>
+                {editOpen && (
+                    <FormModal
+                        title={title}
+                        materialType={materialType}
+                        editOpen={editOpen}
+                        setEditOpen={setEditOpen}
+                        columns={stepMaterial[step]}
+                        form={form}
+                        formOk={formOk}
+                        sourceList={refersSource}
+                    />
+                )}
+            </Card>
+        </MyAppProvider>
     );
 }
 export default CreateDetail;

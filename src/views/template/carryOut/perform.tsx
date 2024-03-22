@@ -31,7 +31,8 @@ function Perform({
     columns,
     setEditOpen,
     setTitle,
-    setStep
+    setStep,
+    setMaterialType
 }: any) {
     const refs = useRef<any>([]);
     //点击全部执行
@@ -226,6 +227,13 @@ function Perform({
                                                             setEditOpen={setEditOpen}
                                                             setTitle={setTitle}
                                                             setStep={() => setStep(steps)}
+                                                            setMaterialType={() =>
+                                                                setMaterialType(
+                                                                    config?.steps[steps]?.variable?.variables?.find(
+                                                                        (item: any) => item.field === 'MATERIAL_TYPE'
+                                                                    )?.value
+                                                                )
+                                                            }
                                                             onChange={(e: any) => {
                                                                 variableChange({
                                                                     e,

@@ -147,25 +147,25 @@ const AddModal = () => {
         if (item.code === 'CustomActionHandler' || item.code === 'TitleActionHandler' || item.code === 'ParagraphActionHandler') {
             if ((item.model === 'RANDOM' || item.model === 'AI_PARODY') && item?.materialList?.length === 0) {
                 flag = true;
-                content = '创作配置 参考来源最少一个';
+                content = '笔记生成 参考来源最少一个';
             } else if (item.model === 'AI_CUSTOM' && !item.requirement) {
                 flag = true;
-                content = '创作配置 文案生成要求必填';
+                content = '笔记生成 文案生成要求必填';
             } else if (item.code === 'ParagraphActionHandler' && !item.paragraphCount) {
                 flag = true;
-                content = '创作配置 文案段落数量必填';
+                content = '笔记生成 文案段落数量必填';
             } else {
                 flag = false;
             }
         } else if (item.code === 'AssembleActionHandler' && !item.content) {
             flag = true;
-            content = '创作配置 文案拼接配置必填';
+            content = '笔记生成 文案拼接配置必填';
         } else if (item.code === 'PosterActionHandler' && item?.styleList?.some((el: any) => el?.templateList.some((i: any) => !i.id))) {
             flag = true;
             content = '图片生成 风格必选';
         } else if (item.code === 'MaterialActionHandler' && !item.materialType) {
             flag = true;
-            content = '创作配置 资料库必选';
+            content = '笔记生成 资料库必选';
         } else {
             flag = false;
         }
@@ -558,7 +558,7 @@ const AddModal = () => {
                 setStepItem([
                     { icon: <HomeOutlined rev={undefined} />, title: '模版说明' },
                     { icon: <ContainerOutlined rev={undefined} />, title: '基础信息' },
-                    { icon: <SettingOutlined rev={undefined} />, title: '创作配置' },
+                    { icon: <SettingOutlined rev={undefined} />, title: '笔记生成' },
                     { icon: <FileImageOutlined rev={undefined} />, title: '图片生成' },
                     { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
                 ]);
@@ -568,7 +568,7 @@ const AddModal = () => {
             ) {
                 setStepItem([
                     { icon: <HomeOutlined rev={undefined} />, title: '模版说明' },
-                    { icon: <SettingOutlined rev={undefined} />, title: '创作配置' },
+                    { icon: <SettingOutlined rev={undefined} />, title: '笔记生成' },
                     { icon: <FileImageOutlined rev={undefined} />, title: '图片生成' },
                     { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
                 ]);
@@ -576,7 +576,7 @@ const AddModal = () => {
                 setStepItem([
                     { icon: <HomeOutlined rev={undefined} />, title: '模版说明' },
                     { icon: <ContainerOutlined rev={undefined} />, title: '基础信息' },
-                    { icon: <SettingOutlined rev={undefined} />, title: '创作配置' },
+                    { icon: <SettingOutlined rev={undefined} />, title: '笔记生成' },
                     { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
                 ]);
             }
@@ -645,11 +645,12 @@ const AddModal = () => {
     const [conOpen, setConOpen] = useState(false);
     const widthRef: any = useRef(null);
     const [popoverWidth, setPopoverWidth] = useState(undefined);
+    const [coll, setColl] = useState<any[]>([]);
     useEffect(() => {
         if (widthRef.current) {
             setPopoverWidth(widthRef.current?.offsetWidth);
         }
-    }, [widthRef]);
+    }, [widthRef, coll]);
     return (
         <MainCard content={false}>
             <CardContent className="pb-[72px]">
@@ -693,7 +694,7 @@ const AddModal = () => {
                             }}
                         />
                     </Grid>
-                    <Grid item md={12} sm={12}>
+                    <Grid item xs={12} sm={12}>
                         <div className="relative mt-[16px] max-w-[300px]">
                             <TreeSelect
                                 className="bg-[#f8fafc]  h-[40px] border border-solid rounded-[6px] antdSel"
@@ -726,7 +727,7 @@ const AddModal = () => {
                             </span>
                         </div>
                     </Grid>
-                    <Grid item md={12} sm={12}>
+                    <Grid item xs={12} sm={6}>
                         <FormControl key={params.tags} color="secondary" size="small" fullWidth>
                             <Autocomplete
                                 sx={{ mt: 2 }}
@@ -784,23 +785,26 @@ const AddModal = () => {
                             </div>
                         </Grid>
                     )}
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            sx={{ mt: 2 }}
+                            fullWidth
+                            multiline
+                            minRows={2}
+                            maxRows={4}
+                            size="small"
+                            color="secondary"
+                            InputLabelProps={{ shrink: true }}
+                            label="备注"
+                            name="description"
+                            value={params.description}
+                            onChange={(e: any) => {
+                                changeParams(e.target);
+                            }}
+                        />
+                    </Grid>
                 </Grid>
-                <TextField
-                    sx={{ mt: 2 }}
-                    fullWidth
-                    multiline
-                    minRows={2}
-                    maxRows={4}
-                    size="small"
-                    color="secondary"
-                    InputLabelProps={{ shrink: true }}
-                    label="备注"
-                    name="description"
-                    value={params.description}
-                    onChange={(e: any) => {
-                        changeParams(e.target);
-                    }}
-                />
+
                 <Divider />
                 <div className="text-[18px] font-[600]">方案创作</div>
                 <div className="flex gap-2 items-end my-[20px]">
@@ -908,8 +912,16 @@ const AddModal = () => {
                             </Row>
                         </>
                     )}
-                    {stepItem[current]?.title === '创作配置' && (
-                        <Collapse bordered={false} style={{ background: 'transparent' }}>
+                    {stepItem[current]?.title === '笔记生成' && (
+                        <Collapse
+                            onChange={(data) => {
+                                if (data?.length > 0) {
+                                    setColl(data as any[]);
+                                }
+                            }}
+                            bordered={false}
+                            style={{ background: 'transparent' }}
+                        >
                             {valueList?.map(
                                 (el, index) =>
                                     el?.code !== 'VariableActionHandler' &&
@@ -930,7 +942,7 @@ const AddModal = () => {
                                                     )}
                                                 </div>
                                             }
-                                            key={index}
+                                            key={el.code}
                                         >
                                             <>
                                                 {/* {el.code === 'MaterialActionHandler' && (
@@ -1239,7 +1251,7 @@ const AddModal = () => {
                     <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} show={true} />
                 )}
             </CardContent>
-            <div className="fixed bottom-0 w-full p-4 flex justify-end z-[1000] bg-white border-t border-solid border-black/10">
+            <div className="fixed bottom-0 w-full h-[60px] px-4 flex items-center justify-end z-[1000] bg-white border-t border-solid border-black/10">
                 <Button className="w-[100px]" size="large" type="primary" onClick={() => handleSave()}>
                     保存
                 </Button>

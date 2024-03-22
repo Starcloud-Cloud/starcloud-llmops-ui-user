@@ -318,11 +318,8 @@ const BatcSmallRedBooks = () => {
 
     return (
         <MainCard content={false}>
-            <CardContent className="pb-[72px]">
-                <SubCard
-                    sx={{ mb: 3 }}
-                    contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
-                >
+            <CardContent className="pb-[72px] !px-4 !pt-4">
+                <SubCard contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}>
                     <div>
                         <IconButton onClick={() => navigate('/redBookTaskList')} color="secondary">
                             <KeyboardBackspace fontSize="small" />
@@ -332,7 +329,7 @@ const BatcSmallRedBooks = () => {
                     </div>
                     <div></div>
                 </SubCard>
-                <Row gutter={40} className="!ml-0">
+                <Row gutter={20} className="!ml-0">
                     <Col span={6} className="relative h-full bg-[#fff] !px-[0]">
                         <Left
                             detailData={detailData}
@@ -348,7 +345,7 @@ const BatcSmallRedBooks = () => {
                             handleSave={(flag: any) => handleSave(flag)}
                         />
                     </Col>
-                    <Col span={18} className="overflow-hidden">
+                    <Col span={18} className="overflow-hidden mt-4">
                         {bathList?.length === 0 ? (
                             <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
                                 <div className="text-center">

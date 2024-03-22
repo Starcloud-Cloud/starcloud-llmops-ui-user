@@ -11,8 +11,6 @@ interface Variable {
     setValue: (data: any) => void;
 }
 const Variables = ({ pre, model, schemaList, value, setValue }: Variable) => {
-    console.log(schemaList);
-
     const { TextArea } = Input;
     const iptRef: any = useRef(null);
     const [demandOpen, setDemandOpen] = useState(false);

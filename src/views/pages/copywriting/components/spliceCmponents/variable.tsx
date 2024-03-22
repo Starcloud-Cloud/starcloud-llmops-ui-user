@@ -112,7 +112,7 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                                                 okText={t('myApp.confirm')}
                                                 cancelText={t('myApp.cancel')}
                                             >
-                                                <IconButton disabled={itemData?.group === 'ADVANCED'} color="error">
+                                                <IconButton disabled={row?.group === 'ADVANCED'} color="error">
                                                     <Delete />
                                                 </IconButton>
                                             </Popconfirm>

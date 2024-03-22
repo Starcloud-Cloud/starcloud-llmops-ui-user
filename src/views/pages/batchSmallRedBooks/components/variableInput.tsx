@@ -77,10 +77,9 @@ const VariableInput = ({
             arrow={false}
             placement="bottom"
             open={open}
-            destroyTooltipOnHide={true}
             onOpenChange={() => setOpen(false)}
             content={
-                <div style={{ width: popoverWidth + 'px', maxWidth: '1024px' }} className={'flex items-stretch gap-2'}>
+                <div style={{ width: popoverWidth + 'px', maxWidth: '1024px', minWidth: '512px' }} className={'flex items-stretch gap-2'}>
                     <Menu inlineIndent={12} className="flex-1 h-[300px] overflow-y-auto" defaultSelectedKeys={[]} mode="inline">
                         {renderMenuItems(items, index)}
                     </Menu>

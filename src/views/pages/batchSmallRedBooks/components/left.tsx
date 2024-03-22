@@ -339,7 +339,7 @@ const Lefts = ({
     return (
         <>
             <div
-                className="!mx-[20px] pt-[20px]  overflow-y-auto pb-[72px]"
+                className=" pt-[20px]  overflow-y-auto pb-[72px]"
                 style={{ height: getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 130px)' }}
             >
                 <TextField
@@ -424,16 +424,19 @@ const Lefts = ({
                                         <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
                                             批量导入
                                         </Button>
-                                        <Button size="small" type="primary">
+                                        {/* <Button size="small" type="primary">
                                             选择已有素材
-                                        </Button>
+                                        </Button> */}
                                     </div>
-                                    <Button
-                                        onClick={() => setZoomOpen(true)}
-                                        type="primary"
-                                        shape="circle"
-                                        icon={<ZoomInOutlined rev={undefined} />}
-                                    ></Button>
+                                    <div className="flex gap-2 items-end">
+                                        <div className="text-xs text-black/50">点击放大编辑</div>
+                                        <Button
+                                            onClick={() => setZoomOpen(true)}
+                                            type="primary"
+                                            shape="circle"
+                                            icon={<ZoomInOutlined rev={undefined} />}
+                                        ></Button>
+                                    </div>
                                 </div>
                                 <Table
                                     rowKey={(record, index) => String(index)}

@@ -472,9 +472,9 @@ const AddModal = () => {
                             key: item.code,
                             description: item.description,
                             children: item.inJsonSchema
-                                ? getjsonschma(getJSON(item))
+                                ? getjsonschma(getJSON(item), item.name)
                                 : item.outJsonSchema
-                                ? getjsonschma(JSON.parse(item.outJsonSchema))
+                                ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
                                 : []
                         };
                     });
@@ -598,13 +598,13 @@ const AddModal = () => {
         }
         return obj;
     };
-    function getjsonschma(json: any, jsonType?: string) {
+    function getjsonschma(json: any, name?: string, jsonType?: string) {
         const arr: any = [];
         const arrList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         for (const key in json.properties) {
             const property = json.properties[key];
             if (property.type === 'object') {
-                const convertedProperty = getjsonschma(property);
+                const convertedProperty = getjsonschma(property, name);
                 arr.push(convertedProperty);
             } else if (property.type === 'array') {
                 arr.push(
@@ -619,12 +619,12 @@ const AddModal = () => {
                                 label: `${key}[${index}]`,
                                 title: property?.title,
                                 desc: property?.description,
-                                children: getjsonschma(property?.items)
+                                children: getjsonschma(property?.items, `${name}.${key}[${index}]`)
                             }))
                         ]
                     },
                     {
-                        key: key,
+                        key: name + '.' + key,
                         label: `${key}.list.(*)`,
                         title: property?.title,
                         desc: property?.description,

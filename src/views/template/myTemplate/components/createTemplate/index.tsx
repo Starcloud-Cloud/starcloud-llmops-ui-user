@@ -313,7 +313,7 @@ function CreateDetail() {
     const exeChange = ({ e, steps, i, type }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
-        if (type) {
+        if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.field === 'REFERS')) {
             newValue.workflowConfig.steps[steps].variable.variables[
                 newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
             ].value = [];
@@ -420,7 +420,13 @@ function CreateDetail() {
                 arr?.find((el: any) => el.field === 'REFERS') &&
                 arr?.find((el: any) => el.field === 'REFERS')?.value
             ) {
-                arr.find((el: any) => el.field === 'REFERS').value = JSON.stringify(arr?.find((el: any) => el.field === 'REFERS')?.value);
+                arr.find((el: any) => el.field === 'REFERS').value = JSON.stringify(
+                    arr?.find((el: any) => el.field === 'REFERS')?.value
+                    // ?.map((i: any) => ({
+                    //     ...i,
+                    //     type: arr?.find((el: any) => el.field === 'MATERIAL_TYPE')?.value
+                    // }))
+                );
             }
         });
         if (details.name && details.category) {
@@ -561,20 +567,22 @@ function CreateDetail() {
             width: 200,
             dataIndex: item.fieldName,
             render: (_: any, row: any) => (
-                <div className="flex justify-center items-center flex-wrap break-all line-clamp-5 gap-2">
-                    {item.type === 'image' ? (
-                        <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
-                    ) : item.fieldName === 'source' ? (
-                        <>
-                            {row[item.fieldName] === 'OTHER'
-                                ? refersSourceRef.current?.find((item: any) => item.value === 'OTHER')?.label
-                                : row[item.fieldName] === 'SMALL_RED_BOOK'
-                                ? refersSourceRef.current?.find((item: any) => item.value === 'SMALL_RED_BOOK')?.label
-                                : row[item.fieldName]}
-                        </>
-                    ) : (
-                        row[item.fieldName]
-                    )}
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    <div className="line-clamp-5">
+                        {item.type === 'image' ? (
+                            <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                        ) : item.fieldName === 'source' ? (
+                            <>
+                                {row[item.fieldName] === 'OTHER'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'OTHER')?.label
+                                    : row[item.fieldName] === 'SMALL_RED_BOOK'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'SMALL_RED_BOOK')?.label
+                                    : row[item.fieldName]}
+                            </>
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
                 </div>
             ),
             type: item.type

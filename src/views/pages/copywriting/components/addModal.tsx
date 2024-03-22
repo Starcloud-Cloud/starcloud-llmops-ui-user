@@ -1148,6 +1148,7 @@ const AddModal = () => {
                     {stepItem[current]?.title === '图片生成' && (
                         <>
                             <CreateTab
+                                appData={appData}
                                 mode={valueList?.find((item: any) => item?.code === 'PosterActionHandler')?.mode}
                                 schemaList={schemaList}
                                 setModel={(data) => {

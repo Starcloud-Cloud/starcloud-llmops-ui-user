@@ -8,12 +8,14 @@ const StyleTabs = ({
     schemaList,
     typeList,
     imageStyleData,
-    setDetailData
+    setDetailData,
+    appData
 }: {
     schemaList?: any[];
     typeList: any[];
     imageStyleData: any[];
     setDetailData: (data: any) => void;
+    appData: any;
 }) => {
     const [activeKey, setActiveKey] = useState('0');
     const onChange = (newActiveKey: string) => {
@@ -85,6 +87,7 @@ const StyleTabs = ({
                         closable: i === 0 ? false : true,
                         children: (
                             <EditStyle
+                                appData={appData}
                                 schemaList={schemaList}
                                 imageStyleData={item}
                                 setData={(data: any) => {

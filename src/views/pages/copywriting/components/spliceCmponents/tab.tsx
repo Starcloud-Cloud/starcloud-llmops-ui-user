@@ -14,8 +14,9 @@ interface Tabs {
     focuActive: any[];
     setFocuActive: (data: any) => void;
     digui: () => number;
+    appData: any;
 }
-const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui }: Tabs) => {
+const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui, appData }: Tabs) => {
     return (
         <div className="h-[800px] overflow-y-auto overflow-x-hidden">
             {/* <div className="flex items-center gap-4 min-h-[32px]">
@@ -156,6 +157,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                     schemaList={schemaList}
                                     imageStyleData={item?.templateList}
                                     typeList={[]}
+                                    appData={appData}
                                     setDetailData={(data: any) => {
                                         const newData = _.cloneDeep(imageStyleData);
                                         newData[i].templateList = data;

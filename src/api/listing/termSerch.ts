@@ -33,9 +33,9 @@ export const exportExtendAsin = (params: any) => {
 };
 
 export const userRighsLimitUse = (params: any) => {
-    return request.get({ url: '/admin-api/admin/level-record/user_rights_limit_use', params });
+    return request.get({ url: '/admin/level-record/user_rights_limit_use', params });
 };
 
 export const userRighsLimitUsedCount = (params: any) => {
-    return request.get({ url: '/admin-api/admin/level-record/user_rights_limit_used_count', params });
+    return request.get({ url: '/admin/level-record/user_rights_limit_used_count', params });
 };

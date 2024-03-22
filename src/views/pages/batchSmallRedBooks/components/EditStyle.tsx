@@ -15,12 +15,14 @@ const EditStyle = ({
     schemaList,
     typeList,
     imageStyleData,
-    setData
+    setData,
+    appData = {}
 }: {
     schemaList?: any[];
     typeList: any[];
     imageStyleData: any;
     setData: (data: any) => void;
+    appData?: any;
 }) => {
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
@@ -122,8 +124,8 @@ const EditStyle = ({
                 {imageStyleData?.id && (
                     <div>
                         <div className="flex">
-                            <div className="flex-1">
-                                <div className="text-[12px]">风格示例图</div>
+                            <div className="w-[40%]">
+                                <div className="text-lg">图片模版示意图</div>
                                 <div className="relative w-[70%] mx-auto" ref={imgRef}>
                                     <Image preview={false} src={currentTemp?.example} />
                                     {currentJson?.objects
@@ -149,14 +151,15 @@ const EditStyle = ({
                                         ))}
                                 </div>
                             </div>
-                            <Divider type="vertical" />
+                            <div>
+                                <Divider type="vertical" style={{ height: '100%' }} />
+                            </div>
                             <div className="flex-1">
                                 <div>
-                                    <div className="text-xl">图片生成配置</div>
+                                    <div className="text-lg">图片生成配置</div>
                                     <div className="text-xs text-black/50">用上传素材的图片类型字段绑定到图片模板上的图片位置</div>
                                     <div className="flex flex-wrap">
-                                        {/* TODO 图片类型没有图片配置 appGroupList */}
-                                        {false ? (
+                                        {appData?.materialType === 'picture' ? (
                                             <>
                                                 <div className="flex items-center gap-4 min-h-[32px]">
                                                     <span>图片生成模式</span>
@@ -218,7 +221,7 @@ const EditStyle = ({
                                     </div>
                                 </div>
                                 <div className="mt-2">
-                                    <div className="text-xl">图片文字配置</div>
+                                    <div className="text-lg">图片文字配置</div>
                                     <div className="text-xs text-black/50">可绑定数据或输入内容到图片模版上具体文字位置上</div>
                                     <div className="flex items-center gap-4 min-h-[32px] ml-3">
                                         <span>图片标题生成</span>

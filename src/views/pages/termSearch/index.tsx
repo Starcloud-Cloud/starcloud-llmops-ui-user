@@ -10,12 +10,14 @@ import TermTable from './component/termTable';
 import _ from 'lodash-es';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import { PermissionUpgradeModal } from '../../template/myChat/createChat/components/modal/permissionUpgradeModal';
 import {
     KeywordMetadataExtendPrepare,
     KeywordMetadataExtendAsin,
     KeywordMetadataPage,
     exportExtendAsin,
-    userRighsLimitUsedCount
+    userRighsLimitUsedCount,
+    userRighsLimitUse
 } from 'api/listing/termSerch';
 const TermSearch = () => {
     const { Option } = Select;
@@ -34,12 +36,15 @@ const TermSearch = () => {
         asinList: []
     });
     const [asinData, setAsinData] = useState<any>({});
+    const [open, setOpen] = useState(false);
     const getAsin = async () => {
         // 获取权限
 
-        const usedResult = await userRighsLimitUsedCount({ levelRightCode: 'listingQuery' });
-        console.log('🚀 ~ getAsin ~ result:', usedResult);
-
+        const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
+        if (usedResult.usedCount >= usedResult.total && usedResult.total !== -1) {
+            setOpen(true);
+            return;
+        }
         if (queryAsin.asinList.length === 0) {
             dispatch(
                 openSnackbar({
@@ -58,6 +63,8 @@ const TermSearch = () => {
             ...queryAsin,
             month: queryAsin.month === '最近30天' ? '' : queryAsin.month
         });
+
+        await userRighsLimitUse({ levelRightsCode: 'listingQuery' });
         setAsinData(result);
         setAsinOpen(true);
     };
@@ -409,6 +416,7 @@ const TermSearch = () => {
                     </MainCard>
                 </Modal>
             )}
+            <PermissionUpgradeModal from="listing_search" open={open} handleClose={() => setOpen(false)} />
         </div>
     );
 };

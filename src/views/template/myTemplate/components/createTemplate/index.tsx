@@ -517,6 +517,7 @@ function CreateDetail() {
     const handleEdit = (row: any, index: number, i?: number) => {
         if (i) setStep(i);
         setTitle('编辑');
+        setMaterialType(row.type);
         form.setFieldsValue(row);
         setRowIndex(index);
         setEditOpen(true);
@@ -528,9 +529,12 @@ function CreateDetail() {
                 newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
             ].value;
         if (title === '编辑') {
-            newList.splice(rowIndex, 1, result);
+            newList.splice(rowIndex, 1, { ...result, type: materialType });
         } else {
-            newList.unshift(result);
+            newList.unshift({
+                ...result,
+                type: materialType
+            });
         }
         newValue.workflowConfig.steps[step].variable.variables[
             newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')

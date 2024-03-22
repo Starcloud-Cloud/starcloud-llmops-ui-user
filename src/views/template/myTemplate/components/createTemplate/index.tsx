@@ -264,7 +264,14 @@ function CreateDetail() {
                 arr?.find((el: any) => el.field === 'REFERS') &&
                 arr?.find((el: any) => el.field === 'REFERS')?.value
             ) {
-                arr.find((el: any) => el.field === 'REFERS').value = JSON.parse(arr?.find((el: any) => el.field === 'REFERS')?.value);
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.field === 'REFERS')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.field === 'REFERS')?.value;
+                }
+                arr.find((el: any) => el.field === 'REFERS').value = list;
             }
         });
         detailRef.current = _.cloneDeep(newValue);

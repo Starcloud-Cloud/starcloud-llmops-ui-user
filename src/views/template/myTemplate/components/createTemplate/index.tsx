@@ -470,12 +470,12 @@ function CreateDetail() {
     const refersSourceRef = useRef<any>(null);
     const [refersSource, setRefersSource] = useState<any[]>([]);
     //删除
-    const handleDel = (index: number, i?: number) => {
+    const handleDel = (index: number, i: number) => {
         if (i) setStep(i);
         const newValue = _.cloneDeep(detailRef.current);
         const newList =
-            newValue.workflowConfig.steps[step].variable.variables[
-                newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+            newValue.workflowConfig.steps[i].variable.variables[
+                newValue.workflowConfig.steps[i].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
             ].value;
         newList.splice(index, 1);
         detailRef.current = newValue;
@@ -515,14 +515,14 @@ function CreateDetail() {
     useEffect(() => {
         if (materialType) {
             materialTemplate(materialType).then((res) => {
-                stepMarRef.current[step] = getHeader(res?.fieldDefine);
+                stepMarRef.current[step] = getHeader(res?.fieldDefine, step);
                 setStepMaterial(stepMarRef.current);
                 setPerform(perform + 1);
             });
         }
     }, [materialType]);
     //获取数据表头
-    const getHeader = (data: any, i?: number) => {
+    const getHeader = (data: any, i: number) => {
         const newList = data.map((item: any) => ({
             title: item.desc,
             align: 'center',
@@ -556,7 +556,13 @@ function CreateDetail() {
                 fixed: 'right',
                 render: (_: any, row: any, index: number) => (
                     <div className="flex justify-center">
-                        <Button onClick={() => handleEdit(row, index, i)} size="small" type="link">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
                             编辑
                         </Button>
                         <Popconfirm
@@ -575,7 +581,7 @@ function CreateDetail() {
             }
         ];
     };
-    const getHeaders = (data: any, i?: number) => {
+    const getHeaders = (data: any, i: number) => {
         const newList = data;
         newList?.splice(newList?.length - 1, 1);
         return [
@@ -587,7 +593,13 @@ function CreateDetail() {
                 fixed: 'right',
                 render: (_: any, row: any, index: number) => (
                     <div className="flex justify-center">
-                        <Button onClick={() => handleEdit(row, index, i)} size="small" type="link">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
                             编辑
                         </Button>
                         <Popconfirm
@@ -628,14 +640,11 @@ function CreateDetail() {
             }
         });
         await Promise.all(allper);
-        console.log(arr);
-
         stepMarRef.current = arr;
         setStepMaterial(stepMarRef?.current);
     };
     const getTableData = (index: number) => {
         const newList = stepMarRef.current;
-        console.log(newList);
         newList?.splice(index + 1, 0, undefined);
         const ccc = newList?.map((el: any, i: number) => {
             if (el) {
@@ -643,7 +652,6 @@ function CreateDetail() {
             }
             return undefined;
         });
-        console.log(ccc);
         stepMarRef.current = ccc;
         setStepMaterial(stepMarRef.current);
     };

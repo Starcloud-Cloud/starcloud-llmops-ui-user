@@ -10,7 +10,7 @@ import TermTable from './component/termTable';
 import _ from 'lodash-es';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
-import { KeywordMetadataExtendPrepare, KeywordMetadataExtendAsin, KeywordMetadataPage } from 'api/listing/termSerch';
+import { KeywordMetadataExtendPrepare, KeywordMetadataExtendAsin, KeywordMetadataPage, exportExtendAsin } from 'api/listing/termSerch';
 const TermSearch = () => {
     const { Option } = Select;
     const handleClose = (index: number) => {
@@ -145,6 +145,29 @@ const TermSearch = () => {
             }
         }
     }, [searchResult]);
+    //导出
+    const handleExport = async () => {
+        const { month, market } = queryAsin;
+        const result = await exportExtendAsin({
+            ...pageQuery,
+            ...searchResult,
+            excludeKeywords: searchResult?.excludeKeywords ? searchResult.excludeKeywords.split(',') : undefined,
+            includeKeywords: searchResult?.includeKeywords ? searchResult.includeKeywords.split(',') : undefined,
+            market,
+            month: market === '最近30天' ? '' : month,
+            queryVariations: type === 1 ? true : false,
+            asinList: type === 2 ? asinData?.diamondList : queryAsin.asinList,
+            originAsinList: queryAsin.asinList,
+            filterDeletedKeywords: false
+        });
+        console.log(result);
+
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(result);
+        link.target = '_blank';
+        link.download = `拓展流量词.xls`;
+        link.click();
+    };
     return (
         <div style={{ height: 'calc(100vh - 128px)' }} className="overflow-y-auto overflow-x-hidden">
             <SubCard
@@ -269,6 +292,7 @@ const TermSearch = () => {
                     setPageQuery={setPageQuery}
                     type={type}
                     getExtended={getExtended}
+                    handleExport={handleExport}
                 />
             )}
             {asinOpen && (

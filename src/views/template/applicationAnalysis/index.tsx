@@ -112,7 +112,7 @@ function ApplicationAnalysis({
     value = 2,
     type = 'GENERATE_RECORD'
 }: {
-    appUid: string | null;
+    appUid: string | null | undefined;
     value: number;
     type: string;
 }) {

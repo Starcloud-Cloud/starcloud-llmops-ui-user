@@ -14,7 +14,7 @@ import {
     // Tabs,
     Typography
 } from '@mui/material';
-import { Tabs, Image, Select, Popover, Form, Popconfirm, Button } from 'antd';
+import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -28,8 +28,8 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/perform';
-import Arrange from './arrange';
-import Basis from './basis';
+import Arrange from './newArrange';
+import Basis from './newBasis';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import Upload from './upLoad';
 import { del, copy } from 'api/template';
@@ -50,7 +50,96 @@ interface AppModels {
     language?: Items[];
     type?: Items[];
 }
-
+const Header = ({
+    permissions,
+    detail,
+    aiModel,
+    setOpenUpgradeModel,
+    perform,
+    setPerform,
+    setAiModel,
+    appModels
+}: {
+    permissions: any;
+    detail: any;
+    aiModel: any;
+    setOpenUpgradeModel: (data: any) => void;
+    perform: any;
+    setPerform: (data: any) => void;
+    setAiModel: (data: any) => void;
+    appModels: any;
+}) => {
+    const { Option } = Select;
+    return (
+        <div>
+            <div className="flex justify-between items-center">
+                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                    {detail?.icon && (
+                        <Image
+                            preview={false}
+                            height={60}
+                            className="rounded-lg overflow-hidden"
+                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                        />
+                    )}
+                    <Box>
+                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                            {detail?.name}
+                        </Typography>
+                        <Box>
+                            <span>#{detail?.category}</span>
+                            {detail?.tags?.map((el: any) => (
+                                <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                            ))}
+                        </Box>
+                    </Box>
+                </Box>
+                {detail?.workflowConfig?.steps?.length === 1 && (
+                    <div className="flex items-center">
+                        <Popover
+                            title="模型介绍"
+                            content={
+                                <>
+                                    <div>- 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用</div>
+                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                </>
+                            }
+                        >
+                            <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
+                        </Popover>
+                        <Select
+                            style={{ width: 100, height: 23 }}
+                            bordered={false}
+                            disabled={true}
+                            className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                            rootClassName="modelSelect"
+                            popupClassName="modelSelectPopup"
+                            value={aiModel}
+                            onChange={(value) => {
+                                if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                    setOpenUpgradeModel(true);
+                                    return;
+                                }
+                                setPerform(perform + 1);
+                                setAiModel(value);
+                            }}
+                        >
+                            {appModels?.aiModel?.map((item: any) => (
+                                <Option key={item.value} value={item.value}>
+                                    {item.label}
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
+                )}
+            </div>
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                {detail?.description}
+            </Typography>
+        </div>
+    );
+};
 function CreateDetail() {
     const categoryList = marketStore((state) => state.categoryList);
     //路由跳转
@@ -69,7 +158,6 @@ function CreateDetail() {
     const [isDisables, setIsDisables] = useState<any>([]);
     //是否显示分享翻译
     const [isShows, setIsShow] = useState<any[]>([]);
-    const basis = useRef<any>(null);
     let conversationUid: undefined | string = undefined;
     //token不足
     const [tokenOpen, setTokenOpen] = useState(false);
@@ -242,6 +330,23 @@ function CreateDetail() {
                 el.field = el.field.toUpperCase();
             });
         });
+        newValue?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            if (
+                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                arr?.find((el: any) => el.field === 'REFERS') &&
+                arr?.find((el: any) => el.field === 'REFERS')?.value
+            ) {
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.field === 'REFERS')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.field === 'REFERS')?.value;
+                }
+                arr.find((el: any) => el.field === 'REFERS').value = list;
+            }
+        });
         detailRef.current = _.cloneDeep(newValue);
         if (newValue?.workflowConfig?.steps?.length === 1) {
             setAiModel(
@@ -254,7 +359,7 @@ function CreateDetail() {
     };
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [perform, setPerform] = useState('perform');
-    //设置name desc
+    //设置name desc icon
     const setData = (data: any) => {
         detailRef.current = {
             ...detailRef.current,
@@ -265,23 +370,11 @@ function CreateDetail() {
             [data.name]: data.value
         });
     };
-    //设置icons
-    const setDetail_icon = (data: any) => {
-        detailRef.current = {
-            ..._.cloneDeep(detail),
-            icon: data
-        };
-        setDetail({
-            ..._.cloneDeep(detailRef.current),
-            icon: data
-        });
-    };
-
     //设置执行的步骤
     const exeChange = ({ e, steps, i, type }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
-        if (type) {
+        if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.field === 'REFERS')) {
             newValue.workflowConfig.steps[steps].variable.variables[
                 newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
             ].value = [];
@@ -361,7 +454,7 @@ function CreateDetail() {
         }
         detailRef.current = _.cloneDeep(oldValue);
         setDetail(oldValue);
-        setPerform(perform + 1);
+        // setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
         const value = _.cloneDeep(detail);
@@ -380,9 +473,20 @@ function CreateDetail() {
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const saveDetail = () => {
-        if (detail.name && detail.category) {
+        const details = _.cloneDeep(detailRef.current);
+        details?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            if (
+                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                arr?.find((el: any) => el.field === 'REFERS') &&
+                arr?.find((el: any) => el.field === 'REFERS')?.value
+            ) {
+                arr.find((el: any) => el.field === 'REFERS').value = JSON.stringify(arr?.find((el: any) => el.field === 'REFERS')?.value);
+            }
+        });
+        if (details.name && details.category) {
             if (searchParams.get('uid')) {
-                appModify(detail).then((res) => {
+                appModify(details).then((res) => {
                     if (res.data) {
                         setSaveState(saveState + 1);
                         dispatch(
@@ -399,7 +503,7 @@ function CreateDetail() {
                     }
                 });
             } else {
-                appCreate(detail).then((res) => {
+                appCreate(details).then((res) => {
                     if (res.data) {
                         navigate('/createApp?uid=' + res.data.uid);
                         getList(res.data.uid);
@@ -438,11 +542,11 @@ function CreateDetail() {
 
     //检测 model
     useEffect(() => {
-        if (detail?.workflowConfig.steps?.length === 1) {
+        if (detail?.workflowConfig?.steps?.length === 1) {
             setAiModel(detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.find((item: any) => item.field === 'model')?.value);
         }
     }, [
-        detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables[
+        detail?.workflowConfig?.steps[0]?.flowStep?.variable?.variables[
             detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.findIndex((el: any) => el?.field === 'model')
         ]?.value
     ]);
@@ -452,12 +556,12 @@ function CreateDetail() {
     const refersSourceRef = useRef<any>(null);
     const [refersSource, setRefersSource] = useState<any[]>([]);
     //删除
-    const handleDel = (index: number, i?: number) => {
+    const handleDel = (index: number, i: number) => {
         if (i) setStep(i);
         const newValue = _.cloneDeep(detailRef.current);
         const newList =
-            newValue.workflowConfig.steps[step].variable.variables[
-                newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+            newValue.workflowConfig.steps[i].variable.variables[
+                newValue.workflowConfig.steps[i].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
             ].value;
         newList.splice(index, 1);
         detailRef.current = newValue;
@@ -469,8 +573,9 @@ function CreateDetail() {
     const [editOpen, setEditOpen] = useState(false);
     const [rowIndex, setRowIndex] = useState(0);
     const handleEdit = (row: any, index: number, i?: number) => {
-        setTitle('编辑');
         if (i) setStep(i);
+        setTitle('编辑');
+        setMaterialType(row.type);
         form.setFieldsValue(row);
         setRowIndex(index);
         setEditOpen(true);
@@ -482,9 +587,12 @@ function CreateDetail() {
                 newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
             ].value;
         if (title === '编辑') {
-            newList.splice(rowIndex, 1, result);
+            newList.splice(rowIndex, 1, { ...result, type: materialType });
         } else {
-            newList.unshift(result);
+            newList.unshift({
+                ...result,
+                type: materialType
+            });
         }
         newValue.workflowConfig.steps[step].variable.variables[
             newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
@@ -492,18 +600,19 @@ function CreateDetail() {
         detailRef.current = newValue;
         setDetail(detailRef.current);
         setEditOpen(false);
+        form.resetFields();
     };
     useEffect(() => {
         if (materialType) {
             materialTemplate(materialType).then((res) => {
-                stepMarRef.current[step] = getHeader(res?.fieldDefine);
+                stepMarRef.current[step] = getHeader(res?.fieldDefine, step);
                 setStepMaterial(stepMarRef.current);
                 setPerform(perform + 1);
             });
         }
     }, [materialType]);
     //获取数据表头
-    const getHeader = (data: any, i?: number) => {
+    const getHeader = (data: any, i: number) => {
         const newList = data.map((item: any) => ({
             title: item.desc,
             align: 'center',
@@ -511,19 +620,21 @@ function CreateDetail() {
             dataIndex: item.fieldName,
             render: (_: any, row: any) => (
                 <div className="flex justify-center items-center flex-wrap break-all gap-2">
-                    {item.type === 'image' ? (
-                        <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
-                    ) : item.fieldName === 'source' ? (
-                        <>
-                            {row[item.fieldName] === 'OTHER'
-                                ? refersSourceRef.current?.find((item: any) => item.value === 'OTHER')?.label
-                                : row[item.fieldName] === 'SMALL_RED_BOOK'
-                                ? refersSourceRef.current?.find((item: any) => item.value === 'SMALL_RED_BOOK')?.label
-                                : row[item.fieldName]}
-                        </>
-                    ) : (
-                        row[item.fieldName]
-                    )}
+                    <div className="line-clamp-5">
+                        {item.type === 'image' ? (
+                            <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                        ) : item.fieldName === 'source' ? (
+                            <>
+                                {row[item.fieldName] === 'OTHER'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'OTHER')?.label
+                                    : row[item.fieldName] === 'SMALL_RED_BOOK'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'SMALL_RED_BOOK')?.label
+                                    : row[item.fieldName]}
+                            </>
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
                 </div>
             ),
             type: item.type
@@ -537,7 +648,50 @@ function CreateDetail() {
                 fixed: 'right',
                 render: (_: any, row: any, index: number) => (
                     <div className="flex justify-center">
-                        <Button onClick={() => handleEdit(row, index, i)} size="small" type="link">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    const getHeaders = (data: any, i: number) => {
+        const newList = data;
+        newList?.splice(newList?.length - 1, 1);
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
                             编辑
                         </Button>
                         <Popconfirm
@@ -574,7 +728,7 @@ function CreateDetail() {
         const allper = newList?.map(async (el: any, index: number) => {
             if (el) {
                 const res = await materialTemplate(el);
-                arr[index] = getHeader(res?.fieldDefine, step);
+                arr[index] = getHeader(res?.fieldDefine, index);
             }
         });
         await Promise.all(allper);
@@ -584,392 +738,270 @@ function CreateDetail() {
     const getTableData = (index: number) => {
         const newList = stepMarRef.current;
         newList?.splice(index + 1, 0, undefined);
+        const ccc = newList?.map((el: any, i: number) => {
+            if (el) {
+                return getHeaders(el, i);
+            }
+            return undefined;
+        });
+        stepMarRef.current = ccc;
+        setStepMaterial(stepMarRef.current);
     };
+    const [segmentedValue, setSegmentedValue] = useState<string | number>('配置');
     return (
-        <MyAppProvider>
-            <Card>
-                <CardHeader
-                    sx={{ padding: 2 }}
-                    avatar={
-                        <Buttons
-                            variant="contained"
-                            startIcon={<ArrowBack />}
-                            color="secondary"
-                            onClick={() => navigate('/template/createCenter')}
-                        >
-                            {t('myApp.back')}
-                        </Buttons>
-                    }
-                    title={<Typography variant="h3">{detail?.name}</Typography>}
-                    action={
-                        <>
-                            {searchParams.get('uid') && (
-                                <IconButton
-                                    aria-label="more"
-                                    id="long-button"
-                                    aria-controls={delOpen ? 'long-menu' : undefined}
-                                    aria-expanded={delOpen ? 'true' : undefined}
-                                    aria-haspopup="true"
-                                    onClick={(e) => {
-                                        setDelAnchorEl(e.currentTarget);
-                                    }}
-                                >
-                                    <MoreVert />
-                                </IconButton>
-                            )}
-                            <Menu
-                                id="del-menu"
-                                MenuListProps={{
-                                    'aria-labelledby': 'del-button'
-                                }}
-                                anchorEl={delAnchorEl}
-                                open={delOpen}
-                                onClose={() => {
-                                    setDelAnchorEl(null);
+        <Card>
+            <CardHeader
+                sx={{ padding: 2 }}
+                avatar={
+                    <Buttons
+                        variant="contained"
+                        startIcon={<ArrowBack />}
+                        color="secondary"
+                        onClick={() => navigate('/template/createCenter')}
+                    >
+                        {t('myApp.back')}
+                    </Buttons>
+                }
+                title={<Typography variant="h3">{detail?.name}</Typography>}
+                action={
+                    <>
+                        {searchParams.get('uid') && (
+                            <IconButton
+                                aria-label="more"
+                                id="long-button"
+                                aria-controls={delOpen ? 'long-menu' : undefined}
+                                aria-expanded={delOpen ? 'true' : undefined}
+                                aria-haspopup="true"
+                                onClick={(e) => {
+                                    setDelAnchorEl(e.currentTarget);
                                 }}
                             >
-                                <MenuItem
-                                    onClick={() => {
-                                        del(searchParams.get('uid') as string).then((res) => {
-                                            if (res) {
-                                                setDelAnchorEl(null);
-                                                navigate('/my-app');
-                                            }
-                                        });
-                                    }}
-                                >
-                                    <ListItemIcon>
-                                        <Delete color="error" />
-                                    </ListItemIcon>
-                                    <Typography variant="inherit" noWrap>
-                                        {t('myApp.delApp')}
-                                    </Typography>
-                                </MenuItem>
-                                <MenuItem
-                                    onClick={() => {
-                                        copy({ uid: searchParams.get('uid') }).then((res) => {
-                                            if (res) {
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: '复制成功',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'success'
-                                                        },
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                        transition: 'SlideDown',
-                                                        close: false
-                                                    })
-                                                );
-                                                setDelAnchorEl(null);
-                                                navigate('/my-app');
-                                            }
-                                        });
-                                    }}
-                                >
-                                    <ListItemIcon>
-                                        <ContentPaste color="secondary" />
-                                    </ListItemIcon>
-                                    <Typography variant="inherit" noWrap>
-                                        复制应用
-                                    </Typography>
-                                </MenuItem>
-                            </Menu>
-                            <Buttons variant="contained" color="secondary" autoFocus onClick={saveDetail}>
-                                {t('myApp.save')}
-                            </Buttons>
-                        </>
-                    }
-                ></CardHeader>
-                <Divider />
-                <div className="p-4">
-                    <Tabs accessKey={value} onChange={setValue}>
-                        <Tabs.TabPane tab=" 基础设置" key="0">
-                            <Grid container spacing={2}>
-                                <Grid item lg={6}>
-                                    {detail && (
-                                        <Basis
-                                            ref={basis}
-                                            initialValues={{
-                                                name: detail?.name,
-                                                description: detail?.description,
-                                                category: detail?.category,
-                                                tags: detail?.tags,
-                                                example: detail?.example
-                                            }}
-                                            basisPre={basisPre}
-                                            sort={detail?.sort}
-                                            type={detail?.type}
-                                            appModel={appModels?.type}
-                                            setValues={setData}
-                                            setDetail_icon={setDetail_icon}
-                                        />
-                                    )}
-                                </Grid>
-                                <Grid item lg={6}>
-                                    <Typography variant="h5" fontSize="1rem" mb={1}>
-                                        {t('market.debug')}
-                                    </Typography>
-                                    <Card elevation={2} sx={{ p: 2 }}>
-                                        <div className="flex justify-between items-center">
-                                            <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                                                {detail?.icon && (
-                                                    <Image
-                                                        preview={false}
-                                                        height={60}
-                                                        className="rounded-lg overflow-hidden"
-                                                        src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
-                                                    />
-                                                )}
-                                                <Box>
-                                                    <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                                        {detail?.name}
-                                                    </Typography>
-                                                    <Box>
-                                                        <span>#{detail?.category}</span>
-                                                        {detail?.tags?.map((el: any) => (
-                                                            <Chip
-                                                                key={el}
-                                                                sx={{ marginLeft: 1 }}
-                                                                size="small"
-                                                                label={el}
-                                                                variant="outlined"
-                                                            />
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                            </Box>
-                                            {detail?.workflowConfig?.steps?.length === 1 && (
-                                                <div className="flex items-center">
-                                                    <Popover
-                                                        title="模型介绍"
-                                                        content={
-                                                            <>
-                                                                <div>
-                                                                    -
-                                                                    默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
-                                                                </div>
-                                                                <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
-                                                            </>
-                                                        }
-                                                    >
-                                                        <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
-                                                    </Popover>
-                                                    <Select
-                                                        style={{ width: 100, height: 23 }}
-                                                        bordered={false}
-                                                        disabled={true}
-                                                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                                        rootClassName="modelSelect"
-                                                        popupClassName="modelSelectPopup"
-                                                        value={aiModel}
-                                                        onChange={(value) => {
-                                                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                                                setOpenUpgradeModel(true);
-                                                                return;
-                                                            }
-                                                            setPerform(perform + 1);
-                                                            setAiModel(value);
-                                                        }}
-                                                    >
-                                                        {appModels?.aiModel?.map((item: any) => (
-                                                            <Option key={item.value} value={item.value}>
-                                                                {item.label}
-                                                            </Option>
-                                                        ))}
-                                                    </Select>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <Divider sx={{ my: 1 }} />
-                                        <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                                            {detail?.description}
-                                        </Typography>
-                                        <Perform
-                                            key={perform}
-                                            isShows={isShows}
-                                            columns={stepMaterial}
-                                            setEditOpen={setEditOpen}
-                                            setStep={setStep}
-                                            setTitle={setTitle}
-                                            config={_.cloneDeep(detail?.workflowConfig)}
-                                            changeConfigs={changeConfigs}
-                                            changeSon={changeData}
-                                            loadings={loadings}
-                                            isDisables={isDisables}
-                                            variableChange={exeChange}
-                                            changeanswer={changeanswer}
-                                            promptChange={promptChange}
-                                            isallExecute={(flag: boolean) => {
-                                                isAllExecute = flag;
-                                            }}
-                                            source="myApp"
-                                        />
-                                    </Card>
-                                </Grid>
-                            </Grid>
-                        </Tabs.TabPane>
-                        <Tabs.TabPane tab="流程编排" key="1">
-                            <Grid container spacing={2}>
-                                <Grid item lg={6} sx={{ width: '100%' }}>
-                                    {detail?.workflowConfig && (
-                                        <Arrange
-                                            detail={detail}
-                                            config={detail?.workflowConfig}
-                                            editChange={editChange}
-                                            basisChange={basisChange}
-                                            statusChange={statusChange}
-                                            changeConfigs={changeConfigs}
-                                            getTableData={getTableData}
-                                        />
-                                    )}
-                                </Grid>
-                                <Grid item lg={6}>
-                                    <Typography variant="h5" fontSize="1rem" mb={1}>
-                                        {t('market.debug')}
-                                    </Typography>
-                                    <Card elevation={2} sx={{ p: 2 }}>
-                                        <div className="flex justify-between items-center">
-                                            <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                                                {detail?.icon && (
-                                                    <Image
-                                                        preview={false}
-                                                        height={60}
-                                                        className="rounded-lg overflow-hidden"
-                                                        src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
-                                                    />
-                                                )}
-                                                <Box>
-                                                    <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                                        {detail?.name}
-                                                    </Typography>
-                                                    <Box>
-                                                        <span>#{detail?.category}</span>
-                                                        {detail?.tags?.map((el: any) => (
-                                                            <Chip
-                                                                key={el}
-                                                                sx={{ marginLeft: 1 }}
-                                                                size="small"
-                                                                label={el}
-                                                                variant="outlined"
-                                                            />
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                            </Box>
-                                            {detail?.workflowConfig?.steps?.length === 1 && (
-                                                <div className="flex items-center">
-                                                    <Popover
-                                                        title="模型介绍"
-                                                        content={
-                                                            <>
-                                                                <div>
-                                                                    -
-                                                                    默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
-                                                                </div>
-                                                                <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
-                                                            </>
-                                                        }
-                                                    >
-                                                        <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
-                                                    </Popover>
-                                                    <Select
-                                                        style={{ width: 100, height: 23 }}
-                                                        bordered={false}
-                                                        disabled={true}
-                                                        className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                                        rootClassName="modelSelect"
-                                                        popupClassName="modelSelectPopup"
-                                                        value={aiModel}
-                                                        onChange={(value) => {
-                                                            if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                                                setOpenUpgradeModel(true);
-                                                                return;
-                                                            }
-                                                            setPerform(perform + 1);
-                                                            setAiModel(value);
-                                                        }}
-                                                    >
-                                                        {appModels?.aiModel?.map((item: any) => (
-                                                            <Option key={item.value} value={item.value}>
-                                                                {item.label}
-                                                            </Option>
-                                                        ))}
-                                                    </Select>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <Divider sx={{ my: 1 }} />
-                                        <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                                            {detail?.description}
-                                        </Typography>
-                                        <Perform
-                                            key={perform}
-                                            columns={stepMaterial}
-                                            setEditOpen={setEditOpen}
-                                            setStep={setStep}
-                                            setTitle={setTitle}
-                                            isShows={isShows}
-                                            config={detail?.workflowConfig}
-                                            changeConfigs={changeConfigs}
-                                            changeSon={changeData}
-                                            changeanswer={changeanswer}
-                                            loadings={loadings}
-                                            isDisables={isDisables}
-                                            variableChange={exeChange}
-                                            promptChange={promptChange}
-                                            isallExecute={(flag: boolean) => {
-                                                isAllExecute = flag;
-                                            }}
-                                            source="myApp"
-                                        />
-                                    </Card>
-                                </Grid>
-                            </Grid>
-                        </Tabs.TabPane>
-                        {detailRef.current?.uid && searchParams.get('uid') && (
-                            <Tabs.TabPane tab="应用分析" key="2">
-                                <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
-                            </Tabs.TabPane>
+                                <MoreVert />
+                            </IconButton>
                         )}
-                        {searchParams.get('uid') && (
-                            <Tabs.TabPane tab="应用发布" key="3">
-                                <Upload
-                                    appUid={searchParams.get('uid') as string}
-                                    saveState={saveState}
-                                    saveDetail={saveDetail}
-                                    getStatus={getStatus}
+                        <Menu
+                            id="del-menu"
+                            MenuListProps={{
+                                'aria-labelledby': 'del-button'
+                            }}
+                            anchorEl={delAnchorEl}
+                            open={delOpen}
+                            onClose={() => {
+                                setDelAnchorEl(null);
+                            }}
+                        >
+                            <MenuItem
+                                onClick={() => {
+                                    del(searchParams.get('uid') as string).then((res) => {
+                                        if (res) {
+                                            setDelAnchorEl(null);
+                                            navigate('/my-app');
+                                        }
+                                    });
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <Delete color="error" />
+                                </ListItemIcon>
+                                <Typography variant="inherit" noWrap>
+                                    {t('myApp.delApp')}
+                                </Typography>
+                            </MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    copy({ uid: searchParams.get('uid') }).then((res) => {
+                                        if (res) {
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '复制成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                    transition: 'SlideDown',
+                                                    close: false
+                                                })
+                                            );
+                                            setDelAnchorEl(null);
+                                            navigate('/my-app');
+                                        }
+                                    });
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <ContentPaste color="secondary" />
+                                </ListItemIcon>
+                                <Typography variant="inherit" noWrap>
+                                    复制应用
+                                </Typography>
+                            </MenuItem>
+                        </Menu>
+                        <Buttons variant="contained" color="secondary" autoFocus onClick={saveDetail}>
+                            {t('myApp.save')}
+                        </Buttons>
+                    </>
+                }
+            ></CardHeader>
+            <Divider />
+            <div className="p-4">
+                <Tabs activeKey={value} onChange={setValue}>
+                    <Tabs.TabPane tab=" 基础设置" key="0">
+                        <Grid container spacing={2}>
+                            <Grid item lg={6}>
+                                <Basis
+                                    detail={{
+                                        name: detail?.name,
+                                        description: detail?.description,
+                                        category: detail?.category,
+                                        tags: detail?.tags,
+                                        example: detail?.example,
+                                        sort: detail?.sort,
+                                        type: detail?.type,
+                                        icon: detail?.icon
+                                    }}
+                                    basisPre={basisPre}
+                                    appModel={appModels?.type}
+                                    setValues={setData}
                                 />
-                            </Tabs.TabPane>
+                            </Grid>
+                            <Grid item lg={6}>
+                                <Typography variant="h5" fontSize="1rem" mb={1}>
+                                    {t('market.debug')}
+                                </Typography>
+                                <Card elevation={2} sx={{ p: 2 }}>
+                                    <Header
+                                        permissions={permissions}
+                                        detail={detail}
+                                        aiModel={aiModel}
+                                        setOpenUpgradeModel={setOpenUpgradeModel}
+                                        perform={perform}
+                                        setPerform={setPerform}
+                                        setAiModel={setAiModel}
+                                        appModels={appModels}
+                                    />
+                                    <Perform
+                                        key={perform}
+                                        isShows={isShows}
+                                        columns={stepMaterial}
+                                        setEditOpen={setEditOpen}
+                                        setStep={setStep}
+                                        setTitle={setTitle}
+                                        config={_.cloneDeep(detail?.workflowConfig)}
+                                        changeConfigs={changeConfigs}
+                                        changeSon={changeData}
+                                        loadings={loadings}
+                                        isDisables={isDisables}
+                                        variableChange={exeChange}
+                                        changeanswer={changeanswer}
+                                        promptChange={promptChange}
+                                        isallExecute={(flag: boolean) => {
+                                            isAllExecute = flag;
+                                        }}
+                                        source="myApp"
+                                    />
+                                </Card>
+                            </Grid>
+                        </Grid>
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="流程编排" key="1">
+                        <div className="pb-4 flex justify-center">
+                            <Segmented value={segmentedValue} onChange={setSegmentedValue} options={['配置', '预料']} />
+                        </div>
+                        {segmentedValue === '配置' && detail && (
+                            <Arrange
+                                detail={detail}
+                                config={detail.workflowConfig}
+                                editChange={editChange}
+                                basisChange={basisChange}
+                                statusChange={statusChange}
+                                changeConfigs={changeConfigs}
+                                getTableData={getTableData}
+                            />
                         )}
-                    </Tabs>
-                </div>
-                {openUpgradeModel && (
-                    <PermissionUpgradeModal from={'upgradeGpt4_0'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
-                )}
-                {tokenOpen && (
-                    <PermissionUpgradeModal
-                        from={from}
-                        open={tokenOpen}
-                        handleClose={() => setTokenOpen(false)}
-                        title={'当前魔法豆不足，升级会员，立享五折优惠！'}
-                    />
-                )}
-                {editOpen && (
-                    <FormModal
-                        title={title}
-                        materialType={materialType}
-                        editOpen={editOpen}
-                        setEditOpen={setEditOpen}
-                        columns={stepMaterial[step]}
-                        form={form}
-                        formOk={formOk}
-                        sourceList={refersSource}
-                    />
-                )}
-            </Card>
-        </MyAppProvider>
+                        {segmentedValue === '预料' && (
+                            <div>
+                                <Typography variant="h5" fontSize="1rem" mb={1}>
+                                    {t('market.debug')}
+                                </Typography>
+                                <Card elevation={2} sx={{ p: 2 }}>
+                                    <Header
+                                        permissions={permissions}
+                                        detail={detail}
+                                        aiModel={aiModel}
+                                        setOpenUpgradeModel={setOpenUpgradeModel}
+                                        perform={perform}
+                                        setPerform={setPerform}
+                                        setAiModel={setAiModel}
+                                        appModels={appModels}
+                                    />
+                                    <Perform
+                                        key={perform}
+                                        columns={stepMaterial}
+                                        setEditOpen={setEditOpen}
+                                        setStep={setStep}
+                                        setMaterialType={setMaterialType}
+                                        setTitle={setTitle}
+                                        isShows={isShows}
+                                        config={_.cloneDeep(detailRef.current.workflowConfig)}
+                                        changeConfigs={changeConfigs}
+                                        changeSon={changeData}
+                                        changeanswer={changeanswer}
+                                        loadings={loadings}
+                                        isDisables={isDisables}
+                                        variableChange={exeChange}
+                                        promptChange={promptChange}
+                                        isallExecute={(flag: boolean) => {
+                                            isAllExecute = flag;
+                                        }}
+                                        source="myApp"
+                                    />
+                                </Card>
+                            </div>
+                        )}
+                    </Tabs.TabPane>
+                    {detailRef.current?.uid && searchParams.get('uid') && (
+                        <Tabs.TabPane tab="应用分析" key="2">
+                            <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
+                        </Tabs.TabPane>
+                    )}
+                    {searchParams.get('uid') && (
+                        <Tabs.TabPane tab="应用发布" key="3">
+                            <Upload
+                                appUid={searchParams.get('uid') as string}
+                                saveState={saveState}
+                                saveDetail={saveDetail}
+                                getStatus={getStatus}
+                            />
+                        </Tabs.TabPane>
+                    )}
+                </Tabs>
+            </div>
+            {openUpgradeModel && (
+                <PermissionUpgradeModal from={'upgradeGpt4_0'} open={openUpgradeModel} handleClose={() => setOpenUpgradeModel(false)} />
+            )}
+            {tokenOpen && (
+                <PermissionUpgradeModal
+                    from={from}
+                    open={tokenOpen}
+                    handleClose={() => setTokenOpen(false)}
+                    title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+                />
+            )}
+            {editOpen && (
+                <FormModal
+                    title={title}
+                    materialType={materialType}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={stepMaterial[step]}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={refersSource}
+                />
+            )}
+        </Card>
     );
 }
 export default CreateDetail;

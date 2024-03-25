@@ -14,7 +14,7 @@ import {
     Tabs,
     Typography
 } from '@mui/material';
-import { Image, Select, Popover, Form, Popconfirm, Button } from 'antd';
+import { Image, Select, Popover, Form, Popconfirm, Button, Segmented } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -695,6 +695,7 @@ function CreateDetail() {
         stepMarRef.current = ccc;
         setStepMaterial(stepMarRef.current);
     };
+    const [segmentedValue, setSegmentedValue] = useState<string | number>('配置');
     return (
         <Card>
             <CardHeader
@@ -930,118 +931,121 @@ function CreateDetail() {
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <Grid container spacing={2}>
-                    <Grid item lg={6} sx={{ width: '100%' }}>
-                        {detail?.workflowConfig && (
-                            <Arrange
-                                detail={detail}
-                                config={_.cloneDeep(detail.workflowConfig)}
-                                editChange={editChange}
-                                basisChange={basisChange}
-                                statusChange={statusChange}
-                                changeConfigs={changeConfigs}
-                                getTableData={getTableData}
-                            />
-                        )}
-                    </Grid>
-                    <Grid item lg={6}>
-                        <Typography variant="h5" fontSize="1rem" mb={1}>
-                            {t('market.debug')}
-                        </Typography>
-                        <Card elevation={2} sx={{ p: 2 }}>
-                            <div className="flex justify-between items-center">
-                                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                                    {detail?.icon && (
-                                        <Image
-                                            preview={false}
-                                            height={60}
-                                            className="rounded-lg overflow-hidden"
-                                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
-                                        />
-                                    )}
-                                    <Box>
-                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                            {detail?.name}
-                                        </Typography>
+                <div>
+                    <div className="pb-4 flex justify-center">
+                        <Segmented value={segmentedValue} onChange={setSegmentedValue} options={['配置', '预料']} />
+                    </div>
+                    {segmentedValue === '配置' && detail && (
+                        <Arrange
+                            detail={detail}
+                            config={_.cloneDeep(detail.workflowConfig)}
+                            editChange={editChange}
+                            basisChange={basisChange}
+                            statusChange={statusChange}
+                            changeConfigs={changeConfigs}
+                            getTableData={getTableData}
+                        />
+                    )}
+                    {segmentedValue === '预料' && (
+                        <div className="w-[80%]">
+                            <Typography variant="h5" fontSize="1rem" mb={1}>
+                                {t('market.debug')}
+                            </Typography>
+                            <Card elevation={2} sx={{ p: 2 }}>
+                                <div className="flex justify-between items-center">
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                                        {detail?.icon && (
+                                            <Image
+                                                preview={false}
+                                                height={60}
+                                                className="rounded-lg overflow-hidden"
+                                                src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                            />
+                                        )}
                                         <Box>
-                                            <span>#{detail?.category}</span>
-                                            {detail?.tags?.map((el: any) => (
-                                                <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                            ))}
+                                            <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                {detail?.name}
+                                            </Typography>
+                                            <Box>
+                                                <span>#{detail?.category}</span>
+                                                {detail?.tags?.map((el: any) => (
+                                                    <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                                ))}
+                                            </Box>
                                         </Box>
                                     </Box>
-                                </Box>
-                                {detail?.workflowConfig?.steps?.length === 1 && (
-                                    <div className="flex items-center">
-                                        <Popover
-                                            title="模型介绍"
-                                            content={
-                                                <>
-                                                    <div>
-                                                        - 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
-                                                    </div>
-                                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
-                                                </>
-                                            }
-                                        >
-                                            <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
-                                        </Popover>
-                                        <Select
-                                            style={{ width: 100, height: 23 }}
-                                            bordered={false}
-                                            disabled={true}
-                                            className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                            rootClassName="modelSelect"
-                                            popupClassName="modelSelectPopup"
-                                            value={aiModel}
-                                            onChange={(value) => {
-                                                if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                                    setOpenUpgradeModel(true);
-                                                    return;
+                                    {detail?.workflowConfig?.steps?.length === 1 && (
+                                        <div className="flex items-center">
+                                            <Popover
+                                                title="模型介绍"
+                                                content={
+                                                    <>
+                                                        <div>
+                                                            - 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
+                                                        </div>
+                                                        <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                                    </>
                                                 }
-                                                setPerform(perform + 1);
-                                                setAiModel(value);
-                                            }}
-                                        >
-                                            {appModels?.aiModel?.map((item: any) => (
-                                                <Option key={item.value} value={item.value}>
-                                                    {item.label}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </div>
+                                            >
+                                                <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
+                                            </Popover>
+                                            <Select
+                                                style={{ width: 100, height: 23 }}
+                                                bordered={false}
+                                                disabled={true}
+                                                className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                                rootClassName="modelSelect"
+                                                popupClassName="modelSelectPopup"
+                                                value={aiModel}
+                                                onChange={(value) => {
+                                                    if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                                        setOpenUpgradeModel(true);
+                                                        return;
+                                                    }
+                                                    setPerform(perform + 1);
+                                                    setAiModel(value);
+                                                }}
+                                            >
+                                                {appModels?.aiModel?.map((item: any) => (
+                                                    <Option key={item.value} value={item.value}>
+                                                        {item.label}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                    )}
+                                </div>
+                                <Divider sx={{ my: 1 }} />
+                                <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                                    {detail?.description}
+                                </Typography>
+                                {detail && value === 1 && (
+                                    <Perform
+                                        key={perform}
+                                        columns={stepMaterial}
+                                        setEditOpen={setEditOpen}
+                                        setStep={setStep}
+                                        setMaterialType={setMaterialType}
+                                        setTitle={setTitle}
+                                        isShows={isShows}
+                                        config={_.cloneDeep(detailRef.current.workflowConfig)}
+                                        changeConfigs={changeConfigs}
+                                        changeSon={changeData}
+                                        changeanswer={changeanswer}
+                                        loadings={loadings}
+                                        isDisables={isDisables}
+                                        variableChange={exeChange}
+                                        promptChange={promptChange}
+                                        isallExecute={(flag: boolean) => {
+                                            isAllExecute = flag;
+                                        }}
+                                        source="myApp"
+                                    />
                                 )}
-                            </div>
-                            <Divider sx={{ my: 1 }} />
-                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                                {detail?.description}
-                            </Typography>
-                            {detail && value === 1 && (
-                                <Perform
-                                    key={perform}
-                                    columns={stepMaterial}
-                                    setEditOpen={setEditOpen}
-                                    setStep={setStep}
-                                    setMaterialType={setMaterialType}
-                                    setTitle={setTitle}
-                                    isShows={isShows}
-                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
-                                    changeConfigs={changeConfigs}
-                                    changeSon={changeData}
-                                    changeanswer={changeanswer}
-                                    loadings={loadings}
-                                    isDisables={isDisables}
-                                    variableChange={exeChange}
-                                    promptChange={promptChange}
-                                    isallExecute={(flag: boolean) => {
-                                        isAllExecute = flag;
-                                    }}
-                                    source="myApp"
-                                />
-                            )}
-                        </Card>
-                    </Grid>
-                </Grid>
+                            </Card>
+                        </div>
+                    )}
+                </div>
             </TabPanel>
             <TabPanel value={value} index={2}>
                 {value === 2 && detailRef.current?.uid && searchParams.get('uid') && (

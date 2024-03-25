@@ -223,7 +223,7 @@ function Perform({
                                                     >
                                                         <FormExecute
                                                             item={el}
-                                                            columns={columns[steps]}
+                                                            columns={columns ? columns[steps] : []}
                                                             setEditOpen={setEditOpen}
                                                             setTitle={setTitle}
                                                             setStep={() => setStep(steps)}

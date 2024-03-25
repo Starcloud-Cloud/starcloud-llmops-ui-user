@@ -98,11 +98,11 @@ export const detailApp = (data: any) => {
 };
 
 //获取我的应用
-export const getApp = (data: { uid: string }) => {
+export const getApp = (data: any) => {
     return request.get({ url: `/llm/app/get/${data.uid}` });
 };
 //获取推荐
-export const getRecommendApp = (data: { recommend: string }) => {
+export const getRecommendApp = (data: any) => {
     return request.get({ url: `/llm/app/getRecommendApp/${data.recommend}` });
 };
 //创建应用

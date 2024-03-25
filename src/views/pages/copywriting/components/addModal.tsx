@@ -635,7 +635,7 @@ const AddModal = () => {
                 );
             } else {
                 arr.push({
-                    key: jsonType ? name + '[' + key + ']' : name + '.' + key,
+                    key: jsonType ? name + `.list('${key}')` : name + '.' + key,
                     label: key,
                     title: property?.title,
                     desc: property?.description,

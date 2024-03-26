@@ -2,6 +2,7 @@ import { Popover, Input } from 'antd';
 import { Error } from '@mui/icons-material';
 import { useEffect, useRef, useState } from 'react';
 import _ from 'lodash-es';
+import { dictData } from 'api/template/index';
 import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
 interface Variable {
     pre: number;
@@ -32,6 +33,12 @@ const Variables = ({ pre, model, schemaList, value, setValue }: Variable) => {
             setPopoverWidth(widthRef.current?.offsetWidth);
         }
     }, [widthRef]);
+    const [promptList, setPromptList] = useState<any[]>([]);
+    useEffect(() => {
+        dictData().then((res) => {
+            setPromptList(res.list);
+        });
+    }, []);
     return (
         <>
             <div className="mt-[20px] mb-[10px] text-[14px] font-[600] flex items-end">
@@ -65,6 +72,8 @@ const Variables = ({ pre, model, schemaList, value, setValue }: Variable) => {
                         setDemandOpen(true);
                         setValue(value);
                     }}
+                    promptList={promptList}
+                    model={model}
                 />
             </div>
             {/* <TextArea

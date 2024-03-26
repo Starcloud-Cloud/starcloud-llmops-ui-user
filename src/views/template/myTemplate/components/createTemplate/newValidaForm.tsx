@@ -2,7 +2,7 @@ import {
     Box,
     Typography,
     Grid,
-    Table,
+    // Table,
     TableBody,
     TableCell,
     TableContainer,
@@ -22,7 +22,8 @@ import {
 } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
 import { t } from 'hooks/web/useI18n';
-import { Divider, Popconfirm, Input, Collapse } from 'antd';
+import { Divider, Popconfirm, Input, Collapse, Table } from 'antd';
+import type { TableProps } from 'antd';
 import MainCard from 'ui-component/cards/MainCard';
 import Add from '@mui/icons-material/Add';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -32,7 +33,9 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import _ from 'lodash-es';
 import { Validas, Rows } from 'types/template';
 import FormExecute from 'views/template/components/newValidaForm';
-import { useState, memo, useEffect, useRef } from 'react';
+import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
+import { dictData } from 'api/template/index';
+import { useState, memo, useEffect, useRef, useCallback, useMemo } from 'react';
 const Valida = ({
     handler,
     variable,
@@ -49,8 +52,68 @@ const Valida = ({
     editModal,
     delModal
 }: Validas) => {
+    console.log('newValidaForm');
+
     const { TextArea } = Input;
     const { Panel } = Collapse;
+    const columns: TableProps<any>['columns'] = [
+        {
+            title: '变量 KEY',
+            dataIndex: 'field',
+            align: 'center'
+        },
+        {
+            title: '变量名称',
+            dataIndex: 'label',
+            align: 'center'
+        },
+        {
+            title: '变量类型',
+            align: 'center',
+            render: (_, row) => <span>{t('myApp.' + row.style.toLowerCase())}</span>
+        },
+        {
+            title: '是否显示',
+            align: 'center',
+            render: (_, row, i) => (
+                <Switch
+                    name={row.field}
+                    onChange={() => {
+                        statusChange({ i, index });
+                    }}
+                    checked={row?.isShow}
+                />
+            )
+        },
+        {
+            title: '操作',
+            align: 'center',
+            render: (_, row, i) => (
+                <div>
+                    <IconButton
+                        onClick={() => {
+                            editModal(row, i, index);
+                        }}
+                        color="primary"
+                    >
+                        <SettingsIcon />
+                    </IconButton>
+                    <Popconfirm
+                        title={t('myApp.del')}
+                        description={t('myApp.delDesc')}
+                        onConfirm={() => delModal(i, index)}
+                        onCancel={() => {}}
+                        okText={t('myApp.confirm')}
+                        cancelText={t('myApp.cancel')}
+                    >
+                        <IconButton disabled={row.group === 'SYSTEM'} color="error">
+                            <DeleteIcon />
+                        </IconButton>
+                    </Popconfirm>
+                </div>
+            )
+        }
+    ];
     const [pre, setPre] = useState(0);
     useEffect(() => {
         if (variables.some((value: any) => !value.value)) {
@@ -58,6 +121,7 @@ const Valida = ({
         }
     }, [allvalida]);
     const iptRef = useRef<any | null>(null);
+    const timeoutRef = useRef<any>(null);
     const changePrompt = (field: string, i: number) => {
         const newVal = _.cloneDeep(variables);
         const part1 = newVal[i].value.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
@@ -65,6 +129,23 @@ const Valida = ({
         newVal[i].value = `${part1}{STEP.${fields}.${field}}${part2}`;
         basisChange({ e: { name: 'prompt', value: newVal[i].value }, index, i, flag: false, values: true });
     };
+    const [dictList, setDictList] = useState<any[]>([]);
+    useEffect(() => {
+        dictData().then((res) => {
+            setDictList(res.list);
+        });
+    }, []);
+
+    const [prompt, setPrompt] = useState<undefined | string>('');
+    const setPrompts = (data: any) => {
+        setPrompt(data.target.value);
+    };
+    useEffect(() => {
+        setPrompt(variables?.find((item: any) => item.field === 'prompt')?.value);
+    }, [variables?.find((item: any) => item.field === 'prompt')?.value]);
+    const getTable = useMemo(() => {
+        return variable;
+    }, [variable]);
     return (
         <div className="py-2">
             <form>
@@ -118,17 +199,23 @@ const Valida = ({
                                                         />
                                                     </Box>
                                                 </Box>
-                                                <TextArea
-                                                    className="mt-[16px]"
-                                                    status={!el.value ? 'error' : ''}
-                                                    ref={iptRef}
-                                                    style={{ height: '200px' }}
-                                                    value={el.value}
-                                                    name={el.field}
-                                                    onChange={(e) => {
-                                                        basisChange({ e: e.target, index, i, flag: false, values: true });
-                                                    }}
-                                                />
+                                                <div className="relative mt-[16px]">
+                                                    <TextArea
+                                                        status={!el.value ? 'error' : ''}
+                                                        ref={iptRef}
+                                                        style={{ height: '200px' }}
+                                                        value={prompt}
+                                                        name={el.field}
+                                                        onChange={(e) => setPrompts(e)}
+                                                        onBlur={(e) => basisChange({ e: e.target, index, i, flag: false, values: true })}
+                                                    />
+                                                    <ExePrompt
+                                                        dictList={dictList}
+                                                        changePrompt={(data) => {
+                                                            changePrompt(data, i);
+                                                        }}
+                                                    />
+                                                </div>
                                                 {!el.value ? (
                                                     <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">{'Prompt 必填'}</span>
                                                 ) : (
@@ -175,59 +262,7 @@ const Valida = ({
                                 </Button>
                             </Box>
                             <Divider style={{ margin: '10px 0' }} />
-                            <TableContainer>
-                                <Table size="small">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>{t('myApp.field')}</TableCell>
-                                            <TableCell>{t('myApp.name')}</TableCell>
-                                            <TableCell>{t('myApp.type')}</TableCell>
-                                            <TableCell> {t('myApp.isShow')}</TableCell>
-                                            <TableCell>{t('myApp.operation')}</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {variable?.map((row: Rows, i: number) => (
-                                            <TableRow hover key={row.field}>
-                                                <TableCell>{row.field}</TableCell>
-                                                <TableCell>{row.label}</TableCell>
-                                                <TableCell>{t('myApp.' + row.style.toLowerCase())}</TableCell>
-                                                <TableCell>
-                                                    <Switch
-                                                        name={row.field}
-                                                        onChange={() => {
-                                                            statusChange({ i, index });
-                                                        }}
-                                                        checked={row?.isShow}
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <IconButton
-                                                        onClick={() => {
-                                                            editModal(row, i, index);
-                                                        }}
-                                                        color="primary"
-                                                    >
-                                                        <SettingsIcon />
-                                                    </IconButton>
-                                                    <Popconfirm
-                                                        title={t('myApp.del')}
-                                                        description={t('myApp.delDesc')}
-                                                        onConfirm={() => delModal(i, index)}
-                                                        onCancel={() => {}}
-                                                        okText={t('myApp.confirm')}
-                                                        cancelText={t('myApp.cancel')}
-                                                    >
-                                                        <IconButton disabled={row.group === 'SYSTEM'} color="error">
-                                                            <DeleteIcon />
-                                                        </IconButton>
-                                                    </Popconfirm>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                            <Table rowKey={(record: any) => record.field} columns={columns} dataSource={getTable} pagination={false} />
                         </MainCard>
                     </Panel>
                     {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && handler !== 'AssembleActionHandler' && (

@@ -1,6 +1,7 @@
 import { Box, Typography, TextField, Divider, Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import { Image } from 'antd';
+import { Image, Dropdown } from 'antd';
 import SubCard from 'ui-component/cards/SubCard';
+import type { MenuProps } from 'antd';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -22,6 +23,7 @@ import { useState, useEffect, memo } from 'react';
 import _ from 'lodash-es';
 
 function Arrange({ detail, config, editChange, basisChange, statusChange, changeConfigs, getTableData }: any) {
+    console.log('arrange');
     const [stepTitle, setStepTitle] = useState<string[]>([]);
     const [modal, setModal] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState<number>(0);
@@ -188,6 +190,12 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         }
         return image;
     };
+    // const items: MenuProps['items'] = [
+    //     {
+    //         key: '1',
+    //         label: ''
+    //     }
+    // ];
     return (
         <Box>
             <Typography variant="h5" fontSize="1rem" mb={1}>
@@ -374,6 +382,20 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                                         <HelpIcon fontSize="small" />
                                     </Tooltip>
                                 )}
+                                {/* <Dropdown
+                                    menu={[
+                                        {
+                                            key: '1',
+                                            label: ''
+                                        }
+                                    ]}
+                                    trigger={['click']}
+                                >
+                                    <IconButton>
+                                        <MoreHorizIcon />
+                                    </IconButton>
+                                </Dropdown> */}
+
                                 <IconButton
                                     aria-controls={menuOpen[index] ? 'del' + index : undefined}
                                     aria-haspopup="true"
@@ -393,16 +415,28 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                                     anchorEl={anchorEl[index]}
                                 >
                                     <MenuItem
-                                        disabled={config?.steps.length === 1}
+                                        disabled={index === 0}
                                         onClick={() => {
-                                            delStep(index);
+                                            stepMove(index, -1);
                                             const newVal = [...anchorEl];
                                             newVal[index] = null;
                                             setAnchorEl(newVal);
                                         }}
                                     >
-                                        <DeleteIcon color="error" />
-                                        {t('market.delete')}
+                                        <ExpandLessIcon color="secondary" />
+                                        向上
+                                    </MenuItem>
+                                    <MenuItem
+                                        disabled={index === config?.steps.length - 1}
+                                        onClick={() => {
+                                            stepMove(index, 1);
+                                            const newVal = [...anchorEl];
+                                            newVal[index] = null;
+                                            setAnchorEl(newVal);
+                                        }}
+                                    >
+                                        <ExpandMoreIcon color="secondary" />
+                                        向下
                                     </MenuItem>
                                     <MenuItem
                                         onClick={() => {
@@ -416,28 +450,16 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                                         复制
                                     </MenuItem>
                                     <MenuItem
-                                        disabled={index === 0}
+                                        disabled={config?.steps.length === 1}
                                         onClick={() => {
-                                            stepMove(index, -1);
+                                            delStep(index);
                                             const newVal = [...anchorEl];
                                             newVal[index] = null;
                                             setAnchorEl(newVal);
                                         }}
                                     >
-                                        <ExpandLessIcon color="secondary" />
-                                        向上移动
-                                    </MenuItem>
-                                    <MenuItem
-                                        disabled={index === config?.steps.length - 1}
-                                        onClick={() => {
-                                            stepMove(index, 1);
-                                            const newVal = [...anchorEl];
-                                            newVal[index] = null;
-                                            setAnchorEl(newVal);
-                                        }}
-                                    >
-                                        <ExpandMoreIcon color="secondary" />
-                                        向下移动
+                                        <DeleteIcon color="error" />
+                                        {t('market.delete')}
                                     </MenuItem>
                                 </Menu>
                             </Box>

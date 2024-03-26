@@ -34,6 +34,7 @@ function Perform({
     setStep,
     setMaterialType
 }: any) {
+    console.log('perform');
     const refs = useRef<any>([]);
     //点击全部执行
     const allExecute = () => {

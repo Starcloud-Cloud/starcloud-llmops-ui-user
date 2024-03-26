@@ -1,5 +1,6 @@
 import { Popover, Menu, Input } from 'antd';
 import _ from 'lodash-es';
+import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
 import { useState, useRef } from 'react';
 const { SubMenu } = Menu;
 const { TextArea } = Input;
@@ -14,7 +15,9 @@ const VariableInput = ({
     title,
     value,
     setValue,
-    styles = {}
+    styles = {},
+    promptList,
+    model
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
@@ -27,9 +30,22 @@ const VariableInput = ({
     row?: number;
     setValue: (data: any) => void;
     styles?: any;
+    promptList?: any[];
+    model?: string;
 }) => {
     const inputList: any = useRef([]);
     const [tipValue, setTipValue] = useState('');
+    const setData = (data: string, flag?: boolean) => {
+        let newValue = _.cloneDeep(value);
+        if (!newValue) {
+            newValue = '';
+        }
+        const part1 = newValue.slice(0, inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
+        const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
+        newValue = flag ? `${part1}{${data}}${part2}` : `${part1}{{${data}}}${part2}`;
+        setOpen(false);
+        handleMenu({ index, newValue });
+    };
     function renderMenuItems(data: any, index: number) {
         return data.map((item: any) => {
             if (item.children && item.children.length > 0) {
@@ -42,15 +58,7 @@ const VariableInput = ({
                 return (
                     <Menu.Item
                         onClick={(data: any) => {
-                            let newValue = _.cloneDeep(value);
-                            if (!newValue) {
-                                newValue = '';
-                            }
-                            const part1 = newValue.slice(0, inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
-                            const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
-                            newValue = `${part1}{{${data?.key}}}${part2}`;
-                            setOpen(false);
-                            handleMenu({ index, newValue });
+                            setData(data?.key);
                         }}
                         key={item.key}
                     >
@@ -86,9 +94,6 @@ const VariableInput = ({
         >
             <div className="flex items-stretch relative">
                 <TextArea
-                    // style={{
-                    //     border: '1px solid red'
-                    // }}
                     style={styles}
                     rows={row || 1}
                     value={value}
@@ -113,6 +118,15 @@ const VariableInput = ({
                 <span className="text-black block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc] z-[1]">
                     {title}
                 </span>
+                {model === 'AI_CUSTOM' && (
+                    <ExePrompt
+                        dictList={promptList}
+                        changePrompt={(data: any) => {
+                            setData('STEP.全局变量.' + data, true);
+                        }}
+                        flag={true}
+                    />
+                )}
             </div>
         </Popover>
     );

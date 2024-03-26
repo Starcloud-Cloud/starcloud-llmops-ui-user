@@ -136,14 +136,15 @@ const BatcSmallRedBooks = () => {
                             batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
                                 setBathTotal(res.total);
                                 setBathList(res.list);
+                                setExeDisabled(false);
                             });
                         })
                         .catch((err) => {
                             batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
                                 setBathTotal(res.total);
                                 setBathList(res.list);
+                                setExeDisabled(false);
                             });
-                            setExeDisabled(false);
                         });
                 }
             } catch (err) {
@@ -190,14 +191,15 @@ const BatcSmallRedBooks = () => {
                             batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
                                 setBathTotal(res.total);
                                 setBathList(res.list);
+                                setExeDisabled;
                             });
                         })
                         .catch((err) => {
                             batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
                                 setBathTotal(res.total);
                                 setBathList(res.list);
+                                setExeDisabled(false);
                             });
-                            setExeDisabled(false);
                         });
                 }
             } catch (err) {
@@ -273,10 +275,11 @@ const BatcSmallRedBooks = () => {
             }, 3000);
         }
     }, [queryPage.pageNo]);
+    const [collapseActive, setcollapseActive] = useState<any[]>([]);
     useEffect(() => {
         if (bathList?.length !== 0) {
             const bathId = bathList[0].batch;
-
+            setcollapseActive([bathId]);
             timer.current?.map((item: any) => {
                 clearInterval(item);
             });
@@ -362,6 +365,7 @@ const BatcSmallRedBooks = () => {
                             <>
                                 <Collapse
                                     onChange={(e: any) => {
+                                        setcollapseActive(e);
                                         timer.current?.map((item: any) => {
                                             clearInterval(item);
                                         });
@@ -395,7 +399,7 @@ const BatcSmallRedBooks = () => {
                                             }
                                         }
                                     }}
-                                    defaultActiveKey={bathList[0]?.batch}
+                                    activeKey={collapseActive}
                                     items={bathList?.map((item) => {
                                         return {
                                             key: item.batch,

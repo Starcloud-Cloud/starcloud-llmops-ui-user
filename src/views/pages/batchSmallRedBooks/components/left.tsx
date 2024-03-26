@@ -545,12 +545,7 @@ const Lefts = ({
                 <Button className="w-full" icon={<SaveOutlined rev={undefined} />} onClick={() => handleSaveClick(false)} type="primary">
                     保存配置
                 </Button>
-                <Button
-                    disabled={exedisabled || (detailData.status && detailData.status === 'RUNNING' ? true : false)}
-                    className="w-full"
-                    type="primary"
-                    onClick={() => handleSaveClick(true)}
-                >
+                <Button disabled={exedisabled} className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
                     保存并开始生成
                 </Button>
             </div>

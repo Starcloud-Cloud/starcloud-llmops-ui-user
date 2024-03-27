@@ -27,7 +27,7 @@ function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle, setS
     };
     const [value, setValue] = useState(false);
     return (
-        <>
+        <div>
             {item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
@@ -143,7 +143,7 @@ function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle, setS
                     <Table rowKey={(_, index) => String(index)} columns={columns} dataSource={item.value} />
                 </div>
             )}
-        </>
+        </div>
     );
 }
 const arePropsEqual = (prevProps: any, nextProps: any) => {

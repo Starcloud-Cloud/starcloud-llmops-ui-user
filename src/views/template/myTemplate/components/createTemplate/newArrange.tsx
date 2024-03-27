@@ -17,7 +17,18 @@ import ArrangeModal from './arrangeModal';
 import { useState, useEffect, memo } from 'react';
 import _ from 'lodash-es';
 
-function Arrange({ detail, config, editChange, basisChange, statusChange, changeConfigs, getTableData }: any) {
+function Arrange({
+    detail,
+    config,
+    editChange,
+    basisChange,
+    statusChange,
+    changeConfigs,
+    getTableData,
+    tableCopy,
+    tableDataDel,
+    tableDataMove
+}: any) {
     const [stepTitle, setStepTitle] = useState<string[]>([]);
     const [modal, setModal] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState<number>(0);
@@ -80,12 +91,14 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     const [descStatus, setDescStatus] = useState<(boolean | null | undefined)[]>([]);
     //删除步骤
     const delStep = (index: number) => {
+        tableDataDel(index);
         const newValue = _.cloneDeep(config);
         newValue.steps.splice(index, 1);
         changeConfigs(newValue);
     };
     //复制步骤
     const copyStep = (step: any, index: number) => {
+        tableCopy(index);
         const newStep = _.cloneDeep(step);
         beforeCopy(index, newStep.name, newStep, config.steps);
     };
@@ -103,6 +116,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     };
     //移动步骤
     const stepMove = (index: number, direction: number) => {
+        tableDataMove({ index, direction });
         const newData = _.cloneDeep(config);
         const temp = newData?.steps[index];
         newData.steps[index] = newData?.steps[index + direction];
@@ -129,7 +143,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         }
     };
     const addStep = (step: any, index: number) => {
-        getTableData(index);
+        getTableData({ step, index });
         const newStep = _.cloneDeep(step);
         stepEtch(index + 1, newStep.name, config.steps, newStep, index);
     };
@@ -167,7 +181,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
             <Typography variant="h5" fontSize="1rem" mb={1}>
                 {t('myApp.flow')}
             </Typography>
-            {config?.steps.map((item: any, index: number) => (
+            {config?.steps?.map((item: any, index: number) => (
                 <Box key={item?.field}>
                     {index !== 0 && (
                         <Box display="flex" justifyContent="center">

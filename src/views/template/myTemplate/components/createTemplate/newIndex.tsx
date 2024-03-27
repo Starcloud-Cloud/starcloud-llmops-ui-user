@@ -54,8 +54,6 @@ const Header = ({
     detail,
     aiModel,
     setOpenUpgradeModel,
-    perform,
-    setPerform,
     setAiModel,
     appModels
 }: {
@@ -63,8 +61,6 @@ const Header = ({
     detail: any;
     aiModel: any;
     setOpenUpgradeModel: (data: any) => void;
-    perform: any;
-    setPerform: (data: any) => void;
     setAiModel: (data: any) => void;
     appModels: any;
 }) => {
@@ -119,7 +115,6 @@ const Header = ({
                                     setOpenUpgradeModel(true);
                                     return;
                                 }
-                                setPerform(perform + 1);
                                 setAiModel(value);
                             }}
                         >
@@ -140,7 +135,6 @@ const Header = ({
     );
 };
 function CreateDetail() {
-    console.log('createDetail');
     const categoryList = marketStore((state) => state.categoryList);
     //路由跳转
     const navigate = useNavigate();
@@ -358,7 +352,6 @@ function CreateDetail() {
         setDetail(newValue);
     };
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
-    const [perform, setPerform] = useState('perform');
     //设置name desc icon
     const setData = (data: any) => {
         detailRef.current = {
@@ -378,8 +371,9 @@ function CreateDetail() {
             newValue.workflowConfig.steps[steps].variable.variables[
                 newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
             ].value = [];
-            setStep(steps);
-            setMaterialType(type);
+            stepRef.current = steps;
+            setStep(stepRef.current);
+            setTableData(type, steps);
         }
         detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
@@ -407,7 +401,6 @@ function CreateDetail() {
                 workflowConfig: data
             })
         );
-        setPerform(perform + 1);
     };
     //设置提示词编排步骤的name desc
     const editChange = useCallback(
@@ -454,7 +447,6 @@ function CreateDetail() {
         }
         detailRef.current = _.cloneDeep(oldValue);
         setDetail(oldValue);
-        // setPerform(perform + 1);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
         const value = _.cloneDeep(detail);
@@ -553,13 +545,17 @@ function CreateDetail() {
         ]?.value
     ]);
     //素材类型的请求接口
+    const stepRef = useRef(0);
     const [step, setStep] = useState(0);
     const [materialType, setMaterialType] = useState('');
     const refersSourceRef = useRef<any>(null);
     const [refersSource, setRefersSource] = useState<any[]>([]);
     //删除
     const handleDel = (index: number, i: number) => {
-        if (i) setStep(i);
+        if (i) {
+            stepRef.current = i;
+            setStep(stepRef.current);
+        }
         const newValue = _.cloneDeep(detailRef.current);
         const newList =
             newValue.workflowConfig.steps[i].variable.variables[
@@ -575,7 +571,13 @@ function CreateDetail() {
     const [editOpen, setEditOpen] = useState(false);
     const [rowIndex, setRowIndex] = useState(0);
     const handleEdit = (row: any, index: number, i?: number) => {
-        if (i) setStep(i);
+        console.log(i);
+        if (i || i === 0) {
+            let newData = _.cloneDeep(stepRef.current);
+            newData = i;
+            stepRef.current = newData;
+            setStep(stepRef.current);
+        }
         setTitle('编辑');
         setMaterialType(row.type);
         form.setFieldsValue(row);
@@ -584,7 +586,7 @@ function CreateDetail() {
     };
     const formOk = (result: any) => {
         const newValue = _.cloneDeep(detailRef.current);
-        const pubilcList = newValue.workflowConfig.steps[step].variable.variables;
+        const pubilcList = newValue.workflowConfig.steps[stepRef.current].variable.variables;
         let newList = pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')]?.value;
         if (title === '编辑') {
             newList.splice(rowIndex, 1, { ...result, type: materialType });
@@ -603,15 +605,6 @@ function CreateDetail() {
         setEditOpen(false);
         form.resetFields();
     };
-    useEffect(() => {
-        if (materialType) {
-            materialTemplate(materialType).then((res) => {
-                stepMarRef.current[step] = getHeader(res?.fieldDefine, step);
-                setStepMaterial(stepMarRef.current);
-                setPerform(perform + 1);
-            });
-        }
-    }, [materialType]);
     //获取数据表头
     const getHeader = (data: any, i: number) => {
         const newList = data.map((item: any) => ({
@@ -640,6 +633,7 @@ function CreateDetail() {
             ),
             type: item.type
         }));
+
         return [
             ...newList,
             {
@@ -675,6 +669,8 @@ function CreateDetail() {
         ];
     };
     const getHeaders = (data: any, i: number) => {
+        console.log(data);
+
         const newList = data;
         newList?.splice(newList?.length - 1, 1);
         return [
@@ -720,6 +716,13 @@ function CreateDetail() {
     //获取哪个步骤有素材
     const stepMarRef = useRef<any[]>([]);
     const [stepMaterial, setStepMaterial] = useState<any[]>([]);
+    const setTableData = async (type: string, steps: number) => {
+        const res = await materialTemplate(type);
+        const newList = _.cloneDeep(stepMarRef.current);
+        newList[steps] = getHeaders(getHeader(res?.fieldDefine, steps), steps);
+        stepMarRef.current = newList;
+        setStepMaterial(stepMarRef.current);
+    };
     const getStepMater = async () => {
         const arr: any[] = [];
         const newList = detailRef.current?.workflowConfig?.steps.map((item: any) => {
@@ -738,16 +741,63 @@ function CreateDetail() {
         stepMarRef.current = arr;
         setStepMaterial(stepMarRef?.current);
     };
-    const getTableData = (index: number) => {
+    //增加表格
+    const getTableData = async ({ step, index }: { step: any; index: number }) => {
         const newList = stepMarRef.current;
-        newList?.splice(index + 1, 0, undefined);
-        console.log(newList);
-
+        let data = undefined;
+        const values = step?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_TYPE');
+        if (values) {
+            const result = await materialTemplate(values?.value);
+            data = result.fieldDefine;
+        }
+        newList?.splice(index + 1, 0, getHeader(data, index + 1));
         const ccc = newList?.map((el: any, i: number) => {
             if (el) {
                 return getHeaders(el, i);
             }
-            return undefined;
+        });
+        stepMarRef.current = ccc;
+        console.log(stepMarRef.current, 'stepMarRef.current');
+
+        setStepMaterial(stepMarRef.current);
+    };
+    //复制表格
+    const tableCopy = (index: number) => {
+        const newData = _.cloneDeep(stepMarRef.current);
+        const temp = _.cloneDeep(newData[index]);
+        newData.splice(index, 0, temp);
+        console.log(newData);
+
+        const ccc = newData?.map((el: any, i: number) => {
+            if (el) {
+                return getHeaders(el, i);
+            }
+        });
+        stepMarRef.current = ccc;
+        setStepMaterial(stepMarRef.current);
+    };
+    //删除表格
+    const tableDataDel = (index: number) => {
+        const newData = _.cloneDeep(stepMarRef.current);
+        newData?.splice(index, 1);
+        const ccc = newData?.map((el: any, i: number) => {
+            if (el) {
+                return getHeaders(el, i);
+            }
+        });
+        stepMarRef.current = ccc;
+        setStepMaterial(stepMarRef.current);
+    };
+    //移动表格
+    const tableDataMove = ({ index, direction }: { index: number; direction: number }) => {
+        const newData = _.cloneDeep(stepMarRef.current);
+        const temp = _.cloneDeep(newData[index]);
+        newData[index] = _.cloneDeep(newData[index + direction]);
+        newData[index + direction] = temp;
+        const ccc = newData?.map((el: any, i: number) => {
+            if (el) {
+                return getHeaders(el, i);
+            }
         });
         stepMarRef.current = ccc;
         setStepMaterial(stepMarRef.current);
@@ -872,48 +922,6 @@ function CreateDetail() {
                                 />
                             </div>
                         </div>
-                        {/* <Grid container spacing={2}>
-                            <Grid item lg={6}>
-                                
-                            </Grid>
-                            {/* <Grid item lg={6}>
-                                <Typography variant="h5" fontSize="1rem" mb={1}>
-                                    {t('market.debug')}
-                                </Typography>
-                                <Card elevation={2} sx={{ p: 2 }}>
-                                    <Header
-                                        permissions={permissions}
-                                        detail={detail}
-                                        aiModel={aiModel}
-                                        setOpenUpgradeModel={setOpenUpgradeModel}
-                                        perform={perform}
-                                        setPerform={setPerform}
-                                        setAiModel={setAiModel}
-                                        appModels={appModels}
-                                    />
-                                    <Perform
-                                        key={perform}
-                                        isShows={isShows}
-                                        columns={stepMaterial}
-                                        setEditOpen={setEditOpen}
-                                        setStep={setStep}
-                                        setTitle={setTitle}
-                                        config={_.cloneDeep(detail?.workflowConfig)}
-                                        changeConfigs={changeConfigs}
-                                        changeSon={changeData}
-                                        loadings={loadings}
-                                        isDisables={isDisables}
-                                        variableChange={exeChange}
-                                        changeanswer={changeanswer}
-                                        promptChange={promptChange}
-                                        isallExecute={(flag: boolean) => {
-                                            isAllExecute = flag;
-                                        }}
-                                        source="myApp"
-                                    />
-                                </Card>
-                            </Grid> */}
-                        {/* </Grid> */}
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="流程编排" key="1">
                         <div className="flex justify-center">
@@ -930,6 +938,9 @@ function CreateDetail() {
                                         statusChange={statusChange}
                                         changeConfigs={changeConfigs}
                                         getTableData={getTableData}
+                                        tableCopy={tableCopy}
+                                        tableDataDel={tableDataDel}
+                                        tableDataMove={tableDataMove}
                                     />
                                 )}
                                 {segmentedValue === '预览' && (
@@ -943,16 +954,16 @@ function CreateDetail() {
                                                 detail={detail}
                                                 aiModel={aiModel}
                                                 setOpenUpgradeModel={setOpenUpgradeModel}
-                                                perform={perform}
-                                                setPerform={setPerform}
                                                 setAiModel={setAiModel}
                                                 appModels={appModels}
                                             />
                                             <Perform
-                                                key={perform}
                                                 columns={stepMaterial}
                                                 setEditOpen={setEditOpen}
-                                                setStep={setStep}
+                                                setStep={(data: any) => {
+                                                    stepRef.current = data;
+                                                    setStep(stepRef.current);
+                                                }}
                                                 setMaterialType={setMaterialType}
                                                 setTitle={setTitle}
                                                 isShows={isShows}
@@ -1009,7 +1020,7 @@ function CreateDetail() {
                     materialType={materialType}
                     editOpen={editOpen}
                     setEditOpen={setEditOpen}
-                    columns={stepMaterial[step]}
+                    columns={stepMarRef.current[stepRef.current]}
                     form={form}
                     formOk={formOk}
                     sourceList={refersSource}

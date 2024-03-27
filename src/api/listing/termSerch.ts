@@ -27,3 +27,7 @@ export const KeywordMetadataExtendAsin = (params: any) => {
 export const KeywordMetadataListing = (params: any) => {
     return request.get({ url: '/listing/KeywordMetadata/Listing', params });
 };
+//导出
+export const exportExtendAsin = (params: any) => {
+    return request.download({ url: '/listing/KeywordMetadata/exportExtendAsin', params });
+};

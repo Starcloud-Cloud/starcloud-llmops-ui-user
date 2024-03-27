@@ -2,12 +2,6 @@ import {
     Box,
     Typography,
     Grid,
-    // Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
     Button,
     IconButton,
     Switch,
@@ -15,7 +9,6 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    TextField,
     Tooltip,
     Chip,
     FormControlLabel
@@ -31,11 +24,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import _ from 'lodash-es';
-import { Validas, Rows } from 'types/template';
+import { Validas } from 'types/template';
 import FormExecute from 'views/template/components/newValidaForm';
-import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
+import NewPrompt from './newPrompt';
 import { dictData } from 'api/template/index';
-import { useState, memo, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, memo, useEffect, useRef, useMemo } from 'react';
 const Valida = ({
     handler,
     variable,
@@ -52,8 +45,6 @@ const Valida = ({
     editModal,
     delModal
 }: Validas) => {
-    console.log('newValidaForm');
-
     const { TextArea } = Input;
     const { Panel } = Collapse;
     const columns: TableProps<any>['columns'] = [
@@ -120,222 +111,151 @@ const Valida = ({
             setPre(pre + 1);
         }
     }, [allvalida]);
-    const iptRef = useRef<any | null>(null);
-    const timeoutRef = useRef<any>(null);
-    const changePrompt = (field: string, i: number) => {
-        const newVal = _.cloneDeep(variables);
-        const part1 = newVal[i].value.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
-        const part2 = newVal[i].value.slice(iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
-        newVal[i].value = `${part1}{STEP.${fields}.${field}}${part2}`;
-        basisChange({ e: { name: 'prompt', value: newVal[i].value }, index, i, flag: false, values: true });
-    };
+
     const [dictList, setDictList] = useState<any[]>([]);
     useEffect(() => {
         dictData().then((res) => {
             setDictList(res.list);
         });
     }, []);
-
-    const [prompt, setPrompt] = useState<undefined | string>('');
-    const setPrompts = (data: any) => {
-        setPrompt(data.target.value);
-    };
-    useEffect(() => {
-        setPrompt(variables?.find((item: any) => item.field === 'prompt')?.value);
-    }, [variables?.find((item: any) => item.field === 'prompt')?.value]);
     const getTable = useMemo(() => {
         return variable;
     }, [variable]);
     return (
         <div className="py-2">
-            <form>
-                <Collapse defaultActiveKey={['1']}>
+            <Collapse defaultActiveKey={['1']}>
+                <Panel
+                    header={
+                        <div className="flex items-center gap-2">
+                            {handler === 'VariableActionHandler' ||
+                            handler === 'MaterialActionHandler' ||
+                            variables?.find((item) => item.field === 'prompt')?.value ? (
+                                <CheckCircleIcon fontSize="small" color="success" />
+                            ) : (
+                                <CancelIcon fontSize="small" color="error" />
+                            )}
+                            <div>
+                                {handler === 'VariableActionHandler' || handler === 'MaterialActionHandler' ? '变量' : t('market.prompt')}
+                            </div>
+                        </div>
+                    }
+                    key="1"
+                >
+                    {variables?.map(
+                        (el: any, i: number) =>
+                            handler !== 'AssembleActionHandler' && (
+                                <Grid item md={12} xs={12} key={el.field}>
+                                    {el.field === 'prompt' && (
+                                        <NewPrompt
+                                            el={el}
+                                            dictList={dictList}
+                                            variable={variables}
+                                            fields={fields}
+                                            index={index}
+                                            i={i}
+                                            variables={variables}
+                                            basisChange={basisChange}
+                                        />
+                                    )}
+                                </Grid>
+                            )
+                    )}
+                    <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Box mr={1}>{t('myApp.table')}</Box>
+                                <Tooltip title={t('market.varableDesc')}>
+                                    <ErrorIcon fontSize="small" />
+                                </Tooltip>
+                            </Typography>
+                            <Button
+                                size="small"
+                                color="secondary"
+                                onClick={() => {
+                                    setModal(index);
+                                    setOpen(true);
+                                    setTitle(t('myApp.add'));
+                                }}
+                                variant="outlined"
+                                startIcon={<Add />}
+                            >
+                                {t('myApp.add')}
+                            </Button>
+                        </Box>
+                        <Divider style={{ margin: '10px 0' }} />
+                        <Table rowKey={(record: any) => record.field} columns={columns} dataSource={getTable} pagination={false} />
+                    </MainCard>
+                </Panel>
+                {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && handler !== 'AssembleActionHandler' && (
                     <Panel
                         header={
                             <div className="flex items-center gap-2">
-                                {handler === 'VariableActionHandler' ||
-                                handler === 'MaterialActionHandler' ||
-                                variables?.find((item) => item.field === 'prompt')?.value ? (
+                                {variables.every((value) => {
+                                    if (value.field !== 'prompt') {
+                                        return value.value;
+                                    } else {
+                                        return true;
+                                    }
+                                }) ? (
                                     <CheckCircleIcon fontSize="small" color="success" />
                                 ) : (
                                     <CancelIcon fontSize="small" color="error" />
                                 )}
-                                <div>
-                                    {handler === 'VariableActionHandler' || handler === 'MaterialActionHandler'
-                                        ? '变量'
-                                        : t('market.prompt')}
-                                </div>
+
+                                <div>{t('market.model')}</div>
                             </div>
                         }
-                        key="1"
+                        key="2"
                     >
-                        {variables?.map(
-                            (el: any, i: number) =>
-                                handler !== 'AssembleActionHandler' && (
-                                    <Grid item md={12} xs={12} key={el.field}>
-                                        {el.field === 'prompt' && (
-                                            <>
-                                                <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                    <Box display="flex" alignItems="center">
-                                                        <Typography mr={1} variant="h5">
-                                                            {t('market.' + el.field)}
-                                                        </Typography>
-                                                        <Tooltip placement="top" title={t('market.promptDesc')}>
-                                                            <ErrorIcon fontSize="small" />
-                                                        </Tooltip>
-                                                    </Box>
-                                                    <Box>
-                                                        <FormControlLabel
-                                                            label="是否显示"
-                                                            control={
-                                                                <Switch
-                                                                    name="promptisShow"
-                                                                    onChange={(e) => {
-                                                                        basisChange({ e: e.target, index, i, flag: true });
-                                                                    }}
-                                                                    checked={el.isShow}
-                                                                />
-                                                            }
-                                                        />
-                                                    </Box>
-                                                </Box>
-                                                <div className="relative mt-[16px]">
-                                                    <TextArea
-                                                        status={!el.value ? 'error' : ''}
-                                                        ref={iptRef}
-                                                        style={{ height: '200px' }}
-                                                        value={prompt}
-                                                        name={el.field}
-                                                        onChange={(e) => setPrompts(e)}
-                                                        onBlur={(e) => basisChange({ e: e.target, index, i, flag: false, values: true })}
-                                                    />
-                                                    <ExePrompt
-                                                        dictList={dictList}
-                                                        changePrompt={(data) => {
-                                                            changePrompt(data, i);
-                                                        }}
-                                                    />
-                                                </div>
-                                                {!el.value ? (
-                                                    <span className="text-[12px] text-[#f44336] mt-[5px] ml-[5px]">{'Prompt 必填'}</span>
-                                                ) : (
-                                                    <span className="text-[12px] mt-[5px] ml-[5px]">{el.description}</span>
-                                                )}
-                                                <Box mb={1}>
-                                                    {variable?.map((item) => (
-                                                        <Tooltip key={item.field} placement="top" title={t('market.fields')}>
-                                                            <Chip
-                                                                sx={{ mr: 1, mt: 1 }}
-                                                                size="small"
-                                                                color="primary"
-                                                                onClick={() => changePrompt(item.field, i)}
-                                                                label={item.field}
-                                                            ></Chip>
-                                                        </Tooltip>
-                                                    ))}
-                                                </Box>
-                                            </>
-                                        )}
-                                    </Grid>
-                                )
-                        )}
-                        <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Box mr={1}>{t('myApp.table')}</Box>
-                                    <Tooltip title={t('market.varableDesc')}>
-                                        <ErrorIcon fontSize="small" />
-                                    </Tooltip>
-                                </Typography>
-                                <Button
-                                    size="small"
-                                    color="secondary"
-                                    onClick={() => {
-                                        setModal(index);
-                                        setOpen(true);
-                                        setTitle(t('myApp.add'));
-                                    }}
-                                    variant="outlined"
-                                    startIcon={<Add />}
-                                >
-                                    {t('myApp.add')}
-                                </Button>
-                            </Box>
-                            <Divider style={{ margin: '10px 0' }} />
-                            <Table rowKey={(record: any) => record.field} columns={columns} dataSource={getTable} pagination={false} />
-                        </MainCard>
+                        {variables?.map((el: any, i: number) => (
+                            <Grid item md={12} xs={12} key={i + 'variables'}>
+                                {el.field !== 'prompt' && el.field !== 'n' && (
+                                    <FormExecute
+                                        item={el}
+                                        onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
+                                        pre={pre}
+                                    />
+                                )}
+                            </Grid>
+                        ))}
                     </Panel>
-                    {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && handler !== 'AssembleActionHandler' && (
-                        <Panel
-                            header={
-                                <div className="flex items-center gap-2">
-                                    {variables.every((value) => {
-                                        if (value.field !== 'prompt') {
-                                            return value.value;
-                                        } else {
-                                            return true;
-                                        }
-                                    }) ? (
-                                        <CheckCircleIcon fontSize="small" color="success" />
-                                    ) : (
-                                        <CancelIcon fontSize="small" color="error" />
-                                    )}
-
-                                    <div>{t('market.model')}</div>
-                                </div>
-                            }
-                            key="2"
-                        >
-                            {variables?.map((el: any, i: number) => (
-                                <Grid item md={12} xs={12} key={i + 'variables'}>
-                                    {el.field !== 'prompt' && el.field !== 'n' && (
-                                        <FormExecute
-                                            item={el}
-                                            onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
-                                            pre={pre}
-                                        />
-                                    )}
-                                </Grid>
-                            ))}
-                        </Panel>
-                    )}
-                    {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && (
-                        <Panel header="响应类型" key="3">
-                            <FormControl fullWidth>
-                                <InputLabel color="secondary" id="responent">
-                                    响应类型
-                                </InputLabel>
-                                <Select
-                                    disabled={responent?.readOnly ? true : false}
-                                    color="secondary"
-                                    onChange={(e) => {
-                                        basisChange({ e: e.target, index, i: 0, flag: false });
-                                    }}
-                                    name="type"
-                                    labelId="responent"
-                                    value={responent.type}
-                                    label="响应类型"
-                                >
-                                    <MenuItem value={'TEXT'}>文本类型</MenuItem>
-                                    <MenuItem value={'JSON'}>JSON 类型</MenuItem>
-                                </Select>
-                            </FormControl>
-                            {responent.type === 'JSON' && (
-                                <TextArea
-                                    disabled={responent?.readOnly ? true : false}
-                                    key={responent?.output?.jsonSchema}
-                                    defaultValue={responent?.output?.jsonSchema}
-                                    className="mt-[16px]"
-                                    style={{ height: '200px' }}
-                                    onBlur={(e) => {
-                                        basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
-                                    }}
-                                />
-                            )}
-                        </Panel>
-                    )}
-                </Collapse>
-            </form>
+                )}
+                {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && (
+                    <Panel header="响应类型" key="3">
+                        <FormControl fullWidth>
+                            <InputLabel color="secondary" id="responent">
+                                响应类型
+                            </InputLabel>
+                            <Select
+                                disabled={responent?.readOnly ? true : false}
+                                color="secondary"
+                                onChange={(e) => {
+                                    basisChange({ e: e.target, index, i: 0, flag: false });
+                                }}
+                                name="type"
+                                labelId="responent"
+                                value={responent.type}
+                                label="响应类型"
+                            >
+                                <MenuItem value={'TEXT'}>文本类型</MenuItem>
+                                <MenuItem value={'JSON'}>JSON 类型</MenuItem>
+                            </Select>
+                        </FormControl>
+                        {responent.type === 'JSON' && (
+                            <TextArea
+                                disabled={responent?.readOnly ? true : false}
+                                key={responent?.output?.jsonSchema}
+                                defaultValue={responent?.output?.jsonSchema}
+                                className="mt-[16px]"
+                                style={{ height: '200px' }}
+                                onBlur={(e) => {
+                                    basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
+                                }}
+                            />
+                        )}
+                    </Panel>
+                )}
+            </Collapse>
         </div>
     );
 };

@@ -261,17 +261,17 @@ function CreateDetail() {
             const arr = item?.variable?.variables;
             if (
                 arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
-                arr?.find((el: any) => el.field === 'REFERS') &&
-                arr?.find((el: any) => el.field === 'REFERS')?.value
+                arr?.find((el: any) => el.style === 'MATERIAL') &&
+                arr?.find((el: any) => el.style === 'MATERIAL')?.value
             ) {
                 let list: any;
 
                 try {
-                    list = JSON.parse(arr?.find((el: any) => el.field === 'REFERS')?.value);
+                    list = JSON.parse(arr?.find((el: any) => el.style === 'MATERIAL')?.value);
                 } catch (err) {
-                    list = arr?.find((el: any) => el.field === 'REFERS')?.value;
+                    list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
                 }
-                arr.find((el: any) => el.field === 'REFERS').value = list;
+                arr.find((el: any) => el.style === 'MATERIAL').value = list;
             }
         });
         detailRef.current = _.cloneDeep(newValue);
@@ -313,9 +313,9 @@ function CreateDetail() {
     const exeChange = ({ e, steps, i, type }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
-        if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.field === 'REFERS')) {
+        if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.style === 'MATERIAL')) {
             newValue.workflowConfig.steps[steps].variable.variables[
-                newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+                newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
             ].value = [];
             setStep(steps);
             setMaterialType(type);
@@ -417,11 +417,11 @@ function CreateDetail() {
             const arr = item?.variable?.variables;
             if (
                 arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
-                arr?.find((el: any) => el.field === 'REFERS') &&
-                arr?.find((el: any) => el.field === 'REFERS')?.value
+                arr?.find((el: any) => el.style === 'MATERIAL') &&
+                arr?.find((el: any) => el.style === 'MATERIAL')?.value
             ) {
-                arr.find((el: any) => el.field === 'REFERS').value = JSON.stringify(
-                    arr?.find((el: any) => el.field === 'REFERS')?.value
+                arr.find((el: any) => el.style === 'MATERIAL').value = JSON.stringify(
+                    arr?.find((el: any) => el.style === 'MATERIAL')?.value
                     // ?.map((i: any) => ({
                     //     ...i,
                     //     type: arr?.find((el: any) => el.field === 'MATERIAL_TYPE')?.value
@@ -509,7 +509,7 @@ function CreateDetail() {
         const newValue = _.cloneDeep(detailRef.current);
         const newList =
             newValue.workflowConfig.steps[i].variable.variables[
-                newValue.workflowConfig.steps[i].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+                newValue.workflowConfig.steps[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
             ].value;
         newList.splice(index, 1);
         detailRef.current = newValue;
@@ -532,7 +532,7 @@ function CreateDetail() {
         const newValue = _.cloneDeep(detailRef.current);
         const newList =
             newValue.workflowConfig.steps[step].variable.variables[
-                newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+                newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
             ].value;
         if (title === '编辑') {
             newList.splice(rowIndex, 1, { ...result, type: materialType });
@@ -543,7 +543,7 @@ function CreateDetail() {
             });
         }
         newValue.workflowConfig.steps[step].variable.variables[
-            newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.field === 'REFERS')
+            newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
         ].value = newList;
         detailRef.current = newValue;
         setDetail(detailRef.current);

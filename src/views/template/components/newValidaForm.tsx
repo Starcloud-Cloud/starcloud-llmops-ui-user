@@ -22,8 +22,6 @@ const changeJSONValue = (value: string) => {
     return parsedJson;
 };
 function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle, setStep, setMaterialType }: any) {
-    console.log('Form');
-
     const mt = {
         marginTop: 2
     };
@@ -41,7 +39,7 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
                     size="small"
                     color="secondary"
                     label={item.label === 'Max Tokens' ? '最大返回Tokens' : item.label === 'Temperature' ? '温度值' : item.label}
-                    value={item.value}
+                    defaultValue={item.value}
                     id={item.field}
                     required
                     name={item.field}
@@ -51,6 +49,8 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
                     helperText={!item.value && value ? `${item.label}必填` : item.description}
                     onChange={(e) => {
                         setValue(true);
+                    }}
+                    onBlur={(e) => {
                         onChange(e.target);
                     }}
                     fullWidth
@@ -61,7 +61,7 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
                     size="small"
                     color="secondary"
                     label={item.label === 'Prompt' ? t('market.' + item.field) : item.label}
-                    value={item.value}
+                    defaultValue={item.value}
                     id={item.field}
                     required
                     name={item.field}
@@ -74,6 +74,8 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
                     helperText={!item.value && value ? `${item.label}必填` : item.description}
                     onChange={(e) => {
                         setValue(true);
+                    }}
+                    onBlur={(e) => {
                         onChange(e.target);
                     }}
                     fullWidth

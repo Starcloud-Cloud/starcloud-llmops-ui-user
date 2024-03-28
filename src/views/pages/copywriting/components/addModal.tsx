@@ -1179,7 +1179,24 @@ const AddModal = () => {
                                     if (!newData || newData?.every((i: any) => !i)) {
                                         return 1;
                                     }
-                                    return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                    return (
+                                        newData
+                                            ?.map((item: any) => Number(item))
+                                            ?.sort((a: any, b: any) => {
+                                                if (typeof a === 'number' && typeof b === 'number' && !isNaN(a) && !isNaN(b)) {
+                                                    return b - a;
+                                                } else if (isNaN(a)) {
+                                                    return 1; // 把NaN排到最后
+                                                } else if (isNaN(b)) {
+                                                    return -1; // 同理，保证NaN在其他正常数值后
+                                                } else {
+                                                    // 对非数值类型进行某种比较或直接返回0保持原顺序
+                                                    return a > b ? 1 : a < b ? -1 : 0;
+                                                }
+                                            })[0] *
+                                            1 +
+                                        1
+                                    );
                                 }}
                             />
                         </>

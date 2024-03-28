@@ -26,7 +26,25 @@ const StyleTabs = ({
         if (!newData || newData?.every((i: any) => !i)) {
             return 1;
         }
-        return newData?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+
+        return (
+            newData
+                ?.map((item) => Number(item))
+                ?.sort((a: any, b: any) => {
+                    if (typeof a === 'number' && typeof b === 'number' && !isNaN(a) && !isNaN(b)) {
+                        return b - a;
+                    } else if (isNaN(a)) {
+                        return 1; // 把NaN排到最后
+                    } else if (isNaN(b)) {
+                        return -1; // 同理，保证NaN在其他正常数值后
+                    } else {
+                        // 对非数值类型进行某种比较或直接返回0保持原顺序
+                        return a > b ? 1 : a < b ? -1 : 0;
+                    }
+                })[0] *
+                1 +
+            1
+        );
     };
     const add = () => {
         const newPanes = _.cloneDeep(imageStyleData);
@@ -93,6 +111,25 @@ const StyleTabs = ({
                                 setData={(data: any) => {
                                     const newData = _.cloneDeep(imageStyleData);
                                     newData[i] = data;
+                                    setDetailData(newData);
+                                }}
+                                setCopyData={(data: any) => {
+                                    const newData = _.cloneDeep(imageStyleData);
+                                    const nameFn = (name: string): string => {
+                                        const data = newData?.find((item: any) => item.name === name);
+                                        if (!data) {
+                                            return name;
+                                        } else {
+                                            return nameFn(name + '_copy');
+                                        }
+                                    };
+                                    const newName = nameFn(data.name + '_copy');
+                                    const newItem = {
+                                        ...data,
+                                        name: newName,
+                                        key: newName
+                                    };
+                                    newData.splice(i + 1, 0, newItem);
                                     setDetailData(newData);
                                 }}
                                 typeList={typeList}

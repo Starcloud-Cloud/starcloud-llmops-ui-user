@@ -104,6 +104,7 @@ const StyleTabs = ({
                                     newData[i] = data;
                                     setDetailData(newData);
                                 }}
+                                setCopyData={() => {}}
                                 typeList={typeList}
                             />
                         )

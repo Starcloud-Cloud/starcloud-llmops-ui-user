@@ -77,6 +77,7 @@ const NewPrompt = ({
                     onBlur={(e) => basisChange({ e: e.target, index, i, flag: false, values: true })}
                 />
                 <ExePrompt
+                    type="prompt_template"
                     changePrompt={(data) => {
                         changePrompt(data, i);
                     }}

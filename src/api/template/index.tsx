@@ -208,6 +208,6 @@ export const getImageTemplateJSON = (templateId: string) => {
     return request.get({ url: `/llm/creative/scheme/posterTemplate?templateId=${templateId}` });
 };
 // 获取template json
-export const dictData = (label = '') => {
-    return request.get({ url: `system/dict-data/page?pageNo=1&pageSize=100&dictType=prompt_template&label=${label}` });
+export const dictData = (label = '', type = 'prompt_template') => {
+    return request.get({ url: `system/dict-data/page?pageNo=1&pageSize=100&dictType=${type}&label=${label}` });
 };

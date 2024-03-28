@@ -77,7 +77,6 @@ const NewPrompt = ({
                     onBlur={(e) => basisChange({ e: e.target, index, i, flag: false, values: true })}
                 />
                 <ExePrompt
-                    dictList={dictList}
                     changePrompt={(data) => {
                         changePrompt(data, i);
                     }}
@@ -107,7 +106,8 @@ const NewPrompt = ({
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.el) === JSON.stringify(nextProps?.el) &&
-        JSON.stringify(prevProps?.variable) === JSON.stringify(nextProps?.variable)
+        JSON.stringify(prevProps?.variable) === JSON.stringify(nextProps?.variable) &&
+        JSON.stringify(prevProps?.dictList) === JSON.stringify(nextProps?.dictList)
     );
 };
 export default memo(NewPrompt, arePropsEqual);

@@ -1,7 +1,7 @@
-import { Button, Tabs, Popover, Switch } from 'antd';
+import { Button, Tabs, Popover, Switch, Dropdown } from 'antd';
 import { TextField, IconButton } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { PlusOutlined, InfoCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, InfoCircleOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import StyleTabs from '../styleTabs';
 import { memo } from 'react';
@@ -18,7 +18,7 @@ interface Tabs {
 }
 const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui, appData }: Tabs) => {
     return (
-        <div className="h-[800px] overflow-y-auto overflow-x-hidden">
+        <div className="min-h-[800px] ">
             {/* <div className="flex items-center gap-4 min-h-[32px]">
                 <span>海报生成模式</span>
                 <Switch
@@ -129,28 +129,65 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                                 }}
                                             />
                                         </div>
-                                        <Popover
-                                            zIndex={9999}
-                                            content={
-                                                <Button
-                                                    onClick={(e: any) => {
-                                                        const newData = _.cloneDeep(imageStyleData);
-                                                        newData.splice(i, 1);
-                                                        setImageStyleData(newData);
-                                                        e.stopPropagation();
-                                                    }}
-                                                    danger
-                                                    icon={<DeleteOutlined rev={undefined} />}
-                                                >
-                                                    删除
-                                                </Button>
-                                            }
-                                            trigger="click"
+                                        <Dropdown
+                                            menu={{
+                                                items: [
+                                                    {
+                                                        key: '1',
+                                                        icon: <CopyOutlined rev={undefined} />,
+                                                        label: (
+                                                            <div
+                                                                onClick={(e: any) => {
+                                                                    const newData = _.cloneDeep(imageStyleData);
+                                                                    const nameFn = (name: string): string => {
+                                                                        const data = newData?.find((item: any) => item.name === name);
+                                                                        if (!data) {
+                                                                            return name;
+                                                                        } else {
+                                                                            return nameFn(name + '_copy');
+                                                                        }
+                                                                    };
+                                                                    const newName = nameFn(item.name + '_copy');
+                                                                    const newItem = {
+                                                                        ...item,
+                                                                        name: newName,
+                                                                        id: newName,
+                                                                        key: newName
+                                                                    };
+                                                                    newData.splice(i + 1, 0, newItem);
+                                                                    setImageStyleData(newData);
+                                                                    e.stopPropagation();
+                                                                }}
+                                                                className="w-full h-full"
+                                                            >
+                                                                复制
+                                                            </div>
+                                                        )
+                                                    },
+                                                    {
+                                                        key: '2',
+                                                        icon: <DeleteOutlined rev={undefined} />,
+                                                        label: (
+                                                            <div
+                                                                onClick={(e: any) => {
+                                                                    const newData = _.cloneDeep(imageStyleData);
+                                                                    newData.splice(i, 1);
+                                                                    setImageStyleData(newData);
+                                                                    e.stopPropagation();
+                                                                }}
+                                                                className="w-full h-full"
+                                                            >
+                                                                删除
+                                                            </div>
+                                                        )
+                                                    }
+                                                ]
+                                            }}
                                         >
-                                            <IconButton size="small" onClick={(e: any) => e.stopPropagation()}>
+                                            <IconButton size="small">
                                                 <MoreVert />
                                             </IconButton>
-                                        </Popover>
+                                        </Dropdown>
                                     </div>
                                 </div>
                                 <StyleTabs

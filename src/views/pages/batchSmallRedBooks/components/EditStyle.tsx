@@ -1,5 +1,5 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
-import { Input, Popover, Tree, Image, Row, Col, Menu, Switch, Select, Divider } from 'antd';
+import { Input, Popover, Tree, Image, Row, Col, Menu, Switch, Button, Divider } from 'antd';
 import type { TreeDataNode } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef, useMemo } from 'react';
@@ -16,12 +16,14 @@ const EditStyle = ({
     typeList,
     imageStyleData,
     setData,
+    setCopyData,
     appData = {}
 }: {
     schemaList?: any[];
     typeList: any[];
     imageStyleData: any;
     setData: (data: any) => void;
+    setCopyData: (data: any) => void;
     appData?: any;
 }) => {
     const [open, setOpen] = React.useState(false);
@@ -70,7 +72,9 @@ const EditStyle = ({
     }, [imageStyleData, tempList]);
     const [perOpen, setPerOpen] = useState<any[]>([]);
     const [items, setItem] = useState<any[]>([]);
-
+    const handleCopy = () => {
+        setCopyData(imageStyleData);
+    };
     useEffect(() => {
         setItem(schemaList as any[]);
     }, []);
@@ -106,20 +110,27 @@ const EditStyle = ({
                 {open && (
                     <SelectTemplateModal open={open} imageTypeList={imageTypeList} handleClose={() => setOpen(false)} handleOk={handleOk} />
                 )}
-                <FormControl error={!imageStyleData?.id} sx={{ flex: 1 }} color="secondary" fullWidth>
-                    <TextField
-                        color="secondary"
-                        className="!cursor-pointer"
-                        id="outlined-basic"
-                        label="图片模版"
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true }}
-                        value={currentTemp?.name}
-                        onClick={() => setOpen(true)}
-                        error={!imageStyleData?.id}
-                    />
-                    <FormHelperText>{!imageStyleData?.id ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
-                </FormControl>
+                <div className="pr-4 flex justify-between">
+                    <div className="!w-[40%]">
+                        <FormControl fullWidth error={!imageStyleData?.id} sx={{ flex: 1 }} color="secondary">
+                            <TextField
+                                color="secondary"
+                                className="!cursor-pointer"
+                                id="outlined-basic"
+                                label="图片模版"
+                                variant="outlined"
+                                InputLabelProps={{ shrink: true }}
+                                value={currentTemp?.name}
+                                onClick={() => setOpen(true)}
+                                error={!imageStyleData?.id}
+                            />
+                            <FormHelperText>{!imageStyleData?.id ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
+                        </FormControl>
+                    </div>
+                    <Button className="mt-[7px]" type="primary" onClick={handleCopy}>
+                        复制
+                    </Button>
+                </div>
                 {imageStyleData?.id && (
                     <div>
                         <div className="flex">

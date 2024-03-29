@@ -5,7 +5,7 @@ import { PlusOutlined, LoadingOutlined, SaveOutlined, ZoomInOutlined } from '@an
 import type { RadioChangeEvent } from 'antd';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Forms from '../../smallRedBook/components/form';
 import { schemeList, materialTemplate, metadata, materialImport, materialExport, materialResilt } from 'api/redBook/batchIndex';
@@ -552,7 +552,7 @@ const Lefts = ({
             <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
             </Modal>
-            <Modal width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
+            <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <div className="flex justify-end my-[20px]">
                     <Button
                         type="primary"
@@ -595,4 +595,12 @@ const Lefts = ({
         </>
     );
 };
-export default Lefts;
+const LeftMemo = (prevProps: any, nextProps: any) => {
+    return (
+        JSON.stringify(prevProps?.detailData) === JSON.stringify(nextProps?.detailData) &&
+        JSON.stringify(prevProps?.imageList) === JSON.stringify(nextProps?.imageList) &&
+        JSON.stringify(prevProps?.schemesList) === JSON.stringify(nextProps?.schemesList) &&
+        JSON.stringify(prevProps?.exedisabled) === JSON.stringify(nextProps?.exedisabled)
+    );
+};
+export default memo(Lefts, LeftMemo);

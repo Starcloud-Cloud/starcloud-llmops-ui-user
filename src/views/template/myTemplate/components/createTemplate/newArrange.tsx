@@ -125,6 +125,7 @@ function Arrange({
         setPre(pre + 1);
     };
     //增加步骤
+    const [stepOpen, setStepOpen] = useState<any[]>([]);
     const [stepLists, setStepList] = useState<any[]>([]);
     const stepEtch = (index: number, name: string, steps: any, newStep: any, i: number) => {
         if (steps.some((item: { name: string }) => item.name === name + index)) {
@@ -143,6 +144,9 @@ function Arrange({
         }
     };
     const addStep = (step: any, index: number) => {
+        const newList = _.cloneDeep(stepOpen);
+        newList[index] = false;
+        setStepOpen(newList);
         getTableData({ step, index });
         const newStep = _.cloneDeep(step);
         stepEtch(index + 1, newStep.name, config.steps, newStep, index);
@@ -163,7 +167,7 @@ function Arrange({
         stepList(detail?.type).then((res) => {
             setStepList(res);
         });
-    }, []);
+    }, [detail?.type]);
     //改变值让子组件检测到
     const [allvalida, setallvalida] = useState<(number | null)[]>([]);
     const [allvalidas, setallvalidas] = useState<(boolean | null)[]>([]);
@@ -419,8 +423,14 @@ function Arrange({
                         |
                     </Box>
                     <Popover
+                        open={stepOpen[index]}
                         placement="bottom"
                         trigger={'click'}
+                        onOpenChange={(open: boolean) => {
+                            const newList = _.cloneDeep(stepOpen);
+                            newList[index] = open;
+                            setStepOpen(newList);
+                        }}
                         content={
                             <div className="lg:w-[700px] md:w-[80%] flex gap-2 flex-wrap">
                                 {stepLists.map((item) => (

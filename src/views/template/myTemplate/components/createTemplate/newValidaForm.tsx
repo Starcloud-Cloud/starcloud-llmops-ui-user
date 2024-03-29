@@ -148,8 +148,9 @@ const Valida = ({
                                     {el.field === 'prompt' && (
                                         <NewPrompt
                                             el={el}
+                                            handler={handler}
                                             dictList={dictList}
-                                            variable={variables}
+                                            variable={variable}
                                             fields={fields}
                                             index={index}
                                             i={i}

@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { DetailModal } from '../redBookContentList/component/detailModal';
 import './index.scss';
 import Left from './components/left';
+import Right from './components/right';
 import Goods from './good';
 import dayjs from 'dayjs';
 const BatcSmallRedBooks = () => {
@@ -55,8 +56,7 @@ const BatcSmallRedBooks = () => {
     };
 
     //批次分页
-    const [batchTotal, setBathTotal] = useState(0);
-    const [batchPage, setBatchPage] = useState({ page: 1, pageSize: 100 });
+    const batchPage = { page: 1, pageSize: 100 };
     const [batchUid, setBatchUid] = useState('');
     const [bathList, setBathList] = useState<any[]>([]);
     const [batchOpen, setbatchOpen] = useState(false);
@@ -67,7 +67,6 @@ const BatcSmallRedBooks = () => {
                 if (result) {
                     setDetail(result);
                     batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                        setBathTotal(res.total);
                         setBathList(res.list);
                     });
                 }
@@ -134,14 +133,12 @@ const BatcSmallRedBooks = () => {
                     planExecute({ uid: searchParams.get('uid') })
                         .then((res) => {
                             batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathTotal(res.total);
                                 setBathList(res.list);
                                 setExeDisabled(false);
                             });
                         })
                         .catch((err) => {
                             batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathTotal(res.total);
                                 setBathList(res.list);
                                 setExeDisabled(false);
                             });
@@ -189,14 +186,12 @@ const BatcSmallRedBooks = () => {
                     planExecute({ uid: res })
                         .then((result) => {
                             batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathTotal(res.total);
                                 setBathList(res.list);
                                 setExeDisabled;
                             });
                         })
                         .catch((err) => {
                             batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathTotal(res.total);
                                 setBathList(res.list);
                                 setExeDisabled(false);
                             });
@@ -208,7 +203,7 @@ const BatcSmallRedBooks = () => {
         }
     };
     //页面滚动
-    const scrollRef: any = useRef(null);
+
     const [total, setTotal] = useState(0);
     const [planList, setPlanList] = useState<any[]>([]);
     const plabListRef: any = useRef(null);
@@ -217,8 +212,7 @@ const BatcSmallRedBooks = () => {
         pageSize: 20
     });
     const queryRef: any = useRef({ pageNo: 1, pageSize: 20 });
-    const handleScroll = () => {
-        const { current } = scrollRef;
+    const handleScroll = (current: any) => {
         if (current) {
             if (
                 current.scrollHeight - current.scrollTop === current.clientHeight &&
@@ -276,6 +270,42 @@ const BatcSmallRedBooks = () => {
         }
     }, [queryPage.pageNo]);
     const [collapseActive, setcollapseActive] = useState<any[]>([]);
+    //手风琴的开关
+    const changeCollapse = (e: any) => {
+        setcollapseActive(e);
+        timer.current?.map((item: any) => {
+            clearInterval(item);
+        });
+        timer.current = [];
+        plabListRef.current = [];
+
+        if (e.length > 0) {
+            setbatchOpen(true);
+            queryRef.current = {
+                pageNo: 1,
+                pageSize: 20
+            };
+            setQueryPage(queryRef.current);
+            setBatchUid(e[0]);
+            if (bathList?.find((item) => item.batch == e[0])?.status === 'SUCCESS') {
+                getList(e[0]);
+            } else {
+                getList(e[0]);
+                timer.current[0] = setInterval(() => {
+                    if (
+                        plabListRef.current?.length === 0 ||
+                        plabListRef.current.slice(0, 1)?.every((item: any) => {
+                            return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
+                        })
+                    ) {
+                        clearInterval(timer.current[0]);
+                        return;
+                    }
+                    getLists(1, e[0]);
+                }, 3000);
+            }
+        }
+    };
     useEffect(() => {
         if (bathList?.length !== 0) {
             const bathId = bathList[0].batch;
@@ -285,7 +315,7 @@ const BatcSmallRedBooks = () => {
             });
             timer.current = [];
             plabListRef.current = [];
-            setPlanList([]);
+            // setPlanList([]);
             setbatchOpen(true);
             queryRef.current = {
                 pageNo: 1,
@@ -349,103 +379,16 @@ const BatcSmallRedBooks = () => {
                         />
                     </Col>
                     <Col span={18} className="overflow-hidden mt-4">
-                        {bathList?.length === 0 ? (
-                            <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
-                                <div className="text-center">
-                                    <img
-                                        className="w-[300px]"
-                                        src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
-                                        alt=""
-                                    />
-                                    <div className="font-[500] text-[20px] text-[#1b2337] my-[8px]">魔法创作计划</div>
-                                    <div>在左侧输入你的创意，保存并开始生成吧</div>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <Collapse
-                                    onChange={(e: any) => {
-                                        setcollapseActive(e);
-                                        timer.current?.map((item: any) => {
-                                            clearInterval(item);
-                                        });
-                                        timer.current = [];
-                                        plabListRef.current = [];
-                                        setPlanList([]);
-                                        if (e.length > 0) {
-                                            setbatchOpen(true);
-                                            queryRef.current = {
-                                                pageNo: 1,
-                                                pageSize: 20
-                                            };
-                                            setQueryPage(queryRef.current);
-                                            setBatchUid(e[0]);
-                                            if (bathList?.find((item) => item.batch == e[0])?.status === 'SUCCESS') {
-                                                getList(e[0]);
-                                            } else {
-                                                getList(e[0]);
-                                                timer.current[0] = setInterval(() => {
-                                                    if (
-                                                        plabListRef.current?.length === 0 ||
-                                                        plabListRef.current.slice(0, 1)?.every((item: any) => {
-                                                            return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
-                                                        })
-                                                    ) {
-                                                        clearInterval(timer.current[0]);
-                                                        return;
-                                                    }
-                                                    getLists(1, e[0]);
-                                                }, 3000);
-                                            }
-                                        }
-                                    }}
-                                    activeKey={collapseActive}
-                                    items={bathList?.map((item) => {
-                                        return {
-                                            key: item.batch,
-                                            label: (
-                                                <div className="w-full flex justify-between items-center text-sm pr-[20px]">
-                                                    <div className="">
-                                                        <span className="font-[600]">生成时间：</span>
-                                                        {dayjs(item?.startTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.batch}）
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-[600]">生成成功数：</span>
-                                                        {item?.successCount}&nbsp;&nbsp;
-                                                        <span className="font-[600]">生成失败数：</span>
-                                                        {item?.failureCount}&nbsp;&nbsp;
-                                                        <span className="font-[600]">生成总数：</span>
-                                                        {item?.totalCount}
-                                                    </div>
-                                                </div>
-                                            ),
-                                            children: (
-                                                <Spin spinning={batchOpen}>
-                                                    <div
-                                                        className="h-[1000px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
-                                                        ref={scrollRef}
-                                                        onScroll={handleScroll}
-                                                    >
-                                                        <Row gutter={20} className="h-[fit-content] w-full">
-                                                            {planList.map((item, index: number) => (
-                                                                <Col key={index} xs={12} md={12} xl={8} xxl={6} className="inline-block">
-                                                                    <Goods
-                                                                        item={item}
-                                                                        setBusinessUid={setBusinessUid}
-                                                                        setDetailOpen={setDetailOpen}
-                                                                    />
-                                                                </Col>
-                                                            ))}
-                                                        </Row>
-                                                    </div>
-                                                </Spin>
-                                            )
-                                        };
-                                    })}
-                                    accordion
-                                />
-                            </>
-                        )}
+                        <Right
+                            bathList={bathList}
+                            collapseActive={collapseActive}
+                            batchOpen={batchOpen}
+                            changeCollapse={(data: any) => changeCollapse(data)}
+                            planList={planList}
+                            setBusinessUid={(data: any) => setBusinessUid(data)}
+                            setDetailOpen={(data: any) => setDetailOpen(data)}
+                            handleScroll={(data: any) => handleScroll(data)}
+                        />
                     </Col>
                 </Row>
                 {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}

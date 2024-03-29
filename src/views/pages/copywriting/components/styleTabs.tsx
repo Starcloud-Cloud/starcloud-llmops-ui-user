@@ -26,7 +26,6 @@ const StyleTabs = ({
         if (!newData || newData?.every((i: any) => !i)) {
             return 1;
         }
-
         return (
             newData
                 ?.map((item) => Number(item))
@@ -46,14 +45,14 @@ const StyleTabs = ({
             1
         );
     };
-    const add = () => {
+    const add = (data?: any) => {
         const newPanes = _.cloneDeep(imageStyleData);
         newPanes.push({
-            id: '',
+            id: data?.id || '',
             name: `图片 ${digui()}`,
             key: digui().toString(),
-            titleGenerateMode: 'DEFAULT',
-            variableList: []
+            titleGenerateMode: data?.titleGenerateMode || 'DEFAULT',
+            variableList: data?.variableList || []
         });
         setDetailData(newPanes);
         setActiveKey((newPanes.length - 1).toString());
@@ -113,25 +112,7 @@ const StyleTabs = ({
                                     newData[i] = data;
                                     setDetailData(newData);
                                 }}
-                                setCopyData={(data: any) => {
-                                    const newData = _.cloneDeep(imageStyleData);
-                                    const nameFn = (name: string): string => {
-                                        const data = newData?.find((item: any) => item.name === name);
-                                        if (!data) {
-                                            return name;
-                                        } else {
-                                            return nameFn(name + '_copy');
-                                        }
-                                    };
-                                    const newName = nameFn(data.name + '_copy');
-                                    const newItem = {
-                                        ...data,
-                                        name: newName,
-                                        key: newName
-                                    };
-                                    newData.splice(i + 1, 0, newItem);
-                                    setDetailData(newData);
-                                }}
+                                setCopyData={add}
                                 typeList={typeList}
                             />
                         )

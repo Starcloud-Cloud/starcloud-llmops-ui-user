@@ -7,6 +7,7 @@ import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
 const NewPrompt = ({
     el,
+    handler,
     dictList,
     variable,
     fields,
@@ -16,6 +17,7 @@ const NewPrompt = ({
     basisChange
 }: {
     el: any;
+    handler?: string;
     dictList: any[];
     variable: any[];
     fields: any;
@@ -34,7 +36,8 @@ const NewPrompt = ({
         const newVal = _.cloneDeep(variables);
         const part1 = newVal[i].value.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
         const part2 = newVal[i].value.slice(iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
-        newVal[i].value = `${part1}{STEP.${fields}.${field}}${part2}`;
+        newVal[i].value =
+            handler === 'OpenAIChatActionHandler' ? `${part1}{STEP.${fields}.${field}}${part2}` : `${part1}{{${field}}}${part2}`;
         basisChange({ e: { name: 'prompt', value: newVal[i].value }, index, i, flag: false, values: true });
     };
     useEffect(() => {

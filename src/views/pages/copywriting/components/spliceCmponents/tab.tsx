@@ -17,51 +17,35 @@ interface Tabs {
     appData: any;
 }
 const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui, appData }: Tabs) => {
+    const handleAdd = (data?: any) => {
+        console.log(data);
+
+        let newData = _.cloneDeep(imageStyleData);
+        if (!newData) {
+            newData = [];
+        }
+        newData.push({
+            name: `风格 ${digui()}`,
+            key: digui().toString(),
+            id: digui().toString(),
+            enable: data?.enable || true,
+            templateList: data?.templateList || [
+                {
+                    key: '1',
+                    name: '首图',
+                    model: '',
+                    titleGenerateMode: 'DEFAULT',
+                    variableList: []
+                }
+            ],
+            totalImageCount: data?.totalImageCount || 0
+        });
+        setImageStyleData(newData);
+    };
     return (
         <div className="min-h-[800px] ">
-            {/* <div className="flex items-center gap-4 min-h-[32px]">
-                <span>海报生成模式</span>
-                <Switch
-                    checked={mode === 'SEQUENCE' ? true : false}
-                    onChange={(e) => {
-                        let newData = _.cloneDeep(mode);
-                        if (e) {
-                            newData = 'SEQUENCE';
-                        } else {
-                            newData = 'RANDOM';
-                        }
-                        setModel(newData);
-                    }}
-                />
-                <span className="text-[#673ab7]">{mode === 'SEQUENCE' ? '顺序生成' : '随机生成'}</span>
-            </div> */}
             <div className="flex items-end mb-[20px]">
-                <Button
-                    onClick={() => {
-                        let newData = _.cloneDeep(imageStyleData);
-                        if (!newData) {
-                            newData = [];
-                        }
-                        newData.push({
-                            name: `风格 ${digui()}`,
-                            key: digui().toString(),
-                            id: digui().toString(),
-                            enable: true,
-                            templateList: [
-                                {
-                                    key: '1',
-                                    name: '首图',
-                                    model: '',
-                                    titleGenerateMode: 'DEFAULT',
-                                    variableList: []
-                                }
-                            ]
-                        });
-                        setImageStyleData(newData);
-                    }}
-                    type="primary"
-                    icon={<PlusOutlined rev={undefined} />}
-                >
+                <Button onClick={handleAdd} type="primary" icon={<PlusOutlined rev={undefined} />}>
                     增加风格
                 </Button>
                 <div
@@ -130,56 +114,28 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                             />
                                         </div>
                                         <Dropdown
+                                            placement="bottom"
+                                            trigger={['click']}
                                             menu={{
+                                                onClick: (e) => {
+                                                    if (e.key === '1') {
+                                                        handleAdd(item);
+                                                    } else if (e.key === '2') {
+                                                        const newData = _.cloneDeep(imageStyleData);
+                                                        newData.splice(i, 1);
+                                                        setImageStyleData(newData);
+                                                    }
+                                                },
                                                 items: [
                                                     {
                                                         key: '1',
-                                                        icon: <CopyOutlined rev={undefined} />,
-                                                        label: (
-                                                            <div
-                                                                onClick={(e: any) => {
-                                                                    const newData = _.cloneDeep(imageStyleData);
-                                                                    const nameFn = (name: string): string => {
-                                                                        const data = newData?.find((item: any) => item.name === name);
-                                                                        if (!data) {
-                                                                            return name;
-                                                                        } else {
-                                                                            return nameFn(name + '_copy');
-                                                                        }
-                                                                    };
-                                                                    const newName = nameFn(item.name + '_copy');
-                                                                    const newItem = {
-                                                                        ...item,
-                                                                        name: newName,
-                                                                        id: newName,
-                                                                        key: newName
-                                                                    };
-                                                                    newData.splice(i + 1, 0, newItem);
-                                                                    setImageStyleData(newData);
-                                                                    e.stopPropagation();
-                                                                }}
-                                                                className="w-full h-full"
-                                                            >
-                                                                复制
-                                                            </div>
-                                                        )
+                                                        label: '复制',
+                                                        icon: <CopyOutlined rev={undefined} />
                                                     },
                                                     {
                                                         key: '2',
                                                         icon: <DeleteOutlined rev={undefined} />,
-                                                        label: (
-                                                            <div
-                                                                onClick={(e: any) => {
-                                                                    const newData = _.cloneDeep(imageStyleData);
-                                                                    newData.splice(i, 1);
-                                                                    setImageStyleData(newData);
-                                                                    e.stopPropagation();
-                                                                }}
-                                                                className="w-full h-full"
-                                                            >
-                                                                删除
-                                                            </div>
-                                                        )
+                                                        label: '删除'
                                                     }
                                                 ]
                                             }}

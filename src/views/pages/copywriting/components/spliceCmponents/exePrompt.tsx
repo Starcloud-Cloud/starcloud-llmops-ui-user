@@ -38,7 +38,7 @@ const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (
 
     return (
         <Popover
-            // open={open}
+            open={open}
             trigger={'click'}
             content={
                 <div className="w-[640px]">
@@ -68,6 +68,7 @@ const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (
                                     }}
                                     onClick={() => {
                                         changePrompt(item.remark);
+                                        setSelectId('');
                                         setTimeout(() => {
                                             setOpen(false);
                                         }, 200);

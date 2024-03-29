@@ -35,7 +35,7 @@ const NewPrompt = ({
         const part1 = newVal[i].value.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
         const part2 = newVal[i].value.slice(iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
         if (exclude) {
-            newVal[i].value = `${field}`;
+            newVal[i].value = `${part1}${field}${part2}`;
         } else {
             newVal[i].value = `${part1}{STEP.${fields}.${field}}${part2}`;
         }

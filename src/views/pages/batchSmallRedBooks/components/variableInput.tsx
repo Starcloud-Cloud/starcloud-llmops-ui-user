@@ -35,7 +35,7 @@ const VariableInput = ({
 }) => {
     const inputList: any = useRef([]);
     const [tipValue, setTipValue] = useState('');
-    const setData = (data: string, flag?: boolean, exclude = false) => {
+    const setData = (data: string, flag?: boolean) => {
         let newValue = _.cloneDeep(value);
         if (!newValue) {
             newValue = '';
@@ -44,11 +44,7 @@ const VariableInput = ({
         const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
         newValue = flag ? `${part1}{${data}}${part2}` : `${part1}{{${data}}}${part2}`;
         setOpen(false);
-        if (exclude) {
-            handleMenu({ index, data });
-        } else {
-            handleMenu({ index, newValue });
-        }
+        handleMenu({ index, newValue });
     };
     function renderMenuItems(data: any, index: number) {
         return data.map((item: any) => {
@@ -126,7 +122,7 @@ const VariableInput = ({
                     <ExePrompt
                         type="prompt_template_user"
                         changePrompt={(data: any) => {
-                            setData(data, true, true);
+                            setData(data, true);
                         }}
                         flag={true}
                     />

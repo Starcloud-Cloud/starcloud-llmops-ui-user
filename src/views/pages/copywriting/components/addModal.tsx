@@ -946,7 +946,7 @@ const AddModal = () => {
                                                     )}
                                                 </div>
                                             }
-                                            key={el.code}
+                                            key={el.code + index}
                                         >
                                             <>
                                                 {/* {el.code === 'MaterialActionHandler' && (

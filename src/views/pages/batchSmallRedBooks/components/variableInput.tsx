@@ -80,7 +80,7 @@ const VariableInput = ({
         <Popover
             trigger="click"
             arrow={false}
-            placement="bottom"
+            placement="bottomLeft"
             open={open}
             onOpenChange={() => setOpen(false)}
             content={
@@ -113,7 +113,7 @@ const VariableInput = ({
                     className="w-[50px] flex justify-center items-center border border-solid border-[#d9d9d9] ml-[-4px] bg-[#f8fafc] rounded-r-[6px] cursor-pointer"
                     style={{ borderLeft: 'none' }}
                 >
-                    fx
+                    参
                 </div>
                 <span className="text-black block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc] z-[1]">
                     {title}

@@ -11,15 +11,15 @@ const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (
     const [open, setOpen] = useState(false);
     const [tag, setTag] = useState([]);
     const [originDictList, setOriginDictList] = useState<any[]>([]);
-    console.log(type, 'type');
 
     useEffect(() => {
         dictData(value, type).then((res) => {
             if (!value) {
                 setOriginDictList(res.list);
+                const tagList = res.list.map((item: any) => item.value.split(/[,，]/));
+                setTag(tagList);
             }
             setDictList(res.list);
-            setTag(res.list.map((item: any) => item.value.split(',')));
         });
     }, [value]);
 
@@ -54,7 +54,7 @@ const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (
                         ))}
                     </div>
                     <div className="w-full flex gap-2 pt-2 h-[300px] overflow-y-auto">
-                        <div className="w-[30%]">
+                        <div className="w-[20%]">
                             {dictList?.map((item) => (
                                 <div
                                     className={` ${
@@ -62,9 +62,11 @@ const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (
                                     }  border-solid cursor-pointer text-sm line-clamp-1 ${
                                         selectId === item.id ? 'bg-[#673ab7]' : ''
                                     } rounded flex justify-center mb-1`}
-                                    onMouseEnter={() => setCurrentDict(item)}
-                                    onClick={() => {
+                                    onMouseEnter={() => {
+                                        setCurrentDict(item);
                                         setSelectId(item.id);
+                                    }}
+                                    onClick={() => {
                                         changePrompt(item.remark);
                                         setTimeout(() => {
                                             setOpen(false);
@@ -75,7 +77,9 @@ const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (
                                 </div>
                             ))}
                         </div>
-                        <div className="text-sm flex-1 bg-[#fafafa] rounded p-1 overflow-y-auto line-clamp-1">{currentDict.remark}</div>
+                        <div className="text-sm flex-1 bg-[#fafafa] rounded p-1 overflow-y-auto line-clamp-1 whitespace-pre">
+                            {currentDict.remark}
+                        </div>
                     </div>
                 </div>
             }

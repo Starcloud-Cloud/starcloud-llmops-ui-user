@@ -1,67 +1,92 @@
-import { Divider, Input, List, Popover } from 'antd';
-import { Tooltip, Chip, Button } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Divider, Input, List, Popover, Tag } from 'antd';
+import { Button } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
 import { dictData } from 'api/template';
 
-const ExePrompt = ({ changePrompt, flag }: { changePrompt: (data: any) => void; flag?: boolean }) => {
+const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (data: any) => void; flag?: boolean }) => {
     const [currentDict, setCurrentDict] = useState<any>({});
     const [dictList, setDictList] = useState<any[]>([]);
     const [value, setValue] = useState('');
+    const [selectId, setSelectId] = useState('');
+    const [open, setOpen] = useState(false);
+    const [tag, setTag] = useState([]);
+    const [originDictList, setOriginDictList] = useState<any[]>([]);
 
     useEffect(() => {
-        dictData().then((res) => {
+        dictData(value, type).then((res) => {
+            if (!value) {
+                setOriginDictList(res.list);
+                const tagList = res.list.map((item: any) => item.value.split(/[,，]/));
+                setTag(tagList);
+            }
             setDictList(res.list);
         });
-    }, []);
+    }, [value]);
 
-    const handleSearch = () => {
-        dictData(value).then((res) => {
-            setDictList(res.list);
-        });
+    const tags = useMemo(() => {
+        // 数组去重
+        const list: any = tag.flat() || [];
+        let uniqueArr = list.filter((item: any, index: number) => list.indexOf(item) === index);
+        return uniqueArr;
+    }, [tag]);
+
+    const handleTag = (tag: string) => {
+        const list = originDictList.filter((item) => item.value.includes(tag));
+        setCurrentDict({});
+        setDictList(list);
     };
 
     return (
         <Popover
+            open={open}
             trigger={'click'}
             content={
-                <div>
+                <div className="w-[640px]">
                     <div className="flex border-b border-solid border-red-50">
                         <Input placeholder="请输入名称" onChange={(e: any) => setValue(e.target.value)} />
-                        <Button className="ml-2" variant="contained" size="small" color="secondary" onClick={() => handleSearch()}>
-                            搜索
-                        </Button>
                     </div>
                     <Divider style={{ margin: '6px 0' }} />
-                    <div className="w-[350px] flex gap-2 pt-2 h-[250px] overflow-y-auto">
-                        <div className="w-[100px]">
-                            <div>名称:</div>
+                    <div className="flex flex-wrap w-full">
+                        {tags.flat().map((item: any) => (
+                            <Tag className="cursor-pointer mb-1" onClick={() => handleTag(item)}>
+                                {item}
+                            </Tag>
+                        ))}
+                    </div>
+                    <div className="w-full flex gap-2 pt-2 h-[300px] overflow-y-auto">
+                        <div className="w-[20%]">
                             {dictList?.map((item) => (
-                                <div className="text-[#2196f3] border-solid cursor-pointer text-base" onClick={() => setCurrentDict(item)}>
+                                <div
+                                    className={` ${
+                                        selectId === item.id ? 'text-[#fff]' : 'text-[#2196f3]'
+                                    }  border-solid cursor-pointer text-sm line-clamp-1 ${
+                                        selectId === item.id ? 'bg-[#673ab7]' : ''
+                                    } rounded flex justify-center mb-1`}
+                                    onMouseEnter={() => {
+                                        setCurrentDict(item);
+                                        setSelectId(item.id);
+                                    }}
+                                    onClick={() => {
+                                        changePrompt(item.remark);
+                                        setSelectId('');
+                                        setTimeout(() => {
+                                            setOpen(false);
+                                        }, 200);
+                                    }}
+                                >
                                     {item.label}
                                 </div>
                             ))}
                         </div>
-                        <div>
-                            <div>值:</div>
-                            <div className="w-[250px] text-base">{currentDict.value}</div>
+                        <div className="text-sm flex-1 bg-[#fafafa] rounded p-1 overflow-y-auto line-clamp-1 whitespace-pre">
+                            {currentDict.remark}
                         </div>
-                    </div>
-                    <Divider style={{ margin: '6px 0' }} />
-                    <div className="flex flex-row-reverse">
-                        <Button
-                            disabled={Object.keys(currentDict).length === 0}
-                            variant="contained"
-                            size="small"
-                            color="secondary"
-                            onClick={() => changePrompt(currentDict.value)}
-                        >
-                            确认
-                        </Button>
                     </div>
                 </div>
             }
         >
             <Button
+                onClick={() => setOpen(true)}
                 variant="contained"
                 size="small"
                 style={{ right: flag ? '52px' : '0.5rem' }}

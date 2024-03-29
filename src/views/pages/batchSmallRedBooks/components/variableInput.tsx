@@ -120,8 +120,9 @@ const VariableInput = ({
                 </span>
                 {model === 'AI_CUSTOM' && (
                     <ExePrompt
+                        type="prompt_template_user"
                         changePrompt={(data: any) => {
-                            setData('STEP.全局变量.' + data, true);
+                            setData(data, true);
                         }}
                         flag={true}
                     />

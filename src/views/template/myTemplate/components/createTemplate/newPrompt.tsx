@@ -32,12 +32,16 @@ const NewPrompt = ({
     const setPrompts = (data: any) => {
         setPrompt(data.target.value);
     };
-    const changePrompt = (field: string, i: number) => {
+    const changePrompt = (field: string, i: number, exclude = false) => {
         const newVal = _.cloneDeep(variables);
         const part1 = newVal[i].value.slice(0, iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
         const part2 = newVal[i].value.slice(iptRef?.current?.resizableTextArea?.textArea?.selectionStart);
-        newVal[i].value =
-            handler === 'OpenAIChatActionHandler' ? `${part1}{STEP.${fields}.${field}}${part2}` : `${part1}{{${field}}}${part2}`;
+        if (exclude) {
+            newVal[i].value = `${part1}${field}${part2}`;
+        } else {
+            newVal[i].value =
+                handler === 'OpenAIChatActionHandler' ? `${part1}{STEP.${fields}.${field}}${part2}` : `${part1}{{${field}}}${part2}`;
+        }
         basisChange({ e: { name: 'prompt', value: newVal[i].value }, index, i, flag: false, values: true });
     };
     useEffect(() => {
@@ -80,8 +84,9 @@ const NewPrompt = ({
                     onBlur={(e) => basisChange({ e: e.target, index, i, flag: false, values: true })}
                 />
                 <ExePrompt
+                    type="prompt_template"
                     changePrompt={(data) => {
-                        changePrompt(data, i);
+                        changePrompt(data, i, true);
                     }}
                 />
             </div>

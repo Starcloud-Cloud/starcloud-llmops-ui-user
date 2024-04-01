@@ -10,7 +10,7 @@ import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { failureRetry } from 'api/redBook/batchIndex';
 import './index.scss';
-const Goods = ({ item, setBusinessUid, setDetailOpen, show }: any) => {
+const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) => {
     const navigate = useNavigate();
     const [likeOpen, setLikeOpen] = useState(item?.liked);
     //执行按钮
@@ -65,6 +65,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show }: any) => {
     const failure = async (uid: string) => {
         setLoading(true);
         const result = await failureRetry(uid);
+        timeFailure();
     };
     const [loading, setLoading] = useState(false);
     return (

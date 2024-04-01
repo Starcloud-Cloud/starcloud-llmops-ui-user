@@ -10,7 +10,8 @@ const Right = ({
     planList,
     setBusinessUid,
     setDetailOpen,
-    handleScroll
+    handleScroll,
+    timeFailure
 }: {
     bathList: any[];
     collapseActive: any;
@@ -20,6 +21,7 @@ const Right = ({
     setBusinessUid: (data: any) => void;
     setDetailOpen: (data: any) => void;
     handleScroll: (data: any) => void;
+    timeFailure: (data: number) => void;
 }) => {
     const scrollRef: any = useRef(null);
     return (
@@ -67,7 +69,12 @@ const Right = ({
                                             ref={scrollRef}
                                             onScroll={() => handleScroll(scrollRef.current)}
                                         >
-                                            <PlanList planList={planList} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} />
+                                            <PlanList
+                                                planList={planList}
+                                                setBusinessUid={setBusinessUid}
+                                                setDetailOpen={setDetailOpen}
+                                                timeFailure={timeFailure}
+                                            />
                                         </div>
                                     </Spin>
                                 )

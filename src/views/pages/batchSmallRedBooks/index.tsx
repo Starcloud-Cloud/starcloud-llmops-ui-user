@@ -388,6 +388,11 @@ const BatcSmallRedBooks = () => {
                             setBusinessUid={(data: any) => setBusinessUid(data)}
                             setDetailOpen={(data: any) => setDetailOpen(data)}
                             handleScroll={(data: any) => handleScroll(data)}
+                            timeFailure={(index: number) => {
+                                const pageNo = Number((index / 20).toFixed(0)) + 1;
+                                clearInterval(timer.current[pageNo]);
+                                timer.current[pageNo] = getLists(pageNo);
+                            }}
                         />
                     </Col>
                 </Row>

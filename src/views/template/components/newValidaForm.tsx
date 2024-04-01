@@ -21,7 +21,7 @@ const changeJSONValue = (value: string) => {
     } catch (error) {}
     return parsedJson;
 };
-function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle, setStep, setMaterialType }: any) {
+function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle, setStep, setMaterialType, history }: any) {
     const mt = {
         marginTop: 2
     };
@@ -44,7 +44,7 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
                     required
                     name={item.field}
                     InputLabelProps={{ shrink: true }}
-                    placeholder={item?.defaultValue}
+                    placeholder={item.defaultValue ? String(item.defaultValue) : ''}
                     error={!item.value && value}
                     helperText={!item.value && value ? `${item.label}必填` : item.description}
                     onChange={(e) => {
@@ -137,6 +137,7 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
                 <div>
                     <div className="flex justify-end">
                         <Button
+                            disabled={history}
                             size="small"
                             type="primary"
                             onClick={() => {

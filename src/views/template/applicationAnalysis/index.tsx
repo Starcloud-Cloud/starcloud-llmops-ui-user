@@ -15,7 +15,7 @@ import {
     Paper,
     Pagination,
     TextField,
-    Button,
+    Button as Button2,
     Drawer,
     Card,
     Divider,
@@ -25,12 +25,12 @@ import {
     Tooltip,
     Link
 } from '@mui/material';
-import { Tag, Image, Select } from 'antd';
+import { Tag, Image, Select, Button } from 'antd';
 import formatDate from 'hooks/useDate';
 import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Chart, { Props } from 'react-apexcharts';
 import { logStatistics, statisticsByAppUid, infoPage, infoPageByAppUid, logMetaData, detailImage, detailApp } from 'api/template';
@@ -41,11 +41,14 @@ import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
 import { metadata } from 'api/template';
+import { schemeMetadata } from 'api/redBook/copywriting';
+import { materialTemplate } from 'api/redBook/batchIndex';
 import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
 import ImageDetail from 'views/picture/components/detail';
 import Echarts from './components/echart';
 import useUserStore from 'store/user';
 import { Charts } from 'types/chat';
+import _ from 'lodash-es';
 interface LogStatistics {
     createDate: string;
     completionCostPoints: number;
@@ -363,6 +366,7 @@ function ApplicationAnalysis({
     //接口请求出来的全部内容
     const [result, setResult] = useState<any>({});
     const [aimodel, setAiModel] = useState('');
+    const detailRef = useRef<any>(null);
     const [exeDetail, setExeDetail] = useState<any>({});
     //聊天
     const [chatVisible, setChatVisible] = useState(false);
@@ -378,6 +382,69 @@ function ApplicationAnalysis({
                 'data:image/png;base64,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';
         }
         return image;
+    };
+
+    const stepMarRef = useRef<any[]>([]);
+    const [stepMaterial, setStepMaterial] = useState<any[]>([]);
+    const getStepMater = async () => {
+        const arr: any[] = [];
+        const newList = detailRef.current?.workflowConfig?.steps.map((item: any) => {
+            const arr = item?.variable?.variables;
+            return arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value;
+        });
+        const allper = newList?.map(async (el: any, index: number) => {
+            if (el) {
+                const res = await materialTemplate(el);
+                arr[index] = getHeader(res?.fieldDefine, index);
+            } else {
+                arr[index] = undefined;
+            }
+        });
+        await Promise.all(allper);
+        stepMarRef.current = arr;
+        setStepMaterial(stepMarRef?.current);
+    };
+    //获取数据表头
+    const getHeader = (data: any, i: number) => {
+        const newList = data.map((item: any) => ({
+            title: item.desc,
+            align: 'center',
+            width: 200,
+            dataIndex: item.fieldName,
+            render: (_: any, row: any) => (
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    <div className="line-clamp-5">
+                        {item.type === 'image' ? (
+                            <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
+                </div>
+            ),
+            type: item.type
+        }));
+
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button disabled={true} size="small" type="link">
+                            编辑
+                        </Button>
+
+                        <Button disabled={true} size="small" type="link" danger>
+                            删除
+                        </Button>
+                    </div>
+                )
+            }
+        ];
     };
     return (
         <Box>
@@ -454,9 +521,9 @@ function ApplicationAnalysis({
                     </FormControl>
                 </Grid>
                 <Grid item md={4} lg={3} xs={12}>
-                    <Button onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
+                    <Button2 onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
                         {t('generateLog.search')}
-                    </Button>
+                    </Button2>
                 </Grid>
             </Grid>
             <Echarts generate={generate} list={list} />
@@ -593,7 +660,7 @@ function ApplicationAnalysis({
                                     </TableCell>
                                 )}
                                 <TableCell align="center">
-                                    <Button
+                                    <Button2
                                         color="secondary"
                                         size="small"
                                         onClick={() => {
@@ -602,10 +669,32 @@ function ApplicationAnalysis({
                                             } else if (row.appMode === 'COMPLETION') {
                                                 detailApp({ appConversationUid: row.uid }).then((res) => {
                                                     if (res) {
-                                                        setExeDetail(res.appInfo);
-                                                        setAiModel(res.aiModel);
-                                                        setResult(res);
-                                                        setConversationUid(res.conversationUid);
+                                                        const newData = _.cloneDeep(res);
+                                                        newData?.appInfo?.workflowConfig?.steps?.forEach((item: any) => {
+                                                            const arr = item?.variable?.variables;
+                                                            if (
+                                                                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                                                                arr?.find((el: any) => el.style === 'MATERIAL') &&
+                                                                arr?.find((el: any) => el.style === 'MATERIAL')?.value
+                                                            ) {
+                                                                let list: any;
+
+                                                                try {
+                                                                    list = JSON.parse(
+                                                                        arr?.find((el: any) => el.style === 'MATERIAL')?.value
+                                                                    );
+                                                                } catch (err) {
+                                                                    list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
+                                                                }
+                                                                arr.find((el: any) => el.style === 'MATERIAL').value = list;
+                                                            }
+                                                        });
+                                                        detailRef.current = newData.appInfo;
+                                                        setExeDetail(detailRef.current);
+                                                        setAiModel(newData.aiModel);
+                                                        setResult(newData);
+                                                        setConversationUid(newData.conversationUid);
+                                                        getStepMater();
                                                         setExeOpen(true);
                                                     }
                                                 });
@@ -626,7 +715,7 @@ function ApplicationAnalysis({
                                         }}
                                     >
                                         {t('generate.detail')}
-                                    </Button>
+                                    </Button2>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -682,7 +771,8 @@ function ApplicationAnalysis({
                     sx={{ '& .MuiDrawer-paper': { overflowY: 'auto' } }}
                     onClose={() => {
                         setExeOpen(false);
-                        setExeDetail({});
+                        detailRef.current = {};
+                        setExeDetail(detailRef.current);
                         setAiModel('');
                         setResult({});
                         setConversationUid('');
@@ -772,6 +862,7 @@ function ApplicationAnalysis({
                                         <Perform
                                             history={true}
                                             config={exeDetail.workflowConfig}
+                                            columns={stepMaterial}
                                             changeConfigs={() => {}}
                                             changeSon={() => {}}
                                             changeanswer={() => {}}

@@ -373,21 +373,6 @@ function TemplateMarket() {
     };
 
     return (
-        // <Box
-        //     sx={{
-        //         position: 'relative',
-        //         '&::after': {
-        //             content: '" "',
-        //             position: 'absolute',
-        //             top: '0',
-        //             right: '0px',
-        //             width: '5px',
-        //             height: maxHeight + 'px',
-        //             backgroundColor: theme.palette.mode === 'dark' ? '#1a223f' : 'rgb(244, 246, 248)',
-        //             pointerEvents: 'none'
-        //         }
-        //     }}
-        // >
         <Box
             height="calc(100vh - 128px)"
             overflow="hidden"
@@ -571,7 +556,6 @@ function TemplateMarket() {
                 />
             )}
         </Box>
-        // </Box>
     );
 }
 export default TemplateMarket;

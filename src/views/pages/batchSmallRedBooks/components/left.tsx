@@ -311,7 +311,7 @@ const Lefts = ({
             tableRef.current = detailData?.creativeMaterialList;
             setTableData(tableRef.current);
         }
-    }, [detailData?.creativeMaterialList]);
+    }, [JSON.stringify(detailData?.creativeMaterialList)]);
     useEffect(() => {
         if (materialType) {
             getTableHeader();
@@ -368,6 +368,7 @@ const Lefts = ({
                     <InputLabel id="example">选择文案模版</InputLabel>
                     <Select
                         labelId="example"
+                        disabled={detailData?.status !== 'PENDING'}
                         value={detailData?.targetKeys}
                         label="选择文案模版"
                         onChange={(e: any) => {

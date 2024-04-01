@@ -6,6 +6,11 @@ import Perform from './perform';
 import formatDate from 'hooks/useDate';
 
 function CarryOut({
+    columns,
+    setEditOpen,
+    setStep,
+    setMaterialType,
+    setTitle,
     config,
     changeData,
     loadings,
@@ -26,8 +31,13 @@ function CarryOut({
                     <Typography variant="h5" sx={{ fontSize: '1.1rem' }} mb={1}>
                         {config?.description}
                     </Typography>
-                    {config && (
+                    {config && columns?.length > 0 && (
                         <Perform
+                            columns={columns}
+                            setEditOpen={setEditOpen}
+                            setStep={setStep}
+                            setMaterialType={setMaterialType}
+                            setTitle={setTitle}
                             config={config?.workflowConfig}
                             detaData={config}
                             changeConfigs={changeConfigs}

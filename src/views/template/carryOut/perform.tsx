@@ -8,7 +8,7 @@ import { useRef, useEffect, memo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash-es';
 import copy from 'clipboard-copy';
-import FormExecute from 'views/template/components/validaForm';
+import FormExecute from 'views/template/components/newValidaForm';
 import { translateText } from 'api/picture/create';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useNavigate } from 'react-router-dom';
@@ -76,11 +76,7 @@ function Perform({
     //执行按钮是否禁用
     const disSteps = (index: number) => {
         const model = config?.steps[index].flowStep.variable?.variables.map((el: El) => {
-            // if (!el.isShow) {
             return el.value || el.value === false || el.defaultValue || el.defaultValue === false ? false : true;
-            // } else {
-            //     return el.defaultValue || el.defaultValue === false ? false : true;
-            // }
         });
         const variable = config?.steps[index].variable?.variables.map((el: El) => {
             if (el.isShow) {
@@ -223,17 +219,18 @@ function Perform({
                                                     >
                                                         <FormExecute
                                                             item={el}
+                                                            history={history}
                                                             columns={columns ? columns[steps] : []}
                                                             setEditOpen={setEditOpen}
                                                             setTitle={setTitle}
                                                             setStep={() => setStep(steps)}
-                                                            setMaterialType={() =>
+                                                            setMaterialType={() => {
                                                                 setMaterialType(
                                                                     config?.steps[steps]?.variable?.variables?.find(
                                                                         (item: any) => item.field === 'MATERIAL_TYPE'
                                                                     )?.value
-                                                                )
-                                                            }
+                                                                );
+                                                            }}
                                                             onChange={(e: any) => {
                                                                 variableChange({
                                                                     e,

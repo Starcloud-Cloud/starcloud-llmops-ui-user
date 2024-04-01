@@ -1,5 +1,5 @@
 import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
-import { Image, Select, Popover } from 'antd';
+import { Image, Select, Popover, Popconfirm, Button, Form } from 'antd';
 // import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 // import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -8,6 +8,8 @@ import {
     metadata
     // installTemplate
 } from 'api/template';
+import { materialTemplate } from 'api/redBook/batchIndex';
+import { schemeMetadata } from 'api/redBook/copywriting';
 import { favoriteGetMarketInfo, favoriteCollect, favoriteCancel } from 'api/template/collect';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -25,6 +27,7 @@ import useCategory from 'hooks/useCategory';
 import useUserStore from 'store/user';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { GradeOutlined, Grade, ErrorOutline } from '@mui/icons-material';
+import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 interface Items {
     label: string;
     value: string;
@@ -213,9 +216,17 @@ function Deatail() {
         setDetailData(newValue);
     };
     //更改变量的值
-    const variableChange = ({ e, steps, i }: any) => {
+    const variableChange = ({ e, steps, i, type }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.style === 'MATERIAL')) {
+            newValue.workflowConfig.steps[steps].variable.variables[
+                newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+            ].value = [];
+            stepRef.current = steps;
+            setStep(stepRef.current);
+            setTableData(type, steps);
+        }
         detailRef.current = newValue;
         setDetailData(newValue);
     };
@@ -253,7 +264,26 @@ function Deatail() {
                     'gpt-3.5-turbo-1106';
                 setAiModels(aimodeRef.current);
             }
-            detailRef.current = result;
+            const newData = _.cloneDeep(result);
+            newData?.workflowConfig?.steps?.forEach((item: any) => {
+                const arr = item?.variable?.variables;
+                if (
+                    arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                    arr?.find((el: any) => el.style === 'MATERIAL') &&
+                    arr?.find((el: any) => el.style === 'MATERIAL')?.value
+                ) {
+                    let list: any;
+
+                    try {
+                        list = JSON.parse(arr?.find((el: any) => el.style === 'MATERIAL')?.value);
+                    } catch (err) {
+                        list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
+                    }
+                    arr.find((el: any) => el.style === 'MATERIAL').value = list;
+                }
+            });
+            detailRef.current = newData;
+            getStepMater();
             setDetailData(detailRef.current);
         };
         metadata().then((res) => {
@@ -309,6 +339,201 @@ function Deatail() {
         }
         return image;
     };
+
+    //获取哪个步骤有素材
+    const stepMarRef = useRef<any[]>([]);
+    const [stepMaterial, setStepMaterial] = useState<any[]>([]);
+    const setTableData = async (type: string, steps: number) => {
+        const res = await materialTemplate(type);
+        const newList = _.cloneDeep(stepMarRef.current);
+        newList[steps] = getHeaders(getHeader(res?.fieldDefine, steps), steps);
+        stepMarRef.current = newList;
+        setStepMaterial(stepMarRef.current);
+    };
+    const getStepMater = async () => {
+        const arr: any[] = [];
+        const newList = detailRef.current?.workflowConfig?.steps.map((item: any) => {
+            const arr = item?.variable?.variables;
+            return arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value;
+        });
+        const allper = newList?.map(async (el: any, index: number) => {
+            if (el) {
+                const res = await materialTemplate(el);
+                arr[index] = getHeader(res?.fieldDefine, index);
+            } else {
+                arr[index] = undefined;
+            }
+        });
+        await Promise.all(allper);
+        stepMarRef.current = arr;
+        setStepMaterial(stepMarRef?.current);
+    };
+    //素材类型的请求接口
+    const stepRef = useRef(0);
+    const [step, setStep] = useState(0);
+    const [materialType, setMaterialType] = useState('');
+    const refersSourceRef = useRef<any>(null);
+    const [refersSource, setRefersSource] = useState<any[]>([]);
+    //获取数据表头
+    const getHeader = (data: any, i: number) => {
+        const newList = data.map((item: any) => ({
+            title: item.desc,
+            align: 'center',
+            width: 200,
+            dataIndex: item.fieldName,
+            render: (_: any, row: any) => (
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    <div className="line-clamp-5">
+                        {item.type === 'image' ? (
+                            <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                        ) : item.fieldName === 'source' ? (
+                            <>
+                                {row[item.fieldName] === 'OTHER'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'OTHER')?.label
+                                    : row[item.fieldName] === 'SMALL_RED_BOOK'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'SMALL_RED_BOOK')?.label
+                                    : row[item.fieldName]}
+                            </>
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
+                </div>
+            ),
+            type: item.type
+        }));
+
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    const getHeaders = (data: any, i: number) => {
+        const newList = data;
+        newList?.splice(newList?.length - 1, 1);
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    //删除
+    const handleDel = (index: number, i: number) => {
+        if (i) {
+            stepRef.current = i;
+            setStep(stepRef.current);
+        }
+        const newValue = _.cloneDeep(detailRef.current);
+        const newList =
+            newValue.workflowConfig.steps[i].variable.variables[
+                newValue.workflowConfig.steps[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+            ].value;
+        newList.splice(index, 1);
+        detailRef.current = newValue;
+        setDetailData(detailRef.current);
+    };
+    const [form] = Form.useForm();
+    const [title, setTitle] = useState('');
+    //编辑
+    const [editOpen, setEditOpen] = useState(false);
+    const [rowIndex, setRowIndex] = useState(0);
+    const handleEdit = (row: any, index: number, i?: number) => {
+        if (i || i === 0) {
+            let newData = _.cloneDeep(stepRef.current);
+            newData = i;
+            stepRef.current = newData;
+            setStep(stepRef.current);
+        }
+        setTitle('编辑');
+        setMaterialType(row.type);
+        form.setFieldsValue(row);
+        setRowIndex(index);
+        setEditOpen(true);
+    };
+    const formOk = (result: any) => {
+        const newValue = _.cloneDeep(detailRef.current);
+        const pubilcList = newValue.workflowConfig.steps[stepRef.current].variable.variables;
+        let newList = pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')]?.value;
+        if (title === '编辑') {
+            newList.splice(rowIndex, 1, { ...result, type: materialType });
+        } else {
+            if (!newList) {
+                newList = [];
+            }
+            newList.unshift({
+                ...result,
+                type: materialType
+            });
+        }
+        pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')].value = newList;
+        detailRef.current = newValue;
+        setDetailData(detailRef.current);
+        setEditOpen(false);
+        form.resetFields();
+    };
+    useEffect(() => {
+        schemeMetadata().then((res) => {
+            refersSourceRef.current = res.refersSource;
+            setRefersSource(refersSourceRef.current);
+        });
+    }, []);
     return (
         <Card ref={ref} elevation={2} sx={{ padding: 2, position: 'relative' }}>
             <div className="absolute right-[20px] top-[20px]">
@@ -488,6 +713,14 @@ function Deatail() {
             </Box>
             <Divider sx={{ my: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />
             <CarryOut
+                columns={stepMaterial}
+                setEditOpen={setEditOpen}
+                setStep={(data: any) => {
+                    stepRef.current = data;
+                    setStep(stepRef.current);
+                }}
+                setMaterialType={setMaterialType}
+                setTitle={setTitle}
                 config={detailData}
                 isShows={isShows}
                 isDisables={isDisables}
@@ -510,6 +743,18 @@ function Deatail() {
                     from={from}
                     handleClose={() => setTokenOpen(false)}
                     title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+                />
+            )}
+            {editOpen && (
+                <FormModal
+                    title={title}
+                    materialType={materialType}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={stepMarRef.current[stepRef.current]}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={refersSource}
                 />
             )}
         </Card>

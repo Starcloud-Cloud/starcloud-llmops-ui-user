@@ -368,10 +368,12 @@ const Lefts = ({
                     <InputLabel id="example">选择文案模版</InputLabel>
                     <Select
                         labelId="example"
-                        disabled={detailData?.status !== 'PENDING'}
+                        disabled={detailData?.status && detailData?.status !== 'PENDING'}
                         value={detailData?.targetKeys}
                         label="选择文案模版"
                         onChange={(e: any) => {
+                            tableRef.current = [];
+                            setTableData(tableRef.current);
                             setPerform(preform + 1);
                             settargetKeysOpen(true);
                             changeBasis('targetKeys', e.target.value);

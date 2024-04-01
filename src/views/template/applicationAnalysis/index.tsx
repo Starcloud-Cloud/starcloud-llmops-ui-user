@@ -778,7 +778,7 @@ function ApplicationAnalysis({
                         setConversationUid('');
                     }}
                 >
-                    <div className="bg-[#f4f6f8] w-[1000px] md:w-[800px] flex justify-center">
+                    <div className="bg-[#f4f6f8] w-[1100px] md:w-[900px] flex justify-center">
                         <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg">
                             <MainCard
                                 title={
@@ -839,21 +839,23 @@ function ApplicationAnalysis({
                                                     </Box>
                                                 </Box>
                                             </Box>
-                                            <Select
-                                                style={{ width: 100, height: 23 }}
-                                                bordered={false}
-                                                className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                                rootClassName="modelSelect"
-                                                popupClassName="modelSelectPopup"
-                                                value={aimodel}
-                                                disabled
-                                            >
-                                                {exeList?.map((item: any) => (
-                                                    <Option key={item.value} value={item.value}>
-                                                        {item.label}
-                                                    </Option>
-                                                ))}
-                                            </Select>
+                                            {exeDetail?.workflowConfig?.steps?.length == 1 && (
+                                                <Select
+                                                    style={{ width: 100, height: 23 }}
+                                                    bordered={false}
+                                                    className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                                    rootClassName="modelSelect"
+                                                    popupClassName="modelSelectPopup"
+                                                    value={aimodel}
+                                                    disabled
+                                                >
+                                                    {exeList?.map((item: any) => (
+                                                        <Option key={item.value} value={item.value}>
+                                                            {item.label}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            )}
                                         </Box>
                                         {result.status !== 'ERROR' && <Divider sx={{ my: 1 }} />}
                                         <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>

@@ -1,4 +1,4 @@
-import { Popover, Menu, Input } from 'antd';
+import { Popover, Menu, Input, Checkbox } from 'antd';
 import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
 import { useState, useRef } from 'react';
@@ -47,7 +47,7 @@ const VariableInput = ({
         handleMenu({ index, newValue });
     };
     function renderMenuItems(data: any, index: number) {
-        return data.map((item: any) => {
+        return data.map((item: any, i: number) => {
             if (item.children && item.children.length > 0) {
                 return (
                     <SubMenu title={item.label} key={item.key}>
@@ -57,8 +57,13 @@ const VariableInput = ({
             } else {
                 return (
                     <Menu.Item
-                        onClick={(data: any) => {
-                            setData(data?.key);
+                        onClick={({ domEvent, key }: any) => {
+                            console.log(domEvent?.target?.type);
+                            if (domEvent?.target?.type === 'checkbox') {
+                                console.log(domEvent?.target?.checked, domEvent?.target?.value, index, i);
+                            } else {
+                                setData(key);
+                            }
                         }}
                         key={item.key}
                     >
@@ -68,7 +73,10 @@ const VariableInput = ({
                             }}
                             className="w-full flex justify-between items-center"
                         >
-                            <div>{item.label}</div>
+                            <div className="flex items-center gap-1">
+                                {/* <div>{item.type === '*' && <Checkbox value={item.label}></Checkbox>}</div> */}
+                                <div>{item.label}</div>
+                            </div>
                             <div className="text-xs text-black/50">{item.desc}</div>
                         </div>
                     </Menu.Item>

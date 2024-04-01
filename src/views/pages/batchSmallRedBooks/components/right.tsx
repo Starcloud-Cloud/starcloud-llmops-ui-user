@@ -51,6 +51,8 @@ const Right = ({
                                         <div className="">
                                             <span className="font-[600]">生成时间：</span>
                                             {dayjs(item?.startTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.batch}）
+                                            <span className="font-[600]">版本号：</span>
+                                            {item?.schemeConfig?.configuration?.version}
                                         </div>
                                         <div>
                                             <span className="font-[600]">生成成功数：</span>

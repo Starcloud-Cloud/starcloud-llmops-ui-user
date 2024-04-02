@@ -1,7 +1,8 @@
-import { Popover, Menu, Input, Checkbox } from 'antd';
+import { Popover, Menu, Input, Checkbox, Button } from 'antd';
 import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { schemeOptions } from 'api/redBook/copywriting';
 const { SubMenu } = Menu;
 const { TextArea } = Input;
 const VariableInput = ({
@@ -9,29 +10,29 @@ const VariableInput = ({
     setOpen,
     popoverWidth,
     handleMenu,
-    items,
     index = 0,
     row,
     title,
     value,
     setValue,
     styles = {},
-    promptList,
-    model
+    model,
+    appUid,
+    stepCode = '图片生成'
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
     popoverWidth?: number;
     handleMenu: (data: any) => void;
-    items: any[];
     index?: number;
     title?: string;
     value?: any;
     row?: number;
     setValue: (data: any) => void;
     styles?: any;
-    promptList?: any[];
     model?: string;
+    appUid: string;
+    stepCode?: string;
 }) => {
     const inputList: any = useRef([]);
     const [tipValue, setTipValue] = useState('');
@@ -46,11 +47,85 @@ const VariableInput = ({
         setOpen(false);
         handleMenu({ index, newValue });
     };
+    const [schemaList, setSchemaList] = useState<any[]>([]);
+    function getjsonschma(json: any, name?: string, jsonType?: string) {
+        const arr: any = [];
+        const arrList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        for (const key in json.properties) {
+            const property = json.properties[key];
+            if (property.type === 'object') {
+                const convertedProperty = getjsonschma(property, name);
+                arr.push(convertedProperty);
+            } else if (property.type === 'array') {
+                arr.push(
+                    {
+                        key: key + 'index',
+                        label: key,
+                        title: property?.title,
+                        desc: property?.description,
+                        children: [
+                            ...arrList.map((item: number, index: number) => ({
+                                key: `${key}[${index}]`,
+                                label: `${key}[${index}]`,
+                                title: property?.title,
+                                desc: property?.description,
+                                children: getjsonschma(property?.items, `${name}.${key}[${index}]`)
+                            }))
+                        ]
+                    },
+                    {
+                        key: name + '.' + key,
+                        label: `${key}.list.(*)`,
+                        title: property?.title,
+                        desc: property?.description,
+                        type: '*',
+                        children: getjsonschma(property?.items, `${name}.${key}`, '*')
+                    }
+                );
+            } else {
+                arr.push({
+                    key: jsonType ? name + `.list('${key}')` : name + '.' + key,
+                    label: key,
+                    title: property?.title,
+                    desc: property?.description,
+                    type: jsonType
+                });
+            }
+        }
+        return arr;
+    }
+    //复选框
+    const variableRef = useRef<any[]>([]);
+    const [varableOpen, setVarableOpen] = useState<any[]>([]);
+    const [variableList, setVariableList] = useState<any>([]);
     function renderMenuItems(data: any, index: number) {
         return data.map((item: any, i: number) => {
             if (item.children && item.children.length > 0) {
                 return (
-                    <SubMenu title={item.label} key={item.key}>
+                    <SubMenu
+                        title={
+                            <div className="flex gap-2 w-full items-center">
+                                <div>{item.label}</div>
+                                {item?.type === '*' && variableList?.length > 0 && (
+                                    <Button
+                                        onClick={(e) => {
+                                            setData(item.key + '.list(' + variableList.map((item: any) => `'${item}'`).join(', ') + ')');
+                                            setVarableOpen([]);
+                                            setOpen(false);
+                                            variableRef.current = [];
+                                            setVariableList(variableRef.current);
+                                            e.stopPropagation();
+                                        }}
+                                        size="small"
+                                        type="primary"
+                                    >
+                                        插入变量
+                                    </Button>
+                                )}
+                            </div>
+                        }
+                        key={item.key}
+                    >
                         {renderMenuItems(item.children, index)}
                     </SubMenu>
                 );
@@ -58,9 +133,21 @@ const VariableInput = ({
                 return (
                     <Menu.Item
                         onClick={({ domEvent, key }: any) => {
-                            console.log(domEvent?.target?.type);
                             if (domEvent?.target?.type === 'checkbox') {
-                                console.log(domEvent?.target?.checked, domEvent?.target?.value, index, i);
+                                if (domEvent?.target?.checked) {
+                                    variableRef.current?.push(domEvent?.target?.value);
+                                    setVariableList(variableRef.current);
+                                    const newList = _.cloneDeep(varableOpen);
+                                    newList[i] = true;
+                                    setVarableOpen(newList);
+                                } else {
+                                    const length = variableRef.current?.findIndex((v) => v === domEvent?.target?.value);
+                                    variableRef.current?.splice(length, 1);
+                                    setVariableList(variableRef.current);
+                                    const newList = _.cloneDeep(varableOpen);
+                                    newList[i] = true;
+                                    setVarableOpen(newList);
+                                }
                             } else {
                                 setData(key);
                             }
@@ -74,7 +161,7 @@ const VariableInput = ({
                             className="w-full flex justify-between items-center"
                         >
                             <div className="flex items-center gap-1">
-                                {/* <div>{item.type === '*' && <Checkbox value={item.label}></Checkbox>}</div> */}
+                                <div>{item.type === '*' && <Checkbox checked={varableOpen[i]} value={item.label}></Checkbox>}</div>
                                 <div>{item.label}</div>
                             </div>
                             <div className="text-xs text-black/50">{item.desc}</div>
@@ -84,6 +171,40 @@ const VariableInput = ({
             }
         });
     }
+    const getJSON = (item: any) => {
+        let obj: any = {};
+        try {
+            obj = {
+                ...JSON.parse(item.inJsonSchema),
+                properties: {
+                    ...JSON.parse(item.inJsonSchema).properties,
+                    ...JSON.parse(item.outJsonSchema)
+                }
+            };
+        } catch (err) {
+            obj = {};
+        }
+        return obj;
+    };
+    useEffect(() => {
+        schemeOptions({ appUid, stepCode }).then((res) => {
+            const newList = res
+                ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
+                ?.map((item: any) => {
+                    return {
+                        label: item.name,
+                        key: item.code,
+                        description: item.description,
+                        children: item.inJsonSchema
+                            ? getjsonschma(getJSON(item), item.name)
+                            : item.outJsonSchema
+                            ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
+                            : []
+                    };
+                });
+            setSchemaList(newList);
+        });
+    }, []);
     return (
         <Popover
             trigger="click"
@@ -94,7 +215,7 @@ const VariableInput = ({
             content={
                 <div style={{ width: popoverWidth + 'px', maxWidth: '1024px', minWidth: '512px' }} className={'flex items-stretch gap-2'}>
                     <Menu inlineIndent={12} className="flex-1 h-[300px] overflow-y-auto" defaultSelectedKeys={[]} mode="inline">
-                        {renderMenuItems(items, index)}
+                        {renderMenuItems(schemaList, index)}
                     </Menu>
                     <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4">{tipValue}</div>
                 </div>

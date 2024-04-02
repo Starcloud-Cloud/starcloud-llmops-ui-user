@@ -302,12 +302,22 @@ const AddModal = () => {
             });
             return false;
         }
+        const newList: any[] = valueList?.map((item) => ({
+            ...item,
+            styleList: item?.styleList?.map((el: any) => ({
+                ...el,
+                templateList: el?.templateList.map((i: any) => ({
+                    ...i,
+                    mode: i.mode || 'SEQUENCE'
+                }))
+            }))
+        }));
         schemeCreate({
             ...params,
             type: params.type ? 'SYSTEM' : 'USER',
             configuration: {
                 ...appData,
-                steps: valueList?.map((item) => {
+                steps: newList?.map((item) => {
                     if (item?.model === 'RANDOM') {
                         return {
                             ...item,
@@ -630,6 +640,7 @@ const AddModal = () => {
                         label: `${key}.list.(*)`,
                         title: property?.title,
                         desc: property?.description,
+                        type: '*',
                         children: getjsonschma(property?.items, `${name}.${key}`, '*')
                     }
                 );
@@ -1024,6 +1035,7 @@ const AddModal = () => {
                                                                 <CreateVariables
                                                                     pre={pre}
                                                                     model={el?.model}
+                                                                    appUid={appData?.appUid}
                                                                     value={el?.requirement}
                                                                     schemaList={schemaList}
                                                                     setValue={(data: string) => {
@@ -1082,7 +1094,8 @@ const AddModal = () => {
                                                                     setValues('title', newData, index);
                                                                 }}
                                                                 title="标题"
-                                                                items={schemaList}
+                                                                appUid={appData.appUid}
+                                                                stepCode="笔记生成"
                                                                 index={undefined}
                                                                 value={el?.title}
                                                                 setValue={(value) => {
@@ -1127,7 +1140,8 @@ const AddModal = () => {
                                                                 }}
                                                                 title="文案拼接配置"
                                                                 row={6}
-                                                                items={schemaList}
+                                                                appUid={appData.appUid}
+                                                                stepCode="笔记生成"
                                                                 index={undefined}
                                                                 value={el?.content}
                                                                 setValue={(value) => {

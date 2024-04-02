@@ -9,9 +9,10 @@ interface Variable {
     model: string;
     schemaList: any[];
     value: any;
+    appUid: string;
     setValue: (data: any) => void;
 }
-const Variables = ({ pre, model, schemaList, value, setValue }: Variable) => {
+const Variables = ({ pre, model, appUid, schemaList, value, setValue }: Variable) => {
     const { TextArea } = Input;
     const iptRef: any = useRef(null);
     const [demandOpen, setDemandOpen] = useState(false);
@@ -36,6 +37,8 @@ const Variables = ({ pre, model, schemaList, value, setValue }: Variable) => {
     const [promptList, setPromptList] = useState<any[]>([]);
     useEffect(() => {
         dictData().then((res) => {
+            console.log(res.list);
+
             setPromptList(res.list);
         });
     }, []);
@@ -64,7 +67,8 @@ const Variables = ({ pre, model, schemaList, value, setValue }: Variable) => {
                     setOpen={setOpen}
                     popoverWidth={popoverWidth}
                     handleMenu={handleMenu}
-                    items={schemaList}
+                    appUid={appUid}
+                    stepCode="笔记生成"
                     index={undefined}
                     value={value}
                     row={6}
@@ -72,7 +76,7 @@ const Variables = ({ pre, model, schemaList, value, setValue }: Variable) => {
                         setDemandOpen(true);
                         setValue(value);
                     }}
-                    promptList={promptList}
+                    // promptList={promptList}
                     model={model}
                 />
             </div>

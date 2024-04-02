@@ -178,15 +178,15 @@ const EditStyle = ({
                                                         onChange={(e) => {
                                                             const newData = _.cloneDeep(imageStyleData);
                                                             if (e) {
-                                                                newData.mode = 'SEQUENCE';
-                                                            } else {
                                                                 newData.mode = 'RANDOM';
+                                                            } else {
+                                                                newData.mode = 'SEQUENCE';
                                                             }
                                                             setData(newData);
                                                         }}
                                                     />
                                                     <span className="text-[#673ab7]">
-                                                        {imageStyleData?.mode === 'SEQUENCE' ? '顺序生成' : '随机生成'}
+                                                        {imageStyleData?.mode === 'RANDOM' ? '随机生成' : '顺序生成'}
                                                     </span>
                                                 </div>
                                             </>
@@ -215,7 +215,7 @@ const EditStyle = ({
                                                                 }}
                                                                 popoverWidth={popoverWidth}
                                                                 handleMenu={handleMenu}
-                                                                items={items}
+                                                                appUid={appData.appUid}
                                                                 index={index}
                                                                 title={el?.label}
                                                                 value={el.value}
@@ -289,7 +289,7 @@ const EditStyle = ({
                                                             }}
                                                             popoverWidth={popoverWidth}
                                                             handleMenu={handleMenu}
-                                                            items={items}
+                                                            appUid={appData.appUid}
                                                             index={index}
                                                             title={el?.label}
                                                             value={el.value}

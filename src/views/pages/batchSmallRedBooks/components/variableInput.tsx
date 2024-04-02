@@ -35,6 +35,7 @@ const VariableInput = ({
     stepCode?: string;
 }) => {
     const inputList: any = useRef([]);
+    const tipRef = useRef<any>('');
     const [tipValue, setTipValue] = useState('');
     const setData = (data: string, flag?: boolean) => {
         let newValue = _.cloneDeep(value);
@@ -62,13 +63,13 @@ const VariableInput = ({
                         key: key + 'index',
                         label: key + '[*]',
                         title: property?.title,
-                        desc: property?.description,
+                        desc: '元素集合',
                         children: [
                             ...arrList.map((item: number, index: number) => ({
                                 key: `${key}[${index}]`,
                                 label: `${key}[${index}]`,
                                 title: property?.title,
-                                desc: property?.description,
+                                desc: `第 ${index} 个元素`,
                                 children: getjsonschma(property?.items, `${name}.${key}[${index}]`)
                             }))
                         ]
@@ -77,7 +78,7 @@ const VariableInput = ({
                         key: name + '.' + key,
                         label: `${key}.list.(*)`,
                         title: property?.title,
-                        desc: property?.description,
+                        desc: '元素内容集合',
                         type: '*',
                         children: getjsonschma(property?.items, `${name}.${key}`, '*')
                     }
@@ -103,25 +104,43 @@ const VariableInput = ({
             if (item.children && item.children.length > 0) {
                 return (
                     <SubMenu
+                        className="relative"
                         title={
-                            <div className="flex gap-2 w-full items-center">
-                                <div>{item.label}</div>
-                                {item?.type === '*' && variableList?.length > 0 && (
-                                    <Button
-                                        onClick={(e) => {
-                                            setData(item.key + '.list(' + variableList.map((item: any) => `'${item}'`).join(', ') + ')');
-                                            setVarableOpen([]);
-                                            setOpen(false);
-                                            variableRef.current = [];
-                                            setVariableList(variableRef.current);
-                                            e.stopPropagation();
-                                        }}
-                                        size="small"
-                                        type="primary"
-                                    >
-                                        插入变量
-                                    </Button>
-                                )}
+                            <div className="flex justify-between items-center">
+                                <div id={item.key + i} className="flex gap-1 w-full items-center">
+                                    <div>{item.label}</div>
+                                    {item?.type === '*' && variableList?.length > 0 && (
+                                        <Button
+                                            onClick={(e) => {
+                                                setData(
+                                                    item.key + '.list(' + variableList.map((item: any) => `'${item}'`).join(', ') + ')'
+                                                );
+                                                setVarableOpen([]);
+                                                setOpen(false);
+                                                variableRef.current = [];
+                                                setVariableList(variableRef.current);
+                                                e.stopPropagation();
+                                            }}
+                                            size="small"
+                                            type="primary"
+                                        >
+                                            插入变量
+                                        </Button>
+                                    )}
+                                </div>
+                                <div className="text-xs text-black/50">{item.desc}</div>
+                                <div
+                                    className="absolute w-full h-full left-0"
+                                    onMouseEnter={() => {
+                                        if (item.type === '*') {
+                                            tipRef.current = `${item.desc}\n会把集合中相同字段的内容显示在一起，可选择多个字段`;
+                                            setTipValue(tipRef.current);
+                                            return;
+                                        }
+                                        tipRef.current = item.desc;
+                                        setTipValue(tipRef.current);
+                                    }}
+                                ></div>
                             </div>
                         }
                         key={item.key}
@@ -156,7 +175,8 @@ const VariableInput = ({
                     >
                         <div
                             onMouseEnter={() => {
-                                setTipValue(item.desc);
+                                tipRef.current = item.desc;
+                                setTipValue(tipRef.current);
                             }}
                             className="w-full flex justify-between items-center"
                         >
@@ -217,7 +237,9 @@ const VariableInput = ({
                     <Menu inlineIndent={12} className="flex-1 h-[300px] overflow-y-auto" defaultSelectedKeys={[]} mode="inline">
                         {renderMenuItems(schemaList, index)}
                     </Menu>
-                    <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4">{tipValue}</div>
+                    <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4 whitespace-pre-wrap">
+                        {tipValue}
+                    </div>
                 </div>
             }
         >

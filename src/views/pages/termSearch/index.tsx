@@ -38,6 +38,7 @@ const TermSearch = () => {
     });
     const [asinData, setAsinData] = useState<any>({});
     const [open, setOpen] = useState(false);
+    const [modPage, setModPage] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -115,10 +116,12 @@ const TermSearch = () => {
     const [type, setType] = useState(0);
 
     const getExtended = async (num: number) => {
-        const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
-        if (usedResult.usedCount >= usedResult.total && usedResult.total !== -1) {
-            setOpen(true);
-            return;
+        if (!modPage) {
+            const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
+            if (usedResult.usedCount >= usedResult.total && usedResult.total !== -1) {
+                setOpen(true);
+                return;
+            }
         }
         const { month, market } = queryAsin;
         setLoading(true);
@@ -138,8 +141,11 @@ const TermSearch = () => {
         setLoading(false);
         setTotal(result.total);
         setTableData(result.items);
-        await userRighsLimitUse({ levelRightsCode: 'listingQuery' });
-        setUpdate((pre: any) => pre + 1);
+        if (!modPage) {
+            await userRighsLimitUse({ levelRightsCode: 'listingQuery' });
+            setUpdate((pre: any) => pre + 1);
+        }
+        setModPage(false);
     };
 
     const [total, setTotal] = useState(0);
@@ -324,6 +330,7 @@ const TermSearch = () => {
             {type !== 0 && <ResultFilter filterTable={filterTable} type={type} getExtended={getExtended} restCount={restCount} />}
             {type !== 0 && (
                 <TermTable
+                    setModPage={setModPage}
                     pageQuery={pageQuery}
                     queryAsin={queryAsin}
                     loading={loading}

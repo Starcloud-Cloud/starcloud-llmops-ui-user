@@ -19,7 +19,8 @@ const TermTable = ({
     type,
     handleExport,
     setPageQuery,
-    getExtended
+    getExtended,
+    setModPage
 }: {
     loading: boolean;
     pageQuery: any;
@@ -30,6 +31,7 @@ const TermTable = ({
     handleExport: () => void;
     setPageQuery: (data: any) => void;
     getExtended: (data: number) => void;
+    setModPage: any;
 }) => {
     const [upgradeOpen, setUpgradeOpen] = useState(false);
     const tableRef: any = useRef(null);
@@ -643,6 +645,7 @@ const TermTable = ({
                         page={pageQuery.page}
                         count={Math.ceil(total / pageQuery.size)}
                         onChange={(e: any, value: number) => {
+                            setModPage(true);
                             setPageQuery({
                                 ...pageQuery,
                                 page: value
@@ -653,6 +656,7 @@ const TermTable = ({
                         style={{ width: 100 }}
                         value={pageQuery.size}
                         onChange={(value) => {
+                            setModPage(true);
                             setPageQuery({
                                 ...pageQuery,
                                 size: value

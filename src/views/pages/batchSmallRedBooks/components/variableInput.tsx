@@ -111,6 +111,7 @@ const VariableInput = ({
                                     <div>{item.label}</div>
                                     {item?.type === '*' && variableList?.length > 0 && (
                                         <Button
+                                            className="z-[1000]"
                                             onClick={(e) => {
                                                 setData(
                                                     item.key + '.list(' + variableList.map((item: any) => `'${item}'`).join(', ') + ')'

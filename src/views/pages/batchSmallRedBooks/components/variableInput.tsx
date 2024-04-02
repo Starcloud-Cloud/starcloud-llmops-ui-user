@@ -60,7 +60,7 @@ const VariableInput = ({
                 arr.push(
                     {
                         key: key + 'index',
-                        label: key,
+                        label: key + '[*]',
                         title: property?.title,
                         desc: property?.description,
                         children: [
@@ -145,7 +145,7 @@ const VariableInput = ({
                                     variableRef.current?.splice(length, 1);
                                     setVariableList(variableRef.current);
                                     const newList = _.cloneDeep(varableOpen);
-                                    newList[i] = true;
+                                    newList[i] = false;
                                     setVarableOpen(newList);
                                 }
                             } else {

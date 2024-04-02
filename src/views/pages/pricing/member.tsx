@@ -261,11 +261,11 @@ const planListDefault = (value: number) => [
             '1个自定义应用', // 4
             '1个自定义机器人', // 4
             '1个微信群机器人', // 4
-            '多渠道发布机器人客服', // 4
-            '上传信息库/文档问答', // 4
-            '每个机器人1个文档上传', // 4
-            'Google/Amazon联网查询', // 5
-            '机器人插件扩展' // 6
+            '多渠道发布机器人客服' // 4
+            // '上传信息库/文档问答', // 4
+            // '每个机器人1个文档上传', // 4
+            // 'Google/Amazon联网查询', // 5
+            // '机器人插件扩展' // 6
         ]
     },
     {
@@ -286,7 +286,7 @@ const planListDefault = (value: number) => [
                 </Tooltip>
             </div>,
             '个人空间',
-            '扩展词查询50次/天',
+            '扩展词查询20次/天',
             '导出扩展词',
             <div className="flex items-center">
                 <span>5个自定义应用</span>
@@ -311,17 +311,17 @@ const planListDefault = (value: number) => [
                 <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
-            </div>,
-            <div className="flex items-center">
-                <span>上传信息库/文档问答</span>
-                <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
-                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-                </Tooltip>
-            </div>,
+            </div>
+            // <div className="flex items-center">
+            //     <span>上传信息库/文档问答</span>
+            //     <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
+            //         <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            //     </Tooltip>
+            // </div>,
 
-            '每个机器人5个文档上传', // 4
-            'Google/Amazon联网查询', // 5
-            '1个机器人插件扩展' // 6
+            // '每个机器人5个文档上传', // 4
+            // 'Google/Amazon联网查询', // 5
+            // '1个机器人插件扩展' // 6
         ]
     },
     {
@@ -370,16 +370,16 @@ const planListDefault = (value: number) => [
                 <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
-            </div>,
-            <div className="flex items-center">
-                <span>上传信息库/文档问答</span>
-                <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
-                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-                </Tooltip>
-            </div>,
-            '每个机器人20个文档上传', // 4
-            'Google/Amazon联网查询', // 5
-            '3个机器人插件扩展' // 6
+            </div>
+            // <div className="flex items-center">
+            //     <span>上传信息库/文档问答</span>
+            //     <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
+            //         <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            //     </Tooltip>
+            // </div>,
+            // '每个机器人20个文档上传', // 4
+            // 'Google/Amazon联网查询', // 5
+            // '3个机器人插件扩展' // 6
         ]
     },
     {
@@ -400,16 +400,16 @@ const planListDefault = (value: number) => [
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
             </div>,
-            '扩展词查询500次/天',
+            '扩展词查询200次/天',
             '导出扩展词',
             '无限自定义应用', // 4
             '无限自定义机器人', // 4
             '无限个微信群机器人', // 4
-            '多渠道发布机器人客服', // 4
-            '上传信息库/文档问答', // 4
-            '无限文档上传', // 4
-            'Google/Amazon联网查询', // 4
-            '10个机器人插件扩展' // 5
+            '多渠道发布机器人客服' // 4
+            // '上传信息库/文档问答', // 4
+            // '无限文档上传', // 4
+            // 'Google/Amazon联网查询', // 4
+            // '10个机器人插件扩展' // 5
         ]
     },
     {

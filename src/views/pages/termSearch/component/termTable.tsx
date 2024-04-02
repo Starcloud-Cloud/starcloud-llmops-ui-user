@@ -8,6 +8,8 @@ import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import './termTable.scss';
+import { PermissionUpgradeModal } from '../../../template/myChat/createChat/components/modal/permissionUpgradeModal';
+import useUserStore from '../../../../store/user';
 const TermTable = ({
     loading,
     pageQuery,
@@ -29,8 +31,10 @@ const TermTable = ({
     setPageQuery: (data: any) => void;
     getExtended: (data: number) => void;
 }) => {
+    const [upgradeOpen, setUpgradeOpen] = useState(false);
     const tableRef: any = useRef(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const permissions = useUserStore((state) => state.permissions);
     const rowSelection = {
         selectedRowKeys,
         onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
@@ -578,7 +582,17 @@ const TermTable = ({
         <div ref={tableRef}>
             <div className="sticky top-0 z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
                 <div>
-                    <Button onClick={handleExport}>导出</Button>
+                    <Button
+                        onClick={() => {
+                            if (!permissions.includes('termSearch:export')) {
+                                setUpgradeOpen(true);
+                                return;
+                            }
+                            handleExport();
+                        }}
+                    >
+                        导出
+                    </Button>
                     <Button className="mx-[10px]" onClick={() => setOpen(true)} disabled={selectedRowKeys.length === 0}>
                         加入词库
                     </Button>
@@ -673,6 +687,7 @@ const TermTable = ({
                 </div>
             )}
             {open && <AddLexicon open={open} queryAsin={queryAsin} selectedRowKeys={selectedRowKeys} setOpen={setOpen} />}
+            <PermissionUpgradeModal from="listing_export" open={upgradeOpen} handleClose={() => setUpgradeOpen(false)} />
         </div>
     );
 };

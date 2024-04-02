@@ -177,7 +177,7 @@ const plansDefault = (value: number) => [
         monthPrice: '免费',
         yearPrice: '免费',
         des: '适用于新用户体验，打卡获得魔法豆',
-        permission: [0, 1, 2, 5, 6, 7, 8, 9, 10],
+        permission: [0, 1, 2, 5, 7, 8, 9, 10, 11, 12],
         btnText: '免费使用'
     },
     {
@@ -190,7 +190,7 @@ const plansDefault = (value: number) => [
         yearPrice: 599,
         preMonthPrice: 49.91,
         des: '适用于普通用户',
-        permission: [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12],
+        permission: [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
         btnText: (
             <div>
                 立即购买
@@ -228,7 +228,7 @@ const plansDefault = (value: number) => [
         yearPrice: 4999,
         preMonthPrice: 416.58,
         des: '适用于公司团队',
-        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
         btnText: '立即购买',
         monthCode: 'pro_month',
         yearCode: 'pro_year'
@@ -256,6 +256,8 @@ const planListDefault = (value: number) => [
             'GPT-3.5/开源模型', // 2
             'GPT-4', // 3
             '个人空间',
+            '扩展词查询5次/天',
+            '导出扩展词',
             '1个自定义应用', // 4
             '1个自定义机器人', // 4
             '1个微信群机器人', // 4
@@ -284,6 +286,8 @@ const planListDefault = (value: number) => [
                 </Tooltip>
             </div>,
             '个人空间',
+            '扩展词查询50次/天',
+            '导出扩展词',
             <div className="flex items-center">
                 <span>5个自定义应用</span>
                 <Tooltip title={'可自定义提示词应用'}>
@@ -396,6 +400,8 @@ const planListDefault = (value: number) => [
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
             </div>,
+            '扩展词查询500次/天',
+            '导出扩展词',
             '无限自定义应用', // 4
             '无限自定义机器人', // 4
             '无限个微信群机器人', // 4

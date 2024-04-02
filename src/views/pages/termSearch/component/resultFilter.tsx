@@ -2,10 +2,12 @@ import { Row, Col, InputNumber, Input, Popover, Button, Checkbox } from 'antd';
 import { DownOutlined, QuestionCircleOutlined, FilterOutlined, SyncOutlined } from '@ant-design/icons';
 import { useState, memo } from 'react';
 const ResultFilter = ({
+    restCount,
     filterTable,
     type,
     getExtended
 }: {
+    restCount: number;
     filterTable: (data: any) => void;
     type: number;
     getExtended: (data: number) => void;
@@ -344,7 +346,7 @@ const ResultFilter = ({
                             type="primary"
                             icon={<FilterOutlined rev={undefined} />}
                         >
-                            开始筛选
+                            开始筛选(剩余{restCount}次)
                         </Button>
                         <Button
                             onClick={() => {

@@ -10,7 +10,14 @@ import TermTable from './component/termTable';
 import _ from 'lodash-es';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
-import { KeywordMetadataExtendPrepare, KeywordMetadataExtendAsin, KeywordMetadataPage, exportExtendAsin } from 'api/listing/termSerch';
+import { PermissionUpgradeModal } from '../../template/myChat/createChat/components/modal/permissionUpgradeModal';
+import {
+    KeywordMetadataExtendPrepare,
+    KeywordMetadataExtendAsin,
+    exportExtendAsin,
+    userRighsLimitUsedCount,
+    userRighsLimitUse
+} from 'api/listing/termSerch';
 const TermSearch = () => {
     const { Option } = Select;
     const handleClose = (index: number) => {
@@ -19,6 +26,8 @@ const TermSearch = () => {
         setQueryAsin(newList);
     };
     const [value, setValue] = useState('');
+    const [restCount, setRestCount] = useState<any>(0);
+    const [update, setUpdate] = useState<any>(0);
 
     //获取拓ASIN
     const [asinOpen, setAsinOpen] = useState(false);
@@ -28,7 +37,27 @@ const TermSearch = () => {
         asinList: []
     });
     const [asinData, setAsinData] = useState<any>({});
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
+            if (usedResult.total === -1) {
+                setRestCount('无限');
+            } else {
+                setRestCount(usedResult.total - usedResult.usedCount);
+            }
+        })();
+    }, [update]);
+
     const getAsin = async () => {
+        // 获取权限
+
+        // const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
+        // if (usedResult.usedCount >= usedResult.total && usedResult.total !== -1) {
+        //     setOpen(true);
+        //     return;
+        // }
         if (queryAsin.asinList.length === 0) {
             dispatch(
                 openSnackbar({
@@ -47,6 +76,9 @@ const TermSearch = () => {
             ...queryAsin,
             month: queryAsin.month === '最近30天' ? '' : queryAsin.month
         });
+
+        // await userRighsLimitUse({ levelRightsCode: 'listingQuery' });
+        // setUpdate((pre: any) => pre + 1);
         setAsinData(result);
         setAsinOpen(true);
     };
@@ -81,7 +113,13 @@ const TermSearch = () => {
     const [searchResult, setSearchResult] = useState<any>(null);
     //变体类型
     const [type, setType] = useState(0);
+
     const getExtended = async (num: number) => {
+        const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
+        if (usedResult.usedCount >= usedResult.total && usedResult.total !== -1) {
+            setOpen(true);
+            return;
+        }
         const { month, market } = queryAsin;
         setLoading(true);
         setAsinOpen(false);
@@ -100,6 +138,8 @@ const TermSearch = () => {
         setLoading(false);
         setTotal(result.total);
         setTableData(result.items);
+        await userRighsLimitUse({ levelRightsCode: 'listingQuery' });
+        setUpdate((pre: any) => pre + 1);
     };
 
     const [total, setTotal] = useState(0);
@@ -278,10 +318,10 @@ const TermSearch = () => {
                 </div>
 
                 <Button type="primary" onClick={getAsin} className="ml-[10px]">
-                    立即查询
+                    立即查询(剩余{restCount}次)
                 </Button>
             </div>
-            {type !== 0 && <ResultFilter filterTable={filterTable} type={type} getExtended={getExtended} />}
+            {type !== 0 && <ResultFilter filterTable={filterTable} type={type} getExtended={getExtended} restCount={restCount} />}
             {type !== 0 && (
                 <TermTable
                     pageQuery={pageQuery}
@@ -398,6 +438,7 @@ const TermSearch = () => {
                     </MainCard>
                 </Modal>
             )}
+            <PermissionUpgradeModal from="listing_search" open={open} handleClose={() => setOpen(false)} />
         </div>
     );
 };

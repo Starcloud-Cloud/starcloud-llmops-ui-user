@@ -174,19 +174,19 @@ const EditStyle = ({
                                                 <div className="flex items-center gap-4 min-h-[32px]">
                                                     <span>图片生成模式</span>
                                                     <Switch
-                                                        checked={imageStyleData?.mode === 'SEQUENCE' ? true : false}
+                                                        checked={imageStyleData?.mode === 'RANDOM' ? true : false}
                                                         onChange={(e) => {
                                                             const newData = _.cloneDeep(imageStyleData);
                                                             if (e) {
-                                                                newData.mode = 'SEQUENCE';
-                                                            } else {
                                                                 newData.mode = 'RANDOM';
+                                                            } else {
+                                                                newData.mode = 'SEQUENCE';
                                                             }
                                                             setData(newData);
                                                         }}
                                                     />
                                                     <span className="text-[#673ab7]">
-                                                        {imageStyleData?.mode === 'SEQUENCE' ? '顺序生成' : '随机生成'}
+                                                        {imageStyleData?.mode === 'RANDOM' ? '随机生成':'顺序生成' }
                                                     </span>
                                                 </div>
                                             </>

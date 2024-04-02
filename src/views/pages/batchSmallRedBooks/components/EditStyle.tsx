@@ -186,7 +186,7 @@ const EditStyle = ({
                                                         }}
                                                     />
                                                     <span className="text-[#673ab7]">
-                                                        {imageStyleData?.mode === 'SEQUENCE' ? '顺序生成' : '随机生成'}
+                                                        {imageStyleData?.mode === 'RANDOM' ? '随机生成' : '顺序生成'}
                                                     </span>
                                                 </div>
                                             </>

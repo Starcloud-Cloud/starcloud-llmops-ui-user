@@ -48,9 +48,7 @@ import { DetailModal } from '../../redBookContentList/component/detailModal';
 import Form from '../../smallRedBook/components/form';
 import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
 const AddModal = () => {
-    const { TextArea } = Input;
     const { Panel } = Collapse;
-    const { Option } = Select;
     const permissions = useUserStore((state) => state.permissions);
     const { tableList, setTableList } = copywriting();
     const location = useLocation();
@@ -474,25 +472,6 @@ const AddModal = () => {
                 setGoodList(res);
             });
         }
-        if (appData) {
-            schemeOptions({ appUid: appData?.appUid, stepCode: '海报生成' }).then((res) => {
-                const newList = res
-                    ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
-                    ?.map((item: any) => {
-                        return {
-                            label: item.name,
-                            key: item.code,
-                            description: item.description,
-                            children: item.inJsonSchema
-                                ? getjsonschma(getJSON(item), item.name)
-                                : item.outJsonSchema
-                                ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
-                                : []
-                        };
-                    });
-                setSchemaList(newList);
-            });
-        }
     }, [appData?.example]);
     const [businessUid, setBusinessUid] = useState('');
     const [detailOpen, setDetailOpen] = useState(false);
@@ -595,67 +574,6 @@ const AddModal = () => {
         }
     }, [appData]);
 
-    const getJSON = (item: any) => {
-        let obj: any = {};
-        try {
-            obj = {
-                ...JSON.parse(item.inJsonSchema),
-                properties: {
-                    ...JSON.parse(item.inJsonSchema).properties,
-                    ...JSON.parse(item.outJsonSchema)
-                }
-            };
-        } catch (err) {
-            obj = {};
-        }
-        return obj;
-    };
-    function getjsonschma(json: any, name?: string, jsonType?: string) {
-        const arr: any = [];
-        const arrList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        for (const key in json.properties) {
-            const property = json.properties[key];
-            if (property.type === 'object') {
-                const convertedProperty = getjsonschma(property, name);
-                arr.push(convertedProperty);
-            } else if (property.type === 'array') {
-                arr.push(
-                    {
-                        key: key + 'index',
-                        label: key,
-                        title: property?.title,
-                        desc: property?.description,
-                        children: [
-                            ...arrList.map((item: number, index: number) => ({
-                                key: `${key}[${index}]`,
-                                label: `${key}[${index}]`,
-                                title: property?.title,
-                                desc: property?.description,
-                                children: getjsonschma(property?.items, `${name}.${key}[${index}]`)
-                            }))
-                        ]
-                    },
-                    {
-                        key: name + '.' + key,
-                        label: `${key}.list.(*)`,
-                        title: property?.title,
-                        desc: property?.description,
-                        type: '*',
-                        children: getjsonschma(property?.items, `${name}.${key}`, '*')
-                    }
-                );
-            } else {
-                arr.push({
-                    key: jsonType ? name + `.list('${key}')` : name + '.' + key,
-                    label: key,
-                    title: property?.title,
-                    desc: property?.description,
-                    type: jsonType
-                });
-            }
-        }
-        return arr;
-    }
     const [valOpen, setValOpen] = useState(false);
     const [conOpen, setConOpen] = useState(false);
     const widthRef: any = useRef(null);

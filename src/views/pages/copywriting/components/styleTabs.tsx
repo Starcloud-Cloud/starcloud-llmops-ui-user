@@ -51,6 +51,7 @@ const StyleTabs = ({
             id: data?.id || '',
             name: `图片 ${digui()}`,
             key: digui().toString(),
+            mode: 'SEQUENCE',
             titleGenerateMode: data?.titleGenerateMode || 'DEFAULT',
             variableList: data?.variableList || []
         });

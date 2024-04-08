@@ -1,6 +1,6 @@
 import { TextField, MenuItem } from '@mui/material';
 import { useState, memo, useEffect } from 'react';
-import { Table, Button } from 'antd';
+import { Table, Button, Radio, Checkbox } from 'antd';
 import { t } from 'i18next';
 import _ from 'lodash-es';
 const verifyJSON = (value: any) => {
@@ -133,6 +133,39 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
                         </MenuItem>
                     ))}
                 </TextField>
+            ) : item.style === 'RADIO' ? (
+                <div>
+                    <Radio.Group
+                        onChange={(e) => {
+                            onChange({ name: item.field, value: e.target.value });
+                        }}
+                        value={item.value}
+                    >
+                        {item?.options?.map((item: any) => (
+                            <Radio value={item.value} key={item.value}>
+                                {item.label}
+                            </Radio>
+                        ))}
+                    </Radio.Group>
+                    <div className="text-xs mt-[20px]">
+                        <span className="text-[#673ab7]">Tips:</span>
+                        {item?.options?.find((el: any) => el.value === item.value)?.description}
+                    </div>
+                </div>
+            ) : item.style === 'CHECKBOX' ? (
+                <div>
+                    <Checkbox.Group
+                        onChange={(e) => {
+                            onChange({ name: item.field, value: e });
+                        }}
+                        options={item.options}
+                        value={item.value}
+                    ></Checkbox.Group>
+                    <div className="text-xs mt-[20px]">
+                        <span className="text-[#673ab7]">Tips:</span>
+                        {item?.options?.find((el: any) => el.value === item.value)?.description}
+                    </div>
+                </div>
             ) : (
                 <div>
                     <div className="flex justify-end">

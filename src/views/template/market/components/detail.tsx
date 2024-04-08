@@ -36,6 +36,7 @@ interface AppModels {
     aiModel?: Items[];
     language?: Items[];
     type?: Items[];
+    variableStyle?: Items[];
 }
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -216,7 +217,7 @@ function Deatail() {
         setDetailData(newValue);
     };
     //更改变量的值
-    const variableChange = ({ e, steps, i, type }: any) => {
+    const variableChange = ({ e, steps, i, type, code }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.style === 'MATERIAL')) {
@@ -226,6 +227,22 @@ function Deatail() {
             stepRef.current = steps;
             setStep(stepRef.current);
             setTableData(type, steps);
+        }
+        if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
+            const num = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REQUIREMENT');
+            const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+            if (e.value === 'RANDOM') {
+                newValue.workflowConfig.steps[steps].variable.variables[num].value = '';
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+            } else if (e.value === 'AI_PARODY') {
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+            } else {
+                newValue.workflowConfig.steps[steps].variable.variables[num1].value = [];
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+            }
         }
         detailRef.current = newValue;
         setDetailData(newValue);
@@ -280,6 +297,25 @@ function Deatail() {
                         list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
                     }
                     arr.find((el: any) => el.style === 'MATERIAL').value = list;
+                }
+                if (arr?.find((el: any) => el.style === 'CHECKBOX')) {
+                    let list: any;
+
+                    try {
+                        list = JSON.parse(arr?.find((el: any) => el.style === 'CHECKBOX')?.value);
+                    } catch (err) {
+                        list = arr?.find((el: any) => el.style === 'CHECKBOX')?.value;
+                    }
+                    arr.find((el: any) => el.style === 'CHECKBOX').value = list;
+                }
+                if (item?.flowStep?.handler === 'PosterActionHandler' && arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')) {
+                    let list: any;
+                    try {
+                        list = JSON.parse(arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value);
+                    } catch (err) {
+                        list = arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
+                    }
+                    arr.find((el: any) => el.field === 'POSTER_STYLE_CONFIG').value = list;
                 }
             });
             detailRef.current = newData;

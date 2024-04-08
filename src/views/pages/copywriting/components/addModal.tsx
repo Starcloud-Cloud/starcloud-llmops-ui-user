@@ -887,6 +887,7 @@ const AddModal = () => {
                                                             console.log(data);
                                                             setValues('materialType', data, index);
                                                         }}
+                                                        options={[]}
                                                     >
                                                         {materialTypeList.map((i: any) => (
                                                             <Option key={i.value} value={i.value}>

@@ -35,6 +35,7 @@ const Valida = ({
     variables,
     responent,
     fields,
+    variableStyle,
     basisChange,
     index,
     allvalida,
@@ -61,7 +62,7 @@ const Valida = ({
         {
             title: '变量类型',
             align: 'center',
-            render: (_, row) => <span>{t('myApp.' + row.style.toLowerCase())}</span>
+            render: (_, row) => <span>{variableStyle?.find((item) => item.value === row.style)?.label}</span>
         },
         {
             title: '是否显示',

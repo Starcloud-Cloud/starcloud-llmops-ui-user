@@ -7,8 +7,8 @@ import StyleTabs from '../styleTabs';
 import { memo } from 'react';
 interface Tabs {
     schemaList?: any[];
-    mode: string;
-    setModel: (data: any) => void;
+    mode?: string;
+    setModel?: (data: any) => void;
     imageStyleData: any;
     setImageStyleData: (data: any) => void;
     focuActive: any[];
@@ -17,9 +17,9 @@ interface Tabs {
     appData: any;
 }
 const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui, appData }: Tabs) => {
-    const handleAdd = (data?: any) => {
-        console.log(data);
+    console.log(imageStyleData);
 
+    const handleAdd = (data?: any) => {
         let newData = _.cloneDeep(imageStyleData);
         if (!newData) {
             newData = [];

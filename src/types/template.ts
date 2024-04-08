@@ -67,6 +67,7 @@ export interface Validas {
     buttonLabel: string;
     index: number;
     fields: string;
+    variableStyle?: any[];
     allvalida: number | null;
     editChange: (data: { num: number; label: string; value: string; flag?: boolean }) => void;
     basisChange: (data: { e: any; index: number; i: number; flag: boolean | undefined | null; values?: boolean }) => void;
@@ -82,4 +83,5 @@ export interface El {
     defaultValue: null | undefined | string | boolean;
     isShow: boolean;
     style: string;
+    field?: string;
 }

@@ -266,7 +266,7 @@ const BatcSmallRedBooks = () => {
                     return;
                 }
                 getLists(queryPage.pageNo);
-            }, 3000);
+            }, 2000);
         }
     }, [queryPage.pageNo]);
     const [collapseActive, setcollapseActive] = useState<any[]>([]);
@@ -294,7 +294,7 @@ const BatcSmallRedBooks = () => {
                 timer.current[0] = setInterval(() => {
                     if (
                         plabListRef.current?.length === 0 ||
-                        plabListRef.current.slice(0, 1)?.every((item: any) => {
+                        plabListRef.current.slice(0, 20)?.every((item: any) => {
                             return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
                         })
                     ) {
@@ -302,7 +302,7 @@ const BatcSmallRedBooks = () => {
                         return;
                     }
                     getLists(1, e[0]);
-                }, 3000);
+                }, 2000);
             }
         }
     };
@@ -328,9 +328,16 @@ const BatcSmallRedBooks = () => {
             } else {
                 getList(bathId);
                 timer.current[0] = setInterval(() => {
+                    console.log(plabListRef.current?.length);
+                    console.log(
+                        plabListRef.current
+                            .slice(0, 20)
+                            ?.every((item: any) => item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init')
+                    );
+
                     if (
                         plabListRef.current?.length === 0 ||
-                        plabListRef.current.slice(0, 1)?.every((item: any) => {
+                        plabListRef.current.slice(0, 20)?.every((item: any) => {
                             return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
                         })
                     ) {
@@ -338,7 +345,7 @@ const BatcSmallRedBooks = () => {
                         return;
                     }
                     getLists(1, bathId);
-                }, 3000);
+                }, 2000);
             }
         }
     }, [bathList]);
@@ -363,7 +370,7 @@ const BatcSmallRedBooks = () => {
                     <div></div>
                 </SubCard>
                 <Row gutter={20} className="!ml-0">
-                    <Col span={6} className="relative h-full bg-[#fff] !px-[0]">
+                    <Col span={10} className="relative h-full bg-[#fff] !px-[0]">
                         <Left
                             detailData={detailData}
                             setDetailData={setDetailData}
@@ -378,7 +385,7 @@ const BatcSmallRedBooks = () => {
                             handleSave={(flag: any) => handleSave(flag)}
                         />
                     </Col>
-                    <Col span={18} className="overflow-hidden mt-4">
+                    <Col span={14} className="overflow-hidden mt-4">
                         <Right
                             bathList={bathList}
                             collapseActive={collapseActive}

@@ -1,5 +1,5 @@
 import { Box, Typography, TextField, Divider, Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import { Image, Dropdown, Popover } from 'antd';
+import { Image, Dropdown, Popover, Switch } from 'antd';
 import { VerticalAlignTopOutlined, VerticalAlignBottomOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
 import SubCard from 'ui-component/cards/SubCard';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -16,10 +16,11 @@ import Valida from './newValidaForm';
 import ArrangeModal from './arrangeModal';
 import { useState, useEffect, memo } from 'react';
 import _ from 'lodash-es';
-
+import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
 function Arrange({
     detail,
     config,
+    variableStyle,
     editChange,
     basisChange,
     statusChange,
@@ -27,7 +28,9 @@ function Arrange({
     getTableData,
     tableCopy,
     tableDataDel,
-    tableDataMove
+    tableDataMove,
+    exeChange,
+    groupChange
 }: any) {
     const [stepTitle, setStepTitle] = useState<string[]>([]);
     const [modal, setModal] = useState<number>(0);
@@ -180,6 +183,8 @@ function Arrange({
         }
         return image;
     };
+    //新增文案与风格
+    const [focuActive, setFocuActive] = useState<any[]>([]);
     return (
         <Box>
             <Typography variant="h5" fontSize="1rem" mb={1}>
@@ -187,238 +192,312 @@ function Arrange({
             </Typography>
             {config?.steps?.map((item: any, index: number) => (
                 <Box key={item?.field}>
-                    {index !== 0 && (
-                        <Box display="flex" justifyContent="center">
-                            <SouthIcon />
-                        </Box>
-                    )}
-                    <SubCard
-                        sx={{ overflow: 'visible' }}
-                        contentSX={{
-                            padding: '0 !important',
-                            height: '100%',
-                            overflow: 'visible'
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                borderRadius: '4px',
-                                overflow: 'visible',
-                                borderLeft: allvalidas[index] ? '5px solid #ff6376' : 'none'
+                    <div>
+                        {index !== 0 && (
+                            <Box display="flex" justifyContent="center">
+                                <SouthIcon />
+                            </Box>
+                        )}
+                        <SubCard
+                            sx={{ overflow: 'visible' }}
+                            contentSX={{
+                                padding: '0 !important',
+                                height: '100%',
+                                overflow: 'visible'
                             }}
-                            height="100px"
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
                         >
-                            <Box display="flex" alignItems="center" flexWrap="wrap" overflow="visible">
-                                <Box
-                                    width="3.125rem"
-                                    height="3.125rem"
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    border="1px solid rgba(76,76,102,.1)"
-                                    borderRadius="6px"
-                                    margin="0 8px"
-                                >
-                                    <Image
-                                        preview={false}
-                                        style={{ width: '2.5rem', height: '2.5rem' }}
-                                        src={getImage(item.flowStep.icon)}
-                                        fallback="data:image/png;base64,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"
-                                        alt="svg"
-                                    />
-                                </Box>
-                                <Box display="flex" alignItems="center">
-                                    <Typography variant="h4">
-                                        {t('market.steps')}
-                                        {index + 1}：
-                                    </Typography>
-                                    {!editStatus[index] && (
-                                        <Typography
-                                            noWrap
-                                            sx={{ maxWidth: { xs: '90px', sm: '200px', md: '450px', lg: '160px' } }}
-                                            variant="h4"
-                                        >
-                                            {item?.name}
+                            <Box
+                                sx={{
+                                    borderRadius: '4px',
+                                    overflow: 'visible',
+                                    borderLeft: allvalidas[index] ? '5px solid #ff6376' : 'none'
+                                }}
+                                height="100px"
+                                display="flex"
+                                justifyContent="space-between"
+                                alignItems="center"
+                            >
+                                <Box display="flex" alignItems="center" flexWrap="wrap" overflow="visible">
+                                    <Box
+                                        width="3.125rem"
+                                        height="3.125rem"
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        border="1px solid rgba(76,76,102,.1)"
+                                        borderRadius="6px"
+                                        margin="0 8px"
+                                    >
+                                        <Image
+                                            preview={false}
+                                            style={{ width: '2.5rem', height: '2.5rem' }}
+                                            src={getImage(item.flowStep.icon)}
+                                            fallback="data:image/png;base64,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"
+                                            alt="svg"
+                                        />
+                                    </Box>
+                                    <Box display="flex" alignItems="center">
+                                        <Typography variant="h4">
+                                            {t('market.steps')}
+                                            {index + 1}：
                                         </Typography>
-                                    )}
-                                    {editStatus[index] && (
-                                        <Box sx={{ width: { xs: '90px', sm: '180px', md: '400px', lg: '140px' } }}>
-                                            <TextField
-                                                onBlur={(e) => {
-                                                    const newValue = _.cloneDeep(editStatus);
-                                                    newValue[index] = false;
-                                                    setEditStatus(newValue);
-                                                    if (e.target.value) {
-                                                        editChange({ num: index, label: 'name', value: e.target.value, flag: true });
-                                                    }
-                                                }}
-                                                name="name"
-                                                fullWidth
-                                                autoFocus
-                                                defaultValue={item?.name}
-                                                variant="standard"
-                                            />
-                                        </Box>
-                                    )}
-                                    {/* 编辑名称和描述 */}
-                                    {expanded[index] && (
-                                        <>
-                                            <Tooltip placement="top" title={t('market.editName')}>
-                                                <IconButton
-                                                    onClick={() => {
-                                                        if (stepTitle[index] === '') {
-                                                            const val = [...stepTitle];
-                                                            val[index] = JSON.parse(JSON.stringify(item.name));
-                                                            setStepTitle(val);
-                                                        }
-                                                        const newValue = { ...editStatus };
-                                                        newValue[index] = true;
+                                        {!editStatus[index] && (
+                                            <Typography
+                                                noWrap
+                                                sx={{ maxWidth: { xs: '90px', sm: '200px', md: '450px', lg: '160px' } }}
+                                                variant="h4"
+                                            >
+                                                {item?.name}
+                                            </Typography>
+                                        )}
+                                        {editStatus[index] && (
+                                            <Box sx={{ width: { xs: '90px', sm: '180px', md: '400px', lg: '140px' } }}>
+                                                <TextField
+                                                    onBlur={(e) => {
+                                                        const newValue = _.cloneDeep(editStatus);
+                                                        newValue[index] = false;
                                                         setEditStatus(newValue);
+                                                        if (e.target.value) {
+                                                            editChange({
+                                                                num: index,
+                                                                label: 'name',
+                                                                value: e.target.value,
+                                                                flag: true
+                                                            });
+                                                        }
                                                     }}
-                                                    size="small"
-                                                >
-                                                    <BorderColorIcon fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Box display="inline-block" position="relative">
-                                                <Tooltip placement="top" title={item.description ? item.description : t('market.addDesc')}>
+                                                    name="name"
+                                                    fullWidth
+                                                    autoFocus
+                                                    defaultValue={item?.name}
+                                                    variant="standard"
+                                                />
+                                            </Box>
+                                        )}
+                                        {/* 编辑名称和描述 */}
+                                        {expanded[index] && (
+                                            <>
+                                                <Tooltip placement="top" title={t('market.editName')}>
                                                     <IconButton
                                                         onClick={() => {
-                                                            const newValue = _.cloneDeep(editStatus);
+                                                            if (stepTitle[index] === '') {
+                                                                const val = [...stepTitle];
+                                                                val[index] = JSON.parse(JSON.stringify(item.name));
+                                                                setStepTitle(val);
+                                                            }
+                                                            const newValue = { ...editStatus };
                                                             newValue[index] = true;
-                                                            setDescStatus(newValue);
+                                                            setEditStatus(newValue);
                                                         }}
                                                         size="small"
                                                     >
-                                                        <ChatBubbleIcon fontSize="small" />
+                                                        <BorderColorIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
-                                                {descStatus[index] && (
-                                                    <Box position="absolute" bottom="-120px" right="-200px" zIndex={10} width="380px">
-                                                        <TextField
-                                                            onBlur={(e) => {
-                                                                editChange({ num: index, label: e.target.name, value: e.target.value });
-                                                                const newValue = _.cloneDeep(descStatus);
-                                                                newValue[index] = false;
+                                                <Box display="inline-block" position="relative">
+                                                    <Tooltip
+                                                        placement="top"
+                                                        title={item.description ? item.description : t('market.addDesc')}
+                                                    >
+                                                        <IconButton
+                                                            onClick={() => {
+                                                                const newValue = _.cloneDeep(editStatus);
+                                                                newValue[index] = true;
                                                                 setDescStatus(newValue);
                                                             }}
-                                                            autoFocus
-                                                            name="description"
-                                                            fullWidth
-                                                            defaultValue={item.description}
-                                                            multiline
-                                                            minRows={4}
-                                                        />
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                        </>
+                                                            size="small"
+                                                        >
+                                                            <ChatBubbleIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                    {descStatus[index] && (
+                                                        <Box position="absolute" bottom="-120px" right="-200px" zIndex={10} width="380px">
+                                                            <TextField
+                                                                onBlur={(e) => {
+                                                                    editChange({
+                                                                        num: index,
+                                                                        label: e.target.name,
+                                                                        value: e.target.value
+                                                                    });
+                                                                    const newValue = _.cloneDeep(descStatus);
+                                                                    newValue[index] = false;
+                                                                    setDescStatus(newValue);
+                                                                }}
+                                                                autoFocus
+                                                                name="description"
+                                                                fullWidth
+                                                                defaultValue={item.description}
+                                                                multiline
+                                                                minRows={4}
+                                                            />
+                                                        </Box>
+                                                    )}
+                                                </Box>
+                                            </>
+                                        )}
+                                    </Box>
+                                </Box>
+                                <Box display="flex" alignItems="center">
+                                    {!expanded[index] && (
+                                        <Button
+                                            onClick={() => {
+                                                expandChange(index);
+                                            }}
+                                            size="small"
+                                            color="secondary"
+                                            variant="outlined"
+                                            startIcon={<BorderColorIcon />}
+                                        >
+                                            {t('market.desc')}
+                                        </Button>
                                     )}
+                                    {expanded[index] && (
+                                        <Tooltip placement="top" title={item.flowStep.description}>
+                                            <HelpIcon fontSize="small" />
+                                        </Tooltip>
+                                    )}
+                                    <Dropdown
+                                        placement="bottom"
+                                        menu={{
+                                            items: [
+                                                {
+                                                    key: '1',
+                                                    label: ' 向上',
+                                                    icon: <VerticalAlignTopOutlined rev={undefined} />,
+                                                    disabled: index === 0
+                                                },
+                                                {
+                                                    key: '2',
+                                                    label: ' 向下',
+                                                    icon: <VerticalAlignBottomOutlined rev={undefined} />,
+                                                    disabled: config?.steps?.length - 1 === index
+                                                },
+                                                {
+                                                    key: '3',
+                                                    label: ' 复制',
+                                                    icon: <CopyOutlined rev={undefined} />
+                                                },
+                                                {
+                                                    key: '4',
+                                                    label: '删除',
+                                                    icon: <DeleteOutlined rev={undefined} />,
+                                                    disabled: config?.steps.length === 1
+                                                }
+                                            ],
+                                            onClick: (e: any) => {
+                                                switch (e.key) {
+                                                    case '1':
+                                                        stepMove(index, -1);
+                                                        break;
+                                                    case '2':
+                                                        stepMove(index, 1);
+                                                        break;
+                                                    case '3':
+                                                        copyStep(item, index);
+                                                        break;
+                                                    case '4':
+                                                        delStep(index);
+                                                        break;
+                                                }
+                                            }
+                                        }}
+                                        trigger={['click']}
+                                    >
+                                        <IconButton>
+                                            <MoreHorizIcon />
+                                        </IconButton>
+                                    </Dropdown>
                                 </Box>
                             </Box>
-                            <Box display="flex" alignItems="center">
-                                {!expanded[index] && (
-                                    <Button
-                                        onClick={() => {
-                                            expandChange(index);
-                                        }}
-                                        size="small"
-                                        color="secondary"
-                                        variant="outlined"
-                                        startIcon={<BorderColorIcon />}
-                                    >
-                                        {t('market.desc')}
-                                    </Button>
-                                )}
-                                {expanded[index] && (
-                                    <Tooltip placement="top" title={item.flowStep.description}>
-                                        <HelpIcon fontSize="small" />
-                                    </Tooltip>
-                                )}
-                                <Dropdown
-                                    placement="bottom"
-                                    menu={{
-                                        items: [
-                                            {
-                                                key: '1',
-                                                label: ' 向上',
-                                                icon: <VerticalAlignTopOutlined rev={undefined} />,
-                                                disabled: index === 0
-                                            },
-                                            {
-                                                key: '2',
-                                                label: ' 向下',
-                                                icon: <VerticalAlignBottomOutlined rev={undefined} />,
-                                                disabled: config?.steps?.length - 1 === index
-                                            },
-                                            {
-                                                key: '3',
-                                                label: ' 复制',
-                                                icon: <CopyOutlined rev={undefined} />
-                                            },
-                                            {
-                                                key: '4',
-                                                label: '删除',
-                                                icon: <DeleteOutlined rev={undefined} />,
-                                                disabled: config?.steps.length === 1
-                                            }
-                                        ],
-                                        onClick: (e: any) => {
-                                            switch (e.key) {
-                                                case '1':
-                                                    stepMove(index, -1);
-                                                    break;
-                                                case '2':
-                                                    stepMove(index, 1);
-                                                    break;
-                                                case '3':
-                                                    copyStep(item, index);
-                                                    break;
-                                                case '4':
-                                                    delStep(index);
-                                                    break;
-                                            }
-                                        }
-                                    }}
-                                    trigger={['click']}
-                                >
-                                    <IconButton>
-                                        <MoreHorizIcon />
-                                    </IconButton>
-                                </Dropdown>
-                            </Box>
-                        </Box>
-                        {expanded[index] && <Divider />}
-                        {expanded[index] && (
-                            <Box>
-                                <Valida
-                                    key={item.field}
-                                    title={item.name}
-                                    handler={item?.flowStep?.handler}
-                                    variable={item.variable?.variables}
-                                    variables={item.flowStep.variable?.variables}
-                                    responent={item.flowStep.response}
-                                    buttonLabel={item.buttonLabel}
-                                    basisChange={basisChange}
-                                    index={index}
-                                    allvalida={allvalida[index]}
-                                    fields={item.field}
-                                    setModal={(i) => {
-                                        setModal(i);
-                                    }}
-                                    setOpen={setOpen}
-                                    setTitle={setTitle}
-                                    editChange={editChange}
-                                    statusChange={statusChange}
-                                    editModal={editModal}
-                                    delModal={delModal}
-                                />
-                            </Box>
-                        )}
-                    </SubCard>
+                            {expanded[index] && <Divider />}
+                            {expanded[index] && (
+                                <Box>
+                                    {item?.flowStep?.handler === 'PosterActionHandler' ? (
+                                        <div className="p-4">
+                                            {item?.variable?.variables?.map(
+                                                (el: any, i: number) =>
+                                                    el?.field === 'POSTER_STYLE_CONFIG' && (
+                                                        <div>
+                                                            <div className="pb-4 flex justify-end">
+                                                                <div className="flex gap-2 items-center">
+                                                                    <span className="text-xs font-bold">是否设为系统</span>
+                                                                    <Switch
+                                                                        checked={el?.group === 'SYSTEM' ? true : false}
+                                                                        onChange={(data) => {
+                                                                            if (data) {
+                                                                                groupChange({ value: 'SYSTEM', i, index });
+                                                                            } else {
+                                                                                groupChange({ value: 'ADVANCED', i, index });
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <span className="text-xs font-bold">是否显示</span>
+                                                                    <Switch
+                                                                        checked={el?.isShow}
+                                                                        onChange={(data) => {
+                                                                            statusChange({ i, index });
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <CreateTab
+                                                                key={el?.field}
+                                                                appData={{ materialType: '', appUid: 'c391a40ab293494d9eae937401065bcd' }}
+                                                                imageStyleData={el.value}
+                                                                setImageStyleData={(data) => {
+                                                                    exeChange({ e: { name: el.field, value: data }, steps: index, i });
+                                                                    console.log(data);
+                                                                }}
+                                                                focuActive={focuActive}
+                                                                setFocuActive={setFocuActive}
+                                                                digui={() => {
+                                                                    const newData = el.value?.map((i: any) => i.name.split(' ')[1]);
+                                                                    if (!newData || newData?.every((i: any) => !i)) {
+                                                                        return 1;
+                                                                    }
+                                                                    return (
+                                                                        newData
+                                                                            ?.map((i: any) => Number(i))
+                                                                            ?.sort((a: any, b: any) => b - a)[0] *
+                                                                            1 +
+                                                                        1
+                                                                    );
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <Valida
+                                            key={item.field}
+                                            title={item.name}
+                                            variableStyle={variableStyle}
+                                            handler={item?.flowStep?.handler}
+                                            variable={item.variable?.variables}
+                                            variables={item.flowStep.variable?.variables}
+                                            responent={item.flowStep.response}
+                                            buttonLabel={item.buttonLabel}
+                                            basisChange={basisChange}
+                                            index={index}
+                                            allvalida={allvalida[index]}
+                                            fields={item.field}
+                                            setModal={(i) => {
+                                                setModal(i);
+                                            }}
+                                            setOpen={setOpen}
+                                            setTitle={setTitle}
+                                            editChange={editChange}
+                                            statusChange={statusChange}
+                                            editModal={editModal}
+                                            delModal={delModal}
+                                        />
+                                    )}
+                                </Box>
+                            )}
+                        </SubCard>
+                    </div>
+
                     <Box textAlign="center" fontSize="25px" fontWeight={600} mt={1}>
                         |
                     </Box>
@@ -466,6 +545,7 @@ function Arrange({
             {open && (
                 <ArrangeModal
                     open={open}
+                    variableStyle={variableStyle}
                     handleClose={handleClose}
                     title={title}
                     detail={detail}

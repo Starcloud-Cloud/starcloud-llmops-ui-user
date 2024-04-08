@@ -82,7 +82,7 @@ const validationSchema = yup.object({
     label: yup.string().required('label is required')
 });
 
-function Arrange({ detail, config, editChange, basisChange, statusChange, changeConfigs, getTableData }: any) {
+function Arrange({ detail, config, variableStyle, editChange, basisChange, statusChange, changeConfigs, getTableData }: any) {
     const [stepTitle, setStepTitle] = useState<string[]>([]);
     const formik = useFormik({
         initialValues: {
@@ -142,13 +142,6 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     //弹窗
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('');
-    const typeList = [
-        { label: t('myApp.input'), value: 'INPUT' },
-        { label: t('myApp.textarea'), value: 'TEXTAREA' },
-        { label: t('myApp.json_textarea'), value: 'JSON' },
-        { label: t('myApp.select'), value: 'SELECT' },
-        { label: t('myApp.material'), value: 'MATERIAL' }
-    ];
     //关闭弹窗
     const handleClose = () => {
         formik.resetForm();
@@ -728,7 +721,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                         <FormControl fullWidth sx={{ mt: detail?.type === 'MEDIA_MATRIX' ? 4 : 2 }}>
                             <InputLabel>{t('myApp.type')}</InputLabel>
                             <Select onChange={formik.handleChange} name="style" value={formik.values.style} label={t('myApp.type')}>
-                                {typeList.map((el: any) => (
+                                {variableStyle?.map((el: any) => (
                                     <MenuItem key={el.value} value={el.value}>
                                         {el.label}
                                     </MenuItem>

@@ -27,7 +27,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
-import Perform from 'views/template/carryOut/perform';
+import Perform from 'views/template/carryOut/newPerform';
 import Arrange from './newArrange';
 import Basis from './newBasis';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
@@ -48,6 +48,7 @@ interface AppModels {
     aiModel?: Items[];
     language?: Items[];
     type?: Items[];
+    variableStyle?: Items[];
 }
 const Header = ({
     permissions,
@@ -340,7 +341,28 @@ function CreateDetail() {
                 }
                 arr.find((el: any) => el.style === 'MATERIAL').value = list;
             }
+            if (arr?.find((el: any) => el.style === 'CHECKBOX')) {
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.style === 'CHECKBOX')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.style === 'CHECKBOX')?.value;
+                }
+                arr.find((el: any) => el.style === 'CHECKBOX').value = list;
+            }
+            if (item?.flowStep?.handler === 'PosterActionHandler' && arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')) {
+                let list: any;
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
+                }
+                arr.find((el: any) => el.field === 'POSTER_STYLE_CONFIG').value = list;
+            }
         });
+        console.log(newValue);
+
         detailRef.current = _.cloneDeep(newValue);
         if (newValue?.workflowConfig?.steps?.length === 1) {
             setAiModel(
@@ -364,7 +386,7 @@ function CreateDetail() {
         });
     };
     //设置执行的步骤
-    const exeChange = ({ e, steps, i, type }: any) => {
+    const exeChange = ({ e, steps, i, type, code }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
         if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.style === 'MATERIAL')) {
@@ -374,6 +396,22 @@ function CreateDetail() {
             stepRef.current = steps;
             setStep(stepRef.current);
             setTableData(type, steps);
+        }
+        if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
+            const num = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REQUIREMENT');
+            const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+            if (e.value === 'RANDOM') {
+                newValue.workflowConfig.steps[steps].variable.variables[num].value = '';
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+            } else if (e.value === 'AI_PARODY') {
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+            } else {
+                newValue.workflowConfig.steps[steps].variable.variables[num1].value = [];
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+            }
         }
         detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
@@ -449,10 +487,17 @@ function CreateDetail() {
         setDetail(oldValue);
     };
     const statusChange = ({ i, index }: { i: number; index: number }) => {
-        const value = _.cloneDeep(detail);
-        value.workflowConfig.steps[index].variable.variables[i].isShow = !value.workflowConfig.steps[index].variable.variables[i].isShow;
-        detailRef.current = _.cloneDeep(value);
-        setDetail(value);
+        const newValue = _.cloneDeep(detailRef.current);
+        newValue.workflowConfig.steps[index].variable.variables[i].isShow =
+            !newValue.workflowConfig.steps[index].variable.variables[i].isShow;
+        detailRef.current = newValue;
+        setDetail(detailRef.current);
+    };
+    const groupChange = ({ i, index, value }: { i: number; index: number; value: string }) => {
+        const newValue = _.cloneDeep(detailRef.current);
+        newValue.workflowConfig.steps[index].variable.variables[i].group = value;
+        detailRef.current = newValue;
+        setDetail(detailRef.current);
     };
     //更改answer
     const changeanswer = ({ value, index }: any) => {
@@ -933,9 +978,12 @@ function CreateDetail() {
                                     <Arrange
                                         detail={detail}
                                         config={detail.workflowConfig}
+                                        variableStyle={appModels?.variableStyle}
                                         editChange={editChange}
                                         basisChange={basisChange}
                                         statusChange={statusChange}
+                                        exeChange={exeChange}
+                                        groupChange={groupChange}
                                         changeConfigs={changeConfigs}
                                         getTableData={getTableData}
                                         tableCopy={tableCopy}

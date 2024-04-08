@@ -27,6 +27,7 @@ import { t } from 'hooks/web/useI18n';
 interface Option {
     label: string;
     value: string;
+    description?: string;
 }
 function BootstrapDialogTitle(props: any) {
     const { children, onClose, ...other } = props;
@@ -62,6 +63,7 @@ const validationSchema = yup.object({
 });
 const ArrangeModal = ({
     open,
+    variableStyle,
     handleClose,
     title,
     detail,
@@ -70,6 +72,7 @@ const ArrangeModal = ({
     changevariable
 }: {
     open: boolean;
+    variableStyle?: any[];
     handleClose: (data: boolean) => void;
     title: string;
     detail: any;
@@ -112,17 +115,10 @@ const ArrangeModal = ({
             }
         }
     });
-    const typeList = [
-        { label: t('myApp.input'), value: 'INPUT' },
-        { label: t('myApp.textarea'), value: 'TEXTAREA' },
-        { label: t('myApp.json_textarea'), value: 'JSON' },
-        { label: t('myApp.select'), value: 'SELECT' },
-        { label: t('myApp.material'), value: 'MATERIAL' }
-    ];
     const [options, setOptions] = useState<Option[]>([]);
     //添加下拉框子项
     const addVariable = () => {
-        setOptions([..._.cloneDeep(options), { label: 'label', value: 'value' }]);
+        setOptions([..._.cloneDeep(options), { label: 'label', value: 'value', description: '' }]);
     };
     //改变下拉框的子项
     const optionChange = (e: { target: { name: string; value: string } }, index: number) => {
@@ -232,7 +228,7 @@ const ArrangeModal = ({
                     <FormControl fullWidth sx={{ mt: detail?.type === 'MEDIA_MATRIX' ? 4 : 2 }}>
                         <InputLabel>{t('myApp.type')}</InputLabel>
                         <Select onChange={formik.handleChange} name="style" value={formik.values.style} label={t('myApp.type')}>
-                            {typeList.map((el: any) => (
+                            {variableStyle?.map((el: any) => (
                                 <MenuItem key={el.value} value={el.value}>
                                     {el.label}
                                 </MenuItem>
@@ -245,26 +241,32 @@ const ArrangeModal = ({
                         label={t('myApp.isShow')}
                         labelPlacement="start"
                     />
-                    {formik.values.style === 'SELECT' && (
+                    {(formik.values.style === 'SELECT' || formik.values.style === 'RADIO') && (
                         <Box>
                             {options.map((item, vIndex: number) => (
-                                <Box key={vIndex} mt={2}>
+                                <Box className="flex gap-2 items-center" key={vIndex} mt={2}>
                                     <TextField
                                         name="label"
                                         label="label"
                                         value={item.label}
                                         onChange={(e) => optionChange(e, vIndex)}
                                         InputLabelProps={{ shrink: true }}
-                                        helperText=" "
                                     />
-                                    <span style={{ display: 'inline-block', margin: '20px 10px 0 10px' }}>—</span>
+                                    <span className="block">—</span>
                                     <TextField
                                         name="value"
                                         label="value"
                                         value={item.value}
                                         onChange={(e) => optionChange(e, vIndex)}
                                         InputLabelProps={{ shrink: true }}
-                                        helperText=" "
+                                    />
+                                    <TextField
+                                        variant="standard"
+                                        name="description"
+                                        label="description"
+                                        value={item.description}
+                                        onChange={(e) => optionChange(e, vIndex)}
+                                        InputLabelProps={{ shrink: true }}
                                     />
                                 </Box>
                             ))}

@@ -27,7 +27,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
-import Perform from 'views/template/carryOut/perform';
+import Perform from '../../../carryOut/newPerform';
 import Arrange from './arrange';
 import Basis from './basis';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
@@ -48,6 +48,7 @@ interface AppModels {
     aiModel?: Items[];
     language?: Items[];
     type?: Items[];
+    variableStyle?: Items[];
 }
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -938,6 +939,7 @@ function CreateDetail() {
                     {segmentedValue === '配置' && detail && (
                         <Arrange
                             detail={detail}
+                            variableStyle={appModels?.variableStyle}
                             config={_.cloneDeep(detail.workflowConfig)}
                             editChange={editChange}
                             basisChange={basisChange}

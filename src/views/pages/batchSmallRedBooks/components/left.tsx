@@ -1,7 +1,7 @@
 import { TextField, FormControl, InputLabel, Select, MenuItem, Chip, FormHelperText, Autocomplete } from '@mui/material';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Progress } from 'antd';
-import { PlusOutlined, LoadingOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
+import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Progress, Tabs } from 'antd';
+import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import type { RadioChangeEvent } from 'antd';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
@@ -342,6 +342,110 @@ const Lefts = ({
                 className=" pt-[20px]  overflow-y-auto pb-[72px]"
                 style={{ height: getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 130px)' }}
             >
+                {/* <TextField
+                    fullWidth
+                    key={detailData?.name}
+                    size="small"
+                    color="secondary"
+                    InputLabelProps={{ shrink: true }}
+                    error={valueOpen && !detailData?.name}
+                    helperText={valueOpen && !detailData?.name ? '计划名称必填' : ''}
+                    label="计划名称"
+                    defaultValue={detailData?.name}
+                    onBlur={(e: any) => {
+                        setValueOpen(true);
+                        changeBasis('name', e.target.value);
+                    }}
+                />
+                <Tabs
+                    defaultActiveKey="1"
+                    items={[
+                        {
+                            label: '素材上传',
+                            key: '1',
+                            children: (
+                                <div>
+                                    <div className="text-[18px] font-[600] mt-[20px] mb-[10px]">
+                                        {materialType === 'picture' ? '批量上传素材图片' : '批量上传素材'}
+                                    </div>
+                                    {materialType === 'picture' ? (
+                                        <>
+                                            <div className="text-[12px] font-[500] flex items-center justify-between">
+                                                <div>图片总量：{imageList?.length}</div>
+                                                {imageList?.length > 0 && (
+                                                    <Button
+                                                        danger
+                                                        onClick={() => {
+                                                            setImageList([]);
+                                                        }}
+                                                        size="small"
+                                                        type="text"
+                                                    >
+                                                        全部清除
+                                                    </Button>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
+                                                <div>
+                                                    <Upload {...props}>
+                                                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                                            <PlusOutlined rev={undefined} />
+                                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                                        </div>
+                                                    </Upload>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex justify-between items-center mb-[10px]">
+                                                <div className="flex gap-2">
+                                                    <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                                                        批量导入
+                                                    </Button>
+                                                </div>
+                                                <div className="flex gap-2 items-end">
+                                                    <div className="text-xs text-black/50">点击放大编辑</div>
+                                                    <Button
+                                                        onClick={() => setZoomOpen(true)}
+                                                        type="primary"
+                                                        shape="circle"
+                                                        icon={<ZoomInOutlined rev={undefined} />}
+                                                    ></Button>
+                                                </div>
+                                            </div>
+                                            <Table
+                                                rowKey={(record, index) => String(index)}
+                                                loading={tableLoading}
+                                                size="small"
+                                                virtual
+                                                columns={columns}
+                                                dataSource={tableData}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            )
+                        },
+                        {
+                            label: '笔记生成',
+                            key: '2',
+                            children:(
+
+                            )
+                        },
+                        {
+                            label: '图片生成',
+                            key: '3',
+                            children:()
+                        },
+                        {
+                            label: '批量生成参数',
+                            key: '4',
+                            children:()
+                        },
+                    ]}
+                /> */}
                 <TextField
                     fullWidth
                     key={detailData?.name}

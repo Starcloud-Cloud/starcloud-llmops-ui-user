@@ -370,7 +370,7 @@ const BatcSmallRedBooks = () => {
                     <div></div>
                 </SubCard>
                 <Row gutter={20} className="!ml-0">
-                    <Col span={6} className="relative h-full bg-[#fff] !px-[0]">
+                    <Col span={10} className="relative h-full bg-[#fff] !px-[0]">
                         <Left
                             detailData={detailData}
                             setDetailData={setDetailData}
@@ -385,7 +385,7 @@ const BatcSmallRedBooks = () => {
                             handleSave={(flag: any) => handleSave(flag)}
                         />
                     </Col>
-                    <Col span={18} className="overflow-hidden mt-4">
+                    <Col span={14} className="overflow-hidden mt-4">
                         <Right
                             bathList={bathList}
                             collapseActive={collapseActive}

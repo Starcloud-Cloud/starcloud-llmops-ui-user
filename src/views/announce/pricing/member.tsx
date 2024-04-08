@@ -75,6 +75,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { SignModal } from './SignModal';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+// import AddStyle from 'ui-component/AddStyle';
 
 const recommendList = [
     {
@@ -1135,6 +1136,7 @@ const Price1 = () => {
                     </>
                 )}
             </Dialog>
+            {/* <AddStyle /> */}
         </div>
     );
 };

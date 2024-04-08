@@ -2209,7 +2209,15 @@ const AddStyle = () => {
     const handleOK = () => {
         // 取最大的+1
         if (type === 0) {
-            // styleData.map((item: any) => item.name);
+            const list = styleData.map((item: any) => item.name);
+            let maxNumber = Math.max(...list.map((item: any) => parseInt(item.match(/\d+/))));
+            setStyleData([
+                ...styleData,
+                {
+                    name: `风格 ${maxNumber + 1}`,
+                    list: selectImgs
+                }
+            ]);
         }
         if (type === 1) {
             styleData[editIndex].list = selectImgs;
@@ -2281,7 +2289,7 @@ const AddStyle = () => {
                 <Button onClick={() => handleAdd()}>增加风格</Button>
             </div>
             <div>
-                <Collapse accordion items={collapseList} />
+                <Collapse accordion items={collapseList} defaultActiveKey={[0]} />
             </div>
             <div className="flex justify-center p-2">
                 <Space>

@@ -154,7 +154,7 @@ function Perform({
             {config?.steps?.map((item: any, steps: number) => (
                 <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
                     {item?.flowStep?.handler === 'PosterActionHandler' ? (
-                        <AddStyle />
+                        <AddStyle record={item} />
                     ) : (
                         item.flowStep?.response.style !== 'BUTTON' && (
                             <>

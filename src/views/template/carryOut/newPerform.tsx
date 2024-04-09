@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import { verifyJSON } from '../components/validaForm';
 import MarketForm from '../components/marketForm';
+import AddStyle from 'ui-component/AddStyle';
 function Perform({
     detaData,
     config,
@@ -153,7 +154,7 @@ function Perform({
             {config?.steps?.map((item: any, steps: number) => (
                 <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
                     {item?.flowStep?.handler === 'PosterActionHandler' ? (
-                        <div>预留位置</div>
+                        <AddStyle />
                     ) : (
                         item.flowStep?.response.style !== 'BUTTON' && (
                             <>

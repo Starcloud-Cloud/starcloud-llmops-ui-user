@@ -324,6 +324,23 @@ function CreateDetail() {
             item.variable?.variables.forEach((el: { field: string }) => {
                 el.field = el.field.toUpperCase();
             });
+            if (item?.flowStep?.handler === 'PosterActionHandler') {
+                if (item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'PROMPT_POSTER_STYLE_CONFIG')) {
+                    item.flowStep.variable.variables.find((el: any) => el.field === 'PROMPT_POSTER_STYLE_CONFIG').value = JSON.parse(
+                        item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'PROMPT_POSTER_STYLE_CONFIG').value
+                    );
+                } else {
+                    item?.flowStep?.variable?.variables?.push({
+                        field: 'PROMPT_POSTER_STYLE_CONFIG',
+                        isShow: true,
+                        label: '风格配置',
+                        order: 5,
+                        style: 'TEXTAREA',
+                        type: 'TEXT',
+                        value: []
+                    });
+                }
+            }
         });
         newValue?.workflowConfig?.steps?.forEach((item: any) => {
             const arr = item?.variable?.variables;
@@ -493,12 +510,6 @@ function CreateDetail() {
         detailRef.current = newValue;
         setDetail(detailRef.current);
     };
-    const groupChange = ({ i, index, value }: { i: number; index: number; value: string }) => {
-        const newValue = _.cloneDeep(detailRef.current);
-        newValue.workflowConfig.steps[index].variable.variables[i].group = value;
-        detailRef.current = newValue;
-        setDetail(detailRef.current);
-    };
     //更改answer
     const changeanswer = ({ value, index }: any) => {
         const newValue = _.cloneDeep(detail);
@@ -513,15 +524,17 @@ function CreateDetail() {
         const details = _.cloneDeep(detailRef.current);
         details?.workflowConfig?.steps?.forEach((item: any) => {
             const arr = item?.variable?.variables;
-            if (
-                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
-                arr?.find((el: any) => el.style === 'MATERIAL') &&
-                arr?.find((el: any) => el.style === 'MATERIAL')?.value
-            ) {
-                arr.find((el: any) => el.style === 'MATERIAL').value = JSON.stringify(
-                    arr?.find((el: any) => el.style === 'MATERIAL')?.value
-                );
-            }
+            const arr1 = item?.flowStep?.variable?.variables;
+            arr?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+            arr1?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
         });
         if (details.name && details.category) {
             if (searchParams.get('uid')) {
@@ -982,8 +995,6 @@ function CreateDetail() {
                                         editChange={editChange}
                                         basisChange={basisChange}
                                         statusChange={statusChange}
-                                        exeChange={exeChange}
-                                        groupChange={groupChange}
                                         changeConfigs={changeConfigs}
                                         getTableData={getTableData}
                                         tableCopy={tableCopy}

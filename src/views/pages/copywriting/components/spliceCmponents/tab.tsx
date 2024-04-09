@@ -17,8 +17,6 @@ interface Tabs {
     appData: any;
 }
 const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui, appData }: Tabs) => {
-    console.log(imageStyleData);
-
     const handleAdd = (data?: any) => {
         let newData = _.cloneDeep(imageStyleData);
         if (!newData) {
@@ -40,6 +38,8 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
             ],
             totalImageCount: data?.totalImageCount || 0
         });
+        console.log(newData);
+
         setImageStyleData(newData);
     };
     return (

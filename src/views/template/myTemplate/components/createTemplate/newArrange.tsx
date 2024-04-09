@@ -28,9 +28,7 @@ function Arrange({
     getTableData,
     tableCopy,
     tableDataDel,
-    tableDataMove,
-    exeChange,
-    groupChange
+    tableDataMove
 }: any) {
     const [stepTitle, setStepTitle] = useState<string[]>([]);
     const [modal, setModal] = useState<number>(0);
@@ -414,12 +412,12 @@ function Arrange({
                                 <Box>
                                     {item?.flowStep?.handler === 'PosterActionHandler' ? (
                                         <div className="p-4">
-                                            {item?.variable?.variables?.map(
+                                            {item?.flowStep?.variable?.variables?.map(
                                                 (el: any, i: number) =>
-                                                    el?.field === 'POSTER_STYLE_CONFIG' && (
+                                                    el?.field === 'PROMPT_POSTER_STYLE_CONFIG' && (
                                                         <div>
                                                             <div className="pb-4 flex justify-end">
-                                                                <div className="flex gap-2 items-center">
+                                                                {/* <div className="flex gap-2 items-center">
                                                                     <span className="text-xs font-bold">是否设为系统</span>
                                                                     <Switch
                                                                         checked={el?.group === 'SYSTEM' ? true : false}
@@ -438,15 +436,19 @@ function Arrange({
                                                                             statusChange({ i, index });
                                                                         }}
                                                                     />
-                                                                </div>
+                                                                </div> */}
                                                             </div>
                                                             <CreateTab
                                                                 key={el?.field}
                                                                 appData={{ materialType: '', appUid: 'c391a40ab293494d9eae937401065bcd' }}
                                                                 imageStyleData={el.value}
                                                                 setImageStyleData={(data) => {
-                                                                    exeChange({ e: { name: el.field, value: data }, steps: index, i });
-                                                                    console.log(data);
+                                                                    basisChange({
+                                                                        e: { name: el.field, value: data },
+                                                                        index,
+                                                                        i,
+                                                                        values: true
+                                                                    });
                                                                 }}
                                                                 focuActive={focuActive}
                                                                 setFocuActive={setFocuActive}

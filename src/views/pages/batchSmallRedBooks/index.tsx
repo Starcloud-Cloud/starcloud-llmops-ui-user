@@ -13,7 +13,7 @@ import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import { DetailModal } from '../redBookContentList/component/detailModal';
 import './index.scss';
-import Left from './components/left';
+import Left from './components/newLeft';
 import Right from './components/right';
 import Goods from './good';
 import dayjs from 'dayjs';

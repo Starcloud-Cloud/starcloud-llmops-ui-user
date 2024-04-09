@@ -1,8 +1,11 @@
 import { TextField, MenuItem } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
 import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { t } from 'i18next';
 import _ from 'lodash-es';
+import { v4 as uuidv4 } from 'uuid';
+import { getAccessToken } from 'utils/auth';
 import { verifyJSON, changeJSONValue } from './validaForm';
 import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
 import { materialImport, materialResilt, materialExport } from 'api/redBook/batchIndex';
@@ -33,6 +36,55 @@ function FormExecute({
             setValue(true);
         }
     }, [pre]);
+
+    const [fileList, setFileList] = useState<any[]>([]);
+    //上传图片
+    const props: UploadProps = {
+        name: 'image',
+        multiple: true,
+        listType: 'picture-card',
+        fileList,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 500,
+        onChange(info) {
+            setFileList(info.fileList);
+            if (info.fileList?.every((item) => item.status !== 'uploading')) {
+                onChange({
+                    name: item.field,
+                    value: info.fileList
+                        // ?.filter((item) => item.status === 'done')
+                        ?.map((item) => ({ pictureUrl: item?.response?.data?.url, type: 'picture' }))
+                });
+            }
+        },
+        // onPreview: (file) => {
+        //     setpreviewImage(file?.response?.data?.url);
+        //     setOpen(true);
+        // },
+        onDrop(e) {
+            console.log('Dropped files', e.dataTransfer.files);
+        }
+    };
+    useEffect(() => {
+        if (materialType === 'picture' && item?.style === 'MATERIAL')
+            setFileList(
+                item?.value?.map((item: any) => {
+                    return {
+                        uid: uuidv4(),
+                        thumbUrl: item?.pictureUrl,
+                        response: {
+                            data: {
+                                url: item?.pictureUrl
+                            }
+                        }
+                    };
+                }) || []
+            );
+    }, []);
+
     const [tableLoading, setTableLoading] = useState(false);
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -251,6 +303,34 @@ function FormExecute({
                     <div className="text-xs mt-[20px]">
                         <span className="text-[#673ab7]">Tips:</span>
                         {item?.options?.find((el: any) => el.value === item.value)?.description}
+                    </div>
+                </div>
+            ) : handlerCode === 'MaterialActionHandler' && materialType === 'picture' ? (
+                <div>
+                    <div className="text-[12px] font-[500] flex items-center justify-between">
+                        <div>图片总量：{item.value?.length}</div>
+                        {item.value?.length > 0 && (
+                            <Button
+                                danger
+                                onClick={() => {
+                                    onChange({ name: item.field, value: [] });
+                                }}
+                                size="small"
+                                type="text"
+                            >
+                                全部清除
+                            </Button>
+                        )}
+                    </div>
+                    <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
+                        <div>
+                            <Upload {...props}>
+                                <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                    <PlusOutlined rev={undefined} />
+                                    <div style={{ marginTop: 8 }}>Upload</div>
+                                </div>
+                            </Upload>
+                        </div>
                     </div>
                 </div>
             ) : (

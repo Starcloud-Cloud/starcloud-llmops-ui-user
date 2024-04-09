@@ -183,7 +183,7 @@ const AddStyle = ({ record }: { record: any }) => {
                                 setEditIndex(index);
                             }}
                         >
-                            选择模版风格
+                            选择风格模版
                         </Button>
                         <div className="flex justify-center items-center cursor-pointer">
                             <span>点击放大编辑</span>
@@ -195,12 +195,12 @@ const AddStyle = ({ record }: { record: any }) => {
         }));
     }, [styleData]);
 
-    console.log(templateList, 'templateList');
-
     return (
         <div className="p-3">
             <div className="py-3">
-                <Button onClick={() => handleAdd()}>增加风格</Button>
+                <Button type="primary" onClick={() => handleAdd()}>
+                    增加风格
+                </Button>
             </div>
             <div>
                 <Collapse accordion items={collapseList} defaultActiveKey={[0]} />
@@ -324,7 +324,7 @@ const AddStyle = ({ record }: { record: any }) => {
                                 fontSize: '12px'
                             }}
                         />
-                        <p className="text-xs">系统根据您的商品信息，为您找到了3款图片模版供您选择</p>
+                        <p className="text-xs">系统根据您的商品信息，为您找到了{templateList?.length || 0}款图片模版供您选择</p>
                     </div>
                     <div className="mt-3">
                         {templateList?.map((item, index) => {

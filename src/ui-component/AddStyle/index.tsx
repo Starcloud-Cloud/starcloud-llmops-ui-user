@@ -2063,6 +2063,7 @@ const AddStyle = () => {
     const [chooseImageIndex, setChooseImageIndex] = useState<any>('');
     const [type, setType] = useState<any>();
     const [editIndex, setEditIndex] = useState<any>();
+    const [templateList, setTemplateList] = useState<any[]>([]);
     const collapseIndexRef: any = useRef(null);
 
     React.useEffect(() => {
@@ -2246,7 +2247,7 @@ const AddStyle = () => {
             ),
             children: (
                 <div>
-                    <div className="mb-3">风格示意图6张</div>
+                    <div className="mb-3">风格示意图{item.list.length}张</div>
                     <div>
                         <Image.PreviewGroup
                             preview={{
@@ -2291,12 +2292,6 @@ const AddStyle = () => {
             <div>
                 <Collapse accordion items={collapseList} defaultActiveKey={[0]} />
             </div>
-            <div className="flex justify-center p-2">
-                <Space>
-                    <Button type="primary">保存配置</Button>
-                    <Button type="primary">保存并开始生成</Button>
-                </Space>
-            </div>
             <Drawer
                 title="选择模版"
                 onClose={() => setVisible(false)}
@@ -2324,7 +2319,7 @@ const AddStyle = () => {
                 }
             >
                 <div className="grid grid-cols-3 gap-3">
-                    <FormControl key={query?.color} color="secondary" size="small" fullWidth>
+                    {/* <FormControl key={query?.color} color="secondary" size="small" fullWidth>
                         <InputLabel id="types">色调</InputLabel>
                         <Select
                             value={query?.color}
@@ -2373,7 +2368,7 @@ const AddStyle = () => {
                         >
                             <MenuItem value={'XHS'}>小红书</MenuItem>
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
                     <FormControl key={query?.picNum} color="secondary" size="small" fullWidth>
                         <InputLabel id="types">图片数量</InputLabel>
                         <Select
@@ -2388,7 +2383,11 @@ const AddStyle = () => {
                                                 handleQuery({ label: 'picNum', value: '' });
                                             }}
                                         >
-                                            <ClearIcon />
+                                            <ClearIcon
+                                                style={{
+                                                    fontSize: '14px'
+                                                }}
+                                            />
                                         </IconButton>
                                     </InputAdornment>
                                 )
@@ -2421,8 +2420,8 @@ const AddStyle = () => {
                                     className={`flex overflow-x-auto cursor-pointer ${
                                         hoverIndex === index || chooseImageIndex === index
                                             ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
-                                            : ''
-                                    } rounded-sm my-2`}
+                                            : 'outline outline-offset-2 outline-1 outline-[#ccc]'
+                                    } rounded-sm my-3`}
                                     onClick={() => handleChoose(index)}
                                     onMouseEnter={() => setHoverIndex(index)}
                                     onMouseLeave={() => setHoverIndex('')}

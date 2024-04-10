@@ -436,6 +436,7 @@ function Deatail() {
                     </div>
                 </div>
             ),
+            required: item.required,
             type: item.type
         }));
 

@@ -359,6 +359,7 @@ function FormExecute({
                                 setMaterialType();
                                 setTitle('新增');
                                 setEditOpen(true);
+                                console.log(222);
                             }}
                         >
                             新增

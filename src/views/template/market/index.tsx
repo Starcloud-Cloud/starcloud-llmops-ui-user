@@ -285,8 +285,13 @@ function TemplateMarket() {
             });
         }
     };
-    const handleDetail = (data: { uid: string }) => {
-        navigate(`/appMarketDetail/${data.uid}`);
+    const handleDetail = (data: { uid: string; type: string }) => {
+        console.log(data);
+        if (data.type === 'MEDIA_MATRIX') {
+            navigate(`/batchSmallRedBook?appUid=${data.uid}`);
+        } else {
+            navigate(`/appMarketDetail/${data.uid}`);
+        }
     };
     const LeftArrow = () => {
         const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);

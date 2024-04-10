@@ -70,6 +70,7 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
                     )}
                 </div>
             ),
+            required: item.required,
             type: item.type
         }));
         setColumns([

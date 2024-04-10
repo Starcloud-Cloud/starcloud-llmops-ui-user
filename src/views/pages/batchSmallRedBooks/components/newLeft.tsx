@@ -1,55 +1,40 @@
-import { TextField, FormControl, InputLabel, Select, MenuItem, Chip, FormHelperText, Autocomplete } from '@mui/material';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Progress, Tabs, Collapse } from 'antd';
+import { Upload, UploadProps, Button, Table, Modal, Image, Popconfirm, Form, Progress, Tabs, Collapse, InputNumber } from 'antd';
+import { FormControl, Autocomplete, Chip, TextField } from '@mui/material';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
-import type { RadioChangeEvent } from 'antd';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Forms from '../../smallRedBook/components/form';
-import { schemeList, materialTemplate, metadata, materialImport, materialExport, materialResilt } from 'api/redBook/batchIndex';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/slices/snackbar';
+import { materialTemplate, materialImport, materialExport, materialResilt, getPlan, planCreate } from 'api/redBook/batchIndex';
 import FormModal from './formModal';
-import moke from './moke.json';
 import MarketForm from '../../../template/components/marketForm';
-const Lefts = ({
-    detailData,
-    setDetailData,
-    imageList,
-    setImageList,
-    schemesList,
-    setSchemeLists,
-    exedisabled,
-    handleSave
-}: {
-    detailData: any; //基础数据
-    setDetailData: (data: any) => void; ///更改基础数据
-    imageList: any[]; //上传图片的列表
-    setImageList: (data: any[]) => void;
-    schemesList: any[]; //变量列表
-    setSchemeLists: (data: any) => void; //更改变量列表
-    exedisabled: boolean; //保存按钮是否禁用
-    handleSave: (data: any) => void; //保存
-}) => {
+import AddStyle from 'ui-component/AddStyle';
+import { useLocation } from 'react-router-dom';
+const Lefts = () => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    //存储的数据
+    const appRef = useRef<any>(null);
+    const [appData, setAppData] = useState<any>(null);
+
     //上传素材
     const [materialType, setMaterialType] = useState('');
     //上传图片
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
+    const [fileList, setFileList] = useState<any[]>([]);
     const props: UploadProps = {
         name: 'image',
         multiple: true,
         listType: 'picture-card',
-        fileList: imageList,
+        fileList,
         action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },
         maxCount: 500,
         onChange(info) {
-            setImageList(info.fileList);
+            setFileList(info.fileList);
         },
         onPreview: (file) => {
             setpreviewImage(file?.response?.data?.url);
@@ -88,48 +73,8 @@ const Lefts = ({
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
     const [parseUid, setParseUid] = useState(''); //上传之后获取的 uid
-    //保存
-    const handleSaveClick = (flag: boolean) => {
-        if (schemesList?.length > 0 && schemesList?.some((item: any) => !item.value && !item.defaultValue)) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '方案参数全部必填',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        const newList = _.cloneDeep(schemesList);
-        newList.forEach((item: any) => {
-            if (item.defaultValue && !item.value) {
-                item.value = item.defaultValue;
-            }
-        });
-        setSchemeLists(newList);
-        const newData = _.cloneDeep(detailData);
-        newData.schemeUid = detailData?.targetKeys;
-        const pictureList = imageList
-            ?.map((item: any) => item?.response?.data?.url)
-            ?.filter((el: any) => el)
-            ?.map((item: any) => {
-                return {
-                    pictureUrl: item,
-                    type: 'picture'
-                };
-            });
-        handleSave({ flag, newData, tableData: materialType === 'picture' ? pictureList : tableData });
-    };
-
     //获取表头数据
     const getTableHeader = async () => {
-        // const res = await metadata();
         const result = await materialTemplate(materialType);
         const newList = result?.fieldDefine?.map((item: any) => {
             return {
@@ -146,6 +91,7 @@ const Lefts = ({
                         )}
                     </div>
                 ),
+                required: item.required,
                 type: item.type
             };
         });
@@ -242,6 +188,7 @@ const Lefts = ({
             tableRef.current = newList;
             setTableData(tableRef.current);
         }
+        form.resetFields();
         setEditOpen(false);
     };
     useEffect(() => {
@@ -252,13 +199,6 @@ const Lefts = ({
             clearInterval(timer.current);
         };
     }, [parseUid]);
-    //上传表格数据
-    useEffect(() => {
-        if (detailData?.creativeMaterialList) {
-            tableRef.current = detailData?.creativeMaterialList;
-            setTableData(tableRef.current);
-        }
-    }, [JSON.stringify(detailData?.creativeMaterialList)]);
     //获取素材上传表格
     useEffect(() => {
         if (materialType) {
@@ -284,11 +224,14 @@ const Lefts = ({
     //笔记生成
     const generRef = useRef<any>(null);
     const [generateList, setGenerateList] = useState<any[]>([]); //笔记生成
-
+    const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
 
-    const getList = () => {
-        const newList: any = _.cloneDeep(moke);
+    const getList = async () => {
+        const result = await getPlan(searchParams.get('appUid'));
+        appRef.current = result;
+        setAppData(appRef.current);
+        const newList: any = _.cloneDeep(result?.configuration?.appInformation);
         newList?.workflowConfig?.steps.forEach((item: any) => {
             const arr: any[] = item?.variable?.variables;
 
@@ -344,7 +287,6 @@ const Lefts = ({
     }, []);
 
     //笔记生成的表头
-
     const stepRef = useRef(0);
     const [step, setStep] = useState(0);
     const [materialTypes, setMaterialTypes] = useState('');
@@ -394,6 +336,7 @@ const Lefts = ({
                     </div>
                 </div>
             ),
+            required: item.required,
             type: item.type
         }));
 
@@ -432,8 +375,6 @@ const Lefts = ({
         ];
     };
     const getHeaders = (data: any, i: number) => {
-        console.log(data);
-
         const newList = data;
         newList?.splice(newList?.length - 1, 1);
         return [
@@ -491,7 +432,6 @@ const Lefts = ({
     const [editOpens, setEditOpens] = useState(false);
     const [rowIndexs, setRowIndexs] = useState(0);
     const handleEdits = (row: any, index: number, i?: number) => {
-        console.log(i);
         if (i || i === 0) {
             let newData = _.cloneDeep(stepRef.current);
             newData = i;
@@ -508,7 +448,7 @@ const Lefts = ({
         const newValue = _.cloneDeep(generRef.current);
         const pubilcList = newValue[stepRef.current].variable.variables;
         let newList = pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')]?.value;
-        if (title === '编辑') {
+        if (titles === '编辑') {
             newList.splice(rowIndexs, 1, { ...result, type: materialTypes });
         } else {
             if (!newList) {
@@ -525,12 +465,112 @@ const Lefts = ({
         setEditOpens(false);
         forms.resetFields();
     };
+
+    // 基础数据
+    const [basisData, setBasisData] = useState<any>({
+        tags: [],
+        totalCount: 5
+    });
+    //保存
+    const handleSaveClick = async (flag: boolean) => {
+        console.log(appData);
+        console.log(tableData);
+        console.log(generateList);
+        const newList = _.cloneDeep(generateList);
+        newList?.forEach((item) => {
+            item?.variable?.variables?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+        });
+        const result = await planCreate({
+            ...basisData,
+            configuration: {
+                imageStyleList: imageRef.current.record,
+                materialList: tableData,
+                appInformation: {
+                    ...appData.configuration.appInformation,
+                    workflowConfig: {
+                        steps: [
+                            ...appData.configuration.appInformation.workflowConfig.steps?.filter(
+                                (item: any) =>
+                                    item?.flowStep?.handler === 'MaterialActionHandler' || item?.flowStep?.handler === 'PosterActionHandler'
+                            ),
+                            ...newList
+                        ]
+                    }
+                }
+            }
+        });
+        console.log(result);
+
+        return;
+    };
     return (
         <>
             <div
                 className=" pt-[20px]  overflow-y-auto pb-[72px]"
                 style={{ height: getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 130px)' }}
             >
+                <div className="mt-[20px]">生成数量：</div>
+                <InputNumber
+                    size="large"
+                    value={basisData?.totalCount}
+                    onChange={(e: any) => {
+                        setBasisData({
+                            ...basisData,
+                            totalCount: e
+                        });
+                    }}
+                    min={1}
+                    max={100}
+                    className="w-full"
+                />
+                <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
+                    <Autocomplete
+                        sx={{ mt: 2 }}
+                        multiple
+                        size="small"
+                        id="tags-filled"
+                        color="secondary"
+                        options={[]}
+                        defaultValue={basisData?.tags}
+                        freeSolo
+                        renderTags={(value: readonly string[], getTagProps) =>
+                            value.map((option: string, index: number) => (
+                                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                            ))
+                        }
+                        onChange={(e: any, newValue) => {
+                            setBasisData({
+                                ...basisData,
+                                tags: newValue
+                            });
+                        }}
+                        renderInput={(param) => (
+                            <TextField
+                                onBlur={(e: any) => {
+                                    if (e.target.value) {
+                                        let newValue: any = basisData.tags;
+                                        if (!newValue) {
+                                            newValue = [];
+                                        }
+                                        newValue.push(e.target.value);
+                                        setBasisData({
+                                            ...basisData,
+                                            tags: newValue
+                                        });
+                                    }
+                                }}
+                                color="secondary"
+                                {...param}
+                                label="标签"
+                                placeholder="请输入标签然后回车"
+                            />
+                        )}
+                    />
+                </FormControl>
                 <Tabs
                     defaultActiveKey="1"
                     items={[
@@ -542,12 +582,12 @@ const Lefts = ({
                                     {materialType === 'picture' ? (
                                         <>
                                             <div className="text-[12px] font-[500] flex items-center justify-between">
-                                                <div>图片总量：{imageList?.length}</div>
-                                                {imageList?.length > 0 && (
+                                                <div>图片总量：{fileList?.length}</div>
+                                                {fileList?.length > 0 && (
                                                     <Button
                                                         danger
                                                         onClick={() => {
-                                                            setImageList([]);
+                                                            setFileList([]);
                                                         }}
                                                         size="small"
                                                         type="text"
@@ -628,14 +668,15 @@ const Lefts = ({
                                                                 }
                                                                 handlerCode={el?.flowStep?.handler}
                                                                 history={false}
-                                                                setEditOpen={setEditOpen}
-                                                                setTitle={setTitle}
+                                                                setEditOpen={setEditOpens}
+                                                                setTitle={setTitles}
                                                                 setStep={() => {
-                                                                    setStep(index);
+                                                                    stepRef.current = index;
+                                                                    setStep(stepRef.current);
                                                                 }}
                                                                 columns={stepMaterial[index]}
                                                                 setMaterialType={() => {
-                                                                    setMaterialType(
+                                                                    setMaterialTypes(
                                                                         el?.variable?.variables?.find(
                                                                             (i: any) => i.field === 'MATERIAL_TYPE'
                                                                         )?.value
@@ -696,7 +737,7 @@ const Lefts = ({
                         {
                             label: '图片生成',
                             key: '3',
-                            children: 222
+                            children: <AddStyle ref={imageRef} record={imageMater} />
                         },
                         {
                             label: '批量生成参数',
@@ -710,7 +751,7 @@ const Lefts = ({
                 <Button className="w-full" icon={<SaveOutlined rev={undefined} />} onClick={() => handleSaveClick(false)} type="primary">
                     保存配置
                 </Button>
-                <Button disabled={exedisabled} className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
+                <Button className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
                     保存并开始生成
                 </Button>
             </div>
@@ -766,18 +807,16 @@ const Lefts = ({
                     columns={stepMarRef.current[stepRef.current]}
                     form={forms}
                     formOk={formOks}
-                    sourceList={[]}
+                    sourceList={[
+                        { label: '小红书', value: 'SMALL_RED_BOOK' },
+                        { label: '其他', value: 'OTHER' }
+                    ]}
                 />
             )}
         </>
     );
 };
 const LeftMemo = (prevProps: any, nextProps: any) => {
-    return (
-        JSON.stringify(prevProps?.detailData) === JSON.stringify(nextProps?.detailData) &&
-        JSON.stringify(prevProps?.imageList) === JSON.stringify(nextProps?.imageList) &&
-        JSON.stringify(prevProps?.schemesList) === JSON.stringify(nextProps?.schemesList) &&
-        JSON.stringify(prevProps?.exedisabled) === JSON.stringify(nextProps?.exedisabled)
-    );
+    return false;
 };
 export default memo(Lefts, LeftMemo);

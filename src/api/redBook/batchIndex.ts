@@ -81,3 +81,8 @@ export const materialExport = (data: any) => {
 export const materialResilt = (parseUid: any) => {
     return request.get({ url: `/llm/material/result/${parseUid}` });
 };
+
+//进入创作计划获取应用数据
+export const getPlan = (appUid: any) => {
+    return request.get({ url: `/llm/creative/plan/getByAppUid?appUid=${appUid}` });
+};

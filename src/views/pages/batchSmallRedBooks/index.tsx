@@ -65,7 +65,7 @@ const BatcSmallRedBooks = () => {
         if (searchParams.get('uid')) {
             planGet(searchParams.get('uid')).then((result) => {
                 if (result) {
-                    setDetail(result);
+                    // setDetail(result);
                     batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
                         setBathList(res.list);
                     });
@@ -371,19 +371,7 @@ const BatcSmallRedBooks = () => {
                 </SubCard>
                 <Row gutter={20} className="!ml-0">
                     <Col span={10} className="relative h-full bg-[#fff] !px-[0]">
-                        <Left
-                            detailData={detailData}
-                            setDetailData={setDetailData}
-                            imageList={imageList}
-                            setImageList={setImageList}
-                            schemesList={schemesList}
-                            setSchemeLists={(data: any) => {
-                                schemeRef.current = data;
-                                setSchemeList(schemeRef.current);
-                            }}
-                            exedisabled={exedisabled}
-                            handleSave={(flag: any) => handleSave(flag)}
-                        />
+                        <Left />
                     </Col>
                     <Col span={14} className="overflow-hidden mt-4">
                         <Right

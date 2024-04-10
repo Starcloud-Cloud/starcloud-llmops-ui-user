@@ -225,8 +225,8 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
     };
 
     return (
-        <div className="p-3">
-            <div className="py-3">
+        <div>
+            <div className="pb-3">
                 <Button type="primary" onClick={() => handleAdd()}>
                     增加风格
                 </Button>

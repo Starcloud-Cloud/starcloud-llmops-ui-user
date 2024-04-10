@@ -689,6 +689,7 @@ function CreateDetail() {
                     </div>
                 </div>
             ),
+            required: item.required,
             type: item.type
         }));
 

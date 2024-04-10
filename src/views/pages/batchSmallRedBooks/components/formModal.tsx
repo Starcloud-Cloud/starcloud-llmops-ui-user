@@ -66,7 +66,7 @@ const FormModal = ({
                                 key={index}
                                 label={item.title}
                                 name={item.dataIndex}
-                                rules={[{ required: item.type === 'weburl' ? false : true, message: `${item.title}是必填的` }]}
+                                rules={[{ required: item.required, message: `${item.title}是必填的` }]}
                             >
                                 {item.type === 'image' ? (
                                     <Upload
@@ -115,7 +115,7 @@ const FormModal = ({
                                         className="flex-1"
                                         noStyle
                                         name={item.dataIndex}
-                                        rules={[{ required: item.type === 'weburl' ? false : true, message: `${item.title}是必填的` }]}
+                                        rules={[{ required: item.required, message: `${item.title}是必填的` }]}
                                     >
                                         <Input />
                                     </Form.Item>

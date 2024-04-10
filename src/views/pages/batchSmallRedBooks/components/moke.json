@@ -65,8 +65,8 @@
                             "group": "SYSTEM",
                             "order": 1,
                             "defaultValue": "bookList",
-                            "value": "contract",
-                            "isShow": true,
+                            "value": "bookList",
+                            "isShow": false,
                             "isPoint": true,
                             "description": "素材类型",
                             "options": [

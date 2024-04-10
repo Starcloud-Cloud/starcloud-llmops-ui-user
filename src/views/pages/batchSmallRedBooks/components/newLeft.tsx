@@ -14,6 +14,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import FormModal from './formModal';
 import moke from './moke.json';
 import MarketForm from '../../../template/components/marketForm';
+import AddStyle from 'ui-component/AddStyle';
 const Lefts = ({
     detailData,
     setDetailData,
@@ -696,7 +697,7 @@ const Lefts = ({
                         {
                             label: '图片生成',
                             key: '3',
-                            children: 222
+                            children: <AddStyle record={} />
                         },
                         {
                             label: '批量生成参数',

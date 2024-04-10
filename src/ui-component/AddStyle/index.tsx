@@ -1,11 +1,12 @@
 import { SearchOutlined } from '@mui/icons-material';
-import { Button, Card, Divider, Image, Dropdown, MenuProps, Space, Drawer, Checkbox, Collapse } from 'antd';
+import { Button, Card, Divider, Image, Dropdown, MenuProps, Space, Drawer, Checkbox, Collapse, Modal, Switch } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useRef, useState } from 'react';
 import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, Select } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
+import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
 
 const AddStyle = ({ record }: { record: any }) => {
     console.log('🚀 ~ AddStyle ~ record:', record);
@@ -24,15 +25,19 @@ const AddStyle = ({ record }: { record: any }) => {
     const [type, setType] = useState<any>();
     const [editIndex, setEditIndex] = useState<any>();
     const [templateList, setTemplateList] = useState<any[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentStyle, setCurrentStyle] = useState<any>(null);
+    const [switchCheck, setSwitchCheck] = useState(false);
 
     const collapseIndexRef: any = useRef(null);
     const templateRef: any = useRef(null);
+
+    console.log(templateList, 'templateList');
 
     useEffect(() => {
         if (record) {
             const tempList =
                 record?.flowStep?.variable.variables.find((item: any) => item.field === 'PROMPT_POSTER_STYLE_CONFIG')?.value || [];
-            console.log('🚀 ~ useEffect ~ tempList:', tempList);
             setTemplateList(tempList);
             templateRef.current = tempList;
         }
@@ -41,8 +46,8 @@ const AddStyle = ({ record }: { record: any }) => {
     React.useEffect(() => {
         if (record) {
             const list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
-            console.log('🚀 ~ React.useEffect ~ list:', list);
-            setStyleData(list);
+            const typeList = list.map((item: any) => ({ ...item, type: 1 }));
+            setStyleData(typeList);
         }
     }, [record]);
 
@@ -185,7 +190,13 @@ const AddStyle = ({ record }: { record: any }) => {
                         >
                             选择风格模版
                         </Button>
-                        <div className="flex justify-center items-center cursor-pointer">
+                        <div
+                            className="flex justify-center items-center cursor-pointer"
+                            onClick={() => {
+                                setCurrentStyle(item);
+                                setIsModalOpen(true);
+                            }}
+                        >
                             <span>点击放大编辑</span>
                             <SearchOutlined />
                         </div>
@@ -194,6 +205,11 @@ const AddStyle = ({ record }: { record: any }) => {
             )
         }));
     }, [styleData]);
+
+    const handleOk = () => {};
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
 
     return (
         <div className="p-3">
@@ -348,6 +364,50 @@ const AddStyle = ({ record }: { record: any }) => {
                     </div>
                 </div>
             </Drawer>
+            <Modal
+                width={1000}
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={
+                    <div>
+                        <Space>
+                            <Button>取消</Button>
+                            <Button type="primary" disabled={!switchCheck}>
+                                确定
+                            </Button>
+                        </Space>
+                    </div>
+                }
+            >
+                <div className="flex justify-between mt-5">
+                    <span className="text-base">{currentStyle?.name}</span>
+                    <div className="flex justify-center">
+                        <span className="mr-1">开启编辑</span>
+                        <Switch
+                            checked={switchCheck}
+                            onChange={(checked) => {
+                                setSwitchCheck(checked);
+                            }}
+                        />
+                    </div>
+                </div>
+
+                <StyleTabs
+                    schemaList={[]}
+                    imageStyleData={currentStyle?.templateList}
+                    typeList={[]}
+                    appData={{
+                        appUid: 'c391a40ab293494d9eae937401065bcd',
+                        materialType: ''
+                    }}
+                    setDetailData={(data: any) => {
+                        const copyCurrentStyle = { ...currentStyle };
+                        copyCurrentStyle.templateList = data;
+                        setCurrentStyle(copyCurrentStyle);
+                    }}
+                />
+            </Modal>
         </div>
     );
 };

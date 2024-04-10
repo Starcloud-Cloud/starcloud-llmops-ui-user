@@ -1,15 +1,15 @@
 import { SearchOutlined } from '@mui/icons-material';
 import { Button, Card, Divider, Image, Dropdown, MenuProps, Space, Drawer, Checkbox, Collapse, Modal, Switch } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, Select } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
 import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
+import _ from 'lodash-es';
 
-const AddStyle = ({ record }: { record: any }) => {
-    console.log('🚀 ~ AddStyle ~ record:', record);
+const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
     const [selectImgs, setSelectImgs] = useState<
@@ -32,7 +32,20 @@ const AddStyle = ({ record }: { record: any }) => {
     const collapseIndexRef: any = useRef(null);
     const templateRef: any = useRef(null);
 
-    console.log(templateList, 'templateList');
+    const submitData = React.useMemo(() => {
+        const copyRecord = _.cloneDeep(record);
+        copyRecord.variable.variables.forEach((item: any) => {
+            if (item.field === 'POSTER_STYLE_CONFIG') {
+                item.value = styleData;
+            }
+        });
+        return copyRecord;
+    }, [styleData, record]);
+
+    console.log(submitData, 'submitData');
+    useImperativeHandle(ref, () => ({
+        record: submitData
+    }));
 
     useEffect(() => {
         if (record) {
@@ -410,6 +423,6 @@ const AddStyle = ({ record }: { record: any }) => {
             </Modal>
         </div>
     );
-};
+});
 
 export default AddStyle;

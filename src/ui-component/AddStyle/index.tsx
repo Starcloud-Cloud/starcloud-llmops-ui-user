@@ -219,8 +219,18 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
         }));
     }, [styleData]);
 
-    const handleOk = () => {};
     const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleOk = () => {
+        const copyStyleData = _.cloneDeep(styleData);
+        copyStyleData.forEach((item: any, index: number) => {
+            if (item.id === currentStyle.id) {
+                copyStyleData[index] = currentStyle;
+            }
+        });
+        setStyleData(copyStyleData);
         setIsModalOpen(false);
     };
 
@@ -378,15 +388,14 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                 </div>
             </Drawer>
             <Modal
-                width={1000}
+                width={900}
                 open={isModalOpen}
-                onOk={handleOk}
                 onCancel={handleCancel}
                 footer={
                     <div>
                         <Space>
-                            <Button>取消</Button>
-                            <Button type="primary" disabled={!switchCheck}>
+                            <Button onClick={() => handleCancel()}>取消</Button>
+                            <Button type="primary" disabled={!switchCheck} onClick={() => handleOk()}>
                                 确定
                             </Button>
                         </Space>

@@ -1,6 +1,6 @@
 import { TextField, FormControl, InputLabel, Select, MenuItem, Chip, FormHelperText, Autocomplete } from '@mui/material';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Progress, Tabs } from 'antd';
+import { Upload, UploadProps, Button, Table, InputNumber, Radio, Modal, Image, Popconfirm, Form, Progress, Tabs, Collapse } from 'antd';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import type { RadioChangeEvent } from 'antd';
 import { getAccessToken } from 'utils/auth';
@@ -33,24 +33,8 @@ const Lefts = ({
     exedisabled: boolean; //保存按钮是否禁用
     handleSave: (data: any) => void; //保存
 }) => {
-    const navigate = useNavigate();
-    const [valueOpen, setValueOpen] = useState(false);
-    const [targetKeysOpen, settargetKeysOpen] = useState(false);
-    //2.文案模板
-    const [mockData, setMockData] = useState<any[]>([]);
-    const [preform, setPerform] = useState(1);
-    //判断上传的类型
+    //上传素材
     const [materialType, setMaterialType] = useState('');
-    useEffect(() => {
-        if (detailData?.targetKeys) {
-            changeBasis('tags', mockData.find((value) => value.uid === detailData?.targetKeys)?.tags);
-            setSchemeLists(mockData.find((value) => value.uid === detailData?.targetKeys)?.variableList);
-            setMaterialType(mockData.find((value) => value.uid === detailData?.targetKeys)?.materialType);
-        } else {
-            changeBasis('tags', []);
-        }
-    }, [detailData?.targetKeys]);
-
     //上传图片
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
@@ -104,48 +88,8 @@ const Lefts = ({
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
     const [parseUid, setParseUid] = useState(''); //上传之后获取的 uid
-    //更改基础信息
-    const changeBasis = (name: string, value: any) => {
-        const newData = _.cloneDeep(detailData);
-        newData[name] = value;
-        setDetailData(newData);
-    };
     //保存
     const handleSaveClick = (flag: boolean) => {
-        if (!detailData?.name) {
-            setValueOpen(true);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '计划名称必填',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (!detailData?.targetKeys) {
-            settargetKeysOpen(true);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '没有选择生成方案',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-            return false;
-        }
         if (schemesList?.length > 0 && schemesList?.some((item: any) => !item.value && !item.defaultValue)) {
             dispatch(
                 openSnackbar({
@@ -308,22 +252,20 @@ const Lefts = ({
             clearInterval(timer.current);
         };
     }, [parseUid]);
+    //上传表格数据
     useEffect(() => {
         if (detailData?.creativeMaterialList) {
             tableRef.current = detailData?.creativeMaterialList;
             setTableData(tableRef.current);
         }
     }, [JSON.stringify(detailData?.creativeMaterialList)]);
+    //获取素材上传表格
     useEffect(() => {
         if (materialType) {
             getTableHeader();
         }
     }, [materialType]);
-    useEffect(() => {
-        schemeList().then((res: any) => {
-            setMockData(res);
-        });
-    }, []);
+    //模拟上传进度
     const timer1: any = useRef(null);
     useEffect(() => {
         if (uploadLoading) {
@@ -339,14 +281,15 @@ const Lefts = ({
         }
     }, [uploadLoading]);
 
-    //改版 Tabs
-    const [upLoadMater, setUpLoadMater] = useState<any>(null); //上传素材
+    //笔记生成
+    const generRef = useRef<any>(null);
     const [generateList, setGenerateList] = useState<any[]>([]); //笔记生成
+
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
 
     const getList = () => {
-        const newList = _.cloneDeep(moke);
-        newList?.workflowConfig?.steps.forEach((item) => {
+        const newList: any = _.cloneDeep(moke);
+        newList?.workflowConfig?.steps.forEach((item: any) => {
             const arr: any[] = item?.variable?.variables;
 
             if (
@@ -383,19 +326,205 @@ const Lefts = ({
                 arr.find((el: any) => el.field === 'POSTER_STYLE_CONFIG').value = list;
             }
         });
-        setUpLoadMater(newList?.workflowConfig?.steps?.find((item) => item?.flowStep?.handler === 'MaterialActionHandler'));
-        setGenerateList(
-            newList?.workflowConfig?.steps?.filter(
-                (item) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
-            )
+        setMaterialType(
+            newList?.workflowConfig?.steps
+                ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value
         );
-        setImagMater(newList?.workflowConfig?.steps?.find((item) => item?.flowStep?.handler === 'PosterActionHandler'));
+        generRef.current = newList?.workflowConfig?.steps?.filter(
+            (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
+        );
+        setGenerateList(generRef.current);
+        getStepMater();
+        setImagMater(newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler'));
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
         getList();
     }, []);
 
+    //笔记生成的表头
+
+    const stepRef = useRef(0);
+    const [step, setStep] = useState(0);
+    const [materialTypes, setMaterialTypes] = useState('');
+    //改变值请求新的表头
+    const stepMarRef = useRef<any[]>([]);
+    const [stepMaterial, setStepMaterial] = useState<any[]>([]);
+    const setTableDatas = async (type: string, steps: number) => {
+        const res = await materialTemplate(type);
+        const newList = _.cloneDeep(stepMarRef.current);
+        newList[steps] = getHeaders(getHeader(res?.fieldDefine, steps), steps);
+        stepMarRef.current = newList;
+        setStepMaterial(stepMarRef.current);
+    };
+    const getStepMater = async () => {
+        const arr: any[] = [];
+        const newList = generRef.current.map((item: any) => {
+            const arr = item?.variable?.variables;
+            return arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value;
+        });
+        const allper = newList?.map(async (el: any, index: number) => {
+            if (el) {
+                const res = await materialTemplate(el);
+                arr[index] = getHeader(res?.fieldDefine, index);
+            } else {
+                arr[index] = undefined;
+            }
+        });
+        await Promise.all(allper);
+        stepMarRef.current = arr;
+        setStepMaterial(stepMarRef?.current);
+    };
+    //获取数据表头
+    const getHeader = (data: any, i: number) => {
+        const newList = data.map((item: any) => ({
+            title: item.desc,
+            align: 'center',
+            width: 200,
+            dataIndex: item.fieldName,
+            render: (_: any, row: any) => (
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    <div className="line-clamp-5">
+                        {item.type === 'image' ? (
+                            <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
+                </div>
+            ),
+            type: item.type
+        }));
+
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdits(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDels(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    const getHeaders = (data: any, i: number) => {
+        console.log(data);
+
+        const newList = data;
+        newList?.splice(newList?.length - 1, 1);
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdits(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDels(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    //删除
+    const handleDels = (index: number, i: number) => {
+        if (i) {
+            stepRef.current = i;
+            setStep(stepRef.current);
+        }
+        const newValue = _.cloneDeep(generRef.current);
+        const newList =
+            generRef.current[i].variable.variables[
+                generRef.current[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+            ].value;
+        newList.splice(index, 1);
+        generRef.current.current = newValue;
+        setGenerateList(generRef.current.current);
+    };
+    const [forms] = Form.useForm();
+    const [titles, setTitles] = useState('');
+    //编辑
+    const [editOpens, setEditOpens] = useState(false);
+    const [rowIndexs, setRowIndexs] = useState(0);
+    const handleEdits = (row: any, index: number, i?: number) => {
+        console.log(i);
+        if (i || i === 0) {
+            let newData = _.cloneDeep(stepRef.current);
+            newData = i;
+            stepRef.current = newData;
+            setStep(stepRef.current);
+        }
+        setTitles('编辑');
+        setMaterialTypes(row.type);
+        forms.setFieldsValue(row);
+        setRowIndexs(index);
+        setEditOpens(true);
+    };
+    const formOks = (result: any) => {
+        const newValue = _.cloneDeep(generRef.current);
+        const pubilcList = newValue[stepRef.current].variable.variables;
+        let newList = pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')]?.value;
+        if (title === '编辑') {
+            newList.splice(rowIndexs, 1, { ...result, type: materialTypes });
+        } else {
+            if (!newList) {
+                newList = [];
+            }
+            newList.unshift({
+                ...result,
+                type: materialType
+            });
+        }
+        pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')].value = newList;
+        generRef.current = newValue;
+        setGenerateList(generRef.current);
+        setEditOpens(false);
+        forms.resetFields();
+    };
     return (
         <>
             <div
@@ -410,45 +539,65 @@ const Lefts = ({
                             key: '1',
                             children: (
                                 <div>
-                                    {upLoadMater?.variable?.variables?.map((item: any) => (
-                                        <MarketForm
-                                            key={item.field}
-                                            item={item}
-                                            materialType={
-                                                upLoadMater.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value
-                                            }
-                                            stepCode={
-                                                item?.field === 'REQUIREMENT'
-                                                    ? upLoadMater.variable?.variables?.find((i: any) => i.field === 'GENERATE_MODE')?.value
-                                                    : ''
-                                            }
-                                            handlerCode={item?.flowStep?.handler}
-                                            history={history}
-                                            columns={[]}
-                                            setEditOpen={setEditOpen}
-                                            setTitle={setTitle}
-                                            setStep={() => {
-                                                console.log(111);
-                                                // setStep(steps)
-                                            }}
-                                            setMaterialType={() => {
-                                                setMaterialType(
-                                                    item?.variable?.variables?.find((i: any) => i.field === 'MATERIAL_TYPE')?.value
-                                                );
-                                            }}
-                                            onChange={(e: any) => {
-                                                console.log(e);
-
-                                                // variableChange({
-                                                //     e,
-                                                //     steps,
-                                                //     i,
-                                                //     type: e.name === 'MATERIAL_TYPE' ? e.value : undefined,
-                                                //     code: item?.flowStep?.handler
-                                                // });
-                                            }}
-                                        />
-                                    ))}
+                                    {materialType === 'picture' ? (
+                                        <>
+                                            <div className="text-[12px] font-[500] flex items-center justify-between">
+                                                <div>图片总量：{imageList?.length}</div>
+                                                {imageList?.length > 0 && (
+                                                    <Button
+                                                        danger
+                                                        onClick={() => {
+                                                            setImageList([]);
+                                                        }}
+                                                        size="small"
+                                                        type="text"
+                                                    >
+                                                        全部清除
+                                                    </Button>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
+                                                <div>
+                                                    <Upload {...props}>
+                                                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                                            <PlusOutlined rev={undefined} />
+                                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                                        </div>
+                                                    </Upload>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex justify-between items-center mb-[10px]">
+                                                <div className="flex gap-2">
+                                                    <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                                                        批量导入
+                                                    </Button>
+                                                    {/* <Button size="small" type="primary">
+                                            选择已有素材
+                                        </Button> */}
+                                                </div>
+                                                <div className="flex gap-2 items-end">
+                                                    <div className="text-xs text-black/50">点击放大编辑</div>
+                                                    <Button
+                                                        onClick={() => setZoomOpen(true)}
+                                                        type="primary"
+                                                        shape="circle"
+                                                        icon={<ZoomInOutlined rev={undefined} />}
+                                                    ></Button>
+                                                </div>
+                                            </div>
+                                            <Table
+                                                rowKey={(record, index) => String(index)}
+                                                loading={tableLoading}
+                                                size="small"
+                                                virtual
+                                                columns={columns}
+                                                dataSource={tableData}
+                                            />
+                                        </>
+                                    )}
                                 </div>
                             )
                         },
@@ -456,53 +605,92 @@ const Lefts = ({
                             label: '笔记生成',
                             key: '2',
                             children: (
-                                <div>
-                                    {generateList?.map((item: any) => (
-                                        <div key={item.field}>
-                                            {item?.variable?.variables?.map((el: any) => (
-                                                <MarketForm
-                                                    key={el.field}
-                                                    item={el}
-                                                    materialType={
-                                                        upLoadMater.variable?.variables?.find((el: any) => el.field === 'MATERIAL_TYPE')
-                                                            ?.value
-                                                    }
-                                                    stepCode={
-                                                        el?.field === 'REQUIREMENT'
-                                                            ? upLoadMater.variable?.variables?.find((i: any) => i.field === 'GENERATE_MODE')
-                                                                  ?.value
-                                                            : ''
-                                                    }
-                                                    handlerCode={el?.flowStep?.handler}
-                                                    history={history}
-                                                    columns={[]}
-                                                    setEditOpen={setEditOpen}
-                                                    setTitle={setTitle}
-                                                    setStep={() => {
-                                                        console.log(111);
-                                                        // setStep(steps)
-                                                    }}
-                                                    setMaterialType={() => {
-                                                        setMaterialType(
-                                                            el?.variable?.variables?.find((i: any) => i.field === 'MATERIAL_TYPE')?.value
-                                                        );
-                                                    }}
-                                                    onChange={(e: any) => {
-                                                        console.log(e);
-
-                                                        // variableChange({
-                                                        //     e,
-                                                        //     steps,
-                                                        //     i,
-                                                        //     type: e.name === 'MATERIAL_TYPE' ? e.value : undefined,
-                                                        //     code: item?.flowStep?.handler
-                                                        // });
-                                                    }}
-                                                />
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
+                                <Collapse
+                                    accordion
+                                    items={generateList?.map((item: any, index: number) => ({
+                                        key: index.toString(),
+                                        label: item.name,
+                                        children: (
+                                            <div key={item.field}>
+                                                {item?.variable?.variables?.map(
+                                                    (el: any, i: number) =>
+                                                        el?.isShow && (
+                                                            <MarketForm
+                                                                key={el.field}
+                                                                item={el}
+                                                                materialType={''}
+                                                                stepCode={
+                                                                    el?.field === 'REQUIREMENT'
+                                                                        ? item.variable?.variables?.find(
+                                                                              (i: any) => i.field === 'GENERATE_MODE'
+                                                                          )?.value
+                                                                        : ''
+                                                                }
+                                                                handlerCode={el?.flowStep?.handler}
+                                                                history={false}
+                                                                setEditOpen={setEditOpen}
+                                                                setTitle={setTitle}
+                                                                setStep={() => {
+                                                                    setStep(index);
+                                                                }}
+                                                                columns={stepMaterial[index]}
+                                                                setMaterialType={() => {
+                                                                    setMaterialType(
+                                                                        el?.variable?.variables?.find(
+                                                                            (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                        )?.value
+                                                                    );
+                                                                }}
+                                                                onChange={(e: any) => {
+                                                                    const newList = _.cloneDeep(generRef.current);
+                                                                    const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                                    const code = item?.flowStep?.handler;
+                                                                    newList[index].variable.variables[i].value = e.value;
+                                                                    if (
+                                                                        type &&
+                                                                        item.variable.variables?.find(
+                                                                            (item: any) => item.style === 'MATERIAL'
+                                                                        )
+                                                                    ) {
+                                                                        newList[index].variable.variables[
+                                                                            item.variable.variables?.findIndex(
+                                                                                (item: any) => item.style === 'MATERIAL'
+                                                                            )
+                                                                        ].value = [];
+                                                                        stepRef.current = index;
+                                                                        setStep(stepRef.current);
+                                                                        setTableDatas(type, index);
+                                                                    }
+                                                                    if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
+                                                                        const num = item.variable.variables?.findIndex(
+                                                                            (item: any) => item.field === 'REQUIREMENT'
+                                                                        );
+                                                                        const num1 = item.variable.variables?.findIndex(
+                                                                            (item: any) => item.style === 'MATERIAL'
+                                                                        );
+                                                                        if (e.value === 'RANDOM') {
+                                                                            newList[index].variable.variables[num].value = '';
+                                                                            newList[index].variable.variables[num].isShow = false;
+                                                                            newList[index].variable.variables[num1].isShow = true;
+                                                                        } else if (e.value === 'AI_PARODY') {
+                                                                            newList[index].variable.variables[num].isShow = true;
+                                                                            newList[index].variable.variables[num1].isShow = true;
+                                                                        } else {
+                                                                            newList[index].variable.variables[num1].value = [];
+                                                                            newList[index].variable.variables[num1].isShow = false;
+                                                                            newList[index].variable.variables[num].isShow = true;
+                                                                        }
+                                                                    }
+                                                                    generRef.current = newList;
+                                                                    setGenerateList(generRef.current);
+                                                                }}
+                                                            />
+                                                        )
+                                                )}
+                                            </div>
+                                        )
+                                    }))}
+                                />
                             )
                         },
                         {
@@ -568,6 +756,18 @@ const Lefts = ({
             </Modal>
             {editOpen && (
                 <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
+            )}
+            {editOpens && (
+                <FormModal
+                    title={titles}
+                    materialType={materialTypes}
+                    editOpen={editOpens}
+                    setEditOpen={setEditOpens}
+                    columns={stepMarRef.current[stepRef.current]}
+                    form={forms}
+                    formOk={formOks}
+                    sourceList={[]}
+                />
             )}
         </>
     );

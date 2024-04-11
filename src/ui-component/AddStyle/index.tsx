@@ -10,14 +10,10 @@ import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
 import _ from 'lodash-es';
 
 const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
+    console.log(record, 'record');
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
-    const [selectImgs, setSelectImgs] = useState<
-        {
-            id: string;
-            src: string;
-        }[]
-    >([]);
+    const [selectImgs, setSelectImgs] = useState<any>(null);
 
     const [query, setQuery] = useState<any | null>(null);
     const [hoverIndex, setHoverIndex] = useState<any>('');
@@ -42,7 +38,6 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
         return copyRecord;
     }, [styleData, record]);
 
-    console.log(submitData, 'submitData');
     useImperativeHandle(ref, () => ({
         record: submitData
     }));
@@ -78,15 +73,15 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
 
     useEffect(() => {
         if (query?.picNum) {
-            const filterList = templateRef.current.filter((item: any) => item.example.length >= query?.picNum || 0);
+            const filterList = templateRef.current.filter((item: any) => item.templateList.length >= query?.picNum || 0);
             setTemplateList(filterList);
         }
     }, [query]);
 
     const handleChoose = (index: number) => {
         setChooseImageIndex(index);
-        const list: any = templateList[index].example;
-        setSelectImgs([...list]);
+        const list: any = templateList[index];
+        setSelectImgs(list);
     };
 
     const items: any = [
@@ -137,13 +132,12 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
             setStyleData([
                 ...styleData,
                 {
-                    name: `风格 ${maxNumber + 1}`,
-                    list: selectImgs
+                    ...selectImgs
                 }
             ]);
         }
         if (type === 1) {
-            styleData[editIndex].list = selectImgs;
+            styleData[editIndex] = selectImgs;
             setStyleData([...styleData]);
         }
         setVisible(false);
@@ -249,7 +243,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                         <div className="flex items-center">
                             <p>选择模版：</p>
                             <div>
-                                {selectImgs.map((item: any, index: number) => (
+                                {selectImgs?.templateList?.map((item: any, index: number) => (
                                     <Image width={32} height={40} src={item.example} preview={false} />
                                 ))}
                             </div>

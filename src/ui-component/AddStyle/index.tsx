@@ -243,7 +243,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                 <Collapse accordion items={collapseList} defaultActiveKey={[0]} />
             </div>
             <Drawer
-                title="选择模版"
+                title="选择风格模版"
                 onClose={() => {
                     setVisible(false);
                     setSelectImgs(null);
@@ -323,7 +323,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                                 fontSize: '12px'
                             }}
                         />
-                        <p className="text-xs">系统根据您的商品信息，为您找到了{templateList?.length || 0}款图片模版供您选择</p>
+                        <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款风格模版供您选择</p>
                     </div>
                     <div className="mt-3">
                         {templateList?.map((item, index) => {

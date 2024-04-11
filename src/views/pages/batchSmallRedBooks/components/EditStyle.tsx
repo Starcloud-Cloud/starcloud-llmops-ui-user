@@ -10,6 +10,7 @@ import { getImageTemplateTypes } from 'api/template';
 import VariableInput from './variableInput';
 import { BorderColor } from '@mui/icons-material';
 import { getImageTemplateJSON } from '../../../../api/template/index';
+import { v4 as uuidv4 } from 'uuid';
 const { SubMenu } = Menu;
 const EditStyle = ({
     schemaList,
@@ -50,6 +51,7 @@ const EditStyle = ({
     const handleOk = (temp: any) => {
         setCurrentTemp(temp);
         const newData = _.cloneDeep(imageStyleData);
+        newData.example = temp.example;
         newData.code = temp.code;
         newData.variableList = temp.variableList;
         setData(newData);
@@ -81,6 +83,7 @@ const EditStyle = ({
     const handleMenu = ({ index, newValue }: any) => {
         const newData = _.cloneDeep(imageStyleData);
         newData.variableList[index].value = newValue;
+        newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
         setData(newData);
     };
     const wrapperRef: any = useRef(null);
@@ -220,8 +223,10 @@ const EditStyle = ({
                                                                 title={el?.label}
                                                                 value={el.value}
                                                                 setValue={(value) => {
+                                                                    console.log(0);
                                                                     const newData = _.cloneDeep(imageStyleData);
                                                                     newData.variableList[index].value = value;
+                                                                    newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
                                                                     setData(newData);
                                                                 }}
                                                             />
@@ -296,6 +301,7 @@ const EditStyle = ({
                                                             setValue={(value) => {
                                                                 const newData = _.cloneDeep(imageStyleData);
                                                                 newData.variableList[index].value = value;
+                                                                newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
                                                                 setData(newData);
                                                             }}
                                                         />

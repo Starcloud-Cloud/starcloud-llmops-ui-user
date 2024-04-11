@@ -4,6 +4,7 @@ import { MoreVert } from '@mui/icons-material';
 import { PlusOutlined, InfoCircleOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import StyleTabs from '../styleTabs';
+import { v4 as uuidv4 } from 'uuid';
 import { memo } from 'react';
 interface Tabs {
     schemaList?: any[];
@@ -27,12 +28,14 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
             index: digui(),
             system: true,
             enable: data?.enable || true,
+            uuid: uuidv4()?.split('-')?.join(''),
             templateList: data?.templateList || [
                 {
                     key: '1',
                     name: '首图',
                     model: '',
                     titleGenerateMode: 'DEFAULT',
+                    uuid: uuidv4()?.split('-')?.join(''),
                     variableList: []
                 }
             ],

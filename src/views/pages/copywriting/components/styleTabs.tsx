@@ -2,6 +2,7 @@ import { Tabs } from 'antd';
 import { useState, useRef } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import EditStyle from '../../batchSmallRedBooks/components/EditStyle';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const StyleTabs = ({
@@ -52,6 +53,7 @@ const StyleTabs = ({
             name: `图片 ${digui()}`,
             key: digui().toString(),
             mode: 'SEQUENCE',
+            uuid: uuidv4()?.split('-')?.join(''),
             titleGenerateMode: data?.titleGenerateMode || 'DEFAULT',
             variableList: data?.variableList || []
         });

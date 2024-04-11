@@ -1,5 +1,5 @@
 import { SearchOutlined } from '@mui/icons-material';
-import { Button, Card, Divider, Image, Dropdown, MenuProps, Space, Drawer, Checkbox, Collapse, Modal, Switch } from 'antd';
+import { Button, Card, Divider, Image, Dropdown, Space, Drawer, Collapse, Modal, Switch } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, Select } from '@mui/material';
@@ -87,18 +87,6 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
         setChooseImageIndex(index);
         const list: any = templateList[index].src;
         setSelectImgs([...list]);
-
-        // const index = selectImgs.map((item) => item.id).findIndex((v) => v === id);
-        // if (index > -1) {
-        //     const copySelectImgs = [...selectImgs];
-        //     copySelectImgs.splice(index, 1);
-        //     setSelectImgs([...copySelectImgs]);
-        // } else {
-        //     const copySelectImgs = [...selectImgs];
-        //     copySelectImgs.push({ id, src });
-        //     console.log(copySelectImgs, 'copySelectImgs');
-        //     setSelectImgs([...copySelectImgs]);
-        // }
     };
 
     const items: any = [
@@ -140,7 +128,12 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
         // 取最大的+1
         if (type === 0) {
             const list = styleData.map((item: any) => item.name);
-            let maxNumber = Math.max(...list.map((item: any) => parseInt(item.match(/\d+/))));
+            let maxNumber;
+            if (list.length === 0) {
+                maxNumber = 0;
+            } else {
+                maxNumber = Math.max(...list.map((item: any) => parseInt(item.match(/\d+/))));
+            }
             setStyleData([
                 ...styleData,
                 {
@@ -176,15 +169,17 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
             ),
             children: (
                 <div>
-                    <div className="mb-3">风格示意图{item?.list?.length || 0}张</div>
-                    <div>
+                    <div className="mb-3">风格示意图{item?.templateList?.length || 0}张</div>
+                    <div className="overflow-x-auto flex">
                         <Image.PreviewGroup
                             preview={{
                                 onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`)
                             }}
                         >
-                            {item?.list?.map((item: any, index: number) => (
-                                <Image width={160} height={200} src={item.src} />
+                            {item?.templateList?.map((item: any, index: number) => (
+                                <div className="w-[160px] h-[200px]">
+                                    <Image width={160} height={200} src={item.src} />
+                                </div>
                             ))}
                         </Image.PreviewGroup>
                     </div>
@@ -271,56 +266,6 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                 }
             >
                 <div className="grid grid-cols-3 gap-3">
-                    {/* <FormControl key={query?.color} color="secondary" size="small" fullWidth>
-                        <InputLabel id="types">色调</InputLabel>
-                        <Select
-                            value={query?.color}
-                            onChange={(e: any) => handleQuery({ label: 'type', value: e.target.value })}
-                            endAdornment={
-                                query?.color && (
-                                    <InputAdornment className="mr-[10px]" position="end">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => {
-                                                handleQuery({ label: 'type', value: '' });
-                                            }}
-                                        >
-                                            <ClearIcon />
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
-                            }
-                            labelId="types"
-                            label="色调"
-                        >
-                            <MenuItem value={'XHS'}>小红书</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <FormControl key={query?.topic} color="secondary" size="small" fullWidth>
-                        <InputLabel id="types">主题</InputLabel>
-                        <Select
-                            value={query?.topic}
-                            onChange={(e: any) => handleQuery({ label: 'type', value: e.target.value })}
-                            endAdornment={
-                                query?.topic && (
-                                    <InputAdornment className="mr-[10px]" position="end">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => {
-                                                handleQuery({ label: 'type', value: '' });
-                                            }}
-                                        >
-                                            <ClearIcon />
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
-                            }
-                            labelId="types"
-                            label="主题"
-                        >
-                            <MenuItem value={'XHS'}>小红书</MenuItem>
-                        </Select>
-                    </FormControl> */}
                     <FormControl key={query?.picNum} color="secondary" size="small" fullWidth>
                         <InputLabel id="types">图片数量</InputLabel>
                         <Select
@@ -378,7 +323,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                                     onMouseEnter={() => setHoverIndex(index)}
                                     onMouseLeave={() => setHoverIndex('')}
                                 >
-                                    {item?.src?.map((v: any, vi: number) => (
+                                    {item?.templateList?.map((v: any, vi: number) => (
                                         <img key={index} width={145} height={200} src={v.src} />
                                     ))}
                                 </div>

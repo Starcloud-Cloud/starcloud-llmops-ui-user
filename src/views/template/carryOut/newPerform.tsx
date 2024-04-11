@@ -34,7 +34,8 @@ function Perform({
     setEditOpen,
     setTitle,
     setStep,
-    setMaterialType
+    setMaterialType,
+    addStyle
 }: any) {
     const refs = useRef<any>([]);
     //点击全部执行
@@ -154,7 +155,7 @@ function Perform({
             {config?.steps?.map((item: any, steps: number) => (
                 <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
                     {item?.flowStep?.handler === 'PosterActionHandler' ? (
-                        <AddStyle record={item} />
+                        <AddStyle record={item} ref={addStyle} />
                     ) : (
                         item.flowStep?.response.style !== 'BUTTON' && (
                             <>

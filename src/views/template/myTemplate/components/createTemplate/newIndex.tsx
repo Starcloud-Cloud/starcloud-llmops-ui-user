@@ -330,6 +330,16 @@ function CreateDetail() {
                     item.flowStep.variable.variables.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG').value = JSON.parse(
                         item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG').value
                     );
+                } else {
+                    item?.flowStep?.variable?.variables?.push({
+                        field: 'SYSTEM_POSTER_STYLE_CONFIG',
+                        isShow: true,
+                        label: '风格配置',
+                        order: 5,
+                        style: 'TEXTAREA',
+                        type: 'TEXT',
+                        value: []
+                    });
                 }
             }
         });
@@ -515,7 +525,7 @@ function CreateDetail() {
         const details = _.cloneDeep(detailRef.current);
         const index: number = details?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {
-            details.workflowConfig.steps[index] = addStyle?.current?.record;
+            details.workflowConfig.steps[index] = addStyle?.current?.record || details.workflowConfig.steps[index];
         }
         details?.workflowConfig?.steps?.forEach((item: any) => {
             const arr = item?.variable?.variables;

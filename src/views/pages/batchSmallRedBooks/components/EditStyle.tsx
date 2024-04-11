@@ -101,7 +101,7 @@ const EditStyle = ({
                 setCurrentJson({ ...json });
             });
         }
-    }, [currentTemp]);
+    }, [currentTemp?.code]);
 
     const scale = useMemo(() => {
         return imgRef?.current && currentJson ? imgRef?.current?.offsetWidth / currentJson?.clipPath?.width : 1;
@@ -223,7 +223,6 @@ const EditStyle = ({
                                                                 title={el?.label}
                                                                 value={el.value}
                                                                 setValue={(value) => {
-                                                                    console.log(0);
                                                                     const newData = _.cloneDeep(imageStyleData);
                                                                     newData.variableList[index].value = value;
                                                                     newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');

@@ -49,7 +49,7 @@ const StyleTabs = ({
     const add = (data?: any) => {
         const newPanes = _.cloneDeep(imageStyleData);
         newPanes.push({
-            id: data?.id || '',
+            code: data?.code || '',
             name: `图片 ${digui()}`,
             key: digui().toString(),
             mode: 'SEQUENCE',
@@ -100,7 +100,7 @@ const StyleTabs = ({
                         label: (
                             <div>
                                 {item.name}
-                                {!item.id && <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />}
+                                {!item.code && <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />}
                             </div>
                         ),
                         key: i.toString(),

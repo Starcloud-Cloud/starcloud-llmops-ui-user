@@ -65,7 +65,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                         label: (
                             <div>
                                 {item.name}
-                                {item?.templateList?.some((item: any) => !item.id) && (
+                                {item?.templateList?.some((item: any) => !item.code) && (
                                     <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />
                                 )}
                             </div>

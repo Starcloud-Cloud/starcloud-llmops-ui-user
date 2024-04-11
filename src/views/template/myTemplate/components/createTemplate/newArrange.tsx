@@ -416,28 +416,6 @@ function Arrange({
                                                 (el: any, i: number) =>
                                                     el?.field === 'SYSTEM_POSTER_STYLE_CONFIG' && (
                                                         <div>
-                                                            <div className="pb-4 flex justify-end">
-                                                                {/* <div className="flex gap-2 items-center">
-                                                                    <span className="text-xs font-bold">是否设为系统</span>
-                                                                    <Switch
-                                                                        checked={el?.group === 'SYSTEM' ? true : false}
-                                                                        onChange={(data) => {
-                                                                            if (data) {
-                                                                                groupChange({ value: 'SYSTEM', i, index });
-                                                                            } else {
-                                                                                groupChange({ value: 'ADVANCED', i, index });
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                    <span className="text-xs font-bold">是否显示</span>
-                                                                    <Switch
-                                                                        checked={el?.isShow}
-                                                                        onChange={(data) => {
-                                                                            statusChange({ i, index });
-                                                                        }}
-                                                                    />
-                                                                </div> */}
-                                                            </div>
                                                             <CreateTab
                                                                 key={el?.field}
                                                                 appData={{ materialType: '', appUid: 'c391a40ab293494d9eae937401065bcd' }}

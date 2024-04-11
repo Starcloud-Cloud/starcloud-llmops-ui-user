@@ -26,7 +26,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
         newData.push({
             name: `风格 ${digui()}`,
             index: digui(),
-            system: true,
+            system: data?.system || true,
             enable: data?.enable || true,
             uuid: uuidv4()?.split('-')?.join(''),
             templateList: data?.templateList || [

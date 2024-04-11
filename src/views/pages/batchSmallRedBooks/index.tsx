@@ -366,7 +366,7 @@ const BatcSmallRedBooks = () => {
             <CardContent className="pb-[72px] !px-4 !pt-4">
                 <SubCard contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}>
                     <div>
-                        <IconButton onClick={() => navigate('/redBookTaskList')} color="secondary">
+                        <IconButton onClick={() => navigate('/appMarket')} color="secondary">
                             <KeyboardBackspace fontSize="small" />
                         </IconButton>
                         <span className="text-[#000c] font-[500]">创作计划</span>&nbsp;

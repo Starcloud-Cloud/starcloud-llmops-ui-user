@@ -274,6 +274,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                 ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
                 ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value
         );
+        setTableData(result?.configuration?.materialList);
         generRef.current = newList?.workflowConfig?.steps?.filter(
             (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
         );
@@ -286,6 +287,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
             }
         });
         setImagMater(newImage);
+        // setImagMater(result?.configuration?.imageStyleList ? result?.configuration.imageStyleList : newImage);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
@@ -527,248 +529,236 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
             newSave(result);
         }
     };
+
     return (
         <>
             <div
                 className=" pt-[20px]  overflow-y-auto pb-[72px]"
                 style={{ height: getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 130px)' }}
             >
-                <Tabs
-                    defaultActiveKey="1"
-                    items={[
-                        {
-                            label: '素材上传',
-                            key: '1',
-                            children: (
-                                <div>
-                                    {materialType === 'picture' ? (
-                                        <>
-                                            <div className="text-[12px] font-[500] flex items-center justify-between">
-                                                <div>图片总量：{fileList?.length}</div>
-                                                {fileList?.length > 0 && (
-                                                    <Button
-                                                        danger
-                                                        onClick={() => {
-                                                            setFileList([]);
-                                                        }}
-                                                        size="small"
-                                                        type="text"
-                                                    >
-                                                        全部清除
-                                                    </Button>
-                                                )}
+                <Tabs defaultActiveKey="1">
+                    {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                        (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+                    ) && (
+                        <Tabs.TabPane key={'1'} tab="素材上传">
+                            <div>
+                                {materialType === 'picture' ? (
+                                    <>
+                                        <div className="text-[12px] font-[500] flex items-center justify-between">
+                                            <div>图片总量：{fileList?.length}</div>
+                                            {fileList?.length > 0 && (
+                                                <Button
+                                                    danger
+                                                    onClick={() => {
+                                                        setFileList([]);
+                                                    }}
+                                                    size="small"
+                                                    type="text"
+                                                >
+                                                    全部清除
+                                                </Button>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
+                                            <div>
+                                                <Upload {...props}>
+                                                    <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                                        <PlusOutlined rev={undefined} />
+                                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                                    </div>
+                                                </Upload>
                                             </div>
-                                            <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
-                                                <div>
-                                                    <Upload {...props}>
-                                                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                                            <PlusOutlined rev={undefined} />
-                                                            <div style={{ marginTop: 8 }}>Upload</div>
-                                                        </div>
-                                                    </Upload>
-                                                </div>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="flex justify-between items-center mb-[10px]">
-                                                <div className="flex gap-2">
-                                                    <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
-                                                        批量导入
-                                                    </Button>
-                                                    {/* <Button size="small" type="primary">
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex justify-between items-center mb-[10px]">
+                                            <div className="flex gap-2">
+                                                <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                                                    批量导入
+                                                </Button>
+                                                {/* <Button size="small" type="primary">
                                             选择已有素材
                                         </Button> */}
-                                                </div>
-                                                <div className="flex gap-2 items-end">
-                                                    <div className="text-xs text-black/50">点击放大编辑</div>
-                                                    <Button
-                                                        onClick={() => setZoomOpen(true)}
-                                                        type="primary"
-                                                        shape="circle"
-                                                        icon={<ZoomInOutlined rev={undefined} />}
-                                                    ></Button>
-                                                </div>
                                             </div>
-                                            <Table
-                                                rowKey={(record, index) => String(index)}
-                                                loading={tableLoading}
-                                                size="small"
-                                                virtual
-                                                columns={columns}
-                                                dataSource={tableData}
-                                            />
-                                        </>
-                                    )}
-                                </div>
-                            )
-                        },
-                        {
-                            label: '笔记生成',
-                            key: '2',
-                            children: (
-                                <Collapse
-                                    accordion
-                                    items={generateList?.map((item: any, index: number) => ({
-                                        key: index.toString(),
-                                        label: item.name,
-                                        children: (
-                                            <div key={item.field}>
-                                                {item?.variable?.variables?.map(
-                                                    (el: any, i: number) =>
-                                                        el?.isShow && (
-                                                            <MarketForm
-                                                                key={el.field}
-                                                                item={el}
-                                                                materialType={''}
-                                                                stepCode={
-                                                                    el?.field === 'REQUIREMENT'
-                                                                        ? item.variable?.variables?.find(
-                                                                              (i: any) => i.field === 'GENERATE_MODE'
-                                                                          )?.value
-                                                                        : ''
-                                                                }
-                                                                handlerCode={el?.flowStep?.handler}
-                                                                history={false}
-                                                                setEditOpen={setEditOpens}
-                                                                setTitle={setTitles}
-                                                                setStep={() => {
-                                                                    stepRef.current = index;
-                                                                    setStep(stepRef.current);
-                                                                }}
-                                                                columns={stepMaterial[index]}
-                                                                setMaterialType={() => {
-                                                                    setMaterialTypes(
-                                                                        el?.variable?.variables?.find(
-                                                                            (i: any) => i.field === 'MATERIAL_TYPE'
-                                                                        )?.value
-                                                                    );
-                                                                }}
-                                                                onChange={(e: any) => {
-                                                                    const newList = _.cloneDeep(generRef.current);
-                                                                    const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
-                                                                    const code = item?.flowStep?.handler;
-                                                                    newList[index].variable.variables[i].value = e.value;
-                                                                    if (
-                                                                        type &&
-                                                                        item.variable.variables?.find(
-                                                                            (item: any) => item.style === 'MATERIAL'
-                                                                        )
-                                                                    ) {
-                                                                        newList[index].variable.variables[
-                                                                            item.variable.variables?.findIndex(
-                                                                                (item: any) => item.style === 'MATERIAL'
-                                                                            )
-                                                                        ].value = [];
-                                                                        stepRef.current = index;
-                                                                        setStep(stepRef.current);
-                                                                        setTableDatas(type, index);
-                                                                    }
-                                                                    if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
-                                                                        const num = item.variable.variables?.findIndex(
-                                                                            (item: any) => item.field === 'REQUIREMENT'
-                                                                        );
-                                                                        const num1 = item.variable.variables?.findIndex(
-                                                                            (item: any) => item.style === 'MATERIAL'
-                                                                        );
-                                                                        if (e.value === 'RANDOM') {
-                                                                            newList[index].variable.variables[num].value = '';
-                                                                            newList[index].variable.variables[num].isShow = false;
-                                                                            newList[index].variable.variables[num1].isShow = true;
-                                                                        } else if (e.value === 'AI_PARODY') {
-                                                                            newList[index].variable.variables[num].isShow = true;
-                                                                            newList[index].variable.variables[num1].isShow = true;
-                                                                        } else {
-                                                                            newList[index].variable.variables[num1].value = [];
-                                                                            newList[index].variable.variables[num1].isShow = false;
-                                                                            newList[index].variable.variables[num].isShow = true;
-                                                                        }
-                                                                    }
-                                                                    generRef.current = newList;
-                                                                    setGenerateList(generRef.current);
-                                                                }}
-                                                            />
-                                                        )
-                                                )}
+                                            <div className="flex gap-2 items-end">
+                                                <div className="text-xs text-black/50">点击放大编辑</div>
+                                                <Button
+                                                    onClick={() => setZoomOpen(true)}
+                                                    type="primary"
+                                                    shape="circle"
+                                                    icon={<ZoomInOutlined rev={undefined} />}
+                                                ></Button>
                                             </div>
-                                        )
-                                    }))}
-                                />
-                            )
-                        },
-                        {
-                            label: '图片生成',
-                            key: '3',
-                            children: <AddStyle ref={imageRef} record={imageMater} />
-                        },
-                        {
-                            label: '批量生成参数',
-                            key: '4',
-                            children: (
-                                <div>
-                                    <div className="mt-[20px]">生成数量：</div>
-                                    <InputNumber
-                                        size="large"
-                                        value={basisData?.totalCount}
-                                        onChange={(e: any) => {
-                                            setBasisData({
-                                                ...basisData,
-                                                totalCount: e
-                                            });
-                                        }}
-                                        min={1}
-                                        max={100}
-                                        className="w-full"
-                                    />
-                                    <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
-                                        <Autocomplete
-                                            sx={{ mt: 2 }}
-                                            multiple
+                                        </div>
+                                        <Table
+                                            rowKey={(record, index) => String(index)}
+                                            loading={tableLoading}
                                             size="small"
-                                            id="tags-filled"
-                                            color="secondary"
-                                            options={[]}
-                                            defaultValue={basisData?.tags}
-                                            freeSolo
-                                            renderTags={(value: readonly string[], getTagProps) =>
-                                                value.map((option: string, index: number) => (
-                                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                                                ))
-                                            }
-                                            onChange={(e: any, newValue) => {
-                                                setBasisData({
-                                                    ...basisData,
-                                                    tags: newValue
-                                                });
-                                            }}
-                                            renderInput={(param) => (
-                                                <TextField
-                                                    onBlur={(e: any) => {
-                                                        if (e.target.value) {
-                                                            let newValue: any = basisData.tags;
-                                                            if (!newValue) {
-                                                                newValue = [];
-                                                            }
-                                                            newValue.push(e.target.value);
-                                                            setBasisData({
-                                                                ...basisData,
-                                                                tags: newValue
-                                                            });
-                                                        }
-                                                    }}
-                                                    color="secondary"
-                                                    {...param}
-                                                    label="标签"
-                                                    placeholder="请输入标签然后回车"
-                                                />
-                                            )}
+                                            virtual
+                                            columns={columns}
+                                            dataSource={tableData}
                                         />
-                                    </FormControl>
-                                </div>
-                            )
-                        }
-                    ]}
-                />
+                                    </>
+                                )}
+                            </div>
+                        </Tabs.TabPane>
+                    )}
+                    <Tabs.TabPane key={'2'} tab="笔记生成">
+                        <Collapse
+                            accordion
+                            items={generateList?.map((item: any, index: number) => ({
+                                key: index.toString(),
+                                label: item.name,
+                                children: (
+                                    <div key={item.field}>
+                                        {item?.variable?.variables?.map(
+                                            (el: any, i: number) =>
+                                                el?.isShow && (
+                                                    <MarketForm
+                                                        key={el.field}
+                                                        item={el}
+                                                        materialType={''}
+                                                        stepCode={
+                                                            el?.field === 'REQUIREMENT'
+                                                                ? item.variable?.variables?.find((i: any) => i.field === 'GENERATE_MODE')
+                                                                      ?.value
+                                                                : ''
+                                                        }
+                                                        handlerCode={el?.flowStep?.handler}
+                                                        history={false}
+                                                        setEditOpen={setEditOpens}
+                                                        setTitle={setTitles}
+                                                        setStep={() => {
+                                                            stepRef.current = index;
+                                                            setStep(stepRef.current);
+                                                        }}
+                                                        columns={stepMaterial[index]}
+                                                        setMaterialType={() => {
+                                                            setMaterialTypes(
+                                                                el?.variable?.variables?.find((i: any) => i.field === 'MATERIAL_TYPE')
+                                                                    ?.value
+                                                            );
+                                                        }}
+                                                        onChange={(e: any) => {
+                                                            const newList = _.cloneDeep(generRef.current);
+                                                            const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                            const code = item?.flowStep?.handler;
+                                                            newList[index].variable.variables[i].value = e.value;
+                                                            if (
+                                                                type &&
+                                                                item.variable.variables?.find((item: any) => item.style === 'MATERIAL')
+                                                            ) {
+                                                                newList[index].variable.variables[
+                                                                    item.variable.variables?.findIndex(
+                                                                        (item: any) => item.style === 'MATERIAL'
+                                                                    )
+                                                                ].value = [];
+                                                                stepRef.current = index;
+                                                                setStep(stepRef.current);
+                                                                setTableDatas(type, index);
+                                                            }
+                                                            if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
+                                                                const num = item.variable.variables?.findIndex(
+                                                                    (item: any) => item.field === 'REQUIREMENT'
+                                                                );
+                                                                const num1 = item.variable.variables?.findIndex(
+                                                                    (item: any) => item.style === 'MATERIAL'
+                                                                );
+                                                                if (e.value === 'RANDOM') {
+                                                                    newList[index].variable.variables[num].value = '';
+                                                                    newList[index].variable.variables[num].isShow = false;
+                                                                    newList[index].variable.variables[num1].isShow = true;
+                                                                } else if (e.value === 'AI_PARODY') {
+                                                                    newList[index].variable.variables[num].isShow = true;
+                                                                    newList[index].variable.variables[num1].isShow = true;
+                                                                } else {
+                                                                    newList[index].variable.variables[num1].value = [];
+                                                                    newList[index].variable.variables[num1].isShow = false;
+                                                                    newList[index].variable.variables[num].isShow = true;
+                                                                }
+                                                            }
+                                                            generRef.current = newList;
+                                                            setGenerateList(generRef.current);
+                                                        }}
+                                                    />
+                                                )
+                                        )}
+                                    </div>
+                                )
+                            }))}
+                        />
+                    </Tabs.TabPane>
+                    {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                        (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                    ) && (
+                        <Tabs.TabPane key={'3'} tab="图片生成">
+                            <AddStyle ref={imageRef} record={imageMater} />
+                        </Tabs.TabPane>
+                    )}
+                    <Tabs.TabPane key={'4'} tab="批量生成参数">
+                        <div>
+                            <div className="mt-[20px]">生成数量：</div>
+                            <InputNumber
+                                size="large"
+                                value={basisData?.totalCount}
+                                onChange={(e: any) => {
+                                    setBasisData({
+                                        ...basisData,
+                                        totalCount: e
+                                    });
+                                }}
+                                min={1}
+                                max={100}
+                                className="w-full"
+                            />
+                            <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
+                                <Autocomplete
+                                    sx={{ mt: 2 }}
+                                    multiple
+                                    size="small"
+                                    id="tags-filled"
+                                    color="secondary"
+                                    options={[]}
+                                    defaultValue={basisData?.tags}
+                                    freeSolo
+                                    renderTags={(value: readonly string[], getTagProps) =>
+                                        value.map((option: string, index: number) => (
+                                            <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                        ))
+                                    }
+                                    onChange={(e: any, newValue) => {
+                                        setBasisData({
+                                            ...basisData,
+                                            tags: newValue
+                                        });
+                                    }}
+                                    renderInput={(param) => (
+                                        <TextField
+                                            onBlur={(e: any) => {
+                                                if (e.target.value) {
+                                                    let newValue: any = basisData.tags;
+                                                    if (!newValue) {
+                                                        newValue = [];
+                                                    }
+                                                    newValue.push(e.target.value);
+                                                    setBasisData({
+                                                        ...basisData,
+                                                        tags: newValue
+                                                    });
+                                                }
+                                            }}
+                                            color="secondary"
+                                            {...param}
+                                            label="标签"
+                                            placeholder="请输入标签然后回车"
+                                        />
+                                    )}
+                                />
+                            </FormControl>
+                        </div>
+                    </Tabs.TabPane>
+                </Tabs>
             </div>
             <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] pb-0 w-[100%]">
                 <Button className="w-full" icon={<SaveOutlined rev={undefined} />} onClick={() => handleSaveClick(false)} type="primary">

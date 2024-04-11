@@ -78,14 +78,14 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
 
     useEffect(() => {
         if (query?.picNum) {
-            const filterList = templateRef.current.filter((item: any) => item.src.length >= query?.picNum || 0);
+            const filterList = templateRef.current.filter((item: any) => item.example.length >= query?.picNum || 0);
             setTemplateList(filterList);
         }
     }, [query]);
 
     const handleChoose = (index: number) => {
         setChooseImageIndex(index);
-        const list: any = templateList[index].src;
+        const list: any = templateList[index].example;
         setSelectImgs([...list]);
     };
 
@@ -178,7 +178,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                         >
                             {item?.templateList?.map((item: any, index: number) => (
                                 <div className="w-[160px] h-[200px]">
-                                    <Image width={160} height={200} src={item.src} />
+                                    <Image width={160} height={200} src={item.example} />
                                 </div>
                             ))}
                         </Image.PreviewGroup>
@@ -249,8 +249,8 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                         <div className="flex items-center">
                             <p>选择模版：</p>
                             <div>
-                                {selectImgs.map((item, index) => (
-                                    <Image width={32} height={40} src={item.src} preview={false} />
+                                {selectImgs.map((item: any, index: number) => (
+                                    <Image width={32} height={40} src={item.example} preview={false} />
                                 ))}
                             </div>
                         </div>
@@ -324,7 +324,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                                     onMouseLeave={() => setHoverIndex('')}
                                 >
                                     {item?.templateList?.map((v: any, vi: number) => (
-                                        <img key={index} width={145} height={200} src={v.src} />
+                                        <img key={vi} width={145} height={200} src={v.example} />
                                     ))}
                                 </div>
                             );

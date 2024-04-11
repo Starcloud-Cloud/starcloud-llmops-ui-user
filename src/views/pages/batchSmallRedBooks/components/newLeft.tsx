@@ -10,7 +10,7 @@ import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import AddStyle from 'ui-component/AddStyle';
 import { useLocation } from 'react-router-dom';
-const Lefts = () => {
+const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     //存储的数据
@@ -473,9 +473,6 @@ const Lefts = () => {
     });
     //保存
     const handleSaveClick = async (flag: boolean) => {
-        console.log(appData);
-        console.log(tableData);
-        console.log(generateList);
         const newList = _.cloneDeep(generateList);
         newList?.forEach((item) => {
             item?.variable?.variables?.forEach((el: any) => {
@@ -487,25 +484,36 @@ const Lefts = () => {
         const result = await planCreate({
             ...basisData,
             configuration: {
-                imageStyleList: imageRef.current.record,
-                materialList: tableData,
+                imageStyleList: imageRef.current.record?.variable?.variables
+                    ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
+                    ?.value?.map((item: any) => ({
+                        ...item,
+                        id: undefined,
+                        code: item.id
+                    })),
+                materialList: tableData?.map((item) => ({
+                    ...item,
+                    type: materialType
+                })),
                 appInformation: {
                     ...appData.configuration.appInformation,
                     workflowConfig: {
                         steps: [
                             ...appData.configuration.appInformation.workflowConfig.steps?.filter(
-                                (item: any) =>
-                                    item?.flowStep?.handler === 'MaterialActionHandler' || item?.flowStep?.handler === 'PosterActionHandler'
+                                (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                             ),
-                            ...newList
+                            ...newList,
+                            ...appData.configuration.appInformation.workflowConfig.steps?.filter(
+                                (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                            )
                         ]
                     }
                 }
             }
         });
-        console.log(result);
-
-        return;
+        if (flag) {
+            newSave(result);
+        }
     };
     return (
         <>

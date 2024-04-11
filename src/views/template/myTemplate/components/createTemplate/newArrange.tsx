@@ -414,7 +414,7 @@ function Arrange({
                                         <div className="p-4">
                                             {item?.flowStep?.variable?.variables?.map(
                                                 (el: any, i: number) =>
-                                                    el?.field === 'PROMPT_POSTER_STYLE_CONFIG' && (
+                                                    el?.field === 'SYSTEM_POSTER_STYLE_CONFIG' && (
                                                         <div>
                                                             <div className="pb-4 flex justify-end">
                                                                 {/* <div className="flex gap-2 items-center">

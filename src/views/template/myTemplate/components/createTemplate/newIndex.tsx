@@ -47,7 +47,7 @@ interface Items {
 interface AppModels {
     aiModel?: Items[];
     language?: Items[];
-    type?: Items[];
+    appType?: Items[];
     variableStyle?: Items[];
 }
 const Header = ({
@@ -325,13 +325,13 @@ function CreateDetail() {
                 el.field = el.field.toUpperCase();
             });
             if (item?.flowStep?.handler === 'PosterActionHandler') {
-                if (item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'PROMPT_POSTER_STYLE_CONFIG')) {
-                    item.flowStep.variable.variables.find((el: any) => el.field === 'PROMPT_POSTER_STYLE_CONFIG').value = JSON.parse(
-                        item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'PROMPT_POSTER_STYLE_CONFIG').value
+                if (item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG')) {
+                    item.flowStep.variable.variables.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG').value = JSON.parse(
+                        item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG').value
                     );
                 } else {
                     item?.flowStep?.variable?.variables?.push({
-                        field: 'PROMPT_POSTER_STYLE_CONFIG',
+                        field: 'SYSTEM_POSTER_STYLE_CONFIG',
                         isShow: true,
                         label: '风格配置',
                         order: 5,
@@ -665,7 +665,7 @@ function CreateDetail() {
     };
     //获取数据表头
     const getHeader = (data: any, i: number) => {
-        const newList = data.map((item: any) => ({
+        const newList = data?.map((item: any) => ({
             title: item.desc,
             align: 'center',
             width: 200,
@@ -809,7 +809,8 @@ function CreateDetail() {
             const result = await materialTemplate(values?.value);
             data = result.fieldDefine;
         }
-        newList?.splice(index + 1, 0, getHeader(data, index + 1));
+
+        newList?.splice(index + 1, 0, data ? getHeader(data, index + 1) : undefined);
         const ccc = newList?.map((el: any, i: number) => {
             if (el) {
                 return getHeaders(el, i);
@@ -976,7 +977,7 @@ function CreateDetail() {
                                         icon: detail?.icon
                                     }}
                                     basisPre={basisPre}
-                                    appModel={appModels?.type}
+                                    appModel={appModels?.appType}
                                     setValues={setData}
                                 />
                             </div>

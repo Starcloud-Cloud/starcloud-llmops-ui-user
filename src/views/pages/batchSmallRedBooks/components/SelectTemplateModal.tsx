@@ -23,8 +23,8 @@ export const SelectTemplateModal = ({
     useEffect(() => {
         const menus = imageTypeList?.map((item: any) => ({
             label: `${item.name}(${item.list.length})`,
-            value: item.id,
-            key: item.id,
+            value: item.code,
+            key: item.code,
             list: item.list
         }));
         setMenuList(menus);
@@ -75,11 +75,11 @@ export const SelectTemplateModal = ({
                                 {templateList.map((v: any, i) => (
                                     <img
                                         className={`h-auto max-w-full rounded-lg cursor-pointer ${
-                                            v.id === current && 'outline outline-offset-2 outline-1 outline-blue-500'
+                                            v.code === current && 'outline outline-offset-2 outline-1 outline-blue-500'
                                         }`}
                                         src={v.example}
                                         key={i}
-                                        onClick={() => setCurrent(v.id)}
+                                        onClick={() => setCurrent(v.code)}
                                     />
                                 ))}
                             </div>
@@ -98,7 +98,7 @@ export const SelectTemplateModal = ({
                             type="button"
                             color={'secondary'}
                             onClick={() => {
-                                const temp = templateList.find((v) => v.id === current);
+                                const temp = templateList.find((v) => v.code === current);
                                 handleOk(temp);
                             }}
                         >

@@ -202,6 +202,11 @@ const BatcSmallRedBooks = () => {
             }
         }
     };
+    const newSave = async ({ uid }: any) => {
+        await planExecute({ uid });
+        const res = await batchPages({ ...batchPage, planUid: uid });
+        setBathList(res.list);
+    };
     //页面滚动
 
     const [total, setTotal] = useState(0);
@@ -371,7 +376,7 @@ const BatcSmallRedBooks = () => {
                 </SubCard>
                 <Row gutter={20} className="!ml-0">
                     <Col span={10} className="relative h-full bg-[#fff] !px-[0]">
-                        <Left />
+                        <Left newSave={newSave} />
                     </Col>
                     <Col span={14} className="overflow-hidden mt-4">
                         <Right

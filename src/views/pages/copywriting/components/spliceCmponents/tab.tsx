@@ -24,8 +24,8 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
         }
         newData.push({
             name: `风格 ${digui()}`,
-            key: digui().toString(),
-            id: digui().toString(),
+            index: digui(),
+            system: true,
             enable: data?.enable || true,
             templateList: data?.templateList || [
                 {
@@ -38,8 +38,6 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
             ],
             totalImageCount: data?.totalImageCount || 0
         });
-        console.log(newData);
-
         setImageStyleData(newData);
     };
     return (
@@ -69,7 +67,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                 )}
                             </div>
                         ),
-                        key: item.id,
+                        key: item.index?.toString(),
                         children: (
                             <div>
                                 <div className="bg-[#edf0f2]/80 rounded py-[12px] px-[16px] flex justify-between items-center">
@@ -103,6 +101,15 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                     )}
                                     <div className="flex gap-2 items-center">
                                         <div className="flex gap-2 items-center">
+                                            <span className="text-xs">是否设为系统</span>
+                                            <Switch
+                                                checked={item?.system}
+                                                onChange={(data) => {
+                                                    const newData = _.cloneDeep(imageStyleData);
+                                                    newData[i].system = data;
+                                                    setImageStyleData(newData);
+                                                }}
+                                            />
                                             <span className="text-xs">是否生效</span>
                                             <Switch
                                                 checked={item?.enable}

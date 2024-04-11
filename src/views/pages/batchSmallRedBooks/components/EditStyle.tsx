@@ -50,7 +50,7 @@ const EditStyle = ({
     const handleOk = (temp: any) => {
         setCurrentTemp(temp);
         const newData = _.cloneDeep(imageStyleData);
-        newData.id = temp.id;
+        newData.code = temp.code;
         newData.variableList = temp.variableList;
         setData(newData);
         setOpen(false);
@@ -65,8 +65,8 @@ const EditStyle = ({
         });
     }, []);
     useEffect(() => {
-        if (imageStyleData.id) {
-            const data = tempList.find((v: any) => v.id === imageStyleData?.id);
+        if (imageStyleData.code) {
+            const data = tempList.find((v: any) => v.code === imageStyleData?.code);
             setCurrentTemp({ ...data });
         }
     }, [imageStyleData, tempList]);
@@ -92,8 +92,8 @@ const EditStyle = ({
     }, [wrapperRef]);
 
     useEffect(() => {
-        if (currentTemp && currentTemp.id) {
-            getImageTemplateJSON(currentTemp.id).then((res) => {
+        if (currentTemp && currentTemp.code) {
+            getImageTemplateJSON(currentTemp.code).then((res) => {
                 const json = JSON.parse(res.json);
                 setCurrentJson({ ...json });
             });
@@ -112,7 +112,7 @@ const EditStyle = ({
                 )}
                 <div className="pr-4 flex justify-between">
                     <div className="!w-[40%]">
-                        <FormControl fullWidth error={!imageStyleData?.id} sx={{ flex: 1 }} color="secondary">
+                        <FormControl fullWidth error={!imageStyleData?.code} sx={{ flex: 1 }} color="secondary">
                             <TextField
                                 color="secondary"
                                 className="!cursor-pointer"
@@ -122,16 +122,16 @@ const EditStyle = ({
                                 InputLabelProps={{ shrink: true }}
                                 value={currentTemp?.name}
                                 onClick={() => setOpen(true)}
-                                error={!imageStyleData?.id}
+                                error={!imageStyleData?.code}
                             />
-                            <FormHelperText>{!imageStyleData?.id ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
+                            <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
                         </FormControl>
                     </div>
                     <Button className="mt-[7px]" type="primary" onClick={handleCopy}>
                         复制
                     </Button>
                 </div>
-                {imageStyleData?.id && (
+                {imageStyleData?.code && (
                     <div>
                         <div className="flex">
                             <div className="w-[40%]">
@@ -143,10 +143,10 @@ const EditStyle = ({
                                         ?.map((item: any, index: number) => (
                                             <div
                                                 key={index}
-                                                onMouseEnter={() => setCurrentElementId(item.id)}
+                                                onMouseEnter={() => setCurrentElementId(item.code)}
                                                 onMouseLeave={() => setCurrentElementId('')}
                                                 className={`${
-                                                    item.id === currentElementId
+                                                    item.code === currentElementId
                                                         ? 'outline outline-offset-2 outline-blue-500 w-full'
                                                         : 'w-full'
                                                 }`}

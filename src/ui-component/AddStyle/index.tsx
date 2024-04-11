@@ -50,7 +50,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
     useEffect(() => {
         if (record) {
             const tempList =
-                record?.flowStep?.variable.variables.find((item: any) => item.field === 'PROMPT_POSTER_STYLE_CONFIG')?.value || [];
+                record?.flowStep?.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
             setTemplateList(tempList);
             templateRef.current = tempList;
         }

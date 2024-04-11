@@ -5,7 +5,7 @@ import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef, memo } from 'react';
-import { materialTemplate, materialImport, materialExport, materialResilt, getPlan, planCreate } from 'api/redBook/batchIndex';
+import { materialTemplate, materialImport, materialExport, materialResilt, getPlan, planModify } from 'api/redBook/batchIndex';
 import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import AddStyle from 'ui-component/AddStyle';
@@ -279,7 +279,13 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
         );
         setGenerateList(generRef.current);
         getStepMater();
-        setImagMater(newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler'));
+        const newImage = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
+        newImage?.flowStep?.variable?.variables?.forEach((item: any) => {
+            if (item.field === 'SYSTEM_POSTER_STYLE_CONFIG' && item.value) {
+                item.value = JSON.parse(item.value);
+            }
+        });
+        setImagMater(newImage);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
@@ -480,11 +486,17 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                     el.value = JSON.stringify(el.value);
                 }
             });
+            item?.flowStep?.variable?.variables?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
         });
-        const result = await planCreate({
+        const result = await planModify({
+            uid: appData?.uid,
             ...basisData,
             configuration: {
-                imageStyleList: imageRef.current.record?.variable?.variables
+                imageStyleList: imageRef.current?.record?.variable?.variables
                     ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
                     ?.value?.map((item: any) => ({
                         ...item,
@@ -521,64 +533,6 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                 className=" pt-[20px]  overflow-y-auto pb-[72px]"
                 style={{ height: getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 130px)' }}
             >
-                <div className="mt-[20px]">生成数量：</div>
-                <InputNumber
-                    size="large"
-                    value={basisData?.totalCount}
-                    onChange={(e: any) => {
-                        setBasisData({
-                            ...basisData,
-                            totalCount: e
-                        });
-                    }}
-                    min={1}
-                    max={100}
-                    className="w-full"
-                />
-                <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
-                    <Autocomplete
-                        sx={{ mt: 2 }}
-                        multiple
-                        size="small"
-                        id="tags-filled"
-                        color="secondary"
-                        options={[]}
-                        defaultValue={basisData?.tags}
-                        freeSolo
-                        renderTags={(value: readonly string[], getTagProps) =>
-                            value.map((option: string, index: number) => (
-                                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                            ))
-                        }
-                        onChange={(e: any, newValue) => {
-                            setBasisData({
-                                ...basisData,
-                                tags: newValue
-                            });
-                        }}
-                        renderInput={(param) => (
-                            <TextField
-                                onBlur={(e: any) => {
-                                    if (e.target.value) {
-                                        let newValue: any = basisData.tags;
-                                        if (!newValue) {
-                                            newValue = [];
-                                        }
-                                        newValue.push(e.target.value);
-                                        setBasisData({
-                                            ...basisData,
-                                            tags: newValue
-                                        });
-                                    }
-                                }}
-                                color="secondary"
-                                {...param}
-                                label="标签"
-                                placeholder="请输入标签然后回车"
-                            />
-                        )}
-                    />
-                </FormControl>
                 <Tabs
                     defaultActiveKey="1"
                     items={[
@@ -750,7 +704,68 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                         {
                             label: '批量生成参数',
                             key: '4',
-                            children: 333
+                            children: (
+                                <div>
+                                    <div className="mt-[20px]">生成数量：</div>
+                                    <InputNumber
+                                        size="large"
+                                        value={basisData?.totalCount}
+                                        onChange={(e: any) => {
+                                            setBasisData({
+                                                ...basisData,
+                                                totalCount: e
+                                            });
+                                        }}
+                                        min={1}
+                                        max={100}
+                                        className="w-full"
+                                    />
+                                    <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
+                                        <Autocomplete
+                                            sx={{ mt: 2 }}
+                                            multiple
+                                            size="small"
+                                            id="tags-filled"
+                                            color="secondary"
+                                            options={[]}
+                                            defaultValue={basisData?.tags}
+                                            freeSolo
+                                            renderTags={(value: readonly string[], getTagProps) =>
+                                                value.map((option: string, index: number) => (
+                                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                                ))
+                                            }
+                                            onChange={(e: any, newValue) => {
+                                                setBasisData({
+                                                    ...basisData,
+                                                    tags: newValue
+                                                });
+                                            }}
+                                            renderInput={(param) => (
+                                                <TextField
+                                                    onBlur={(e: any) => {
+                                                        if (e.target.value) {
+                                                            let newValue: any = basisData.tags;
+                                                            if (!newValue) {
+                                                                newValue = [];
+                                                            }
+                                                            newValue.push(e.target.value);
+                                                            setBasisData({
+                                                                ...basisData,
+                                                                tags: newValue
+                                                            });
+                                                        }
+                                                    }}
+                                                    color="secondary"
+                                                    {...param}
+                                                    label="标签"
+                                                    placeholder="请输入标签然后回车"
+                                                />
+                                            )}
+                                        />
+                                    </FormControl>
+                                </div>
+                            )
                         }
                     ]}
                 />

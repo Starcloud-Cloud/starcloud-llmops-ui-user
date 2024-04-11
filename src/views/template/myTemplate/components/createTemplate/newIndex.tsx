@@ -137,6 +137,7 @@ const Header = ({
 };
 function CreateDetail() {
     const categoryList = marketStore((state) => state.categoryList);
+    const addStyle = useRef<any>(null);
     //路由跳转
     const navigate = useNavigate();
     const location = useLocation();
@@ -329,16 +330,6 @@ function CreateDetail() {
                     item.flowStep.variable.variables.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG').value = JSON.parse(
                         item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG').value
                     );
-                } else {
-                    item?.flowStep?.variable?.variables?.push({
-                        field: 'SYSTEM_POSTER_STYLE_CONFIG',
-                        isShow: true,
-                        label: '风格配置',
-                        order: 5,
-                        style: 'TEXTAREA',
-                        type: 'TEXT',
-                        value: []
-                    });
                 }
             }
         });
@@ -522,6 +513,10 @@ function CreateDetail() {
     //保存更改
     const saveDetail = () => {
         const details = _.cloneDeep(detailRef.current);
+        const index: number = details?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
+        if (index !== -1) {
+            details.workflowConfig.steps[index] = addStyle?.current?.record;
+        }
         details?.workflowConfig?.steps?.forEach((item: any) => {
             const arr = item?.variable?.variables;
             const arr1 = item?.flowStep?.variable?.variables;
@@ -590,7 +585,6 @@ function CreateDetail() {
         setflag(data);
     };
     const permissions = useUserStore((state) => state.permissions);
-    const { Option } = Select;
 
     //检测 model
     useEffect(() => {
@@ -1039,6 +1033,7 @@ function CreateDetail() {
                                                 isallExecute={(flag: boolean) => {
                                                     isAllExecute = flag;
                                                 }}
+                                                addStyle={addStyle}
                                                 source="myApp"
                                             />
                                         </Card>

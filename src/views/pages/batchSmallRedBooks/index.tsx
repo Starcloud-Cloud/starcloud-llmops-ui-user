@@ -202,7 +202,7 @@ const BatcSmallRedBooks = () => {
             }
         }
     };
-    const newSave = async ({ uid }: any) => {
+    const newSave = async (uid: string) => {
         await planExecute({ uid });
         const res = await batchPages({ ...batchPage, planUid: uid });
         setBathList(res.list);

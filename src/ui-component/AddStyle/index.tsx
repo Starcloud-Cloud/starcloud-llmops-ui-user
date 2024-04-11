@@ -1,5 +1,5 @@
 import { SearchOutlined } from '@mui/icons-material';
-import { Button, Card, Divider, Image, Dropdown, Space, Drawer, Collapse, Modal, Switch } from 'antd';
+import { Button, Card, Divider, Image, Dropdown, Space, Drawer, Collapse, Modal, Switch, message } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, Select } from '@mui/material';
@@ -19,7 +19,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
     const [hoverIndex, setHoverIndex] = useState<any>('');
     const [chooseImageIndex, setChooseImageIndex] = useState<any>('');
     const [type, setType] = useState<any>();
-    const [editIndex, setEditIndex] = useState<any>();
+    const [editIndex, setEditIndex] = useState<any>('');
     const [templateList, setTemplateList] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentStyle, setCurrentStyle] = useState<any>(null);
@@ -38,6 +38,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
         return copyRecord;
     }, [styleData, record]);
 
+    console.log(submitData, 'submitData');
     useImperativeHandle(ref, () => ({
         record: submitData
     }));
@@ -120,6 +121,11 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
     ];
 
     const handleOK = () => {
+        if (!selectImgs) {
+            message.warning('请选择图片模版');
+            return;
+        }
+
         // 取最大的+1
         if (type === 0) {
             const list = styleData.map((item: any) => item.name);
@@ -132,7 +138,8 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
             setStyleData([
                 ...styleData,
                 {
-                    ...selectImgs
+                    ...selectImgs,
+                    name: `风格 ${maxNumber + 1}`
                 }
             ]);
         }
@@ -141,6 +148,8 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
             setStyleData([...styleData]);
         }
         setVisible(false);
+        setSelectImgs(null);
+        setChooseImageIndex('');
     };
 
     const collapseList = React.useMemo(() => {
@@ -235,22 +244,34 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
             </div>
             <Drawer
                 title="选择模版"
-                onClose={() => setVisible(false)}
+                onClose={() => {
+                    setVisible(false);
+                    setSelectImgs(null);
+                    setChooseImageIndex('');
+                }}
                 open={visible}
                 width={500}
                 footer={
                     <div className="flex justify-between">
                         <div className="flex items-center">
                             <p>选择模版：</p>
-                            <div>
+                            <div className="max-w-[260px] overflow-x-auto">
                                 {selectImgs?.templateList?.map((item: any, index: number) => (
-                                    <Image width={32} height={40} src={item.example} preview={false} />
+                                    <Image width={32} height={40} src={item.example} />
                                 ))}
                             </div>
                         </div>
                         <div className="flex">
                             <Space>
-                                <Button onClick={() => setVisible(false)}>取消</Button>
+                                <Button
+                                    onClick={() => {
+                                        setVisible(false);
+                                        setSelectImgs(null);
+                                        setChooseImageIndex('');
+                                    }}
+                                >
+                                    取消
+                                </Button>
                                 <Button type="primary" onClick={() => handleOK()}>
                                     确定
                                 </Button>
@@ -327,7 +348,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                 </div>
             </Drawer>
             <Modal
-                width={900}
+                width={'60%'}
                 open={isModalOpen}
                 onCancel={handleCancel}
                 footer={

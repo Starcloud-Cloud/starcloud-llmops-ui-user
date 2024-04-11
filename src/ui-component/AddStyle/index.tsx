@@ -128,7 +128,12 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
         // 取最大的+1
         if (type === 0) {
             const list = styleData.map((item: any) => item.name);
-            let maxNumber = Math.max(...list.map((item: any) => parseInt(item.match(/\d+/))));
+            let maxNumber;
+            if (list.length === 0) {
+                maxNumber = 0;
+            } else {
+                maxNumber = Math.max(...list.map((item: any) => parseInt(item.match(/\d+/))));
+            }
             setStyleData([
                 ...styleData,
                 {
@@ -165,14 +170,16 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
             children: (
                 <div>
                     <div className="mb-3">风格示意图{item?.templateList?.length || 0}张</div>
-                    <div>
+                    <div className="overflow-x-auto flex">
                         <Image.PreviewGroup
                             preview={{
                                 onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`)
                             }}
                         >
                             {item?.templateList?.map((item: any, index: number) => (
-                                <Image width={160} height={200} src={item.src} />
+                                <div className="w-[160px] h-[200px]">
+                                    <Image width={160} height={200} src={item.src} />
+                                </div>
                             ))}
                         </Image.PreviewGroup>
                     </div>

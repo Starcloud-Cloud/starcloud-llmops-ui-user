@@ -207,7 +207,7 @@ function Perform({
                                         </Box>
                                     </Box>
                                     <Grid container spacing={2}>
-                                        <Grid item lg={6} sm={12}>
+                                        <Grid item lg={item?.flowStep?.response?.isShow ? 6 : 12} sm={12}>
                                             {item.variable?.variables?.map(
                                                 (el: any, i: number) =>
                                                     el.isShow && (
@@ -257,8 +257,8 @@ function Perform({
                                                     )
                                             )}
                                         </Grid>
-                                        <Grid item lg={6} sm={12}>
-                                            {item?.flowStep?.response?.isShow && (
+                                        {item?.flowStep?.response?.isShow && (
+                                            <Grid item lg={6} sm={12}>
                                                 <TextField
                                                     sx={{ mt: 2 }}
                                                     inputRef={(el) => (mdRef.current[steps] = el)}
@@ -290,54 +290,55 @@ function Perform({
                                                             : 2
                                                     }
                                                 />
-                                            )}
-                                            {item.flowStep.response.answer && isShows[steps] && (
-                                                <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
-                                                    <Box>
-                                                        <IconButton
-                                                            color="secondary"
-                                                            onClick={() => {
-                                                                copy(item.flowStep.response.answer);
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: '复制成功',
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'success'
-                                                                        },
-                                                                        close: false,
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                                                                        transition: 'SlideLeft'
-                                                                    })
-                                                                );
-                                                            }}
-                                                        >
-                                                            <ContentPaste fontSize="small" />
-                                                        </IconButton>
-                                                        <IconButton
-                                                            onClick={() =>
-                                                                translation(
-                                                                    /[\u4e00-\u9fa5]/.test(item.flowStep.response.answer),
-                                                                    item.flowStep.response.answer,
-                                                                    steps
-                                                                )
-                                                            }
-                                                        >
-                                                            {/[\u4e00-\u9fa5]/.test(item.flowStep.response.answer) ? (
-                                                                <Tooltip title="翻译成英文" arrow placement="top">
-                                                                    <img width="20px" src={En} alt="" />
-                                                                </Tooltip>
-                                                            ) : (
-                                                                <Tooltip title="翻译成中文" arrow placement="top">
-                                                                    <img width="20px" src={Zh} alt="" />
-                                                                </Tooltip>
-                                                            )}
-                                                        </IconButton>
+
+                                                {item.flowStep.response.answer && isShows[steps] && (
+                                                    <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
+                                                        <Box>
+                                                            <IconButton
+                                                                color="secondary"
+                                                                onClick={() => {
+                                                                    copy(item.flowStep.response.answer);
+                                                                    dispatch(
+                                                                        openSnackbar({
+                                                                            open: true,
+                                                                            message: '复制成功',
+                                                                            variant: 'alert',
+                                                                            alert: {
+                                                                                color: 'success'
+                                                                            },
+                                                                            close: false,
+                                                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                            transition: 'SlideLeft'
+                                                                        })
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <ContentPaste fontSize="small" />
+                                                            </IconButton>
+                                                            <IconButton
+                                                                onClick={() =>
+                                                                    translation(
+                                                                        /[\u4e00-\u9fa5]/.test(item.flowStep.response.answer),
+                                                                        item.flowStep.response.answer,
+                                                                        steps
+                                                                    )
+                                                                }
+                                                            >
+                                                                {/[\u4e00-\u9fa5]/.test(item.flowStep.response.answer) ? (
+                                                                    <Tooltip title="翻译成英文" arrow placement="top">
+                                                                        <img width="20px" src={En} alt="" />
+                                                                    </Tooltip>
+                                                                ) : (
+                                                                    <Tooltip title="翻译成中文" arrow placement="top">
+                                                                        <img width="20px" src={Zh} alt="" />
+                                                                    </Tooltip>
+                                                                )}
+                                                            </IconButton>
+                                                        </Box>
                                                     </Box>
-                                                </Box>
-                                            )}
-                                        </Grid>
+                                                )}
+                                            </Grid>
+                                        )}
                                     </Grid>
                                 </CardContent>
                             </>

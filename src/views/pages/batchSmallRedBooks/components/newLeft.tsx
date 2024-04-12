@@ -10,6 +10,7 @@ import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import AddStyle from 'ui-component/AddStyle';
 import { useLocation } from 'react-router-dom';
+import {v4 as uuidv4} from "uuid"
 const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -269,12 +270,28 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                 arr.find((el: any) => el.field === 'POSTER_STYLE_CONFIG').value = list;
             }
         });
+        const newMater = newList?.workflowConfig?.steps
+        ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+        ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value
         setMaterialType(
-            newList?.workflowConfig?.steps
-                ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value
+            newMater
         );
-        setTableData(result?.configuration?.materialList);
+        if(newMater === 'picture'){
+            setFileList(
+                result?.configuration?.materialList?.map((item:any)=>({
+                    uid: uuidv4(),
+                        thumbUrl: item?.pictureUrl,
+                        response: {
+                            data: {
+                                url: item?.pictureUrl
+                            }
+                        }
+                }))
+            )
+        }else{
+            setTableData(result?.configuration?.materialList);
+        }
+        
         generRef.current = newList?.workflowConfig?.steps?.filter(
             (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
         );
@@ -494,6 +511,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                 }
             });
         });
+        
         const result = await planModify({
             uid: appData?.uid,
             ...basisData,
@@ -505,7 +523,13 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                         id: undefined,
                         code: item.id
                     })),
-                materialList: tableData?.map((item) => ({
+                materialList: materialType==='picture'?
+                fileList?.map(item=>({
+                    pictureUrl:item?.response?.data?.url,
+                    type:'picture'
+                }))
+                :
+                 tableData?.map((item) => ({
                     ...item,
                     type: materialType
                 })),

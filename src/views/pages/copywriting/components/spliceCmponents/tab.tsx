@@ -19,6 +19,23 @@ interface Tabs {
 }
 const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui, appData }: Tabs) => {
     const handleAdd = (data?: any) => {
+        console.log(data);
+        console.log({
+            name: `风格 ${digui()}`,
+            index: digui(),
+            system: data?.system || true,
+            enable: data?.enable || true,
+            uuid: uuidv4()?.split('-')?.join(''),
+            templateList: data?.templateList?.map((item: any) => ({
+                ...data?.templateList,
+                uuid: uuidv4()?.split('-')?.join(''),
+                variableList: item?.variableList?.map((el: any) => ({
+                    ...el,
+                    uuid: uuidv4()?.split('-')?.join('')
+                }))
+            }))
+        });
+
         let newData = _.cloneDeep(imageStyleData);
         if (!newData) {
             newData = [];
@@ -29,10 +46,11 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
             system: data?.system || true,
             enable: data?.enable || true,
             uuid: uuidv4()?.split('-')?.join(''),
+
             templateList: data?.templateList?.map((item: any) => ({
-                ...data?.templateList,
+                ...item,
                 uuid: uuidv4()?.split('-')?.join(''),
-                variableList: item?.variableList((el: any) => ({
+                variableList: item?.variableList?.map((el: any) => ({
                     ...el,
                     uuid: uuidv4()?.split('-')?.join('')
                 }))

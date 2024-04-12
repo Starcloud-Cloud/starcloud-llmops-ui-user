@@ -102,7 +102,7 @@ const FormModal = ({
                                         options={sourceList}
                                         allowClear
                                     />
-                                ) : item.title === '内容' ? (
+                                ) : item.title === '内容' || item.type === 'textBox' ? (
                                     <TextArea rows={4} />
                                 ) : (
                                     <Input />

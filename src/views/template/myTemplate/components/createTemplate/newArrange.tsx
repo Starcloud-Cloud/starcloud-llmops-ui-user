@@ -430,7 +430,7 @@ function Arrange({
                                                         <div>
                                                             <CreateTab
                                                                 key={el?.field}
-                                                                appData={{ materialType: '', appUid: 'c391a40ab293494d9eae937401065bcd' }}
+                                                                appData={{ materialType: '', appReqVO: detail }}
                                                                 imageStyleData={el.value}
                                                                 setImageStyleData={(data) => {
                                                                     basisChange({
@@ -521,7 +521,7 @@ function Arrange({
                                         </div>
                                         <div className="flex justify-between gap-2 flex-col">
                                             <div className="text-[16px] font-bold">{item?.name}</div>
-                                            <div className="text-xs text-black/50 line-clamp-1">{item.description}</div>
+                                            <div className="text-xs text-black/50 line-clamp-3">{item.description}</div>
                                         </div>
                                     </div>
                                 ))}

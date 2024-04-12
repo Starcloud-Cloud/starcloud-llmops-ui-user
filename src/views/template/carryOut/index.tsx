@@ -38,6 +38,7 @@ function CarryOut({
                             setStep={setStep}
                             setMaterialType={setMaterialType}
                             setTitle={setTitle}
+                            details={config}
                             config={config?.workflowConfig}
                             detaData={config}
                             changeConfigs={changeConfigs}

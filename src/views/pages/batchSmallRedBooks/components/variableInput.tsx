@@ -17,6 +17,7 @@ const VariableInput = ({
     setValue,
     styles = {},
     model,
+    details,
     appUid,
     stepCode = '图片生成'
 }: {
@@ -31,7 +32,8 @@ const VariableInput = ({
     setValue: (data: any) => void;
     styles?: any;
     model?: string;
-    appUid: string;
+    details?: any;
+    appUid?: string;
     stepCode?: string;
 }) => {
     const inputList: any = useRef([]);
@@ -208,24 +210,26 @@ const VariableInput = ({
         return obj;
     };
     useEffect(() => {
-        schemeOptions({ appUid, stepCode }).then((res) => {
-            const newList = res
-                ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
-                ?.map((item: any) => {
-                    return {
-                        label: item.name,
-                        key: item.code,
-                        description: item.description,
-                        children: item.inJsonSchema
-                            ? getjsonschma(getJSON(item), item.name)
-                            : item.outJsonSchema
-                            ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
-                            : []
-                    };
-                });
-            setSchemaList(newList);
-        });
-    }, []);
+        if (open) {
+            schemeOptions({ appUid, stepCode, appReqVO: details }).then((res) => {
+                const newList = res
+                    ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
+                    ?.map((item: any) => {
+                        return {
+                            label: item.name,
+                            key: item.code,
+                            description: item.description,
+                            children: item.inJsonSchema
+                                ? getjsonschma(getJSON(item), item.name)
+                                : item.outJsonSchema
+                                ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
+                                : []
+                        };
+                    });
+                setSchemaList(newList);
+            });
+        }
+    }, [open]);
     return (
         <Popover
             trigger="click"

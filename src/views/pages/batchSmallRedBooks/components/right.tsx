@@ -45,14 +45,14 @@ const Right = ({
                         activeKey={collapseActive}
                         items={bathList?.map((item) => {
                             return {
-                                key: item.batch,
+                                key: item.uid,
                                 label: (
                                     <div className="w-full flex justify-between items-center text-sm pr-[20px]">
                                         <div className="">
                                             <span className="font-[600]">生成时间：</span>
-                                            {dayjs(item?.startTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.batch}）
+                                            {dayjs(item?.timestamp)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.uid}）
                                             <span className="font-[600]">版本号：</span>
-                                            {item?.schemeConfig?.configuration?.version}
+                                            {item?.version}
                                         </div>
                                         <div>
                                             <span className="font-[600]">生成成功数：</span>

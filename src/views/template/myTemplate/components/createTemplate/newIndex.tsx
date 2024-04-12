@@ -805,9 +805,9 @@ function CreateDetail() {
     const getTableData = async ({ step, index }: { step: any; index: number }) => {
         const newList = stepMarRef.current;
         let data = undefined;
-        const values = step?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_TYPE');
+        const values = step?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_TYPE')?.value;
         if (values) {
-            const result = await materialTemplate(values?.value);
+            const result = await materialTemplate(values);
             data = result.fieldDefine;
         }
 
@@ -1028,6 +1028,7 @@ function CreateDetail() {
                                                 setMaterialType={setMaterialType}
                                                 setTitle={setTitle}
                                                 isShows={isShows}
+                                                details={_.cloneDeep(detailRef.current)}
                                                 config={_.cloneDeep(detailRef.current.workflowConfig)}
                                                 changeConfigs={changeConfigs}
                                                 changeSon={changeData}

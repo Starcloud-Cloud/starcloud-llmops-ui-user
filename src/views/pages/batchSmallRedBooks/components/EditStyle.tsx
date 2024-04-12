@@ -221,6 +221,7 @@ const EditStyle = ({
                                                                 popoverWidth={popoverWidth}
                                                                 handleMenu={handleMenu}
                                                                 appUid={appData.appUid}
+                                                                details={appData.appReqVO}
                                                                 index={index}
                                                                 title={el?.label}
                                                                 value={el.value}

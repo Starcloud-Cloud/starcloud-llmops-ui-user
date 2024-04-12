@@ -1,5 +1,5 @@
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Upload, UploadProps, Button, Table, Modal, Image, Popconfirm, Form, Progress, Tabs, Collapse, InputNumber } from 'antd';
+import { Upload, UploadProps, Button, Table, Modal, Image, Popconfirm, Form, Progress, Tabs, Collapse, InputNumber, Tag } from 'antd';
 import { FormControl, Autocomplete, Chip, TextField } from '@mui/material';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -10,13 +10,30 @@ import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import AddStyle from 'ui-component/AddStyle';
 import { useLocation } from 'react-router-dom';
-const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
+const Lefts = ({ newSave, setPlanUid }: { newSave: (data: any) => void; setPlanUid: (data: any) => void }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     //存储的数据
     const appRef = useRef<any>(null);
     const [appData, setAppData] = useState<any>(null);
-
+    const getStatus = (status: any) => {
+        switch (status) {
+            case 'PENDING':
+                return <Tag>待执行</Tag>;
+            case 'RUNNING':
+                return <Tag color="processing">执行中</Tag>;
+            case 'PAUSE':
+                return <Tag color="warning">暂停</Tag>;
+            case 'CANCELED':
+                return <Tag>已取消</Tag>;
+            case 'COMPLETE':
+                return <Tag color="success">已完成</Tag>;
+            case 'FAILURE':
+                return <Tag color="error">失败</Tag>;
+            default:
+                return <Tag>待执行</Tag>;
+        }
+    };
     //上传素材
     const [materialType, setMaterialType] = useState('');
     //上传图片
@@ -229,6 +246,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
 
     const getList = async () => {
         const result = await getPlan(searchParams.get('appUid'));
+        setPlanUid(result?.uid);
         appRef.current = result;
         setAppData(appRef.current);
         const newList: any = _.cloneDeep(result?.configuration?.appInformation);
@@ -286,8 +304,13 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                 item.value = JSON.parse(item.value);
             }
         });
+        if (result?.configuration?.imageStyleList?.length > 0) {
+            newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
+                result?.configuration?.imageStyleList;
+        }
+        console.log(newImage);
+
         setImagMater(newImage);
-        // setImagMater(result?.configuration?.imageStyleList ? result?.configuration.imageStyleList : newImage);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
@@ -534,9 +557,9 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
         <>
             <div className="relative">
                 <div className="flex justify-between items-end">
-                    <div></div>
+                    <div>{appData?.configuration?.appInformation?.name}</div>
                     <div>
-                        版本号： <span className="font-blod">{appData?.version}</span>
+                        状态：{getStatus(appData?.status)} 版本号： <span className="font-blod">{appData?.version}</span>
                     </div>
                 </div>
                 <div
@@ -615,6 +638,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                         <Tabs.TabPane key={'2'} tab="笔记生成">
                             <Collapse
                                 accordion
+                                defaultActiveKey={['0']}
                                 items={generateList?.map((item: any, index: number) => ({
                                     key: index.toString(),
                                     label: item.name,
@@ -627,6 +651,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                                                             key={el.field}
                                                             item={el}
                                                             materialType={''}
+                                                            appUid={appData?.appUid}
                                                             stepCode={
                                                                 el?.field === 'REQUIREMENT'
                                                                     ? item.variable?.variables?.find(
@@ -702,25 +727,29 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
-                                <AddStyle ref={imageRef} record={imageMater} />
+                                <AddStyle appUid={appData?.appUid} ref={imageRef} record={imageMater} />
                             </Tabs.TabPane>
                         )}
                         <Tabs.TabPane key={'4'} tab="批量生成参数">
                             <div>
-                                <div className="mt-[20px]">生成数量：</div>
-                                <InputNumber
-                                    size="large"
-                                    value={basisData?.totalCount}
-                                    onChange={(e: any) => {
-                                        setBasisData({
-                                            ...basisData,
-                                            totalCount: e
-                                        });
-                                    }}
-                                    min={1}
-                                    max={100}
-                                    className="w-full"
-                                />
+                                <div className="relative mt-[16px] max-w-[300px]">
+                                    <InputNumber
+                                        className="bg-[#f8fafc] w-full"
+                                        size="large"
+                                        value={basisData?.totalCount}
+                                        onChange={(e: any) => {
+                                            setBasisData({
+                                                ...basisData,
+                                                totalCount: e
+                                            });
+                                        }}
+                                        min={1}
+                                        max={100}
+                                    />
+                                    <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
+                                        生成数量
+                                    </span>
+                                </div>
                                 <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
                                     <Autocomplete
                                         sx={{ mt: 2 }}
@@ -815,10 +844,11 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                     </span>
                 </p>
                 <div className="flex justify-center mt-[20px]">
-                    <div>
+                    <div className="flex flex-col items-center">
                         <Upload {...props1}>
                             <Button type="primary">上传 ZIP</Button>
                         </Upload>
+                        <div className="text-xs text-black/50 mt-2">请把下载的内容修改后，对目录打包后再上传</div>
                     </div>
                 </div>
                 {uploadLoading && <Progress size="small" percent={percent} />}

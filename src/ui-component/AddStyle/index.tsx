@@ -235,7 +235,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
     return (
         <div>
             <div className="pb-3">
-                <Button type="primary" onClick={() => handleAdd()}>
+                <Button size="small" type="primary" onClick={() => handleAdd()}>
                     增加风格
                 </Button>
             </div>

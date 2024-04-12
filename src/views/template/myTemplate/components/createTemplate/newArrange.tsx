@@ -150,6 +150,18 @@ function Arrange({
         setStepOpen(newList);
         getTableData({ step, index });
         const newStep = _.cloneDeep(step);
+        if (newStep?.flowStep?.handler === 'PosterActionHandler') {
+            newStep?.variable?.variables?.forEach((item: any) => {
+                if (item?.field === 'POSTER_STYLE_CONFIG' && item.value) {
+                    item.value = JSON.parse(item.value);
+                }
+            });
+            newStep?.flowStep?.variable?.variables?.forEach((item: any) => {
+                if (item?.field === 'SYSTEM_POSTER_STYLE_CONFIG' && item.value) {
+                    item.value = JSON.parse(item.value);
+                }
+            });
+        }
         stepEtch(index + 1, newStep.name, config.steps, newStep, index);
     };
     const [pre, setPre] = useState(0);

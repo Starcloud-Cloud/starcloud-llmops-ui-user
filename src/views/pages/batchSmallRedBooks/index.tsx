@@ -362,43 +362,48 @@ const BatcSmallRedBooks = () => {
     const [businessUid, setBusinessUid] = useState('');
 
     return (
-        <MainCard content={false}>
-            <CardContent className="pb-[72px] !px-4 !pt-4">
-                <SubCard contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}>
-                    <div>
-                        <IconButton onClick={() => navigate('/appMarket')} color="secondary">
-                            <KeyboardBackspace fontSize="small" />
-                        </IconButton>
-                        <span className="text-[#000c] font-[500]">创作计划</span>&nbsp;
-                        <span className="text-[#673ab7] font-[500]">- {!searchParams.get('uid') ? '新建创作计划' : '编辑创作计划'}</span>
-                    </div>
-                    <div></div>
-                </SubCard>
-                <Row gutter={20} className="!ml-0">
-                    <Col span={10} className="relative h-full bg-[#fff] !px-[0]">
-                        <Left newSave={newSave} />
-                    </Col>
-                    <Col span={14} className="overflow-hidden mt-4">
-                        <Right
-                            bathList={bathList}
-                            collapseActive={collapseActive}
-                            batchOpen={batchOpen}
-                            changeCollapse={(data: any) => changeCollapse(data)}
-                            planList={planList}
-                            setBusinessUid={(data: any) => setBusinessUid(data)}
-                            setDetailOpen={(data: any) => setDetailOpen(data)}
-                            handleScroll={(data: any) => handleScroll(data)}
-                            timeFailure={(index: number) => {
-                                const pageNo = Number((index / 20).toFixed(0)) + 1;
-                                clearInterval(timer.current[pageNo]);
-                                timer.current[pageNo] = getLists(pageNo);
-                            }}
-                        />
-                    </Col>
-                </Row>
-                {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
-            </CardContent>
-        </MainCard>
+        <div className="bg-[rgb(244,246,248)] p-4">
+            <SubCard
+                sx={{ minWidth: '1818px' }}
+                contentSX={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    p: '10px !important'
+                }}
+            >
+                <div>
+                    <IconButton onClick={() => navigate('/appMarket')} color="secondary">
+                        <KeyboardBackspace fontSize="small" />
+                    </IconButton>
+                    <span className="text-[#000c] font-[500]">应用市场</span>
+                </div>
+                <div></div>
+            </SubCard>
+            <div className="flex gap-[20px] mt-4">
+                <div className="!w-[700px] flex-none bg-white rounded-lg p-4">
+                    <Left newSave={newSave} />
+                </div>
+                <div className="flex-1 min-w-[1100px] bg-white rounded-lg p-4">
+                    <Right
+                        bathList={bathList}
+                        collapseActive={collapseActive}
+                        batchOpen={batchOpen}
+                        changeCollapse={(data: any) => changeCollapse(data)}
+                        planList={planList}
+                        setBusinessUid={(data: any) => setBusinessUid(data)}
+                        setDetailOpen={(data: any) => setDetailOpen(data)}
+                        handleScroll={(data: any) => handleScroll(data)}
+                        timeFailure={(index: number) => {
+                            const pageNo = Number((index / 20).toFixed(0)) + 1;
+                            clearInterval(timer.current[pageNo]);
+                            timer.current[pageNo] = getLists(pageNo);
+                        }}
+                    />
+                </div>
+            </div>
+            {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
+        </div>
     );
 };
 export default BatcSmallRedBooks;

@@ -55,7 +55,11 @@ const StyleTabs = ({
             mode: 'SEQUENCE',
             uuid: uuidv4()?.split('-')?.join(''),
             titleGenerateMode: data?.titleGenerateMode || 'DEFAULT',
-            variableList: data?.variableList || []
+            variableList:
+                data?.variableList?.map((item: any) => ({
+                    ...item,
+                    uuid: uuidv4()?.split('-')?.join('')
+                })) || []
         });
         setDetailData(newPanes);
         setActiveKey((newPanes.length - 1).toString());

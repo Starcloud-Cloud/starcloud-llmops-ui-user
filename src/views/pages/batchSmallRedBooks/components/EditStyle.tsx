@@ -53,7 +53,10 @@ const EditStyle = ({
         const newData = _.cloneDeep(imageStyleData);
         newData.example = temp.example;
         newData.code = temp.code;
-        newData.variableList = temp.variableList;
+        newData.variableList = temp.variableList?.map((item: any) => ({
+            ...item,
+            uuid: uuidv4()?.split('-')?.join('')
+        }));
         setData(newData);
         setOpen(false);
     };
@@ -83,7 +86,6 @@ const EditStyle = ({
     const handleMenu = ({ index, newValue }: any) => {
         const newData = _.cloneDeep(imageStyleData);
         newData.variableList[index].value = newValue;
-        newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
         setData(newData);
     };
     const wrapperRef: any = useRef(null);
@@ -300,7 +302,6 @@ const EditStyle = ({
                                                             setValue={(value) => {
                                                                 const newData = _.cloneDeep(imageStyleData);
                                                                 newData.variableList[index].value = value;
-                                                                newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
                                                                 setData(newData);
                                                             }}
                                                         />

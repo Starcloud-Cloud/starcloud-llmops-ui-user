@@ -380,14 +380,13 @@ function CreateDetail() {
             }
         });
         console.log(newValue);
-
-        detailRef.current = _.cloneDeep(newValue);
         if (newValue?.workflowConfig?.steps?.length === 1) {
             setAiModel(
                 newValue?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
                     'gpt-3.5-turbo-1106'
             );
         }
+        detailRef.current = _.cloneDeep(newValue);
         getStepMater();
         setDetail(newValue);
     };
@@ -732,8 +731,6 @@ function CreateDetail() {
         ];
     };
     const getHeaders = (data: any, i: number) => {
-        console.log(data);
-
         const newList = data;
         newList?.splice(newList?.length - 1, 1);
         return [
@@ -821,7 +818,6 @@ function CreateDetail() {
             }
         });
         stepMarRef.current = ccc;
-        console.log(stepMarRef.current, 'stepMarRef.current');
 
         setStepMaterial(stepMarRef.current);
     };

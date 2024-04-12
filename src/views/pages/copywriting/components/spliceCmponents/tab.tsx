@@ -29,7 +29,14 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
             system: data?.system || true,
             enable: data?.enable || true,
             uuid: uuidv4()?.split('-')?.join(''),
-            templateList: data?.templateList || [
+            templateList: data?.templateList?.map((item: any) => ({
+                ...data?.templateList,
+                uuid: uuidv4()?.split('-')?.join(''),
+                variableList: item?.variableList((el: any) => ({
+                    ...el,
+                    uuid: uuidv4()?.split('-')?.join('')
+                }))
+            })) || [
                 {
                     key: '1',
                     name: '首图',

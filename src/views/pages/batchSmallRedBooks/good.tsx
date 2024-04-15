@@ -75,7 +75,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                     <div className="w-full aspect-[250/335] flex justify-center items-center relative gu">
                         <Skeleton.Image
                             className="!w-[100%] !h-[100%]"
-                            active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
+                            active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
                         />
                         {(item.status === 'EXECUTING' || item.status === 'FAILURE') && (
                             <div className="absolute top-0 right-0 left-0 bottom-0 flex flex-col gap-2 justify-center items-center z-1000">
@@ -106,23 +106,23 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         <Skeleton
                             paragraph={false}
                             className="mt-[10px] h-[44px]"
-                            active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
+                            active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
                         />
                         <div className="h-[88px]">
                             <Skeleton
                                 paragraph={false}
                                 className="mt-[10px]"
-                                active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
+                                active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
                             />
                             <Skeleton
                                 paragraph={false}
                                 className="mt-[10px]"
-                                active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
+                                active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
                             />
                             <Skeleton
                                 paragraph={false}
                                 className="mt-[10px] mb-[15px]"
-                                active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
+                                active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
                             />
                         </div>
                         <div className="absolute right-1 top-0">
@@ -226,12 +226,12 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                     </div>
                                     <div>
                                         <span className="font-[600]">描述：</span>
-                                        <span className="text-[#15273799] ">{item?.executeResult?.copyWriting?.Content}</span>
+                                        <span className="text-[#15273799] ">{item?.executeResult?.copyWriting?.content}</span>
                                     </div>
                                 </div>
                             }
                         >
-                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[88px]">{item?.executeResult?.copyWriting?.Content}</div>
+                            <div className="line-clamp-4 mt-[10px] text-[14px] h-[88px]">{item?.executeResult?.copyWriting?.content}</div>
                         </Popover>
                         {!show && (
                             <>

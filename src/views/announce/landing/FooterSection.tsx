@@ -189,7 +189,7 @@ const FooterSection = () => {
                         <Typography color="text.secondary">
                             版权所有 © 星河云海(杭州)网络技术有限公司{' '}
                             <Link href="https://beian.miit.gov.cn" target="_blank" underline="hover">
-                                浙ICP备 2022002996号
+                                浙ICP备2022002996号
                             </Link>{' '}
                             <Link
                                 href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33011002017175"

@@ -85,7 +85,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                 />
                                 <Popover content={'执行到第几步/总步数'}>
                                     <div className="font-[500] cursor-pointer">
-                                        {item?.progress?.currentStepIndex}/{item?.progress?.totalStep}
+                                        {item?.progress?.currentStepIndex}/{item?.progress?.totalStepCount}
                                     </div>
                                 </Popover>
                             </div>

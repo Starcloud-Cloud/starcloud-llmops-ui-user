@@ -341,15 +341,15 @@ const Lefts = ({
             newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
                 result?.configuration?.imageStyleList;
         }
-        console.log(newImage);
-
         setImagMater(newImage);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
-        getList();
+        if (detailShow) {
+            getList();
+        } else {
+        }
     }, []);
-
     //笔记生成的表头
     const stepRef = useRef(0);
     const [step, setStep] = useState(0);
@@ -554,13 +554,14 @@ const Lefts = ({
             uid: appData?.uid,
             ...basisData,
             configuration: {
-                imageStyleList: imageRef.current?.record?.variable?.variables
-                    ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
-                    ?.value?.map((item: any) => ({
-                        ...item,
-                        id: undefined,
-                        code: item.id
-                    })),
+                imageStyleList:
+                    imageRef.current?.record?.variable?.variables
+                        ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
+                        ?.value?.map((item: any) => ({
+                            ...item,
+                            id: undefined,
+                            code: item.id
+                        })) || imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
                 materialList:
                     materialType === 'picture'
                         ? fileList?.map((item) => ({

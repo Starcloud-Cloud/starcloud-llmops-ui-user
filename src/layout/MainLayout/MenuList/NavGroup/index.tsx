@@ -223,7 +223,7 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
                                                     <span>{currentItem.title}</span>
                                                     {currentItem.title === '应用市场' && (
                                                         <span
-                                                            className="text-[#673ab7] text-xs ml-1 cursor-pointer"
+                                                            className="cursor-pointer font-[10px] text-[#1d4ed8] ml-1"
                                                             onClick={() => setOpen(true)}
                                                         >
                                                             应用市场使用视频

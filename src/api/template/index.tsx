@@ -200,7 +200,7 @@ export const xhsApp = (uid: any) => {
 
 // 获取模版分类
 export const getImageTemplateTypes = () => {
-    return request.get({ url: `/llm/creative/scheme/templateGroupByType` });
+    return request.get({ url: `/llm/creative/scheme/listPosterTemplateType` });
 };
 
 // 获取template json

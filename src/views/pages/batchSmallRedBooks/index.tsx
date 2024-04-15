@@ -215,7 +215,7 @@ const BatcSmallRedBooks = () => {
                 if (
                     plabListRef.current
                         .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
-                        ?.every((item: any) => item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init')
+                        ?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT')
                 ) {
                     clearInterval(timer.current[queryPage.pageNo - 1]);
                     return;
@@ -250,7 +250,7 @@ const BatcSmallRedBooks = () => {
                     if (
                         plabListRef.current?.length === 0 ||
                         plabListRef.current.slice(0, 20)?.every((item: any) => {
-                            return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
+                            return item?.status !== 'EXECUTING' && item?.status !== 'INIT';
                         })
                     ) {
                         clearInterval(timer.current[0]);
@@ -285,15 +285,13 @@ const BatcSmallRedBooks = () => {
                 timer.current[0] = setInterval(() => {
                     console.log(plabListRef.current?.length);
                     console.log(
-                        plabListRef.current
-                            .slice(0, 20)
-                            ?.every((item: any) => item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init')
+                        plabListRef.current.slice(0, 20)?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT')
                     );
 
                     if (
                         plabListRef.current?.length === 0 ||
                         plabListRef.current.slice(0, 20)?.every((item: any) => {
-                            return item?.pictureStatus !== 'executing' && item?.pictureStatus !== 'init';
+                            return item?.status !== 'EXECUTING' && item?.status !== 'INIT';
                         })
                     ) {
                         clearInterval(timer.current[0]);

@@ -255,6 +255,7 @@ const Lefts = ({
 
     const getList = async () => {
         const result = await getPlan(searchParams.get('appUid'));
+        setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
         appRef.current = result;
         setAppData(appRef.current);
@@ -341,15 +342,15 @@ const Lefts = ({
             newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
                 result?.configuration?.imageStyleList;
         }
-        console.log(newImage);
-
         setImagMater(newImage);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
-        getList();
+        if (detailShow) {
+            getList();
+        } else {
+        }
     }, []);
-
     //笔记生成的表头
     const stepRef = useRef(0);
     const [step, setStep] = useState(0);
@@ -531,10 +532,7 @@ const Lefts = ({
     };
 
     // 基础数据
-    const [basisData, setBasisData] = useState<any>({
-        tags: [],
-        totalCount: 5
-    });
+    const [totalCount, setTotalCount] = useState<number>(5);
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
         const newList = _.cloneDeep(generateList);
@@ -552,15 +550,16 @@ const Lefts = ({
         });
         const data = {
             uid: appData?.uid,
-            ...basisData,
+            totalCount,
             configuration: {
-                imageStyleList: imageRef.current?.record?.variable?.variables
-                    ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
-                    ?.value?.map((item: any) => ({
-                        ...item,
-                        id: undefined,
-                        code: item.id
-                    })),
+                imageStyleList:
+                    imageRef.current?.record?.variable?.variables
+                        ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
+                        ?.value?.map((item: any) => ({
+                            ...item,
+                            id: undefined,
+                            code: item.id
+                        })) || imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
                 materialList:
                     materialType === 'picture'
                         ? fileList?.map((item) => ({
@@ -785,12 +784,9 @@ const Lefts = ({
                                         <InputNumber
                                             className="bg-[#f8fafc] w-full"
                                             size="large"
-                                            value={basisData?.totalCount}
+                                            value={totalCount}
                                             onChange={(e: any) => {
-                                                setBasisData({
-                                                    ...basisData,
-                                                    totalCount: e
-                                                });
+                                                setTotalCount(e);
                                             }}
                                             min={1}
                                             max={100}
@@ -799,50 +795,6 @@ const Lefts = ({
                                             生成数量
                                         </span>
                                     </div>
-                                    <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
-                                        <Autocomplete
-                                            sx={{ mt: 2 }}
-                                            multiple
-                                            size="small"
-                                            id="tags-filled"
-                                            color="secondary"
-                                            options={[]}
-                                            defaultValue={basisData?.tags}
-                                            freeSolo
-                                            renderTags={(value: readonly string[], getTagProps) =>
-                                                value.map((option: string, index: number) => (
-                                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                                                ))
-                                            }
-                                            onChange={(e: any, newValue) => {
-                                                setBasisData({
-                                                    ...basisData,
-                                                    tags: newValue
-                                                });
-                                            }}
-                                            renderInput={(param) => (
-                                                <TextField
-                                                    onBlur={(e: any) => {
-                                                        if (e.target.value) {
-                                                            let newValue: any = basisData.tags;
-                                                            if (!newValue) {
-                                                                newValue = [];
-                                                            }
-                                                            newValue.push(e.target.value);
-                                                            setBasisData({
-                                                                ...basisData,
-                                                                tags: newValue
-                                                            });
-                                                        }
-                                                    }}
-                                                    color="secondary"
-                                                    {...param}
-                                                    label="笔记标签"
-                                                    placeholder="请输入笔记标签然后回车"
-                                                />
-                                            )}
-                                        />
-                                    </FormControl>
                                 </div>
                             </Tabs.TabPane>
                         )}

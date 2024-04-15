@@ -47,7 +47,8 @@ const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) =
         if (record) {
             const tempList =
                 record?.flowStep?.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
-            setTemplateList(tempList);
+            const sysTempList = tempList.filter((item: any) => item.system);
+            setTemplateList(sysTempList);
             templateRef.current = tempList;
         }
     }, [record]);

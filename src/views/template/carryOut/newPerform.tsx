@@ -18,6 +18,7 @@ import MarketForm from '../components/marketForm';
 import AddStyle from 'ui-component/AddStyle';
 function Perform({
     detaData,
+    details,
     config,
     changeSon,
     source,
@@ -155,7 +156,15 @@ function Perform({
             {config?.steps?.map((item: any, steps: number) => (
                 <Card key={item.field + item.steps} sx={{ position: 'relative' }}>
                     {item?.flowStep?.handler === 'PosterActionHandler' ? (
-                        <AddStyle record={item} ref={addStyle} />
+                        <>
+                            <Box>
+                                <Typography variant="h4">{item.name}</Typography>
+                                <Typography variant="caption" display="block" mt={1}>
+                                    {item.description}
+                                </Typography>
+                            </Box>
+                            <AddStyle record={item} details={details} ref={addStyle} />
+                        </>
                     ) : (
                         item.flowStep?.response.style !== 'BUTTON' && (
                             <>
@@ -206,140 +215,130 @@ function Perform({
                                             </Button>
                                         </Box>
                                     </Box>
-                                    <Grid container spacing={2}>
-                                        <Grid item lg={item?.flowStep?.response?.isShow ? 6 : 12} sm={12}>
-                                            {item.variable?.variables?.map(
-                                                (el: any, i: number) =>
-                                                    el.isShow && (
-                                                        <MarketForm
-                                                            item={el}
-                                                            materialType={
-                                                                item.variable?.variables?.find(
-                                                                    (item: any) => item.field === 'MATERIAL_TYPE'
-                                                                )?.value
-                                                            }
-                                                            stepCode={
-                                                                el?.field === 'REQUIREMENT'
-                                                                    ? item.variable?.variables?.find(
-                                                                          (item: any) => item.field === 'GENERATE_MODE'
-                                                                      )?.value
-                                                                    : ''
-                                                            }
-                                                            handlerCode={item?.flowStep?.handler}
-                                                            history={history}
-                                                            columns={columns ? columns[steps] : []}
-                                                            setEditOpen={setEditOpen}
-                                                            setTitle={setTitle}
-                                                            setStep={() => setStep(steps)}
-                                                            setMaterialType={() => {
-                                                                setMaterialType(
-                                                                    config?.steps[steps]?.variable?.variables?.find(
-                                                                        (item: any) => item.field === 'MATERIAL_TYPE'
-                                                                    )?.value
+                                    {item.variable?.variables?.map(
+                                        (el: any, i: number) =>
+                                            el.isShow && (
+                                                <MarketForm
+                                                    details={details}
+                                                    item={el}
+                                                    materialType={
+                                                        item.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value
+                                                    }
+                                                    stepCode={
+                                                        el?.field === 'REQUIREMENT'
+                                                            ? item.variable?.variables?.find((item: any) => item.field === 'GENERATE_MODE')
+                                                                  ?.value
+                                                            : ''
+                                                    }
+                                                    handlerCode={item?.flowStep?.handler}
+                                                    history={history}
+                                                    columns={columns ? columns[steps] : []}
+                                                    setEditOpen={setEditOpen}
+                                                    setTitle={setTitle}
+                                                    setStep={() => setStep(steps)}
+                                                    setMaterialType={() => {
+                                                        setMaterialType(
+                                                            config?.steps[steps]?.variable?.variables?.find(
+                                                                (item: any) => item.field === 'MATERIAL_TYPE'
+                                                            )?.value
+                                                        );
+                                                    }}
+                                                    onChange={(e: any) => {
+                                                        variableChange({
+                                                            e,
+                                                            steps,
+                                                            i,
+                                                            type: e.name === 'MATERIAL_TYPE' ? e.value : undefined,
+                                                            code: item?.flowStep?.handler
+                                                        });
+                                                    }}
+                                                />
+                                            )
+                                    )}
+                                    {item.flowStep?.variable?.variables?.map(
+                                        (el: any, i: number) =>
+                                            el.isShow && <FormExecute item={el} onChange={(e: any) => promptChange({ e, steps, i })} />
+                                    )}
+                                    {item?.flowStep?.response?.isShow && (
+                                        <>
+                                            <TextField
+                                                sx={{ mt: 2 }}
+                                                inputRef={(el) => (mdRef.current[steps] = el)}
+                                                fullWidth
+                                                color="secondary"
+                                                InputLabelProps={{ shrink: true }}
+                                                label={
+                                                    <Box display="flex" alignItems="center">
+                                                        <AutoAwesome fontSize="small" />
+                                                        生成结果
+                                                    </Box>
+                                                }
+                                                onChange={(e) => {
+                                                    changeanswer({ value: e.target.value, index: steps });
+                                                }}
+                                                value={item.flowStep.response.answer}
+                                                placeholder={item.flowStep.response.defaultValue}
+                                                multiline
+                                                minRows={
+                                                    item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'JSON'
+                                                        ? 5
+                                                        : 1
+                                                }
+                                                maxRows={
+                                                    item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'JSON'
+                                                        ? 7
+                                                        : 2
+                                                }
+                                            />
+
+                                            {item.flowStep.response.answer && isShows[steps] && (
+                                                <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
+                                                    <Box>
+                                                        <IconButton
+                                                            color="secondary"
+                                                            onClick={() => {
+                                                                copy(item.flowStep.response.answer);
+                                                                dispatch(
+                                                                    openSnackbar({
+                                                                        open: true,
+                                                                        message: '复制成功',
+                                                                        variant: 'alert',
+                                                                        alert: {
+                                                                            color: 'success'
+                                                                        },
+                                                                        close: false,
+                                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                        transition: 'SlideLeft'
+                                                                    })
                                                                 );
                                                             }}
-                                                            onChange={(e: any) => {
-                                                                variableChange({
-                                                                    e,
-                                                                    steps,
-                                                                    i,
-                                                                    type: e.name === 'MATERIAL_TYPE' ? e.value : undefined,
-                                                                    code: item?.flowStep?.handler
-                                                                });
-                                                            }}
-                                                        />
-                                                    )
-                                            )}
-                                            {item.flowStep?.variable?.variables?.map(
-                                                (el: any, i: number) =>
-                                                    el.isShow && (
-                                                        <FormExecute item={el} onChange={(e: any) => promptChange({ e, steps, i })} />
-                                                    )
-                                            )}
-                                        </Grid>
-                                        {item?.flowStep?.response?.isShow && (
-                                            <Grid item lg={6} sm={12}>
-                                                <TextField
-                                                    sx={{ mt: 2 }}
-                                                    inputRef={(el) => (mdRef.current[steps] = el)}
-                                                    fullWidth
-                                                    color="secondary"
-                                                    InputLabelProps={{ shrink: true }}
-                                                    label={
-                                                        <Box display="flex" alignItems="center">
-                                                            <AutoAwesome fontSize="small" />
-                                                            {t('myApp.execuent')}
-                                                        </Box>
-                                                    }
-                                                    onChange={(e) => {
-                                                        changeanswer({ value: e.target.value, index: steps });
-                                                    }}
-                                                    value={item.flowStep.response.answer}
-                                                    placeholder={item.flowStep.response.defaultValue}
-                                                    multiline
-                                                    minRows={
-                                                        item.flowStep.response.style === 'TEXTAREA' ||
-                                                        item.flowStep.response.style === 'JSON'
-                                                            ? 5
-                                                            : 1
-                                                    }
-                                                    maxRows={
-                                                        item.flowStep.response.style === 'TEXTAREA' ||
-                                                        item.flowStep.response.style === 'JSON'
-                                                            ? 7
-                                                            : 2
-                                                    }
-                                                />
-
-                                                {item.flowStep.response.answer && isShows[steps] && (
-                                                    <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
-                                                        <Box>
-                                                            <IconButton
-                                                                color="secondary"
-                                                                onClick={() => {
-                                                                    copy(item.flowStep.response.answer);
-                                                                    dispatch(
-                                                                        openSnackbar({
-                                                                            open: true,
-                                                                            message: '复制成功',
-                                                                            variant: 'alert',
-                                                                            alert: {
-                                                                                color: 'success'
-                                                                            },
-                                                                            close: false,
-                                                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                                                                            transition: 'SlideLeft'
-                                                                        })
-                                                                    );
-                                                                }}
-                                                            >
-                                                                <ContentPaste fontSize="small" />
-                                                            </IconButton>
-                                                            <IconButton
-                                                                onClick={() =>
-                                                                    translation(
-                                                                        /[\u4e00-\u9fa5]/.test(item.flowStep.response.answer),
-                                                                        item.flowStep.response.answer,
-                                                                        steps
-                                                                    )
-                                                                }
-                                                            >
-                                                                {/[\u4e00-\u9fa5]/.test(item.flowStep.response.answer) ? (
-                                                                    <Tooltip title="翻译成英文" arrow placement="top">
-                                                                        <img width="20px" src={En} alt="" />
-                                                                    </Tooltip>
-                                                                ) : (
-                                                                    <Tooltip title="翻译成中文" arrow placement="top">
-                                                                        <img width="20px" src={Zh} alt="" />
-                                                                    </Tooltip>
-                                                                )}
-                                                            </IconButton>
-                                                        </Box>
+                                                        >
+                                                            <ContentPaste fontSize="small" />
+                                                        </IconButton>
+                                                        <IconButton
+                                                            onClick={() =>
+                                                                translation(
+                                                                    /[\u4e00-\u9fa5]/.test(item.flowStep.response.answer),
+                                                                    item.flowStep.response.answer,
+                                                                    steps
+                                                                )
+                                                            }
+                                                        >
+                                                            {/[\u4e00-\u9fa5]/.test(item.flowStep.response.answer) ? (
+                                                                <Tooltip title="翻译成英文" arrow placement="top">
+                                                                    <img width="20px" src={En} alt="" />
+                                                                </Tooltip>
+                                                            ) : (
+                                                                <Tooltip title="翻译成中文" arrow placement="top">
+                                                                    <img width="20px" src={Zh} alt="" />
+                                                                </Tooltip>
+                                                            )}
+                                                        </IconButton>
                                                     </Box>
-                                                )}
-                                            </Grid>
-                                        )}
-                                    </Grid>
+                                                </Box>
+                                            )}
+                                        </>
+                                    )}
                                 </CardContent>
                             </>
                         )

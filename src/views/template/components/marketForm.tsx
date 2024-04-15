@@ -13,6 +13,8 @@ import { useLocation } from 'react-router-dom';
 
 function FormExecute({
     item,
+    details = undefined,
+    appUid = undefined,
     onChange,
     pre,
     materialType,
@@ -205,7 +207,8 @@ function FormExecute({
                         handleMenu={({ newValue }) => {
                             onChange({ name: item.field, value: newValue });
                         }}
-                        appUid={'c391a40ab293494d9eae937401065bcd'}
+                        details={details}
+                        appUid={appUid}
                         stepCode={'标题生成'}
                         index={undefined}
                         value={item.value}
@@ -377,10 +380,11 @@ function FormExecute({
                         </span>
                     </p>
                     <div className="flex justify-center mt-[20px]">
-                        <div>
+                        <div className="flex flex-col items-center">
                             <Upload {...props1}>
                                 <Button type="primary">上传 ZIP</Button>
                             </Upload>
+                            <div className="text-xs text-black/50 mt-2">请把下载的内容修改后，对目录打包后再上传</div>
                         </div>
                     </div>
                     {uploadLoading && <Progress size="small" percent={percent} />}

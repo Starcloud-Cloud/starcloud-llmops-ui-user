@@ -150,6 +150,18 @@ function Arrange({
         setStepOpen(newList);
         getTableData({ step, index });
         const newStep = _.cloneDeep(step);
+        if (newStep?.flowStep?.handler === 'PosterActionHandler') {
+            newStep?.variable?.variables?.forEach((item: any) => {
+                if (item?.field === 'POSTER_STYLE_CONFIG' && item.value) {
+                    item.value = JSON.parse(item.value);
+                }
+            });
+            newStep?.flowStep?.variable?.variables?.forEach((item: any) => {
+                if (item?.field === 'SYSTEM_POSTER_STYLE_CONFIG' && item.value) {
+                    item.value = JSON.parse(item.value);
+                }
+            });
+        }
         stepEtch(index + 1, newStep.name, config.steps, newStep, index);
     };
     const [pre, setPre] = useState(0);
@@ -418,7 +430,7 @@ function Arrange({
                                                         <div>
                                                             <CreateTab
                                                                 key={el?.field}
-                                                                appData={{ materialType: '', appUid: 'c391a40ab293494d9eae937401065bcd' }}
+                                                                appData={{ materialType: '', appReqVO: detail }}
                                                                 imageStyleData={el.value}
                                                                 setImageStyleData={(data) => {
                                                                     basisChange({
@@ -509,7 +521,7 @@ function Arrange({
                                         </div>
                                         <div className="flex justify-between gap-2 flex-col">
                                             <div className="text-[16px] font-bold">{item?.name}</div>
-                                            <div className="text-xs text-black/50 line-clamp-1">{item.description}</div>
+                                            <div className="text-xs text-black/50 line-clamp-3">{item.description}</div>
                                         </div>
                                     </div>
                                 ))}

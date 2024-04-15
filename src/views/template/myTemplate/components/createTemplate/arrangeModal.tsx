@@ -145,7 +145,7 @@ const ArrangeModal = ({
             <DialogContent dividers>
                 <Typography variant="body2">{t('market.addPrompt')}:</Typography>
                 <Typography variant="body2" mb={2}>
-                    {'{STEP.' + detail?.config?.steps[modal].field + '.' + formik.values.field + '}'}
+                    {'{' + formik.values.field + '}'}
                 </Typography>
                 <form onSubmit={formik.handleSubmit}>
                     <TextField

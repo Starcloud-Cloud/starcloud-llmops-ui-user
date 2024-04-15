@@ -380,14 +380,13 @@ function CreateDetail() {
             }
         });
         console.log(newValue);
-
-        detailRef.current = _.cloneDeep(newValue);
         if (newValue?.workflowConfig?.steps?.length === 1) {
             setAiModel(
                 newValue?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
                     'gpt-3.5-turbo-1106'
             );
         }
+        detailRef.current = _.cloneDeep(newValue);
         getStepMater();
         setDetail(newValue);
     };
@@ -732,8 +731,6 @@ function CreateDetail() {
         ];
     };
     const getHeaders = (data: any, i: number) => {
-        console.log(data);
-
         const newList = data;
         newList?.splice(newList?.length - 1, 1);
         return [
@@ -808,9 +805,9 @@ function CreateDetail() {
     const getTableData = async ({ step, index }: { step: any; index: number }) => {
         const newList = stepMarRef.current;
         let data = undefined;
-        const values = step?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_TYPE');
+        const values = step?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_TYPE')?.value;
         if (values) {
-            const result = await materialTemplate(values?.value);
+            const result = await materialTemplate(values);
             data = result.fieldDefine;
         }
 
@@ -821,7 +818,6 @@ function CreateDetail() {
             }
         });
         stepMarRef.current = ccc;
-        console.log(stepMarRef.current, 'stepMarRef.current');
 
         setStepMaterial(stepMarRef.current);
     };
@@ -1032,6 +1028,7 @@ function CreateDetail() {
                                                 setMaterialType={setMaterialType}
                                                 setTitle={setTitle}
                                                 isShows={isShows}
+                                                details={_.cloneDeep(detailRef.current)}
                                                 config={_.cloneDeep(detailRef.current.workflowConfig)}
                                                 changeConfigs={changeConfigs}
                                                 changeSon={changeData}

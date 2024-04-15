@@ -9,7 +9,7 @@ import React from 'react';
 import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
 import _ from 'lodash-es';
 
-const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
+const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) => {
     console.log(record, 'record');
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
@@ -241,7 +241,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
     return (
         <div>
             <div className="pb-3">
-                <Button type="primary" onClick={() => handleAdd()}>
+                <Button size="small" type="primary" onClick={() => handleAdd()}>
                     增加风格
                 </Button>
             </div>
@@ -389,7 +389,8 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                     imageStyleData={currentStyle?.templateList}
                     typeList={[]}
                     appData={{
-                        appUid: 'c391a40ab293494d9eae937401065bcd',
+                        appUid,
+                        appReqVO: details,
                         materialType: ''
                     }}
                     setDetailData={(data: any) => {

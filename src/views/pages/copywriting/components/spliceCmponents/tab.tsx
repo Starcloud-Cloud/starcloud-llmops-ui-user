@@ -26,10 +26,18 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
         newData.push({
             name: `风格 ${digui()}`,
             index: digui(),
-            system: true,
+            system: data?.system || true,
             enable: data?.enable || true,
             uuid: uuidv4()?.split('-')?.join(''),
-            templateList: data?.templateList || [
+
+            templateList: data?.templateList?.map((item: any) => ({
+                ...item,
+                uuid: uuidv4()?.split('-')?.join(''),
+                variableList: item?.variableList?.map((el: any) => ({
+                    ...el,
+                    uuid: uuidv4()?.split('-')?.join('')
+                }))
+            })) || [
                 {
                     key: '1',
                     name: '首图',
@@ -88,6 +96,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                     ) : (
                                         <TextField
                                             autoFocus
+                                            defaultValue={item.name}
                                             onBlur={(e) => {
                                                 const newList = _.cloneDeep(focuActive);
                                                 newList[i] = false;

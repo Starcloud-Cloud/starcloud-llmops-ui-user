@@ -22,57 +22,14 @@ const BatcSmallRedBooks = () => {
     const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
     const timer: any = useRef([]);
-    //1.批量上传图片素材
-    const [imageList, setImageList] = useState<any[]>([]);
+
     const uidRef = useRef('');
-    const setDetail = (result: any) => {
-        const res = _.cloneDeep(result);
-        setDetailData({
-            ...res.configuration,
-            total: res.total,
-            randomType: res.randomType,
-            status: res.status,
-            name: res.name,
-            targetKeys: res.configuration?.schemeUid,
-            tags: res.tags || []
-        });
-        schemeRef.current = res.configuration?.variableList ? res.configuration?.variableList : [];
-        setSchemeList(schemeRef.current);
-        if (res.configuration?.creativeMaterialList?.findIndex((item: any) => item.type === 'picture') !== -1) {
-            setImageList(
-                res.configuration?.creativeMaterialList?.map((item: any) => {
-                    return {
-                        uid: uuidv4(),
-                        thumbUrl: item?.pictureUrl,
-                        response: {
-                            data: {
-                                url: item?.pictureUrl
-                            }
-                        }
-                    };
-                })
-            );
-        }
-    };
 
     //批次分页
-    const batchPage = { page: 1, pageSize: 100 };
+    const batchPage = { pageNo: 1, pageSize: 100 };
     const [batchUid, setBatchUid] = useState('');
     const [bathList, setBathList] = useState<any[]>([]);
     const [batchOpen, setbatchOpen] = useState(false);
-    //编辑获列表
-    useEffect(() => {
-        if (searchParams.get('uid')) {
-            planGet(searchParams.get('uid')).then((result) => {
-                if (result) {
-                    // setDetail(result);
-                    batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                        setBathList(res.list);
-                    });
-                }
-            });
-        }
-    }, []);
     //关闭页面清除定时器
     useEffect(() => {
         return () => {
@@ -81,134 +38,129 @@ const BatcSmallRedBooks = () => {
             });
         };
     }, []);
-    //基础数据
-    const [detailData, setDetailData] = useState<any>({
-        randomType: 'RANDOM',
-        total: 5
-    });
     const [exedisabled, setExeDisabled] = useState(false);
-    const handleSave = async ({ flag, newData, tableData }: { flag: boolean; newData: any; tableData: any[] }) => {
-        if (flag) {
-            setExeDisabled(true);
-            plabListRef.current = [];
-            setPlanList(plabListRef.current);
-        }
-        if (searchParams.get('uid')) {
-            try {
-                const res = await planModify({
-                    name: newData?.name,
-                    randomType: newData.randomType,
-                    total: newData.total,
-                    tags: newData?.tags,
-                    configuration: {
-                        ...newData,
-                        creativeMaterialList: tableData,
-                        total: undefined,
-                        randomType: undefined,
-                        imageStyleList: undefined,
-                        name: undefined,
-                        tags: undefined,
-                        targetKeys: undefined,
-                        variableList: schemeRef.current
-                    },
-                    type: 'XHS',
+    // const handleSave = async ({ flag, newData, tableData }: { flag: boolean; newData: any; tableData: any[] }) => {
+    //     if (flag) {
+    //         setExeDisabled(true);
+    //         plabListRef.current = [];
+    //         setPlanList(plabListRef.current);
+    //     }
+    //     if (searchParams.get('uid')) {
+    //         try {
+    //             const res = await planModify({
+    //                 name: newData?.name,
+    //                 randomType: newData.randomType,
+    //                 total: newData.total,
+    //                 tags: newData?.tags,
+    //                 configuration: {
+    //                     ...newData,
+    //                     creativeMaterialList: tableData,
+    //                     total: undefined,
+    //                     randomType: undefined,
+    //                     imageStyleList: undefined,
+    //                     name: undefined,
+    //                     tags: undefined,
+    //                     targetKeys: undefined,
+    //                     variableList: schemeRef.current
+    //                 },
+    //                 type: 'XHS',
 
-                    uid: searchParams.get('uid')
-                });
-                uidRef.current = res;
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '编辑成功',
-                        variant: 'alert',
-                        alert: {
-                            color: 'success'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        transition: 'SlideDown',
-                        close: false
-                    })
-                );
-                if (flag) {
-                    planExecute({ uid: searchParams.get('uid') })
-                        .then((res) => {
-                            batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathList(res.list);
-                                setExeDisabled(false);
-                            });
-                        })
-                        .catch((err) => {
-                            batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathList(res.list);
-                                setExeDisabled(false);
-                            });
-                        });
-                }
-            } catch (err) {
-                setExeDisabled(false);
-            }
-        } else {
-            try {
-                const res = await planCreate({
-                    name: newData?.name,
-                    randomType: newData.randomType,
-                    total: newData.total,
-                    tags: newData?.tags,
-                    configuration: {
-                        ...newData,
-                        creativeMaterialList: tableData,
-                        total: undefined,
-                        randomType: undefined,
-                        imageStyleList: undefined,
-                        name: undefined,
-                        tags: undefined,
-                        targetKeys: undefined,
-                        variableList: schemeRef.current
-                    },
-                    type: 'XHS'
-                });
-                uidRef.current = res;
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '创建成功',
-                        variant: 'alert',
-                        alert: {
-                            color: 'success'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        transition: 'SlideDown',
-                        close: false
-                    })
-                );
-                navigate('/batchSmallRedBook?uid=' + res);
-                if (flag) {
-                    planExecute({ uid: res })
-                        .then((result) => {
-                            batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathList(res.list);
-                                setExeDisabled;
-                            });
-                        })
-                        .catch((err) => {
-                            batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-                                setBathList(res.list);
-                                setExeDisabled(false);
-                            });
-                        });
-                }
-            } catch (err) {
-                setExeDisabled(false);
-            }
-        }
-    };
+    //                 uid: searchParams.get('uid')
+    //             });
+    //             uidRef.current = res;
+    //             dispatch(
+    //                 openSnackbar({
+    //                     open: true,
+    //                     message: '编辑成功',
+    //                     variant: 'alert',
+    //                     alert: {
+    //                         color: 'success'
+    //                     },
+    //                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
+    //                     transition: 'SlideDown',
+    //                     close: false
+    //                 })
+    //             );
+    //             if (flag) {
+    //                 planExecute({ uid: searchParams.get('uid') })
+    //                     .then((res) => {
+    //                         batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+    //                             setBathList(res.list);
+    //                             setExeDisabled(false);
+    //                         });
+    //                     })
+    //                     .catch((err) => {
+    //                         batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+    //                             setBathList(res.list);
+    //                             setExeDisabled(false);
+    //                         });
+    //                     });
+    //             }
+    //         } catch (err) {
+    //             setExeDisabled(false);
+    //         }
+    //     } else {
+    //         try {
+    //             const res = await planCreate({
+    //                 name: newData?.name,
+    //                 randomType: newData.randomType,
+    //                 total: newData.total,
+    //                 tags: newData?.tags,
+    //                 configuration: {
+    //                     ...newData,
+    //                     creativeMaterialList: tableData,
+    //                     total: undefined,
+    //                     randomType: undefined,
+    //                     imageStyleList: undefined,
+    //                     name: undefined,
+    //                     tags: undefined,
+    //                     targetKeys: undefined,
+    //                     variableList: schemeRef.current
+    //                 },
+    //                 type: 'XHS'
+    //             });
+    //             uidRef.current = res;
+    //             dispatch(
+    //                 openSnackbar({
+    //                     open: true,
+    //                     message: '创建成功',
+    //                     variant: 'alert',
+    //                     alert: {
+    //                         color: 'success'
+    //                     },
+    //                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
+    //                     transition: 'SlideDown',
+    //                     close: false
+    //                 })
+    //             );
+    //             navigate('/batchSmallRedBook?uid=' + res);
+    //             if (flag) {
+    //                 planExecute({ uid: res })
+    //                     .then((result) => {
+    //                         batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+    //                             setBathList(res.list);
+    //                             setExeDisabled;
+    //                         });
+    //                     })
+    //                     .catch((err) => {
+    //                         batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
+    //                             setBathList(res.list);
+    //                             setExeDisabled(false);
+    //                         });
+    //                     });
+    //             }
+    //         } catch (err) {
+    //             setExeDisabled(false);
+    //         }
+    //     }
+    // };
     const newSave = async (uid: string) => {
         await planExecute({ uid });
         const res = await batchPages({ ...batchPage, planUid: uid });
         setBathList(res.list);
     };
-    //页面滚动
 
+    //页面滚动
     const [total, setTotal] = useState(0);
     const [planList, setPlanList] = useState<any[]>([]);
     const plabListRef: any = useRef(null);
@@ -234,8 +186,7 @@ const BatcSmallRedBooks = () => {
     const getList = (batch?: string) => {
         getContentPage({
             ...queryRef.current,
-            batch: batch || batchUid,
-            planUid: searchParams.get('uid') || uidRef.current
+            batchUid: batch || batchUid
         }).then((res) => {
             setTotal(res.total);
             plabListRef.current = [...plabListRef.current, ...res.list];
@@ -247,8 +198,7 @@ const BatcSmallRedBooks = () => {
         getContentPage({
             ...queryRef.current,
             pageNo,
-            batch: batch || batchUid,
-            planUid: searchParams.get('uid') || uidRef.current
+            batchUid: batch || batchUid
         }).then((res) => {
             setTotal(res.total);
             const newList = _.cloneDeep(plabListRef.current);
@@ -292,7 +242,7 @@ const BatcSmallRedBooks = () => {
             };
             setQueryPage(queryRef.current);
             setBatchUid(e[0]);
-            if (bathList?.find((item) => item.batch == e[0])?.status === 'SUCCESS') {
+            if (bathList?.find((item) => item.uid == e[0])?.status === 'SUCCESS') {
                 getList(e[0]);
             } else {
                 getList(e[0]);
@@ -313,7 +263,7 @@ const BatcSmallRedBooks = () => {
     };
     useEffect(() => {
         if (bathList?.length !== 0) {
-            const bathId = bathList[0].batch;
+            const bathId = bathList[0].uid;
             setcollapseActive([bathId]);
             timer.current?.map((item: any) => {
                 clearInterval(item);
@@ -328,7 +278,7 @@ const BatcSmallRedBooks = () => {
             };
             setQueryPage(queryRef.current);
             setBatchUid(bathId);
-            if (bathList?.find((item) => item.batch == bathId)?.status === 'SUCCESS') {
+            if (bathList?.find((item) => item.uid == bathId)?.status === 'SUCCESS') {
                 getList(bathId);
             } else {
                 getList(bathId);
@@ -354,51 +304,61 @@ const BatcSmallRedBooks = () => {
             }
         }
     }, [bathList]);
-    //变量
-    const [schemesList, setSchemeList] = useState<any[]>([]);
-    const schemeRef: any = useRef(null);
 
     const [detailOpen, setDetailOpen] = useState(false);
     const [businessUid, setBusinessUid] = useState('');
-
+    //编辑获列表
+    const [PlanUid, setPlanUid] = useState('');
+    useEffect(() => {
+        if (PlanUid) {
+            batchPages({ ...batchPage, planUid: PlanUid }).then((res) => {
+                setBathList(res.list);
+            });
+        }
+    }, [PlanUid]);
     return (
-        <MainCard content={false}>
-            <CardContent className="pb-[72px] !px-4 !pt-4">
-                <SubCard contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}>
-                    <div>
-                        <IconButton onClick={() => navigate('/redBookTaskList')} color="secondary">
-                            <KeyboardBackspace fontSize="small" />
-                        </IconButton>
-                        <span className="text-[#000c] font-[500]">创作计划</span>&nbsp;
-                        <span className="text-[#673ab7] font-[500]">- {!searchParams.get('uid') ? '新建创作计划' : '编辑创作计划'}</span>
-                    </div>
-                    <div></div>
-                </SubCard>
-                <Row gutter={20} className="!ml-0">
-                    <Col span={10} className="relative h-full bg-[#fff] !px-[0]">
-                        <Left newSave={newSave} />
-                    </Col>
-                    <Col span={14} className="overflow-hidden mt-4">
-                        <Right
-                            bathList={bathList}
-                            collapseActive={collapseActive}
-                            batchOpen={batchOpen}
-                            changeCollapse={(data: any) => changeCollapse(data)}
-                            planList={planList}
-                            setBusinessUid={(data: any) => setBusinessUid(data)}
-                            setDetailOpen={(data: any) => setDetailOpen(data)}
-                            handleScroll={(data: any) => handleScroll(data)}
-                            timeFailure={(index: number) => {
-                                const pageNo = Number((index / 20).toFixed(0)) + 1;
-                                clearInterval(timer.current[pageNo]);
-                                timer.current[pageNo] = getLists(pageNo);
-                            }}
-                        />
-                    </Col>
-                </Row>
-                {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
-            </CardContent>
-        </MainCard>
+        <div className="bg-[rgb(244,246,248)] p-4">
+            <SubCard
+                sx={{ minWidth: '1818px' }}
+                contentSX={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    p: '10px !important'
+                }}
+            >
+                <div>
+                    <IconButton onClick={() => navigate('/appMarket')} color="secondary">
+                        <KeyboardBackspace fontSize="small" />
+                    </IconButton>
+                    <span className="text-[#000c] font-[500]">应用市场</span>
+                </div>
+                <div></div>
+            </SubCard>
+            <div className="flex gap-[20px] mt-4">
+                <div className="!w-[700px] flex-none bg-white rounded-lg p-4">
+                    <Left newSave={newSave} setPlanUid={setPlanUid} />
+                </div>
+                <div className="flex-1 min-w-[1100px] bg-white rounded-lg p-4">
+                    <Right
+                        bathList={bathList}
+                        collapseActive={collapseActive}
+                        batchOpen={batchOpen}
+                        changeCollapse={(data: any) => changeCollapse(data)}
+                        planList={planList}
+                        setBusinessUid={(data: any) => setBusinessUid(data)}
+                        setDetailOpen={(data: any) => setDetailOpen(data)}
+                        handleScroll={(data: any) => handleScroll(data)}
+                        timeFailure={(index: number) => {
+                            const pageNo = Number((index / 20).toFixed(0)) + 1;
+                            clearInterval(timer.current[pageNo]);
+                            timer.current[pageNo] = getLists(pageNo);
+                        }}
+                    />
+                </div>
+            </div>
+            {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
+        </div>
     );
 };
 export default BatcSmallRedBooks;

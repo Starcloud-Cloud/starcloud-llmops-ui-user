@@ -1,5 +1,5 @@
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Upload, UploadProps, Button, Table, Modal, Image, Popconfirm, Form, Progress, Tabs, Collapse, InputNumber } from 'antd';
+import { Upload, UploadProps, Button, Table, Modal, Image, Popconfirm, Form, Progress, Tabs, Collapse, InputNumber, Tag } from 'antd';
 import { FormControl, Autocomplete, Chip, TextField } from '@mui/material';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -10,13 +10,31 @@ import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import AddStyle from 'ui-component/AddStyle';
 import { useLocation } from 'react-router-dom';
-const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
+import { v4 as uuidv4 } from 'uuid';
+const Lefts = ({ newSave, setPlanUid }: { newSave: (data: any) => void; setPlanUid: (data: any) => void }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     //存储的数据
     const appRef = useRef<any>(null);
     const [appData, setAppData] = useState<any>(null);
-
+    const getStatus = (status: any) => {
+        switch (status) {
+            case 'PENDING':
+                return <Tag>待执行</Tag>;
+            case 'RUNNING':
+                return <Tag color="processing">执行中</Tag>;
+            case 'PAUSE':
+                return <Tag color="warning">暂停</Tag>;
+            case 'CANCELED':
+                return <Tag>已取消</Tag>;
+            case 'COMPLETE':
+                return <Tag color="success">已完成</Tag>;
+            case 'FAILURE':
+                return <Tag color="error">失败</Tag>;
+            default:
+                return <Tag>待执行</Tag>;
+        }
+    };
     //上传素材
     const [materialType, setMaterialType] = useState('');
     //上传图片
@@ -229,6 +247,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
 
     const getList = async () => {
         const result = await getPlan(searchParams.get('appUid'));
+        setPlanUid(result?.uid);
         appRef.current = result;
         setAppData(appRef.current);
         const newList: any = _.cloneDeep(result?.configuration?.appInformation);
@@ -269,11 +288,26 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                 arr.find((el: any) => el.field === 'POSTER_STYLE_CONFIG').value = list;
             }
         });
-        setMaterialType(
-            newList?.workflowConfig?.steps
-                ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value
-        );
+        const newMater = newList?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
+        setMaterialType(newMater);
+        if (newMater === 'picture') {
+            setFileList(
+                result?.configuration?.materialList?.map((item: any) => ({
+                    uid: uuidv4(),
+                    thumbUrl: item?.pictureUrl,
+                    response: {
+                        data: {
+                            url: item?.pictureUrl
+                        }
+                    }
+                }))
+            );
+        } else {
+            setTableData(result?.configuration?.materialList);
+        }
+
         generRef.current = newList?.workflowConfig?.steps?.filter(
             (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
         );
@@ -285,6 +319,12 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                 item.value = JSON.parse(item.value);
             }
         });
+        if (result?.configuration?.imageStyleList?.length > 0) {
+            newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
+                result?.configuration?.imageStyleList;
+        }
+        console.log(newImage);
+
         setImagMater(newImage);
     };
     //页面进入给 Tabs 分配值
@@ -492,6 +532,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                 }
             });
         });
+
         const result = await planModify({
             uid: appData?.uid,
             ...basisData,
@@ -503,10 +544,16 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                         id: undefined,
                         code: item.id
                     })),
-                materialList: tableData?.map((item) => ({
-                    ...item,
-                    type: materialType
-                })),
+                materialList:
+                    materialType === 'picture'
+                        ? fileList?.map((item) => ({
+                              pictureUrl: item?.response?.data?.url,
+                              type: 'picture'
+                          }))
+                        : tableData?.map((item) => ({
+                              ...item,
+                              type: materialType
+                          })),
                 appInformation: {
                     ...appData.configuration.appInformation,
                     workflowConfig: {
@@ -527,19 +574,25 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
             newSave(result);
         }
     };
+
     return (
         <>
-            <div
-                className=" pt-[20px]  overflow-y-auto pb-[72px]"
-                style={{ height: getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 130px)' }}
-            >
-                <Tabs
-                    defaultActiveKey="1"
-                    items={[
-                        {
-                            label: '素材上传',
-                            key: '1',
-                            children: (
+            <div className="relative">
+                <div className="flex justify-between items-end">
+                    <div>{appData?.configuration?.appInformation?.name}</div>
+                    <div>
+                        状态：{getStatus(appData?.status)} 版本号： <span className="font-blod">{appData?.version}</span>
+                    </div>
+                </div>
+                <div
+                    style={{ height: getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 130px)' }}
+                    className="overflow-y-auto pb-[72px]"
+                >
+                    <Tabs defaultActiveKey="1">
+                        {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                            (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+                        ) && (
+                            <Tabs.TabPane key={'1'} tab="素材上传">
                                 <div>
                                     {materialType === 'picture' ? (
                                         <>
@@ -591,6 +644,7 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                                                 </div>
                                             </div>
                                             <Table
+                                                className="!w-[684px]"
                                                 rowKey={(record, index) => String(index)}
                                                 loading={tableLoading}
                                                 size="small"
@@ -601,113 +655,108 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                                         </>
                                     )}
                                 </div>
-                            )
-                        },
-                        {
-                            label: '笔记生成',
-                            key: '2',
-                            children: (
-                                <Collapse
-                                    accordion
-                                    items={generateList?.map((item: any, index: number) => ({
-                                        key: index.toString(),
-                                        label: item.name,
-                                        children: (
-                                            <div key={item.field}>
-                                                {item?.variable?.variables?.map(
-                                                    (el: any, i: number) =>
-                                                        el?.isShow && (
-                                                            <MarketForm
-                                                                key={el.field}
-                                                                item={el}
-                                                                materialType={''}
-                                                                stepCode={
-                                                                    el?.field === 'REQUIREMENT'
-                                                                        ? item.variable?.variables?.find(
-                                                                              (i: any) => i.field === 'GENERATE_MODE'
-                                                                          )?.value
-                                                                        : ''
-                                                                }
-                                                                handlerCode={el?.flowStep?.handler}
-                                                                history={false}
-                                                                setEditOpen={setEditOpens}
-                                                                setTitle={setTitles}
-                                                                setStep={() => {
-                                                                    stepRef.current = index;
-                                                                    setStep(stepRef.current);
-                                                                }}
-                                                                columns={stepMaterial[index]}
-                                                                setMaterialType={() => {
-                                                                    setMaterialTypes(
-                                                                        el?.variable?.variables?.find(
-                                                                            (i: any) => i.field === 'MATERIAL_TYPE'
-                                                                        )?.value
-                                                                    );
-                                                                }}
-                                                                onChange={(e: any) => {
-                                                                    const newList = _.cloneDeep(generRef.current);
-                                                                    const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
-                                                                    const code = item?.flowStep?.handler;
-                                                                    newList[index].variable.variables[i].value = e.value;
-                                                                    if (
-                                                                        type &&
-                                                                        item.variable.variables?.find(
+                            </Tabs.TabPane>
+                        )}
+                        <Tabs.TabPane key={'2'} tab="笔记生成">
+                            <Collapse
+                                accordion
+                                defaultActiveKey={['0']}
+                                items={generateList?.map((item: any, index: number) => ({
+                                    key: index.toString(),
+                                    label: item.name,
+                                    children: (
+                                        <div key={item.field}>
+                                            {item?.variable?.variables?.map(
+                                                (el: any, i: number) =>
+                                                    el?.isShow && (
+                                                        <MarketForm
+                                                            key={el.field}
+                                                            item={el}
+                                                            materialType={''}
+                                                            appUid={appData?.appUid}
+                                                            stepCode={
+                                                                el?.field === 'REQUIREMENT'
+                                                                    ? item.variable?.variables?.find(
+                                                                          (i: any) => i.field === 'GENERATE_MODE'
+                                                                      )?.value
+                                                                    : ''
+                                                            }
+                                                            handlerCode={el?.flowStep?.handler}
+                                                            history={false}
+                                                            setEditOpen={setEditOpens}
+                                                            setTitle={setTitles}
+                                                            setStep={() => {
+                                                                stepRef.current = index;
+                                                                setStep(stepRef.current);
+                                                            }}
+                                                            columns={stepMaterial[index]}
+                                                            setMaterialType={() => {
+                                                                setMaterialTypes(
+                                                                    el?.variable?.variables?.find((i: any) => i.field === 'MATERIAL_TYPE')
+                                                                        ?.value
+                                                                );
+                                                            }}
+                                                            onChange={(e: any) => {
+                                                                const newList = _.cloneDeep(generRef.current);
+                                                                const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                                const code = item?.flowStep?.handler;
+                                                                newList[index].variable.variables[i].value = e.value;
+                                                                if (
+                                                                    type &&
+                                                                    item.variable.variables?.find((item: any) => item.style === 'MATERIAL')
+                                                                ) {
+                                                                    newList[index].variable.variables[
+                                                                        item.variable.variables?.findIndex(
                                                                             (item: any) => item.style === 'MATERIAL'
                                                                         )
-                                                                    ) {
-                                                                        newList[index].variable.variables[
-                                                                            item.variable.variables?.findIndex(
-                                                                                (item: any) => item.style === 'MATERIAL'
-                                                                            )
-                                                                        ].value = [];
-                                                                        stepRef.current = index;
-                                                                        setStep(stepRef.current);
-                                                                        setTableDatas(type, index);
+                                                                    ].value = [];
+                                                                    stepRef.current = index;
+                                                                    setStep(stepRef.current);
+                                                                    setTableDatas(type, index);
+                                                                }
+                                                                if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
+                                                                    const num = item.variable.variables?.findIndex(
+                                                                        (item: any) => item.field === 'REQUIREMENT'
+                                                                    );
+                                                                    const num1 = item.variable.variables?.findIndex(
+                                                                        (item: any) => item.style === 'MATERIAL'
+                                                                    );
+                                                                    if (e.value === 'RANDOM') {
+                                                                        newList[index].variable.variables[num].value = '';
+                                                                        newList[index].variable.variables[num].isShow = false;
+                                                                        newList[index].variable.variables[num1].isShow = true;
+                                                                    } else if (e.value === 'AI_PARODY') {
+                                                                        newList[index].variable.variables[num].isShow = true;
+                                                                        newList[index].variable.variables[num1].isShow = true;
+                                                                    } else {
+                                                                        newList[index].variable.variables[num1].value = [];
+                                                                        newList[index].variable.variables[num1].isShow = false;
+                                                                        newList[index].variable.variables[num].isShow = true;
                                                                     }
-                                                                    if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
-                                                                        const num = item.variable.variables?.findIndex(
-                                                                            (item: any) => item.field === 'REQUIREMENT'
-                                                                        );
-                                                                        const num1 = item.variable.variables?.findIndex(
-                                                                            (item: any) => item.style === 'MATERIAL'
-                                                                        );
-                                                                        if (e.value === 'RANDOM') {
-                                                                            newList[index].variable.variables[num].value = '';
-                                                                            newList[index].variable.variables[num].isShow = false;
-                                                                            newList[index].variable.variables[num1].isShow = true;
-                                                                        } else if (e.value === 'AI_PARODY') {
-                                                                            newList[index].variable.variables[num].isShow = true;
-                                                                            newList[index].variable.variables[num1].isShow = true;
-                                                                        } else {
-                                                                            newList[index].variable.variables[num1].value = [];
-                                                                            newList[index].variable.variables[num1].isShow = false;
-                                                                            newList[index].variable.variables[num].isShow = true;
-                                                                        }
-                                                                    }
-                                                                    generRef.current = newList;
-                                                                    setGenerateList(generRef.current);
-                                                                }}
-                                                            />
-                                                        )
-                                                )}
-                                            </div>
-                                        )
-                                    }))}
-                                />
-                            )
-                        },
-                        {
-                            label: '图片生成',
-                            key: '3',
-                            children: <AddStyle ref={imageRef} record={imageMater} />
-                        },
-                        {
-                            label: '批量生成参数',
-                            key: '4',
-                            children: (
-                                <div>
-                                    <div className="mt-[20px]">生成数量：</div>
+                                                                }
+                                                                generRef.current = newList;
+                                                                setGenerateList(generRef.current);
+                                                            }}
+                                                        />
+                                                    )
+                                            )}
+                                        </div>
+                                    )
+                                }))}
+                            />
+                        </Tabs.TabPane>
+                        {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                            (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                        ) && (
+                            <Tabs.TabPane key={'3'} tab="图片生成">
+                                <AddStyle appUid={appData?.appUid} ref={imageRef} record={imageMater} />
+                            </Tabs.TabPane>
+                        )}
+                        <Tabs.TabPane key={'4'} tab="批量生成参数">
+                            <div>
+                                <div className="relative mt-[16px] max-w-[300px]">
                                     <InputNumber
+                                        className="bg-[#f8fafc] w-full"
                                         size="large"
                                         value={basisData?.totalCount}
                                         onChange={(e: any) => {
@@ -718,65 +767,72 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                                         }}
                                         min={1}
                                         max={100}
-                                        className="w-full"
                                     />
-                                    <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
-                                        <Autocomplete
-                                            sx={{ mt: 2 }}
-                                            multiple
-                                            size="small"
-                                            id="tags-filled"
-                                            color="secondary"
-                                            options={[]}
-                                            defaultValue={basisData?.tags}
-                                            freeSolo
-                                            renderTags={(value: readonly string[], getTagProps) =>
-                                                value.map((option: string, index: number) => (
-                                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                                                ))
-                                            }
-                                            onChange={(e: any, newValue) => {
-                                                setBasisData({
-                                                    ...basisData,
-                                                    tags: newValue
-                                                });
-                                            }}
-                                            renderInput={(param) => (
-                                                <TextField
-                                                    onBlur={(e: any) => {
-                                                        if (e.target.value) {
-                                                            let newValue: any = basisData.tags;
-                                                            if (!newValue) {
-                                                                newValue = [];
-                                                            }
-                                                            newValue.push(e.target.value);
-                                                            setBasisData({
-                                                                ...basisData,
-                                                                tags: newValue
-                                                            });
-                                                        }
-                                                    }}
-                                                    color="secondary"
-                                                    {...param}
-                                                    label="标签"
-                                                    placeholder="请输入标签然后回车"
-                                                />
-                                            )}
-                                        />
-                                    </FormControl>
+                                    <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
+                                        生成数量
+                                    </span>
                                 </div>
-                            )
-                        }
-                    ]}
-                />
-            </div>
-            <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] p-[20px] pb-0 w-[100%]">
-                <Button className="w-full" icon={<SaveOutlined rev={undefined} />} onClick={() => handleSaveClick(false)} type="primary">
-                    保存配置
-                </Button>
-                <Button className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
-                    保存并开始生成
-                </Button>
+                                <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
+                                    <Autocomplete
+                                        sx={{ mt: 2 }}
+                                        multiple
+                                        size="small"
+                                        id="tags-filled"
+                                        color="secondary"
+                                        options={[]}
+                                        defaultValue={basisData?.tags}
+                                        freeSolo
+                                        renderTags={(value: readonly string[], getTagProps) =>
+                                            value.map((option: string, index: number) => (
+                                                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                            ))
+                                        }
+                                        onChange={(e: any, newValue) => {
+                                            setBasisData({
+                                                ...basisData,
+                                                tags: newValue
+                                            });
+                                        }}
+                                        renderInput={(param) => (
+                                            <TextField
+                                                onBlur={(e: any) => {
+                                                    if (e.target.value) {
+                                                        let newValue: any = basisData.tags;
+                                                        if (!newValue) {
+                                                            newValue = [];
+                                                        }
+                                                        newValue.push(e.target.value);
+                                                        setBasisData({
+                                                            ...basisData,
+                                                            tags: newValue
+                                                        });
+                                                    }
+                                                }}
+                                                color="secondary"
+                                                {...param}
+                                                label="笔记标签"
+                                                placeholder="请输入笔记标签然后回车"
+                                            />
+                                        )}
+                                    />
+                                </FormControl>
+                            </div>
+                        </Tabs.TabPane>
+                    </Tabs>
+                </div>
+                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] pt-4 w-[100%]">
+                    <Button
+                        className="w-full"
+                        icon={<SaveOutlined rev={undefined} />}
+                        onClick={() => handleSaveClick(false)}
+                        type="primary"
+                    >
+                        保存配置
+                    </Button>
+                    <Button className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
+                        保存并开始生成
+                    </Button>
+                </div>
             </div>
             <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
@@ -810,10 +866,11 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
                     </span>
                 </p>
                 <div className="flex justify-center mt-[20px]">
-                    <div>
+                    <div className="flex flex-col items-center">
                         <Upload {...props1}>
                             <Button type="primary">上传 ZIP</Button>
                         </Upload>
+                        <div className="text-xs text-black/50 mt-2">请把下载的内容修改后，对目录打包后再上传</div>
                     </div>
                 </div>
                 {uploadLoading && <Progress size="small" percent={percent} />}
@@ -839,7 +896,5 @@ const Lefts = ({ newSave }: { newSave: (data: any) => void }) => {
         </>
     );
 };
-const LeftMemo = (prevProps: any, nextProps: any) => {
-    return false;
-};
-export default memo(Lefts, LeftMemo);
+
+export default Lefts;

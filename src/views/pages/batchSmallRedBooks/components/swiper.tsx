@@ -28,7 +28,7 @@ const Swipers = ({ item }: { item: any }) => {
                     disableOnInteraction: false
                 }}
             >
-                {item?.executeResult?.executeResult?.map((el: any, index: number) => (
+                {item?.executeResult?.imageList?.map((el: any, index: number) => (
                     <SwiperSlide key={el.url}>
                         <img className="w-full h-full object-contain" src={el.url} />
                     </SwiperSlide>

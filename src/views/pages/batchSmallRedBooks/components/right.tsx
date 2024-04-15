@@ -50,7 +50,7 @@ const Right = ({
                                     <div className="w-full flex justify-between items-center text-sm pr-[20px]">
                                         <div className="">
                                             <span className="font-[600]">生成时间：</span>
-                                            {dayjs(item?.timestamp)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.uid}）
+                                            {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.uid}）
                                             <span className="font-[600]">版本号：</span>
                                             {item?.version}
                                         </div>

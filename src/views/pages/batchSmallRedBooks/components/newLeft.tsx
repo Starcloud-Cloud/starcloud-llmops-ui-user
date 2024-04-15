@@ -11,7 +11,15 @@ import MarketForm from '../../../template/components/marketForm';
 import AddStyle from 'ui-component/AddStyle';
 import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-const Lefts = ({ newSave, setPlanUid }: { newSave: (data: any) => void; setPlanUid: (data: any) => void }) => {
+const Lefts = ({
+    detailShow = true,
+    newSave,
+    setPlanUid
+}: {
+    detailShow?: boolean;
+    newSave: (data: any) => void;
+    setPlanUid: (data: any) => void;
+}) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     //存储的数据
@@ -278,6 +286,16 @@ const Lefts = ({ newSave, setPlanUid }: { newSave: (data: any) => void; setPlanU
                 }
                 arr.find((el: any) => el.style === 'CHECKBOX').value = list;
             }
+            if (arr?.find((el: any) => el.style === 'TAG_BOX')) {
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.style === 'TAG_BOX')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.style === 'TAG_BOX')?.value;
+                }
+                arr.find((el: any) => el.style === 'TAG_BOX').value = list;
+            }
             if (item?.flowStep?.handler === 'PosterActionHandler' && arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')) {
                 let list: any;
                 try {
@@ -518,7 +536,7 @@ const Lefts = ({ newSave, setPlanUid }: { newSave: (data: any) => void; setPlanU
         totalCount: 5
     });
     //保存
-    const handleSaveClick = async (flag: boolean) => {
+    const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
         const newList = _.cloneDeep(generateList);
         newList?.forEach((item) => {
             item?.variable?.variables?.forEach((el: any) => {
@@ -532,8 +550,7 @@ const Lefts = ({ newSave, setPlanUid }: { newSave: (data: any) => void; setPlanU
                 }
             });
         });
-
-        const result = await planModify({
+        const data = {
             uid: appData?.uid,
             ...basisData,
             configuration: {
@@ -569,23 +586,32 @@ const Lefts = ({ newSave, setPlanUid }: { newSave: (data: any) => void; setPlanU
                     }
                 }
             }
-        });
-        if (flag) {
-            newSave(result);
+        };
+        if (detailShow) {
+            newSave(data);
+        } else {
+            const result = await planModify(data);
+            if (flag) {
+                newSave(result);
+            }
         }
     };
 
     return (
         <>
             <div className="relative">
-                <div className="flex justify-between items-end">
-                    <div>{appData?.configuration?.appInformation?.name}</div>
-                    <div>
-                        状态：{getStatus(appData?.status)} 版本号： <span className="font-blod">{appData?.version}</span>
+                {detailShow && (
+                    <div className="flex justify-between items-end">
+                        <div>{appData?.configuration?.appInformation?.name}</div>
+                        <div>
+                            状态：{getStatus(appData?.status)} 版本号： <span className="font-blod">{appData?.version}</span>
+                        </div>
                     </div>
-                </div>
+                )}
                 <div
-                    style={{ height: getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 130px)' }}
+                    style={{
+                        height: detailShow ? (getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 165px)') : '80vh'
+                    }}
                     className="overflow-y-auto pb-[72px]"
                 >
                     <Tabs defaultActiveKey="1">
@@ -752,86 +778,98 @@ const Lefts = ({ newSave, setPlanUid }: { newSave: (data: any) => void; setPlanU
                                 <AddStyle appUid={appData?.appUid} ref={imageRef} record={imageMater} />
                             </Tabs.TabPane>
                         )}
-                        <Tabs.TabPane key={'4'} tab="批量生成参数">
-                            <div>
-                                <div className="relative mt-[16px] max-w-[300px]">
-                                    <InputNumber
-                                        className="bg-[#f8fafc] w-full"
-                                        size="large"
-                                        value={basisData?.totalCount}
-                                        onChange={(e: any) => {
-                                            setBasisData({
-                                                ...basisData,
-                                                totalCount: e
-                                            });
-                                        }}
-                                        min={1}
-                                        max={100}
-                                    />
-                                    <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
-                                        生成数量
-                                    </span>
-                                </div>
-                                <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
-                                    <Autocomplete
-                                        sx={{ mt: 2 }}
-                                        multiple
-                                        size="small"
-                                        id="tags-filled"
-                                        color="secondary"
-                                        options={[]}
-                                        defaultValue={basisData?.tags}
-                                        freeSolo
-                                        renderTags={(value: readonly string[], getTagProps) =>
-                                            value.map((option: string, index: number) => (
-                                                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                                            ))
-                                        }
-                                        onChange={(e: any, newValue) => {
-                                            setBasisData({
-                                                ...basisData,
-                                                tags: newValue
-                                            });
-                                        }}
-                                        renderInput={(param) => (
-                                            <TextField
-                                                onBlur={(e: any) => {
-                                                    if (e.target.value) {
-                                                        let newValue: any = basisData.tags;
-                                                        if (!newValue) {
-                                                            newValue = [];
+                        {detailShow && (
+                            <Tabs.TabPane key={'4'} tab="批量生成参数">
+                                <div>
+                                    <div className="relative mt-[16px] max-w-[300px]">
+                                        <InputNumber
+                                            className="bg-[#f8fafc] w-full"
+                                            size="large"
+                                            value={basisData?.totalCount}
+                                            onChange={(e: any) => {
+                                                setBasisData({
+                                                    ...basisData,
+                                                    totalCount: e
+                                                });
+                                            }}
+                                            min={1}
+                                            max={100}
+                                        />
+                                        <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
+                                            生成数量
+                                        </span>
+                                    </div>
+                                    <FormControl key={basisData?.tags} color="secondary" size="small" fullWidth>
+                                        <Autocomplete
+                                            sx={{ mt: 2 }}
+                                            multiple
+                                            size="small"
+                                            id="tags-filled"
+                                            color="secondary"
+                                            options={[]}
+                                            defaultValue={basisData?.tags}
+                                            freeSolo
+                                            renderTags={(value: readonly string[], getTagProps) =>
+                                                value.map((option: string, index: number) => (
+                                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                                ))
+                                            }
+                                            onChange={(e: any, newValue) => {
+                                                setBasisData({
+                                                    ...basisData,
+                                                    tags: newValue
+                                                });
+                                            }}
+                                            renderInput={(param) => (
+                                                <TextField
+                                                    onBlur={(e: any) => {
+                                                        if (e.target.value) {
+                                                            let newValue: any = basisData.tags;
+                                                            if (!newValue) {
+                                                                newValue = [];
+                                                            }
+                                                            newValue.push(e.target.value);
+                                                            setBasisData({
+                                                                ...basisData,
+                                                                tags: newValue
+                                                            });
                                                         }
-                                                        newValue.push(e.target.value);
-                                                        setBasisData({
-                                                            ...basisData,
-                                                            tags: newValue
-                                                        });
-                                                    }
-                                                }}
-                                                color="secondary"
-                                                {...param}
-                                                label="笔记标签"
-                                                placeholder="请输入笔记标签然后回车"
-                                            />
-                                        )}
-                                    />
-                                </FormControl>
-                            </div>
-                        </Tabs.TabPane>
+                                                    }}
+                                                    color="secondary"
+                                                    {...param}
+                                                    label="笔记标签"
+                                                    placeholder="请输入笔记标签然后回车"
+                                                />
+                                            )}
+                                        />
+                                    </FormControl>
+                                </div>
+                            </Tabs.TabPane>
+                        )}
                     </Tabs>
                 </div>
+
                 <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] pt-4 w-[100%]">
-                    <Button
-                        className="w-full"
-                        icon={<SaveOutlined rev={undefined} />}
-                        onClick={() => handleSaveClick(false)}
-                        type="primary"
-                    >
-                        保存配置
-                    </Button>
-                    <Button className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
-                        保存并开始生成
-                    </Button>
+                    {detailShow && (
+                        <>
+                            <Button
+                                className="w-full"
+                                icon={<SaveOutlined rev={undefined} />}
+                                onClick={() => handleSaveClick(false)}
+                                type="primary"
+                            >
+                                保存配置
+                            </Button>
+                            <Button className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
+                                保存并开始生成
+                            </Button>
+                        </>
+                    )}
+                    {!detailShow && (
+                        <Button className="w-full" onClick={() => handleSaveClick(false, true)} type="primary">
+                            保存并重新生成
+                        </Button>
+                    )}
                 </div>
             </div>
             <Modal open={open} footer={null} onCancel={() => setOpen(false)}>

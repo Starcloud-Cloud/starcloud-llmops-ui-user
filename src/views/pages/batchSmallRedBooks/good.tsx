@@ -16,13 +16,13 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
     //执行按钮
     const handleTransfer = (key: string, errMessage: string, count?: number) => {
         switch (key) {
-            case 'init':
+            case 'INIT':
                 return <span className="!mr-0">初始化</span>;
-            case 'executing':
+            case 'EXECUTING':
                 return <span className="!mr-0">生成中</span>;
-            case 'execute_success':
+            case 'SUCCESS':
                 return <span>执行成功</span>;
-            case 'execute_error':
+            case 'FAILURE':
                 return (
                     <Popover
                         content={
@@ -37,7 +37,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         </span>
                     </Popover>
                 );
-            case 'execute_error_finished':
+            case 'ULTIMATE_FAILURE':
                 return errMessage?.indexOf('权益不足') !== -1 && !count ? (
                     <span
                         onClick={() => {
@@ -64,20 +64,20 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
     //失败重试
     const failure = async (uid: string) => {
         setLoading(true);
-        const result = await failureRetry(uid);
+        const result = await failureRetry({ uid });
         timeFailure();
     };
     const [loading, setLoading] = useState(false);
     return (
         <div className="mb-[20px] w-full aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]">
-            {item.status !== 'execute_success' ? (
+            {item.status !== 'SUCCESS' ? (
                 <div>
                     <div className="w-full aspect-[250/335] flex justify-center items-center relative gu">
                         <Skeleton.Image
                             className="!w-[100%] !h-[100%]"
-                            active={item.status === 'init' || item.status === 'executing' ? true : false}
+                            active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
                         />
-                        {(item.status === 'executing' || item.status === 'execute_error') && (
+                        {(item.status === 'EXECUTING' || item.status === 'FAILURE') && (
                             <div className="absolute top-0 right-0 left-0 bottom-0 flex flex-col gap-2 justify-center items-center z-1000">
                                 <Progress
                                     type="circle"
@@ -90,7 +90,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                 </Popover>
                             </div>
                         )}
-                        {item.status === 'execute_error_finished' && (
+                        {item.status === 'ULTIMATE_FAILURE' && (
                             <Button
                                 disabled={loading}
                                 onClick={() => failure(item.uid)}
@@ -106,28 +106,28 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         <Skeleton
                             paragraph={false}
                             className="mt-[10px] h-[44px]"
-                            active={item.status === 'init' || item.status === 'executing' ? true : false}
+                            active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
                         />
                         <div className="h-[88px]">
                             <Skeleton
                                 paragraph={false}
                                 className="mt-[10px]"
-                                active={item.status === 'init' || item.status === 'executing' ? true : false}
+                                active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
                             />
                             <Skeleton
                                 paragraph={false}
                                 className="mt-[10px]"
-                                active={item.status === 'init' || item.status === 'executing' ? true : false}
+                                active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
                             />
                             <Skeleton
                                 paragraph={false}
                                 className="mt-[10px] mb-[15px]"
-                                active={item.status === 'init' || item.status === 'executing' ? true : false}
+                                active={item.status === 'init' || item.status === 'EXECUTING' ? true : false}
                             />
                         </div>
                         <div className="absolute right-1 top-0">
                             {handleTransfer(item.status, item.errorMessage)}
-                            {item.status === 'execute_error' && <span>({item.retryCount})</span>}
+                            {item.status === 'FAILURE' && <span>({item.retryCount})</span>}
                         </div>
                         <div className="line-clamp-1">
                             <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">

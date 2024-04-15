@@ -13,7 +13,6 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import FormModal from './formModal';
 import moke from './moke.json';
-console.log(moke);
 
 const Lefts = ({
     detailData,

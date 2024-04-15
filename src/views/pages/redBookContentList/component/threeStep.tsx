@@ -1,5 +1,5 @@
 import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, UploadProps, Upload, Modal } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -15,6 +15,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { Tooltip } from '@mui/material';
 import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
+import Left from '../../batchSmallRedBooks/components/newLeft';
 
 export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
     const [title, setTitle] = React.useState<string>('');
@@ -67,11 +68,11 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
 
     useEffect(() => {
         if (data) {
-            setText(data?.copyWritingContent);
-            setTitle(data?.copyWritingTitle);
+            setText(data?.executeResult?.copyWriting?.content);
+            setTitle(data?.executeResult?.copyWriting?.title);
             setClaim(data?.claim);
             // setImages(data?.pictureContent || []);
-            const imgs = data?.pictureContent.map((item: any) => ({
+            const imgs = data?.executeResult?.imageList?.map((item: any) => ({
                 uid: item.index,
                 status: 'done',
                 name: item.url,
@@ -83,6 +84,8 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
     }, [data]);
 
     const doRetry = async () => {
+        setOpen(true);
+        return;
         const res = await retryContent(data.businessUid);
         if (res) {
             setText(res.copyWritingContent);
@@ -134,6 +137,8 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
             setPreviewOpen(true);
         }
     };
+    //重新生成
+    const [open, setOpen] = useState(false);
 
     return (
         <div className="h-full">
@@ -301,7 +306,7 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
                                         </CopyToClipboard>
                                     )}
                                     <div className="flex gap-4 flex-wrap text-lg">
-                                        {data?.tags?.map((item: string) => (
+                                        {data?.executeResult?.copyWriting?.tagList?.map((item: string) => (
                                             <span key={item} className="text-[#13386c] cursor-pointer">
                                                 #{item}
                                             </span>
@@ -314,8 +319,19 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
                 </div>
             </Card>
 
-            <Modal style={{ zIndex: 9999 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
+            <Modal style={{ zIndex: 8000 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
                 <img alt="example" style={{ width: '100%' }} src={previewImage} />
+            </Modal>
+            <Modal style={{ zIndex: 9999 }} open={open} title={'重新生成'} footer={null} onCancel={() => setOpen(false)}>
+                <Left
+                    detailShow={false}
+                    newSave={(data: any) => {
+                        console.log(data);
+                    }}
+                    setPlanUid={(uid: any) => {
+                        console.log(uid);
+                    }}
+                />
             </Modal>
         </div>
     );

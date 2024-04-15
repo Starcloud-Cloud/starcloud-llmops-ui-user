@@ -1,4 +1,4 @@
-import { TextField, MenuItem } from '@mui/material';
+import { TextField, MenuItem, FormControl, Autocomplete, Chip } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
 import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
@@ -308,6 +308,49 @@ function FormExecute({
                         {item?.options?.find((el: any) => el.value === item.value)?.description}
                     </div>
                 </div>
+            ) : item.style === 'TAG_BOX' ? (
+                <div className="mt-4">
+                    <FormControl key={item?.value} color="secondary" size="small" fullWidth>
+                        <Autocomplete
+                            sx={{ mt: 2 }}
+                            multiple
+                            size="small"
+                            id="tags-filled"
+                            color="secondary"
+                            options={[]}
+                            defaultValue={item?.value || []}
+                            freeSolo
+                            renderTags={(value: readonly string[], getTagProps) =>
+                                value?.map((option: string, index: number) => (
+                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                ))
+                            }
+                            onChange={(e: any, newValue) => {
+                                onChange({ name: item?.field, value: newValue });
+                            }}
+                            renderInput={(param) => (
+                                <TextField
+                                    onBlur={(e: any) => {
+                                        if (e.target.value) {
+                                            let newValue: any = item?.value;
+                                            if (!newValue) {
+                                                newValue = [];
+                                            }
+                                            newValue.push(e.target.value);
+                                            console.log(newValue);
+
+                                            onChange({ name: item?.field, value: newValue });
+                                        }
+                                    }}
+                                    color="secondary"
+                                    {...param}
+                                    label="笔记标签"
+                                    placeholder="请输入笔记标签然后回车"
+                                />
+                            )}
+                        />
+                    </FormControl>
+                </div>
             ) : handlerCode === 'MaterialActionHandler' && materialType === 'picture' ? (
                 <div>
                     <div className="text-[12px] font-[500] flex items-center justify-between">
@@ -337,7 +380,7 @@ function FormExecute({
                     </div>
                 </div>
             ) : (
-                <div>
+                <div className="mt-4">
                     <div className="flex justify-between mb-4">
                         <div>
                             {handlerCode === 'MaterialActionHandler' && (

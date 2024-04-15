@@ -54,8 +54,8 @@ export const contentUnlike = (data: any) => {
     return request.post({ url: '/llm/xhs/content/unlike', data });
 };
 //失败重试
-export const failureRetry = (uid: any) => {
-    return request.get({ url: `/llm/xhs/content/failureRetry/${uid}` });
+export const failureRetry = (data: any) => {
+    return request.post({ url: `/llm/xhs/content/retry`, data });
 };
 //失败重试
 export const batchPages = (data: any) => {

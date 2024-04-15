@@ -2,6 +2,8 @@ import { Divider, Input, List, Popover, Tag } from 'antd';
 import { Button } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { dictData } from 'api/template';
+import _ from 'lodash';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (data: any) => void; flag?: boolean }) => {
     const [currentDict, setCurrentDict] = useState<any>({});
@@ -35,6 +37,9 @@ const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (
         setCurrentDict({});
         setDictList(list);
     };
+    const handleValue = _.debounce((e: any) => {
+        setValue(e.target.value);
+    }, 200);
 
     return (
         <Popover
@@ -42,8 +47,11 @@ const ExePrompt = ({ type, changePrompt, flag }: { type: string; changePrompt: (
             trigger={'click'}
             content={
                 <div className="w-[640px]">
+                    <div className="flex justify-end mb-3">
+                        <ClearIcon onClick={() => setOpen(false)} style={{ color: '#666', cursor: 'pointer' }} />
+                    </div>
                     <div className="flex border-b border-solid border-red-50">
-                        <Input placeholder="请输入名称" onChange={(e: any) => setValue(e.target.value)} />
+                        <Input placeholder="请输入名称" onChange={(e: any) => handleValue(e)} />
                     </div>
                     <Divider style={{ margin: '6px 0' }} />
                     <div className="flex flex-wrap w-full">

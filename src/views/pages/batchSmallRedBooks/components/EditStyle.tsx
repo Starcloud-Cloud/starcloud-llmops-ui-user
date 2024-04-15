@@ -139,17 +139,17 @@ const EditStyle = ({
                         <div className="flex">
                             <div className="w-[40%]">
                                 <div className="text-lg">图片模版示意图</div>
-                                <div className="relative w-[70%] mx-auto" ref={imgRef}>
+                                <div className="relative w-[85%] mx-auto" ref={imgRef}>
                                     <Image preview={false} src={currentTemp?.example} />
                                     {currentJson?.objects
                                         ?.filter((item: any) => item.type === 'image' || item.type.includes('text'))
                                         ?.map((item: any, index: number) => (
                                             <div
                                                 key={index}
-                                                onMouseEnter={() => setCurrentElementId(item.code)}
+                                                onMouseEnter={() => setCurrentElementId(item.id)}
                                                 onMouseLeave={() => setCurrentElementId('')}
                                                 className={`${
-                                                    item.code === currentElementId
+                                                    item.id === currentElementId
                                                         ? 'outline outline-offset-2 outline-blue-500 w-full'
                                                         : 'w-full'
                                                 }`}

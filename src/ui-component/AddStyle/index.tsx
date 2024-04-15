@@ -120,6 +120,8 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
         }
     ];
 
+    console.log(currentStyle, 'currentStyle');
+
     const handleOK = () => {
         if (!selectImgs) {
             message.warning('请选择图片模版');
@@ -138,8 +140,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
             setStyleData([
                 ...styleData,
                 {
-                    ...selectImgs,
-                    name: `风格 ${maxNumber + 1}`
+                    ...selectImgs
                 }
             ]);
         }
@@ -158,21 +159,24 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
             label: (
                 <div className="flex justify-between">
                     <span>{item.name}</span>
-                    <Dropdown menu={{ items }} placement="bottom" arrow trigger={['click']}>
-                        <span
-                            onClick={(e) => {
-                                collapseIndexRef.current = index;
-                                e.stopPropagation();
-                            }}
-                        >
-                            <MoreVertIcon className="cursor-pointer" />
-                        </span>
-                    </Dropdown>
+                    <div className="flex justify-center">
+                        <span>共{item?.templateList?.length || 0}张图片</span>
+                        <Dropdown menu={{ items }} placement="bottom" arrow trigger={['click']}>
+                            <span
+                                onClick={(e) => {
+                                    collapseIndexRef.current = index;
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <MoreVertIcon className="cursor-pointer" />
+                            </span>
+                        </Dropdown>
+                    </div>
                 </div>
             ),
             children: (
                 <div>
-                    <div className="mb-3">风格示意图{item?.templateList?.length || 0}张</div>
+                    <div className="mb-3">风格示意图</div>
                     <div className="overflow-x-auto flex">
                         <Image.PreviewGroup
                             preview={{
@@ -232,6 +236,8 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
         setIsModalOpen(false);
     };
 
+    console.log(templateList, 'templateList');
+
     return (
         <div>
             <div className="pb-3">
@@ -240,7 +246,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                 </Button>
             </div>
             <div>
-                <Collapse accordion items={collapseList} defaultActiveKey={[0]} />
+                <Collapse items={collapseList} defaultActiveKey={[0]} />
             </div>
             <Drawer
                 title="选择风格模版"
@@ -257,7 +263,7 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                             <p>选择模版：</p>
                             <div className="max-w-[260px] overflow-x-auto">
                                 {selectImgs?.templateList?.map((item: any, index: number) => (
-                                    <Image width={32} height={40} src={item.example} />
+                                    <Image preview={false} width={32} height={40} src={item.example} />
                                 ))}
                             </div>
                         </div>
@@ -328,19 +334,22 @@ const AddStyle = React.forwardRef(({ record }: any, ref: any) => {
                     <div className="mt-3">
                         {templateList?.map((item, index) => {
                             return (
-                                <div
-                                    className={`flex overflow-x-auto cursor-pointer ${
-                                        hoverIndex === index || chooseImageIndex === index
-                                            ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
-                                            : 'outline outline-offset-2 outline-1 outline-[#ccc]'
-                                    } rounded-sm my-3`}
-                                    onClick={() => handleChoose(index)}
-                                    onMouseEnter={() => setHoverIndex(index)}
-                                    onMouseLeave={() => setHoverIndex('')}
-                                >
-                                    {item?.templateList?.map((v: any, vi: number) => (
-                                        <img key={vi} width={145} height={200} src={v.example} />
-                                    ))}
+                                <div className="mt-3">
+                                    <span>{item.name}</span>
+                                    <div
+                                        className={`flex overflow-x-auto cursor-pointer ${
+                                            hoverIndex === index || chooseImageIndex === index
+                                                ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
+                                                : 'outline outline-offset-2 outline-1 outline-[#ccc]'
+                                        } rounded-sm my-3`}
+                                        onClick={() => handleChoose(index)}
+                                        onMouseEnter={() => setHoverIndex(index)}
+                                        onMouseLeave={() => setHoverIndex('')}
+                                    >
+                                        {item?.templateList?.map((v: any, vi: number) => (
+                                            <img key={vi} width={145} height={200} src={v.example} />
+                                        ))}
+                                    </div>
                                 </div>
                             );
                         })}

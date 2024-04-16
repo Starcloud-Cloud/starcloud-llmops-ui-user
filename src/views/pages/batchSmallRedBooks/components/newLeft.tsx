@@ -13,10 +13,12 @@ import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 const Lefts = ({
     detailShow = true,
+    data,
     newSave,
     setPlanUid
 }: {
     detailShow?: boolean;
+    data?: any;
     newSave: (data: any) => void;
     setPlanUid: (data: any) => void;
 }) => {
@@ -206,6 +208,8 @@ const Lefts = ({
     const formOk = (result: any) => {
         const newList = [...tableRef.current];
         if (title === '编辑') {
+            console.log(rowIndex);
+            return;
             newList.splice(rowIndex, 1, result);
             tableRef.current = newList;
             setTableData(tableRef.current);
@@ -254,12 +258,19 @@ const Lefts = ({
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
 
     const getList = async () => {
-        const result = await getPlan(searchParams.get('appUid'));
+        let result;
+        let newList: any;
+        if (data) {
+            result = _.cloneDeep(data);
+            newList = _.cloneDeep(result?.executeParam?.appInformation);
+        } else {
+            result = await getPlan(searchParams.get('appUid'));
+            newList = _.cloneDeep(result?.configuration?.appInformation);
+        }
         setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
         appRef.current = result;
         setAppData(appRef.current);
-        const newList: any = _.cloneDeep(result?.configuration?.appInformation);
         newList?.workflowConfig?.steps.forEach((item: any) => {
             const arr: any[] = item?.variable?.variables;
 
@@ -310,21 +321,47 @@ const Lefts = ({
         const newMater = newList?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
+
         setMaterialType(newMater);
         if (newMater === 'picture') {
-            setFileList(
-                result?.configuration?.materialList?.map((item: any) => ({
-                    uid: uuidv4(),
-                    thumbUrl: item?.pictureUrl,
-                    response: {
-                        data: {
-                            url: item?.pictureUrl
+            if (!data) {
+                setFileList(
+                    result?.configuration?.materialList?.map((item: any) => ({
+                        uid: uuidv4(),
+                        thumbUrl: item?.pictureUrl,
+                        response: {
+                            data: {
+                                url: item?.pictureUrl
+                            }
                         }
-                    }
-                }))
-            );
+                    }))
+                );
+            } else {
+                setFileList(
+                    newList?.workflowConfig?.steps
+                        ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                        ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
+                        ?.value?.map((item: any) => ({
+                            uid: uuidv4(),
+                            thumbUrl: item?.pictureUrl,
+                            response: {
+                                data: {
+                                    url: item?.pictureUrl
+                                }
+                            }
+                        }))
+                );
+            }
         } else {
-            setTableData(result?.configuration?.materialList);
+            if (data) {
+                setTableData(
+                    newList?.workflowConfig?.steps
+                        ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                        ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value
+                );
+            } else {
+                setTableData(result?.configuration?.materialList);
+            }
         }
 
         generRef.current = newList?.workflowConfig?.steps?.filter(
@@ -346,10 +383,7 @@ const Lefts = ({
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
-        if (detailShow) {
-            getList();
-        } else {
-        }
+        getList();
     }, []);
     //笔记生成的表头
     const stepRef = useRef(0);
@@ -614,9 +648,12 @@ const Lefts = ({
                     className="overflow-y-auto pb-[72px]"
                 >
                     <Tabs defaultActiveKey="1">
-                        {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                        {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                             (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
-                        ) && (
+                        ) ||
+                            appData?.executeParam?.appInformation?.workflowConfig?.steps?.find(
+                                (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+                            )) && (
                             <Tabs.TabPane key={'1'} tab="素材上传">
                                 <div>
                                     {materialType === 'picture' ? (

@@ -325,6 +325,7 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
             <Modal style={{ zIndex: 9999 }} open={open} title={'重新生成'} footer={null} onCancel={() => setOpen(false)}>
                 <Left
                     detailShow={false}
+                    data={data}
                     newSave={(data: any) => {
                         console.log(data);
                     }}

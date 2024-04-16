@@ -18,6 +18,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import Left from '../../batchSmallRedBooks/components/newLeft';
 
 export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boolean; pre: number; setPre: (data: number) => void }) => {
+    console.log('🚀 ~ ThreeStep ~ data:', data);
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     // const [images, setImages] = React.useState<any[]>([]);
@@ -34,15 +35,15 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
         setLoading(true);
         try {
             const res = await modify({
-                planUid: data.planUid,
-                businessUid: data.businessUid,
-                copyWritingTitle: title,
-                copyWritingContent: text,
-                pictureContent: imageList.map((item: any, index) => ({
-                    index: index + 1,
-                    url: item.url,
-                    isMain: index === 0
-                }))
+                uid: data.uid,
+                executeResult: {
+                    copyWriting: { content: text, tagList: data.executeResult.copyWriting.tagList, title },
+                    imageList: imageList.map((item: any, index) => ({
+                        index: index + 1,
+                        url: item.url,
+                        isMain: index === 0
+                    }))
+                }
             });
             setEditType(false);
             setLoading(false);

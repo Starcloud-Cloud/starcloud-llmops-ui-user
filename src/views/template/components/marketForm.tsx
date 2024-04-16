@@ -19,6 +19,7 @@ function FormExecute({
     pre,
     materialType,
     stepCode,
+    model,
     handlerCode,
     columns = [],
     setEditOpen,
@@ -209,14 +210,14 @@ function FormExecute({
                         }}
                         details={details}
                         appUid={appUid}
-                        stepCode={'标题生成'}
+                        stepCode={stepCode}
                         index={undefined}
                         value={item.value}
                         row={6}
                         setValue={(value) => {
                             onChange({ name: item.field, value: value });
                         }}
-                        model={stepCode}
+                        model={model}
                     />
                     <span className="z-[100] block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
                         {item.label}
@@ -447,6 +448,7 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
         JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item) &&
         JSON.stringify(prevProps?.open) === JSON.stringify(nextProps?.open) &&
         JSON.stringify(prevProps?.columns) === JSON.stringify(nextProps?.columns) &&
+        JSON.stringify(prevProps?.model) === JSON.stringify(nextProps?.model) &&
         JSON.stringify(prevProps?.stepCode) === JSON.stringify(nextProps?.stepCode)
     );
 };

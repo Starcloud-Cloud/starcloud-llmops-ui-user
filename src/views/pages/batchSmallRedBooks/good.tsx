@@ -75,7 +75,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                             className="!w-[100%] !h-[100%]"
                             active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
                         />
-                        {(item.status === 'EXECUTING' || item.status === 'FAILURE') && (
+                        {item.status === 'EXECUTING' && (
                             <div className="absolute top-0 right-0 left-0 bottom-0 flex flex-col gap-2 justify-center items-center z-1000">
                                 <Progress
                                     type="circle"
@@ -138,7 +138,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                     {(item.elapsed / 1000)?.toFixed(2) || 0}S
                                 </div>
                                 <div className=" whitespace-nowrap">
-                                    <span className="font-[600]">张数/字数：</span>-
+                                    <span className="font-[600]">张数：</span>-
                                 </div>
                             </div>
                         </div>
@@ -234,17 +234,17 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                             <>
                                 <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
                                     <div className="line-clamp-1">
-                                        <div className=" whitespace-nowrap">
+                                        <div className="inline-block whitespace-nowrap">
                                             <span className="font-[600]">状态：</span>
                                             {handleTransfer(item.status, item.errorMessage)}
                                         </div>
-                                        <div className=" whitespace-nowrap">
+                                        <div className="inline-block whitespace-nowrap">
                                             <span className="font-[600]">耗时：</span>
                                             {(item.elapsed / 1000)?.toFixed(2)}S
                                         </div>
-                                        <div className=" whitespace-nowrap">
-                                            <span className="font-[600]">张数/字数：</span>
-                                            {item.pictureNum}
+                                        <div className="inline-block whitespace-nowrap">
+                                            <span className="font-[600]">张数：</span>
+                                            {item?.executeResult?.imageList?.length}
                                         </div>
                                     </div>
                                 </div>

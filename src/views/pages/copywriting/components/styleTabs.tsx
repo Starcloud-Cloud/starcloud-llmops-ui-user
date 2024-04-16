@@ -11,7 +11,7 @@ const StyleTabs = ({
     imageStyleData,
     setDetailData,
     appData,
-    canEdit = true
+    canEdit = false
 }: {
     schemaList?: any[];
     typeList: any[];

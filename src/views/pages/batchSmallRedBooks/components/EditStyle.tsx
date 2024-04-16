@@ -207,13 +207,15 @@ const EditStyle = ({
                                                             className="w-[50%] p-3"
                                                             ref={wrapperRef}
                                                             onClick={() => setCurrentElementId(el.field)}
+                                                            onMouseEnter={() => setCurrentElementId(el.field)}
+                                                            onMouseLeave={() => setCurrentElementId('')}
                                                         >
                                                             <VariableInput
                                                                 disabled={canEdit}
                                                                 styles={
                                                                     currentElementId === el.field
                                                                         ? {
-                                                                              border: '1px solid #673ab7'
+                                                                              border: '2px solid #673ab7'
                                                                           }
                                                                         : {}
                                                                 }
@@ -285,13 +287,15 @@ const EditStyle = ({
                                                         className="w-[50%] p-3"
                                                         ref={wrapperRef}
                                                         onClick={() => setCurrentElementId(el.field)}
+                                                        onMouseEnter={() => setCurrentElementId(el.field)}
+                                                        onMouseLeave={() => setCurrentElementId('')}
                                                     >
                                                         <VariableInput
                                                             disabled={canEdit}
                                                             styles={
                                                                 currentElementId === el.field
                                                                     ? {
-                                                                          border: '1px solid #673ab7'
+                                                                          border: '2px solid #673ab7'
                                                                       }
                                                                     : {}
                                                             }

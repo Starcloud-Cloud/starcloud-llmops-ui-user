@@ -138,8 +138,8 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                     onClick={(e) => {
                         e.stopPropagation();
                         const index: any = collapseIndexRef.current;
-                        const copyStyleData = [...styleData];
-                        copyStyleData.splice(index + 1, 0, { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` });
+                        let copyStyleData = [...styleData];
+                        copyStyleData = [...copyStyleData, { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }];
                         setStyleData(copyStyleData);
                     }}
                 >
@@ -291,6 +291,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                 <Collapse items={collapseList} defaultActiveKey={[0]} />
             </div>
             <Drawer
+                zIndex={9999}
                 title="选择风格模版"
                 onClose={() => {
                     setVisible(false);
@@ -298,6 +299,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                     setChooseImageIndex('');
                 }}
                 open={visible}
+                placement={'left'}
                 width={500}
                 footer={
                     <div className="flex justify-between">
@@ -388,9 +390,25 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                                         onMouseEnter={() => setHoverIndex(index)}
                                         onMouseLeave={() => setHoverIndex('')}
                                     >
-                                        {item?.templateList?.map((v: any, vi: number) => (
-                                            <img key={vi} width={145} height={200} src={v.example} />
-                                        ))}
+                                        <Image.PreviewGroup
+                                            preview={{
+                                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`)
+                                            }}
+                                        >
+                                            {item?.templateList?.map((v: any, vi: number) => (
+                                                <div className="mx-1">
+                                                    <Image
+                                                        style={{
+                                                            width: '145px'
+                                                        }}
+                                                        key={vi}
+                                                        width={145}
+                                                        height={200}
+                                                        src={v.example}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </Image.PreviewGroup>
                                     </div>
                                 </div>
                             );

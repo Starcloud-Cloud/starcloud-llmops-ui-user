@@ -32,7 +32,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
     const templateRef: any = useRef(null);
 
     const submitData = React.useMemo(() => {
-        console.log(styleData, 'styleData');
         const copyRecord = _.cloneDeep(record);
         copyRecord.variable.variables.forEach((item: any) => {
             // 风格产生===2 -> POSTER_STYLE
@@ -42,7 +41,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                 }
             } else {
                 if (item.field === 'POSTER_STYLE_CONFIG') {
-                    item.value = styleData;
+                    item.value = JSON.stringify(styleData?.[0] || {});
                 }
             }
         });

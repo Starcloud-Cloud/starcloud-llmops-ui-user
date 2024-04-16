@@ -581,10 +581,6 @@ const Lefts = ({
                 }
             });
         });
-        console.log(appData);
-        console.log(imageRef.current?.record);
-        console.log(generateList);
-
         if (detailShow) {
             const data = _.cloneDeep(appData);
             const upData = data?.executeParam?.appInformation?.workflowConfig?.steps?.find(
@@ -617,6 +613,7 @@ const Lefts = ({
                           (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                       )
             ];
+            newSave(data);
         } else {
             const data = {
                 uid: appData?.uid,

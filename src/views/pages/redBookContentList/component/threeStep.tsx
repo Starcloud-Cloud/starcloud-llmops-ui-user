@@ -1,5 +1,5 @@
 import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, UploadProps, Upload, Modal } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -17,7 +17,7 @@ import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
 import Left from '../../batchSmallRedBooks/components/newLeft';
 
-export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
+export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boolean; pre: number; setPre: (data: number) => void }) => {
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     // const [images, setImages] = React.useState<any[]>([]);
@@ -139,7 +139,8 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
     };
     //重新生成
     const [open, setOpen] = useState(false);
-
+    const [aginLoading, setAginLoading] = useState(false);
+    const timer = useRef<any>(null);
     return (
         <div className="h-full">
             <Card
@@ -167,123 +168,89 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
                     )
                 }
             >
-                <div className="w-full grid grid-cols-3 h-full">
-                    <div className="col-span-2 relative h-full overflow-hidden">
-                        {imageList?.length > 0 &&
-                            (editType ? (
-                                <Upload {...props}>
-                                    <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                        <PlusOutlined rev={undefined} />
-                                        <div style={{ marginTop: 8 }}>上传</div>
-                                    </div>
-                                </Upload>
-                            ) : (
-                                <>
-                                    <div className="flex justify-between absolute top-[46%] w-full z-10">
-                                        <Button
-                                            icon={<KeyboardBackspaceIcon />}
-                                            shape="circle"
-                                            onClick={() => {
-                                                console.log(swiperRef, 'swiperRef');
-                                                swiperRef?.slidePrev();
-                                            }}
-                                        />
-                                        <Button
-                                            style={{ marginLeft: '10px' }}
-                                            icon={<ArrowForwardIcon />}
-                                            shape="circle"
-                                            onClick={() => {
-                                                swiperRef?.slideNext();
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="h-full">
-                                        {imageList.length > 0 && (
-                                            <Swiper
-                                                onSwiper={(swiper) => setSwiperRef(swiper)}
-                                                slidesPerView={1}
-                                                spaceBetween={30}
-                                                centeredSlides={false}
-                                                loop
-                                                pagination={{ clickable: true }}
-                                                modules={[Pagination]}
-                                                className="mySwiper h-full"
-                                                autoplay={{
-                                                    delay: 2500,
-                                                    disableOnInteraction: false
-                                                }}
-                                            >
-                                                {imageList.map((item: any, index) => (
-                                                    <SwiperSlide key={index}>
-                                                        <img className="w-full h-full object-contain" src={item.url} />
-                                                    </SwiperSlide>
-                                                ))}
-                                            </Swiper>
-                                        )}
-                                    </div>
-                                </>
-                            ))}
-                    </div>
-                    <div className="col-span-1 h-full overflow-auto">
-                        {
-                            <div className="w-full h-full p-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center">
-                                        <Avatar />
-
-                                        <span className="text-[rgba(51,51,51,0.8)] text-base ml-2">不沾果酱</span>
-                                    </div>
-                                    <div
-                                        className="bg-[#ff2e4d] text-white text-base w-[96px] font-semibold px-6 h-[40px] cursor-pointer rounded-2xl text-center"
-                                        style={{ lineHeight: '40px' }}
-                                    >
-                                        关注
-                                    </div>
-                                </div>
-                                {editType ? (
-                                    <Input
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap"
-                                        value={title}
-                                    />
+                <Spin spinning={aginLoading}>
+                    <div className="w-full grid grid-cols-3 h-full">
+                        <div className="col-span-2 relative h-full overflow-hidden">
+                            {imageList?.length > 0 &&
+                                (editType ? (
+                                    <Upload {...props}>
+                                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                            <PlusOutlined rev={undefined} />
+                                            <div style={{ marginTop: 8 }}>上传</div>
+                                        </div>
+                                    </Upload>
                                 ) : (
-                                    <CopyToClipboard
-                                        text={title}
-                                        onCopy={() =>
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '复制成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    close: false,
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideLeft'
-                                                })
-                                            )
-                                        }
-                                    >
-                                        <Tooltip title="点击复制">
-                                            <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap cursor-pointer select-none">
-                                                {title}
-                                            </div>
-                                        </Tooltip>
-                                    </CopyToClipboard>
-                                )}
-                                <Divider />
-                                <div className="max-h-[calc(100%-150px)] ">
+                                    <>
+                                        <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                            <Button
+                                                icon={<KeyboardBackspaceIcon />}
+                                                shape="circle"
+                                                onClick={() => {
+                                                    console.log(swiperRef, 'swiperRef');
+                                                    swiperRef?.slidePrev();
+                                                }}
+                                            />
+                                            <Button
+                                                style={{ marginLeft: '10px' }}
+                                                icon={<ArrowForwardIcon />}
+                                                shape="circle"
+                                                onClick={() => {
+                                                    swiperRef?.slideNext();
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="h-full">
+                                            {imageList.length > 0 && (
+                                                <Swiper
+                                                    onSwiper={(swiper) => setSwiperRef(swiper)}
+                                                    slidesPerView={1}
+                                                    spaceBetween={30}
+                                                    centeredSlides={false}
+                                                    loop
+                                                    pagination={{ clickable: true }}
+                                                    modules={[Pagination]}
+                                                    className="mySwiper h-full"
+                                                    autoplay={{
+                                                        delay: 2500,
+                                                        disableOnInteraction: false
+                                                    }}
+                                                >
+                                                    {imageList.map((item: any, index) => (
+                                                        <SwiperSlide key={index}>
+                                                            <img className="w-full h-full object-contain" src={item.url} />
+                                                        </SwiperSlide>
+                                                    ))}
+                                                </Swiper>
+                                            )}
+                                        </div>
+                                    </>
+                                ))}
+                        </div>
+                        <div className="col-span-1 h-full overflow-auto">
+                            {
+                                <div className="w-full h-full p-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center">
+                                            <Avatar />
+
+                                            <span className="text-[rgba(51,51,51,0.8)] text-base ml-2">不沾果酱</span>
+                                        </div>
+                                        <div
+                                            className="bg-[#ff2e4d] text-white text-base w-[96px] font-semibold px-6 h-[40px] cursor-pointer rounded-2xl text-center"
+                                            style={{ lineHeight: '40px' }}
+                                        >
+                                            关注
+                                        </div>
+                                    </div>
                                     {editType ? (
-                                        <Input.TextArea
-                                            onChange={(e) => setText(e.target.value)}
-                                            className="text-base mb-2 whitespace-pre-wrap"
-                                            value={text}
-                                            rows={16}
+                                        <Input
+                                            onChange={(e) => setTitle(e.target.value)}
+                                            className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap"
+                                            value={title}
                                         />
                                     ) : (
                                         <CopyToClipboard
-                                            text={text}
+                                            text={title}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({
@@ -301,22 +268,60 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
                                             }
                                         >
                                             <Tooltip title="点击复制">
-                                                <div className="text-base mb-2 whitespace-pre-wrap cursor-pointer select-none">{text}</div>
+                                                <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap cursor-pointer select-none">
+                                                    {title}
+                                                </div>
                                             </Tooltip>
                                         </CopyToClipboard>
                                     )}
-                                    <div className="flex gap-4 flex-wrap text-lg">
-                                        {data?.executeResult?.copyWriting?.tagList?.map((item: string) => (
-                                            <span key={item} className="text-[#13386c] cursor-pointer">
-                                                #{item}
-                                            </span>
-                                        ))}
+                                    <Divider />
+                                    <div className="max-h-[calc(100%-150px)] ">
+                                        {editType ? (
+                                            <Input.TextArea
+                                                onChange={(e) => setText(e.target.value)}
+                                                className="text-base mb-2 whitespace-pre-wrap"
+                                                value={text}
+                                                rows={16}
+                                            />
+                                        ) : (
+                                            <CopyToClipboard
+                                                text={text}
+                                                onCopy={() =>
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideLeft'
+                                                        })
+                                                    )
+                                                }
+                                            >
+                                                <Tooltip title="点击复制">
+                                                    <div className="text-base mb-2 whitespace-pre-wrap cursor-pointer select-none">
+                                                        {text}
+                                                    </div>
+                                                </Tooltip>
+                                            </CopyToClipboard>
+                                        )}
+                                        <div className="flex gap-4 flex-wrap text-lg">
+                                            {data?.executeResult?.copyWriting?.tagList?.map((item: string) => (
+                                                <span key={item} className="text-[#13386c] cursor-pointer">
+                                                    #{item}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
-                </div>
+                </Spin>
             </Card>
 
             <Modal style={{ zIndex: 8000 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
@@ -326,8 +331,19 @@ export const ThreeStep = ({ data, show }: { data: any; show?: boolean }) => {
                 <Left
                     detailShow={false}
                     data={data}
-                    newSave={(data: any) => {
+                    newSave={async (data: any) => {
+                        await retryContent(data);
+                        setOpen(false);
+                        setAginLoading(true);
                         console.log(data);
+
+                        timer.current = setInterval(() => {
+                            if (data?.status !== 'EXECUTING') {
+                                clearInterval(timer.current);
+                                setAginLoading(false);
+                            }
+                            setPre(pre + 1);
+                        }, 200);
                     }}
                     setPlanUid={(uid: any) => {
                         console.log(uid);

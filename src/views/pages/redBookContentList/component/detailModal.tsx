@@ -17,7 +17,7 @@ type IAddAiModalProps = {
 
 export const DetailModal = ({ open, handleClose, businessUid, show }: IAddAiModalProps) => {
     const [detail, setDetail] = useState(null);
-
+    const [pre, setPre] = useState(0);
     useEffect(() => {
         if (show) {
             getContentDetail1(businessUid).then((res) => {
@@ -32,12 +32,12 @@ export const DetailModal = ({ open, handleClose, businessUid, show }: IAddAiModa
                 }
             });
         }
-    }, [businessUid]);
+    }, [businessUid, pre]);
 
     return (
         <Modal width={'80%'} open={open} onCancel={handleClose} title="详情" footer={false}>
             <div className="h-[calc(80vh-86px)] p-2">
-                <ThreeStep data={detail} show={show} />
+                <ThreeStep data={detail} show={show} pre={pre} setPre={setPre} />
             </div>
         </Modal>
     );

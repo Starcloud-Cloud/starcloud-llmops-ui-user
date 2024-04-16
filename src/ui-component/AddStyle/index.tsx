@@ -9,7 +9,7 @@ import React from 'react';
 import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
 import _ from 'lodash-es';
 
-const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) => {
+const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, ref: any) => {
     console.log(record, 'record');
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
@@ -64,11 +64,21 @@ const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) =
 
     React.useEffect(() => {
         if (record) {
-            const list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
+            let list: any = [];
+            if (mode === 2) {
+                const value = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE')?.value;
+                if (value) {
+                    list = [JSON.parse(value)];
+                }
+            } else {
+                list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
+            }
+
+            console.log(list, 'list');
             const typeList = list.map((item: any) => ({ ...item, type: 1 }));
             setStyleData(typeList);
         }
-    }, [record]);
+    }, [record, mode]);
 
     const handleAdd = () => {
         setType(0);
@@ -169,16 +179,18 @@ const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) =
                     <span>{item.name}</span>
                     <div className="flex justify-center">
                         <span>共{item?.templateList?.length || 0}张图片</span>
-                        <Dropdown menu={{ items }} placement="bottom" arrow trigger={['click']}>
-                            <span
-                                onClick={(e) => {
-                                    collapseIndexRef.current = index;
-                                    e.stopPropagation();
-                                }}
-                            >
-                                <MoreVertIcon className="cursor-pointer" />
-                            </span>
-                        </Dropdown>
+                        {mode === 1 && (
+                            <Dropdown menu={{ items }} placement="bottom" arrow trigger={['click']}>
+                                <span
+                                    onClick={(e) => {
+                                        collapseIndexRef.current = index;
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    <MoreVertIcon className="cursor-pointer" />
+                                </span>
+                            </Dropdown>
+                        )}
                     </div>
                 </div>
             ),
@@ -246,11 +258,13 @@ const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) =
 
     return (
         <div>
-            <div className="pb-3">
-                <Button size="small" type="primary" onClick={() => handleAdd()}>
-                    增加风格
-                </Button>
-            </div>
+            {mode === 1 && (
+                <div className="pb-3">
+                    <Button size="small" type="primary" onClick={() => handleAdd()}>
+                        增加风格
+                    </Button>
+                </div>
+            )}
             <div>
                 <Collapse items={collapseList} defaultActiveKey={[0]} />
             </div>

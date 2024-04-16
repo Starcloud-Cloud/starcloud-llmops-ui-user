@@ -829,7 +829,7 @@ const Lefts = ({
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
-                                <AddStyle appUid={appData?.appUid} ref={imageRef} record={imageMater} />
+                                <AddStyle appUid={appData?.appUid} ref={imageRef} record={imageMater} mode={2} />
                             </Tabs.TabPane>
                         )}
                         {detailShow && (

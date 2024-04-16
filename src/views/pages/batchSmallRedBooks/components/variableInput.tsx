@@ -3,6 +3,10 @@ import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
 import { useState, useRef, useEffect } from 'react';
 import { schemeOptions } from 'api/redBook/copywriting';
+import image from 'assets/images/icons/image.svg';
+import string from 'assets/images/icons/string.svg';
+import textBox from 'assets/images/icons/textBox.svg';
+import number from 'assets/images/icons/nu.svg';
 const { SubMenu } = Menu;
 const { TextArea } = Input;
 const VariableInput = ({
@@ -180,16 +184,33 @@ const VariableInput = ({
                     >
                         <div
                             onMouseEnter={() => {
-                                tipRef.current = item.desc;
+                                tipRef.current = item.desc?.split('-')[0];
                                 setTipValue(tipRef.current);
                             }}
                             className="w-full flex justify-between items-center"
                         >
-                            <div className="flex items-center gap-1">
-                                <div>{item.type === '*' && <Checkbox checked={varableOpen[i]} value={item.label}></Checkbox>}</div>
-                                <div>{item.label}</div>
+                            <div className="flex gap-1 items-center">
+                                {item.desc?.split('-')[1] && (
+                                    <img
+                                        className="w-[15px]"
+                                        src={
+                                            item.desc?.split('-')[1] === 'image'
+                                                ? image
+                                                : item.desc?.split('-')[1] === 'string'
+                                                ? string
+                                                : item.desc?.split('-')[1] === 'textBox'
+                                                ? textBox
+                                                : number
+                                        }
+                                        alt=""
+                                    />
+                                )}
+                                <div className="flex items-center gap-1">
+                                    <div>{item.type === '*' && <Checkbox checked={varableOpen[i]} value={item.label}></Checkbox>}</div>
+                                    <div>{item.label}</div>
+                                </div>
                             </div>
-                            <div className="text-xs text-black/50">{item.desc}</div>
+                            <div className="text-xs text-black/50">{item.desc?.split('-')[0]}</div>
                         </div>
                     </Menu.Item>
                 );

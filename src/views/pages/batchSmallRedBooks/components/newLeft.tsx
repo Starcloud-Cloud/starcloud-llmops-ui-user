@@ -754,15 +754,10 @@ const Lefts = ({
                                                             item={el}
                                                             materialType={''}
                                                             appUid={appData?.appUid}
-                                                            stepCode={
-                                                                el?.field === 'REQUIREMENT'
-                                                                    ? item.variable?.variables?.find(
-                                                                          (i: any) => i.field === 'GENERATE_MODE'
-                                                                      )?.value
-                                                                    : ''
-                                                            }
+                                                            stepCode={''}
                                                             handlerCode={el?.flowStep?.handler}
                                                             history={false}
+                                                            promptShow={true}
                                                             setEditOpen={setEditOpens}
                                                             setTitle={setTitles}
                                                             setStep={() => {

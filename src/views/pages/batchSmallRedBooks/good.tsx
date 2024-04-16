@@ -1,4 +1,4 @@
-import { Progress, Skeleton, Popover, Button } from 'antd';
+import { Progress, Skeleton, Popover, Button, Tag } from 'antd';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import GradeIcon from '@mui/icons-material/Grade';
 import Swipers from './components/swiper';
@@ -17,11 +17,11 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
     const handleTransfer = (key: string, errMessage: string, count?: number) => {
         switch (key) {
             case 'INIT':
-                return <span className="!mr-0">初始化</span>;
+                return <Tag>初始化</Tag>;
             case 'EXECUTING':
-                return <span className="!mr-0">生成中</span>;
+                return <Tag color="processing">生成中</Tag>;
             case 'SUCCESS':
-                return <span>执行成功</span>;
+                return <Tag color="success">执行成功</Tag>;
             case 'FAILURE':
                 return (
                     <Popover
@@ -32,9 +32,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         }
                         title="失败原因"
                     >
-                        <span className="!mr-0 cursor-pointer" color="red">
-                            执行失败{count && `(${count})`}
-                        </span>
+                        <Tag color="error">执行失败{count && `(${count})`}</Tag>
                     </Popover>
                 );
             case 'ULTIMATE_FAILURE':
@@ -56,7 +54,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         }
                         title="失败原因"
                     >
-                        <span className="!mr-0 cursor-pointer">执行失败</span>
+                        <Tag color="error">执行失败</Tag>
                     </Popover>
                 );
         }
@@ -140,14 +138,13 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                     {(item.elapsed / 1000)?.toFixed(2) || 0}S
                                 </div>
                                 <div className=" whitespace-nowrap">
-                                    <span className="font-[600]">张数/字数：</span>
-                                    {item.pictureNum}
+                                    <span className="font-[600]">张数/字数：</span>-
                                 </div>
                             </div>
                         </div>
                         <div className="text-[#15273799] text-[12px] line-clamp-1">
                             <span className="font-[600]">时间：</span>
-                            {item.startTime && item.endTime ? formatDate(item.startTime) + '-' + formatDate(item.endTime) : ''}
+                            {item.startTime && item.endTime ? formatDate(item.startTime) + '到' + formatDate(item.endTime) : ''}
                         </div>
                     </div>
                 </div>
@@ -235,8 +232,8 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         </Popover>
                         {!show && (
                             <>
-                                <div className="line-clamp-1">
-                                    <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                                    <div className="line-clamp-1">
                                         <div className=" whitespace-nowrap">
                                             <span className="font-[600]">状态：</span>
                                             {handleTransfer(item.status, item.errorMessage)}
@@ -253,7 +250,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                 </div>
                                 <div className="text-[#15273799] text-[12px] line-clamp-1">
                                     <span className="font-[600]">时间：</span>
-                                    {formatDate(item.startTime)}-{formatDate(item.endTime)}
+                                    {formatDate(item.startTime)}到{formatDate(item.endTime)}
                                 </div>
                             </>
                         )}

@@ -8,6 +8,7 @@ import { useState, useEffect, useRef, memo } from 'react';
 import { materialTemplate, materialImport, materialExport, materialResilt, getPlan, planModify } from 'api/redBook/batchIndex';
 import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
+import LeftModalAdd from './leftModalAdd';
 import AddStyle from 'ui-component/AddStyle';
 import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -206,11 +207,9 @@ const Lefts = ({
         setEditOpen(true);
     };
     const formOk = (result: any) => {
-        const newList = [...tableRef.current];
+        const newList = _.cloneDeep(tableRef.current);
         if (title === '编辑') {
-            console.log(rowIndex);
-            return;
-            newList.splice(rowIndex, 1, result);
+            newList.splice((page - 1) * 10 + rowIndex, 1, result);
             tableRef.current = newList;
             setTableData(tableRef.current);
         } else {
@@ -354,13 +353,13 @@ const Lefts = ({
             }
         } else {
             if (data) {
-                setTableData(
-                    newList?.workflowConfig?.steps
-                        ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                        ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value
-                );
+                tableRef.current = newList?.workflowConfig?.steps
+                    ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                    ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value;
+                setTableData(tableRef.current);
             } else {
-                setTableData(result?.configuration?.materialList);
+                tableRef.current = result?.configuration?.materialList;
+                setTableData(tableRef.current);
             }
         }
 
@@ -629,7 +628,8 @@ const Lefts = ({
             }
         }
     };
-
+    const [tabKey, setTabKey] = useState('1');
+    const [page, setPage] = useState(1);
     return (
         <>
             <div className="relative">
@@ -647,7 +647,7 @@ const Lefts = ({
                     }}
                     className="overflow-y-auto pb-[72px]"
                 >
-                    <Tabs defaultActiveKey="1">
+                    <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                             (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                         ) ||
@@ -707,7 +707,14 @@ const Lefts = ({
                                             </div>
                                             <Table
                                                 className="!w-[684px]"
-                                                rowKey={(record, index) => String(index)}
+                                                pagination={{
+                                                    onChange: (page) => {
+                                                        setPage(page);
+                                                    }
+                                                }}
+                                                rowKey={(record, index) => {
+                                                    return String(index);
+                                                }}
                                                 loading={tableLoading}
                                                 size="small"
                                                 virtual
@@ -719,9 +726,20 @@ const Lefts = ({
                                 </div>
                             </Tabs.TabPane>
                         )}
-                        <Tabs.TabPane key={'2'} tab="笔记生成">
+                        <Tabs.TabPane
+                            key={
+                                appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                                    (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+                                ) ||
+                                appData?.executeParam?.appInformation?.workflowConfig?.steps?.find(
+                                    (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+                                )
+                                    ? '2'
+                                    : '1'
+                            }
+                            tab="笔记生成"
+                        >
                             <Collapse
-                                accordion
                                 defaultActiveKey={['0']}
                                 items={generateList?.map((item: any, index: number) => ({
                                     key: index.toString(),
@@ -864,27 +882,18 @@ const Lefts = ({
             <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
             </Modal>
-            <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
-                <div className="flex justify-end my-[20px]">
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            setTitle('新增');
-                            setEditOpen(true);
-                        }}
-                    >
-                        新增
-                    </Button>
-                </div>
-                <Table
-                    rowKey={(record, index) => String(index)}
-                    loading={tableLoading}
-                    size="small"
-                    virtual
+            {zoomOpen && (
+                <LeftModalAdd
+                    zoomOpen={zoomOpen}
+                    setZoomOpen={setZoomOpen}
+                    tableLoading={tableLoading}
                     columns={columns}
-                    dataSource={tableData}
+                    tableData={tableData}
+                    setTitle={setTitle}
+                    setEditOpen={setEditOpen}
+                    setPage={setPage}
                 />
-            </Modal>
+            )}
             <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
                 <p>
                     支持以 XLS 文件形式批量导入页面元素，导入文件将自动刷新列表页。

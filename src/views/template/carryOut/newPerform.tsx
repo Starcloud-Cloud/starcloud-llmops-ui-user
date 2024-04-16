@@ -224,7 +224,8 @@ function Perform({
                                                     materialType={
                                                         item.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value
                                                     }
-                                                    stepCode={
+                                                    stepCode={item?.field}
+                                                    model={
                                                         el?.field === 'REQUIREMENT'
                                                             ? item.variable?.variables?.find((item: any) => item.field === 'GENERATE_MODE')
                                                                   ?.value

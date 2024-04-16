@@ -581,47 +581,81 @@ const Lefts = ({
                 }
             });
         });
-        const data = {
-            uid: appData?.uid,
-            totalCount,
-            configuration: {
-                imageStyleList:
-                    imageRef.current?.record?.variable?.variables
-                        ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
-                        ?.value?.map((item: any) => ({
-                            ...item,
-                            id: undefined,
-                            code: item.id
-                        })) || imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
-                materialList:
-                    materialType === 'picture'
-                        ? fileList?.map((item) => ({
-                              pictureUrl: item?.response?.data?.url,
-                              type: 'picture'
-                          }))
-                        : tableData?.map((item) => ({
-                              ...item,
-                              type: materialType
-                          })),
-                appInformation: {
-                    ...appData.configuration.appInformation,
-                    workflowConfig: {
-                        steps: [
-                            ...appData.configuration.appInformation.workflowConfig.steps?.filter(
-                                (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
-                            ),
-                            ...newList,
-                            ...appData.configuration.appInformation.workflowConfig.steps?.filter(
-                                (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
-                            )
-                        ]
+        console.log(appData);
+        console.log(imageRef.current?.record);
+        console.log(generateList);
+
+        if (detailShow) {
+            const data = _.cloneDeep(appData);
+            const upData = data?.executeParam?.appInformation?.workflowConfig?.steps?.find(
+                (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+            );
+            upData?.variable?.variables?.forEach((item: any) => {
+                if (item?.style === 'MATERIAL') {
+                    item.value =
+                        materialType === 'picture'
+                            ? JSON.stringify(
+                                  fileList?.map((item) => ({
+                                      pictureUrl: item?.response?.data?.url,
+                                      type: 'picture'
+                                  }))
+                              )
+                            : JSON.stringify(
+                                  tableData?.map((item) => ({
+                                      ...item,
+                                      type: materialType
+                                  }))
+                              );
+                }
+            });
+            data.executeParam.appInformation.workflowConfig.steps = [
+                upData,
+                ...newList,
+                imageRef.current
+                    ? imageRef.current?.record
+                    : appData.executeParam.appInformation.workflowConfig.steps?.find(
+                          (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                      )
+            ];
+        } else {
+            const data = {
+                uid: appData?.uid,
+                totalCount,
+                configuration: {
+                    imageStyleList:
+                        imageRef.current?.record?.variable?.variables
+                            ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
+                            ?.value?.map((item: any) => ({
+                                ...item,
+                                id: undefined,
+                                code: item.id
+                            })) || imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
+                    materialList:
+                        materialType === 'picture'
+                            ? fileList?.map((item) => ({
+                                  pictureUrl: item?.response?.data?.url,
+                                  type: 'picture'
+                              }))
+                            : tableData?.map((item) => ({
+                                  ...item,
+                                  type: materialType
+                              })),
+                    appInformation: {
+                        ...appData.configuration.appInformation,
+                        workflowConfig: {
+                            steps: [
+                                ...appData.configuration.appInformation.workflowConfig.steps?.filter(
+                                    (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+                                ),
+                                ...newList,
+                                ...appData.configuration.appInformation.workflowConfig.steps?.filter(
+                                    (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                                )
+                            ]
+                        }
                     }
                 }
-            }
-        };
-        if (detailShow) {
-            newSave(data);
-        } else {
+            };
             const result = await planModify(data);
             if (flag) {
                 newSave(result);
@@ -634,8 +668,8 @@ const Lefts = ({
         <>
             <div className="relative">
                 {detailShow && (
-                    <div className="flex justify-between items-end">
-                        <div>{appData?.configuration?.appInformation?.name}</div>
+                    <div className="flex justify-between items-end mb-4">
+                        <div className="text-[22px]">{appData?.configuration?.appInformation?.name}</div>
                         <div>
                             状态：{getStatus(appData?.status)} 版本号： <span className="font-blod">{appData?.version}</span>
                         </div>
@@ -643,7 +677,7 @@ const Lefts = ({
                 )}
                 <div
                     style={{
-                        height: detailShow ? (getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 210px)' : 'calc(100vh - 165px)') : '80vh'
+                        height: detailShow ? (getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 370px)' : 'calc(100vh - 181px)') : '80vh'
                     }}
                     className="overflow-y-auto pb-[72px]"
                 >
@@ -746,6 +780,7 @@ const Lefts = ({
                                     label: item.name,
                                     children: (
                                         <div key={item.field}>
+                                            <div className="text-xs text-black/50 mb-4">{item?.description}</div>
                                             {item?.variable?.variables?.map(
                                                 (el: any, i: number) =>
                                                     el?.isShow && (
@@ -754,7 +789,8 @@ const Lefts = ({
                                                             item={el}
                                                             materialType={''}
                                                             appUid={appData?.appUid}
-                                                            stepCode={''}
+                                                            stepCode={item?.field}
+                                                            model={''}
                                                             handlerCode={el?.flowStep?.handler}
                                                             history={false}
                                                             promptShow={true}
@@ -824,6 +860,13 @@ const Lefts = ({
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
+                                <AddStyle appUid={appData?.appUid} ref={imageRef} record={imageMater} />
+                            </Tabs.TabPane>
+                        )}
+                        {appData?.executeParam?.appInformation?.workflowConfig?.steps?.find(
+                            (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+                        ) && (
+                            <Tabs.TabPane key={'3'} tab="图片生成">
                                 <AddStyle appUid={appData?.appUid} ref={imageRef} record={imageMater} mode={2} />
                             </Tabs.TabPane>
                         )}
@@ -855,14 +898,14 @@ const Lefts = ({
                     {detailShow && (
                         <>
                             <Button
-                                className="w-full"
+                                className="w-full h-[43px]"
                                 icon={<SaveOutlined rev={undefined} />}
                                 onClick={() => handleSaveClick(false)}
                                 type="primary"
                             >
                                 保存配置
                             </Button>
-                            <Button className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
+                            <Button className="w-full h-[43px]" type="primary" onClick={() => handleSaveClick(true)}>
                                 保存并开始生成
                             </Button>
                         </>

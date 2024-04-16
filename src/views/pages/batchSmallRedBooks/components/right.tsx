@@ -1,4 +1,4 @@
-import { Collapse, Spin } from 'antd';
+import { Collapse, Spin, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { memo, useRef, useMemo } from 'react';
 import PlanList from './PlanList';
@@ -24,6 +24,24 @@ const Right = ({
     timeFailure: (data: number) => void;
 }) => {
     const scrollRef: any = useRef(null);
+    const getStatus = (status: any) => {
+        switch (status) {
+            case 'PENDING':
+                return <Tag>待执行</Tag>;
+            case 'RUNNING':
+                return <Tag color="processing">执行中</Tag>;
+            case 'PAUSE':
+                return <Tag color="warning">暂停</Tag>;
+            case 'CANCELED':
+                return <Tag>已取消</Tag>;
+            case 'COMPLETE':
+                return <Tag color="success">已完成</Tag>;
+            case 'FAILURE':
+                return <Tag color="error">失败</Tag>;
+            default:
+                return <Tag>待执行</Tag>;
+        }
+    };
     return (
         <div>
             {bathList?.length === 0 ? (
@@ -48,7 +66,9 @@ const Right = ({
                                 key: item.uid,
                                 label: (
                                     <div className="w-full flex justify-between items-center text-sm pr-[20px]">
-                                        <div className="">
+                                        <div>
+                                            {item.status}
+                                            {item.status && getStatus(item.status)}
                                             <span className="font-[600]">生成时间：</span>
                                             {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.uid}）
                                             <span className="font-[600]">版本号：</span>

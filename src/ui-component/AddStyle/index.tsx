@@ -8,6 +8,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
 import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
 import _ from 'lodash-es';
+import { v4 as uuidv4 } from 'uuid';
 
 const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, ref: any) => {
     console.log(record, 'record');
@@ -24,7 +25,9 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentStyle, setCurrentStyle] = useState<any>(null);
     const [switchCheck, setSwitchCheck] = useState(false);
+    const [updIndex, setUpdIndex] = useState<any>('');
 
+    const currentStyleRef: any = useRef(null);
     const collapseIndexRef: any = useRef(null);
     const templateRef: any = useRef(null);
 
@@ -38,15 +41,15 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
         return copyRecord;
     }, [styleData, record]);
 
-    console.log('🚀 ~ AddStyle ~ currentStyle:', currentStyle);
     useEffect(() => {
-        console.log(currentStyle, 'currentStyle');
+        // 系统的初始化为关闭
         if (currentStyle?.system) {
-            // true
+            setSwitchCheck(false);
         } else {
-            //false
+            // 自定义的只能是开启 不能关闭
+            setSwitchCheck(true);
         }
-    }, [currentStyle]);
+    }, [currentStyle?.system]);
 
     useImperativeHandle(ref, () => ({
         record: submitData
@@ -74,7 +77,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                 list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
             }
 
-            console.log(list, 'list');
             const typeList = list.map((item: any) => ({ ...item, type: 1 }));
             setStyleData(typeList);
         }
@@ -94,7 +96,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
 
     useEffect(() => {
         if (query?.picNum) {
-            const filterList = templateRef.current.filter((item: any) => item.templateList.length >= query?.picNum || 0);
+            const filterList = templateRef.current.filter((item: any) => (item.templateList.length = query?.picNum));
             setTemplateList(filterList);
         }
     }, [query]);
@@ -229,7 +231,9 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                             className="flex justify-center items-center cursor-pointer"
                             onClick={() => {
                                 setCurrentStyle(item);
+                                currentStyleRef.current = item;
                                 setIsModalOpen(true);
+                                setUpdIndex(index);
                             }}
                         >
                             <span>点击放大编辑</span>
@@ -242,18 +246,29 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
     }, [styleData]);
 
     const handleCancel = () => {
+        setUpdIndex('');
         setIsModalOpen(false);
     };
 
+    // 根据Index 来判断
     const handleOk = () => {
         const copyStyleData = _.cloneDeep(styleData);
-        copyStyleData.forEach((item: any, index: number) => {
-            if (item.id === currentStyle.id) {
-                copyStyleData[index] = currentStyle;
-            }
-        });
+
+        // 非系统的uuid需要变
+        if (!currentStyle.system) {
+            currentStyle.uuid = uuidv4()?.split('-')?.join('');
+            currentStyle.templateList.forEach((item: any) => {
+                item.uuid = uuidv4()?.split('-')?.join('');
+                item.variableList.forEach((item1: any) => {
+                    item1.uuid = uuidv4()?.split('-')?.join('');
+                });
+            });
+        }
+
+        copyStyleData[updIndex] = currentStyle;
         setStyleData(copyStyleData);
         setIsModalOpen(false);
+        setUpdIndex('');
     };
 
     return (
@@ -391,14 +406,20 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                     </div>
                 }
             >
-                <div className="flex justify-between mt-5">
+                <div className="flex justify-between mt-6">
                     <span className="text-base">{currentStyle?.name}</span>
                     <div className="flex justify-center">
                         <span className="mr-2">开启编辑</span>
                         <Switch
+                            // 非系统不可编辑
+                            disabled={!currentStyleRef?.current?.system}
                             checked={switchCheck}
                             onChange={(checked) => {
                                 setSwitchCheck(checked);
+                                setCurrentStyle((pre: any) => ({
+                                    ...pre,
+                                    system: !checked
+                                }));
                             }}
                         />
                     </div>
@@ -413,6 +434,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                         appReqVO: details,
                         materialType: ''
                     }}
+                    canEdit={!switchCheck}
                     setDetailData={(data: any) => {
                         const copyCurrentStyle = { ...currentStyle };
                         copyCurrentStyle.templateList = data;

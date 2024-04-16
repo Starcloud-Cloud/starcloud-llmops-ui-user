@@ -18,7 +18,8 @@ const EditStyle = ({
     imageStyleData,
     setData,
     setCopyData,
-    appData = {}
+    appData = {},
+    canEdit = false
 }: {
     schemaList?: any[];
     typeList: any[];
@@ -26,6 +27,7 @@ const EditStyle = ({
     setData: (data: any) => void;
     setCopyData: (data: any) => void;
     appData?: any;
+    canEdit?: boolean;
 }) => {
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
@@ -128,6 +130,7 @@ const EditStyle = ({
                                 value={currentTemp?.name}
                                 onClick={() => setOpen(true)}
                                 error={!imageStyleData?.code}
+                                disabled={canEdit}
                             />
                             <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
                         </FormControl>
@@ -179,6 +182,7 @@ const EditStyle = ({
                                                 <div className="flex items-center gap-4 min-h-[32px]">
                                                     <span>图片生成模式</span>
                                                     <Switch
+                                                        disabled={canEdit}
                                                         checked={imageStyleData?.mode === 'RANDOM' ? true : false}
                                                         onChange={(e) => {
                                                             const newData = _.cloneDeep(imageStyleData);
@@ -205,6 +209,7 @@ const EditStyle = ({
                                                             onClick={() => setCurrentElementId(el.field)}
                                                         >
                                                             <VariableInput
+                                                                disabled={canEdit}
                                                                 styles={
                                                                     currentElementId === el.field
                                                                         ? {
@@ -244,6 +249,7 @@ const EditStyle = ({
                                     <div className="flex items-center gap-4 min-h-[32px] ml-3">
                                         <span>图片标题生成</span>
                                         <Switch
+                                            disabled={canEdit}
                                             checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
                                             onChange={(e) => {
                                                 const newData = _.cloneDeep(imageStyleData);
@@ -281,6 +287,7 @@ const EditStyle = ({
                                                         onClick={() => setCurrentElementId(el.field)}
                                                     >
                                                         <VariableInput
+                                                            disabled={canEdit}
                                                             styles={
                                                                 currentElementId === el.field
                                                                     ? {

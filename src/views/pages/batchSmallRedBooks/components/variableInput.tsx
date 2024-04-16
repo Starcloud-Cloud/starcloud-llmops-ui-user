@@ -19,7 +19,8 @@ const VariableInput = ({
     model,
     details,
     appUid,
-    stepCode = '图片生成'
+    stepCode = '图片生成',
+    disabled = false
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
@@ -35,6 +36,7 @@ const VariableInput = ({
     details?: any;
     appUid?: string;
     stepCode?: string;
+    disabled?: boolean;
 }) => {
     const inputList: any = useRef([]);
     const tipRef = useRef<any>('');
@@ -250,6 +252,7 @@ const VariableInput = ({
         >
             <div className="flex items-stretch relative">
                 <TextArea
+                    disabled={disabled}
                     style={styles}
                     rows={row || 1}
                     value={value}

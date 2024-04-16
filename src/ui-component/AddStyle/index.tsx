@@ -38,7 +38,16 @@ const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) =
         return copyRecord;
     }, [styleData, record]);
 
-    console.log(submitData, 'submitData');
+    console.log('🚀 ~ AddStyle ~ currentStyle:', currentStyle);
+    useEffect(() => {
+        console.log(currentStyle, 'currentStyle');
+        if (currentStyle?.system) {
+            // true
+        } else {
+            //false
+        }
+    }, [currentStyle]);
+
     useImperativeHandle(ref, () => ({
         record: submitData
     }));
@@ -120,8 +129,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) =
             )
         }
     ];
-
-    console.log(currentStyle, 'currentStyle');
 
     const handleOK = () => {
         if (!selectImgs) {
@@ -236,8 +243,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) =
         setStyleData(copyStyleData);
         setIsModalOpen(false);
     };
-
-    console.log(templateList, 'templateList');
 
     return (
         <div>
@@ -375,7 +380,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid }: any, ref: any) =
                 <div className="flex justify-between mt-5">
                     <span className="text-base">{currentStyle?.name}</span>
                     <div className="flex justify-center">
-                        <span className="mr-1">开启编辑</span>
+                        <span className="mr-2">开启编辑</span>
                         <Switch
                             checked={switchCheck}
                             onChange={(checked) => {

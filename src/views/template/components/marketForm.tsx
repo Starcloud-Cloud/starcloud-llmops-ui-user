@@ -411,7 +411,13 @@ function FormExecute({
                             新增
                         </Button>
                     </div>
-                    <Table rowKey={(_, index) => String(index)} loading={tableLoading} columns={columns} dataSource={item.value} />
+                    <Table
+                        rowKey={(_, index) => String(index)}
+                        loading={tableLoading}
+                        columns={columns}
+                        dataSource={item.value}
+                        pagination={false}
+                    />
                 </div>
             )}
             {uploadOpen && (

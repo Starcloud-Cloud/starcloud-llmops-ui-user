@@ -140,7 +140,7 @@ function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle, setS
                             新增
                         </Button>
                     </div>
-                    <Table rowKey={(_, index) => String(index)} columns={columns} dataSource={item.value} />
+                    <Table rowKey={(_, index) => String(index)} columns={columns} dataSource={item.value} pagination={false} />
                 </div>
             )}
         </div>

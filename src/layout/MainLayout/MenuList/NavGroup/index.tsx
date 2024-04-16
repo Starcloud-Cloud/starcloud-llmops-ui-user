@@ -226,7 +226,7 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
                                                             className="cursor-pointer font-[10px] text-[#1d4ed8] ml-1"
                                                             onClick={() => setOpen(true)}
                                                         >
-                                                            应用市场使用视频
+                                                            使用视频
                                                         </span>
                                                     )}
                                                 </div>

@@ -232,7 +232,7 @@ export function DiscountModal({
                                             <span className="text-[#de4437] text-lg ">
                                                 ￥{(currentSelect?.totalPrice / 100).toFixed(2)}
                                             </span>
-                                            <span className="text-xs">/元</span>
+                                            <span className="text-xs">元</span>
                                         </div>
                                     </div>
                                     {currentSelect.experience ? (

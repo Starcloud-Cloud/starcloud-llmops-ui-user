@@ -17,6 +17,7 @@ import ArrangeModal from './arrangeModal';
 import { useState, useEffect, memo } from 'react';
 import _ from 'lodash-es';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
+import React from 'react';
 function Arrange({
     detail,
     config,
@@ -30,6 +31,7 @@ function Arrange({
     tableDataDel,
     tableDataMove
 }: any) {
+    console.log(detail, 'detail');
     const [stepTitle, setStepTitle] = useState<string[]>([]);
     const [modal, setModal] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState<number>(0);
@@ -195,6 +197,13 @@ function Arrange({
     };
     //新增文案与风格
     const [focuActive, setFocuActive] = useState<any[]>([]);
+
+    const materialType = React.useMemo(() => {
+        const materialData = detail?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler');
+        const filterData: any = materialData?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_TYPE');
+        return filterData?.value || filterData?.defaultValue;
+    }, [detail]);
+
     return (
         <Box>
             <Typography variant="h5" fontSize="1rem" mb={1}>
@@ -430,7 +439,7 @@ function Arrange({
                                                         <div>
                                                             <CreateTab
                                                                 key={el?.field}
-                                                                appData={{ materialType: '', appReqVO: detail }}
+                                                                appData={{ materialType, appReqVO: detail }}
                                                                 imageStyleData={el.value}
                                                                 setImageStyleData={(data) => {
                                                                     basisChange({

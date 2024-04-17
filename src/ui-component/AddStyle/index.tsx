@@ -35,7 +35,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
         const copyRecord = _.cloneDeep(record);
         copyRecord.variable.variables.forEach((item: any) => {
             // 风格产生===2 -> POSTER_STYLE
-            if (mode === 2) {
+            if (mode === 1) {
                 if (item.field === 'POSTER_STYLE') {
                     item.value = styleData;
                 }
@@ -47,6 +47,8 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
         });
         return copyRecord;
     }, [styleData, record]);
+
+    console.log(submitData, 'submitData');
 
     useEffect(() => {
         // 系统的初始化为关闭
@@ -84,7 +86,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                 list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
             }
 
-            const typeList = list.map((item: any) => ({ ...item, type: 1 }));
+            const typeList = list?.map((item: any) => ({ ...item, type: 1 }));
             setStyleData(typeList);
         }
     }, [record, mode]);

@@ -364,7 +364,7 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
                 <img alt="example" style={{ width: '100%' }} src={previewImage} />
             </Modal>
             <Drawer
-                width={'100%'}
+                width={700}
                 style={{ zIndex: 9999 }}
                 open={open}
                 title={'重新生成'}

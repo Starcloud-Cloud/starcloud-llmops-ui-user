@@ -55,6 +55,8 @@ const VariableModal = ({
     itemData: any;
     saveContent: (data: any) => void;
 }) => {
+    console.log('itemData', itemData);
+
     const typeList = [
         { label: t('myApp.input'), value: 'INPUT' },
         { label: t('myApp.textarea'), value: 'TEXTAREA' },

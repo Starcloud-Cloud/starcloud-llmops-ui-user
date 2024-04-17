@@ -45,13 +45,15 @@ const Right = ({
                 return <Tag>待执行</Tag>;
         }
     };
+    console.log(exampleList);
+
     return (
         <div>
             {bathList?.length === 0 ? (
                 <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
                     <div className="text-center">
                         {exampleList?.length > 0 ? (
-                            <div>
+                            <div className="!w-[300px] justify-center flex gap-2">
                                 {exampleList?.map((item: any) => (
                                     <Good
                                         key={item?.businessUid}
@@ -130,7 +132,8 @@ const RightMemo = (prevProps: any, nextProps: any) => {
         JSON.stringify(prevProps?.bathList) === JSON.stringify(nextProps?.bathList) &&
         JSON.stringify(prevProps?.collapseActive) === JSON.stringify(nextProps?.collapseActive) &&
         JSON.stringify(prevProps?.batchOpen) === JSON.stringify(nextProps?.batchOpen) &&
-        JSON.stringify(prevProps?.planList) === JSON.stringify(nextProps?.planList)
+        JSON.stringify(prevProps?.planList) === JSON.stringify(nextProps?.planList) &&
+        JSON.stringify(prevProps?.exampleList) === JSON.stringify(nextProps?.exampleList)
     );
 };
 export default memo(Right, RightMemo);

@@ -36,12 +36,12 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
         copyRecord.variable.variables.forEach((item: any) => {
             // 风格产生===2 -> POSTER_STYLE
             if (mode === 1) {
-                if (item.field === 'POSTER_STYLE') {
-                    item.value = JSON.stringify(styleData?.[0] || {});
-                }
-            } else {
                 if (item.field === 'POSTER_STYLE_CONFIG') {
                     item.value = styleData;
+                }
+            } else {
+                if (item.field === 'POSTER_STYLE') {
+                    item.value = JSON.stringify(styleData?.[0] || {});
                 }
             }
         });

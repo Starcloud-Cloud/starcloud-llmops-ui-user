@@ -86,3 +86,7 @@ export const materialResilt = (parseUid: any) => {
 export const getPlan = (appUid: any) => {
     return request.get({ url: `/llm/creative/plan/getByAppUid?appUid=${appUid}` });
 };
+//获取应用计划示例
+export const getListExample = (uid: any) => {
+    return request.get({ url: `/llm/xhs/content/listExample?uidList=${uid}` });
+};

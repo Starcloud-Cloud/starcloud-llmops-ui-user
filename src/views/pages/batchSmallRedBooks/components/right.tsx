@@ -1,9 +1,11 @@
 import { Collapse, Spin, Tag } from 'antd';
 import dayjs from 'dayjs';
-import { memo, useRef, useMemo } from 'react';
+import { memo, useRef } from 'react';
 import PlanList from './PlanList';
+import Good from '../good';
 const Right = ({
     bathList,
+    exampleList,
     collapseActive,
     batchOpen,
     changeCollapse,
@@ -14,6 +16,7 @@ const Right = ({
     timeFailure
 }: {
     bathList: any[];
+    exampleList: any[];
     collapseActive: any;
     batchOpen: boolean;
     changeCollapse: (data: any) => void;
@@ -47,11 +50,25 @@ const Right = ({
             {bathList?.length === 0 ? (
                 <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
                     <div className="text-center">
-                        <img
-                            className="w-[300px]"
-                            src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
-                            alt=""
-                        />
+                        {exampleList?.length > 0 ? (
+                            <div>
+                                {exampleList?.map((item: any) => (
+                                    <Good
+                                        key={item?.businessUid}
+                                        item={item}
+                                        setBusinessUid={setBusinessUid}
+                                        setDetailOpen={setDetailOpen}
+                                        show={true}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <img
+                                className="w-[300px]"
+                                src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
+                                alt=""
+                            />
+                        )}
                         <div className="font-[500] text-[20px] text-[#1b2337] my-[8px]">魔法创作计划</div>
                         <div>在左侧输入你的创意，保存并开始生成吧</div>
                     </div>
@@ -67,8 +84,7 @@ const Right = ({
                                 label: (
                                     <div className="w-full flex justify-between items-center text-sm pr-[20px]">
                                         <div>
-                                            {item.status}
-                                            {item.status && getStatus(item.status)}
+                                            {getStatus(item.status)}
                                             <span className="font-[600]">生成时间：</span>
                                             {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.uid}）
                                             <span className="font-[600]">版本号：</span>

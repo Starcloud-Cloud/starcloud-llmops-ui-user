@@ -15,11 +15,13 @@ import { v4 as uuidv4 } from 'uuid';
 const Lefts = ({
     detailShow = true,
     data,
+    setCollData,
     newSave,
     setPlanUid
 }: {
     detailShow?: boolean;
     data?: any;
+    setCollData?: (data: any) => void;
     newSave: (data: any) => void;
     setPlanUid: (data: any) => void;
 }) => {
@@ -265,6 +267,10 @@ const Lefts = ({
         } else {
             result = await getPlan(searchParams.get('appUid'));
             newList = _.cloneDeep(result?.configuration?.appInformation);
+            const collData: any = result?.configuration?.appInformation?.example;
+            if (collData) {
+                setCollData && setCollData(collData.split(','));
+            }
         }
         setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
@@ -569,6 +575,9 @@ const Lefts = ({
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
         const newList = _.cloneDeep(generateList);
+        console.log(newList);
+        console.log(imageRef.current?.record);
+
         newList?.forEach((item) => {
             item?.variable?.variables?.forEach((el: any) => {
                 if (el.value && typeof el.value === 'object') {
@@ -615,18 +624,20 @@ const Lefts = ({
             ];
             newSave(data);
         } else {
+            const styleData = imageRef.current?.record?.variable?.variables?.find(
+                (item: any) => item.field === 'POSTER_STYLE_CONFIG'
+            )?.value;
             const data = {
                 uid: appData?.uid,
                 totalCount,
                 configuration: {
-                    imageStyleList:
-                        imageRef.current?.record?.variable?.variables
-                            ?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')
-                            ?.value?.map((item: any) => ({
-                                ...item,
-                                id: undefined,
-                                code: item.id
-                            })) || imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
+                    imageStyleList: styleData
+                        ? JSON.parse(styleData)?.map((item: any) => ({
+                              ...item,
+                              id: undefined,
+                              code: item.id
+                          }))
+                        : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
                     materialList:
                         materialType === 'picture'
                             ? fileList?.map((item) => ({
@@ -668,7 +679,18 @@ const Lefts = ({
                     <div className="flex justify-between items-end mb-4">
                         <div className="text-[22px]">{appData?.configuration?.appInformation?.name}</div>
                         <div>
-                            状态：{getStatus(appData?.status)} 版本号： <span className="font-blod">{appData?.version}</span>
+                            状态：{getStatus(appData?.status)}{' '}
+                            <Popconfirm
+                                title="提示"
+                                description="当前应用最新版本为：2，你使用的应用版本为：1，是否需要更新版本，获得最佳创作效果"
+                                onConfirm={() => {}}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                    版本号： <span className="font-blod">{appData?.version}</span>
+                                </span>
+                            </Popconfirm>
                         </div>
                     </div>
                 )}

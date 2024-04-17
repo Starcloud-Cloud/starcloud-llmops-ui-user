@@ -83,7 +83,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
             } else {
                 list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
             }
-
             const typeList = list.map((item: any) => ({ ...item, type: 1 }));
             setStyleData(typeList);
         }

@@ -80,6 +80,9 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
                 url: item.url,
                 isMain: item.isMain
             }));
+
+            console.log(imgs);
+
             setImageList(imgs);
         }
     }, [data]);
@@ -336,8 +339,6 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
                         await retryContent(data);
                         setOpen(false);
                         setAginLoading(true);
-                        console.log(data);
-
                         timer.current = setInterval(() => {
                             if (data?.status !== 'EXECUTING') {
                                 clearInterval(timer.current);

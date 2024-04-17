@@ -1,5 +1,5 @@
 import { SearchOutlined } from '@mui/icons-material';
-import { Button, Card, Divider, Image, Dropdown, Space, Drawer, Collapse, Modal, Switch, message } from 'antd';
+import { Button, Card, Divider, Image, Dropdown, Space, Drawer, Collapse, Modal, Switch, message, Checkbox, CheckboxProps } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, Select, TextField } from '@mui/material';
@@ -287,6 +287,11 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
         setUpdIndex('');
     };
 
+    const onCheckboxChange = (e: any, index: number) => {
+        // console.log(`checked = ${e.target.checked}`);
+        setChooseImageIndex(index);
+    };
+
     return (
         <div>
             {mode === 1 && (
@@ -400,11 +405,21 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                                             hoverIndex === index || chooseImageIndex === index
                                                 ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
                                                 : 'outline outline-offset-2 outline-1 outline-[#ccc]'
-                                        } rounded-sm my-3`}
-                                        onClick={() => handleChoose(index)}
+                                        } rounded-sm my-3 relative`}
+                                        // onClick={() => handleChoose(index)}
                                         onMouseEnter={() => setHoverIndex(index)}
                                         onMouseLeave={() => setHoverIndex('')}
                                     >
+                                        <Checkbox
+                                            checked={chooseImageIndex === index}
+                                            style={{
+                                                position: 'absolute',
+                                                left: '10px',
+                                                top: '10px',
+                                                zIndex: 999
+                                            }}
+                                            onChange={(e) => onCheckboxChange(e, index)}
+                                        />
                                         <Image.PreviewGroup
                                             preview={{
                                                 onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`)

@@ -329,7 +329,7 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
                                                 placeholder="标签"
                                                 value={tags}
                                                 onChange={handleChange}
-                                                options={data?.executeResult?.copyWriting?.tagList}
+                                                options={[]}
                                             />
                                         </div>
                                     ) : (

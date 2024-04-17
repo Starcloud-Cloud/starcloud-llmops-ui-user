@@ -105,8 +105,10 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
 
     useEffect(() => {
         if (query?.picNum) {
-            const filterList = templateRef.current.filter((item: any) => (item.templateList.length = query?.picNum));
+            const filterList = templateRef.current.filter((item: any) => item.templateList.length === query?.picNum);
             setTemplateList(filterList);
+        } else {
+            setTemplateList(templateRef.current);
         }
     }, [query]);
 
@@ -298,7 +300,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                 <Collapse items={collapseList} defaultActiveKey={[0]} />
             </div>
             <Drawer
-                zIndex={9999}
+                // zIndex={9999}
                 title="选择风格模版"
                 onClose={() => {
                     setVisible(false);
@@ -306,7 +308,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                     setChooseImageIndex('');
                 }}
                 open={visible}
-                placement={'left'}
+                // placement={'left'}
                 width={500}
                 footer={
                     <div className="flex justify-between">

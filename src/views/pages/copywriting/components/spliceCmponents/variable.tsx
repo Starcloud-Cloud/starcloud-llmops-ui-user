@@ -16,7 +16,7 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import { Error, Add, Delete, Settings } from '@mui/icons-material';
 import { t } from 'hooks/web/useI18n';
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import _ from 'lodash-es';
 import VariableModal from '../variableModal';
 interface Variable {
@@ -45,6 +45,11 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
             setVariableOpen(false);
         }
     };
+    useEffect(() => {
+        if (!open) {
+            setItemData({});
+        }
+    }, [open]);
     return (
         <>
             <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>

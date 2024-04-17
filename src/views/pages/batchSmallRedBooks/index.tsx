@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CardContent, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
-import { Row, Col, Collapse, Spin } from 'antd';
 import { getContentPage } from 'api/redBook';
-import { planCreate, planGet, planModify, planExecute, batchPages } from 'api/redBook/batchIndex';
+import { planExecute, batchPages, getListExample } from 'api/redBook/batchIndex';
 import SubCard from 'ui-component/cards/SubCard';
-import MainCard from 'ui-component/cards/MainCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
@@ -18,18 +16,24 @@ import Right from './components/right';
 import Goods from './good';
 import dayjs from 'dayjs';
 const BatcSmallRedBooks = () => {
-    const location = useLocation();
     const navigate = useNavigate();
-    const searchParams = new URLSearchParams(location.search);
     const timer: any = useRef([]);
-
-    const uidRef = useRef('');
 
     //批次分页
     const batchPage = { pageNo: 1, pageSize: 100 };
     const [batchUid, setBatchUid] = useState('');
     const [bathList, setBathList] = useState<any[]>([]);
     const [batchOpen, setbatchOpen] = useState(false);
+    //手风琴的数据
+    const [collData, setCollData] = useState([]);
+    //监听手风琴有值的时候请求数据
+    useEffect(() => {
+        if (collData?.length != 0) {
+            getListExample(collData).then((res) => {
+                setExampleList(res);
+            });
+        }
+    }, [collData]);
     //关闭页面清除定时器
     useEffect(() => {
         return () => {
@@ -38,7 +42,6 @@ const BatcSmallRedBooks = () => {
             });
         };
     }, []);
-    const [exedisabled, setExeDisabled] = useState(false);
     // const handleSave = async ({ flag, newData, tableData }: { flag: boolean; newData: any; tableData: any[] }) => {
     //     if (flag) {
     //         setExeDisabled(true);
@@ -161,6 +164,7 @@ const BatcSmallRedBooks = () => {
     };
 
     //页面滚动
+    const [exampleList, setExampleList] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
     const [planList, setPlanList] = useState<any[]>([]);
     const plabListRef: any = useRef(null);
@@ -335,11 +339,12 @@ const BatcSmallRedBooks = () => {
             </SubCard>
             <div className="flex gap-[20px] mt-4">
                 <div className="!w-[700px] flex-none bg-white rounded-lg p-4">
-                    <Left newSave={newSave} setPlanUid={setPlanUid} />
+                    <Left setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
                 </div>
                 <div className="flex-1 min-w-[1100px] bg-white rounded-lg p-4">
                     <Right
                         bathList={bathList}
+                        exampleList={exampleList}
                         collapseActive={collapseActive}
                         batchOpen={batchOpen}
                         changeCollapse={(data: any) => changeCollapse(data)}

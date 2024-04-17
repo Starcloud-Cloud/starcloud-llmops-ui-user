@@ -177,7 +177,31 @@ function FormExecute({
     }, [widthRef]);
     return (
         <>
-            {item.style === 'INPUT' ? (
+            {item.style === 'TEXTAREA' || handlerCode === 'AssembleActionHandler' ? (
+                <div ref={widthRef} className="w-full relative mt-4">
+                    <VariableInput
+                        open={open}
+                        setOpen={setOpen}
+                        popoverWidth={popoverWidth}
+                        handleMenu={({ newValue }) => {
+                            onChange({ name: item.field, value: newValue });
+                        }}
+                        details={details}
+                        appUid={appUid}
+                        stepCode={stepCode}
+                        index={undefined}
+                        value={item.value}
+                        row={item?.field === 'TITLE' ? 1 : 6}
+                        setValue={(value) => {
+                            onChange({ name: item.field, value: value });
+                        }}
+                        model={model}
+                    />
+                    <span className="z-[100] block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                        {item.label}
+                    </span>
+                </div>
+            ) : item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
                     size="small"
@@ -199,30 +223,6 @@ function FormExecute({
                     }}
                     fullWidth
                 />
-            ) : item.style === 'TEXTAREA' ? (
-                <div ref={widthRef} className="w-full relative mt-4">
-                    <VariableInput
-                        open={open}
-                        setOpen={setOpen}
-                        popoverWidth={popoverWidth}
-                        handleMenu={({ newValue }) => {
-                            onChange({ name: item.field, value: newValue });
-                        }}
-                        details={details}
-                        appUid={appUid}
-                        stepCode={stepCode}
-                        index={undefined}
-                        value={item.value}
-                        row={6}
-                        setValue={(value) => {
-                            onChange({ name: item.field, value: value });
-                        }}
-                        model={model}
-                    />
-                    <span className="z-[100] block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                        {item.label}
-                    </span>
-                </div>
             ) : item.style === 'JSON' ? (
                 <TextField
                     sx={mt}

@@ -16,6 +16,7 @@ const VariableInput = ({
     handleMenu,
     index = 0,
     row,
+    status = false,
     title,
     value,
     setValue,
@@ -34,6 +35,7 @@ const VariableInput = ({
     title?: string;
     value?: any;
     row?: number;
+    status?: boolean;
     setValue: (data: any) => void;
     styles?: any;
     model?: string;
@@ -276,7 +278,7 @@ const VariableInput = ({
                     disabled={disabled}
                     style={styles}
                     rows={row || 1}
-                    status={!value ? 'error' : ''}
+                    status={!value && status ? 'error' : ''}
                     value={value}
                     ref={(ref) => (inputList.current[index] = ref)}
                     onChange={(e) => {

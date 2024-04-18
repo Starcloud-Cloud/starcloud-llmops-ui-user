@@ -177,7 +177,7 @@ function FormExecute({
     }, [widthRef]);
     return (
         <>
-            {item.style === 'TEXTAREA' || handlerCode === 'AssembleActionHandler' ? (
+            {item.style === 'TEXTAREA' || (handlerCode === 'AssembleActionHandler' && item.field === 'TITLE') ? (
                 <div ref={widthRef} className="w-full relative mt-4">
                     <VariableInput
                         open={open}
@@ -191,6 +191,7 @@ function FormExecute({
                         stepCode={stepCode}
                         index={undefined}
                         value={item.value}
+                        status={handlerCode === 'AssembleActionHandler' ? true : false}
                         row={item?.field === 'TITLE' ? 1 : 6}
                         setValue={(value) => {
                             onChange({ name: item.field, value: value });
@@ -198,12 +199,14 @@ function FormExecute({
                         model={model}
                     />
                     <span
-                        style={{ color: !item.value ? '#f44336' : '#364152' }}
+                        style={{ color: !item.value && handlerCode === 'AssembleActionHandler' ? '#f44336' : '#364152' }}
                         className="z-[100] block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
                     >
                         {item.label}
                     </span>
-                    {!item.value && <p className="text-[#f44336] mt-[4px] text-xs">{item.label}必填</p>}
+                    {!item.value && handlerCode === 'AssembleActionHandler' && (
+                        <p className="text-[#f44336] mt-[4px] text-xs">{item.label}必填</p>
+                    )}
                 </div>
             ) : item.style === 'INPUT' ? (
                 <TextField

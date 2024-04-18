@@ -55,6 +55,7 @@ export const DetailModal = ({ open, handleClose, businessUid, show }: IAddAiModa
                     show={show}
                     pre={preRef.current}
                     dataStatus={dataStatus}
+                    setSataStatus={setSataStatus}
                     setPre={(data) => {
                         preRef.current = data;
                         setPre(preRef.current);

@@ -1,5 +1,21 @@
 import React, { useEffect, useState, useRef, memo } from 'react';
-import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, UploadProps, Upload, Modal, Select, Drawer } from 'antd';
+import {
+    Avatar,
+    Card,
+    CollapseProps,
+    Divider,
+    Space,
+    Button,
+    Spin,
+    Input,
+    UploadProps,
+    Upload,
+    Modal,
+    Select,
+    Drawer,
+    Progress,
+    Popover
+} from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -22,12 +38,14 @@ const ThreeStep = ({
     show,
     pre,
     dataStatus,
+    setSataStatus,
     setPre
 }: {
     data: any;
     show?: boolean;
     pre: number;
     dataStatus: boolean;
+    setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
 }) => {
     const [title, setTitle] = React.useState<string>('');
@@ -106,21 +124,6 @@ const ThreeStep = ({
 
     const doRetry = async () => {
         setOpen(true);
-        return;
-        const res = await retryContent(data.businessUid);
-        if (res) {
-            setText(res.copyWritingContent);
-            setTitle(res.copyWritingTitle);
-
-            const imgs = res?.pictureContent.map((item: any) => ({
-                uid: item.index,
-                status: 'done',
-                name: item.url,
-                url: item.url,
-                isMain: item.isMain
-            }));
-            setImageList(imgs);
-        }
     };
     useEffect(() => {
         return () => {
@@ -378,7 +381,17 @@ const ThreeStep = ({
                     </div>
                     {aginLoading && (
                         <div className="z-[1000] absolute w-full h-full flex justify-center items-center bg-black/50">
-                            <Spin tip="Loading" size="large" spinning={aginLoading} />
+                            <div className="flex flex-col gap-2 justify-center items-center">
+                                <Progress
+                                    type="circle"
+                                    percent={Math.floor((data?.progress?.currentStepIndex / data?.progress?.totalStepCount) * 100)}
+                                />
+                                <Popover content={'执行到第几步/总步数'}>
+                                    <div className="font-[500] cursor-pointer">
+                                        {data?.progress?.currentStepIndex || '-'}/{data?.progress?.totalStepCount || '-'}
+                                    </div>
+                                </Popover>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -402,6 +415,7 @@ const ThreeStep = ({
                     saveLoading={saveLoading}
                     newSave={async (data: any) => {
                         setSaveLoading(true);
+                        setSataStatus(false);
                         await retryContent(data);
                         setSaveLoading(false);
                         setOpen(false);

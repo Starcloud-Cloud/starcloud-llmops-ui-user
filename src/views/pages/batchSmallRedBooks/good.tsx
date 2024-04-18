@@ -64,6 +64,9 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
         setLoading(true);
         const result = await failureRetry({ uid });
         timeFailure();
+        setTimeout(() => {
+            setLoading(false);
+        }, 3000);
     };
     const [loading, setLoading] = useState(false);
     return (

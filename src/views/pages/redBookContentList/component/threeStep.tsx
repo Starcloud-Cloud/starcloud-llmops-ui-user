@@ -18,6 +18,7 @@ import {
 } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import './threeStep.css';
 import 'swiper/css/pagination';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -426,8 +427,9 @@ const ThreeStep = ({
             <Drawer
                 width={700}
                 // style={{ zIndex: 9999 }}
-                style={{
-                    transform: 'translateX(0)'
+                style={{ transform: 'none !important' }}
+                rootStyle={{
+                    transform: 'none !important'
                 }}
                 open={open}
                 title={'重新生成'}

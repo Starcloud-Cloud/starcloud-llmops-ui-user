@@ -374,6 +374,8 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
             <Drawer
                 zIndex={9999}
                 title="选择风格模版"
+                // mask={false}
+                // maskClosable={false}
                 onClose={() => {
                     setVisible(false);
                     setSelectImgs(null);

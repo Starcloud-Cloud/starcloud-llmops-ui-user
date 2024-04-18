@@ -204,9 +204,14 @@ const ThreeStep = ({
                                     编辑
                                 </Button>
                             ) : (
-                                <Button type="primary" onClick={handleModify}>
-                                    保存
-                                </Button>
+                                <Space>
+                                    <Button type="primary" onClick={handleModify}>
+                                        保存
+                                    </Button>
+                                    <Button type="default" onClick={() => setEditType(false)}>
+                                        取消
+                                    </Button>
+                                </Space>
                             )}
                         </>
                     )

@@ -157,8 +157,22 @@ const BatcSmallRedBooks = () => {
     //         }
     //     }
     // };
+    const [pre, setPre] = useState(0);
     const newSave = async (uid: string) => {
         await planExecute({ uid });
+        setPre(pre + 1);
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '执行成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                close: false
+            })
+        );
         const res = await batchPages({ ...batchPage, planUid: uid });
         setBathList(res.list);
     };
@@ -334,7 +348,7 @@ const BatcSmallRedBooks = () => {
             </SubCard>
             <div className="flex gap-[20px] mt-4">
                 <div className="!w-[700px] flex-none bg-white rounded-lg p-4">
-                    <Left setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
+                    <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
                 </div>
                 <div className="flex-1 min-w-[1100px] bg-white rounded-lg p-4">
                     <Right

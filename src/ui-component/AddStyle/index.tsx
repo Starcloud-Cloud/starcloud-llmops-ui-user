@@ -10,7 +10,7 @@ import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
-const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, ref: any) => {
+const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType }: any, ref: any) => {
     console.log(record, 'record');
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
@@ -506,7 +506,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
                     appData={{
                         appUid,
                         appReqVO: details,
-                        materialType: ''
+                        materialType
                     }}
                     canEdit={!switchCheck}
                     setDetailData={(data: any) => {

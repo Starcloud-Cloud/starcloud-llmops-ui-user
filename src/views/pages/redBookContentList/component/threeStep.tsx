@@ -32,6 +32,7 @@ import { Tooltip } from '@mui/material';
 import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
 import Left from '../../batchSmallRedBooks/components/newLeft';
+import { useAllDetail } from 'contexts/JWTContext';
 
 const ThreeStep = ({
     data,
@@ -60,10 +61,7 @@ const ThreeStep = ({
     const [previewOpen, setPreviewOpen] = React.useState(false);
     const [previewImage, setPreviewImage] = React.useState('');
     const [claim, setClaim] = React.useState(true);
-
-    useEffect(() => {
-        setTags(data?.executeResult?.copyWriting?.tagList);
-    }, [data]);
+    const all_detail = useAllDetail();
 
     const handleChange = (value: any) => {
         setTags(value);
@@ -85,6 +83,20 @@ const ThreeStep = ({
             });
             setEditType(false);
             setLoading(false);
+            if (res) {
+                setTags(res?.executeResult?.copyWriting?.tagList);
+                setText(res?.executeResult?.copyWriting?.content);
+                setTitle(res?.executeResult?.copyWriting?.title);
+                setClaim(res?.claim);
+                const imgs = res?.executeResult?.imageList?.map((item: any) => ({
+                    uid: item.index,
+                    status: 'done',
+                    name: item.url,
+                    url: item.url,
+                    isMain: item.isMain
+                }));
+                setImageList(imgs);
+            }
             dispatch(
                 openSnackbar({
                     anchorOrigin: {
@@ -107,6 +119,7 @@ const ThreeStep = ({
 
     useEffect(() => {
         if (data) {
+            setTags(data?.executeResult?.copyWriting?.tagList);
             setText(data?.executeResult?.copyWriting?.content);
             setTitle(data?.executeResult?.copyWriting?.title);
             setClaim(data?.claim);
@@ -189,31 +202,41 @@ const ThreeStep = ({
         >
             <Card
                 className="h-full"
-                title="小红书生成"
+                // title="小红书生成"
                 bodyStyle={{
-                    height: 'calc(100% - 30px)',
-                    overflow: 'hidden'
+                    height: 'calc(100% - 30px)'
                 }}
-                extra={
-                    !show && (
-                        <>
-                            <Button onClick={doRetry}>重新生成</Button>
-                            <Divider type="vertical" />
-                            {!editType ? (
-                                <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
-                                    编辑
-                                </Button>
-                            ) : (
-                                <Button type="primary" onClick={handleModify}>
-                                    保存
-                                </Button>
-                            )}
-                        </>
-                    )
-                }
             >
                 {/* <Spin spinning={aginLoading}> */}
                 <div className="w-full  h-full flex relative">
+                    <div>
+                        {!show && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    right: '0',
+                                    top: '-67px'
+                                }}
+                            >
+                                <Button onClick={doRetry}>重新生成</Button>
+                                <Divider type="vertical" />
+                                {!editType ? (
+                                    <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
+                                        编辑
+                                    </Button>
+                                ) : (
+                                    <Space>
+                                        <Button type="primary" onClick={handleModify}>
+                                            保存
+                                        </Button>
+                                        <Button type="default" onClick={() => setEditType(false)}>
+                                            取消
+                                        </Button>
+                                    </Space>
+                                )}
+                            </div>
+                        )}
+                    </div>
                     <div className="relative h-full overflow-hidden flex-1">
                         {imageList?.length > 0 &&
                             (editType ? (
@@ -276,7 +299,7 @@ const ThreeStep = ({
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
                                         <Avatar />
-                                        <span className="text-[rgba(51,51,51,0.8)] text-base ml-2">不沾果酱</span>
+                                        <span className="text-[rgba(51,51,51,0.8)] text-base ml-2"> {all_detail?.allDetail?.nickname}</span>
                                     </div>
                                     <div
                                         className="bg-[#ff2e4d] text-white text-base w-[96px] font-semibold px-6 h-[40px] cursor-pointer rounded-2xl text-center"
@@ -368,7 +391,7 @@ const ThreeStep = ({
                                         </div>
                                     ) : (
                                         <div className="flex gap-4 flex-wrap text-lg">
-                                            {data?.executeResult?.copyWriting?.tagList?.map((item: string) => (
+                                            {tags?.map((item: string) => (
                                                 <span key={item} className="text-[#13386c] cursor-pointer">
                                                     #{item}
                                                 </span>
@@ -402,7 +425,10 @@ const ThreeStep = ({
             </Modal>
             <Drawer
                 width={700}
-                style={{ zIndex: 9999 }}
+                // style={{ zIndex: 9999 }}
+                style={{
+                    transform: 'translateX(0)'
+                }}
                 open={open}
                 title={'重新生成'}
                 footer={null}

@@ -246,84 +246,87 @@ const EditStyle = ({
                                         )}
                                     </div>
                                 </div>
-                                <div className="mt-2">
-                                    <div className="text-lg">图片文字配置</div>
-                                    <div className="text-xs text-black/50">可绑定数据或输入内容到图片模版上具体文字位置上</div>
-                                    <div className="flex items-center gap-4 min-h-[32px] ml-3">
-                                        <span>图片标题生成</span>
-                                        <Switch
-                                            disabled={canEdit}
-                                            checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
-                                            onChange={(e) => {
-                                                const newData = _.cloneDeep(imageStyleData);
-                                                if (e) {
-                                                    newData.titleGenerateMode = 'AI';
-                                                } else {
-                                                    newData.titleGenerateMode = 'DEFAULT';
-                                                }
-                                                setData(newData);
-                                            }}
-                                        />
-                                        <span className="text-[#673ab7]">
-                                            {imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}
-                                        </span>
-                                        {imageStyleData?.titleGenerateMode === 'AI' && (
-                                            <Input
-                                                className="w-[400px]"
-                                                value={imageStyleData?.titleGenerateRequirement}
+
+                                {imageStyleData?.variableList?.filter((item: any) => item?.type === 'TEXT')?.length > 0 && (
+                                    <div className="mt-2">
+                                        <div className="text-lg">图片文字配置</div>
+                                        <div className="text-xs text-black/50">可绑定数据或输入内容到图片模版上具体文字位置上</div>
+                                        <div className="flex items-center gap-4 min-h-[32px] ml-3">
+                                            <span>图片标题生成</span>
+                                            <Switch
+                                                disabled={canEdit}
+                                                checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
                                                 onChange={(e) => {
                                                     const newData = _.cloneDeep(imageStyleData);
-                                                    newData.titleGenerateRequirement = e.target.value;
+                                                    if (e) {
+                                                        newData.titleGenerateMode = 'AI';
+                                                    } else {
+                                                        newData.titleGenerateMode = 'DEFAULT';
+                                                    }
                                                     setData(newData);
                                                 }}
-                                                placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
                                             />
-                                        )}
+                                            <span className="text-[#673ab7]">
+                                                {imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}
+                                            </span>
+                                            {imageStyleData?.titleGenerateMode === 'AI' && (
+                                                <Input
+                                                    className="w-[400px]"
+                                                    value={imageStyleData?.titleGenerateRequirement}
+                                                    onChange={(e) => {
+                                                        const newData = _.cloneDeep(imageStyleData);
+                                                        newData.titleGenerateRequirement = e.target.value;
+                                                        setData(newData);
+                                                    }}
+                                                    placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
+                                                />
+                                            )}
+                                        </div>
+                                        <div className="flex flex-wrap">
+                                            {imageStyleData?.variableList?.map(
+                                                (el: any, index: number) =>
+                                                    el.type === 'TEXT' && (
+                                                        <div
+                                                            className="w-[50%] p-3"
+                                                            ref={wrapperRef}
+                                                            onClick={() => setCurrentElementId(el.field)}
+                                                            onMouseEnter={() => setCurrentElementId(el.field)}
+                                                            onMouseLeave={() => setCurrentElementId('')}
+                                                        >
+                                                            <VariableInput
+                                                                disabled={canEdit}
+                                                                styles={
+                                                                    currentElementId === el.field
+                                                                        ? {
+                                                                              border: '2px solid #673ab7'
+                                                                          }
+                                                                        : {}
+                                                                }
+                                                                open={perOpen[index]}
+                                                                setOpen={(flag) => {
+                                                                    const newData = _.cloneDeep(perOpen);
+                                                                    newData[index] = flag;
+                                                                    setPerOpen(newData);
+                                                                }}
+                                                                code=""
+                                                                popoverWidth={popoverWidth}
+                                                                handleMenu={handleMenu}
+                                                                appUid={appData.appUid}
+                                                                index={index}
+                                                                title={el?.label}
+                                                                value={el.value}
+                                                                setValue={(value) => {
+                                                                    const newData = _.cloneDeep(imageStyleData);
+                                                                    newData.variableList[index].value = value;
+                                                                    setData(newData);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="flex flex-wrap">
-                                        {imageStyleData?.variableList?.map(
-                                            (el: any, index: number) =>
-                                                el.type === 'TEXT' && (
-                                                    <div
-                                                        className="w-[50%] p-3"
-                                                        ref={wrapperRef}
-                                                        onClick={() => setCurrentElementId(el.field)}
-                                                        onMouseEnter={() => setCurrentElementId(el.field)}
-                                                        onMouseLeave={() => setCurrentElementId('')}
-                                                    >
-                                                        <VariableInput
-                                                            disabled={canEdit}
-                                                            styles={
-                                                                currentElementId === el.field
-                                                                    ? {
-                                                                          border: '2px solid #673ab7'
-                                                                      }
-                                                                    : {}
-                                                            }
-                                                            open={perOpen[index]}
-                                                            setOpen={(flag) => {
-                                                                const newData = _.cloneDeep(perOpen);
-                                                                newData[index] = flag;
-                                                                setPerOpen(newData);
-                                                            }}
-                                                            code=""
-                                                            popoverWidth={popoverWidth}
-                                                            handleMenu={handleMenu}
-                                                            appUid={appData.appUid}
-                                                            index={index}
-                                                            title={el?.label}
-                                                            value={el.value}
-                                                            setValue={(value) => {
-                                                                const newData = _.cloneDeep(imageStyleData);
-                                                                newData.variableList[index].value = value;
-                                                                setData(newData);
-                                                            }}
-                                                        />
-                                                    </div>
-                                                )
-                                        )}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -14,14 +14,15 @@ import {
     InputNumber,
     Tag,
     Row,
-    Col
+    Col,
+    Badge
 } from 'antd';
-import { FormControl, Autocomplete, Chip, TextField } from '@mui/material';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
-import { useState, useEffect, useRef, memo } from 'react';
-import { materialTemplate, materialImport, materialExport, materialResilt, getPlan, planModify } from 'api/redBook/batchIndex';
+import { useState, useEffect, useRef } from 'react';
+import { materialTemplate, materialImport, materialExport, materialResilt, getPlan, planModify, planUpgrade } from 'api/redBook/batchIndex';
+import { marketDeatail } from 'api/template/index';
 import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import CreateVariable from '../../copywriting/components/spliceCmponents/variable';
@@ -54,6 +55,7 @@ const Lefts = ({
     //存储的数据
     const appRef = useRef<any>(null);
     const [appData, setAppData] = useState<any>(null);
+    const [version, setVersion] = useState(0);
     const getStatus = (status: any) => {
         switch (status) {
             case 'PENDING':
@@ -129,6 +131,10 @@ const Lefts = ({
     const [uploadOpen, setUploadOpen] = useState(false);
     const [parseUid, setParseUid] = useState(''); //上传之后获取的 uid
     //获取表头数据
+    const typeList = [
+        { label: '小红书', value: 'SMALL_RED_BOOK' },
+        { label: '其他', value: 'OTHER' }
+    ];
     const getTableHeader = async () => {
         const result = await materialTemplate(materialType);
         const newList = result?.fieldDefine?.map((item: any) => {
@@ -142,7 +148,11 @@ const Lefts = ({
                         {item.type === 'image' ? (
                             <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
                         ) : (
-                            <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
+                            <div className="break-all line-clamp-4">
+                                {item.fieldName === 'source'
+                                    ? typeList?.find((i) => i.value === row[item.fieldName])?.label
+                                    : row[item.fieldName]}
+                            </div>
                         )}
                     </div>
                 ),
@@ -290,6 +300,8 @@ const Lefts = ({
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else {
             result = await getPlan(searchParams.get('appUid'));
+            const res = await marketDeatail({ uid: searchParams.get('appUid') });
+            setVersion(res.version);
             newList = _.cloneDeep(result?.configuration?.appInformation);
             const collData: any = result?.configuration?.appInformation?.example;
             if (collData) {
@@ -451,13 +463,22 @@ const Lefts = ({
         const newList = data.map((item: any) => ({
             title: item.desc,
             align: 'center',
-            width: 200,
+            width: item.fieldName === 'source' ? 100 : 200,
+            fixed: item.fieldName === 'source' ? true : false,
             dataIndex: item.fieldName,
             render: (_: any, row: any) => (
                 <div className="flex justify-center items-center flex-wrap break-all gap-2">
                     <div className="line-clamp-5">
                         {item.type === 'image' ? (
-                            <Image width={50} height={50} preview={false} src={row[item.fieldName]} />
+                            <Image
+                                width={50}
+                                height={50}
+                                preview={false}
+                                src={row[item.fieldName]}
+                                fallback="data:image/png;base64,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"
+                            />
+                        ) : item.fieldName === 'source' ? (
+                            typeList?.find((i) => i.value === row[item.fieldName])?.label
                         ) : (
                             row[item.fieldName]
                         )}
@@ -595,7 +616,7 @@ const Lefts = ({
     };
 
     // 基础数据
-    const [totalCount, setTotalCount] = useState<number>(5);
+    const [totalCount, setTotalCount] = useState<number>(1);
     useEffect(() => {
         if (pre && pre > 0) {
             getList();
@@ -710,37 +731,66 @@ const Lefts = ({
     };
     const [tabKey, setTabKey] = useState('1');
     const [page, setPage] = useState(1);
+    const upDateVersion = async () => {
+        const result = await planUpgrade({
+            uid: appData?.uid,
+            appUid: searchParams.get('appUid'),
+            configuration: appData?.configuration,
+            totalCount
+        });
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '更新成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                close: false
+            })
+        );
+        getList();
+    };
     return (
         <>
-            <div className="relative">
+            <div className="relative" style={{ height: detailShow ? 'auto' : '100%' }}>
                 {detailShow && (
                     <div className="flex justify-between items-end mb-4">
                         <div className="text-[22px]">{appData?.configuration?.appInformation?.name}</div>
                         <div>
                             状态：{getStatus(appData?.status)}{' '}
-                            <Popconfirm
-                                title="更新提示"
-                                description={
-                                    <div>
-                                        <div>当前应用最新版本为：2</div>
-                                        <div>你使用的应用版本为：1</div>
-                                        <div>是否需要更新版本，获得最佳创作效果</div>
-                                    </div>
-                                }
-                                onConfirm={() => {}}
-                                okText="更新"
-                                cancelText="取消"
-                            >
+                            {appData?.version !== version ? (
+                                <Popconfirm
+                                    title="更新提示"
+                                    description={
+                                        <div>
+                                            <div>当前应用最新版本为：{version}</div>
+                                            <div>你使用的应用版本为：{appData?.version}</div>
+                                            <div>是否需要更新版本，获得最佳创作效果</div>
+                                        </div>
+                                    }
+                                    onConfirm={() => upDateVersion()}
+                                    okText="更新"
+                                    cancelText="取消"
+                                >
+                                    <Badge dot>
+                                        <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                            版本号： <span className="font-blod">{appData?.version}</span>
+                                        </span>
+                                    </Badge>
+                                </Popconfirm>
+                            ) : (
                                 <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
                                     版本号： <span className="font-blod">{appData?.version}</span>
                                 </span>
-                            </Popconfirm>
+                            )}
                         </div>
                     </div>
                 )}
                 <div
                     style={{
-                        height: detailShow ? (getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 370px)' : 'calc(100vh - 181px)') : '80vh'
+                        height: detailShow ? (getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 370px)' : 'calc(100vh - 181px)') : '100%'
                     }}
                     className="overflow-y-auto pb-[72px]"
                 >
@@ -900,14 +950,12 @@ const Lefts = ({
                                                                             (item: any) => item.style === 'MATERIAL'
                                                                         );
                                                                         if (e.value === 'RANDOM') {
-                                                                            newList[index].variable.variables[num].value = '';
                                                                             newList[index].variable.variables[num].isShow = false;
                                                                             newList[index].variable.variables[num1].isShow = true;
                                                                         } else if (e.value === 'AI_PARODY') {
                                                                             newList[index].variable.variables[num].isShow = true;
                                                                             newList[index].variable.variables[num1].isShow = true;
                                                                         } else {
-                                                                            newList[index].variable.variables[num1].value = [];
                                                                             newList[index].variable.variables[num1].isShow = false;
                                                                             newList[index].variable.variables[num].isShow = true;
                                                                         }
@@ -921,21 +969,10 @@ const Lefts = ({
                                                 ))
                                             ) : (
                                                 <Tabs defaultActiveKey="1">
-                                                    <Tabs.TabPane tab="变量列表" key="1">
-                                                        <CreateVariable
-                                                            rows={item?.variable?.variables}
-                                                            setRows={(data: any[]) => {
-                                                                const newList = _.cloneDeep(generateList);
-                                                                newList[index].variable.variables = data;
-                                                                generRef.current = newList;
-                                                                setGenerateList(generRef.current);
-                                                            }}
-                                                        />
-                                                    </Tabs.TabPane>
-                                                    <Tabs.TabPane tab="变量编辑" key="2">
+                                                    <Tabs.TabPane tab="变量编辑" key="1">
                                                         <Row gutter={10}>
                                                             {item?.variable?.variables?.map((item: any, de: number) => (
-                                                                <Col key={item?.field} span={12}>
+                                                                <Col key={item?.field} span={24}>
                                                                     <Forms
                                                                         item={item}
                                                                         index={de}
@@ -950,6 +987,17 @@ const Lefts = ({
                                                                 </Col>
                                                             ))}
                                                         </Row>
+                                                    </Tabs.TabPane>
+                                                    <Tabs.TabPane tab="变量列表" key="2">
+                                                        <CreateVariable
+                                                            rows={item?.variable?.variables}
+                                                            setRows={(data: any[]) => {
+                                                                const newList = _.cloneDeep(generateList);
+                                                                newList[index].variable.variables = data;
+                                                                generRef.current = newList;
+                                                                setGenerateList(generRef.current);
+                                                            }}
+                                                        />
                                                     </Tabs.TabPane>
                                                 </Tabs>
                                             )}

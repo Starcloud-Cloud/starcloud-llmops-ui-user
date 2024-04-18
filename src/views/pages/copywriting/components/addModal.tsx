@@ -1015,6 +1015,7 @@ const AddModal = () => {
                                                                 title="标题"
                                                                 appUid={appData.appUid}
                                                                 stepCode="笔记生成"
+                                                                code={el.code}
                                                                 index={undefined}
                                                                 value={el?.title}
                                                                 setValue={(value) => {
@@ -1057,6 +1058,7 @@ const AddModal = () => {
                                                                     newData = newValue;
                                                                     setValues('content', newData, index);
                                                                 }}
+                                                                code={el.code}
                                                                 title="文案拼接配置"
                                                                 row={6}
                                                                 appUid={appData.appUid}

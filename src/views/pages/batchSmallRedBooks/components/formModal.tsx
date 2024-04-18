@@ -1,5 +1,5 @@
 import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select } from 'antd';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { getAccessToken } from 'utils/auth';
 import { dispatch } from 'store';
@@ -25,7 +25,6 @@ const FormModal = ({
     sourceList?: any[];
     materialType?: string;
 }) => {
-    console.log(columns);
     const { TextArea } = Input;
     const [uploadLoading, setUploadLoading] = useState(false);
     const [linkLoading, setLinkLoading] = useState(false);
@@ -42,6 +41,8 @@ const FormModal = ({
             setSeleVal('SMALL_RED_BOOK');
         }
     }, []);
+    const [open, setOpen] = useState(false);
+    const [imageUrl, setImageUrl] = useState('');
     return (
         <Modal
             zIndex={!materialType ? 9000 : 1100}
@@ -86,7 +87,20 @@ const FormModal = ({
                                         }}
                                     >
                                         {form.getFieldValue(item.dataIndex) ? (
-                                            <Image preview={false} width={102} height={102} src={form.getFieldValue(item.dataIndex)} />
+                                            <div className="relative">
+                                                <Image preview={false} width={102} height={102} src={form.getFieldValue(item.dataIndex)} />
+                                                <div className="top-0 left-0 z-[100] absolute w-full h-full hover:bg-black/30 flex justify-center items-center opacity-0 hover:opacity-100">
+                                                    <EyeOutlined
+                                                        onClick={(e) => {
+                                                            setImageUrl(form.getFieldValue(item.dataIndex));
+                                                            setOpen(true);
+                                                            e.stopPropagation();
+                                                        }}
+                                                        rev={undefined}
+                                                        className="text-white/60 hover:text-white"
+                                                    />
+                                                </div>
+                                            </div>
                                         ) : (
                                             <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
                                                 {uploadLoading ? <LoadingOutlined rev={undefined} /> : <PlusOutlined rev={undefined} />}
@@ -165,6 +179,9 @@ const FormModal = ({
                         ))
                 )}
             </Form>
+            <Modal width={448} title={'预览'} footer={false} open={open} onCancel={() => setOpen(false)} zIndex={9999}>
+                <Image width={400} preview={false} src={imageUrl} />
+            </Modal>
         </Modal>
     );
 };

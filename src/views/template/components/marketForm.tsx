@@ -188,6 +188,7 @@ function FormExecute({
                         }}
                         details={details}
                         appUid={appUid}
+                        code={handlerCode}
                         stepCode={stepCode}
                         index={undefined}
                         value={item.value}
@@ -420,6 +421,7 @@ function FormExecute({
                         </Button>
                     </div>
                     <Table
+                        virtual
                         rowKey={(_, index) => String(index)}
                         loading={tableLoading}
                         columns={columns}

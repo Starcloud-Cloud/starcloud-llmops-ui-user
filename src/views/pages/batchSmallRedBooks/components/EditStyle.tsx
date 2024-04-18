@@ -225,6 +225,7 @@ const EditStyle = ({
                                                                     newData[index] = flag;
                                                                     setPerOpen(newData);
                                                                 }}
+                                                                code="PosterActionHandler"
                                                                 popoverWidth={popoverWidth}
                                                                 handleMenu={handleMenu}
                                                                 appUid={appData.appUid}
@@ -305,6 +306,7 @@ const EditStyle = ({
                                                                 newData[index] = flag;
                                                                 setPerOpen(newData);
                                                             }}
+                                                            code=""
                                                             popoverWidth={popoverWidth}
                                                             handleMenu={handleMenu}
                                                             appUid={appData.appUid}

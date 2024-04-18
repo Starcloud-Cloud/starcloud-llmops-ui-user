@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Row, Col } from 'antd';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
 import { getContentPage } from 'api/redBook';
@@ -8,13 +9,10 @@ import SubCard from 'ui-component/cards/SubCard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
-import { v4 as uuidv4 } from 'uuid';
 import { DetailModal } from '../redBookContentList/component/detailModal';
 import './index.scss';
 import Left from './components/newLeft';
 import Right from './components/right';
-import Goods from './good';
-import dayjs from 'dayjs';
 const BatcSmallRedBooks = () => {
     const navigate = useNavigate();
     const timer: any = useRef([]);
@@ -318,6 +316,11 @@ const BatcSmallRedBooks = () => {
 
     const [detailOpen, setDetailOpen] = useState(false);
     const [businessUid, setBusinessUid] = useState('');
+    const [businessIndex, setBusinessIndex] = useState(0);
+    const changeList = () => {
+        const pageNo = Number((businessIndex / 20).toFixed(0)) + 1;
+        getLists(pageNo);
+    };
     //编辑获列表
     const [PlanUid, setPlanUid] = useState('');
     useEffect(() => {
@@ -330,7 +333,6 @@ const BatcSmallRedBooks = () => {
     return (
         <div className="bg-[rgb(244,246,248)] p-4">
             <SubCard
-                sx={{ minWidth: '1818px' }}
                 contentSX={{
                     display: 'flex',
                     alignItems: 'center',
@@ -346,44 +348,53 @@ const BatcSmallRedBooks = () => {
                 </div>
                 <div></div>
             </SubCard>
-            <div className="flex gap-[20px] mt-4">
-                <div className="!w-[700px] flex-none bg-white rounded-lg p-4">
-                    <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
-                </div>
-                <div className="flex-1 min-w-[1100px] bg-white rounded-lg p-4">
-                    <Right
-                        bathList={bathList}
-                        exampleList={exampleList}
-                        collapseActive={collapseActive}
-                        batchOpen={batchOpen}
-                        changeCollapse={(data: any) => changeCollapse(data)}
-                        planList={planList}
-                        setBusinessUid={(data: any) => setBusinessUid(data)}
-                        setDetailOpen={(data: any) => setDetailOpen(data)}
-                        handleScroll={(data: any) => handleScroll(data)}
-                        timeFailure={(index: number) => {
-                            const pageNo = Number((index / 20).toFixed(0)) + 1;
-                            clearInterval(timer.current[pageNo]);
-                            timer.current[pageNo] = getLists(pageNo);
-                            timer.current[pageNo] = setInterval(() => {
-                                if (
-                                    plabListRef.current
-                                        .slice((pageNo - 1) * queryPage.pageSize, pageNo * queryPage.pageSize)
-                                        ?.every(
-                                            (item: any) =>
-                                                item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
-                                        )
-                                ) {
-                                    clearInterval(timer.current[pageNo]);
-                                    return;
-                                }
-                                getLists(pageNo);
-                            }, 2000);
-                        }}
-                    />
-                </div>
-            </div>
-            {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
+            <Row gutter={20} className="mt-[20px]">
+                <Col span={9}>
+                    <div className="bg-white rounded-lg p-4">
+                        <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
+                    </div>
+                </Col>
+                <Col span={15}>
+                    <div className="bg-white rounded-lg p-4 h-full">
+                        <Right
+                            bathList={bathList}
+                            exampleList={exampleList}
+                            collapseActive={collapseActive}
+                            batchOpen={batchOpen}
+                            changeCollapse={(data: any) => changeCollapse(data)}
+                            planList={planList}
+                            setBusinessUid={(data: any) => {
+                                setBusinessUid(data.uid);
+                                setBusinessIndex(data.index);
+                            }}
+                            setDetailOpen={(data: any) => setDetailOpen(data)}
+                            handleScroll={(data: any) => handleScroll(data)}
+                            timeFailure={(index: number) => {
+                                const pageNo = Number((index / 20).toFixed(0)) + 1;
+                                clearInterval(timer.current[pageNo]);
+                                timer.current[pageNo] = getLists(pageNo);
+                                timer.current[pageNo] = setInterval(() => {
+                                    if (
+                                        plabListRef.current
+                                            .slice((pageNo - 1) * queryPage.pageSize, pageNo * queryPage.pageSize)
+                                            ?.every(
+                                                (item: any) =>
+                                                    item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
+                                            )
+                                    ) {
+                                        clearInterval(timer.current[pageNo]);
+                                        return;
+                                    }
+                                    getLists(pageNo);
+                                }, 2000);
+                            }}
+                        />
+                    </div>
+                </Col>
+            </Row>
+            {detailOpen && (
+                <DetailModal open={detailOpen} changeList={changeList} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />
+            )}
         </div>
     );
 };

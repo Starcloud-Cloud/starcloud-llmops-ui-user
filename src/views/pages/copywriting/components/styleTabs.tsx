@@ -96,6 +96,7 @@ const StyleTabs = ({
     return (
         <>
             <Tabs
+                hideAdd={canEdit}
                 className="mt-[20px]"
                 type="editable-card"
                 onChange={onChange}
@@ -110,7 +111,7 @@ const StyleTabs = ({
                             </div>
                         ),
                         key: i.toString(),
-                        closable: i === 0 ? false : true,
+                        closable: canEdit ? false : i === 0 ? false : true,
                         children: (
                             <EditStyle
                                 appData={appData}

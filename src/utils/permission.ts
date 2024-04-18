@@ -5,9 +5,9 @@ export const enum ENUM_TENANT {
 
 export const getTenant = () => {
     const hostname = window.location.hostname;
-    if (hostname === 'cn-test.llmops-ui-user.hotsalestar.com' || hostname === 'www.mofaai.com.cn') {
+    if (hostname === 'cn-test.mofaai.com.cn' || hostname === 'www.mofaai.com.cn') {
         return ENUM_TENANT.AI;
-    } else if (hostname === 'cn-test.juzhen.hotsalestar.com' || hostname === 'juzhen.mofaai.com.cn') {
+    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn') {
         return ENUM_TENANT.ANNOUNCE;
     } else {
         return ENUM_TENANT.ANNOUNCE;

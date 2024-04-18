@@ -276,6 +276,7 @@ const VariableInput = ({
                     disabled={disabled}
                     style={styles}
                     rows={row || 1}
+                    status={!value ? 'error' : ''}
                     value={value}
                     ref={(ref) => (inputList.current[index] = ref)}
                     onChange={(e) => {

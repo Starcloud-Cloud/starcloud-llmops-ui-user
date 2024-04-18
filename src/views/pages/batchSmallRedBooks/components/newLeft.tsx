@@ -33,12 +33,14 @@ import Forms from '../../smallRedBook/components/form';
 const Lefts = ({
     detailShow = true,
     data,
+    saveLoading,
     setCollData,
     newSave,
     setPlanUid
 }: {
     detailShow?: boolean;
     data?: any;
+    saveLoading?: boolean;
     setCollData?: (data: any) => void;
     newSave: (data: any) => void;
     setPlanUid: (data: any) => void;
@@ -593,9 +595,6 @@ const Lefts = ({
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
         const newList = _.cloneDeep(generateList);
-        console.log(newList);
-        console.log(imageRef.current?.record);
-
         newList?.forEach((item) => {
             item?.variable?.variables?.forEach((el: any) => {
                 if (el.value && typeof el.value === 'object') {
@@ -993,7 +992,7 @@ const Lefts = ({
                         </>
                     )}
                     {!detailShow && (
-                        <Button className="w-full" onClick={() => handleSaveClick(false, true)} type="primary">
+                        <Button loading={saveLoading} className="w-full" onClick={() => handleSaveClick(false, true)} type="primary">
                             保存并重新生成
                         </Button>
                     )}

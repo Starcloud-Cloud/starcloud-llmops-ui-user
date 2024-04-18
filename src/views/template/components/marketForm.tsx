@@ -197,9 +197,13 @@ function FormExecute({
                         }}
                         model={model}
                     />
-                    <span className="z-[100] block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                    <span
+                        style={{ color: !item.value ? '#f44336' : '#364152' }}
+                        className="z-[100] block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc]"
+                    >
                         {item.label}
                     </span>
+                    {!item.value && <p className="text-[#f44336] mt-[4px] text-xs">{item.label}必填</p>}
                 </div>
             ) : item.style === 'INPUT' ? (
                 <TextField

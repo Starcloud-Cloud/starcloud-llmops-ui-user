@@ -30,8 +30,11 @@ import AddStyle from 'ui-component/AddStyle';
 import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Forms from '../../smallRedBook/components/form';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const Lefts = ({
     detailShow = true,
+    pre,
     data,
     saveLoading,
     setCollData,
@@ -39,6 +42,7 @@ const Lefts = ({
     setPlanUid
 }: {
     detailShow?: boolean;
+    pre?: number;
     data?: any;
     saveLoading?: boolean;
     setCollData?: (data: any) => void;
@@ -396,7 +400,7 @@ const Lefts = ({
         getStepMater();
         const newImage = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         newImage?.flowStep?.variable?.variables?.forEach((item: any) => {
-            if (item.field === 'SYSTEM_POSTER_STYLE_CONFIG' && item.value) {
+            if (item.field === 'SYSTEM_POSTER_STYLE_CONFIG' && item.value && typeof item.value === 'string') {
                 item.value = JSON.parse(item.value);
             }
         });
@@ -592,6 +596,11 @@ const Lefts = ({
 
     // 基础数据
     const [totalCount, setTotalCount] = useState<number>(5);
+    useEffect(() => {
+        if (pre && pre > 0) {
+            getList();
+        }
+    }, [pre]);
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
         const newList = _.cloneDeep(generateList);
@@ -649,7 +658,7 @@ const Lefts = ({
                 totalCount,
                 configuration: {
                     imageStyleList: styleData
-                        ? JSON.parse(styleData)?.map((item: any) => ({
+                        ? styleData?.map((item: any) => ({
                               ...item,
                               id: undefined,
                               code: item.id
@@ -682,6 +691,18 @@ const Lefts = ({
                 }
             };
             const result = await planModify(data);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '保存成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
             if (flag) {
                 newSave(result);
             }

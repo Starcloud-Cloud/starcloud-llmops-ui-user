@@ -1,8 +1,12 @@
-import { Collapse, Spin, Tag } from 'antd';
+import { Collapse, Spin, Tag, Popover } from 'antd';
+import { CopyrightOutlined } from '@ant-design/icons';
+import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
 import { memo, useRef } from 'react';
 import PlanList from './PlanList';
 import Good from '../good';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const Right = ({
     bathList,
     exampleList,
@@ -45,8 +49,6 @@ const Right = ({
                 return <Tag>待执行</Tag>;
         }
     };
-    console.log(exampleList);
-
     return (
         <div>
             {bathList?.length === 0 ? (
@@ -86,13 +88,43 @@ const Right = ({
                                 label: (
                                     <div className="w-full flex justify-between items-center text-sm pr-[20px]">
                                         <div>
-                                            {getStatus(item.status)}
+                                            <Popover
+                                                content={
+                                                    <div className="flex items-center gap-2">
+                                                        <span>批次号：{item.uid}</span>
+                                                        <CopyrightOutlined
+                                                            onClick={(e) => {
+                                                                copy(item.uid);
+                                                                dispatch(
+                                                                    openSnackbar({
+                                                                        open: true,
+                                                                        message: '复制成功',
+                                                                        variant: 'alert',
+                                                                        alert: {
+                                                                            color: 'success'
+                                                                        },
+                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                        close: false
+                                                                    })
+                                                                );
+                                                                e.stopPropagation();
+                                                            }}
+                                                            className="cursor-pointer"
+                                                            rev={undefined}
+                                                        />
+                                                    </div>
+                                                }
+                                            >
+                                                {getStatus(item.status)}
+                                            </Popover>
                                             <span className="font-[600]">生成时间：</span>
-                                            {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}（{item?.uid}）
+                                            {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}
                                             <span className="font-[600]">版本号：</span>
                                             {item?.version}
                                         </div>
                                         <div>
+                                            <span className="font-[600]">执行人：</span>
+                                            {item?.creator}&nbsp;&nbsp;
                                             <span className="font-[600]">生成成功数：</span>
                                             {item?.successCount}&nbsp;&nbsp;
                                             <span className="font-[600]">生成失败数：</span>

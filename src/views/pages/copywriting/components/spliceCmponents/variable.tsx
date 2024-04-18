@@ -46,10 +46,10 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
         }
     };
     useEffect(() => {
-        if (!open) {
+        if (!variableOpen) {
             setItemData({});
         }
-    }, [open]);
+    }, [variableOpen]);
     return (
         <>
             <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
@@ -80,7 +80,6 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                             <TableRow>
                                 <TableCell>{t('myApp.field')}</TableCell>
                                 <TableCell>{t('myApp.name')}</TableCell>
-                                <TableCell>变量默认值</TableCell>
                                 <TableCell>{t('myApp.type')}</TableCell>
                                 <TableCell>{t('myApp.operation')}</TableCell>
                             </TableRow>
@@ -91,7 +90,6 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                                     <TableRow hover key={row.field}>
                                         <TableCell>{row.field}</TableCell>
                                         <TableCell>{row.label}</TableCell>
-                                        <TableCell>{row.defaultValue}</TableCell>
                                         <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
                                         <TableCell sx={{ width: 120 }}>
                                             <IconButton

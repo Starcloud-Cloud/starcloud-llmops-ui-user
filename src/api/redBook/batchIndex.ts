@@ -90,3 +90,7 @@ export const getPlan = (appUid: any) => {
 export const getListExample = (uid: any) => {
     return request.get({ url: `/llm/xhs/content/listExample?uidList=${uid}` });
 };
+//更新版本
+export const planUpgrade = (data: any) => {
+    return request.post({ url: `/llm/creative/plan/upgrade`, data });
+};

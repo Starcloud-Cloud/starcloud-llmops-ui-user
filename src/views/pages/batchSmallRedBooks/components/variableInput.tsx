@@ -12,6 +12,7 @@ const { TextArea } = Input;
 const VariableInput = ({
     open,
     setOpen,
+    code,
     popoverWidth,
     handleMenu,
     index = 0,
@@ -29,6 +30,7 @@ const VariableInput = ({
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
+    code?: string;
     popoverWidth?: number;
     handleMenu: (data: any) => void;
     index?: number;
@@ -94,13 +96,25 @@ const VariableInput = ({
                     }
                 );
             } else {
-                arr.push({
-                    key: jsonType ? name + `.list('${key}')` : name + '.' + key,
-                    label: key,
-                    title: property?.title,
-                    desc: property?.description,
-                    type: jsonType
-                });
+                if (code === 'PosterActionHandler') {
+                    if (property?.description?.split('-')[1] === 'image') {
+                        arr.push({
+                            key: jsonType ? name + `.list('${key}')` : name + '.' + key,
+                            label: key,
+                            title: property?.title,
+                            desc: property?.description,
+                            type: jsonType
+                        });
+                    }
+                } else {
+                    arr.push({
+                        key: jsonType ? name + `.list('${key}')` : name + '.' + key,
+                        label: key,
+                        title: property?.title,
+                        desc: property?.description,
+                        type: jsonType
+                    });
+                }
             }
         }
         return arr;
@@ -192,21 +206,23 @@ const VariableInput = ({
                             className="w-full flex justify-between items-center"
                         >
                             <div className="flex gap-1 items-center">
-                                {item.desc?.split('-')[1] && (
-                                    <img
-                                        className="w-[15px]"
-                                        src={
-                                            item.desc?.split('-')[1] === 'image'
-                                                ? image
-                                                : item.desc?.split('-')[1] === 'string'
-                                                ? string
-                                                : item.desc?.split('-')[1] === 'textBox'
-                                                ? textBox
-                                                : number
-                                        }
-                                        alt=""
-                                    />
-                                )}
+                                <div className="w-[15px]">
+                                    {item.desc?.split('-')[1] && (
+                                        <img
+                                            className="w-[15px]"
+                                            src={
+                                                item.desc?.split('-')[1] === 'image'
+                                                    ? image
+                                                    : item.desc?.split('-')[1] === 'string'
+                                                    ? string
+                                                    : item.desc?.split('-')[1] === 'textBox'
+                                                    ? textBox
+                                                    : number
+                                            }
+                                            alt=""
+                                        />
+                                    )}
+                                </div>
                                 <div className="flex items-center gap-1">
                                     <div>{item.type === '*' && <Checkbox checked={varableOpen[i]} value={item.label}></Checkbox>}</div>
                                     <div>{item.label}</div>

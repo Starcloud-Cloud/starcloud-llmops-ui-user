@@ -13,7 +13,7 @@ export const categoryTree = () => {
     return request.get({ url: '/llm/app/categoryTree' });
 };
 //模板市场详情
-export const marketDeatail = (data: { uid: string }) => {
+export const marketDeatail = (data: any) => {
     return request.get({ url: `/llm/app/market/get/${data.uid}` });
 };
 //删除模板市场

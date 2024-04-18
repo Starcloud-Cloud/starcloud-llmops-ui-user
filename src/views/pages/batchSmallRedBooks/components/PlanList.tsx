@@ -18,7 +18,9 @@ const PlanList = ({
                 <Col key={item.businessUid} xs={12} md={12} xl={8} xxl={6} className="inline-block">
                     <Goods
                         item={item}
-                        setBusinessUid={setBusinessUid}
+                        setBusinessUid={(data: any) => {
+                            setBusinessUid({ uid: data, index });
+                        }}
                         setDetailOpen={setDetailOpen}
                         timeFailure={() => timeFailure(index + 1)}
                     />

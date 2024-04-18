@@ -1,8 +1,23 @@
 import { SearchOutlined } from '@mui/icons-material';
-import { Button, Card, Divider, Image, Dropdown, Space, Drawer, Collapse, Modal, Switch, message, Checkbox, CheckboxProps } from 'antd';
+import {
+    Button,
+    Card,
+    Divider,
+    Image,
+    Dropdown,
+    Space,
+    Drawer,
+    Collapse,
+    Modal,
+    Switch,
+    message,
+    Checkbox,
+    CheckboxProps,
+    Select
+} from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, Select, TextField } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, TextField } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
@@ -307,7 +322,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                 <Collapse items={collapseList} defaultActiveKey={[0]} />
             </div>
             <Drawer
-                // zIndex={9999}
+                zIndex={9999}
                 title="选择风格模版"
                 onClose={() => {
                     setVisible(false);
@@ -315,7 +330,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                     setChooseImageIndex('');
                 }}
                 open={visible}
-                // placement={'left'}
+                placement={'left'}
                 width={500}
                 footer={
                     <div className="flex justify-between">
@@ -353,9 +368,9 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                 }
             >
                 <div className="grid grid-cols-3 gap-3">
-                    <FormControl key={query?.picNum} color="secondary" size="small" fullWidth>
-                        <InputLabel id="types">图片数量</InputLabel>
-                        <Select
+                    {/* <FormControl key={query?.picNum} color="secondary" size="small" fullWidth>
+                        <InputLabel id="types">图片数量</InputLabel> */}
+                    {/* <Select
                             value={query?.picNum}
                             onChange={(e: any) => handleQuery({ label: 'picNum', value: e.target.value })}
                             endAdornment={
@@ -385,8 +400,40 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                             <MenuItem value={4}>4</MenuItem>
                             <MenuItem value={5}>5</MenuItem>
                             <MenuItem value={6}>6</MenuItem>
-                        </Select>
-                    </FormControl>
+                        </Select> */}
+                    {/* </FormControl> */}
+                    <Select
+                        allowClear
+                        placeholder={'图片数量'}
+                        value={query?.picNum}
+                        onChange={(value) => handleQuery({ label: 'picNum', value })}
+                        options={[
+                            {
+                                value: 1,
+                                label: '1'
+                            },
+                            {
+                                value: 2,
+                                label: '2'
+                            },
+                            {
+                                value: 3,
+                                label: '3'
+                            },
+                            {
+                                value: 4,
+                                label: '4'
+                            },
+                            {
+                                value: 5,
+                                label: '5'
+                            },
+                            {
+                                value: 6,
+                                label: '6'
+                            }
+                        ]}
+                    />
                 </div>
                 <div>
                     <div className="flex items-center mt-1">

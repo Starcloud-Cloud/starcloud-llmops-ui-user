@@ -290,6 +290,8 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1 }: any, r
     const onCheckboxChange = (e: any, index: number) => {
         // console.log(`checked = ${e.target.checked}`);
         setChooseImageIndex(index);
+        const list: any = templateList[index];
+        setSelectImgs(list);
     };
 
     return (

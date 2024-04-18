@@ -1,5 +1,5 @@
-import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, UploadProps, Upload, Modal, Select } from 'antd';
 import React, { useEffect, useState, useRef, memo } from 'react';
+import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, UploadProps, Upload, Modal, Select, Drawer } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -175,7 +175,15 @@ const ThreeStep = ({
     const timer = useRef<any>(null);
 
     return (
-        <div className="h-full">
+        <div
+            className="h-full"
+            style={{
+                position: 'relative'
+                // background: token.colorFillAlter,
+                // border: `1px solid ${token.colorBorderSecondary}`,
+                // borderRadius: token.borderRadiusLG
+            }}
+        >
             <Card
                 className="h-full"
                 title="小红书生成"
@@ -379,7 +387,15 @@ const ThreeStep = ({
             <Modal style={{ zIndex: 8000 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
                 <img alt="example" style={{ width: '100%' }} src={previewImage} />
             </Modal>
-            <Modal style={{ zIndex: 9999 }} open={open} title={'重新生成'} footer={null} onCancel={() => setOpen(false)}>
+            <Drawer
+                width={700}
+                style={{ zIndex: 9999 }}
+                open={open}
+                title={'重新生成'}
+                footer={null}
+                getContainer={false}
+                onClose={() => setOpen(false)}
+            >
                 <Left
                     detailShow={false}
                     data={data}
@@ -398,7 +414,7 @@ const ThreeStep = ({
                         console.log(uid);
                     }}
                 />
-            </Modal>
+            </Drawer>
         </div>
     );
 };

@@ -219,7 +219,7 @@ const BatcSmallRedBooks = () => {
                 if (
                     plabListRef.current
                         .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
-                        ?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT')
+                        ?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE')
                 ) {
                     clearInterval(timer.current[queryPage.pageNo - 1]);
                     return;
@@ -254,7 +254,7 @@ const BatcSmallRedBooks = () => {
                     if (
                         plabListRef.current?.length === 0 ||
                         plabListRef.current.slice(0, 20)?.every((item: any) => {
-                            return item?.status !== 'EXECUTING' && item?.status !== 'INIT';
+                            return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
                         })
                     ) {
                         clearInterval(timer.current[0]);
@@ -287,15 +287,10 @@ const BatcSmallRedBooks = () => {
             } else {
                 getList(bathId);
                 timer.current[0] = setInterval(() => {
-                    console.log(plabListRef.current?.length);
-                    console.log(
-                        plabListRef.current.slice(0, 20)?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT')
-                    );
-
                     if (
                         plabListRef.current?.length === 0 ||
                         plabListRef.current.slice(0, 20)?.every((item: any) => {
-                            return item?.status !== 'EXECUTING' && item?.status !== 'INIT';
+                            return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
                         })
                     ) {
                         clearInterval(timer.current[0]);
@@ -356,6 +351,20 @@ const BatcSmallRedBooks = () => {
                             const pageNo = Number((index / 20).toFixed(0)) + 1;
                             clearInterval(timer.current[pageNo]);
                             timer.current[pageNo] = getLists(pageNo);
+                            timer.current[pageNo] = setInterval(() => {
+                                if (
+                                    plabListRef.current
+                                        .slice((pageNo - 1) * queryPage.pageSize, pageNo * queryPage.pageSize)
+                                        ?.every(
+                                            (item: any) =>
+                                                item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
+                                        )
+                                ) {
+                                    clearInterval(timer.current[pageNo]);
+                                    return;
+                                }
+                                getLists(pageNo);
+                            }, 2000);
                         }}
                     />
                 </div>

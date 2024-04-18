@@ -1,5 +1,21 @@
-import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, UploadProps, Upload, Modal, Select, Drawer } from 'antd';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
+import {
+    Avatar,
+    Card,
+    CollapseProps,
+    Divider,
+    Space,
+    Button,
+    Spin,
+    Input,
+    UploadProps,
+    Upload,
+    Modal,
+    Select,
+    Drawer,
+    Progress,
+    Popover
+} from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -17,8 +33,21 @@ import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
 import Left from '../../batchSmallRedBooks/components/newLeft';
 
-export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boolean; pre: number; setPre: (data: number) => void }) => {
-    console.log('🚀 ~ ThreeStep ~ data:', data);
+const ThreeStep = ({
+    data,
+    show,
+    pre,
+    dataStatus,
+    setSataStatus,
+    setPre
+}: {
+    data: any;
+    show?: boolean;
+    pre: number;
+    dataStatus: boolean;
+    setSataStatus: (data: boolean) => void;
+    setPre: (data: number) => void;
+}) => {
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     const [tags, setTags] = React.useState<any>([]);
@@ -89,32 +118,24 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
                 url: item.url,
                 isMain: item.isMain
             }));
-
-            console.log(imgs);
-
             setImageList(imgs);
         }
     }, [data]);
 
     const doRetry = async () => {
         setOpen(true);
-        return;
-        const res = await retryContent(data.businessUid);
-        if (res) {
-            setText(res.copyWritingContent);
-            setTitle(res.copyWritingTitle);
-
-            const imgs = res?.pictureContent.map((item: any) => ({
-                uid: item.index,
-                status: 'done',
-                name: item.url,
-                url: item.url,
-                isMain: item.isMain
-            }));
-            setImageList(imgs);
-        }
     };
-
+    useEffect(() => {
+        return () => {
+            clearInterval(timer.current);
+        };
+    }, []);
+    useEffect(() => {
+        if (dataStatus) {
+            clearInterval(timer.current);
+            setAginLoading(false);
+        }
+    }, [dataStatus]);
     const props: UploadProps = {
         name: 'image',
         multiple: true,
@@ -152,8 +173,10 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
     };
     //重新生成
     const [open, setOpen] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
     const [aginLoading, setAginLoading] = useState(false);
     const timer = useRef<any>(null);
+
     return (
         <div
             className="h-full"
@@ -190,7 +213,7 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
                 }
             >
                 {/* <Spin spinning={aginLoading}> */}
-                <div className="w-full  h-full flex">
+                <div className="w-full  h-full flex relative">
                     <div className="relative h-full overflow-hidden flex-1">
                         {imageList?.length > 0 &&
                             (editType ? (
@@ -356,8 +379,22 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
                             </div>
                         }
                     </div>
+                    {aginLoading && (
+                        <div className="z-[1000] absolute w-full h-full flex justify-center items-center bg-black/50">
+                            <div className="flex flex-col gap-2 justify-center items-center">
+                                <Progress
+                                    type="circle"
+                                    percent={Math.floor((data?.progress?.currentStepIndex / data?.progress?.totalStepCount) * 100)}
+                                />
+                                <Popover content={'执行到第几步/总步数'}>
+                                    <div className="font-[500] cursor-pointer">
+                                        {data?.progress?.currentStepIndex || '-'}/{data?.progress?.totalStepCount || '-'}
+                                    </div>
+                                </Popover>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                {/* </Spin> */}
             </Card>
 
             <Modal style={{ zIndex: 8000 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
@@ -375,17 +412,17 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
                 <Left
                     detailShow={false}
                     data={data}
+                    saveLoading={saveLoading}
                     newSave={async (data: any) => {
+                        setSaveLoading(true);
+                        setSataStatus(false);
                         await retryContent(data);
+                        setSaveLoading(false);
                         setOpen(false);
                         setAginLoading(true);
                         timer.current = setInterval(() => {
-                            if (data?.status !== 'EXECUTING') {
-                                clearInterval(timer.current);
-                                setAginLoading(false);
-                            }
-                            setPre(pre + 1);
-                        }, 200);
+                            setPre(Math.random() + Math.random());
+                        }, 2000);
                     }}
                     setPlanUid={(uid: any) => {
                         console.log(uid);
@@ -395,3 +432,8 @@ export const ThreeStep = ({ data, show, pre, setPre }: { data: any; show?: boole
         </div>
     );
 };
+const prop = (newValue: any, oldValue: any) => {
+    return JSON.stringify(newValue.data) === JSON.stringify(oldValue.data) && JSON.stringify(newValue.pre) === JSON.stringify(oldValue.pre);
+};
+
+export default memo(ThreeStep, prop);

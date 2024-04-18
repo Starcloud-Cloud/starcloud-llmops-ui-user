@@ -1,11 +1,11 @@
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import React from 'react';
 import { Modal } from 'antd';
-import { ThreeStep } from './threeStep';
+import ThreeStep from './threeStep';
 import { getContentDetail, getContentDetail1 } from 'api/redBook';
 
 type IAddAiModalProps = {
@@ -17,7 +17,9 @@ type IAddAiModalProps = {
 
 export const DetailModal = ({ open, handleClose, businessUid, show }: IAddAiModalProps) => {
     const [detail, setDetail] = useState(null);
+    const preRef = useRef(0);
     const [pre, setPre] = useState(0);
+    const [dataStatus, setSataStatus] = useState(false);
     useEffect(() => {
         if (show) {
             getContentDetail1(businessUid).then((res) => {
@@ -32,12 +34,33 @@ export const DetailModal = ({ open, handleClose, businessUid, show }: IAddAiModa
                 }
             });
         }
-    }, [businessUid, pre]);
-
+    }, [businessUid]);
+    useEffect(() => {
+        if (pre) {
+            getContentDetail(businessUid).then((res) => {
+                if (res) {
+                    if (res.status !== 'EXECUTING') {
+                        setSataStatus(true);
+                    }
+                    setDetail(res);
+                }
+            });
+        }
+    }, [pre]);
     return (
         <Modal width={'80%'} open={open} onCancel={handleClose} title="详情" footer={false} style={{ maxWidth: '1400px' }}>
             <div className="h-[calc(80vh-86px)] p-2">
-                <ThreeStep data={detail} show={show} pre={pre} setPre={setPre} />
+                <ThreeStep
+                    data={detail}
+                    show={show}
+                    pre={preRef.current}
+                    dataStatus={dataStatus}
+                    setSataStatus={setSataStatus}
+                    setPre={(data) => {
+                        preRef.current = data;
+                        setPre(preRef.current);
+                    }}
+                />
             </div>
         </Modal>
     );

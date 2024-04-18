@@ -1,37 +1,21 @@
-import { SearchOutlined } from '@mui/icons-material';
-import {
-    Button,
-    Card,
-    Divider,
-    Image,
-    Dropdown,
-    Space,
-    Drawer,
-    Collapse,
-    Modal,
-    Switch,
-    message,
-    Checkbox,
-    CheckboxProps,
-    Select
-} from 'antd';
+import { Button, Card, Divider, Image, Dropdown, Space, Drawer, Collapse, Modal, Switch, message } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, TextField } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
 import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType }: any, ref: any) => {
-    console.log(record, 'record');
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
     const [selectImgs, setSelectImgs] = useState<any>(null);
 
-    const [query, setQuery] = useState<any | null>(null);
+    const [query, setQuery] = useState<any | null>({
+        picNum: ''
+    });
     const [hoverIndex, setHoverIndex] = useState<any>('');
     const [chooseImageIndex, setChooseImageIndex] = useState<any>('');
     const [type, setType] = useState<any>();
@@ -41,6 +25,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
     const [currentStyle, setCurrentStyle] = useState<any>(null);
     const [switchCheck, setSwitchCheck] = useState(false);
     const [updIndex, setUpdIndex] = useState<any>('');
+    const [previewShow, setPreviewShow] = useState(false);
 
     const currentStyleRef: any = useRef(null);
     const collapseIndexRef: any = useRef(null);
@@ -133,36 +118,103 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
         setSelectImgs(list);
     };
 
-    const items: any = [
+    const items: any =
+        mode === 1
+            ? [
+                  {
+                      key: '0',
+                      label: (
+                          <span
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  const index: any = collapseIndexRef.current;
+                                  const copyStyleData = [...styleData];
+                                  const item = copyStyleData[index];
+                                  setCurrentStyle(item);
+                                  currentStyleRef.current = item;
+                                  setIsModalOpen(true);
+                                  setUpdIndex(index);
+                              }}
+                          >
+                              编辑
+                          </span>
+                      )
+                  },
+                  {
+                      key: '1',
+                      label: (
+                          <span
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  const index: any = collapseIndexRef.current;
+                                  const copyStyleData = [...styleData];
+                                  copyStyleData.splice(index, 1);
+                                  setStyleData(copyStyleData);
+                              }}
+                          >
+                              删除
+                          </span>
+                      )
+                  },
+                  {
+                      key: '2',
+                      label: (
+                          <span
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  const index: any = collapseIndexRef.current;
+                                  let copyStyleData = [...styleData];
+                                  copyStyleData = [
+                                      ...copyStyleData,
+                                      { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }
+                                  ];
+                                  setStyleData(copyStyleData);
+                              }}
+                          >
+                              复制
+                          </span>
+                      )
+                  }
+              ]
+            : [
+                  {
+                      key: '0',
+                      label: (
+                          <span
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  const index: any = collapseIndexRef.current;
+                                  const copyStyleData = [...styleData];
+                                  const item = copyStyleData[index];
+                                  setCurrentStyle(item);
+                                  currentStyleRef.current = item;
+                                  setIsModalOpen(true);
+                                  setUpdIndex(index);
+                              }}
+                          >
+                              编辑
+                          </span>
+                      )
+                  }
+              ];
+
+    const itemsEidt: any = [
         {
-            key: '1',
+            key: '0',
             label: (
                 <span
                     onClick={(e) => {
                         e.stopPropagation();
                         const index: any = collapseIndexRef.current;
                         const copyStyleData = [...styleData];
-                        copyStyleData.splice(index, 1);
-                        setStyleData(copyStyleData);
+                        const item = copyStyleData[index];
+                        setCurrentStyle(item);
+                        currentStyleRef.current = item;
+                        setIsModalOpen(true);
+                        setUpdIndex(index);
                     }}
                 >
-                    删除
-                </span>
-            )
-        },
-        {
-            key: '2',
-            label: (
-                <span
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        const index: any = collapseIndexRef.current;
-                        let copyStyleData = [...styleData];
-                        copyStyleData = [...copyStyleData, { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }];
-                        setStyleData(copyStyleData);
-                    }}
-                >
-                    复制
+                    编辑
                 </span>
             )
         }
@@ -207,18 +259,16 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                     <span>{item.name}</span>
                     <div className="flex justify-center">
                         <span>共{item?.templateList?.length || 0}张图片</span>
-                        {mode === 1 && (
-                            <Dropdown menu={{ items }} placement="bottom" arrow trigger={['click']}>
-                                <span
-                                    onClick={(e) => {
-                                        collapseIndexRef.current = index;
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <MoreVertIcon className="cursor-pointer" />
-                                </span>
-                            </Dropdown>
-                        )}
+                        <Dropdown menu={{ items }} placement="bottom" arrow trigger={['click']}>
+                            <span
+                                onClick={(e) => {
+                                    collapseIndexRef.current = index;
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <MoreVertIcon className="cursor-pointer" />
+                            </span>
+                        </Dropdown>
                     </div>
                 </div>
             ),
@@ -256,9 +306,9 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                                 setEditIndex(index);
                             }}
                         >
-                            选择风格模版
+                            切换风格模版
                         </Button>
-                        <div
+                        {/* <div
                             className="flex justify-center items-center cursor-pointer"
                             onClick={() => {
                                 setCurrentStyle(item);
@@ -269,7 +319,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         >
                             <span>点击放大编辑</span>
                             <SearchOutlined />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             )
@@ -402,12 +452,16 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                             <MenuItem value={6}>6</MenuItem>
                         </Select> */}
                     {/* </FormControl> */}
-                    <Select
+                    {/* <Select
                         allowClear
                         placeholder={'图片数量'}
                         value={query?.picNum}
                         onChange={(value) => handleQuery({ label: 'picNum', value })}
                         options={[
+                            {
+                                value: '',
+                                label: '所有'
+                            },
                             {
                                 value: 1,
                                 label: '1'
@@ -433,7 +487,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                                 label: '6'
                             }
                         ]}
-                    />
+                    /> */}
                 </div>
                 <div>
                     <div className="flex items-center mt-1">
@@ -448,18 +502,41 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         {templateList?.map((item, index) => {
                             return (
                                 <div className="mt-3">
-                                    <span>{item.name}</span>
+                                    <span className="text-base flex items-center ">
+                                        <span className="mr-1">{item.name}</span>
+                                        <svg
+                                            onClick={() => setPreviewShow(true)}
+                                            className="cursor-pointer"
+                                            viewBox="0 0 1024 1024"
+                                            version="1.1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            p-id="1575"
+                                            width="22"
+                                            height="22"
+                                        >
+                                            <path
+                                                d="M942.2 486.2C847.4 286.5 704.1 186 512 186c-192.2 0-335.4 100.5-430.2 300.3-7.7 16.2-7.7 35.2 0 51.5C176.6 737.5 319.9 838 512 838c192.2 0 335.4-100.5 430.2-300.3 7.7-16.2 7.7-35 0-51.5zM512 766c-161.3 0-279.4-81.8-362.7-254C232.6 339.8 350.7 258 512 258c161.3 0 279.4 81.8 362.7 254C791.5 684.2 673.4 766 512 766z"
+                                                p-id="1576"
+                                                fill="#8a8a8a"
+                                            ></path>
+                                            <path
+                                                d="M508 336c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176z m0 288c-61.9 0-112-50.1-112-112s50.1-112 112-112 112 50.1 112 112-50.1 112-112 112z"
+                                                p-id="1577"
+                                                fill="#8a8a8a"
+                                            ></path>
+                                        </svg>
+                                    </span>
                                     <div
                                         className={`flex overflow-x-auto cursor-pointer ${
                                             hoverIndex === index || chooseImageIndex === index
                                                 ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
                                                 : 'outline outline-offset-2 outline-1 outline-[#ccc]'
                                         } rounded-sm my-3 relative`}
-                                        // onClick={() => handleChoose(index)}
+                                        onClick={() => handleChoose(index)}
                                         onMouseEnter={() => setHoverIndex(index)}
                                         onMouseLeave={() => setHoverIndex('')}
                                     >
-                                        <Checkbox
+                                        {/* <Checkbox
                                             checked={chooseImageIndex === index}
                                             style={{
                                                 position: 'absolute',
@@ -468,10 +545,15 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                                                 zIndex: 999
                                             }}
                                             onChange={(e) => onCheckboxChange(e, index)}
-                                        />
+                                        /> */}
                                         <Image.PreviewGroup
+                                            items={item?.templateList?.map((item: any) => ({ src: item.example }))}
                                             preview={{
-                                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`)
+                                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                                                visible: previewShow,
+                                                onVisibleChange: (visible) => {
+                                                    setPreviewShow(visible);
+                                                }
                                             }}
                                         >
                                             {item?.templateList?.map((v: any, vi: number) => (
@@ -484,6 +566,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                                                         width={145}
                                                         height={200}
                                                         src={v.example}
+                                                        preview={false}
                                                         fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3PTWBSGcbGzM6GCKqlIBRV0dHRJFarQ0eUT8LH4BnRU0NHR0UEFVdIlFRV7TzRksomPY8uykTk/zewQfKw/9znv4yvJynLv4uLiV2dBoDiBf4qP3/ARuCRABEFAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghgg0Aj8i0JO4OzsrPv69Wv+hi2qPHr0qNvf39+iI97soRIh4f3z58/u7du3SXX7Xt7Z2enevHmzfQe+oSN2apSAPj09TSrb+XKI/f379+08+A0cNRE2ANkupk+ACNPvkSPcAAEibACyXUyfABGm3yNHuAECRNgAZLuYPgEirKlHu7u7XdyytGwHAd8jjNyng4OD7vnz51dbPT8/7z58+NB9+/bt6jU/TI+AGWHEnrx48eJ/EsSmHzx40L18+fLyzxF3ZVMjEyDCiEDjMYZZS5wiPXnyZFbJaxMhQIQRGzHvWR7XCyOCXsOmiDAi1HmPMMQjDpbpEiDCiL358eNHurW/5SnWdIBbXiDCiA38/Pnzrce2YyZ4//59F3ePLNMl4PbpiL2J0L979+7yDtHDhw8vtzzvdGnEXdvUigSIsCLAWavHp/+qM0BcXMd/q25n1vF57TYBp0a3mUzilePj4+7k5KSLb6gt6ydAhPUzXnoPR0dHl79WGTNCfBnn1uvSCJdegQhLI1vvCk+fPu2ePXt2tZOYEV6/fn31dz+shwAR1sP1cqvLntbEN9MxA9xcYjsxS1jWR4AIa2Ibzx0tc44fYX/16lV6NDFLXH+YL32jwiACRBiEbf5KcXoTIsQSpzXx4N28Ja4BQoK7rgXiydbHjx/P25TaQAJEGAguWy0+2Q8PD6/Ki4R8EVl+bzBOnZY95fq9rj9zAkTI2SxdidBHqG9+skdw43borCXO/ZcJdraPWdv22uIEiLA4q7nvvCug8WTqzQveOH26fodo7g6uFe/a17W3+nFBAkRYENRdb1vkkz1CH9cPsVy/jrhr27PqMYvENYNlHAIesRiBYwRy0V+8iXP8+/fvX11Mr7L7ECueb/r48eMqm7FuI2BGWDEG8cm+7G3NEOfmdcTQw4h9/55lhm7DekRYKQPZF2ArbXTAyu4kDYB2YxUzwg0gi/41ztHnfQG26HbGel/crVrm7tNY+/1btkOEAZ2M05r4FB7r9GbAIdxaZYrHdOsgJ/wCEQY0J74TmOKnbxxT9n3FgGGWWsVdowHtjt9Nnvf7yQM2aZU/TIAIAxrw6dOnAWtZZcoEnBpNuTuObWMEiLAx1HY0ZQJEmHJ3HNvGCBBhY6jtaMoEiJB0Z29vL6ls58vxPcO8/zfrdo5qvKO+d3Fx8Wu8zf1dW4p/cPzLly/dtv9Ts/EbcvGAHhHyfBIhZ6NSiIBTo0LNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiEC/wGgKKC4YMA4TAAAAABJRU5ErkJggg=="
                                                     />
                                                 </div>

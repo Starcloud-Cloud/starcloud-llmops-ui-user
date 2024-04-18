@@ -48,8 +48,8 @@ export const DetailModal = ({ open, handleClose, businessUid, show }: IAddAiModa
         }
     }, [pre]);
     return (
-        <Modal width={'80%'} open={open} onCancel={handleClose} title="详情" footer={false} style={{ maxWidth: '1400px' }}>
-            <div className="h-[calc(80vh-86px)] p-2">
+        <Modal width={'80%'} open={open} onCancel={handleClose} title="详情" footer={false} style={{ maxWidth: '1400px', top: 30 }}>
+            <div className="h-[88vh] p-2">
                 <ThreeStep
                     data={detail}
                     show={show}

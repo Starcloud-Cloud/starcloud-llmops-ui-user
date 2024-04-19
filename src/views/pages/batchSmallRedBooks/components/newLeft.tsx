@@ -1075,7 +1075,7 @@ const Lefts = ({
                     )}
                 </div>
             </div>
-            <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
+            <Modal zIndex={9999} open={open} footer={null} onCancel={() => setOpen(false)}>
                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
             </Modal>
             {zoomOpen && (
@@ -1090,7 +1090,7 @@ const Lefts = ({
                     setPage={setPage}
                 />
             )}
-            <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
+            <Modal zIndex={9999} width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
                 <p>
                     支持以 XLS 文件形式批量导入页面元素，导入文件将自动刷新列表页。
                     <span className="text-[#673ab7] cursor-pointer" onClick={handleDownLoad}>

@@ -379,11 +379,13 @@ function TemplateMarket() {
 
     return (
         <Box
+            style={{
+                padding: jsCookie.get('isClient') ? '16px' : '0px'
+            }}
             height={jsCookie.get('isClient') ? '100vh' : '100%'}
             overflow="hidden"
             ref={scrollRef}
             sx={{
-                padding: { xs: 0, sm: '0 20px', md: 0 },
                 scrollbarGutter: 'stable',
                 '&:hover': {
                     overflow: 'scroll'

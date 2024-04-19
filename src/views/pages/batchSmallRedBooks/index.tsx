@@ -12,6 +12,7 @@ import { DetailModal } from '../redBookContentList/component/detailModal';
 import './index.scss';
 import Left from './components/newLeft';
 import Right from './components/right';
+import jsCookie from 'js-cookie';
 const BatcSmallRedBooks = () => {
     const navigate = useNavigate();
     const timer: any = useRef([]);
@@ -330,7 +331,12 @@ const BatcSmallRedBooks = () => {
         }
     }, [PlanUid]);
     return (
-        <div className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto">
+        <div
+            style={{
+                height: jsCookie.get('isClient') ? '100vh' : '100%'
+            }}
+            className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto"
+        >
             <SubCard
                 contentSX={{
                     display: 'flex',

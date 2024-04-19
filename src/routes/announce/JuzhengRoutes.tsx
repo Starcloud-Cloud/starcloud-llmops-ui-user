@@ -17,6 +17,7 @@ const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedB
 const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
 const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
 const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
+const Market = Loadable(lazy(() => import('views/template/market')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -30,6 +31,10 @@ const JuzhengRoutes = {
         // { path: '/web-view/orderRecord', element: <OrderRecord /> },
         // { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
         //AI媒体分发嵌入
+        {
+            path: '/appMarket',
+            element: <Market />
+        },
         { path: '/copywriting', element: <Copywriting /> },
         { path: '/redBookTaskList', element: <RedBookTaskList /> },
         { path: '/copywritingModal', element: <CopywritingModal /> },

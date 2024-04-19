@@ -83,8 +83,8 @@ const MainRoutes = {
             element: <AppUserAccountProfile />
         },
         {
-            path: '/appMarket',
-            element: <Market />
+            // path: '/appMarket',
+            // element: <Market />
             // children: [
             //     {
             //         path: 'list',

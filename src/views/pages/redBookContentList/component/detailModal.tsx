@@ -50,8 +50,16 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show }
         }
     }, [pre]);
     return (
-        <Modal width={'80%'} open={open} onCancel={handleClose} title="详情" footer={false} style={{ maxWidth: '1400px', top: 30 }}>
-            <div className="h-[88vh] p-2">
+        <Modal
+            width={'80%'}
+            open={open}
+            onCancel={handleClose}
+            title="详情"
+            footer={false}
+            style={{ maxWidth: '1400px', top: 30 }}
+            zIndex={99999}
+        >
+            <div className="h-[calc(88vh-50px)] p-2">
                 <ThreeStep
                     data={detail}
                     show={show}

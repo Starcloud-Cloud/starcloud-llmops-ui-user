@@ -209,7 +209,7 @@ const ThreeStep = ({
                 }}
             >
                 {/* <Spin spinning={aginLoading}> */}
-                <div className="w-full  h-full flex relative">
+                <div className="w-full  h-full relative grid grid-cols-4 gap-4">
                     <div>
                         {!show && (
                             <div
@@ -238,7 +238,7 @@ const ThreeStep = ({
                             </div>
                         )}
                     </div>
-                    <div className="relative h-full overflow-hidden flex-1">
+                    <div className="relative h-full overflow-hidden col-span-2">
                         {imageList?.length > 0 &&
                             (editType ? (
                                 <Upload {...props}>
@@ -294,7 +294,7 @@ const ThreeStep = ({
                                 </>
                             ))}
                     </div>
-                    <div className="h-full overflow-auto w-[450px]">
+                    <div className="h-full overflow-auto col-span-1">
                         {
                             <div className="w-full h-full p-4">
                                 <div className="flex items-center justify-between">

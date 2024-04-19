@@ -130,21 +130,20 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                             {handleTransfer(item.status, item.errorMessage)}
                             {item.status === 'FAILURE' && <span>({item.retryCount})</span>}
                         </div>
-                        <div className="line-clamp-1">
-                            <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
-                                <div>
-                                    <div className=" whitespace-nowrap">
-                                        <span className="font-[600]">状态：</span>
-                                        {handleTransfer(item.status, item.errorMessage, item.retryCount)}
-                                    </div>
-                                    <div className=" whitespace-nowrap">
-                                        <span className="font-[600]">耗时：</span>
-                                        {(item.elapsed / 1000)?.toFixed(2) || 0}S
-                                    </div>
+                        <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
+                            <div className="whitespace-nowrap">
+                                <div className="inline-block whitespace-nowrap">
+                                    <span className="font-[600]">状态：</span>
+                                    {handleTransfer(item.status, item.errorMessage, item.retryCount)}
                                 </div>
-                                <div className="whitespace-nowrap">
-                                    <span className="font-[600]">张数：</span>-
+                                <div className="inline-block whitespace-nowrap">
+                                    <span className="font-[600]">耗时：</span>
+                                    {(item.elapsed / 1000)?.toFixed(2) || 0}S
                                 </div>
+                            </div>
+                            <div className=" line-clamp-1">
+                                <span className="font-[600]">张数：</span>
+                                '-'
                             </div>
                         </div>
                         <div className="text-[#15273799] text-[12px] line-clamp-1">

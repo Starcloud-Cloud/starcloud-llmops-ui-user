@@ -30,6 +30,7 @@ import { useAllDetail } from '../../../contexts/JWTContext';
 import market from 'assets/images/landing/pre-apps/market.jpg';
 import { MarketVideoModel } from './MarketVideoModel';
 import { NewUserVip } from '../../../ui-component/new-user-vip/index';
+import jsCookie from 'js-cookie';
 import dayjs from 'dayjs';
 interface MarketList {
     name: string;
@@ -286,7 +287,6 @@ function TemplateMarket() {
         }
     };
     const handleDetail = (data: { uid: string; type: string }) => {
-        console.log(data);
         if (data.type === 'MEDIA_MATRIX') {
             navigate(`/batchSmallRedBook?appUid=${data.uid}`);
         } else {
@@ -379,11 +379,11 @@ function TemplateMarket() {
 
     return (
         <Box
-            height="calc(100vh - 128px)"
+            height={jsCookie.get('isClient') ? '100vh' : '100%'}
             overflow="hidden"
             ref={scrollRef}
             sx={{
-                padding: { xs: 0, sm: '0 20px' },
+                padding: { xs: 0, sm: '0 20px', md: 0 },
                 scrollbarGutter: 'stable',
                 '&:hover': {
                     overflow: 'scroll'

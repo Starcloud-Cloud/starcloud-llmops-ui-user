@@ -552,7 +552,7 @@ const MainLayout = () => {
                                 {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                                 {!isLarge ? (
                                     <Container
-                                        className={`max-w-[1300px] h-full ${isMobile && '!px-0'}`}
+                                        className={`max-w-[1300px] ${isMobile && '!p-0'} h-[calc(100vh-176px)] overflow-y-auto`}
                                         {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         {/* breadcrumb */}
@@ -562,7 +562,7 @@ const MainLayout = () => {
                                 ) : (
                                     <Container
                                         maxWidth={false}
-                                        className={`h-full ${isMobile && '!px-0'}`}
+                                        className={`${isMobile && '!p-0'} h-[calc(100vh-176px)] overflow-y-auto`}
                                         {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />

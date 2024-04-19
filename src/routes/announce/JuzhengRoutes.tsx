@@ -4,6 +4,8 @@ import { lazy } from 'react';
 import Loadable from 'ui-component/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import MinimalLayout from 'layout/MinimalLayout';
+import MainLayout from 'layout/MainLayout';
+import jsCookie from 'js-cookie';
 
 const PagesPrice = Loadable(lazy(() => import('views/announce/pricing/member')));
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
@@ -18,26 +20,22 @@ const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
-const WebviewRoutes = {
+const JuzhengRoutes = {
     path: '/',
-    element: (
-        <AuthGuard>
-            <MinimalLayout />
-        </AuthGuard>
-    ),
+    element: <AuthGuard>{jsCookie.get('isClient') ? <MinimalLayout /> : <MainLayout />}</AuthGuard>,
     children: [
-        // { path: '/', element: <PagesLanding /> },
-        { path: '/subscribe', element: <PagesPrice /> },
-        { path: '/web-view/exchange', element: <Redemption /> },
-        { path: '/web-view/orderRecord', element: <OrderRecord /> },
-        { path: '/web-view/account-profile', element: <AppUserAccountProfile /> }
+        // // { path: '/', element: <PagesLanding /> },
+        // { path: '/subscribe', element: <PagesPrice /> },
+        // { path: '/web-view/exchange', element: <Redemption /> },
+        // { path: '/web-view/orderRecord', element: <OrderRecord /> },
+        // { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },
         //AI媒体分发嵌入
-        // { path: '/copywriting', element: <Copywriting /> },
-        // { path: '/redBookTaskList', element: <RedBookTaskList /> },
-        // { path: '/copywritingModal', element: <CopywritingModal /> },
-        // { path: '/batchSmallRedBook', element: <BatchSmallRedBook /> },
-        // { path: '/redBookContentList', element: <RedBookContentList /> }
+        { path: '/copywriting', element: <Copywriting /> },
+        { path: '/redBookTaskList', element: <RedBookTaskList /> },
+        { path: '/copywritingModal', element: <CopywritingModal /> },
+        { path: '/batchSmallRedBook', element: <BatchSmallRedBook /> },
+        { path: '/redBookContentList', element: <RedBookContentList /> }
     ]
 };
 
-export default WebviewRoutes;
+export default JuzhengRoutes;

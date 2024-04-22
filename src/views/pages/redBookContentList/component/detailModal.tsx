@@ -59,7 +59,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show }
             style={{ maxWidth: '1400px', top: 30 }}
             zIndex={99999}
         >
-            <div className="h-[calc(88vh-50px)] p-2">
+            <div className="h-[calc(100vh-140px)] p-2">
                 <ThreeStep
                     data={detail}
                     show={show}

@@ -5,6 +5,7 @@ import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, TextFiel
 import InfoIcon from '@mui/icons-material/Info';
 import React from 'react';
 import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
+import './index.css';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -198,28 +199,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                   }
               ];
 
-    const itemsEidt: any = [
-        {
-            key: '0',
-            label: (
-                <span
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        const index: any = collapseIndexRef.current;
-                        const copyStyleData = [...styleData];
-                        const item = copyStyleData[index];
-                        setCurrentStyle(item);
-                        currentStyleRef.current = item;
-                        setIsModalOpen(true);
-                        setUpdIndex(index);
-                    }}
-                >
-                    编辑
-                </span>
-            )
-        }
-    ];
-
     const handleOK = () => {
         if (!selectImgs) {
             message.warning('请选择图片模版');
@@ -259,7 +238,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                     <span>{item.name}</span>
                     <div className="flex justify-center">
                         <span>共{item?.templateList?.length || 0}张图片</span>
-                        <Dropdown menu={{ items }} placement="bottom" arrow trigger={['click']}>
+                        <Dropdown menu={{ items }} placement="bottom" arrow>
                             <span
                                 onClick={(e) => {
                                     collapseIndexRef.current = index;
@@ -360,7 +339,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
     };
 
     return (
-        <div>
+        <div className="addStyle">
             {mode === 1 && (
                 <div className="pb-3">
                     <Button size="small" type="primary" onClick={() => handleAdd()}>
@@ -372,7 +351,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                 <Collapse items={collapseList} defaultActiveKey={[0]} />
             </div>
             <Drawer
-                zIndex={9999}
+                zIndex={99999}
                 title="选择风格模版"
                 // mask={false}
                 // maskClosable={false}
@@ -419,7 +398,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                     </div>
                 }
             >
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-3 ">
                     {/* <FormControl key={query?.picNum} color="secondary" size="small" fullWidth>
                         <InputLabel id="types">图片数量</InputLabel> */}
                     {/* <Select

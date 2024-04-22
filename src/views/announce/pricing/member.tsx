@@ -568,7 +568,7 @@ const Price1 = () => {
                     handleClose();
                     setOpenPayDialog(true);
                     setTimeout(() => {
-                        navigate('/orderRecord');
+                        window.location.href = '/orderRecord';
                     }, 3000);
                 }
             });
@@ -627,7 +627,7 @@ const Price1 = () => {
                             handleClose();
                             setOpenPayDialog(true);
                             setTimeout(() => {
-                                navigate('/orderRecord');
+                                window.location.href = '/orderRecord';
                             }, 3000);
                         }
                     });
@@ -672,7 +672,7 @@ const Price1 = () => {
                             handleSignClose();
                             setOpenSignDialog(true);
                             setTimeout(() => {
-                                navigate('/orderRecord');
+                                window.location.href = '/orderRecord';
                             }, 3000);
                         }
                     });

@@ -34,6 +34,7 @@ import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
 import Left from '../../batchSmallRedBooks/components/newLeft';
 import { useAllDetail } from 'contexts/JWTContext';
+import copy from 'clipboard-copy';
 
 const ThreeStep = ({
     data,
@@ -314,44 +315,66 @@ const ThreeStep = ({
                                         value={title}
                                     />
                                 ) : (
-                                    <CopyToClipboard
-                                        text={title}
-                                        onCopy={() =>
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '复制成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    close: false,
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideLeft'
-                                                })
-                                            )
-                                        }
-                                    >
-                                        <Tooltip title="点击复制">
-                                            <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap cursor-pointer select-none">
-                                                {title}
-                                            </div>
-                                        </Tooltip>
-                                    </CopyToClipboard>
+                                    <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap select-none">
+                                        <div>
+                                            <Space>
+                                                <Button
+                                                    type="primary"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        copy(title);
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '复制成功',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'success'
+                                                                },
+                                                                close: false,
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                transition: 'SlideLeft'
+                                                            })
+                                                        );
+                                                    }}
+                                                >
+                                                    复制标题
+                                                </Button>
+                                                <Button
+                                                    type="primary"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        copy(`${title}${text}${tags}`);
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '复制成功',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'success'
+                                                                },
+                                                                close: false,
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                transition: 'SlideLeft'
+                                                            })
+                                                        );
+                                                    }}
+                                                >
+                                                    复制全部
+                                                </Button>
+                                            </Space>
+                                        </div>
+                                        <div>{title}</div>
+                                    </div>
                                 )}
                                 <Divider />
-                                <div className="max-h-[calc(100%-150px)] ">
-                                    {editType ? (
-                                        <Input.TextArea
-                                            onChange={(e) => setText(e.target.value)}
-                                            className="text-base mb-2 whitespace-pre-wrap"
-                                            value={text}
-                                            rows={16}
-                                        />
-                                    ) : (
-                                        <CopyToClipboard
-                                            text={text}
-                                            onCopy={() =>
+                                <div>
+                                    <Space>
+                                        <Button
+                                            type="primary"
+                                            size="small"
+                                            onClick={() => {
+                                                copy(text);
                                                 dispatch(
                                                     openSnackbar({
                                                         open: true,
@@ -364,13 +387,45 @@ const ThreeStep = ({
                                                         anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                         transition: 'SlideLeft'
                                                     })
-                                                )
-                                            }
+                                                );
+                                            }}
                                         >
-                                            <Tooltip title="点击复制">
-                                                <div className="text-base mb-2 whitespace-pre-wrap cursor-pointer select-none">{text}</div>
-                                            </Tooltip>
-                                        </CopyToClipboard>
+                                            复制内容
+                                        </Button>
+                                        <Button
+                                            type="primary"
+                                            size="small"
+                                            onClick={() => {
+                                                copy(`${tags}`);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '复制成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        close: false,
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                        transition: 'SlideLeft'
+                                                    })
+                                                );
+                                            }}
+                                        >
+                                            复制标签
+                                        </Button>
+                                    </Space>
+                                </div>
+                                <div className="max-h-[calc(100%-150px)] ">
+                                    {editType ? (
+                                        <Input.TextArea
+                                            onChange={(e) => setText(e.target.value)}
+                                            className="text-base mb-2 whitespace-pre-wrap"
+                                            value={text}
+                                            rows={16}
+                                        />
+                                    ) : (
+                                        <div className="text-base mb-2 whitespace-pre-wrap select-none">{text}</div>
                                     )}
                                     {editType ? (
                                         <div className="flex gap-4 flex-wrap text-lg">
@@ -391,7 +446,7 @@ const ThreeStep = ({
                                     ) : (
                                         <div className="flex gap-4 flex-wrap text-lg">
                                             {tags?.map((item: string) => (
-                                                <span key={item} className="text-[#13386c] cursor-pointer">
+                                                <span key={item} className="text-[#13386c]">
                                                     #{item}
                                                 </span>
                                             ))}

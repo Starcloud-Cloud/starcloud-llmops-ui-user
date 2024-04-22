@@ -535,7 +535,7 @@ const MainLayout = () => {
                                 position="absolute"
                                 color="inherit"
                                 elevation={0}
-                                sx={{ bgcolor: theme.palette.background.default }}
+                                sx={{ bgcolor: theme.palette.background.default, zIndex: 10 }}
                             >
                                 {header}
                             </AppBar>

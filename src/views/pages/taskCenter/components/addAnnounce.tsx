@@ -90,7 +90,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         const result = await contentPage({
             pageNo: addCurrent,
             pageSize: addPageSize,
-            batch,
+            uid: batch,
             status: 'execute_success',
             claim: false,
             planUid: values
@@ -147,16 +147,16 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         <Select labelId="plans" value={values} label="创作计划" onChange={(e: any) => setValue(e.target.value)}>
                             {valueList?.map((item: any) => (
                                 <MenuItem key={item.uid} value={item.uid}>
-                                    {item.name}
+                                    {item.uid}
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
                     <FormControl sx={{ ml: 2, mb: 2, width: '300px' }} color="secondary" size="small">
-                        <InputLabel id="batch">创作批次</InputLabel>
-                        <Select labelId="batch" value={batch} label="创作批次" onChange={(e: any) => setBatch(e.target.value)}>
+                        <InputLabel id="uid">创作批次</InputLabel>
+                        <Select labelId="uid" value={batch} label="创作批次" onChange={(e: any) => setBatch(e.target.value)}>
                             {batchList?.map((item: any) => (
-                                <MenuItem key={item.batch} value={item.batch}>
+                                <MenuItem key={item.uid} value={item.uid}>
                                     {dayjs(item.startTime).format('YYYY-MM-DD hh:mm:ss')}（{item.totalCount}）
                                 </MenuItem>
                             ))}

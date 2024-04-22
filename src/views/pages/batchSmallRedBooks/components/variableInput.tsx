@@ -70,31 +70,31 @@ const VariableInput = ({
                 const convertedProperty = getjsonschma(property, name);
                 arr.push(convertedProperty);
             } else if (property.type === 'array') {
-                arr.push(
-                    {
-                        key: key + 'index',
-                        label: key + '[*]',
-                        title: property?.title,
-                        desc: '元素集合',
-                        children: [
-                            ...arrList.map((item: number, index: number) => ({
-                                key: `${key}[${index}]`,
-                                label: `${key}[${index}]`,
-                                title: property?.title,
-                                desc: `第 ${index} 个元素`,
-                                children: getjsonschma(property?.items, `${name}.${key}[${index}]`)
-                            }))
-                        ]
-                    },
-                    {
+                arr.push({
+                    key: key + 'index',
+                    label: key + '[*]',
+                    title: property?.title,
+                    desc: '元素集合',
+                    children: [
+                        ...arrList.map((item: number, index: number) => ({
+                            key: `${key}[${index}]`,
+                            label: `${key}[${index}]`,
+                            title: property?.title,
+                            desc: `第 ${index} 个元素`,
+                            children: getjsonschma(property?.items, `${name}.${key}[${index}]`)
+                        }))
+                    ]
+                });
+                if (code !== 'PosterActionHandler') {
+                    arr.push({
                         key: name + '.' + key,
                         label: `${key}.list.(*)`,
                         title: property?.title,
                         desc: '元素内容集合',
                         type: '*',
                         children: getjsonschma(property?.items, `${name}.${key}`, '*')
-                    }
-                );
+                    });
+                }
             } else {
                 if (code === 'PosterActionHandler') {
                     if (property?.description?.split('-')[1] === 'image') {

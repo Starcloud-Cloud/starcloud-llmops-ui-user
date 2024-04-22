@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Row, Col } from 'antd';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
 import { getContentPage } from 'api/redBook';
@@ -13,6 +12,7 @@ import { DetailModal } from '../redBookContentList/component/detailModal';
 import './index.scss';
 import Left from './components/newLeft';
 import Right from './components/right';
+import jsCookie from 'js-cookie';
 const BatcSmallRedBooks = () => {
     const navigate = useNavigate();
     const timer: any = useRef([]);
@@ -331,7 +331,12 @@ const BatcSmallRedBooks = () => {
         }
     }, [PlanUid]);
     return (
-        <div className="bg-[rgb(244,246,248)] p-4">
+        <div
+            style={{
+                height: jsCookie.get('isClient') ? '100vh' : '100%'
+            }}
+            className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto"
+        >
             <SubCard
                 contentSX={{
                     display: 'flex',
@@ -348,50 +353,47 @@ const BatcSmallRedBooks = () => {
                 </div>
                 <div></div>
             </SubCard>
-            <Row gutter={20} className="mt-[20px]">
-                <Col span={9}>
-                    <div className="bg-white rounded-lg p-4">
-                        <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
-                    </div>
-                </Col>
-                <Col span={15}>
-                    <div className="bg-white rounded-lg p-4 h-full">
-                        <Right
-                            bathList={bathList}
-                            exampleList={exampleList}
-                            collapseActive={collapseActive}
-                            batchOpen={batchOpen}
-                            changeCollapse={(data: any) => changeCollapse(data)}
-                            planList={planList}
-                            setBusinessUid={(data: any) => {
-                                setBusinessUid(data.uid);
-                                setBusinessIndex(data.index);
-                            }}
-                            setDetailOpen={(data: any) => setDetailOpen(data)}
-                            handleScroll={(data: any) => handleScroll(data)}
-                            timeFailure={(index: number) => {
-                                const pageNo = Number((index / 20).toFixed(0)) + 1;
-                                clearInterval(timer.current[pageNo]);
-                                timer.current[pageNo] = getLists(pageNo);
-                                timer.current[pageNo] = setInterval(() => {
-                                    if (
-                                        plabListRef.current
-                                            .slice((pageNo - 1) * queryPage.pageSize, pageNo * queryPage.pageSize)
-                                            ?.every(
-                                                (item: any) =>
-                                                    item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
-                                            )
-                                    ) {
-                                        clearInterval(timer.current[pageNo]);
-                                        return;
-                                    }
-                                    getLists(pageNo);
-                                }, 2000);
-                            }}
-                        />
-                    </div>
-                </Col>
-            </Row>
+            <div className="flex gap-[20px] mt-4 h-[calc(100%-74px)]">
+                <div className="2xl:w-[500px] xl:w-[400px] lg:w-[350px]  w-[350px] bg-white rounded-lg p-4">
+                    <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
+                </div>
+                <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
+                    <Right
+                        bathList={bathList}
+                        exampleList={exampleList}
+                        collapseActive={collapseActive}
+                        batchOpen={batchOpen}
+                        changeCollapse={(data: any) => changeCollapse(data)}
+                        planList={planList}
+                        setBusinessUid={(data: any) => {
+                            setBusinessUid(data.uid);
+                            setBusinessIndex(data.index);
+                        }}
+                        setDetailOpen={(data: any) => setDetailOpen(data)}
+                        handleScroll={(data: any) => handleScroll(data)}
+                        timeFailure={(index: number) => {
+                            const pageNo = Number((index / 20).toFixed(0)) + 1;
+                            clearInterval(timer.current[pageNo]);
+                            timer.current[pageNo] = getLists(pageNo);
+                            timer.current[pageNo] = setInterval(() => {
+                                if (
+                                    plabListRef.current
+                                        .slice((pageNo - 1) * queryPage.pageSize, pageNo * queryPage.pageSize)
+                                        ?.every(
+                                            (item: any) =>
+                                                item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
+                                        )
+                                ) {
+                                    clearInterval(timer.current[pageNo]);
+                                    return;
+                                }
+                                getLists(pageNo);
+                            }, 2000);
+                        }}
+                    />
+                </div>
+            </div>
+
             {detailOpen && (
                 <DetailModal open={detailOpen} changeList={changeList} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />
             )}

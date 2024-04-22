@@ -754,7 +754,7 @@ const Lefts = ({
     };
     return (
         <>
-            <div className="relative" style={{ height: detailShow ? 'auto' : '100%' }}>
+            <div className="relative h-full">
                 {detailShow && (
                     <div className="flex justify-between items-end mb-4">
                         <div className="text-[22px]">{appData?.configuration?.appInformation?.name}</div>
@@ -774,15 +774,13 @@ const Lefts = ({
                                     okText="更新"
                                     cancelText="取消"
                                 >
-                                    <Badge dot>
-                                        <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
-                                            版本号： <span className="font-blod">{appData?.version}</span>
-                                        </span>
-                                    </Badge>
+                                    <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                        版本号： <span className="font-blod">{appData?.version || 0}</span>
+                                    </span>
                                 </Popconfirm>
                             ) : (
-                                <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
-                                    版本号： <span className="font-blod">{appData?.version}</span>
+                                <span className="p-2 rounded-md">
+                                    版本号： <span className="font-blod">{appData?.version || 0}</span>
                                 </span>
                             )}
                         </div>
@@ -790,7 +788,11 @@ const Lefts = ({
                 )}
                 <div
                     style={{
-                        height: detailShow ? (getTenant() === ENUM_TENANT.AI ? 'calc(100vh - 370px)' : 'calc(100vh - 181px)') : '100%'
+                        height: detailShow
+                            ? getTenant() === ENUM_TENANT.AI
+                                ? 'calc(100% - 100px)'
+                                : 'calc(100% - 36px)'
+                            : 'calc(100% - 14px)'
                     }}
                     className="overflow-y-auto pb-[72px]"
                 >
@@ -1054,14 +1056,14 @@ const Lefts = ({
                     {detailShow && (
                         <>
                             <Button
-                                className="w-full h-[43px]"
+                                className="w-full"
                                 icon={<SaveOutlined rev={undefined} />}
                                 onClick={() => handleSaveClick(false)}
                                 type="primary"
                             >
                                 保存配置
                             </Button>
-                            <Button className="w-full h-[43px]" type="primary" onClick={() => handleSaveClick(true)}>
+                            <Button className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
                                 保存并开始生成
                             </Button>
                         </>
@@ -1073,7 +1075,7 @@ const Lefts = ({
                     )}
                 </div>
             </div>
-            <Modal open={open} footer={null} onCancel={() => setOpen(false)}>
+            <Modal zIndex={9999} open={open} footer={null} onCancel={() => setOpen(false)}>
                 <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
             </Modal>
             {zoomOpen && (
@@ -1088,7 +1090,7 @@ const Lefts = ({
                     setPage={setPage}
                 />
             )}
-            <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
+            <Modal zIndex={9999} width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
                 <p>
                     支持以 XLS 文件形式批量导入页面元素，导入文件将自动刷新列表页。
                     <span className="text-[#673ab7] cursor-pointer" onClick={handleDownLoad}>

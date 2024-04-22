@@ -392,7 +392,7 @@ function TemplateMarket() {
                 }
             }}
         >
-            <Box className="flex mb-[8px] flex-wrap items-end gap-3">
+            {/* <Box className="flex mb-[8px] flex-wrap items-end gap-3">
                 <Typography variant="h2" lineHeight={1}>
                     {t('market.title')}
                 </Typography>
@@ -411,7 +411,7 @@ function TemplateMarket() {
                         placeholder={t('market.place')}
                     />
                 </FormControl>
-            </Box>
+            </Box> */}
             <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                 {menuList?.map((item, index) => (
                     <Box
@@ -494,7 +494,7 @@ function TemplateMarket() {
                                 <CustomTabPanel value={value} index={0}>
                                     <Grid container display="flex" flexWrap={'wrap'} spacing={2}>
                                         {item.appList.map((el: any, index: number) => (
-                                            <Grid flexShrink={0} xl={1.5} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                            <Grid flexShrink={0} xl={2} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
                                                 <Template like="market" handleDetail={handleDetail} data={el} />
                                             </Grid>
                                         ))}
@@ -510,7 +510,7 @@ function TemplateMarket() {
                                             spacing={2}
                                         >
                                             {collectList.map((el: any, index: number) => (
-                                                <Grid flexShrink={0} xl={1.5} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                                <Grid flexShrink={0} xl={2} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
                                                     <Template handleDetail={handleDetail} data={el} />
                                                 </Grid>
                                             ))}
@@ -538,7 +538,7 @@ function TemplateMarket() {
                                 spacing={2}
                             >
                                 {item.appList.map((el: any, index: number) => (
-                                    <Grid flexShrink={0} xl={1.5} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
+                                    <Grid flexShrink={0} xl={2} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
                                         <Template like="market" handleDetail={handleDetail} data={el} />
                                     </Grid>
                                 ))}
@@ -551,12 +551,17 @@ function TemplateMarket() {
                 handleClose={() => {
                     setOpenMarketVideo(false);
                     localStorage.setItem(`marketVideo-${allDetail?.allDetail?.id}`, 'true');
+                    const newUserVip = localStorage.getItem(`newUserVipEndTime-${allDetail?.allDetail.id}`);
+                    // 第一次打开
+                    if (!newUserVip && allDetail?.allDetail?.isNewUser) {
+                        setNewUserVipOpen(true);
+                    }
                 }}
             />
             {newUserVipOpen && (
                 <NewUserVip
                     onClose={() => {
-                        const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
+                        const newUserVipEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
                         localStorage.setItem(`newUserVipEndTime-${allDetail?.allDetail.id}`, newUserVipEndTime);
                         setNewUserVipOpen(false);
                     }}
@@ -566,3 +571,6 @@ function TemplateMarket() {
     );
 }
 export default TemplateMarket;
+
+// 第一次视频关闭后弹出新用户活动
+// 后面每3天弹一次

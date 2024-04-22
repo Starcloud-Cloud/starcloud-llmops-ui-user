@@ -26,7 +26,7 @@ export const PayBtn = () => {
         if (allDetail?.allDetail?.isNewUser) {
             setText('新用户限时体验9.9元');
         }
-    }, []);
+    }, [allDetail]);
 
     const handleClick = () => {
         if (allDetail?.allDetail?.isNewUser) {

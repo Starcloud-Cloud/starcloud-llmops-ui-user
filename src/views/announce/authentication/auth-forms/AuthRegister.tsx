@@ -78,6 +78,25 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
         changePassword('');
     }, []);
 
+    function CheckIcon(props: any) {
+        return (
+            <svg
+                {...props}
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+                <polyline points="20 6 9 17 4 12" />
+            </svg>
+        );
+    }
+
     return (
         <>
             <Grid container direction="column" justifyContent="center" spacing={2}>
@@ -303,9 +322,17 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                     )}
                 </Formik>
             ) : (
-                <div className="h-[375px] flex justify-center text-center items-center text-base text-red-500 flex-col">
-                    <CheckCircleOutlineIcon className="text-4xl mb-4" />
-                    {t('auth.register.successful')}
+                // <div className="h-[375px] flex justify-center text-center items-center text-base text-red-500 flex-col">
+                //     <CheckCircleOutlineIcon className="text-4xl mb-4" />
+                //     {t('auth.register.successful')}
+                // </div>
+                // <div className="flex flex-col items-center justify-center gap-6">
+                <div className="h-[375px] flex justify-center text-center items-center text-base flex-col  gap-6">
+                    <div className="bg-green-500 p-4 rounded-full w-[80px] h-[80px]">
+                        <CheckIcon className="h-12 w-12 text-white" />
+                    </div>
+                    <h1 className="text-3xl font-bold">注册成功</h1>
+                    <p className="text-gray-500 dark:text-gray-400"> {t('auth.register.successful')}</p>
                 </div>
             )}
         </>

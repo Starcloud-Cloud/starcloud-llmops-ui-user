@@ -85,12 +85,18 @@ const Header = () => {
             const dateTime = localStorage.getItem(`tipsEndTime-${allDetail?.allDetail?.id}`);
             if (dateTime) {
                 if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
-                    setLogoPopoverOpen(true);
+                    // 5分钟后出来
+                    setTimeout(() => {
+                        setLogoPopoverOpen(true);
+                    }, 1000 * 60 * 5);
                 } else {
                     setLogoPopoverOpen(false);
                 }
             } else {
-                setLogoPopoverOpen(true);
+                // 5分钟后出来
+                setTimeout(() => {
+                    setLogoPopoverOpen(true);
+                }, 1000 * 60 * 5);
             }
         }
     }, [allDetail]);
@@ -123,6 +129,7 @@ const Header = () => {
                         <div className="relative">
                             <span
                                 onClick={() => {
+                                    // 3天出来
                                     const tipsEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
                                     localStorage.setItem(`tipsEndTime-${allDetail?.allDetail?.id}`, tipsEndTime);
                                     setLogoPopoverOpen(false);
@@ -130,7 +137,19 @@ const Header = () => {
                             >
                                 <CloseIcon className="absolute right-[-3px] top-[-35px] text-base cursor-pointer" />
                             </span>
-                            {isMac() ? <p>按「command+D」收藏本站 或 拖动LOGO到书签栏</p> : <p>按「ctrl+D」收藏本站 或 拖动LOGO到书签栏</p>}
+                            {isMac() ? (
+                                <p>
+                                    按「command+D」收藏本站
+                                    <br />
+                                    或拖动LOGO到书签栏
+                                </p>
+                            ) : (
+                                <p>
+                                    按「ctrl+D」收藏本站
+                                    <br />
+                                    或拖动LOGO到书签栏
+                                </p>
+                            )}
                         </div>
                     }
                     zIndex={9999}
@@ -192,6 +211,27 @@ const Header = () => {
                     <Box sx={{ flexGrow: 1 }} />
                 </>
             )}
+            <Box
+                display="flex"
+                alignItems="center"
+                sx={{ cursor: 'pointer', marginRight: '2px' }}
+                onClick={() => window.open('https://support.qq.com/products/646091')}
+                className="sm:ml-[47px] xs:ml-[20px]"
+            >
+                <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7564" width="24" height="24">
+                    <path
+                        d="M883.2 83.2l-742.4 0c-51.2 0-92.8 41.6-92.8 89.6l0 582.4c0 48 41.6 89.6 92.8 89.6l256 0c0 0 6.4 6.4 16 19.2 3.2 3.2 6.4 6.4 9.6 12.8 0 0 6.4 9.6 9.6 12.8 28.8 44.8 51.2 67.2 86.4 67.2 35.2 0 60.8-22.4 89.6-67.2 22.4-35.2 28.8-44.8 28.8-44.8l249.6 0c51.2 0 92.8-41.6 92.8-89.6l0-582.4C976 121.6 934.4 83.2 883.2 83.2zM931.2 755.2c0 25.6-19.2 44.8-44.8 44.8l-252.8 0c-6.4 0-9.6 0-16 3.2-9.6 6.4-19.2 12.8-28.8 28.8-3.2 6.4-22.4 35.2-22.4 35.2-19.2 32-35.2 44.8-48 44.8-12.8 0-25.6-12.8-48-44.8-3.2-3.2-6.4-12.8-9.6-12.8-3.2-6.4-6.4-9.6-9.6-12.8-19.2-25.6-32-38.4-54.4-38.4l-256 0c-25.6 0-44.8-19.2-44.8-44.8l0-582.4c0-25.6 22.4-44.8 48-44.8l742.4 0c25.6 0 48 19.2 48 44.8L934.4 755.2z"
+                        p-id="7565"
+                    ></path>
+                    <path d="M220.8 483.2a1.6 1.6 0 1 0 102.4 0 1.6 1.6 0 1 0-102.4 0Z" p-id="7566"></path>
+                    <path d="M460.8 483.2a1.6 1.6 0 1 0 102.4 0 1.6 1.6 0 1 0-102.4 0Z" p-id="7567"></path>
+                    <path d="M697.6 483.2a1.6 1.6 0 1 0 102.4 0 1.6 1.6 0 1 0-102.4 0Z" p-id="7568"></path>
+                </svg>
+                <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
+                    帮助与反馈
+                </Typography>
+            </Box>
+
             {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_QRCODE) && (
                 <Popover
                     zIndex={9999}
@@ -235,7 +275,7 @@ const Header = () => {
                         alignItems="center"
                         sx={{ cursor: 'pointer', marginRight: '12px' }}
                         onClick={handleClick}
-                        className="sm:ml-[47px] xs:ml-[20px]"
+                        className="sm:ml-[20px] xs:ml-[20px]"
                     >
                         <QrCode2Icon />
                         <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>

@@ -85,12 +85,18 @@ const Header = () => {
             const dateTime = localStorage.getItem(`tipsEndTime-${allDetail?.allDetail?.id}`);
             if (dateTime) {
                 if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
-                    setLogoPopoverOpen(true);
+                    // 5分钟后出来
+                    setTimeout(() => {
+                        setLogoPopoverOpen(true);
+                    }, 1000 * 60 * 5);
                 } else {
                     setLogoPopoverOpen(false);
                 }
             } else {
-                setLogoPopoverOpen(true);
+                // 5分钟后出来
+                setTimeout(() => {
+                    setLogoPopoverOpen(true);
+                }, 1000 * 60 * 5);
             }
         }
     }, [allDetail]);
@@ -123,6 +129,7 @@ const Header = () => {
                         <div className="relative">
                             <span
                                 onClick={() => {
+                                    // 3天出来
                                     const tipsEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
                                     localStorage.setItem(`tipsEndTime-${allDetail?.allDetail?.id}`, tipsEndTime);
                                     setLogoPopoverOpen(false);
@@ -130,7 +137,19 @@ const Header = () => {
                             >
                                 <CloseIcon className="absolute right-[-3px] top-[-35px] text-base cursor-pointer" />
                             </span>
-                            {isMac() ? <p>按「command+D」收藏本站 或 拖动LOGO到书签栏</p> : <p>按「ctrl+D」收藏本站 或 拖动LOGO到书签栏</p>}
+                            {isMac() ? (
+                                <p>
+                                    按「command+D」收藏本站
+                                    <br />
+                                    或拖动LOGO到书签栏
+                                </p>
+                            ) : (
+                                <p>
+                                    按「ctrl+D」收藏本站
+                                    <br />
+                                    或拖动LOGO到书签栏
+                                </p>
+                            )}
                         </div>
                     }
                     zIndex={9999}

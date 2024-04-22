@@ -563,12 +563,17 @@ function TemplateMarket() {
                 handleClose={() => {
                     setOpenMarketVideo(false);
                     localStorage.setItem(`marketVideo-${allDetail?.allDetail?.id}`, 'true');
+                    const newUserVip = localStorage.getItem(`newUserVipEndTime-${allDetail?.allDetail.id}`);
+                    // 第一次打开
+                    if (!newUserVip && allDetail?.allDetail?.isNewUser) {
+                        setNewUserVipOpen(true);
+                    }
                 }}
             />
             {newUserVipOpen && (
                 <NewUserVip
                     onClose={() => {
-                        const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
+                        const newUserVipEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
                         localStorage.setItem(`newUserVipEndTime-${allDetail?.allDetail.id}`, newUserVipEndTime);
                         setNewUserVipOpen(false);
                     }}
@@ -579,3 +584,6 @@ function TemplateMarket() {
     );
 }
 export default TemplateMarket;
+
+// 第一次视频关闭后弹出新用户活动
+// 后面每3天弹一次

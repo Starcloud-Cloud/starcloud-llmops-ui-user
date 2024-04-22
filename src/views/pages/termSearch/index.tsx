@@ -88,11 +88,22 @@ const TermSearch = () => {
     // }, []);
     useEffect(() => {
         if (value) {
+            const values = _.cloneDeep(value);
+            const newValue = values.split(' ');
             const str = /^[a-zA-Z0-9]{10}$/;
-            if (str.test(value)) {
-                const newList = _.cloneDeep(queryAsin);
-                newList.asinList.push(value.toUpperCase());
-                setQueryAsin(newList);
+            const newList = _.cloneDeep(queryAsin);
+            newValue?.map((item) => {
+                if (str.test(item)) {
+                    console.log(1);
+                    if (!newList.asinList.includes(item.toUpperCase())) {
+                        newList.asinList.push(item.toUpperCase());
+                    }
+                }
+            });
+            setQueryAsin(newList);
+            console.log(2);
+
+            if (newValue.some((item) => str.test(item))) {
                 setValue('');
             }
         }
@@ -206,8 +217,6 @@ const TermSearch = () => {
             originAsinList: queryAsin.asinList,
             filterDeletedKeywords: false
         });
-        console.log(result);
-
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(result);
         link.target = '_blank';
@@ -307,7 +316,7 @@ const TermSearch = () => {
                                 }
                                 className="ml-[10px border-b border-dashed border-[#9fa3a8] cursor-pointer hover:text-[#673ab7]"
                             >
-                                B098T9ZFB5,B09JW5FNVX,B0B71DH45N,B07MHHM31K,B08RYQR1CJ
+                                B098T9ZFB5,B09JW5FNVX,B0B71DH45N,B07MHHM31K,B08RYQR1C
                             </span>
                         </p>
                         <Button

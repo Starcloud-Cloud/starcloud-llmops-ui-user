@@ -131,7 +131,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                             {item.status === 'FAILURE' && <span>({item.retryCount})</span>}
                         </div>
                         <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
-                            <div className="whitespace-nowrap">
+                            <div className="whitespace-nowrap line-clamp-1">
                                 <div className="inline-block whitespace-nowrap">
                                     <span className="font-[600]">状态：</span>
                                     {handleTransfer(item.status, item.errorMessage, item.retryCount)}
@@ -237,7 +237,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         {!show && (
                             <>
                                 <div className="text-[#15273799] text-[12px] mt-[5px] flex justify-between items-center">
-                                    <div className="whitespace-nowrap">
+                                    <div className="whitespace-nowrap line-clamp-1">
                                         <div className="inline-block whitespace-nowrap">
                                             <span className="font-[600]">状态：</span>
                                             {handleTransfer(item.status, item.errorMessage)}
@@ -247,7 +247,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                             {(item.elapsed / 1000)?.toFixed(2)}S
                                         </div>
                                     </div>
-                                    <div className=" line-clamp-1">
+                                    <div className="line-clamp-1">
                                         <span className="font-[600]">张数：</span>
                                         {item?.executeResult?.imageList?.length}
                                     </div>

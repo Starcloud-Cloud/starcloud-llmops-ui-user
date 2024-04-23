@@ -57,7 +57,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show }
             title="详情"
             footer={false}
             style={{ maxWidth: '1400px', top: 30 }}
-            zIndex={99999}
+            zIndex={8888}
         >
             <div className="h-[calc(100vh-140px)] p-2">
                 <ThreeStep

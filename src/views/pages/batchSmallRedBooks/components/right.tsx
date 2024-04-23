@@ -137,7 +137,7 @@ const Right = ({
                                 children: (
                                     <Spin className="!max-h-full" spinning={batchOpen}>
                                         <div
-                                            className="h-[1000px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
+                                            className="h-[600px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2 mt-[20px]"
                                             ref={scrollRef}
                                             onScroll={() => handleScroll(scrollRef.current)}
                                         >

@@ -33,6 +33,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Forms from '../../smallRedBook/components/form';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { useAllDetail } from 'contexts/JWTContext';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 const Lefts = ({
     detailShow = true,
     pre,
@@ -50,6 +52,9 @@ const Lefts = ({
     newSave: (data: any) => void;
     setPlanUid: (data: any) => void;
 }) => {
+    const { allDetail: all_detail }: any = useAllDetail();
+    console.log(all_detail);
+
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     //存储的数据
@@ -180,6 +185,7 @@ const Lefts = ({
                             编辑
                         </Button>
                         <Popconfirm
+                            zIndex={9999}
                             title="提示"
                             description="请再次确认是否删除？"
                             okText="确认"
@@ -194,6 +200,7 @@ const Lefts = ({
                 )
             }
         ]);
+        setTableLoading(false);
     };
     //下载模板
     const handleDownLoad = async () => {
@@ -299,6 +306,7 @@ const Lefts = ({
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else {
+            setTableLoading(true);
             result = await getPlan(searchParams.get('appUid'));
             const res = await marketDeatail({ uid: searchParams.get('appUid') });
             setVersion(res.version);
@@ -508,6 +516,7 @@ const Lefts = ({
                             编辑
                         </Button>
                         <Popconfirm
+                            zIndex={9999}
                             title="提示"
                             description="请再次确认是否删除？"
                             okText="确认"
@@ -545,6 +554,7 @@ const Lefts = ({
                             编辑
                         </Button>
                         <Popconfirm
+                            zIndex={9999}
                             title="提示"
                             description="请再次确认是否删除？"
                             okText="确认"
@@ -614,7 +624,6 @@ const Lefts = ({
         setEditOpens(false);
         forms.resetFields();
     };
-
     // 基础数据
     const [totalCount, setTotalCount] = useState<number>(1);
     useEffect(() => {
@@ -725,6 +734,10 @@ const Lefts = ({
                 })
             );
             if (flag) {
+                if (totalCount > all_detail?.rights?.find((item: any) => item?.type === 'MATRIX_BEAN')?.remaining) {
+                    setBotOpen(true);
+                    return;
+                }
                 newSave(result);
             }
         }
@@ -752,6 +765,8 @@ const Lefts = ({
         );
         getList();
     };
+    //token 不足弹框
+    const [botOpen, setBotOpen] = useState(false);
     return (
         <>
             <div className="relative h-full">
@@ -1037,10 +1052,13 @@ const Lefts = ({
                                             size="large"
                                             value={totalCount}
                                             onChange={(e: any) => {
+                                                if (e > all_detail?.rights?.find((item: any) => item?.type === 'MATRIX_BEAN')?.remaining) {
+                                                    setBotOpen(true);
+                                                    return;
+                                                }
                                                 setTotalCount(e);
                                             }}
                                             min={1}
-                                            max={100}
                                         />
                                         <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
                                             生成数量
@@ -1125,6 +1143,7 @@ const Lefts = ({
                     ]}
                 />
             )}
+            {botOpen && <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`生成数量不足`} from={''} />}
         </>
     );
 };

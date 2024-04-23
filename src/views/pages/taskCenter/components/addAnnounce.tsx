@@ -31,7 +31,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         setDetailOpen(true);
                     }}
                 >
-                    {row.copyWritingTitle}
+                    {row?.executeResult?.copyWriting?.title}
                 </span>
             )
         },
@@ -49,7 +49,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
             title: '图片数量',
             align: 'center',
             width: 100,
-            dataIndex: 'pictureNum'
+            render: (_, row) => <div>{row?.executeResult?.imageList?.length}</div>
         },
         {
             title: '图片内容',
@@ -57,7 +57,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
             dataIndex: 'pictureContent',
             render: (_, row) => (
                 <div className="w-[200px] overflow-x-auto flex gap-2">
-                    {row.pictureContent.map((item: any) => (
+                    {row?.executeResult?.imageList?.map((item: any) => (
                         <div className="w-[50px] h-[50px]">
                             <Image width={50} height={50} preview={false} src={item.url} />
                         </div>
@@ -67,7 +67,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         },
         {
             title: '生成时间',
-            render: (_, row) => <div>{formatDate(row.pictureStartTime)}</div>
+            render: (_, row) => <div>{formatDate(row.startTime)}</div>
         }
     ];
     const [addTable, setAddTable] = useState<any[]>([]);
@@ -90,8 +90,8 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         const result = await contentPage({
             pageNo: addCurrent,
             pageSize: addPageSize,
-            uid: batch,
-            status: 'execute_success',
+            batchUid: batch,
+            status: 'success',
             claim: false,
             planUid: values
         });

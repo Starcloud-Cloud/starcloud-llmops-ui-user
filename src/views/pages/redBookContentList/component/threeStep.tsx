@@ -34,6 +34,7 @@ import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
 import Left from '../../batchSmallRedBooks/components/newLeft';
 import { useAllDetail } from 'contexts/JWTContext';
+import jsCookie from 'js-cookie';
 
 const ThreeStep = ({
     data,
@@ -212,14 +213,17 @@ const ThreeStep = ({
                 <div className="w-full  h-full relative grid grid-cols-3">
                     {!show && (
                         <div
+                            className="flex gap-2"
                             style={{
                                 position: 'absolute',
                                 right: '0',
                                 top: '-67px'
                             }}
                         >
+                            {/* {jsCookie.get('isClient')&&
+                            <Button>加入代发布列表</Button>
+                            } */}
                             <Button onClick={doRetry}>重新生成</Button>
-                            <Divider type="vertical" />
                             {!editType ? (
                                 <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                     编辑
@@ -435,25 +439,27 @@ const ThreeStep = ({
                 getContainer={false}
                 onClose={() => setOpen(false)}
             >
-                <Left
-                    detailShow={false}
-                    data={data}
-                    saveLoading={saveLoading}
-                    newSave={async (data: any) => {
-                        setSaveLoading(true);
-                        setSataStatus(false);
-                        await retryContent(data);
-                        setSaveLoading(false);
-                        setOpen(false);
-                        setAginLoading(true);
-                        timer.current = setInterval(() => {
-                            setPre(Math.random() + Math.random());
-                        }, 2000);
-                    }}
-                    setPlanUid={(uid: any) => {
-                        console.log(uid);
-                    }}
-                />
+                <div className="mt-[-24px]">
+                    <Left
+                        detailShow={false}
+                        data={data}
+                        saveLoading={saveLoading}
+                        newSave={async (data: any) => {
+                            setSaveLoading(true);
+                            setSataStatus(false);
+                            await retryContent(data);
+                            setSaveLoading(false);
+                            setOpen(false);
+                            setAginLoading(true);
+                            timer.current = setInterval(() => {
+                                setPre(Math.random() + Math.random());
+                            }, 2000);
+                        }}
+                        setPlanUid={(uid: any) => {
+                            console.log(uid);
+                        }}
+                    />
+                </div>
             </Drawer>
         </div>
     );

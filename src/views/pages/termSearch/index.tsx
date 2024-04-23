@@ -27,6 +27,8 @@ const TermSearch = () => {
         setQueryAsin(newList);
     };
     const [value, setValue] = useState('');
+    const [restCount, setRestCount] = useState<any>(0);
+    const [update, setUpdate] = useState<any>(0);
 
     //获取拓ASIN
     const [asinOpen, setAsinOpen] = useState(false);
@@ -37,14 +39,27 @@ const TermSearch = () => {
     });
     const [asinData, setAsinData] = useState<any>({});
     const [open, setOpen] = useState(false);
+    const [modPage, setModPage] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
+            if (usedResult.total === -1) {
+                setRestCount('无限');
+            } else {
+                setRestCount(usedResult.total - usedResult.usedCount);
+            }
+        })();
+    }, [update]);
+
     const getAsin = async () => {
         // 获取权限
 
-        const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
-        if (usedResult.usedCount >= usedResult.total && usedResult.total !== -1) {
-            setOpen(true);
-            return;
-        }
+        // const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
+        // if (usedResult.usedCount >= usedResult.total && usedResult.total !== -1) {
+        //     setOpen(true);
+        //     return;
+        // }
         if (queryAsin.asinList.length === 0) {
             dispatch(
                 openSnackbar({
@@ -64,7 +79,8 @@ const TermSearch = () => {
             month: queryAsin.month === '最近30天' ? '' : queryAsin.month
         });
 
-        await userRighsLimitUse({ levelRightsCode: 'listingQuery' });
+        // await userRighsLimitUse({ levelRightsCode: 'listingQuery' });
+        // setUpdate((pre: any) => pre + 1);
         setAsinData(result);
         setAsinOpen(true);
     };
@@ -73,11 +89,22 @@ const TermSearch = () => {
     // }, []);
     useEffect(() => {
         if (value) {
+            const values = _.cloneDeep(value);
+            const newValue = values.split(' ');
             const str = /^[a-zA-Z0-9]{10}$/;
-            if (str.test(value)) {
-                const newList = _.cloneDeep(queryAsin);
-                newList.asinList.push(value.toUpperCase());
-                setQueryAsin(newList);
+            const newList = _.cloneDeep(queryAsin);
+            newValue?.map((item) => {
+                if (str.test(item)) {
+                    console.log(1);
+                    if (!newList.asinList.includes(item.toUpperCase())) {
+                        newList.asinList.push(item.toUpperCase());
+                    }
+                }
+            });
+            setQueryAsin(newList);
+            console.log(2);
+
+            if (newValue.some((item) => str.test(item))) {
                 setValue('');
             }
         }
@@ -99,7 +126,15 @@ const TermSearch = () => {
     const [searchResult, setSearchResult] = useState<any>(null);
     //变体类型
     const [type, setType] = useState(0);
+
     const getExtended = async (num: number) => {
+        if (!modPage) {
+            const usedResult = await userRighsLimitUsedCount({ levelRightsCode: 'listingQuery' });
+            if (usedResult.usedCount >= usedResult.total && usedResult.total !== -1) {
+                setOpen(true);
+                return;
+            }
+        }
         const { month, market } = queryAsin;
         setLoading(true);
         setAsinOpen(false);
@@ -118,6 +153,11 @@ const TermSearch = () => {
         setLoading(false);
         setTotal(result.total);
         setTableData(result.items);
+        if (!modPage) {
+            await userRighsLimitUse({ levelRightsCode: 'listingQuery' });
+            setUpdate((pre: any) => pre + 1);
+        }
+        setModPage(false);
     };
 
     const [total, setTotal] = useState(0);
@@ -178,8 +218,6 @@ const TermSearch = () => {
             originAsinList: queryAsin.asinList,
             filterDeletedKeywords: false
         });
-        console.log(result);
-
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(result);
         link.target = '_blank';
@@ -279,7 +317,7 @@ const TermSearch = () => {
                                 }
                                 className="ml-[10px border-b border-dashed border-[#9fa3a8] cursor-pointer hover:text-[#673ab7]"
                             >
-                                B098T9ZFB5,B09JW5FNVX,B0B71DH45N,B07MHHM31K,B08RYQR1CJ
+                                B098T9ZFB5,B09JW5FNVX,B0B71DH45N,B07MHHM31K,B08RYQR1C
                             </span>
                         </p>
                         <Button
@@ -296,12 +334,13 @@ const TermSearch = () => {
                 </div>
 
                 <Button type="primary" onClick={getAsin} className="ml-[10px]">
-                    立即查询
+                    立即查询(剩余{restCount}次)
                 </Button>
             </div>
-            {type !== 0 && <ResultFilter filterTable={filterTable} type={type} getExtended={getExtended} />}
+            {type !== 0 && <ResultFilter filterTable={filterTable} type={type} getExtended={getExtended} restCount={restCount} />}
             {type !== 0 && (
                 <TermTable
+                    setModPage={setModPage}
                     pageQuery={pageQuery}
                     queryAsin={queryAsin}
                     loading={loading}

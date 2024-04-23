@@ -8,6 +8,8 @@ import copy from 'clipboard-copy';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import './termTable.scss';
+import { PermissionUpgradeModal } from '../../../template/myChat/createChat/components/modal/permissionUpgradeModal';
+import useUserStore from '../../../../store/user';
 const TermTable = ({
     loading,
     pageQuery,
@@ -17,7 +19,8 @@ const TermTable = ({
     type,
     handleExport,
     setPageQuery,
-    getExtended
+    getExtended,
+    setModPage
 }: {
     loading: boolean;
     pageQuery: any;
@@ -28,9 +31,12 @@ const TermTable = ({
     handleExport: () => void;
     setPageQuery: (data: any) => void;
     getExtended: (data: number) => void;
+    setModPage: any;
 }) => {
+    const [upgradeOpen, setUpgradeOpen] = useState(false);
     const tableRef: any = useRef(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const permissions = useUserStore((state) => state.permissions);
     const rowSelection = {
         selectedRowKeys,
         onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
@@ -238,9 +244,6 @@ const TermTable = ({
                             <p>最近2-3年该关键词的月度搜索量趋势</p>
                             <p>对于季节性或趋势性关键词，可能只在最近2年某几个月出现，则其它月份搜索量填充0</p>
                             <p>对于月搜索量为0的关键词，表示该关键词搜索量太小，没有达到收录阈值</p>
-                            <p className="mt-[10px]">
-                                扩展阅读：<span className="text-[#673ab7] cursor-pointer">如何通过搜索趋势判断买家需求？</span>
-                            </p>
                         </>
                     }
                 >
@@ -286,9 +289,6 @@ const TermTable = ({
                             </p>
                             <p>（如果关键词上个月没有搜索量，则显示的是该关键词最近有搜索量的月份的数据）</p>
                             <p className="mt-[10px]">下行：日均搜索量，日均搜索量=月搜索量/30天</p>
-                            <p>
-                                如何评估卖家精灵关键词的准确率：<span className="text-[#673ab7] cursor-pointer">详细了解</span>
-                            </p>
                         </>
                     }
                 >
@@ -345,9 +345,6 @@ const TermTable = ({
                             <p>SellerSprite Product Rank，能够让该关键词排名维持在搜索结果第1页的8天预估单量</p>
                             <p>比如SPR=280，则代表产品8天内该关键词下的出单量需要达到280，才能让该关键词排名维持在搜索结果第1页</p>
                             <p className="mt-[10px]">SPR数值越大，表示让关键词排名维持在首页的单量要求更高，竞争更激烈</p>
-                            <p>
-                                扩展阅读：<span className="cursor-pointer text-[#673ab7]">如何让关键词排名快速上首页？</span>
-                            </p>
                         </>
                     }
                 >
@@ -365,9 +362,6 @@ const TermTable = ({
                         <>
                             <p>该关键词在亚马逊搜索结果第1页的产品中，标题包含该关键词的产品数量</p>
                             <p>比如标题密度为12，则代表该关键词的搜索结果第1页中，共有12个产品的标题包含了该关键词</p>
-                            <p className="mt-[10px]">
-                                扩展阅读：<span className="cursor-pointer text-[#673ab7]">如何利用标题密度找出竞品核心关键词？</span>
-                            </p>
                         </>
                     }
                 >
@@ -387,7 +381,6 @@ const TermTable = ({
                             <p>比如：1-48 of over 1,000 results for "ipad stand"</p>
                             <p className="mt-[10px]">
                                 基于IP地址的不同，各地区IP呈现的搜索结果数都不同，所以您在亚马逊前台搜索的结果数可能也会存在差别，
-                                <span className="cursor-pointer text-[#673ab7]">详细解释</span>
                             </p>
                         </>
                     }
@@ -446,10 +439,7 @@ const TermTable = ({
                     title={
                         <>
                             <p>上行：点击集中度，指该关键词下点击排名前三ASIN的点击总占比</p>
-                            <p>
-                                数据来源于亚马逊后台ABA报告，一般来说，点击集中度越高，该词垄断程度越高 扩展阅读：
-                                <span className="cursor-pointer text-[#673ab7]">如何快速判断细分市场垄断程度？</span>
-                            </p>
+
                             <p className="mt-[10px]">假设点击前三ASIN的点击共享分别是13.9%、12.4%、11.1%</p>
                             <p>则前三ASIN点击总占比=13.9%+12.4%+11.1%=37.4%</p>
                             <p className="mt-[10px]">
@@ -481,9 +471,6 @@ const TermTable = ({
                             <p>关键词出价是市场竞争度、市场成熟度的直接反映，也是营销费用的反映</p>
                             <p className="mt-[10px]">
                                 在站内广告投放时，您可以优先选择低竞争高需求的关键词，也就是出价较低而搜索量较高的关键词
-                            </p>
-                            <p>
-                                视频介绍：<span className="cursor-pointer text-[#673ab7]">点击这里</span>
                             </p>
                         </>
                     }
@@ -579,7 +566,17 @@ const TermTable = ({
         <div ref={tableRef}>
             <div className="sticky top-0 z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">
                 <div>
-                    <Button onClick={handleExport}>导出</Button>
+                    <Button
+                        onClick={() => {
+                            if (!permissions.includes('termSearch:export')) {
+                                setUpgradeOpen(true);
+                                return;
+                            }
+                            handleExport();
+                        }}
+                    >
+                        导出
+                    </Button>
                     <Button className="mx-[10px]" onClick={() => setOpen(true)} disabled={selectedRowKeys.length === 0}>
                         加入词库
                     </Button>
@@ -649,6 +646,7 @@ const TermTable = ({
                         page={pageQuery.page}
                         count={Math.ceil(total / pageQuery.size)}
                         onChange={(e: any, value: number) => {
+                            setModPage(true);
                             setPageQuery({
                                 ...pageQuery,
                                 page: value
@@ -659,6 +657,7 @@ const TermTable = ({
                         style={{ width: 100 }}
                         value={pageQuery.size}
                         onChange={(value) => {
+                            setModPage(true);
                             setPageQuery({
                                 ...pageQuery,
                                 size: value
@@ -674,6 +673,7 @@ const TermTable = ({
                 </div>
             )}
             {open && <AddLexicon open={open} queryAsin={queryAsin} selectedRowKeys={selectedRowKeys} setOpen={setOpen} />}
+            <PermissionUpgradeModal from="listing_export" open={upgradeOpen} handleClose={() => setUpgradeOpen(false)} />
         </div>
     );
 };

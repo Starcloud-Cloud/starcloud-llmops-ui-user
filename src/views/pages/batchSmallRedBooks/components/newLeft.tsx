@@ -771,33 +771,35 @@ const Lefts = ({
         <>
             <div className="relative h-full">
                 {detailShow && (
-                    <div className="flex justify-between items-end mb-4">
-                        <div className="text-[22px]">{appData?.configuration?.appInformation?.name}</div>
+                    <div className="flex gap-2 justify-between items-center mb-4">
+                        <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         <div>
-                            状态：{getStatus(appData?.status)}{' '}
-                            {appData?.version !== version ? (
-                                <Popconfirm
-                                    title="更新提示"
-                                    description={
-                                        <div>
-                                            <div>当前应用最新版本为：{version}</div>
-                                            <div>你使用的应用版本为：{appData?.version}</div>
-                                            <div>是否需要更新版本，获得最佳创作效果</div>
-                                        </div>
-                                    }
-                                    onConfirm={() => upDateVersion()}
-                                    okText="更新"
-                                    cancelText="取消"
-                                >
-                                    <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                            状态：{getStatus(appData?.status)}
+                            <div className="inline-block whitespace-nowrap">
+                                {appData?.version !== version ? (
+                                    <Popconfirm
+                                        title="更新提示"
+                                        description={
+                                            <div>
+                                                <div>当前应用最新版本为：{version}</div>
+                                                <div>你使用的应用版本为：{appData?.version}</div>
+                                                <div>是否需要更新版本，获得最佳创作效果</div>
+                                            </div>
+                                        }
+                                        onConfirm={() => upDateVersion()}
+                                        okText="更新"
+                                        cancelText="取消"
+                                    >
+                                        <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                            版本号： <span className="font-blod">{appData?.version || 0}</span>
+                                        </span>
+                                    </Popconfirm>
+                                ) : (
+                                    <span>
                                         版本号： <span className="font-blod">{appData?.version || 0}</span>
                                     </span>
-                                </Popconfirm>
-                            ) : (
-                                <span className="p-2 rounded-md">
-                                    版本号： <span className="font-blod">{appData?.version || 0}</span>
-                                </span>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}

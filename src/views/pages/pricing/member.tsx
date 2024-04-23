@@ -177,7 +177,7 @@ const plansDefault = (value: number) => [
         monthPrice: '免费',
         yearPrice: '免费',
         des: '适用于新用户体验，打卡获得魔法豆',
-        permission: [0, 1, 2, 5, 6, 7, 8, 9, 10],
+        permission: [0, 1, 2, 5, 7, 8, 9, 10, 11, 12],
         btnText: '免费使用'
     },
     {
@@ -190,7 +190,7 @@ const plansDefault = (value: number) => [
         yearPrice: 599,
         preMonthPrice: 49.91,
         des: '适用于普通用户',
-        permission: [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12],
+        permission: [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
         btnText: (
             <div>
                 立即购买
@@ -228,7 +228,7 @@ const plansDefault = (value: number) => [
         yearPrice: 4999,
         preMonthPrice: 416.58,
         des: '适用于公司团队',
-        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        permission: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
         btnText: '立即购买',
         monthCode: 'pro_month',
         yearCode: 'pro_year'
@@ -256,14 +256,16 @@ const planListDefault = (value: number) => [
             'GPT-3.5/开源模型', // 2
             'GPT-4', // 3
             '个人空间',
+            '扩展词查询5次/天',
+            '导出扩展词',
             '1个自定义应用', // 4
             '1个自定义机器人', // 4
             '1个微信群机器人', // 4
-            '多渠道发布机器人客服', // 4
-            '上传信息库/文档问答', // 4
-            '每个机器人1个文档上传', // 4
-            'Google/Amazon联网查询', // 5
-            '机器人插件扩展' // 6
+            '多渠道发布机器人客服' // 4
+            // '上传信息库/文档问答', // 4
+            // '每个机器人1个文档上传', // 4
+            // 'Google/Amazon联网查询', // 5
+            // '机器人插件扩展' // 6
         ]
     },
     {
@@ -284,6 +286,8 @@ const planListDefault = (value: number) => [
                 </Tooltip>
             </div>,
             '个人空间',
+            '扩展词查询20次/天',
+            '导出扩展词',
             <div className="flex items-center">
                 <span>5个自定义应用</span>
                 <Tooltip title={'可自定义提示词应用'}>
@@ -307,17 +311,17 @@ const planListDefault = (value: number) => [
                 <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
-            </div>,
-            <div className="flex items-center">
-                <span>上传信息库/文档问答</span>
-                <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
-                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-                </Tooltip>
-            </div>,
+            </div>
+            // <div className="flex items-center">
+            //     <span>上传信息库/文档问答</span>
+            //     <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
+            //         <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            //     </Tooltip>
+            // </div>,
 
-            '每个机器人5个文档上传', // 4
-            'Google/Amazon联网查询', // 5
-            '1个机器人插件扩展' // 6
+            // '每个机器人5个文档上传', // 4
+            // 'Google/Amazon联网查询', // 5
+            // '1个机器人插件扩展' // 6
         ]
     },
     {
@@ -366,16 +370,16 @@ const planListDefault = (value: number) => [
                 <Tooltip title={'可把配置好的机器人部署到 公共号,微信群,个人网站等地方,即可直接使用'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
-            </div>,
-            <div className="flex items-center">
-                <span>上传信息库/文档问答</span>
-                <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
-                    <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
-                </Tooltip>
-            </div>,
-            '每个机器人20个文档上传', // 4
-            'Google/Amazon联网查询', // 5
-            '3个机器人插件扩展' // 6
+            </div>
+            // <div className="flex items-center">
+            //     <span>上传信息库/文档问答</span>
+            //     <Tooltip title={'可上传私有文档，机器人可自动参考文档的内容，并进行最合理的回答'}>
+            //         <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
+            //     </Tooltip>
+            // </div>,
+            // '每个机器人20个文档上传', // 4
+            // 'Google/Amazon联网查询', // 5
+            // '3个机器人插件扩展' // 6
         ]
     },
     {
@@ -396,14 +400,16 @@ const planListDefault = (value: number) => [
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
             </div>,
+            '扩展词查询200次/天',
+            '导出扩展词',
             '无限自定义应用', // 4
             '无限自定义机器人', // 4
             '无限个微信群机器人', // 4
-            '多渠道发布机器人客服', // 4
-            '上传信息库/文档问答', // 4
-            '无限文档上传', // 4
-            'Google/Amazon联网查询', // 4
-            '10个机器人插件扩展' // 5
+            '多渠道发布机器人客服' // 4
+            // '上传信息库/文档问答', // 4
+            // '无限文档上传', // 4
+            // 'Google/Amazon联网查询', // 4
+            // '10个机器人插件扩展' // 5
         ]
     },
     {
@@ -422,6 +428,25 @@ const planListDefault = (value: number) => [
 // ===============================|| PRICING - PRICE 1 ||=============================== //
 
 let interval: any;
+
+function CheckIcon(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <polyline points="20 6 9 17 4 12" />
+        </svg>
+    );
+}
 
 const Price1 = () => {
     const [planList, setPlanList] = useState<any[]>(planListDefault(1));
@@ -816,7 +841,7 @@ const Price1 = () => {
 
     console.log('value', value);
     return (
-        <div>
+        <div className="relative">
             <HeaderWrapper id="vip">
                 <VipBar />
             </HeaderWrapper>
@@ -1273,7 +1298,7 @@ const Price1 = () => {
                     </>
                 )}
             </Dialog>
-            <Dialog
+            {/* <Dialog
                 open={openPayDialog}
                 onClose={() => setOpenPayDialog(false)}
                 aria-labelledby="alert-dialog-title"
@@ -1292,7 +1317,26 @@ const Price1 = () => {
                         </DialogContent>
                     </>
                 )}
-            </Dialog>
+            </Dialog> */}
+            {openPayDialog && (
+                <div className="flex flex-col items-center justify-center min-h-screen  dark:bg-gray-900 fixed inset-0 z-[10000]">
+                    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 max-w-md w-full">
+                        <div className="flex flex-col items-center justify-center space-y-4">
+                            <div className="bg-green-500 text-white rounded-full p-3 w-[60px] h-[60px] flex items-center justify-center">
+                                <CheckIcon className="h-8 w-8" />
+                            </div>
+                            <h1 className="text-2xl font-bold">支付成功</h1>
+                            <p className="text-gray-500 dark:text-gray-400">支付成功，3S后跳转至订单记录页...</p>
+                            <div
+                                className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-900/90 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus:ring-gray-300 cursor-pointer"
+                                onClick={() => (window.location.href = '/orderRecord')}
+                            >
+                                点击跳转
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             <Dialog
                 open={openSignDialog}
                 onClose={() => setOpenSignDialog(false)}

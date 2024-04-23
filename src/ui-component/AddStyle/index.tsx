@@ -234,7 +234,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
         return styleData.map((item: any, index: number) => ({
             key: index,
             label: (
-                <div className="flex justify-between">
+                <div className="flex justify-between h-[22px]">
                     <span>{item.name}</span>
                     <div className="flex justify-center">
                         <span>共{item?.templateList?.length || 0}张图片</span>
@@ -517,18 +517,8 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                                         onMouseEnter={() => setHoverIndex(index)}
                                         onMouseLeave={() => setHoverIndex('')}
                                     >
-                                        {/* <Checkbox
-                                            checked={chooseImageIndex === index}
-                                            style={{
-                                                position: 'absolute',
-                                                left: '10px',
-                                                top: '10px',
-                                                zIndex: 999
-                                            }}
-                                            onChange={(e) => onCheckboxChange(e, index)}
-                                        /> */}
                                         <Image.PreviewGroup
-                                            items={item?.templateList?.map((item: any) => ({ src: item.example }))}
+                                            items={templateList?.[index]?.templateList?.map((item: any) => ({ src: item.example }))}
                                             preview={{
                                                 onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
                                                 visible: previewShow,

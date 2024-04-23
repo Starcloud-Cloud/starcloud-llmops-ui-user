@@ -379,29 +379,28 @@ const MainLayout = () => {
             } else {
                 setNewUserVipOpen(false);
             }
-        } else {
-            setNewUserVipOpen(true);
         }
     };
     const [act, setAct] = useState(0);
     useEffect(() => {
         if (allDetail?.allDetail) {
             if (allDetail?.allDetail?.isNewUser) {
-                setTimeout(() => {
-                    handleShowNewUserVip();
-                }, 1000 * 60 * 3);
-            } else {
-                const dateTime = localStorage.getItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`);
-                if (dateTime) {
-                    if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
-                        setOpenInvite(true);
-                    } else {
-                        setOpenInvite(false);
-                    }
-                } else {
-                    setOpenInvite(true);
-                }
+                // setTimeout(() => {
+                handleShowNewUserVip();
+                // }, 1000 * 60 * 3);
             }
+            //  else {
+            //     const dateTime = localStorage.getItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`);
+            //     if (dateTime) {
+            //         if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+            //             setOpenInvite(true);
+            //         } else {
+            //             setOpenInvite(false);
+            //         }
+            //     } else {
+            //         setOpenInvite(true);
+            //     }
+            // }
         }
     }, [location.pathname, allDetail]);
 
@@ -536,7 +535,7 @@ const MainLayout = () => {
                                 position="absolute"
                                 color="inherit"
                                 elevation={0}
-                                sx={{ bgcolor: theme.palette.background.default }}
+                                sx={{ bgcolor: theme.palette.background.default, zIndex: 10 }}
                             >
                                 {header}
                             </AppBar>
@@ -589,7 +588,7 @@ const MainLayout = () => {
                                 {newUserVipOpen && (
                                     <NewUserVip
                                         onClose={() => {
-                                            const newUserVipEndTime = dayjs().add(30, 'm').format('YYYY-MM-DD HH:mm:ss');
+                                            const newUserVipEndTime = dayjs().add(3, 'day').format('YYYY-MM-DD HH:mm:ss');
                                             localStorage.setItem(`newUserVipEndTime-${allDetail?.allDetail.id}`, newUserVipEndTime);
                                             setNewUserVipOpen(false);
                                         }}

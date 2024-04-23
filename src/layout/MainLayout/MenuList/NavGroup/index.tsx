@@ -30,6 +30,7 @@ import { t } from 'hooks/web/useI18n';
 import { IconChevronDown, IconChevronRight, IconMinusVertical } from '@tabler/icons';
 import { NavItemType } from 'types';
 import { activeID } from 'store/slices/menu';
+import { MarketVideoModel } from '../../../../views/template/market/MarketVideoModel';
 
 // mini-menu - wrapper
 const PopperStyled = styled(Popper)(({ theme }) => ({
@@ -75,6 +76,7 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
     const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
     const [anchorEl, setAnchorEl] = useState<VirtualElement | (() => VirtualElement) | null | undefined>(null);
     const [currentItem, setCurrentItem] = useState(item);
+    const [open, setOpen] = useState(false);
 
     const openMini = Boolean(anchorEl);
 
@@ -217,7 +219,17 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
                                                     </span>
                                                 </div>
                                             ) : (
-                                                currentItem.title
+                                                <div>
+                                                    <span>{currentItem.title}</span>
+                                                    {currentItem.title === '应用市场' && (
+                                                        <span
+                                                            className="cursor-pointer font-[10px] text-[#1d4ed8] ml-1"
+                                                            onClick={() => setOpen(true)}
+                                                        >
+                                                            使用视频
+                                                        </span>
+                                                    )}
+                                                </div>
                                             )}
 
                                             {currentItem.caption && (
@@ -325,6 +337,7 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
                     </ListItemButton>
                 </List>
             )}
+            <MarketVideoModel open={open} handleClose={() => setOpen(false)} />
         </>
     );
 };

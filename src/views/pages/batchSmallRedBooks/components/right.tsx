@@ -119,8 +119,10 @@ const Right = ({
                                             </Popover>
                                             <span className="font-[600]">生成时间：</span>
                                             {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}
-                                            <span className="font-[600]">版本号：</span>
-                                            {item?.version}
+                                            <div className="inline-block whitespace-nowrap">
+                                                <span className="font-[600]">版本号：</span>
+                                                {item?.version}
+                                            </div>
                                         </div>
                                         <div>
                                             <span className="font-[600]">执行人：</span>
@@ -129,8 +131,10 @@ const Right = ({
                                             {item?.successCount}&nbsp;&nbsp;
                                             <span className="font-[600]">生成失败数：</span>
                                             {item?.failureCount}&nbsp;&nbsp;
-                                            <span className="font-[600]">生成总数：</span>
-                                            {item?.totalCount}
+                                            <div className="inline-block whitespace-nowrap">
+                                                <span className="font-[600]">生成总数：</span>
+                                                {item?.totalCount}
+                                            </div>
                                         </div>
                                     </div>
                                 ),

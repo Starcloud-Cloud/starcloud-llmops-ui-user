@@ -175,7 +175,11 @@ const EditStyle = ({
                             <div className="flex-1">
                                 <div>
                                     <div className="text-lg">图片生成配置</div>
-                                    <div className="text-xs text-black/50">用上传素材的图片类型字段绑定到图片模板上的图片位置</div>
+                                    <div className="text-xs text-black/50">
+                                        {appData?.materialType === 'picture'
+                                            ? '用上传素材的图片随机绑定到图片模板上'
+                                            : '用上传素材的图片类型字段绑定到图片模板上的图片位置'}
+                                    </div>
                                     <div className="flex flex-wrap">
                                         {appData?.materialType === 'picture' ? (
                                             <>

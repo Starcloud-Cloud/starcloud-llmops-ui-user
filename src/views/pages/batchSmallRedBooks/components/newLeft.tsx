@@ -15,13 +15,22 @@ import {
     Tag,
     Row,
     Col,
-    Badge
+    Input
 } from 'antd';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef } from 'react';
-import { materialTemplate, materialImport, materialExport, materialResilt, getPlan, planModify, planUpgrade } from 'api/redBook/batchIndex';
+import {
+    materialTemplate,
+    materialImport,
+    materialExport,
+    materialResilt,
+    getPlan,
+    planModify,
+    planUpgrade,
+    materialParse
+} from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
 import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
@@ -53,8 +62,7 @@ const Lefts = ({
     setPlanUid: (data: any) => void;
 }) => {
     const { allDetail: all_detail }: any = useAllDetail();
-    console.log(all_detail);
-
+    const { TextArea } = Input;
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     //存储的数据
@@ -134,6 +142,9 @@ const Lefts = ({
     const [columns, setColumns] = useState<any[]>([]);
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
+    const [bookOpen, setBookOpen] = useState(false);
+    const [bookValue, setBookValue] = useState('');
+    const [bookLoading, setBookLoading] = useState(false);
     const [parseUid, setParseUid] = useState(''); //上传之后获取的 uid
     //获取表头数据
     const typeList = [
@@ -201,6 +212,7 @@ const Lefts = ({
             }
         ]);
         setTableLoading(false);
+        setTablePre(1);
     };
     //下载模板
     const handleDownLoad = async () => {
@@ -276,7 +288,7 @@ const Lefts = ({
         if (materialType) {
             getTableHeader();
         }
-    }, [materialType]);
+    }, [materialType, pre]);
     //模拟上传进度
     const timer1: any = useRef(null);
     useEffect(() => {
@@ -356,6 +368,16 @@ const Lefts = ({
                     list = arr?.find((el: any) => el.style === 'TAG_BOX')?.value;
                 }
                 arr.find((el: any) => el.style === 'TAG_BOX').value = list;
+            }
+            if (arr?.find((el: any) => el.style === 'IMAGE_LIST')) {
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.style === 'IMAGE_LIST')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.style === 'IMAGE_LIST')?.value;
+                }
+                arr.find((el: any) => el.style === 'IMAGE_LIST').value = list;
             }
             if (item?.flowStep?.handler === 'PosterActionHandler' && arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')) {
                 let list: any;
@@ -578,12 +600,10 @@ const Lefts = ({
         }
         const newValue = _.cloneDeep(generRef.current);
         const newList =
-            generRef.current[i].variable.variables[
-                generRef.current[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
-            ].value;
+            newValue[i].variable.variables[newValue[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')].value;
         newList.splice(index, 1);
-        generRef.current.current = newValue;
-        setGenerateList(generRef.current.current);
+        generRef.current = newValue;
+        setGenerateList(generRef.current);
     };
     const [forms] = Form.useForm();
     const [titles, setTitles] = useState('');
@@ -767,6 +787,30 @@ const Lefts = ({
     };
     //token 不足弹框
     const [botOpen, setBotOpen] = useState(false);
+    useEffect(() => {
+        if (!bookOpen) {
+            setBookValue('');
+        }
+    }, [bookOpen]);
+    //监听素材上传发生变化
+    const [tablePre, setTablePre] = useState(0);
+    useEffect(() => {
+        if (tablePre && materialType === 'note') {
+            const imageList = tableData
+                .map((item: any) => item.images)
+                ?.flat(1)
+                ?.filter((item) => item);
+            const newList = _.cloneDeep(generRef.current);
+            newList
+                .find((item: any) => item.flowStep.handler === 'ImitateActionHandler')
+                .variable.variables.find((item: any) => item.style === 'MATERIAL').value = tableData;
+            newList
+                .find((item: any) => item.flowStep.handler === 'ImitateActionHandler')
+                .variable.variables.find((item: any) => item.field === 'REFERS_IMAGE').value = imageList;
+            generRef.current = newList;
+            setGenerateList(generRef.current);
+        }
+    }, [JSON.stringify(tableData)]);
     return (
         <>
             <div className="relative h-full">
@@ -854,7 +898,17 @@ const Lefts = ({
                                         <>
                                             <div className="flex justify-between items-center mb-[10px]">
                                                 <div className="flex gap-2">
-                                                    <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                                                    <Button
+                                                        size="small"
+                                                        type="primary"
+                                                        onClick={() => {
+                                                            if (materialType === 'note') {
+                                                                setBookOpen(true);
+                                                            } else {
+                                                                setUploadOpen(true);
+                                                            }
+                                                        }}
+                                                    >
                                                         批量导入
                                                     </Button>
                                                     {/* <Button size="small" type="primary">
@@ -1126,6 +1180,34 @@ const Lefts = ({
                     </div>
                 </div>
                 {uploadLoading && <Progress size="small" percent={percent} />}
+            </Modal>
+            <Modal
+                zIndex={9999}
+                width={400}
+                title="批量导入"
+                open={bookOpen}
+                onOk={async () => {
+                    setBookLoading(true);
+                    try {
+                        const result = await materialParse({ noteUrlList: bookValue?.split(' '), materialType });
+                        const newList = _.cloneDeep(tableData);
+                        newList.unshift(...result);
+                        setTableData(newList);
+                        setBookLoading(false);
+                        setBookOpen(false);
+                    } catch (e) {
+                        setBookLoading(false);
+                    }
+                }}
+                onCancel={() => setBookOpen(false)}
+                confirmLoading={bookLoading}
+            >
+                <TextArea
+                    placeholder="请输入小红书地址使用“空格”分割"
+                    rows={8}
+                    value={bookValue}
+                    onChange={(e) => setBookValue(e.target.value)}
+                />
             </Modal>
             {editOpen && (
                 <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />

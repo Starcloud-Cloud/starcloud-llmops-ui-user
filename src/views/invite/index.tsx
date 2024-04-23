@@ -1,6 +1,5 @@
 import { Image } from 'antd';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
-import { useCache } from 'hooks/web/useCache';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -8,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { spaceSimple, spaceJoin } from 'api/section';
 import { useAllDetail } from 'contexts/JWTContext';
 import { DASHBOARD_PATH } from 'config';
+import { CACHE_KEY, useCache } from 'hooks/web/useCache';
 const Invite = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -46,6 +46,7 @@ const Invite = () => {
                 );
             }
         } else {
+            wsCache.set(CACHE_KEY.INVITE, searchParams.get('invite'));
             navigate('/login');
         }
     };

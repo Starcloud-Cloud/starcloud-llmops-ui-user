@@ -75,6 +75,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { SignModal } from './SignModal';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+import jsCookie from 'js-cookie';
 
 const recommendList = [
     {
@@ -245,7 +246,7 @@ const planListDefault = (value: number) => [
         keyword: 'free',
         value: [
             <div className="flex items-center">
-                <span>矩阵豆：10</span>
+                <span>矩阵豆：5</span>
                 <Tooltip title={'用来AI创作图文笔记'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
@@ -724,7 +725,7 @@ const Price1 = () => {
     const handleClick = (index: number, payId?: number) => {
         switch (index) {
             case 0:
-                return navigate('/exchange');
+                return !jsCookie.get('isClient') ? navigate('/exchange') : navigate('/web-view/exchange');
             case 1:
             case 2:
             case 3:

@@ -331,8 +331,8 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                     <div className="bg-green-500 p-4 rounded-full w-[80px] h-[80px]">
                         <CheckIcon className="h-12 w-12 text-white" />
                     </div>
-                    <h1 className="text-3xl font-bold">注册成功</h1>
-                    <p className="text-gray-500 dark:text-gray-400"> {t('auth.register.successful')}</p>
+                    {/* <h1 className="text-3xl font-bold">注册成功</h1> */}
+                    <p className="text-gray-500 dark:text-gray-400 text-lg"> {t('auth.register.successful')}</p>
                 </div>
             )}
         </>

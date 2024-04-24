@@ -34,10 +34,11 @@ import { oriregister } from 'api/login';
 
 import { discountNewUser } from 'api/vip';
 import { spaceJoin } from 'api/section';
+import { useCache, CACHE_KEY } from 'hooks/web/useCache';
 import { dispatch as dispatchs } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { CACHE_KEY, useCache } from 'hooks/web/useCache';
 const { wsCache } = useCache();
+
 // import * as LoginApi from 'api/login';
 
 // const chance = new Chance();

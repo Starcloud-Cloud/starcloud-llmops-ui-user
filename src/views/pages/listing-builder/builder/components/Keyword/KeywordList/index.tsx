@@ -414,7 +414,9 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                         {row.status === 10 ? (
                                             <div className="w-[180px]">{row.keyword}</div>
                                         ) : [6, 7].includes(row.status) ? (
-                                            <div className="w-[180px] text-[#bec2cc] line-through">{row.keyword}</div>
+                                            <Tooltip title={'未获取到关键词数据'}>
+                                                <div className="w-[180px] text-[#bec2cc] line-through">{row.keyword}</div>
+                                            </Tooltip>
                                         ) : (
                                             <div>
                                                 <Tooltip title={'正在请求数据'}>

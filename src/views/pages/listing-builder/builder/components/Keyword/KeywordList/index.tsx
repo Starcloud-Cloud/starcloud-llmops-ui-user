@@ -25,6 +25,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Popover, Rate } from 'antd';
 import _ from 'lodash-es';
 import { COUNTRY_LIST } from 'views/pages/listing-builder/data';
+import { TextWithTooltip } from '../../../../../../../ui-component/TextWithToolTip/index';
 
 type TableEnhancedCreateDataType = {
     keyword: string;
@@ -404,15 +405,15 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                     </TableCell>
                                     <TableCell align="left" className="py-[6px] px-0">
                                         {row.status === 10 ? (
-                                            <div className="line-clamp-1 w-[180px]">{row.keyword}</div>
-                                        ) : row.status === 6 ? (
+                                            <TextWithTooltip text={row.keyword} maxLength={25} />
+                                        ) : [6, 7].includes(row.status) ? (
                                             <div>
-                                                <span className="line-clamp-1 line-through text-[#bec2cc] inline">{row.keyword}</span>
+                                                <TextWithTooltip text={row.keyword} maxLength={25} through={true} color={'#bec2cc'} />
                                             </div>
                                         ) : (
                                             <div>
                                                 <Tooltip title={'正在请求数据'}>
-                                                    <span className="line-clamp-1  text-[#bec2cc] inline cursor-pointer">
+                                                    <span className="line-clamp-1 w-[180px]  text-[#bec2cc] cursor-pointer">
                                                         {row.keyword}
                                                     </span>
                                                 </Tooltip>

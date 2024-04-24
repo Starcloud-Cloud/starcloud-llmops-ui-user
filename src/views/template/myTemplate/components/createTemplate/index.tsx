@@ -45,7 +45,7 @@ interface Items {
     value: string;
 }
 interface AppModels {
-    aiModel?: Items[];
+    llmModelType?: Items[];
     language?: Items[];
     type?: Items[];
     variableStyle?: Items[];
@@ -891,7 +891,7 @@ function CreateDetail() {
                                                 setAiModel(value);
                                             }}
                                         >
-                                            {appModels?.aiModel?.map((item: any) => (
+                                            {appModels?.llmModelType?.map((item: any) => (
                                                 <Option key={item.value} value={item.value}>
                                                     {item.label}
                                                 </Option>
@@ -1008,7 +1008,7 @@ function CreateDetail() {
                                                     setAiModel(value);
                                                 }}
                                             >
-                                                {appModels?.aiModel?.map((item: any) => (
+                                                {appModels?.llmModelType?.map((item: any) => (
                                                     <Option key={item.value} value={item.value}>
                                                         {item.label}
                                                     </Option>

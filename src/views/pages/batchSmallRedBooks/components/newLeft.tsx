@@ -294,7 +294,7 @@ const Lefts = ({
         if (materialType) {
             getTableHeader();
         }
-    }, [materialType, pre]);
+    }, [materialType]);
     //模拟上传进度
     const timer1: any = useRef(null);
     useEffect(() => {
@@ -653,8 +653,13 @@ const Lefts = ({
     // 基础数据
     const [totalCount, setTotalCount] = useState<number>(1);
     useEffect(() => {
+        const getStatus = async () => {
+            const result = await getPlan(searchParams.get('appUid'));
+            appRef.current.status = result?.status;
+            setAppData(appRef.current);
+        };
         if (pre && pre > 0) {
-            getList();
+            getStatus();
         }
     }, [pre]);
     //保存

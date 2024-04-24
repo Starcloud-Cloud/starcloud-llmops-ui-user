@@ -219,7 +219,7 @@ function ApplicationAnalysis({
             setAppScene(res.appScene);
         });
         metadata().then((res) => {
-            setExeList(res.aiModel);
+            setExeList(res.llmModelType);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

@@ -157,6 +157,7 @@ const BatcSmallRedBooks = () => {
     // };
     const [pre, setPre] = useState(0);
     const newSave = async (uid: string) => {
+        setBathOpen(true);
         await planExecute({ uid });
         const res = await batchPages({ ...batchPage, planUid: uid });
         setBathList(res.list);
@@ -233,6 +234,9 @@ const BatcSmallRedBooks = () => {
                         .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
                         ?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE')
                 ) {
+                    setBathOpen(false);
+                    getbatchPages();
+                    setPre(pre + 1);
                     clearInterval(timer.current[queryPage.pageNo - 1]);
                     return;
                 }
@@ -270,6 +274,9 @@ const BatcSmallRedBooks = () => {
                         })
                     ) {
                         clearInterval(timer.current[0]);
+                        setBathOpen(false);
+                        getbatchPages();
+                        setPre(pre + 1);
                         return;
                     }
                     getLists(1, e[0]);
@@ -277,8 +284,9 @@ const BatcSmallRedBooks = () => {
             }
         }
     };
+    const [bathOpen, setBathOpen] = useState(false);
     useEffect(() => {
-        if (bathList?.length !== 0) {
+        if (bathList?.length !== 0 && bathOpen) {
             const bathId = bathList[0].uid;
             setcollapseActive([bathId]);
             timer.current?.map((item: any) => {
@@ -306,6 +314,9 @@ const BatcSmallRedBooks = () => {
                         })
                     ) {
                         clearInterval(timer.current[0]);
+                        setBathOpen(false);
+                        getbatchPages();
+                        setPre(pre + 1);
                         return;
                     }
                     getLists(1, bathId);
@@ -323,11 +334,14 @@ const BatcSmallRedBooks = () => {
     };
     //编辑获列表
     const [PlanUid, setPlanUid] = useState('');
+    const getbatchPages = () => {
+        batchPages({ ...batchPage, planUid: PlanUid }).then((res) => {
+            setBathList(res.list);
+        });
+    };
     useEffect(() => {
         if (PlanUid) {
-            batchPages({ ...batchPage, planUid: PlanUid }).then((res) => {
-                setBathList(res.list);
-            });
+            getbatchPages();
         }
     }, [PlanUid]);
     return (
@@ -385,6 +399,9 @@ const BatcSmallRedBooks = () => {
                                         )
                                 ) {
                                     clearInterval(timer.current[pageNo]);
+                                    setBathOpen(false);
+                                    getbatchPages();
+                                    setPre(pre + 1);
                                     return;
                                 }
                                 getLists(pageNo);

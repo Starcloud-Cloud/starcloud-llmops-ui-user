@@ -47,7 +47,21 @@ const Invite = () => {
             }
         } else {
             wsCache.set(CACHE_KEY.INVITE, searchParams.get('invite'));
-            navigate('/login');
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '请先登录后，再加入团队',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+            setTimeout(() => {
+                navigate('/login');
+            }, 1000);
         }
     };
     const getList = async () => {

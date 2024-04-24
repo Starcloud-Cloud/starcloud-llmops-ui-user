@@ -194,6 +194,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     //用户信息
     const [allDetail, setAllDetail] = useState(null);
     const [pre, setPre] = useState(1);
+    const [preInvite, setPreInvite] = useState(1);
     useEffect(() => {
         const getList = async () => {
             if (wsCache.get(CACHE_KEY.INVITE)) {
@@ -211,20 +212,15 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
                     })
                 );
                 wsCache.delete(CACHE_KEY.INVITE);
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-                window.location.reload();
-                return;
             }
             const result = await discountNewUser();
             setAllDetail(result);
+            setPreInvite(preInvite + 1);
         };
         if (location?.pathname !== '/invite') {
             getList();
         }
     }, [pre]);
-
     if (state.isInitialized !== undefined && !state.isInitialized) {
         return <Loader />;
     }
@@ -245,6 +241,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
                 ...state,
                 allDetail,
                 pre,
+                preInvite,
                 setPre,
                 login,
                 logout,

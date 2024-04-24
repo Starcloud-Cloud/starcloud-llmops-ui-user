@@ -21,6 +21,7 @@ import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
 import { items } from './Login';
 import AuthRegisterResult from '../auth-forms/AuthRegisterResult';
+import { getRegisterResult } from 'api/login';
 
 // carousel items
 
@@ -32,6 +33,7 @@ const RegisterResult = () => {
     const query = new URLSearchParams(location.search);
     const urlInviteCode = query.get('q');
     const navigate = useNavigate();
+    const activationId = query.get('activation');
 
     const [inviteCode, setInviteCode] = useState('');
 
@@ -55,6 +57,10 @@ const RegisterResult = () => {
     }, [urlInviteCode]);
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
+
+    useEffect(() => {
+        getRegisterResult(activationId).then((res) => {});
+    }, []);
 
     useEffect(() => {
         let timeout = setTimeout(() => {

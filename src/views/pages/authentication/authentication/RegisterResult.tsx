@@ -44,6 +44,7 @@ const RegisterResult = () => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const urlInviteCode = query.get('q');
+    const activationId = query.get('activation');
     const navigate = useNavigate();
 
     const [inviteCode, setInviteCode] = useState('');
@@ -69,14 +70,14 @@ const RegisterResult = () => {
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 
-    useEffect(() => {
-        let timeout = setTimeout(() => {
-            navigate(inviteCode ? `/login?loginType=pwd&q=${inviteCode}` : '/login?loginType=pwd');
-        }, 3 * 1000);
-        return () => {
-            clearTimeout(timeout);
-        };
-    }, []);
+    // useEffect(() => {
+    //     let timeout = setTimeout(() => {
+    //         navigate(inviteCode ? `/login?loginType=pwd&q=${inviteCode}` : '/login?loginType=pwd');
+    //     }, 3 * 1000);
+    //     return () => {
+    //         clearTimeout(timeout);
+    //     };
+    // }, []);
 
     return (
         <AuthWrapper2>

@@ -118,3 +118,7 @@ export const sendCode = (data: any) => {
 export const validateCode = (data: any) => {
     return request.postOriginal({ url: 'llm/communication/validate/code', data });
 };
+
+export const getRegisterResult = (activationId: any) => {
+    return request.postOriginal({ url: `llm/auth/activation/${activationId}` });
+};

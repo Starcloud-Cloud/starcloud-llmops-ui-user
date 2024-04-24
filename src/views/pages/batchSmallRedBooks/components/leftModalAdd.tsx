@@ -19,7 +19,7 @@ const LeftModalAdd = ({
     setPage: (data: any) => void;
 }) => {
     return (
-        <Modal zIndex={9999} maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
+        <Modal zIndex={8889} maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
             <div className="flex justify-end my-[20px]">
                 <Button
                     type="primary"

@@ -354,7 +354,7 @@ const BatcSmallRedBooks = () => {
                 <div></div>
             </SubCard>
             <div className="flex gap-[20px] mt-4 h-[calc(100%-74px)]">
-                <div className="2xl:w-[500px] xl:w-[400px] lg:w-[350px]  w-[350px] bg-white rounded-lg p-4">
+                <div className="2xl:w-[500px] xl:w-[410px] lg:w-[370px]  w-[370px] bg-white rounded-lg p-4">
                     <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
                 </div>
                 <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">

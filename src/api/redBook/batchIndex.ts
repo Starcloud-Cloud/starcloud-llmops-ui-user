@@ -94,3 +94,7 @@ export const getListExample = (uid: any) => {
 export const planUpgrade = (data: any) => {
     return request.post({ url: `/llm/creative/plan/upgrade`, data });
 };
+//小红书查询
+export const materialParse = (data: any) => {
+    return request.post({ url: `/llm/material/parse`, data });
+};

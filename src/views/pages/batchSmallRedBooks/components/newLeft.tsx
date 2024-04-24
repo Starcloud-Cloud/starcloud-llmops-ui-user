@@ -15,13 +15,22 @@ import {
     Tag,
     Row,
     Col,
-    Badge
+    Input
 } from 'antd';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef } from 'react';
-import { materialTemplate, materialImport, materialExport, materialResilt, getPlan, planModify, planUpgrade } from 'api/redBook/batchIndex';
+import {
+    materialTemplate,
+    materialImport,
+    materialExport,
+    materialResilt,
+    getPlan,
+    planModify,
+    planUpgrade,
+    materialParse
+} from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
 import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
@@ -33,6 +42,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Forms from '../../smallRedBook/components/form';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { useAllDetail } from 'contexts/JWTContext';
+import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 const Lefts = ({
     detailShow = true,
     pre,
@@ -50,6 +61,8 @@ const Lefts = ({
     newSave: (data: any) => void;
     setPlanUid: (data: any) => void;
 }) => {
+    const { allDetail: all_detail }: any = useAllDetail();
+    const { TextArea } = Input;
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     //存储的数据
@@ -129,6 +142,9 @@ const Lefts = ({
     const [columns, setColumns] = useState<any[]>([]);
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
+    const [bookOpen, setBookOpen] = useState(false);
+    const [bookValue, setBookValue] = useState('');
+    const [bookLoading, setBookLoading] = useState(false);
     const [parseUid, setParseUid] = useState(''); //上传之后获取的 uid
     //获取表头数据
     const typeList = [
@@ -180,6 +196,7 @@ const Lefts = ({
                             编辑
                         </Button>
                         <Popconfirm
+                            zIndex={9999}
                             title="提示"
                             description="请再次确认是否删除？"
                             okText="确认"
@@ -194,6 +211,8 @@ const Lefts = ({
                 )
             }
         ]);
+        setTableLoading(false);
+        setTablePre(1);
     };
     //下载模板
     const handleDownLoad = async () => {
@@ -269,7 +288,7 @@ const Lefts = ({
         if (materialType) {
             getTableHeader();
         }
-    }, [materialType]);
+    }, [materialType, pre]);
     //模拟上传进度
     const timer1: any = useRef(null);
     useEffect(() => {
@@ -299,6 +318,7 @@ const Lefts = ({
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else {
+            setTableLoading(true);
             result = await getPlan(searchParams.get('appUid'));
             const res = await marketDeatail({ uid: searchParams.get('appUid') });
             setVersion(res.version);
@@ -348,6 +368,16 @@ const Lefts = ({
                     list = arr?.find((el: any) => el.style === 'TAG_BOX')?.value;
                 }
                 arr.find((el: any) => el.style === 'TAG_BOX').value = list;
+            }
+            if (arr?.find((el: any) => el.style === 'IMAGE_LIST')) {
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.style === 'IMAGE_LIST')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.style === 'IMAGE_LIST')?.value;
+                }
+                arr.find((el: any) => el.style === 'IMAGE_LIST').value = list;
             }
             if (item?.flowStep?.handler === 'PosterActionHandler' && arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')) {
                 let list: any;
@@ -508,6 +538,7 @@ const Lefts = ({
                             编辑
                         </Button>
                         <Popconfirm
+                            zIndex={9999}
                             title="提示"
                             description="请再次确认是否删除？"
                             okText="确认"
@@ -545,6 +576,7 @@ const Lefts = ({
                             编辑
                         </Button>
                         <Popconfirm
+                            zIndex={9999}
                             title="提示"
                             description="请再次确认是否删除？"
                             okText="确认"
@@ -568,12 +600,10 @@ const Lefts = ({
         }
         const newValue = _.cloneDeep(generRef.current);
         const newList =
-            generRef.current[i].variable.variables[
-                generRef.current[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
-            ].value;
+            newValue[i].variable.variables[newValue[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')].value;
         newList.splice(index, 1);
-        generRef.current.current = newValue;
-        setGenerateList(generRef.current.current);
+        generRef.current = newValue;
+        setGenerateList(generRef.current);
     };
     const [forms] = Form.useForm();
     const [titles, setTitles] = useState('');
@@ -614,7 +644,6 @@ const Lefts = ({
         setEditOpens(false);
         forms.resetFields();
     };
-
     // 基础数据
     const [totalCount, setTotalCount] = useState<number>(1);
     useEffect(() => {
@@ -725,6 +754,10 @@ const Lefts = ({
                 })
             );
             if (flag) {
+                if (totalCount > all_detail?.rights?.find((item: any) => item?.type === 'MATRIX_BEAN')?.remaining) {
+                    setBotOpen(true);
+                    return;
+                }
                 newSave(result);
             }
         }
@@ -752,37 +785,65 @@ const Lefts = ({
         );
         getList();
     };
+    //token 不足弹框
+    const [botOpen, setBotOpen] = useState(false);
+    useEffect(() => {
+        if (!bookOpen) {
+            setBookValue('');
+        }
+    }, [bookOpen]);
+    //监听素材上传发生变化
+    const [tablePre, setTablePre] = useState(0);
+    useEffect(() => {
+        if (tablePre && materialType === 'note') {
+            const imageList = tableData
+                .map((item: any) => item.images)
+                ?.flat(1)
+                ?.filter((item) => item);
+            const newList = _.cloneDeep(generRef.current);
+            newList
+                .find((item: any) => item.flowStep.handler === 'ImitateActionHandler')
+                .variable.variables.find((item: any) => item.style === 'MATERIAL').value = tableData;
+            newList
+                .find((item: any) => item.flowStep.handler === 'ImitateActionHandler')
+                .variable.variables.find((item: any) => item.field === 'REFERS_IMAGE').value = imageList;
+            generRef.current = newList;
+            setGenerateList(generRef.current);
+        }
+    }, [JSON.stringify(tableData)]);
     return (
         <>
             <div className="relative h-full">
                 {detailShow && (
-                    <div className="flex justify-between items-end mb-4">
-                        <div className="text-[22px]">{appData?.configuration?.appInformation?.name}</div>
+                    <div className="flex gap-2 justify-between items-center mb-4">
+                        <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         <div>
-                            状态：{getStatus(appData?.status)}{' '}
-                            {appData?.version !== version ? (
-                                <Popconfirm
-                                    title="更新提示"
-                                    description={
-                                        <div>
-                                            <div>当前应用最新版本为：{version}</div>
-                                            <div>你使用的应用版本为：{appData?.version}</div>
-                                            <div>是否需要更新版本，获得最佳创作效果</div>
-                                        </div>
-                                    }
-                                    onConfirm={() => upDateVersion()}
-                                    okText="更新"
-                                    cancelText="取消"
-                                >
-                                    <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                            状态：{getStatus(appData?.status)}
+                            <div className="inline-block whitespace-nowrap">
+                                {appData?.version !== version ? (
+                                    <Popconfirm
+                                        title="更新提示"
+                                        description={
+                                            <div>
+                                                <div>当前应用最新版本为：{version}</div>
+                                                <div>你使用的应用版本为：{appData?.version}</div>
+                                                <div>是否需要更新版本，获得最佳创作效果</div>
+                                            </div>
+                                        }
+                                        onConfirm={() => upDateVersion()}
+                                        okText="更新"
+                                        cancelText="取消"
+                                    >
+                                        <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                            版本号： <span className="font-blod">{appData?.version || 0}</span>
+                                        </span>
+                                    </Popconfirm>
+                                ) : (
+                                    <span>
                                         版本号： <span className="font-blod">{appData?.version || 0}</span>
                                     </span>
-                                </Popconfirm>
-                            ) : (
-                                <span className="p-2 rounded-md">
-                                    版本号： <span className="font-blod">{appData?.version || 0}</span>
-                                </span>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -837,7 +898,17 @@ const Lefts = ({
                                         <>
                                             <div className="flex justify-between items-center mb-[10px]">
                                                 <div className="flex gap-2">
-                                                    <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                                                    <Button
+                                                        size="small"
+                                                        type="primary"
+                                                        onClick={() => {
+                                                            if (materialType === 'note') {
+                                                                setBookOpen(true);
+                                                            } else {
+                                                                setUploadOpen(true);
+                                                            }
+                                                        }}
+                                                    >
                                                         批量导入
                                                     </Button>
                                                     {/* <Button size="small" type="primary">
@@ -1037,10 +1108,13 @@ const Lefts = ({
                                             size="large"
                                             value={totalCount}
                                             onChange={(e: any) => {
+                                                if (e > all_detail?.rights?.find((item: any) => item?.type === 'MATRIX_BEAN')?.remaining) {
+                                                    setBotOpen(true);
+                                                    return;
+                                                }
                                                 setTotalCount(e);
                                             }}
                                             min={1}
-                                            max={100}
                                         />
                                         <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
                                             生成数量
@@ -1107,6 +1181,34 @@ const Lefts = ({
                 </div>
                 {uploadLoading && <Progress size="small" percent={percent} />}
             </Modal>
+            <Modal
+                zIndex={9999}
+                width={400}
+                title="批量导入"
+                open={bookOpen}
+                onOk={async () => {
+                    setBookLoading(true);
+                    try {
+                        const result = await materialParse({ noteUrlList: bookValue?.split(' '), materialType });
+                        const newList = _.cloneDeep(tableData);
+                        newList.unshift(...result);
+                        setTableData(newList);
+                        setBookLoading(false);
+                        setBookOpen(false);
+                    } catch (e) {
+                        setBookLoading(false);
+                    }
+                }}
+                onCancel={() => setBookOpen(false)}
+                confirmLoading={bookLoading}
+            >
+                <TextArea
+                    placeholder="请输入小红书地址使用“空格”分割"
+                    rows={8}
+                    value={bookValue}
+                    onChange={(e) => setBookValue(e.target.value)}
+                />
+            </Modal>
             {editOpen && (
                 <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
             )}
@@ -1125,6 +1227,7 @@ const Lefts = ({
                     ]}
                 />
             )}
+            {botOpen && <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`生成数量不足`} from={''} />}
         </>
     );
 };

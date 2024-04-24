@@ -182,7 +182,7 @@ const Cards = ({ flag = false }) => {
             setSpaceList(result);
         };
         if (flag) getList();
-    }, []);
+    }, [allDetail?.preInvite]);
     //切换部门
     return (
         <CardStyle

@@ -379,6 +379,16 @@ function CreateDetail() {
                 }
                 arr.find((el: any) => el.style === 'TAG_BOX').value = list;
             }
+            if (arr?.find((el: any) => el.style === 'IMAGE_LIST')) {
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.style === 'IMAGE_LIST')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.style === 'IMAGE_LIST')?.value;
+                }
+                arr.find((el: any) => el.style === 'IMAGE_LIST').value = list;
+            }
             if (item?.flowStep?.handler === 'PosterActionHandler' && arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')) {
                 let list: any;
                 try {

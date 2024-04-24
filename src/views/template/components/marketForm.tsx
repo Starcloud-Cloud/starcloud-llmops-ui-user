@@ -1,6 +1,6 @@
 import { TextField, MenuItem, FormControl, Autocomplete, Chip } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
-import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox } from 'antd';
+import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { t } from 'i18next';
 import _ from 'lodash-es';
@@ -10,6 +10,7 @@ import { verifyJSON, changeJSONValue } from './validaForm';
 import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
 import { materialImport, materialResilt, materialExport } from 'api/redBook/batchIndex';
 import { useLocation } from 'react-router-dom';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function FormExecute({
     item,
@@ -175,6 +176,19 @@ function FormExecute({
             setPopoverWidth(widthRef.current?.offsetWidth);
         }
     }, [widthRef]);
+    const onDragEnd = (result: any) => {
+        if (!result.destination) return;
+        let values: any = _.cloneDeep(item.value);
+        if (result.source.index < result.destination.index) {
+            values?.splice(result.destination.index + 1, 0, result.draggableId);
+            values?.splice(result.source.index, 1);
+        }
+        if (result.source.index > result.destination.index) {
+            values?.splice(result.source.index, 1);
+            values?.splice(result.destination.index, 0, result.draggableId);
+        }
+        onChange({ name: item?.field, value: values });
+    };
     return (
         <>
             {item.style === 'TEXTAREA' || (handlerCode === 'AssembleActionHandler' && item.field === 'TITLE') ? (
@@ -360,6 +374,28 @@ function FormExecute({
                         />
                     </FormControl>
                 </div>
+            ) : item.style === 'IMAGE_LIST' ? (
+                <>
+                    <div className="mt-4 mb-2 font-bold text-xs">参考图片</div>
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <Droppable direction="horizontal" droppableId="droppable">
+                            {(provided: any) => (
+                                <div {...provided.droppableProps} ref={provided.innerRef} className="flex gap-2 overflow-auto">
+                                    {item?.value?.map((i: any, index: number) => (
+                                        <Draggable key={i} draggableId={i?.toString()} index={index}>
+                                            {(provided: any, snapshot: any) => (
+                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                    <Image src={String(i)} width={100} height={100} />
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </DragDropContext>
+                </>
             ) : handlerCode === 'MaterialActionHandler' && materialType === 'picture' ? (
                 <div>
                     <div className="text-[12px] font-[500] flex items-center justify-between">
@@ -405,29 +441,34 @@ function FormExecute({
                                 </Button>
                             )}
                         </div>
-                        <Button
-                            disabled={history}
-                            size="small"
-                            type="primary"
-                            onClick={() => {
-                                setStep();
-                                setMaterialType();
-                                setTitle('新增');
-                                setEditOpen(true);
-                                console.log(222);
-                            }}
-                        >
-                            新增
-                        </Button>
+                        {handlerCode !== 'ImitateActionHandler' && (
+                            <Button
+                                disabled={history}
+                                size="small"
+                                type="primary"
+                                onClick={() => {
+                                    setStep();
+                                    setMaterialType();
+                                    setTitle('新增');
+                                    setEditOpen(true);
+                                    console.log(222);
+                                }}
+                            >
+                                新增
+                            </Button>
+                        )}
                     </div>
                     <Table
                         virtual
                         rowKey={(_, index) => String(index)}
                         loading={tableLoading}
-                        columns={columns}
+                        columns={handlerCode !== 'ImitateActionHandler' ? columns : columns?.filter((item: any) => item.title !== '操作')}
                         dataSource={item.value}
                         pagination={false}
                     />
+                    {model && (model === 'RANDOM' || model === 'AI_PARODY') && (
+                        <span className="text-xs text-[rgb(244,67,54)] mt-4">参考列表最少需要一个</span>
+                    )}
                 </div>
             )}
             {uploadOpen && (

@@ -66,13 +66,13 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'keyword', numeric: false, disablePadding: true, label: '关键词', align: 'left' },
+    { id: 'keyword', numeric: false, disablePadding: true, label: '关键词', align: 'left', width: '50%' },
     // { id: 'score', numeric: false, disablePadding: true, label: '分值' },
-    { id: 'searches', numeric: false, disablePadding: true, label: '搜索量', align: 'left' },
+    { id: 'searches', numeric: false, disablePadding: true, label: '搜索量', align: 'left', width: '20%' },
     // { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
     // { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
     // { id: 'body', numeric: false, disablePadding: true, label: '推荐值' },
-    { id: 'use', numeric: false, disablePadding: true, label: '使用分布', align: 'right' }
+    { id: 'use', numeric: false, disablePadding: true, label: '使用分布', align: 'right', width: '20%' }
 ];
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
@@ -83,7 +83,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     return (
         <TableHead>
             <TableRow>
-                <TableCell className="py-[6px] px-0">
+                <TableCell className="py-[6px] px-0 ">
                     <Checkbox
                         color="primary"
                         size="small"
@@ -99,7 +99,9 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                     <TableCell
                         component="th"
                         scope="row"
-                        width={200}
+                        style={{
+                            width: headCell.width
+                        }}
                         key={headCell.id}
                         align={headCell.align as any}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
@@ -403,7 +405,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                             }}
                                         />
                                     </TableCell>
-                                    <TableCell align="left" className="py-[6px] px-0">
+                                    <TableCell align="left" className="py-[6px] px-0" style={{ width: '50%' }}>
                                         {row.status === 10 ? (
                                             <TextWithTooltip text={row.keyword} maxLength={25} />
                                         ) : [6, 7].includes(row.status) ? (
@@ -421,7 +423,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                         )}
                                     </TableCell>
                                     {/* <TableCell align="center">{row.score}</TableCell> */}
-                                    <TableCell align="left" className="py-[6px] px-0">
+                                    <TableCell align="left" className="py-[6px] px-0" style={{ width: '20%' }}>
                                         {row.searches}
                                     </TableCell>
                                     {/* <TableCell align="center">{row.keyword}</TableCell> */}
@@ -429,7 +431,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                     {/* <TableCell align="left" className="py-[6px] px-0">
                                         {row.keyword}
                                     </TableCell> */}
-                                    <TableCell align="right" className="py-[6px] px-0">
+                                    <TableCell align="right" className="py-[6px] px-0" style={{ width: '20%' }}>
                                         <div className="flex items-center justify-end">{handleUse(row.keyword)}</div>
                                     </TableCell>
                                 </TableRow>

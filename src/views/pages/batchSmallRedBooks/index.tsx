@@ -158,6 +158,8 @@ const BatcSmallRedBooks = () => {
     const [pre, setPre] = useState(0);
     const newSave = async (uid: string) => {
         await planExecute({ uid });
+        const res = await batchPages({ ...batchPage, planUid: uid });
+        setBathList(res.list);
         setPre(pre + 1);
         dispatch(
             openSnackbar({
@@ -171,8 +173,6 @@ const BatcSmallRedBooks = () => {
                 close: false
             })
         );
-        const res = await batchPages({ ...batchPage, planUid: uid });
-        setBathList(res.list);
     };
 
     //页面滚动

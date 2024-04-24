@@ -2388,7 +2388,7 @@ export const DEFAULT_LIST = [
         maxCharacter: 2000,
         character: 0,
         word: 0,
-        row: 7,
+        row: 14,
         btnText: 'AI生成描述(消耗1点)',
         enable: true,
         keyword: [],

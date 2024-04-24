@@ -90,6 +90,16 @@ const ListingBuilder = () => {
         });
     };
 
+    useEffect(() => {
+        return () => {
+            setCountry({
+                key: COUNTRY_LIST?.['0']?.key,
+                icon: COUNTRY_LIST?.['0']?.icon,
+                label: COUNTRY_LIST?.['0']?.label
+            });
+        };
+    }, []);
+
     const handleDel = async () => {
         const res = await delListing([version]);
         if (res) {
@@ -182,8 +192,9 @@ const ListingBuilder = () => {
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '操作成功',
+                    message: '保存草稿成功',
                     variant: 'alert',
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     alert: {
                         color: 'success'
                     },
@@ -208,9 +219,7 @@ const ListingBuilder = () => {
                     title={
                         <div className="flex justify-between items-center ">
                             <Tooltip title={list?.[0]?.value || 'Listing草稿'}>
-                                <div className="sm:w-[400px] line-clamp-1 cursor-pointer xs:flex-wrap xs:w-full">
-                                    {list?.[0]?.value || 'Listing草稿'}
-                                </div>
+                                <div className="cursor-pointer xs:flex-wrap xs:w-full">{list?.[0]?.value || 'Listing草稿'}</div>
                             </Tooltip>
                             <div className="flex items-center">
                                 <div className="w-[130px] flex items-center">
@@ -236,6 +245,9 @@ const ListingBuilder = () => {
                                     startIcon={<SaveIcon />}
                                     color="secondary"
                                     size="small"
+                                    style={{
+                                        width: '100px'
+                                    }}
                                     variant="contained"
                                     onClick={() => handleSave()}
                                 >

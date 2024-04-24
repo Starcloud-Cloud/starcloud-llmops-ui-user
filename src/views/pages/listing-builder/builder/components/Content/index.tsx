@@ -575,11 +575,14 @@ const Content = () => {
         }
     };
 
-    const getFiveDesAllKeys = (fiveDescConfig: any) => {
-        console.log(fiveDescConfig);
-        Object.values(fiveDescConfig).reduce((acc: any, cur: any) => {
-            return acc.concat(cur.keys);
-        }, []);
+    const getFiveDesAllKeys = (obj: any) => {
+        let allKeys: any = [];
+
+        for (let key in obj) {
+            allKeys = allKeys.concat(obj[key].keys);
+        }
+
+        return allKeys;
     };
     const doAiWrite = async (item: any, index: number, isAll?: boolean) => {
         try {

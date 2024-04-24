@@ -150,7 +150,7 @@ const ListingBuilderPage: React.FC = () => {
     const all_detail = useAllDetail();
 
     useEffect(() => {
-        if (!storage.get(`video-${all_detail?.allDetail.id}`)) {
+        if (!storage.get(`video-${all_detail?.allDetail?.id}`)) {
             setVideoOpen(true);
         }
     }, []);

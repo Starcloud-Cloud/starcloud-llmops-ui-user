@@ -65,13 +65,13 @@ function stableSort(array: TableEnhancedCreateDataType[], comparator: (a: KeyedO
 }
 
 const headCells = [
-    { id: 'keyword', numeric: false, disablePadding: true, label: '关键词' },
+    { id: 'keyword', numeric: false, disablePadding: true, label: '关键词', align: 'left' },
     // { id: 'score', numeric: false, disablePadding: true, label: '分值' },
-    { id: 'searches', numeric: false, disablePadding: true, label: '搜索量' },
+    { id: 'searches', numeric: false, disablePadding: true, label: '搜索量', align: 'left' },
     // { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
     // { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
     // { id: 'body', numeric: false, disablePadding: true, label: '推荐值' },
-    { id: 'use', numeric: true, disablePadding: true, label: '使用分布' }
+    { id: 'use', numeric: false, disablePadding: true, label: '使用分布', align: 'right' }
 ];
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
@@ -82,7 +82,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
+                <TableCell className="py-[6px] px-0">
                     <Checkbox
                         color="primary"
                         size="small"
@@ -98,13 +98,13 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                     <TableCell
                         component="th"
                         scope="row"
-                        width={150}
+                        width={200}
                         key={headCell.id}
-                        align={'left'}
+                        align={headCell.align as any}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                     >
-                        {headCell.id !== 'keyword' ? (
+                        {headCell.id == 'searches' ? (
                             <TableSortLabel
                                 active={orderBy === headCell.id}
                                 direction={orderBy === headCell.id ? order : 'asc'}
@@ -391,7 +391,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                     tabIndex={-1}
                                     selected={isItemSelected}
                                 >
-                                    <TableCell padding="checkbox">
+                                    <TableCell className="py-[6px] px-0">
                                         <Checkbox
                                             size={'small'}
                                             color="primary"
@@ -404,7 +404,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                     </TableCell>
                                     <TableCell align="left" className="py-[6px] px-0">
                                         {row.status === 10 ? (
-                                            <div className="line-clamp-1 w-[150px]">{row.keyword}</div>
+                                            <div className="line-clamp-1 w-[180px]">{row.keyword}</div>
                                         ) : row.status === 6 ? (
                                             <div>
                                                 <span className="line-clamp-1 line-through text-[#bec2cc] inline">{row.keyword}</span>
@@ -429,7 +429,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                         {row.keyword}
                                     </TableCell> */}
                                     <TableCell align="right" className="py-[6px] px-0">
-                                        <div className="flex items-center justify-center">{handleUse(row.keyword)}</div>
+                                        <div className="flex items-center justify-end">{handleUse(row.keyword)}</div>
                                     </TableCell>
                                 </TableRow>
                             );

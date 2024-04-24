@@ -390,11 +390,11 @@ function TemplateMarket() {
                 }
             }}
         >
-            {/* <Box className="flex mb-[8px] flex-wrap items-end gap-3">
+            <Box className="flex mb-[8px] flex-wrap items-end gap-3">
                 <Typography variant="h2" lineHeight={1}>
                     {t('market.title')}
                 </Typography>
-                <FormControl color="secondary" size="small" sx={{ width: '300px' }} variant="outlined">
+                {/* <FormControl color="secondary" size="small" sx={{ width: '300px' }} variant="outlined">
                     <OutlinedInput
                         name="name"
                         value={marketTitle}
@@ -408,8 +408,8 @@ function TemplateMarket() {
                         }
                         placeholder={t('market.place')}
                     />
-                </FormControl>
-            </Box> */}
+                </FormControl> */}
+            </Box>
             <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
                 {menuList?.map((item, index) => (
                     <Box

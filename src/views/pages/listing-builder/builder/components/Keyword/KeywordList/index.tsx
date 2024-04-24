@@ -327,7 +327,7 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
             const filterFive =
                 keywordHighlight.flat()?.filter((item) => item?.type === ListingBuilderEnum.FIVE_DES && item?.text === keyword) || [];
 
-            switch (filterNotFive.length + filterFive.length) {
+            switch (filterNotFive.length ? 1 : 0 + filterFive.length) {
                 case 0:
                     return null;
                 case 1:

@@ -6,8 +6,12 @@ export const enum ENUM_TENANT {
 export const getTenant = () => {
     const hostname = window.location.hostname;
     if (hostname === 'cn-test.mofaai.com.cn' || hostname === 'www.mofaai.com.cn') {
+        console.log(1);
+
         return ENUM_TENANT.AI;
     } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn') {
+        console.log(2);
+
         return ENUM_TENANT.ANNOUNCE;
     } else {
         return ENUM_TENANT.ANNOUNCE;
@@ -63,8 +67,12 @@ const announceList: IList = {
 export const getPermission = (key: ENUM_PERMISSION) => {
     const hostname = window.location.hostname;
     if (hostname === 'cn-test.mofaai.com.cn' || hostname === 'www.mofaai.com.cn') {
+        console.log(3);
+
         return list[key];
     } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn') {
+        console.log(4);
+
         return announceList[key];
     } else {
         return announceList[key];

@@ -72,7 +72,7 @@ const headCells = [
     // { id: 'body', numeric: false, disablePadding: true, label: ' 购买率' },
     // { id: 'body', numeric: false, disablePadding: true, label: '竞争度' },
     // { id: 'body', numeric: false, disablePadding: true, label: '推荐值' },
-    { id: 'use', numeric: false, disablePadding: true, label: '使用分布', align: 'right', width: '20%' }
+    { id: 'use', numeric: false, disablePadding: true, label: '使用分布', align: 'right', width: '16%' }
 ];
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }: EnhancedTableHeadProps) {
@@ -394,7 +394,12 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                     tabIndex={-1}
                                     selected={isItemSelected}
                                 >
-                                    <TableCell className="py-[6px] px-0">
+                                    <TableCell
+                                        className="py-[6px] px-0"
+                                        style={{
+                                            display: 'contents'
+                                        }}
+                                    >
                                         <Checkbox
                                             size={'small'}
                                             color="primary"
@@ -407,17 +412,13 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                     </TableCell>
                                     <TableCell align="left" className="py-[6px] px-0" style={{ width: '50%' }}>
                                         {row.status === 10 ? (
-                                            <TextWithTooltip text={row.keyword} maxLength={25} />
+                                            <div className="w-[180px]">{row.keyword}</div>
                                         ) : [6, 7].includes(row.status) ? (
-                                            <div>
-                                                <TextWithTooltip text={row.keyword} maxLength={25} through={true} color={'#bec2cc'} />
-                                            </div>
+                                            <div className="w-[180px] text-[#bec2cc] line-through">{row.keyword}</div>
                                         ) : (
                                             <div>
                                                 <Tooltip title={'正在请求数据'}>
-                                                    <span className="line-clamp-1 w-[180px]  text-[#bec2cc] cursor-pointer">
-                                                        {row.keyword}
-                                                    </span>
+                                                    <div className="w-[180px]  text-[#bec2cc] cursor-pointer">{row.keyword}</div>
                                                 </Tooltip>
                                             </div>
                                         )}
@@ -431,8 +432,8 @@ export const KeywordList = ({ selected, setSelected, hiddenUse, setIsLoading }: 
                                     {/* <TableCell align="left" className="py-[6px] px-0">
                                         {row.keyword}
                                     </TableCell> */}
-                                    <TableCell align="right" className="py-[6px] px-0" style={{ width: '20%' }}>
-                                        <div className="flex items-center justify-end">{handleUse(row.keyword)}</div>
+                                    <TableCell align="right" className="py-[6px] px-0" style={{ width: '16%' }}>
+                                        <div className="flex items-center justify-center">{handleUse(row.keyword)}</div>
                                     </TableCell>
                                 </TableRow>
                             );

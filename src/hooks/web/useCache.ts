@@ -14,7 +14,8 @@ export const CACHE_KEY = {
     THEME: 'theme',
     LAYOUT: 'layout',
     ROLE_ROUTERS: 'roleRouters',
-    DICT_CACHE: 'dictCache'
+    DICT_CACHE: 'dictCache',
+    INVITE: 'invite'
 };
 
 export const useCache = (type: CacheType = 'localStorage') => {

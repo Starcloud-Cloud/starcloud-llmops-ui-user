@@ -33,6 +33,12 @@ import { useLocation } from 'react-router-dom';
 import { oriregister } from 'api/login';
 
 import { discountNewUser } from 'api/vip';
+import { useCache, CACHE_KEY } from 'hooks/web/useCache';
+import { dispatch as dispatchs } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { spaceJoin } from 'api/section';
+const { wsCache } = useCache();
+
 // import * as LoginApi from 'api/login';
 
 // const chance = new Chance();
@@ -189,10 +195,28 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     //用户信息
     const [allDetail, setAllDetail] = useState(null);
     const [pre, setPre] = useState(1);
+    const [preInvite, setPreInvite] = useState(1);
     useEffect(() => {
         const getList = async () => {
+            if (wsCache.get(CACHE_KEY.INVITE)) {
+                await spaceJoin(wsCache.get(CACHE_KEY.INVITE));
+                dispatchs(
+                    openSnackbar({
+                        open: true,
+                        message: '加入成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        close: false
+                    })
+                );
+                wsCache.delete(CACHE_KEY.INVITE);
+            }
             const result = await discountNewUser();
             setAllDetail(result);
+            setPreInvite(preInvite + 1);
         };
         if (location?.pathname !== '/invite') {
             getList();
@@ -219,6 +243,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
                 ...state,
                 allDetail,
                 pre,
+                preInvite,
                 setPre,
                 login,
                 logout,

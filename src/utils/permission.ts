@@ -62,9 +62,9 @@ const announceList: IList = {
 
 export const getPermission = (key: ENUM_PERMISSION) => {
     const hostname = window.location.hostname;
-    if (hostname === 'cn-test.llmops-ui-user.hotsalestar.com' || hostname === 'www.mofaai.com.cn') {
+    if (hostname === 'cn-test.mofaai.com.cn' || hostname === 'www.mofaai.com.cn') {
         return list[key];
-    } else if (hostname === 'cn-test.juzhen.hotsalestar.com' || hostname === 'juzhen.mofaai.com.cn') {
+    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn') {
         return announceList[key];
     } else {
         return announceList[key];

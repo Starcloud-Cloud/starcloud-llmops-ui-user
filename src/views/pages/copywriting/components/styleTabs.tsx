@@ -57,6 +57,7 @@ const StyleTabs = ({
             mode: 'SEQUENCE',
             uuid: uuidv4()?.split('-')?.join(''),
             titleGenerateMode: data?.titleGenerateMode || 'DEFAULT',
+            example: data?.example || '',
             variableList:
                 data?.variableList?.map((item: any) => ({
                     ...item,

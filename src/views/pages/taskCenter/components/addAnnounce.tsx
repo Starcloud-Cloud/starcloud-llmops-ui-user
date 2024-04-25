@@ -6,7 +6,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { planPage } from 'api/redBook/batchIndex';
+import { planPages } from 'api/redBook/batchIndex';
 import { contentPage, singleAdd } from 'api/redBook/task';
 import { DetailModal } from '../../redBookContentList/component/detailModal';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
@@ -111,8 +111,8 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         }
     }, [addOpen, addCurrent, addPageSize, values, batch]);
     useEffect(() => {
-        planPage({ pageNo: 1, pageSize: 10000 }).then((res) => {
-            setValueList(res?.list);
+        planPages().then((res) => {
+            setValueList(res);
         });
     }, []);
     const handleSave = async () => {
@@ -147,7 +147,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         <Select labelId="plans" value={values} label="创作计划" onChange={(e: any) => setValue(e.target.value)}>
                             {valueList?.map((item: any) => (
                                 <MenuItem key={item.uid} value={item.uid}>
-                                    {item.uid}
+                                    {item?.configuration?.appInformation?.name}（{item?.creatorName}）
                                 </MenuItem>
                             ))}
                         </Select>
@@ -157,7 +157,8 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         <Select labelId="uid" value={batch} label="创作批次" onChange={(e: any) => setBatch(e.target.value)}>
                             {batchList?.map((item: any) => (
                                 <MenuItem key={item.uid} value={item.uid}>
-                                    {dayjs(item.startTime).format('YYYY-MM-DD hh:mm:ss')}（{item.totalCount}）
+                                    {dayjs(item.startTime).format('YYYY-MM-DD hh:mm:ss')}&nbsp;&nbsp;{item.id}&nbsp;&nbsp;（
+                                    {item.totalCount}）
                                 </MenuItem>
                             ))}
                         </Select>

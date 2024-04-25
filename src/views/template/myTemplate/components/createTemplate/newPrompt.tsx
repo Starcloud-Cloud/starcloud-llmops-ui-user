@@ -77,7 +77,7 @@ const NewPrompt = ({
                 <TextArea
                     status={!el.value ? 'error' : ''}
                     ref={iptRef}
-                    style={{ height: '200px' }}
+                    style={{ height: '400px' }}
                     value={prompt}
                     name={el.field}
                     onChange={(e) => setPrompts(e)}

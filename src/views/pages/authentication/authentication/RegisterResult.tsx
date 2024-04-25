@@ -20,6 +20,7 @@ import imgMain from 'assets/images/auth/img-a2-signup.svg';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
 import AuthRegisterResult from 'views/announce/authentication/auth-forms/AuthRegisterResult';
+import { getRegisterResult } from 'api/login';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -48,6 +49,9 @@ const RegisterResult = () => {
     const navigate = useNavigate();
 
     const [inviteCode, setInviteCode] = useState('');
+    const [isSuccess, setIsSuccess] = useState(true);
+    const [errorMsg, setErrorMsg] = useState('');
+    const [isFetch, setIsFetch] = useState(true);
 
     // 获取存储在localStorage的inviteCode及其过期时间
     useEffect(() => {
@@ -70,14 +74,25 @@ const RegisterResult = () => {
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 
-    // useEffect(() => {
-    //     let timeout = setTimeout(() => {
-    //         navigate(inviteCode ? `/login?loginType=pwd&q=${inviteCode}` : '/login?loginType=pwd');
-    //     }, 3 * 1000);
-    //     return () => {
-    //         clearTimeout(timeout);
-    //     };
-    // }, []);
+    useEffect(() => {
+        let timeout: any;
+        if (activationId) {
+            getRegisterResult(activationId).then((res) => {
+                setIsFetch(false);
+                setIsSuccess(res.data);
+                if (res.data) {
+                    timeout = setTimeout(() => {
+                        navigate(inviteCode ? `/login?loginType=pwd&q=${inviteCode}` : '/login?loginType=pwd');
+                    }, 3 * 1000);
+                } else {
+                    setErrorMsg(res.msg);
+                }
+            });
+        }
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [activationId]);
 
     return (
         <AuthWrapper2>
@@ -127,7 +142,12 @@ const RegisterResult = () => {
                                             </Stack>
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <AuthRegisterResult inviteCode={inviteCode} />
+                                            <AuthRegisterResult
+                                                inviteCode={inviteCode}
+                                                isSuccess={isSuccess}
+                                                errorMsg={errorMsg}
+                                                isFetch={isFetch}
+                                            />
                                         </Grid>
                                         <Grid item xs={12}>
                                             <Divider />

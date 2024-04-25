@@ -120,5 +120,5 @@ export const validateCode = (data: any) => {
 };
 
 export const getRegisterResult = (activationId: any) => {
-    return request.postOriginal({ url: `llm/auth/activation/${activationId}` });
+    return request.getOriginal({ url: `llm/auth/activation/${activationId}` });
 };

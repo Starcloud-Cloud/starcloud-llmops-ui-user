@@ -36,6 +36,9 @@ const RegisterResult = () => {
     const activationId = query.get('activation');
 
     const [inviteCode, setInviteCode] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [isFetch, setIsFetch] = useState(true);
 
     // 获取存储在localStorage的inviteCode及其过期时间
     useEffect(() => {
@@ -63,13 +66,24 @@ const RegisterResult = () => {
     }, []);
 
     useEffect(() => {
-        let timeout = setTimeout(() => {
-            navigate(inviteCode ? `/login?loginType=pwd&q=${inviteCode}` : '/login?loginType=pwd');
-        }, 3 * 1000);
+        let timeout: any;
+        if (activationId) {
+            getRegisterResult(activationId).then((res) => {
+                setIsSuccess(res.data);
+                setIsFetch(false);
+                if (res.data) {
+                    timeout = setTimeout(() => {
+                        navigate(inviteCode ? `/login?loginType=pwd&q=${inviteCode}` : '/login?loginType=pwd');
+                    }, 3 * 1000);
+                } else {
+                    setErrorMsg(res.msg);
+                }
+            });
+        }
         return () => {
             clearTimeout(timeout);
         };
-    }, []);
+    }, [activationId]);
 
     return (
         <AuthWrapper2>
@@ -119,7 +133,12 @@ const RegisterResult = () => {
                                             </Stack>
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <AuthRegisterResult inviteCode={inviteCode} />
+                                            <AuthRegisterResult
+                                                inviteCode={inviteCode}
+                                                isSuccess={isSuccess}
+                                                errorMsg={errorMsg}
+                                                isFetch={isFetch}
+                                            />
                                         </Grid>
                                         <Grid item xs={12}>
                                             <Divider />

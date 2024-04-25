@@ -433,14 +433,10 @@ const MainLayout = () => {
         };
     }, []);
     useEffect(() => {
-        if (allDetail?.allDetail?.rights) {
+        const arr = allDetail?.allDetail?.teamRights || allDetail?.allDetail?.rights;
+        if (arr) {
             if (status) {
-                if (
-                    use?.mobile === '' &&
-                    !storage.get('phonenumber') &&
-                    !use?.mobile &&
-                    JSON.stringify(twoUser) !== JSON.stringify(allDetail?.allDetail?.rights)
-                ) {
+                if (use?.mobile === '' && !storage.get('phonenumber') && !use?.mobile && JSON.stringify(twoUser) !== JSON.stringify(arr)) {
                     setTimeout(() => {
                         setPhoneOpen(true);
                     }, 1000 * 60 * 6);
@@ -449,10 +445,16 @@ const MainLayout = () => {
                 }
             } else {
                 setStatus(true);
-                setTwoUser(allDetail?.allDetail?.rights);
+                setTwoUser(arr);
             }
         }
-    }, [JSON.stringify(allDetail?.allDetail?.rights?.map((item: any) => item.usedNum))]);
+    }, [
+        JSON.stringify(
+            allDetail?.allDetail?.teamRights
+                ? allDetail?.allDetail?.teamRights?.map((item: any) => item.usedNum)
+                : allDetail?.allDetail?.rights?.map((item: any) => item.usedNum)
+        )
+    ]);
     const [phoneOpne, setPhoneOpen] = useState(false);
     const condition = layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && !matchDownMd;
 

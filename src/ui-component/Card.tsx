@@ -99,7 +99,9 @@ interface BenefitItem {
 }
 function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     const theme = useTheme();
-    const list = info?.allDetail?.rights?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type));
+    const list = info?.allDetail?.teamRights
+        ? info?.allDetail?.teamRights?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type))
+        : info?.allDetail?.rights?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type));
     return (
         <Box>
             {list?.map((item: BenefitItem) => (

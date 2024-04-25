@@ -35,7 +35,7 @@ const Invite = () => {
                 dispatch(
                     openSnackbar({
                         open: true,
-                        message: '加入成功',
+                        message: '加入团队成功',
                         variant: 'alert',
                         alert: {
                             color: 'success'

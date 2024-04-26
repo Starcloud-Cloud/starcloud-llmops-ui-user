@@ -453,7 +453,13 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 {needRefresh && (
                                     <div className="absolute flex justify-center items-center bg-black bg-opacity-50 left-0 top-0 w-[233px] h-[233px]">
                                         <svg
-                                            onClick={() => setRefreshCount((pre) => pre + 1)}
+                                            onClick={() => {
+                                                if (setTimeOutRef.current) {
+                                                    clearTimeout(setTimeOutRef.current);
+                                                    setTimeOutRef.current = null;
+                                                }
+                                                setRefreshCount((pre) => pre + 1);
+                                            }}
                                             className="absolute flex justify-center items-center cursor-pointer"
                                             viewBox="0 0 1024 1024"
                                             version="1.1"

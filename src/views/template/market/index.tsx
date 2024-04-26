@@ -481,12 +481,14 @@ function TemplateMarket() {
                                         }
                                         {...a11yProps(1)}
                                     />
-                                    <div
-                                        className="cursor-pointer text-[#6839b7] ml-1 flex justify-center items-center"
-                                        onClick={() => setOpenMarketVideo(true)}
-                                    >
-                                        应用市场使用视频
-                                    </div>
+                                    {getPermission(ENUM_PERMISSION.MARKET_VIDEO_MODAL) && (
+                                        <div
+                                            className="cursor-pointer text-[#6839b7] ml-1 flex justify-center items-center"
+                                            onClick={() => setOpenMarketVideo(true)}
+                                        >
+                                            应用市场使用视频
+                                        </div>
+                                    )}
                                 </Tabs>
                             )}
                         </>

@@ -490,15 +490,17 @@ const MainLayout = () => {
     return (
         <ListingProvider>
             <div className="w-full">
-                <div className="w-full">
-                    <img
-                        src={require('../../assets/images/header/present.jpeg')}
-                        className="cursor-pointer w-full"
-                        onClick={() => {
-                            navigate('/subscribe');
-                        }}
-                    />
-                </div>
+                {getPermission(ENUM_PERMISSION.SPRING_SALE) && (
+                    <div className="w-full">
+                        <img
+                            src={require('../../assets/images/header/present.jpeg')}
+                            className="cursor-pointer w-full"
+                            onClick={() => {
+                                navigate('/subscribe');
+                            }}
+                        />
+                    </div>
+                )}
                 <div className="flex flex-col">
                     {timeOutObj && (
                         <div className="flex justify-center bg-[#f4f6f8] py-1">

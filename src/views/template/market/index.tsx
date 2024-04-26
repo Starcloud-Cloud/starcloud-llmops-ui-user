@@ -32,6 +32,7 @@ import { MarketVideoModel } from './MarketVideoModel';
 import { NewUserVip } from '../../../ui-component/new-user-vip/index';
 import jsCookie from 'js-cookie';
 import dayjs from 'dayjs';
+import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 interface MarketList {
     name: string;
     tags: string[];
@@ -360,9 +361,11 @@ function TemplateMarket() {
 
     useEffect(() => {
         if (allDetail?.allDetail?.id) {
-            const result = localStorage.getItem(`marketVideo-${allDetail?.allDetail?.id}`);
-            if (!result) {
-                setOpenMarketVideo(true);
+            if (getPermission(ENUM_PERMISSION.MARKET_VIDEO_MODAL)) {
+                const result = localStorage.getItem(`marketVideo-${allDetail?.allDetail?.id}`);
+                if (!result) {
+                    setOpenMarketVideo(true);
+                }
             }
         }
     }, [allDetail]);

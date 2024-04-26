@@ -385,22 +385,10 @@ const MainLayout = () => {
     useEffect(() => {
         if (allDetail?.allDetail) {
             if (allDetail?.allDetail?.isNewUser) {
-                // setTimeout(() => {
-                handleShowNewUserVip();
-                // }, 1000 * 60 * 3);
+                if (getPermission(ENUM_PERMISSION.NEW_USER_ACTIVITY)) {
+                    handleShowNewUserVip();
+                }
             }
-            //  else {
-            //     const dateTime = localStorage.getItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`);
-            //     if (dateTime) {
-            //         if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
-            //             setOpenInvite(true);
-            //         } else {
-            //             setOpenInvite(false);
-            //         }
-            //     } else {
-            //         setOpenInvite(true);
-            //     }
-            // }
         }
     }, [location.pathname, allDetail]);
 
@@ -433,19 +421,26 @@ const MainLayout = () => {
         };
     }, []);
     useEffect(() => {
-        const arr = allDetail?.allDetail?.teamRights || allDetail?.allDetail?.rights;
-        if (arr) {
-            if (status) {
-                if (use?.mobile === '' && !storage.get('phonenumber') && !use?.mobile && JSON.stringify(twoUser) !== JSON.stringify(arr)) {
-                    setTimeout(() => {
-                        setPhoneOpen(true);
-                    }, 1000 * 60 * 6);
+        if (getPermission(ENUM_PERMISSION.PHONE_CHECK)) {
+            const arr = allDetail?.allDetail?.teamRights || allDetail?.allDetail?.rights;
+            if (arr) {
+                if (status) {
+                    if (
+                        use?.mobile === '' &&
+                        !storage.get('phonenumber') &&
+                        !use?.mobile &&
+                        JSON.stringify(twoUser) !== JSON.stringify(arr)
+                    ) {
+                        setTimeout(() => {
+                            setPhoneOpen(true);
+                        }, 1000 * 60 * 6);
+                    } else {
+                        setPhoneOpen(false);
+                    }
                 } else {
-                    setPhoneOpen(false);
+                    setStatus(true);
+                    setTwoUser(arr);
                 }
-            } else {
-                setStatus(true);
-                setTwoUser(arr);
             }
         }
     }, [

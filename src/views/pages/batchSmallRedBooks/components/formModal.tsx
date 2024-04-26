@@ -5,6 +5,7 @@ import { getAccessToken } from 'utils/auth';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { noteDetail } from 'api/redBook/copywriting';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import '../index.scss';
 const FormModal = ({
@@ -39,12 +40,33 @@ const FormModal = ({
     };
     const [seleVal, setSeleVal] = useState('');
     useEffect(() => {
+        const newList = columns?.find((item) => item.type === 'listImage');
+        if (newList) {
+            setFileList(
+                form.getFieldValue('images')?.map((item: any) => ({
+                    uid: uuidv4(),
+                    thumbUrl: item,
+                    response: {
+                        data: {
+                            url: item
+                        }
+                    }
+                }))
+            );
+            form.setFieldValue(
+                'images',
+                form.getFieldValue('images')?.map((item: any) => item)
+            );
+        }
+    }, []);
+    useEffect(() => {
         if (title === '编辑') {
             setSeleVal('SMALL_RED_BOOK');
         }
     }, []);
     const [open, setOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
+    const [fileList, setFileList] = useState<any[]>([]);
     return (
         <Modal
             zIndex={!materialType ? 9000 : 1100}
@@ -56,6 +78,10 @@ const FormModal = ({
             }}
             onOk={async () => {
                 const result = await form.validateFields();
+                if (result?.images) {
+                    result.images = fileList?.map((item: any) => item?.response?.data?.url) || [];
+                }
+                console.log(result);
                 formOk(result);
             }}
         >
@@ -120,6 +146,41 @@ const FormModal = ({
                                             </div>
                                         )}
                                     </Upload>
+                                ) : item.type === 'listImage' ? (
+                                    <Upload
+                                        {...propShow}
+                                        fileList={fileList}
+                                        showUploadList={true}
+                                        listType="picture-card"
+                                        onChange={(info) => {
+                                            if (info.file.status === 'uploading') {
+                                                setFileList(info.fileList);
+                                                form.setFieldValue(item.dataIndex, undefined);
+                                                return;
+                                            }
+                                            if (info?.file?.status === 'done') {
+                                                setFileList(info.fileList);
+                                                form.setFieldValue(
+                                                    item.dataIndex,
+                                                    info?.fileList?.map((item) => item?.response?.data?.url)
+                                                );
+                                            }
+                                        }}
+                                        onRemove={(file) => {
+                                            const newList = _.cloneDeep(fileList);
+                                            newList?.splice(
+                                                newList?.findIndex((item) => item.uid === file.uid),
+                                                1
+                                            );
+                                            setFileList(newList);
+                                            return;
+                                        }}
+                                    >
+                                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                            {uploadLoading[index] ? <LoadingOutlined rev={undefined} /> : <PlusOutlined rev={undefined} />}
+                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                        </div>
+                                    </Upload>
                                 ) : item.type === 'select' ? (
                                     <Select
                                         onChange={(data) => {
@@ -130,6 +191,8 @@ const FormModal = ({
                                     />
                                 ) : item.title === '内容' || item.type === 'textBox' ? (
                                     <TextArea rows={4} />
+                                ) : item.type === 'listStr' ? (
+                                    <Select mode="tags" options={[]} />
                                 ) : (
                                     <Input />
                                 )}

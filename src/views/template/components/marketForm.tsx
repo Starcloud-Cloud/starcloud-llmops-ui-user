@@ -180,12 +180,12 @@ function FormExecute({
         if (!result.destination) return;
         let values: any = _.cloneDeep(item.value);
         if (result.source.index < result.destination.index) {
-            values?.splice(result.destination.index + 1, 0, result.draggableId);
+            values?.splice(result.destination.index + 1, 0, { type: 'note', pictureUrl: result.draggableId });
             values?.splice(result.source.index, 1);
         }
         if (result.source.index > result.destination.index) {
             values?.splice(result.source.index, 1);
-            values?.splice(result.destination.index, 0, result.draggableId);
+            values?.splice(result.destination.index, 0, { type: 'note', pictureUrl: result.draggableId });
         }
         onChange({ name: item?.field, value: values });
     };
@@ -360,15 +360,13 @@ function FormExecute({
                                                 newValue = [];
                                             }
                                             newValue.push(e.target.value);
-                                            console.log(newValue);
-
                                             onChange({ name: item?.field, value: newValue });
                                         }
                                     }}
                                     color="secondary"
                                     {...param}
-                                    label="笔记标签"
-                                    placeholder="请输入笔记标签然后回车"
+                                    label={item.label}
+                                    placeholder="请输入标签然后回车"
                                 />
                             )}
                         />
@@ -382,10 +380,10 @@ function FormExecute({
                             {(provided: any) => (
                                 <div {...provided.droppableProps} ref={provided.innerRef} className="flex gap-2 overflow-auto">
                                     {item?.value?.map((i: any, index: number) => (
-                                        <Draggable key={i} draggableId={i?.toString()} index={index}>
+                                        <Draggable key={i?.pictureUrl} draggableId={i?.pictureUrl} index={index}>
                                             {(provided: any, snapshot: any) => (
                                                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                    <Image src={String(i)} width={100} height={100} />
+                                                    <Image src={i?.pictureUrl} width={100} height={100} />
                                                 </div>
                                             )}
                                         </Draggable>
@@ -451,7 +449,6 @@ function FormExecute({
                                     setMaterialType();
                                     setTitle('新增');
                                     setEditOpen(true);
-                                    console.log(222);
                                 }}
                             >
                                 新增

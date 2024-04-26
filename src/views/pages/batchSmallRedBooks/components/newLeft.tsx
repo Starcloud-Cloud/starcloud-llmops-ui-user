@@ -173,6 +173,18 @@ const Lefts = ({
                                 preview={false}
                                 src={row[item.fieldName]}
                             />
+                        ) : item.type === 'listImage' ? (
+                            <div className="flex gap-1 flex-wrap">
+                                {row[item.fieldName]?.map((item: any) => (
+                                    <Image width={50} height={50} preview={false} src={item} />
+                                ))}
+                            </div>
+                        ) : item.type === 'listStr' ? (
+                            <div className="flex gap-1 flex-wrap">
+                                {row[item.fieldName]?.map((item: any) => (
+                                    <Tag color="processing">{item}</Tag>
+                                ))}
+                            </div>
                         ) : (
                             <div className="break-all line-clamp-4">
                                 {item.fieldName === 'source'
@@ -321,7 +333,7 @@ const Lefts = ({
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
 
-    const getList = async () => {
+    const getList = async (flag?: boolean) => {
         let result;
         let newList: any;
         if (data) {
@@ -338,6 +350,7 @@ const Lefts = ({
                 setCollData && setCollData(collData.split(','));
             }
         }
+        if (flag) setTableLoading(false);
         setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
         appRef.current = result;
@@ -503,7 +516,7 @@ const Lefts = ({
         const newList = data.map((item: any) => ({
             title: item.desc,
             align: 'center',
-            width: item.fieldName === 'source' ? 100 : 200,
+            width: item.fieldName === 'source' ? 100 : item.width || 200,
             fixed: item.fieldName === 'source' ? true : false,
             dataIndex: item.fieldName,
             render: (_: any, row: any) => (
@@ -521,6 +534,18 @@ const Lefts = ({
                                         : 'data:image/png;base64,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'
                                 }
                             />
+                        ) : item.type === 'listImage' ? (
+                            <div className="flex gap-1 flex-wrap">
+                                {row[item.fieldName]?.map((item: any) => (
+                                    <Image width={50} height={50} preview={false} src={item} />
+                                ))}
+                            </div>
+                        ) : item.type === 'listStr' ? (
+                            <div className="flex gap-1 flex-wrap">
+                                {row[item.fieldName]?.map((item: any) => (
+                                    <Tag color="processing">{item}</Tag>
+                                ))}
+                            </div>
                         ) : item.fieldName === 'source' ? (
                             typeList?.find((i) => i.value === row[item.fieldName])?.label
                         ) : (
@@ -802,7 +827,7 @@ const Lefts = ({
                 close: false
             })
         );
-        getList();
+        getList(true);
     };
     //token 不足弹框
     const [botOpen, setBotOpen] = useState(false);
@@ -813,19 +838,25 @@ const Lefts = ({
     }, [bookOpen]);
     //监听素材上传发生变化
     const [tablePre, setTablePre] = useState(0);
+    const getTag = (type: string) => {
+        return tableData
+            .map((item: any) => item[type])
+            ?.flat(1)
+            ?.filter((item: string) => item);
+    };
     useEffect(() => {
         if (tablePre && materialType === 'note') {
-            const imageList = tableData
-                .map((item: any) => item.images)
-                ?.flat(1)
-                ?.filter((item) => item);
+            const imageList = getTag('images')?.map((item) => ({
+                type: 'note',
+                pictureUrl: item
+            }));
+            const TagList = getTag('tags');
             const newList = _.cloneDeep(generRef.current);
-            newList
-                .find((item: any) => item.flowStep.handler === 'ImitateActionHandler')
-                .variable.variables.find((item: any) => item.style === 'MATERIAL').value = tableData;
-            newList
-                .find((item: any) => item.flowStep.handler === 'ImitateActionHandler')
-                .variable.variables.find((item: any) => item.field === 'REFERS_IMAGE').value = imageList;
+            let conList = newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables;
+            conList.find((item: any) => item.style === 'MATERIAL').value = tableData;
+            conList.find((item: any) => item.field === 'REFERS_IMAGE').value = imageList;
+            conList.find((item: any) => item.field === 'REFERS_TAG').value = TagList;
+            newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables = conList;
             generRef.current = newList;
             setGenerateList(generRef.current);
         }
@@ -1208,10 +1239,9 @@ const Lefts = ({
                 onOk={async () => {
                     setBookLoading(true);
                     try {
-                        const result = await materialParse({ noteUrlList: bookValue?.split(' '), materialType });
-                        const newList = _.cloneDeep(tableData);
-                        newList.unshift(...result);
-                        setTableData(newList);
+                        const result = await materialParse({ noteUrlList: bookValue?.split(/\r?\n/), materialType });
+                        tableRef.current = result;
+                        setTableData(tableRef.current);
                         setBookLoading(false);
                         setBookOpen(false);
                     } catch (e) {
@@ -1229,7 +1259,15 @@ const Lefts = ({
                 />
             </Modal>
             {editOpen && (
-                <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
+                <FormModal
+                    title={title}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={columns}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={typeList}
+                />
             )}
             {editOpens && (
                 <FormModal
@@ -1240,10 +1278,7 @@ const Lefts = ({
                     columns={stepMarRef.current[stepRef.current]}
                     form={forms}
                     formOk={formOks}
-                    sourceList={[
-                        { label: '小红书', value: 'SMALL_RED_BOOK' },
-                        { label: '其他', value: 'OTHER' }
-                    ]}
+                    sourceList={typeList}
                 />
             )}
             {botOpen && <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`生成数量不足`} from={''} />}

@@ -25,6 +25,10 @@ export const planCreate = (data: any) => {
 export const planPage = (params: any) => {
     return request.get({ url: '/llm/creative/plan/page', params });
 };
+//列表1
+export const planPages = () => {
+    return request.get({ url: '/llm/creative/plan/list' });
+};
 //删除
 export const planDelete = (data: any) => {
     return request.delete({ url: '/llm/creative/plan/delete/' + data });

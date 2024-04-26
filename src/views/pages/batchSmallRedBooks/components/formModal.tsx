@@ -1,10 +1,11 @@
 import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select } from 'antd';
 import { LoadingOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getAccessToken } from 'utils/auth';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { noteDetail } from 'api/redBook/copywriting';
+import _ from 'lodash-es';
 import '../index.scss';
 const FormModal = ({
     title,
@@ -26,7 +27,8 @@ const FormModal = ({
     materialType?: string;
 }) => {
     const { TextArea } = Input;
-    const [uploadLoading, setUploadLoading] = useState(false);
+    const uploadRef = useRef<any>([]);
+    const [uploadLoading, setUploadLoading] = useState([]);
     const [linkLoading, setLinkLoading] = useState(false);
     const propShow: UploadProps = {
         name: 'image',
@@ -76,12 +78,18 @@ const FormModal = ({
                                         listType="picture-card"
                                         onChange={(info) => {
                                             if (info.file.status === 'uploading') {
-                                                setUploadLoading(true);
+                                                const newList = _.cloneDeep(uploadRef.current);
+                                                newList[index] = true;
+                                                uploadRef.current = newList;
+                                                setUploadLoading(uploadRef.current);
                                                 form.setFieldValue(item.dataIndex, undefined);
                                                 return;
                                             }
                                             if (info?.file?.status === 'done') {
-                                                setUploadLoading(false);
+                                                const newList = _.cloneDeep(uploadRef.current);
+                                                newList[index] = false;
+                                                uploadRef.current = newList;
+                                                setUploadLoading(uploadRef.current);
                                                 form.setFieldValue(item.dataIndex, info?.file?.response?.data?.url);
                                             }
                                         }}
@@ -103,7 +111,11 @@ const FormModal = ({
                                             </div>
                                         ) : (
                                             <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                                {uploadLoading ? <LoadingOutlined rev={undefined} /> : <PlusOutlined rev={undefined} />}
+                                                {uploadLoading[index] ? (
+                                                    <LoadingOutlined rev={undefined} />
+                                                ) : (
+                                                    <PlusOutlined rev={undefined} />
+                                                )}
                                                 <div style={{ marginTop: 8 }}>Upload</div>
                                             </div>
                                         )}

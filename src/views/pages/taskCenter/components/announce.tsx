@@ -66,7 +66,6 @@ const Announce = ({
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const handleTransfer = (key: string, msg?: string) => {
-        console.log(msg);
         switch (key) {
             case 'init':
                 return (

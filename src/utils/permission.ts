@@ -33,7 +33,8 @@ export const enum ENUM_PERMISSION {
     NEW_USER_ACTIVITY = 'new_user_activity', // 新手活动
     COLLECT = 'collect', // 收藏
     PHONE_CHECK = 'phone_check', // 手机校验
-    MARKET_VIDEO_MODAL = 'market_video_modal'
+    MARKET_VIDEO_MODAL = 'market_video_modal',
+    SPRING_SALE = 'spring_sale'
 }
 
 const list: IList = {
@@ -51,7 +52,8 @@ const list: IList = {
     [ENUM_PERMISSION.NEW_USER_ACTIVITY]: true, // 新手互动
     [ENUM_PERMISSION.COLLECT]: true,
     [ENUM_PERMISSION.PHONE_CHECK]: true,
-    [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: true
+    [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: true,
+    [ENUM_PERMISSION.SPRING_SALE]: true
 };
 
 const announceList: IList = {
@@ -69,7 +71,8 @@ const announceList: IList = {
     [ENUM_PERMISSION.NEW_USER_ACTIVITY]: false,
     [ENUM_PERMISSION.COLLECT]: false,
     [ENUM_PERMISSION.PHONE_CHECK]: false,
-    [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: false
+    [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: false,
+    [ENUM_PERMISSION.SPRING_SALE]: false
 };
 
 export const getPermission = (key: ENUM_PERMISSION) => {

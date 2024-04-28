@@ -15,7 +15,8 @@ import {
     Tag,
     Row,
     Col,
-    Input
+    Input,
+    Badge
 } from 'antd';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -44,6 +45,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useAllDetail } from 'contexts/JWTContext';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+import { useNavigate } from 'react-router-dom';
 const Lefts = ({
     detailShow = true,
     pre,
@@ -61,6 +63,7 @@ const Lefts = ({
     newSave: (data: any) => void;
     setPlanUid: (data: any) => void;
 }) => {
+    const navigate = useNavigate();
     const { allDetail: all_detail }: any = useAllDetail();
     const { TextArea } = Input;
     const location = useLocation();
@@ -341,7 +344,7 @@ const Lefts = ({
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else {
             setTableLoading(true);
-            result = await getPlan(searchParams.get('appUid'));
+            result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid') });
             const res = await marketDeatail({ uid: searchParams.get('appUid') });
             setVersion(res.version);
             newList = _.cloneDeep(result?.configuration?.appInformation);
@@ -349,6 +352,7 @@ const Lefts = ({
             if (collData) {
                 setCollData && setCollData(collData.split(','));
             }
+            navigate('/batchSmallRedBook?appUid=' + searchParams.get('appUid') + '&uid=' + result.uid);
         }
         if (flag) setTableLoading(false);
         setTotalCount(result?.totalCount);
@@ -457,7 +461,6 @@ const Lefts = ({
                 setTableData(tableRef.current);
             }
         }
-
         generRef.current = newList?.workflowConfig?.steps?.filter(
             (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
         );
@@ -687,7 +690,7 @@ const Lefts = ({
     const [totalCount, setTotalCount] = useState<number>(1);
     useEffect(() => {
         const getStatus = async () => {
-            const result = await getPlan(searchParams.get('appUid'));
+            const result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid') });
             appRef.current.status = result?.status;
             setAppData(appRef.current);
         };
@@ -865,7 +868,7 @@ const Lefts = ({
         <>
             <div className="relative h-full">
                 {detailShow && (
-                    <div className="flex gap-2 justify-between items-center mb-4">
+                    <div className="flex gap-2 justify-between items-center mb-4 mr-4">
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         <div>
                             状态：{getStatus(appData?.status)}
@@ -884,9 +887,11 @@ const Lefts = ({
                                         okText="更新"
                                         cancelText="取消"
                                     >
-                                        <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
-                                            版本号： <span className="font-blod">{appData?.version || 0}</span>
-                                        </span>
+                                        <Badge dot>
+                                            <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                                版本号： <span className="font-blod">{appData?.version || 0}</span>
+                                            </span>
+                                        </Badge>
                                     </Popconfirm>
                                 ) : (
                                     <span>
@@ -905,7 +910,7 @@ const Lefts = ({
                                 : 'calc(100% - 36px)'
                             : 'calc(100% - 14px)'
                     }}
-                    className="overflow-y-auto pb-[72px]"
+                    className="overflow-y-auto pb-[72px] pr-4"
                 >
                     <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(

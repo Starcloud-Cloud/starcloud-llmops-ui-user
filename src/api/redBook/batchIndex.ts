@@ -87,8 +87,8 @@ export const materialResilt = (parseUid: any) => {
 };
 
 //进入创作计划获取应用数据
-export const getPlan = (appUid: any) => {
-    return request.get({ url: `/llm/creative/plan/getByAppUid?appUid=${appUid}` });
+export const getPlan = (params: any) => {
+    return request.get({ url: `/llm/creative/plan/getByAppUid`, params });
 };
 //获取应用计划示例
 export const getListExample = (uid: any) => {

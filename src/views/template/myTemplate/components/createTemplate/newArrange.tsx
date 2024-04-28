@@ -175,7 +175,15 @@ function Arrange({
     }, [config.steps.length, pre]);
     useEffect(() => {
         setallvalidas(
-            config?.steps.map((item: any) => item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value))
+            config?.steps.map((item: any) => {
+                if (item?.flowStep?.handler === 'AssembleActionHandler') {
+                    return item.flowStep.variable?.variables
+                        ?.filter((el: any) => el?.field !== 'prompt')
+                        ?.some((el: { value: string | null }) => !el.value);
+                } else {
+                    return item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value);
+                }
+            })
         );
     }, [expanded]);
     useEffect(() => {

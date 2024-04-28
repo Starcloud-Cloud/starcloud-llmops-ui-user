@@ -22,6 +22,7 @@ import marketStore from 'store/market';
 import { useTheme } from '@mui/material/styles';
 import { listGroupByCategory, categories, categoryTree } from 'api/template';
 import Template from 'views/template/myTemplate/components/content/template';
+import MarketTemplate from '../myTemplate/components/content/marketTemplate';
 import { favoriteList } from 'api/template/collect';
 import _ from 'lodash-es';
 import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
@@ -497,57 +498,32 @@ function TemplateMarket() {
                         (item?.code === 'HOT' ? (
                             <>
                                 <CustomTabPanel value={value} index={0}>
-                                    <Grid container display="flex" flexWrap={'wrap'} spacing={2}>
+                                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
                                         {item.appList.map((el: any, index: number) => (
-                                            <Grid flexShrink={0} xl={2} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
-                                                <Template like="market" handleDetail={handleDetail} data={el} />
-                                            </Grid>
+                                            <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
                                         ))}
-                                    </Grid>
+                                    </div>
                                 </CustomTabPanel>
                                 <CustomTabPanel value={value} index={1}>
-                                    <div className="relative">
-                                        <Grid
-                                            container
-                                            className="min-h-[178px] max-h-[492px] overflow-hidden"
-                                            display="flex"
-                                            flexWrap={'wrap'}
-                                            spacing={2}
-                                        >
-                                            {collectList.map((el: any, index: number) => (
-                                                <Grid flexShrink={0} xl={2} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
-                                                    <Template handleDetail={handleDetail} data={el} />
-                                                </Grid>
-                                            ))}
-                                        </Grid>
-                                        {collectList.length > 0 && (
-                                            <div
-                                                onClick={() => {
-                                                    navigate('/collect');
-                                                }}
-                                                className="absolute right-0 top-[-10px] text-[#673ab7] cursor-pointer"
-                                            >
-                                                更多收藏
-                                                <RightOutlined rev={undefined} />
-                                            </div>
-                                        )}
+                                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                                        {collectList.map((el: any, index: number) => (
+                                            <MarketTemplate key={el?.uid} handleDetail={handleDetail} data={el} />
+                                        ))}
                                     </div>
                                 </CustomTabPanel>
                             </>
                         ) : (
-                            <Grid
-                                container
-                                display="flex"
-                                flexWrap={queryParams.category === 'ALL' ? 'nowrap' : 'wrap'}
-                                overflow="hidden"
-                                spacing={2}
+                            <div
+                                className={`grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8`}
+                                style={{
+                                    height: queryParams.category === 'ALL' ? '190px' : 'auto',
+                                    overflow: 'hidden'
+                                }}
                             >
                                 {item.appList.map((el: any, index: number) => (
-                                    <Grid flexShrink={0} xl={2} lg={2.4} md={3} sm={6} xs={6} key={el.uid + index} item>
-                                        <Template like="market" handleDetail={handleDetail} data={el} />
-                                    </Grid>
+                                    <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
                                 ))}
-                            </Grid>
+                            </div>
                         ))}
                 </div>
             ))}

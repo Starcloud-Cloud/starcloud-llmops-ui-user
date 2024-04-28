@@ -70,10 +70,10 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
     };
     const [loading, setLoading] = useState(false);
     return (
-        <div className="mb-[20px] w-full aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff]">
+        <div className=" w-full aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff] h-[550px]">
             {item.status !== 'SUCCESS' ? (
                 <div>
-                    <div className="w-full aspect-[250/335] flex justify-center items-center relative gu">
+                    <div className="w-full h-[330px] aspect-[250/335] flex justify-center items-center relative gu">
                         <Skeleton.Image
                             className="!w-[100%] !h-[100%]"
                             active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
@@ -142,8 +142,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                 </div>
                             </div>
                             <div className=" line-clamp-1">
-                                <span className="font-[600]">张数：</span>
-                                '-'
+                                <span className="font-[600]">张数：</span>-
                             </div>
                         </div>
                         <div className="text-[#15273799] text-[12px] line-clamp-1">

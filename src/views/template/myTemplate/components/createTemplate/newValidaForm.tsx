@@ -130,13 +130,18 @@ const Valida = ({
                         <div className="flex items-center gap-2">
                             {handler === 'VariableActionHandler' ||
                             handler === 'MaterialActionHandler' ||
+                            handler === 'AssembleActionHandler' ||
                             variables?.find((item) => item.field === 'prompt')?.value ? (
                                 <CheckCircleIcon fontSize="small" color="success" />
                             ) : (
                                 <CancelIcon fontSize="small" color="error" />
                             )}
                             <div>
-                                {handler === 'VariableActionHandler' || handler === 'MaterialActionHandler' ? '变量' : t('market.prompt')}
+                                {handler === 'VariableActionHandler' ||
+                                handler === 'MaterialActionHandler' ||
+                                handler === 'AssembleActionHandler'
+                                    ? '变量'
+                                    : t('market.prompt')}
                             </div>
                         </div>
                     }

@@ -11,7 +11,7 @@ import { Pagination } from 'swiper';
 const Swipers = ({ item }: { item: any }) => {
     const [swiperRef, setSwiperRef] = useState<any>(null);
     return (
-        <div className="w-full flex justify-center items-center aspect-[250/335] relative swiperImages m-auto">
+        <div className="w-full h-[330px] flex justify-center items-center aspect-[250/335] relative swiperImages m-auto">
             <Swiper
                 onSwiper={(swiper) => {
                     setSwiperRef(swiper);

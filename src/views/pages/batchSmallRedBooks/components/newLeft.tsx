@@ -15,7 +15,8 @@ import {
     Tag,
     Row,
     Col,
-    Input
+    Input,
+    Badge
 } from 'antd';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -44,6 +45,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useAllDetail } from 'contexts/JWTContext';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+import { useNavigate } from 'react-router-dom';
 const Lefts = ({
     detailShow = true,
     pre,
@@ -61,6 +63,7 @@ const Lefts = ({
     newSave: (data: any) => void;
     setPlanUid: (data: any) => void;
 }) => {
+    const navigate = useNavigate();
     const { allDetail: all_detail }: any = useAllDetail();
     const { TextArea } = Input;
     const location = useLocation();
@@ -173,6 +176,18 @@ const Lefts = ({
                                 preview={false}
                                 src={row[item.fieldName]}
                             />
+                        ) : item.type === 'listImage' ? (
+                            <div className="flex gap-1 flex-wrap">
+                                {row[item.fieldName]?.map((item: any) => (
+                                    <Image width={50} height={50} preview={false} src={item} />
+                                ))}
+                            </div>
+                        ) : item.type === 'listStr' ? (
+                            <div className="flex gap-1 flex-wrap">
+                                {row[item.fieldName]?.map((item: any) => (
+                                    <Tag color="processing">{item}</Tag>
+                                ))}
+                            </div>
                         ) : (
                             <div className="break-all line-clamp-4">
                                 {item.fieldName === 'source'
@@ -321,7 +336,7 @@ const Lefts = ({
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
 
-    const getList = async () => {
+    const getList = async (flag?: boolean) => {
         let result;
         let newList: any;
         if (data) {
@@ -329,7 +344,7 @@ const Lefts = ({
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else {
             setTableLoading(true);
-            result = await getPlan(searchParams.get('appUid'));
+            result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid') });
             const res = await marketDeatail({ uid: searchParams.get('appUid') });
             setVersion(res.version);
             newList = _.cloneDeep(result?.configuration?.appInformation);
@@ -337,7 +352,9 @@ const Lefts = ({
             if (collData) {
                 setCollData && setCollData(collData.split(','));
             }
+            navigate('/batchSmallRedBook?appUid=' + searchParams.get('appUid') + '&uid=' + result.uid);
         }
+        if (flag) setTableLoading(false);
         setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
         appRef.current = result;
@@ -444,7 +461,6 @@ const Lefts = ({
                 setTableData(tableRef.current);
             }
         }
-
         generRef.current = newList?.workflowConfig?.steps?.filter(
             (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
         );
@@ -503,7 +519,7 @@ const Lefts = ({
         const newList = data.map((item: any) => ({
             title: item.desc,
             align: 'center',
-            width: item.fieldName === 'source' ? 100 : 200,
+            width: item.fieldName === 'source' ? 100 : item.width || 200,
             fixed: item.fieldName === 'source' ? true : false,
             dataIndex: item.fieldName,
             render: (_: any, row: any) => (
@@ -521,6 +537,18 @@ const Lefts = ({
                                         : 'data:image/png;base64,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'
                                 }
                             />
+                        ) : item.type === 'listImage' ? (
+                            <div className="flex gap-1 flex-wrap">
+                                {row[item.fieldName]?.map((item: any) => (
+                                    <Image width={50} height={50} preview={false} src={item} />
+                                ))}
+                            </div>
+                        ) : item.type === 'listStr' ? (
+                            <div className="flex gap-1 flex-wrap">
+                                {row[item.fieldName]?.map((item: any) => (
+                                    <Tag color="processing">{item}</Tag>
+                                ))}
+                            </div>
                         ) : item.fieldName === 'source' ? (
                             typeList?.find((i) => i.value === row[item.fieldName])?.label
                         ) : (
@@ -662,7 +690,7 @@ const Lefts = ({
     const [totalCount, setTotalCount] = useState<number>(1);
     useEffect(() => {
         const getStatus = async () => {
-            const result = await getPlan(searchParams.get('appUid'));
+            const result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid') });
             appRef.current.status = result?.status;
             setAppData(appRef.current);
         };
@@ -802,7 +830,7 @@ const Lefts = ({
                 close: false
             })
         );
-        getList();
+        getList(true);
     };
     //token 不足弹框
     const [botOpen, setBotOpen] = useState(false);
@@ -813,19 +841,25 @@ const Lefts = ({
     }, [bookOpen]);
     //监听素材上传发生变化
     const [tablePre, setTablePre] = useState(0);
+    const getTag = (type: string) => {
+        return tableData
+            .map((item: any) => item[type])
+            ?.flat(1)
+            ?.filter((item: string) => item);
+    };
     useEffect(() => {
         if (tablePre && materialType === 'note') {
-            const imageList = tableData
-                .map((item: any) => item.images)
-                ?.flat(1)
-                ?.filter((item) => item);
+            const imageList = getTag('images')?.map((item) => ({
+                type: 'note',
+                pictureUrl: item
+            }));
+            const TagList = getTag('tags');
             const newList = _.cloneDeep(generRef.current);
-            newList
-                .find((item: any) => item.flowStep.handler === 'ImitateActionHandler')
-                .variable.variables.find((item: any) => item.style === 'MATERIAL').value = tableData;
-            newList
-                .find((item: any) => item.flowStep.handler === 'ImitateActionHandler')
-                .variable.variables.find((item: any) => item.field === 'REFERS_IMAGE').value = imageList;
+            let conList = newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables;
+            conList.find((item: any) => item.style === 'MATERIAL').value = tableData;
+            conList.find((item: any) => item.field === 'REFERS_IMAGE').value = imageList;
+            conList.find((item: any) => item.field === 'REFERS_TAG').value = TagList;
+            newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables = conList;
             generRef.current = newList;
             setGenerateList(generRef.current);
         }
@@ -834,7 +868,7 @@ const Lefts = ({
         <>
             <div className="relative h-full">
                 {detailShow && (
-                    <div className="flex gap-2 justify-between items-center mb-4">
+                    <div className="flex gap-2 justify-between items-center mb-4 mr-4">
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         <div>
                             状态：{getStatus(appData?.status)}
@@ -853,9 +887,11 @@ const Lefts = ({
                                         okText="更新"
                                         cancelText="取消"
                                     >
-                                        <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
-                                            版本号： <span className="font-blod">{appData?.version || 0}</span>
-                                        </span>
+                                        <Badge dot>
+                                            <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                                版本号： <span className="font-blod">{appData?.version || 0}</span>
+                                            </span>
+                                        </Badge>
                                     </Popconfirm>
                                 ) : (
                                     <span>
@@ -874,7 +910,7 @@ const Lefts = ({
                                 : 'calc(100% - 36px)'
                             : 'calc(100% - 14px)'
                     }}
-                    className="overflow-y-auto pb-[72px]"
+                    className="overflow-y-auto pb-[72px] pr-4"
                 >
                     <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
@@ -1208,10 +1244,9 @@ const Lefts = ({
                 onOk={async () => {
                     setBookLoading(true);
                     try {
-                        const result = await materialParse({ noteUrlList: bookValue?.split(' '), materialType });
-                        const newList = _.cloneDeep(tableData);
-                        newList.unshift(...result);
-                        setTableData(newList);
+                        const result = await materialParse({ noteUrlList: bookValue?.split(/\r?\n/), materialType });
+                        tableRef.current = result;
+                        setTableData(tableRef.current);
                         setBookLoading(false);
                         setBookOpen(false);
                     } catch (e) {
@@ -1229,7 +1264,15 @@ const Lefts = ({
                 />
             </Modal>
             {editOpen && (
-                <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
+                <FormModal
+                    title={title}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={columns}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={typeList}
+                />
             )}
             {editOpens && (
                 <FormModal
@@ -1240,10 +1283,7 @@ const Lefts = ({
                     columns={stepMarRef.current[stepRef.current]}
                     form={forms}
                     formOk={formOks}
-                    sourceList={[
-                        { label: '小红书', value: 'SMALL_RED_BOOK' },
-                        { label: '其他', value: 'OTHER' }
-                    ]}
+                    sourceList={typeList}
                 />
             )}
             {botOpen && <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`生成数量不足`} from={''} />}

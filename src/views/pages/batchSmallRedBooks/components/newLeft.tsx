@@ -213,7 +213,7 @@ const Lefts = ({
             {
                 title: '操作',
                 align: 'center',
-                width: 100,
+                width: 50,
                 fixed: 'right',
                 render: (_: any, row: any, index: number) => (
                     <div className="flex justify-center">

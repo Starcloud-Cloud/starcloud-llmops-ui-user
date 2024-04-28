@@ -516,8 +516,9 @@ function TemplateMarket() {
                             <div
                                 className={`grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8`}
                                 style={{
-                                    height: queryParams.category === 'ALL' ? '190px' : 'auto',
-                                    overflow: 'hidden'
+                                    height: queryParams.category === 'ALL' ? '190px' : '190px',
+                                    overflowX: 'visible',
+                                    overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible'
                                 }}
                             >
                                 {item.appList.map((el: any, index: number) => (

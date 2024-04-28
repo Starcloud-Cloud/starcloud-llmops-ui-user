@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import React from 'react';
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import ThreeStep from './threeStep';
 import { getContentDetail, getContentDetail1 } from 'api/redBook';
 
@@ -49,15 +49,21 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show }
             });
         }
     }, [pre]);
+
     return (
         <Modal
             width={'80%'}
             open={open}
             onCancel={handleClose}
             title="详情"
-            footer={false}
             style={{ maxWidth: '1400px', top: 30 }}
             zIndex={8888}
+            // footer={
+            //     <div>
+            //         <Button>上一篇</Button>
+            //         <Button>下一篇</Button>
+            //     </div>
+            // }
         >
             <div className="h-[calc(100vh-140px)] p-2">
                 <ThreeStep

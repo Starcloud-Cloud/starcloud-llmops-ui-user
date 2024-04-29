@@ -15,7 +15,7 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper';
 import { appModify } from 'api/template';
 
-const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType, getList }: any, ref: any) => {
+const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType }: any, ref: any) => {
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
     const [selectImgs, setSelectImgs] = useState<any>(null);
@@ -327,7 +327,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
 
     // 根据Index 来判断
     const handleOk = () => {
-        if (!currentStyle?.name) {
+        if (!currentStyle.name) {
             message.warning('请填写风格名称');
             return;
         }
@@ -383,7 +383,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
 
             appModify(copyDetails).then((res: any) => {
                 console.log(res, 'res');
-                getList();
             });
         }
 
@@ -633,7 +632,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                                                             width={145}
                                                             height={200}
                                                             src={`${v.example}?x-oss-process=image/resize,w_300/quality,q_80`}
-                                                            preview={false}
+                                                            // preview={false}
                                                             placeholder={
                                                                 <div className="w-[145px] h-[200px] flex justify-center items-center">
                                                                     <Spin />

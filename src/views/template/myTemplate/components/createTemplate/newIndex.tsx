@@ -1077,6 +1077,7 @@ function CreateDetail() {
                                                         stepRef.current = data;
                                                         setStep(stepRef.current);
                                                     }}
+                                                    getList={getList}
                                                     setMaterialType={setMaterialType}
                                                     setTitle={setTitle}
                                                     isShows={isShows}

@@ -378,6 +378,9 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                     setSelectImgs(null);
                     setChooseImageIndex('');
                 }}
+                bodyStyle={{
+                    background: 'rgb(244, 246, 248)'
+                }}
                 open={visible}
                 placement={'left'}
                 width={680}
@@ -418,7 +421,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                     </div>
                 }
             >
-                <div className="grid grid-cols-3 gap-3 ">
+                <div className="grid grid-cols-3 gap-3 bg-[rgb(244, 246, 248)]">
                     {/* <FormControl key={query?.picNum} color="secondary" size="small" fullWidth>
                         <InputLabel id="types">图片数量</InputLabel> */}
                     {/* <Select
@@ -490,7 +493,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         ]}
                     /> */}
                 </div>
-                <div>
+                <div className="flex justify-between bg-[#fff] mb-3 p-2">
                     <div className="flex items-center mt-1">
                         <InfoIcon
                             style={{
@@ -499,6 +502,11 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         />
                         <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款风格模版供您选择</p>
                     </div>
+                    <div>
+                        <Button>创建自定义风格</Button>
+                    </div>
+                </div>
+                <div className="bg-white p-6 h-[94%]">
                     <div className="grid gap-4 grid-cols-4 mt-3">
                         {templateList?.map((item, index) => {
                             return (

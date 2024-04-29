@@ -13,10 +13,9 @@ import './index.scss';
 import Left from './components/newLeft';
 import Right from './components/right';
 import jsCookie from 'js-cookie';
-const BatcSmallRedBooks = () => {
+const BatcSmallRedBooks = ({ uid, isMyApp }: { uid?: string; isMyApp?: boolean }) => {
     const navigate = useNavigate();
     const timer: any = useRef([]);
-
     //批次分页
     const batchPage = { pageNo: 1, pageSize: 100 };
     const [batchUid, setBatchUid] = useState('');
@@ -40,121 +39,6 @@ const BatcSmallRedBooks = () => {
             });
         };
     }, []);
-    // const handleSave = async ({ flag, newData, tableData }: { flag: boolean; newData: any; tableData: any[] }) => {
-    //     if (flag) {
-    //         setExeDisabled(true);
-    //         plabListRef.current = [];
-    //         setPlanList(plabListRef.current);
-    //     }
-    //     if (searchParams.get('uid')) {
-    //         try {
-    //             const res = await planModify({
-    //                 name: newData?.name,
-    //                 randomType: newData.randomType,
-    //                 total: newData.total,
-    //                 tags: newData?.tags,
-    //                 configuration: {
-    //                     ...newData,
-    //                     creativeMaterialList: tableData,
-    //                     total: undefined,
-    //                     randomType: undefined,
-    //                     imageStyleList: undefined,
-    //                     name: undefined,
-    //                     tags: undefined,
-    //                     targetKeys: undefined,
-    //                     variableList: schemeRef.current
-    //                 },
-    //                 type: 'XHS',
-
-    //                 uid: searchParams.get('uid')
-    //             });
-    //             uidRef.current = res;
-    //             dispatch(
-    //                 openSnackbar({
-    //                     open: true,
-    //                     message: '编辑成功',
-    //                     variant: 'alert',
-    //                     alert: {
-    //                         color: 'success'
-    //                     },
-    //                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
-    //                     transition: 'SlideDown',
-    //                     close: false
-    //                 })
-    //             );
-    //             if (flag) {
-    //                 planExecute({ uid: searchParams.get('uid') })
-    //                     .then((res) => {
-    //                         batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-    //                             setBathList(res.list);
-    //                             setExeDisabled(false);
-    //                         });
-    //                     })
-    //                     .catch((err) => {
-    //                         batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-    //                             setBathList(res.list);
-    //                             setExeDisabled(false);
-    //                         });
-    //                     });
-    //             }
-    //         } catch (err) {
-    //             setExeDisabled(false);
-    //         }
-    //     } else {
-    //         try {
-    //             const res = await planCreate({
-    //                 name: newData?.name,
-    //                 randomType: newData.randomType,
-    //                 total: newData.total,
-    //                 tags: newData?.tags,
-    //                 configuration: {
-    //                     ...newData,
-    //                     creativeMaterialList: tableData,
-    //                     total: undefined,
-    //                     randomType: undefined,
-    //                     imageStyleList: undefined,
-    //                     name: undefined,
-    //                     tags: undefined,
-    //                     targetKeys: undefined,
-    //                     variableList: schemeRef.current
-    //                 },
-    //                 type: 'XHS'
-    //             });
-    //             uidRef.current = res;
-    //             dispatch(
-    //                 openSnackbar({
-    //                     open: true,
-    //                     message: '创建成功',
-    //                     variant: 'alert',
-    //                     alert: {
-    //                         color: 'success'
-    //                     },
-    //                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
-    //                     transition: 'SlideDown',
-    //                     close: false
-    //                 })
-    //             );
-    //             navigate('/batchSmallRedBook?uid=' + res);
-    //             if (flag) {
-    //                 planExecute({ uid: res })
-    //                     .then((result) => {
-    //                         batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-    //                             setBathList(res.list);
-    //                             setExeDisabled;
-    //                         });
-    //                     })
-    //                     .catch((err) => {
-    //                         batchPages({ ...batchPage, planUid: searchParams.get('uid') }).then((res) => {
-    //                             setBathList(res.list);
-    //                             setExeDisabled(false);
-    //                         });
-    //                     });
-    //             }
-    //         } catch (err) {
-    //             setExeDisabled(false);
-    //         }
-    //     }
-    // };
     const [pre, setPre] = useState(0);
     const newSave = async (uid: string) => {
         setBathOpen(true);
@@ -351,22 +235,24 @@ const BatcSmallRedBooks = () => {
             }}
             className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto"
         >
-            <SubCard
-                contentSX={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    p: '10px !important'
-                }}
-            >
-                <div>
-                    <IconButton onClick={() => navigate('/appMarket')} color="secondary">
-                        <KeyboardBackspace fontSize="small" />
-                    </IconButton>
-                    <span className="text-[#000c] font-[500]">应用市场</span>
-                </div>
-                <div></div>
-            </SubCard>
+            {!isMyApp && (
+                <SubCard
+                    contentSX={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        p: '10px !important'
+                    }}
+                >
+                    <div>
+                        <IconButton onClick={() => navigate('/appMarket')} color="secondary">
+                            <KeyboardBackspace fontSize="small" />
+                        </IconButton>
+                        <span className="text-[#000c] font-[500]">应用市场</span>
+                    </div>
+                    <div></div>
+                </SubCard>
+            )}
             <div className="flex gap-[20px] mt-4 h-[calc(100%-74px)]">
                 <div className="2xl:w-[500px] xl:w-[410px] lg:w-[370px]  w-[370px] bg-white rounded-lg p-4 pr-0">
                     <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />

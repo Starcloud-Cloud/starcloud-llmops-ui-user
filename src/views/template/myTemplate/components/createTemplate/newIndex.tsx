@@ -14,7 +14,7 @@ import {
     // Tabs,
     Typography
 } from '@mui/material';
-import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented } from 'antd';
+import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented, Spin } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -40,6 +40,7 @@ import { PermissionUpgradeModal } from 'views/template/myChat/createChat/compone
 import { materialTemplate } from 'api/redBook/batchIndex';
 import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 import { schemeMetadata } from 'api/redBook/copywriting';
+import CreatePlan from 'views/pages/batchSmallRedBooks';
 interface Items {
     label: string;
     value: string;
@@ -562,6 +563,7 @@ function CreateDetail() {
         if (details.name && details.category) {
             if (searchParams.get('uid')) {
                 appModify(details).then((res) => {
+                    setViewLoading(false);
                     if (res.data) {
                         setSaveState(saveState + 1);
                         dispatch(
@@ -579,6 +581,7 @@ function CreateDetail() {
                 });
             } else {
                 appCreate(details).then((res) => {
+                    setViewLoading(false);
                     if (res.data) {
                         navigate('/createApp?uid=' + res.data.uid);
                         getList(res.data.uid);
@@ -651,7 +654,6 @@ function CreateDetail() {
     const [editOpen, setEditOpen] = useState(false);
     const [rowIndex, setRowIndex] = useState(0);
     const handleEdit = (row: any, index: number, i?: number) => {
-        console.log(i);
         if (i || i === 0) {
             let newData = _.cloneDeep(stepRef.current);
             newData = i;
@@ -894,8 +896,9 @@ function CreateDetail() {
         setStepMaterial(stepMarRef.current);
     };
     const [segmentedValue, setSegmentedValue] = useState<string | number>('配置');
+    const [viewLoading, setViewLoading] = useState(false);
     return (
-        <Card>
+        <Card sx={{ height: '100%', overflowY: 'auto' }}>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={
@@ -1018,7 +1021,17 @@ function CreateDetail() {
                         <div className="flex justify-center">
                             <div className="xl:w-[80%] lg:w-full">
                                 <div className="pb-4 flex justify-center">
-                                    <Segmented value={segmentedValue} onChange={setSegmentedValue} options={['配置', '预览']} />
+                                    <Segmented
+                                        value={segmentedValue}
+                                        onChange={(e) => {
+                                            if (detailRef?.current?.type === 'MEDIA_MATRIX') {
+                                                // setViewLoading(true);
+                                                // saveDetail();
+                                            }
+                                            setSegmentedValue(e);
+                                        }}
+                                        options={['配置', '预览']}
+                                    />
                                 </div>
                                 {segmentedValue === '配置' && detail && (
                                     <Arrange
@@ -1035,48 +1048,58 @@ function CreateDetail() {
                                         tableDataMove={tableDataMove}
                                     />
                                 )}
-                                {segmentedValue === '预览' && (
-                                    <div>
-                                        <Typography variant="h5" fontSize="1rem" mb={1}>
-                                            {t('market.debug')}
-                                        </Typography>
-                                        <Card elevation={2} sx={{ p: 2 }}>
-                                            <Header
-                                                permissions={permissions}
-                                                detail={detail}
-                                                aiModel={aiModel}
-                                                setOpenUpgradeModel={setOpenUpgradeModel}
-                                                setAiModel={setAiModel}
-                                                appModels={appModels}
-                                            />
-                                            <Perform
-                                                columns={stepMaterial}
-                                                setEditOpen={setEditOpen}
-                                                setStep={(data: any) => {
-                                                    stepRef.current = data;
-                                                    setStep(stepRef.current);
-                                                }}
-                                                setMaterialType={setMaterialType}
-                                                setTitle={setTitle}
-                                                isShows={isShows}
-                                                details={_.cloneDeep(detailRef.current)}
-                                                config={_.cloneDeep(detailRef.current.workflowConfig)}
-                                                changeConfigs={changeConfigs}
-                                                changeSon={changeData}
-                                                changeanswer={changeanswer}
-                                                loadings={loadings}
-                                                isDisables={isDisables}
-                                                variableChange={exeChange}
-                                                promptChange={promptChange}
-                                                isallExecute={(flag: boolean) => {
-                                                    isAllExecute = flag;
-                                                }}
-                                                addStyle={addStyle}
-                                                source="myApp"
-                                            />
-                                        </Card>
-                                    </div>
-                                )}
+                                {
+                                    segmentedValue === '预览' && (
+                                        // (detail?.type === 'MEDIA_MATRIX' ? (
+                                        //     <Spin spinning={viewLoading} tip="Loading">
+                                        //         <div className="min-h-[300px]">
+                                        //             <CreatePlan uid={detail?.uid} isMyApp={true} />
+                                        //         </div>
+                                        //     </Spin>
+                                        // ) : (
+                                        <div>
+                                            <Typography variant="h5" fontSize="1rem" mb={1}>
+                                                {t('market.debug')}
+                                            </Typography>
+                                            <Card elevation={2} sx={{ p: 2 }}>
+                                                <Header
+                                                    permissions={permissions}
+                                                    detail={detail}
+                                                    aiModel={aiModel}
+                                                    setOpenUpgradeModel={setOpenUpgradeModel}
+                                                    setAiModel={setAiModel}
+                                                    appModels={appModels}
+                                                />
+                                                <Perform
+                                                    columns={stepMaterial}
+                                                    setEditOpen={setEditOpen}
+                                                    setStep={(data: any) => {
+                                                        stepRef.current = data;
+                                                        setStep(stepRef.current);
+                                                    }}
+                                                    setMaterialType={setMaterialType}
+                                                    setTitle={setTitle}
+                                                    isShows={isShows}
+                                                    details={_.cloneDeep(detailRef.current)}
+                                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
+                                                    changeConfigs={changeConfigs}
+                                                    changeSon={changeData}
+                                                    changeanswer={changeanswer}
+                                                    loadings={loadings}
+                                                    isDisables={isDisables}
+                                                    variableChange={exeChange}
+                                                    promptChange={promptChange}
+                                                    isallExecute={(flag: boolean) => {
+                                                        isAllExecute = flag;
+                                                    }}
+                                                    addStyle={addStyle}
+                                                    source="myApp"
+                                                />
+                                            </Card>
+                                        </div>
+                                    )
+                                    // ))
+                                }
                             </div>
                         </div>
                     </Tabs.TabPane>

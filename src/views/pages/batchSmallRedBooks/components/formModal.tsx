@@ -121,7 +121,15 @@ const FormModal = ({
                                     >
                                         {form.getFieldValue(item.dataIndex) ? (
                                             <div className="relative">
-                                                <Image preview={false} width={102} height={102} src={form.getFieldValue(item.dataIndex)} />
+                                                <Image
+                                                    preview={false}
+                                                    width={102}
+                                                    height={102}
+                                                    src={
+                                                        form.getFieldValue(item.dataIndex) +
+                                                        '?x-oss-process=image/resize,w_300/quality,q_80'
+                                                    }
+                                                />
                                                 <div className="top-0 left-0 z-[100] absolute w-full h-full hover:bg-black/30 flex justify-center items-center opacity-0 hover:opacity-100">
                                                     <EyeOutlined
                                                         onClick={(e) => {

@@ -173,7 +173,7 @@ const Lefts = ({
                                     width={50}
                                     height={50}
                                     preview={false}
-                                    src={row[item.fieldName]}
+                                    src={row[item.fieldName] + '?x-oss-process=image/resize,w_300/quality,q_80'}
                                 />
                             ) : (
                                 <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
@@ -181,7 +181,12 @@ const Lefts = ({
                         ) : item.type === 'listImage' ? (
                             <div className="flex gap-1 flex-wrap">
                                 {row[item.fieldName]?.map((item: any) => (
-                                    <Image width={50} height={50} preview={false} src={item} />
+                                    <Image
+                                        width={50}
+                                        height={50}
+                                        preview={false}
+                                        src={item + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                    />
                                 ))}
                             </div>
                         ) : item.type === 'listStr' ? (
@@ -536,7 +541,7 @@ const Lefts = ({
                                     width={50}
                                     height={50}
                                     preview={false}
-                                    src={row[item.fieldName]}
+                                    src={row[item.fieldName] + '?x-oss-process=image/resize,w_300/quality,q_80'}
                                 />
                             ) : (
                                 <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
@@ -544,7 +549,12 @@ const Lefts = ({
                         ) : item.type === 'listImage' ? (
                             <div className="flex gap-1 flex-wrap">
                                 {row[item.fieldName]?.map((item: any) => (
-                                    <Image width={50} height={50} preview={false} src={item} />
+                                    <Image
+                                        width={50}
+                                        height={50}
+                                        preview={false}
+                                        src={item + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                    />
                                 ))}
                             </div>
                         ) : item.type === 'listStr' ? (
@@ -1208,7 +1218,12 @@ const Lefts = ({
                 </div>
             </div>
             <Modal zIndex={9999} open={open} footer={null} onCancel={() => setOpen(false)}>
-                <Image className="min-w-[472px]" preview={false} alt="example" src={previewImage} />
+                <Image
+                    className="min-w-[472px]"
+                    preview={false}
+                    alt="example"
+                    src={previewImage + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                />
             </Modal>
             {zoomOpen && (
                 <LeftModalAdd

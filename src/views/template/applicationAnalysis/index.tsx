@@ -1,6 +1,5 @@
 import {
     Box,
-    Grid,
     FormControl,
     InputLabel,
     Select as Selects,
@@ -25,7 +24,7 @@ import {
     Tooltip,
     Link
 } from '@mui/material';
-import { Tag, Image, Select, Button } from 'antd';
+import { Row, Col, Tag, Image, Select, Button } from 'antd';
 import formatDate from 'hooks/useDate';
 import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
@@ -458,10 +457,10 @@ function ApplicationAnalysis({
     };
     return (
         <Box>
-            <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
+            <Row className="my-4" gutter={[20, 20]}>
                 {!appUid && (
                     <>
-                        <Grid item md={4} lg={3} xs={12}>
+                        <Col md={8} lg={6} xs={12}>
                             <TextField
                                 label={t('generateLog.name')}
                                 value={queryParams.appName}
@@ -471,8 +470,8 @@ function ApplicationAnalysis({
                                 onChange={handleChange}
                                 fullWidth
                             />
-                        </Grid>
-                        <Grid item md={4} lg={3} xs={12}>
+                        </Col>
+                        <Col md={8} lg={6} xs={12}>
                             <TextField
                                 label={'用户 ID'}
                                 value={queryParams.userId}
@@ -482,8 +481,8 @@ function ApplicationAnalysis({
                                 onChange={handleChange}
                                 fullWidth
                             />
-                        </Grid>
-                        <Grid item md={4} lg={3} xs={12}>
+                        </Col>
+                        <Col md={8} lg={6} xs={12}>
                             <FormControl fullWidth>
                                 <InputLabel id="appMode">模式</InputLabel>
                                 <Selects
@@ -499,10 +498,10 @@ function ApplicationAnalysis({
                                     ))}
                                 </Selects>
                             </FormControl>
-                        </Grid>
+                        </Col>
                     </>
                 )}
-                <Grid item md={4} lg={3} xs={12}>
+                <Col md={8} lg={6} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="fromScene">场景</InputLabel>
                         <Selects labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
@@ -511,8 +510,8 @@ function ApplicationAnalysis({
                             ))}
                         </Selects>
                     </FormControl>
-                </Grid>
-                <Grid item md={4} lg={3} xs={12}>
+                </Col>
+                <Col md={8} lg={6} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
                         <Selects
@@ -529,13 +528,13 @@ function ApplicationAnalysis({
                             ))}
                         </Selects>
                     </FormControl>
-                </Grid>
-                <Grid item md={4} lg={3} xs={12}>
+                </Col>
+                <Col md={8} lg={6} xs={12}>
                     <Button2 onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
                         {t('generateLog.search')}
                     </Button2>
-                </Grid>
-            </Grid>
+                </Col>
+            </Row>
             <Echarts generate={generate} list={list} />
             <TableContainer component={Paper} sx={{ mt: 2 }}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -547,15 +546,19 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.mode')}
                             </TableCell>
-                            <TableCell sx={{ minWidth: '100px' }} align="center">
-                                执行场景
-                            </TableCell>
+                            {permissions?.includes('log:app:page:adminColumns') && (
+                                <TableCell sx={{ minWidth: '100px' }} align="center">
+                                    执行场景
+                                </TableCell>
+                            )}
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.totalAnswerTokens')}
                             </TableCell>
-                            <TableCell sx={{ minWidth: '100px' }} align="center">
-                                {t('generate.totalElapsed')} (s)
-                            </TableCell>
+                            {permissions?.includes('log:app:page:adminColumns') && (
+                                <TableCell sx={{ minWidth: '100px' }} align="center">
+                                    {t('generate.totalElapsed')} (s)
+                                </TableCell>
+                            )}
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 用户
                             </TableCell>
@@ -585,9 +588,13 @@ function ApplicationAnalysis({
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell align="center">{row.appName}</TableCell>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
-                                <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
+                                {permissions?.includes('log:app:page:adminColumns') && (
+                                    <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
+                                )}
                                 <TableCell align="center">{row?.appMode === 'IMAGE' ? row.imagePoints : row.costPoints}</TableCell>
-                                <TableCell align="center">{row.totalElapsed}</TableCell>
+                                {permissions?.includes('log:app:page:adminColumns') && (
+                                    <TableCell align="center">{row.totalElapsed}</TableCell>
+                                )}
                                 <TableCell align="center">{row.appExecutor}</TableCell>
                                 <TableCell align="center">
                                     {row.status !== 'SUCCESS' ? (

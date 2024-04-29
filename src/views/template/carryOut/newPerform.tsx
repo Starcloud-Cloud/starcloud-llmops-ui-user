@@ -36,6 +36,7 @@ function Perform({
     setTitle,
     setStep,
     setMaterialType,
+    getList,
     addStyle
 }: any) {
     const refs = useRef<any>([]);
@@ -163,7 +164,7 @@ function Perform({
                                     {item.description}
                                 </Typography>
                             </Box>
-                            <AddStyle record={item} details={details} ref={addStyle} />
+                            <AddStyle record={item} details={details} ref={addStyle} getList={getList} />
                         </>
                     ) : (
                         item.flowStep?.response.style !== 'BUTTON' && (

@@ -15,7 +15,7 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper';
 import { appModify } from 'api/template';
 
-const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType }: any, ref: any) => {
+const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType, getList }: any, ref: any) => {
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
     const [selectImgs, setSelectImgs] = useState<any>(null);
@@ -379,6 +379,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
 
             appModify(copyDetails).then((res: any) => {
                 console.log(res, 'res');
+                getList();
             });
         }
 

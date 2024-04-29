@@ -254,7 +254,7 @@ const ThreeStep = ({
                                 </Upload>
                             ) : (
                                 <>
-                                    {/* <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                    <div className="flex justify-between absolute top-[46%] w-full z-10">
                                         <Button
                                             icon={<KeyboardBackspaceIcon />}
                                             shape="circle"
@@ -271,7 +271,7 @@ const ThreeStep = ({
                                                 swiperRef?.slideNext();
                                             }}
                                         />
-                                    </div> */}
+                                    </div>
                                     <div className="h-full">
                                         {imageList.length > 0 && (
                                             <Swiper
@@ -280,7 +280,7 @@ const ThreeStep = ({
                                                 spaceBetween={30}
                                                 centeredSlides={false}
                                                 loop
-                                                pagination={{ clickable: true }}
+                                                // pagination={{ clickable: true }}
                                                 modules={[Pagination]}
                                                 className="mySwiper h-full"
                                                 autoplay={{

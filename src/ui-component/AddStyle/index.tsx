@@ -327,6 +327,10 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
 
     // 根据Index 来判断
     const handleOk = () => {
+        if (!currentStyle?.name) {
+            message.warning('请填写风格名称');
+            return;
+        }
         // 新增
         if (addType === 1) {
             const copyRecord = _.cloneDeep(record);

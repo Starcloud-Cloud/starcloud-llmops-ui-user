@@ -13,6 +13,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper';
+import { appModify } from 'api/template';
 
 const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType }: any, ref: any) => {
     const [visible, setVisible] = useState(false);
@@ -32,6 +33,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
     const [switchCheck, setSwitchCheck] = useState(false);
     const [updIndex, setUpdIndex] = useState<any>('');
     const [previewShow, setPreviewShow] = useState(false);
+    const [addType, setAddType] = useState(0);
 
     const currentStyleRef: any = useRef(null);
     const collapseIndexRef: any = useRef(null);
@@ -40,21 +42,23 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
     const submitData = React.useMemo(() => {
         const copyRecord = _.cloneDeep(record);
         copyRecord.variable.variables.forEach((item: any) => {
-            // 风格产生===2 -> POSTER_STYLE
-            if (mode === 1) {
-                if (item.field === 'POSTER_STYLE_CONFIG') {
-                    item.value = styleData;
-                }
+            // addType
+            if (addType === 1) {
             } else {
-                if (item.field === 'POSTER_STYLE') {
-                    item.value = JSON.stringify(styleData?.[0] || {});
+                // 风格产生===2 -> POSTER_STYLE
+                if (mode === 1) {
+                    if (item.field === 'POSTER_STYLE_CONFIG') {
+                        item.value = styleData;
+                    }
+                } else {
+                    if (item.field === 'POSTER_STYLE') {
+                        item.value = JSON.stringify(styleData?.[0] || {});
+                    }
                 }
             }
         });
         return copyRecord;
     }, [styleData, record]);
-
-    console.log(submitData, 'submitData');
 
     useEffect(() => {
         // 系统的初始化为关闭
@@ -317,13 +321,68 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
 
     const handleCancel = () => {
         setUpdIndex('');
+        setAddType(0);
         setIsModalOpen(false);
     };
 
     // 根据Index 来判断
     const handleOk = () => {
-        const copyStyleData = _.cloneDeep(styleData);
+        // 新增
+        if (addType === 1) {
+            const copyRecord = _.cloneDeep(record);
+            const copyDetails = _.cloneDeep(details);
 
+            const indexList = copyRecord.flowStep.variable.variables
+                .find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')
+                .value.map((item: any) => item.index)
+                .filter((item: any) => typeof item === 'number')
+                .filter(Boolean);
+
+            const index = Math.max(...indexList);
+            copyRecord.flowStep.variable.variables.forEach((item: any) => {
+                if (item.field === 'SYSTEM_POSTER_STYLE_CONFIG') {
+                    item.value = [
+                        ...item.value,
+                        {
+                            ...currentStyle,
+                            enable: true,
+                            index: index + 1,
+                            system: true,
+                            totalImageCount: 0,
+                            uuid: uuidv4()?.split('-')?.join('')
+                        }
+                    ];
+                }
+            });
+
+            copyDetails.workflowConfig.steps.forEach((item: any) => {
+                if (item.flowStep.handler === 'PosterActionHandler') {
+                    // 将该步骤的属性值更改为 copyRecord 的值
+                    Object.assign(item, copyRecord);
+                }
+            });
+
+            copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                const arr = item?.variable?.variables;
+                const arr1 = item?.flowStep?.variable?.variables;
+                arr?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+                arr1?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+            });
+
+            appModify(copyDetails).then((res: any) => {
+                console.log(res, 'res');
+            });
+        }
+
+        const copyStyleData = _.cloneDeep(styleData);
         // 非系统的uuid需要变
         if (!currentStyle.system) {
             currentStyle.uuid = uuidv4()?.split('-')?.join('');
@@ -339,6 +398,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
         setStyleData(copyStyleData);
         setIsModalOpen(false);
         setUpdIndex('');
+        setAddType(0);
     };
 
     const onCheckboxChange = (e: any, index: number) => {
@@ -369,7 +429,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                 <Collapse items={collapseList} defaultActiveKey={[0]} />
             </div>
             <Drawer
-                zIndex={99999}
+                // zIndex={99999}
                 title="选择风格模版"
                 // mask={false}
                 // maskClosable={false}
@@ -503,7 +563,14 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款风格模版供您选择</p>
                     </div>
                     <div>
-                        <Button>创建自定义风格</Button>
+                        <Button
+                            onClick={() => {
+                                setAddType(1);
+                                setIsModalOpen(true);
+                            }}
+                        >
+                            创建自定义风格
+                        </Button>
                     </div>
                 </div>
                 <div className="bg-white p-6 h-[94%]">
@@ -641,7 +708,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
 
                 <StyleTabs
                     schemaList={[]}
-                    imageStyleData={currentStyle?.templateList}
+                    imageStyleData={currentStyle?.templateList || []}
                     typeList={[]}
                     appData={{
                         appUid,

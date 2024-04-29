@@ -172,7 +172,7 @@ function Arrange({
             setStepTitle(config.steps.map((item: { name: string }) => item.name));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [config.steps.length, pre]);
+    }, [config?.steps?.length, pre]);
     useEffect(() => {
         setallvalidas(
             config?.steps.map((item: any) => {

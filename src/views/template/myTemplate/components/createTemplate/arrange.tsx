@@ -282,7 +282,7 @@ function Arrange({ detail, config, variableStyle, editChange, basisChange, statu
             setStepTitle(config.steps.map((item: { name: string }) => item.name));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [config.steps.length, pre]);
+    }, [config?.steps?.length, pre]);
     useEffect(() => {
         setallvalidas(
             config?.steps.map((item: any) => item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value))

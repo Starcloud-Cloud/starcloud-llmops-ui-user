@@ -20,6 +20,7 @@ const StyleTabs = ({
     appData: any;
     canEdit?: boolean;
 }) => {
+    console.log(appData, 'appData');
     const [activeKey, setActiveKey] = useState('0');
     const onChange = (newActiveKey: string) => {
         setActiveKey(newActiveKey);

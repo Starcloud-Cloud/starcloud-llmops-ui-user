@@ -207,7 +207,9 @@ const ThreeStep = ({
                 className="h-full"
                 // title="小红书生成"
                 bodyStyle={{
-                    height: 'calc(100% - 30px)'
+                    // height: 'calc(100% - 30px)'
+                    height: '100%',
+                    padding: 0
                 }}
             >
                 {/* <Spin spinning={aginLoading}> */}
@@ -217,8 +219,8 @@ const ThreeStep = ({
                             className="flex gap-2"
                             style={{
                                 position: 'absolute',
-                                right: '0',
-                                top: '-67px'
+                                right: '12px',
+                                top: '-48px'
                             }}
                         >
                             {/* {jsCookie.get('isClient')&&
@@ -252,7 +254,7 @@ const ThreeStep = ({
                                 </Upload>
                             ) : (
                                 <>
-                                    <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                    {/* <div className="flex justify-between absolute top-[46%] w-full z-10">
                                         <Button
                                             icon={<KeyboardBackspaceIcon />}
                                             shape="circle"
@@ -269,7 +271,7 @@ const ThreeStep = ({
                                                 swiperRef?.slideNext();
                                             }}
                                         />
-                                    </div>
+                                    </div> */}
                                     <div className="h-full">
                                         {imageList.length > 0 && (
                                             <Swiper
@@ -288,7 +290,7 @@ const ThreeStep = ({
                                             >
                                                 {imageList.map((item: any, index) => (
                                                     <SwiperSlide key={index}>
-                                                        <img className="w-full h-full object-contain" src={item.url} />
+                                                        <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
                                                     </SwiperSlide>
                                                 ))}
                                             </Swiper>
@@ -299,7 +301,7 @@ const ThreeStep = ({
                     </div>
                     <div className="h-full overflow-auto col-span-1">
                         {
-                            <div className="w-full h-full p-4">
+                            <div className="w-full h-full p-4 !pl-2">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
                                         <Avatar />

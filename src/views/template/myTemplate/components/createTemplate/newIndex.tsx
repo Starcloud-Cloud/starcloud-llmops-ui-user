@@ -14,7 +14,7 @@ import {
     // Tabs,
     Typography
 } from '@mui/material';
-import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented } from 'antd';
+import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented, Spin } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -40,6 +40,7 @@ import { PermissionUpgradeModal } from 'views/template/myChat/createChat/compone
 import { materialTemplate } from 'api/redBook/batchIndex';
 import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 import { schemeMetadata } from 'api/redBook/copywriting';
+import CreatePlan from 'views/pages/batchSmallRedBooks';
 interface Items {
     label: string;
     value: string;
@@ -562,6 +563,7 @@ function CreateDetail() {
         if (details.name && details.category) {
             if (searchParams.get('uid')) {
                 appModify(details).then((res) => {
+                    setViewLoading(false);
                     if (res.data) {
                         setSaveState(saveState + 1);
                         dispatch(
@@ -579,6 +581,7 @@ function CreateDetail() {
                 });
             } else {
                 appCreate(details).then((res) => {
+                    setViewLoading(false);
                     if (res.data) {
                         navigate('/createApp?uid=' + res.data.uid);
                         getList(res.data.uid);
@@ -651,7 +654,6 @@ function CreateDetail() {
     const [editOpen, setEditOpen] = useState(false);
     const [rowIndex, setRowIndex] = useState(0);
     const handleEdit = (row: any, index: number, i?: number) => {
-        console.log(i);
         if (i || i === 0) {
             let newData = _.cloneDeep(stepRef.current);
             newData = i;
@@ -696,17 +698,19 @@ function CreateDetail() {
                 <div className="flex justify-center items-center flex-wrap break-all gap-2">
                     <div className="line-clamp-5">
                         {item.type === 'image' ? (
-                            <Image
-                                width={50}
-                                height={50}
-                                preview={false}
-                                src={row[item.fieldName]}
-                                fallback={
-                                    row[item.fieldName]
-                                        ? ''
-                                        : 'data:image/png;base64,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'
-                                }
-                            />
+                            row[item.fieldName] ? (
+                                <Image
+                                    fallback={
+                                        'data:image/png;base64,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'
+                                    }
+                                    width={50}
+                                    height={50}
+                                    preview={false}
+                                    src={row[item.fieldName]}
+                                />
+                            ) : (
+                                <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
+                            )
                         ) : item.fieldName === 'source' ? (
                             <>
                                 {row[item.fieldName] === 'OTHER'
@@ -892,8 +896,9 @@ function CreateDetail() {
         setStepMaterial(stepMarRef.current);
     };
     const [segmentedValue, setSegmentedValue] = useState<string | number>('配置');
+    const [viewLoading, setViewLoading] = useState(false);
     return (
-        <Card>
+        <Card sx={{ height: '100%', overflowY: 'auto' }}>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={
@@ -1016,7 +1021,17 @@ function CreateDetail() {
                         <div className="flex justify-center">
                             <div className="xl:w-[80%] lg:w-full">
                                 <div className="pb-4 flex justify-center">
-                                    <Segmented value={segmentedValue} onChange={setSegmentedValue} options={['配置', '预览']} />
+                                    <Segmented
+                                        value={segmentedValue}
+                                        onChange={(e) => {
+                                            if (detailRef?.current?.type === 'MEDIA_MATRIX') {
+                                                // setViewLoading(true);
+                                                // saveDetail();
+                                            }
+                                            setSegmentedValue(e);
+                                        }}
+                                        options={['配置', '预览']}
+                                    />
                                 </div>
                                 {segmentedValue === '配置' && detail && (
                                     <Arrange
@@ -1033,48 +1048,58 @@ function CreateDetail() {
                                         tableDataMove={tableDataMove}
                                     />
                                 )}
-                                {segmentedValue === '预览' && (
-                                    <div>
-                                        <Typography variant="h5" fontSize="1rem" mb={1}>
-                                            {t('market.debug')}
-                                        </Typography>
-                                        <Card elevation={2} sx={{ p: 2 }}>
-                                            <Header
-                                                permissions={permissions}
-                                                detail={detail}
-                                                aiModel={aiModel}
-                                                setOpenUpgradeModel={setOpenUpgradeModel}
-                                                setAiModel={setAiModel}
-                                                appModels={appModels}
-                                            />
-                                            <Perform
-                                                columns={stepMaterial}
-                                                setEditOpen={setEditOpen}
-                                                setStep={(data: any) => {
-                                                    stepRef.current = data;
-                                                    setStep(stepRef.current);
-                                                }}
-                                                setMaterialType={setMaterialType}
-                                                setTitle={setTitle}
-                                                isShows={isShows}
-                                                details={_.cloneDeep(detailRef.current)}
-                                                config={_.cloneDeep(detailRef.current.workflowConfig)}
-                                                changeConfigs={changeConfigs}
-                                                changeSon={changeData}
-                                                changeanswer={changeanswer}
-                                                loadings={loadings}
-                                                isDisables={isDisables}
-                                                variableChange={exeChange}
-                                                promptChange={promptChange}
-                                                isallExecute={(flag: boolean) => {
-                                                    isAllExecute = flag;
-                                                }}
-                                                addStyle={addStyle}
-                                                source="myApp"
-                                            />
-                                        </Card>
-                                    </div>
-                                )}
+                                {
+                                    segmentedValue === '预览' && (
+                                        // (detail?.type === 'MEDIA_MATRIX' ? (
+                                        //     <Spin spinning={viewLoading} tip="Loading">
+                                        //         <div className="min-h-[300px]">
+                                        //             <CreatePlan uid={detail?.uid} isMyApp={true} />
+                                        //         </div>
+                                        //     </Spin>
+                                        // ) : (
+                                        <div>
+                                            <Typography variant="h5" fontSize="1rem" mb={1}>
+                                                {t('market.debug')}
+                                            </Typography>
+                                            <Card elevation={2} sx={{ p: 2 }}>
+                                                <Header
+                                                    permissions={permissions}
+                                                    detail={detail}
+                                                    aiModel={aiModel}
+                                                    setOpenUpgradeModel={setOpenUpgradeModel}
+                                                    setAiModel={setAiModel}
+                                                    appModels={appModels}
+                                                />
+                                                <Perform
+                                                    columns={stepMaterial}
+                                                    setEditOpen={setEditOpen}
+                                                    setStep={(data: any) => {
+                                                        stepRef.current = data;
+                                                        setStep(stepRef.current);
+                                                    }}
+                                                    setMaterialType={setMaterialType}
+                                                    setTitle={setTitle}
+                                                    isShows={isShows}
+                                                    details={_.cloneDeep(detailRef.current)}
+                                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
+                                                    changeConfigs={changeConfigs}
+                                                    changeSon={changeData}
+                                                    changeanswer={changeanswer}
+                                                    loadings={loadings}
+                                                    isDisables={isDisables}
+                                                    variableChange={exeChange}
+                                                    promptChange={promptChange}
+                                                    isallExecute={(flag: boolean) => {
+                                                        isAllExecute = flag;
+                                                    }}
+                                                    addStyle={addStyle}
+                                                    source="myApp"
+                                                />
+                                            </Card>
+                                        </div>
+                                    )
+                                    // ))
+                                }
                             </div>
                         </div>
                     </Tabs.TabPane>

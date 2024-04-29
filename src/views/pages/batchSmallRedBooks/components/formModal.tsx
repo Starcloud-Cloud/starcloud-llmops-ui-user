@@ -69,7 +69,7 @@ const FormModal = ({
     const [fileList, setFileList] = useState<any[]>([]);
     return (
         <Modal
-            zIndex={!materialType ? 9000 : 1100}
+            zIndex={1000}
             title={title}
             open={editOpen}
             onCancel={() => {
@@ -81,7 +81,6 @@ const FormModal = ({
                 if (result?.images) {
                     result.images = fileList?.map((item: any) => item?.response?.data?.url) || [];
                 }
-                console.log(result);
                 formOk(result);
             }}
         >
@@ -122,7 +121,15 @@ const FormModal = ({
                                     >
                                         {form.getFieldValue(item.dataIndex) ? (
                                             <div className="relative">
-                                                <Image preview={false} width={102} height={102} src={form.getFieldValue(item.dataIndex)} />
+                                                <Image
+                                                    preview={false}
+                                                    width={102}
+                                                    height={102}
+                                                    src={
+                                                        form.getFieldValue(item.dataIndex) +
+                                                        '?x-oss-process=image/resize,w_300/quality,q_80'
+                                                    }
+                                                />
                                                 <div className="top-0 left-0 z-[100] absolute w-full h-full hover:bg-black/30 flex justify-center items-center opacity-0 hover:opacity-100">
                                                     <EyeOutlined
                                                         onClick={(e) => {
@@ -254,9 +261,17 @@ const FormModal = ({
                         ))
                 )}
             </Form>
-            <Modal width={448} title={'预览'} footer={false} open={open} onCancel={() => setOpen(false)} zIndex={9999}>
-                <Image width={400} preview={false} src={imageUrl} />
-            </Modal>
+            <Image
+                className="hidden"
+                width={400}
+                preview={{
+                    visible: open,
+                    onVisibleChange: (visible) => {
+                        setOpen(visible);
+                    }
+                }}
+                src={imageUrl}
+            />
         </Modal>
     );
 };

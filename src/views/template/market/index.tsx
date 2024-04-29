@@ -383,9 +383,6 @@ function TemplateMarket() {
 
     return (
         <Box
-            style={{
-                padding: jsCookie.get('isClient') ? '16px' : '0px'
-            }}
             height={jsCookie.get('isClient') ? '100vh' : '100%'}
             overflow="hidden"
             ref={scrollRef}
@@ -393,7 +390,10 @@ function TemplateMarket() {
                 scrollbarGutter: 'stable',
                 '&:hover': {
                     overflow: 'scroll'
-                }
+                },
+                background: '#fff',
+                p: 2,
+                borderRadius: '8px'
             }}
         >
             <Box className="flex mb-[8px] flex-wrap items-end gap-3">

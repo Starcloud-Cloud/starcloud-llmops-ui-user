@@ -15,7 +15,6 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 function FormExecute({
     item,
     details = undefined,
-    appUid = undefined,
     onChange,
     pre,
     materialType,
@@ -201,7 +200,6 @@ function FormExecute({
                             onChange({ name: item.field, value: newValue });
                         }}
                         details={details}
-                        appUid={appUid}
                         code={handlerCode}
                         stepCode={stepCode}
                         index={undefined}

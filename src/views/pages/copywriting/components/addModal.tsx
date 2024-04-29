@@ -954,7 +954,7 @@ const AddModal = () => {
                                                                 <CreateVariables
                                                                     pre={pre}
                                                                     model={el?.model}
-                                                                    appUid={appData?.appUid}
+                                                                    details={appData?.appReqVO}
                                                                     value={el?.requirement}
                                                                     schemaList={schemaList}
                                                                     setValue={(data: string) => {
@@ -1013,7 +1013,7 @@ const AddModal = () => {
                                                                     setValues('title', newData, index);
                                                                 }}
                                                                 title="标题"
-                                                                appUid={appData.appUid}
+                                                                details={appData.appReqVO}
                                                                 stepCode="笔记生成"
                                                                 code={el.code}
                                                                 index={undefined}
@@ -1061,7 +1061,7 @@ const AddModal = () => {
                                                                 code={el.code}
                                                                 title="文案拼接配置"
                                                                 row={6}
-                                                                appUid={appData.appUid}
+                                                                details={appData.appReqVO}
                                                                 stepCode="笔记生成"
                                                                 index={undefined}
                                                                 value={el?.content}

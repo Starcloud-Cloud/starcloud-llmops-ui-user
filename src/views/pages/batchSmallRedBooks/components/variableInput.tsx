@@ -24,7 +24,6 @@ const VariableInput = ({
     styles = {},
     model,
     details,
-    appUid,
     stepCode = '图片生成',
     disabled = false
 }: {
@@ -41,8 +40,7 @@ const VariableInput = ({
     setValue: (data: any) => void;
     styles?: any;
     model?: string;
-    details?: any;
-    appUid?: string;
+    details: any;
     stepCode?: string;
     disabled?: boolean;
 }) => {
@@ -252,7 +250,7 @@ const VariableInput = ({
     };
     useEffect(() => {
         if (open) {
-            schemeOptions({ appUid, stepCode, appReqVO: details }).then((res) => {
+            schemeOptions({ stepCode, appReqVO: details }).then((res) => {
                 const newList = res
                     ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
                     ?.map((item: any) => {

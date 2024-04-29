@@ -550,8 +550,13 @@ const MainLayout = () => {
                                 {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                                 {!isLarge ? (
                                     <Container
-                                        className={`max-w-[1300px] ${isMobile && '!p-0'} h-[calc(100vh-176px)] overflow-y-auto`}
-                                        {...(!container && { sx: { px: { xs: 0 } } })}
+                                        className={
+                                            // `${isMobile && '!p-0'}
+                                            `!p-0 max-w-[1300px] h-[calc(100vh-${
+                                                getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'
+                                            })] overflow-y-auto`
+                                        }
+                                        // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         {/* breadcrumb */}
                                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
@@ -560,8 +565,13 @@ const MainLayout = () => {
                                 ) : (
                                     <Container
                                         maxWidth={false}
-                                        className={`${isMobile && '!p-0'} h-[calc(100vh-176px)] overflow-y-auto`}
-                                        {...(!container && { sx: { px: { xs: 0 } } })}
+                                        className={
+                                            // `${isMobile && '!p-0'}
+                                            `!p-0 h-[calc(100vh-${
+                                                getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'
+                                            })]  overflow-y-scroll`
+                                        }
+                                        // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                                         <Outlet />

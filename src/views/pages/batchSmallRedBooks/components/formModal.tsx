@@ -69,7 +69,7 @@ const FormModal = ({
     const [fileList, setFileList] = useState<any[]>([]);
     return (
         <Modal
-            zIndex={!materialType ? 9000 : 1100}
+            zIndex={1000}
             title={title}
             open={editOpen}
             onCancel={() => {
@@ -81,7 +81,6 @@ const FormModal = ({
                 if (result?.images) {
                     result.images = fileList?.map((item: any) => item?.response?.data?.url) || [];
                 }
-                console.log(result);
                 formOk(result);
             }}
         >
@@ -254,9 +253,17 @@ const FormModal = ({
                         ))
                 )}
             </Form>
-            <Modal width={448} title={'预览'} footer={false} open={open} onCancel={() => setOpen(false)} zIndex={9999}>
-                <Image width={400} preview={false} src={imageUrl} />
-            </Modal>
+            <Image
+                className="hidden"
+                width={400}
+                preview={{
+                    visible: open,
+                    onVisibleChange: (visible) => {
+                        setOpen(visible);
+                    }
+                }}
+                src={imageUrl}
+            />
         </Modal>
     );
 };

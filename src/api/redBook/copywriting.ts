@@ -50,5 +50,5 @@ export const getExample = (data: any) => {
     return request.post({ url: `/llm/xhs/content/getExample`, data });
 };
 export const schemeOptions = (data: any) => {
-    return request.post({ url: `llm/creative/scheme/appStepOptions`, data });
+    return request.post({ url: `llm/creative/scheme/newOptions`, data });
 };

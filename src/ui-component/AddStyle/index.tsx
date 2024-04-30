@@ -14,7 +14,6 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper';
 import { appModify } from 'api/template';
-import { items } from '../../views/announce/authentication/authentication/Login';
 
 const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType }: any, ref: any) => {
     const [visible, setVisible] = useState(false);

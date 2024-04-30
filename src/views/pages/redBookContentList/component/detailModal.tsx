@@ -56,6 +56,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show }
             open={open}
             onCancel={handleClose}
             title="详情"
+            footer={null}
             style={{ maxWidth: '1400px', top: 30 }}
 
             // footer={

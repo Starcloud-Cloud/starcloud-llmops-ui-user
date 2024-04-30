@@ -554,7 +554,7 @@ const MainLayout = () => {
                                             // `${isMobile && '!p-0'}
                                             `!p-0 max-w-[1300px] overflow-y-auto`
                                         }
-                                        sx={{ height: `100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'}` }}
+                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'})` }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         {/* breadcrumb */}
@@ -568,7 +568,7 @@ const MainLayout = () => {
                                             // `${isMobile && '!p-0'}
                                             `!p-0 overflow-y-scroll`
                                         }
-                                        sx={{ height: `100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'}` }}
+                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'})` }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />

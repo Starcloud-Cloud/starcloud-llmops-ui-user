@@ -301,18 +301,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         >
                             切换风格模版
                         </Button>
-                        {/* <div
-                            className="flex justify-center items-center cursor-pointer"
-                            onClick={() => {
-                                setCurrentStyle(item);
-                                currentStyleRef.current = item;
-                                setIsModalOpen(true);
-                                setUpdIndex(index);
-                            }}
-                        >
-                            <span>点击放大编辑</span>
-                            <SearchOutlined />
-                        </div> */}
                     </div>
                 </div>
             )
@@ -447,7 +435,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                 }}
                 open={visible}
                 placement={'left'}
-                width={680}
+                width={720}
                 footer={
                     <div className="flex justify-between">
                         <div className="flex items-center">
@@ -485,78 +473,6 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                     </div>
                 }
             >
-                <div className="grid grid-cols-3 gap-3 bg-[rgb(244, 246, 248)]">
-                    {/* <FormControl key={query?.picNum} color="secondary" size="small" fullWidth>
-                        <InputLabel id="types">图片数量</InputLabel> */}
-                    {/* <Select
-                            value={query?.picNum}
-                            onChange={(e: any) => handleQuery({ label: 'picNum', value: e.target.value })}
-                            endAdornment={
-                                query?.picNum && (
-                                    <InputAdornment className="mr-[10px]" position="end">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => {
-                                                handleQuery({ label: 'picNum', value: '' });
-                                            }}
-                                        >
-                                            <ClearIcon
-                                                style={{
-                                                    fontSize: '14px'
-                                                }}
-                                            />
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
-                            }
-                            labelId="types"
-                            label="图片数量"
-                        >
-                            <MenuItem value={1}>1</MenuItem>
-                            <MenuItem value={2}>2</MenuItem>
-                            <MenuItem value={3}>3</MenuItem>
-                            <MenuItem value={4}>4</MenuItem>
-                            <MenuItem value={5}>5</MenuItem>
-                            <MenuItem value={6}>6</MenuItem>
-                        </Select> */}
-                    {/* </FormControl> */}
-                    {/* <Select
-                        allowClear
-                        placeholder={'图片数量'}
-                        value={query?.picNum}
-                        onChange={(value) => handleQuery({ label: 'picNum', value })}
-                        options={[
-                            {
-                                value: '',
-                                label: '所有'
-                            },
-                            {
-                                value: 1,
-                                label: '1'
-                            },
-                            {
-                                value: 2,
-                                label: '2'
-                            },
-                            {
-                                value: 3,
-                                label: '3'
-                            },
-                            {
-                                value: 4,
-                                label: '4'
-                            },
-                            {
-                                value: 5,
-                                label: '5'
-                            },
-                            {
-                                value: 6,
-                                label: '6'
-                            }
-                        ]}
-                    /> */}
-                </div>
                 <div className="flex justify-between bg-[#fff] mb-3 p-2">
                     <div className="flex items-center mt-1">
                         <InfoIcon
@@ -577,7 +493,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         </Button>
                     </div>
                 </div>
-                <div className="bg-white p-6 h-[94%]">
+                <div className="bg-white p-6 h-[90%]">
                     <div className="grid gap-4 grid-cols-4 mt-3">
                         {templateList?.map((item, index) => {
                             return (
@@ -612,14 +528,14 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                                         autoplay
                                     >
                                         <Image.PreviewGroup
-                                            items={templateList?.[index]?.templateList?.map((item: any) => ({ src: item.example }))}
-                                            preview={{
-                                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                                                visible: previewShow,
-                                                onVisibleChange: (visible) => {
-                                                    setPreviewShow(visible);
-                                                }
-                                            }}
+                                            items={templateList?.[index]?.templateList?.map((item: any) => item.example)}
+                                            // preview={{
+                                            //     onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                                            //     visible: previewShow,
+                                            //     onVisibleChange: (visible) => {
+                                            //         setPreviewShow(visible);
+                                            //     }
+                                            // }}
                                         >
                                             <div className="w-[145px] h-[200px] flex">
                                                 {item?.templateList?.map((v: any, vi: number) => (
@@ -654,6 +570,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
             <Modal
                 width={'60%'}
                 open={isModalOpen}
+                zIndex={10001}
                 onCancel={handleCancel}
                 footer={
                     <div>

@@ -493,7 +493,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         </Button>
                     </div>
                 </div>
-                <div className="bg-white p-6 h-[90%]">
+                <div className="bg-white p-6 h-[calc(100% - 60px)]">
                     <div className="grid gap-4 grid-cols-4 mt-3">
                         {templateList?.map((item, index) => {
                             return (

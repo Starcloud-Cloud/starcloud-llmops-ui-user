@@ -254,7 +254,7 @@ const BatcSmallRedBooks = ({ uid, isMyApp }: { uid?: string; isMyApp?: boolean }
                 </SubCard>
             )}
             <div className="flex gap-[20px] mt-4 h-[calc(100%-74px)]">
-                <div className="2xl:w-[500px] xl:w-[410px] lg:w-[370px]  w-[370px] bg-white rounded-lg p-4 pr-0">
+                <div className="2xl:w-[500px] xl:w-[410px] lg:w-[370px]  w-[370px] bg-white rounded-lg py-4 pl-2 pr-0">
                     <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
                 </div>
                 <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">

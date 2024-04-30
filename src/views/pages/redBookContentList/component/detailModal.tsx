@@ -14,26 +14,34 @@ type IAddAiModalProps = {
     changeList?: () => void;
     businessUid: string;
     show?: boolean;
+    executeResult?: any;
 };
 
-export const DetailModal = ({ open, handleClose, changeList, businessUid, show }: IAddAiModalProps) => {
+export const DetailModal = ({ open, handleClose, changeList, businessUid, show, executeResult }: IAddAiModalProps) => {
     const [detail, setDetail] = useState(null);
     const preRef = useRef(0);
     const [pre, setPre] = useState(0);
     const [dataStatus, setSataStatus] = useState(false);
+    //是否是生成记录的详情
+    const [exeDetail, setExeDetail] = useState(false);
     useEffect(() => {
-        if (show) {
-            getContentDetail1(businessUid).then((res) => {
-                if (res) {
-                    setDetail(res);
-                }
-            });
+        if (!executeResult) {
+            if (show) {
+                getContentDetail1(businessUid).then((res) => {
+                    if (res) {
+                        setDetail(res);
+                    }
+                });
+            } else {
+                getContentDetail(businessUid).then((res) => {
+                    if (res) {
+                        setDetail(res);
+                    }
+                });
+            }
         } else {
-            getContentDetail(businessUid).then((res) => {
-                if (res) {
-                    setDetail(res);
-                }
-            });
+            setDetail(executeResult);
+            setExeDetail(true);
         }
     }, [businessUid]);
     useEffect(() => {
@@ -56,6 +64,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show }
             open={open}
             onCancel={handleClose}
             title="详情"
+            footer={false}
             style={{ maxWidth: '1400px', top: 30 }}
 
             // footer={
@@ -71,6 +80,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show }
                     show={show}
                     pre={preRef.current}
                     dataStatus={dataStatus}
+                    exeDetail={exeDetail}
                     setSataStatus={setSataStatus}
                     setPre={(data) => {
                         preRef.current = data;

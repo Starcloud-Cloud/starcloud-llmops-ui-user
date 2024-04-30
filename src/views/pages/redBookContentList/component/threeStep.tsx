@@ -464,7 +464,7 @@ const ThreeStep = ({
                     </div>
                     {aginLoading && (
                         <div className="z-[1000] absolute w-full h-full flex justify-center items-center bg-black/50">
-                            <div className="flex flex-col gap-2 justify-center items-center">
+                            <div className="flex flex-col gap-2 justify-center items-center bg-white w-[200px] h-[200px] rounded-lg">
                                 <Progress
                                     type="circle"
                                     percent={Math.floor((data?.progress?.currentStepIndex / data?.progress?.totalStepCount) * 100)}

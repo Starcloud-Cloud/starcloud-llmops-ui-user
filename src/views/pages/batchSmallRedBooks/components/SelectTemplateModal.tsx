@@ -48,6 +48,9 @@ export const SelectTemplateModal = ({
             sx={{
                 '& > div:focus-visible': { outline: 'none' }
             }}
+            style={{
+                zIndex: 99999
+            }}
         >
             <MainCard
                 style={{

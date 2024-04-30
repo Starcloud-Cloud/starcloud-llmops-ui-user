@@ -145,7 +145,7 @@ const EditStyle = ({
                             <div className="w-[40%]">
                                 <div className="text-lg">图片模版示意图</div>
                                 <div className="relative w-[85%] mx-auto" ref={imgRef}>
-                                    <Image preview={false} src={currentTemp?.example + '?x-oss-process=image/resize,w_300/quality,q_80'} />
+                                    <Image preview={false} src={currentTemp?.example + '?x-oss-process=image/quality,q_60'} />
                                     {currentJson?.objects
                                         ?.filter((item: any) => item.type === 'image' || item.type.includes('text'))
                                         ?.map((item: any, index: number) => (

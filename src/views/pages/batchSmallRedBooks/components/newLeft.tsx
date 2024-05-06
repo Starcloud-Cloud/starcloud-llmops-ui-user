@@ -16,7 +16,8 @@ import {
     Row,
     Col,
     Input,
-    Badge
+    Badge,
+    theme
 } from 'antd';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
@@ -63,6 +64,7 @@ const Lefts = ({
     newSave: (data: any) => void;
     setPlanUid: (data: any) => void;
 }) => {
+    const { token } = theme.useToken();
     const navigate = useNavigate();
     const { allDetail: all_detail }: any = useAllDetail();
     const { TextArea } = Input;
@@ -882,7 +884,7 @@ const Lefts = ({
         <>
             <div className="relative h-full">
                 {detailShow && (
-                    <div className="flex gap-2 justify-between items-center mb-4 mr-4">
+                    <div className="flex gap-2 justify-between items-center mx-2 mb-4 mr-4">
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         <div>
                             状态：{getStatus(appData?.status)}
@@ -924,7 +926,7 @@ const Lefts = ({
                                 : 'calc(100% - 36px)'
                             : 'calc(100% - 14px)'
                     }}
-                    className="overflow-y-auto pb-[72px] pr-4"
+                    className="overflow-y-auto pb-[72px] pr-2"
                 >
                     <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
@@ -1030,9 +1032,10 @@ const Lefts = ({
                         >
                             <Collapse
                                 defaultActiveKey={['0']}
+                                style={{ background: token.colorBgContainer, border: 'none' }}
                                 items={generateList?.map((item: any, index: number) => ({
                                     key: index.toString(),
-                                    label: item.name,
+                                    label: <span className="text-[16px]">{item.name}</span>,
                                     children: (
                                         <div key={item.field}>
                                             <div className="text-xs text-black/50 mb-4">{item?.description}</div>
@@ -1144,7 +1147,13 @@ const Lefts = ({
                                                 </Tabs>
                                             )}
                                         </div>
-                                    )
+                                    ),
+                                    style: {
+                                        marginBottom: 16,
+                                        background: token.colorFillAlter,
+                                        borderRadius: token.borderRadiusLG,
+                                        border: 'none'
+                                    }
                                 }))}
                             />
                         </Tabs.TabPane>
@@ -1194,7 +1203,7 @@ const Lefts = ({
                         )}
                     </Tabs>
                 </div>
-                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] pt-4 w-[100%]">
+                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] pt-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <>
                             <Button

@@ -47,6 +47,7 @@ import ImageDetail from 'views/picture/components/detail';
 import Echarts from './components/echart';
 import useUserStore from 'store/user';
 import { Charts } from 'types/chat';
+import { DetailModal } from 'views/pages/redBookContentList/component/detailModal';
 import _ from 'lodash-es';
 interface LogStatistics {
     createDate: string;
@@ -362,6 +363,9 @@ function ApplicationAnalysis({
     //智能抠图弹窗
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>({});
+    //小红书弹窗
+    const [redBookOpen, setRedBookOpen] = useState(false);
+    const [executeResult, setExecuteResult] = useState<any>(null);
     //接口请求出来的全部内容
     const [result, setResult] = useState<any>({});
     const [aimodel, setAiModel] = useState('');
@@ -687,7 +691,7 @@ function ApplicationAnalysis({
                                                 getDeList(row);
                                             } else if (row.appMode === 'COMPLETION') {
                                                 detailApp({ appConversationUid: row.uid }).then((res) => {
-                                                    if (res) {
+                                                    if (!res?.executeResult) {
                                                         const newData = _.cloneDeep(res);
                                                         newData?.appInfo?.workflowConfig?.steps?.forEach((item: any) => {
                                                             const arr = item?.variable?.variables;
@@ -715,6 +719,9 @@ function ApplicationAnalysis({
                                                         setConversationUid(newData.conversationUid);
                                                         getStepMater();
                                                         setExeOpen(true);
+                                                    } else {
+                                                        setExecuteResult(res);
+                                                        setRedBookOpen(true);
                                                     }
                                                 });
                                             } else if (row.appMode === 'CHAT') {
@@ -903,6 +910,9 @@ function ApplicationAnalysis({
                 </Drawer>
             )}
             {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
+            {redBookOpen && (
+                <DetailModal open={redBookOpen} handleClose={() => setRedBookOpen(false)} executeResult={executeResult} businessUid={''} />
+            )}
         </Box>
     );
 }

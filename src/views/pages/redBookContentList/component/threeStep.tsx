@@ -41,6 +41,7 @@ const ThreeStep = ({
     data,
     show,
     pre,
+    exeDetail,
     dataStatus,
     setSataStatus,
     setPre
@@ -48,6 +49,7 @@ const ThreeStep = ({
     data: any;
     show?: boolean;
     pre: number;
+    exeDetail: boolean;
     dataStatus: boolean;
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
@@ -214,7 +216,7 @@ const ThreeStep = ({
             >
                 {/* <Spin spinning={aginLoading}> */}
                 <div className="w-full  h-full relative grid grid-cols-3">
-                    {!show && (
+                    {!show && !exeDetail && (
                         <div
                             className="flex gap-2"
                             style={{
@@ -323,104 +325,108 @@ const ThreeStep = ({
                                 ) : (
                                     <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap select-none">
                                         <div>
-                                            <Space>
-                                                <Button
-                                                    type="primary"
-                                                    size="small"
-                                                    onClick={() => {
-                                                        copy(title);
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '复制成功',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'success'
-                                                                },
-                                                                close: false,
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                transition: 'SlideLeft'
-                                                            })
-                                                        );
-                                                    }}
-                                                >
-                                                    复制标题
-                                                </Button>
-                                                <Button
-                                                    type="primary"
-                                                    size="small"
-                                                    onClick={() => {
-                                                        copy(`${title}${text}${tags}`);
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '复制成功',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'success'
-                                                                },
-                                                                close: false,
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                transition: 'SlideLeft'
-                                                            })
-                                                        );
-                                                    }}
-                                                >
-                                                    复制全部
-                                                </Button>
-                                            </Space>
+                                            {!exeDetail && (
+                                                <Space>
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(title);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        复制标题
+                                                    </Button>
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(`${title}${text}${tags}`);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        复制全部
+                                                    </Button>
+                                                </Space>
+                                            )}
                                         </div>
                                         <div>{title}</div>
                                     </div>
                                 )}
                                 <Divider />
                                 <div>
-                                    <Space>
-                                        <Button
-                                            type="primary"
-                                            size="small"
-                                            onClick={() => {
-                                                copy(text);
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: '复制成功',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'success'
-                                                        },
-                                                        close: false,
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                        transition: 'SlideLeft'
-                                                    })
-                                                );
-                                            }}
-                                        >
-                                            复制内容
-                                        </Button>
-                                        <Button
-                                            type="primary"
-                                            size="small"
-                                            onClick={() => {
-                                                copy(`${tags}`);
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: '复制成功',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'success'
-                                                        },
-                                                        close: false,
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                        transition: 'SlideLeft'
-                                                    })
-                                                );
-                                            }}
-                                        >
-                                            复制标签
-                                        </Button>
-                                    </Space>
+                                    {!exeDetail && (
+                                        <Space>
+                                            <Button
+                                                type="primary"
+                                                size="small"
+                                                onClick={() => {
+                                                    copy(text);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideLeft'
+                                                        })
+                                                    );
+                                                }}
+                                            >
+                                                复制内容
+                                            </Button>
+                                            <Button
+                                                type="primary"
+                                                size="small"
+                                                onClick={() => {
+                                                    copy(`${tags}`);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideLeft'
+                                                        })
+                                                    );
+                                                }}
+                                            >
+                                                复制标签
+                                            </Button>
+                                        </Space>
+                                    )}
                                 </div>
                                 <div className="max-h-[calc(100%-150px)] ">
                                     {editType ? (

@@ -183,7 +183,6 @@ const AuthenticationRoutes = {
             path: '/pages/under-construction',
             element: <MaintenanceUnderConstruction />
         },
-
         {
             path: '/pages/landing',
             element: <PagesLanding />

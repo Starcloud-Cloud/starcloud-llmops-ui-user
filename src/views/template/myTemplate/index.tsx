@@ -217,7 +217,7 @@ function MyTemplate() {
                     </FormControl>
                 </Grid> */}
                 <Grid item lg={3}>
-                    <div className=" relative">
+                    <div className="myApp relative">
                         <TreeSelect
                             placeholder="请选择类目"
                             className="bg-[#f8fafc]  h-[51px] border border-solid border-[#697586ad] rounded-[6px] antdSel"

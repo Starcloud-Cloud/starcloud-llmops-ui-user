@@ -347,7 +347,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                 }
             });
 
-            copyDetails.workflowConfig.steps.forEach((item: any) => {
+            copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
                 if (item.flowStep.handler === 'PosterActionHandler') {
                     // 将该步骤的属性值更改为 copyRecord 的值
                     Object.assign(item, copyRecord);
@@ -563,7 +563,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
             <Modal
                 width={'60%'}
                 open={isModalOpen}
-                zIndex={10001}
+                zIndex={1001}
                 onCancel={handleCancel}
                 footer={
                     <div>

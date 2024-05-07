@@ -7,7 +7,7 @@ export const getTenant = () => {
     const hostname = window.location.hostname;
     if (hostname.includes('mofaai')) {
         return ENUM_TENANT.AI;
-    } else if (hostname.includes('mofabang')) {
+    } else if (hostname.includes('mofabang') || hostname.includes('juzhen')) {
         return ENUM_TENANT.ANNOUNCE;
     } else {
         return ENUM_TENANT.ANNOUNCE;
@@ -79,7 +79,7 @@ export const getPermission = (key: ENUM_PERMISSION) => {
     const hostname = window.location.hostname;
     if (hostname.includes('mofaai')) {
         return list[key];
-    } else if (hostname.includes('mofabang')) {
+    } else if (hostname.includes('mofabang') || hostname.includes('juzhen')) {
         return announceList[key];
     } else {
         return announceList[key];

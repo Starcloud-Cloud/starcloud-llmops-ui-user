@@ -20,9 +20,13 @@ const MarketTemplate = ({ like, data, handleDetail }: any) => {
         }
         return image;
     };
-    const { categoryList } = marketStore();
     const [active, setActive] = useState(false);
     const [marketActive, setMarketActive] = useState(false);
+    useEffect(() => {
+        if (data.isFavorite) {
+            setMarketActive(true);
+        }
+    }, []);
     return (
         <div
             className="group rounded-[12px] shadow-md border border-solid border-[transparent] hover:border-[#CECAD5] cursor-pointer h-[185px] bg-white relative p-4"

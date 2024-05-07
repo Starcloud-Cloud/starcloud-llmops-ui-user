@@ -68,6 +68,13 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const urlInviteCode = query.get('q');
+    const loginType = query.get('loginType');
+
+    useEffect(() => {
+        if (loginType && loginType === 'pwd') {
+            setOpen(false);
+        }
+    }, [loginType]);
 
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);

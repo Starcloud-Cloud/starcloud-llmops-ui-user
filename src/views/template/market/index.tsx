@@ -21,8 +21,6 @@ import { t } from 'hooks/web/useI18n';
 import marketStore from 'store/market';
 import { useTheme } from '@mui/material/styles';
 import { listGroupByCategory, categories, categoryTree } from 'api/template';
-import Template from 'views/template/myTemplate/components/content/template';
-import MarketTemplate from '../myTemplate/components/content/marketTemplate';
 import { favoriteList } from 'api/template/collect';
 import _ from 'lodash-es';
 import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
@@ -31,9 +29,10 @@ import { useAllDetail } from '../../../contexts/JWTContext';
 import market from 'assets/images/landing/pre-apps/market.jpg';
 import { MarketVideoModel } from './MarketVideoModel';
 import { NewUserVip } from '../../../ui-component/new-user-vip/index';
-import jsCookie from 'js-cookie';
+import MarketTemplate from '../myTemplate/components/content/marketTemplate';
 import dayjs from 'dayjs';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+import jsCookie from 'js-cookie';
 interface MarketList {
     name: string;
     tags: string[];
@@ -505,18 +504,31 @@ function TemplateMarket() {
                                     </div>
                                 </CustomTabPanel>
                                 <CustomTabPanel value={value} index={1}>
-                                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
-                                        {collectList.map((el: any, index: number) => (
-                                            <MarketTemplate key={el?.uid} handleDetail={handleDetail} data={el} />
-                                        ))}
+                                    <div className="relative">
+                                        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                                            {collectList.map((el: any, index: number) => (
+                                                <MarketTemplate key={el?.uid} handleDetail={handleDetail} data={el} />
+                                            ))}
+                                        </div>
+                                        {collectList.length > 0 && (
+                                            <div
+                                                onClick={() => {
+                                                    navigate('/collect');
+                                                }}
+                                                className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
+                                            >
+                                                更多收藏
+                                                <RightOutlined rev={undefined} />
+                                            </div>
+                                        )}
                                     </div>
                                 </CustomTabPanel>
                             </>
                         ) : (
                             <div
-                                className={`grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8`}
+                                className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
                                 style={{
-                                    height: queryParams.category === 'ALL' ? '190px' : '190px',
+                                    height: '190px',
                                     overflowX: 'visible',
                                     overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible'
                                 }}

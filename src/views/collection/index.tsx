@@ -1,6 +1,6 @@
 import { TextField, InputAdornment, Grid, FormControl, OutlinedInput, IconButton } from '@mui/material';
 import { Search } from '@mui/icons-material';
-import Template from 'views/template/myTemplate/components/content/template';
+import MarketTemplate from 'views/template/myTemplate/components/content/marketTemplate';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { favoriteList } from 'api/template/collect';
@@ -50,14 +50,10 @@ const Collection = () => {
                     placeholder="搜索收藏的AI应用"
                 />
             </FormControl>
-            <div className="mt-[16px]">
-                <Grid container spacing={2}>
-                    {newList.map((item) => (
-                        <Grid xl={1.5} lg={2.4} md={3} sm={6} xs={6} key={item.uid} item>
-                            <Template like="collect" handleDetail={handleDetail} data={item} />
-                        </Grid>
-                    ))}
-                </Grid>
+            <div className="mt-4 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                {newList.map((el: any, index: number) => (
+                    <MarketTemplate like="collect" key={el?.uid} handleDetail={handleDetail} data={el} />
+                ))}
             </div>
         </div>
     );

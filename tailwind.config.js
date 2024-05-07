@@ -11,7 +11,11 @@ module.exports = {
             xs: '350px',
             ...defaultTheme.screens
         },
-        extend: {}
+        extend: {
+            '3xl': '1830px',
+            '4xl': '2100px',
+            '5xl': '2362px',
+        }
     },
     plugins: []
 };

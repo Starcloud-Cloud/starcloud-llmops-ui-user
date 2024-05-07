@@ -1206,6 +1206,7 @@ const Lefts = ({
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <AddStyle
                                     details={appData?.configuration?.appInformation}
+                                    getList={() => getList(true)}
                                     appUid={appData?.appUid}
                                     ref={imageRef}
                                     record={imageMater}
@@ -1223,6 +1224,7 @@ const Lefts = ({
                                     ref={imageRef}
                                     record={imageMater}
                                     mode={2}
+                                    getList={() => getList(true)}
                                     materialType={materialType}
                                 />
                             </Tabs.TabPane>

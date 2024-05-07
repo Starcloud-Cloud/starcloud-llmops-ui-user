@@ -50,18 +50,22 @@ import { useNavigate } from 'react-router-dom';
 const Lefts = ({
     detailShow = true,
     pre,
+    detail,
     data,
     saveLoading,
     setCollData,
     newSave,
+    setDetail,
     setPlanUid
 }: {
     detailShow?: boolean;
     pre?: number;
+    detail?: any;
     data?: any;
     saveLoading?: boolean;
     setCollData?: (data: any) => void;
     newSave: (data: any) => void;
+    setDetail?: (data: any) => void;
     setPlanUid: (data: any) => void;
 }) => {
     const { token } = theme.useToken();
@@ -296,7 +300,7 @@ const Lefts = ({
         setEditOpen(true);
     };
     const formOk = (result: any) => {
-        const newList = _.cloneDeep(tableRef.current);
+        const newList = _.cloneDeep(tableRef.current) || [];
         if (title === '编辑') {
             newList.splice((page - 1) * 10 + rowIndex, 1, result);
             tableRef.current = newList;
@@ -351,6 +355,10 @@ const Lefts = ({
         if (data) {
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
+        } else if (detail) {
+            result = _.cloneDeep({ configuration: { appInformation: detail } });
+            newList = _.cloneDeep(result?.configuration?.appInformation);
+            setTotalCount(3);
         } else {
             setTableLoading(true);
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid') });
@@ -507,7 +515,7 @@ const Lefts = ({
     };
     const getStepMater = async () => {
         const arr: any[] = [];
-        const newList = generRef.current.map((item: any) => {
+        const newList = generRef.current?.map((item: any) => {
             const arr = item?.variable?.variables;
             return arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value;
         });
@@ -714,6 +722,37 @@ const Lefts = ({
             getStatus();
         }
     }, [pre]);
+    const emitView = () => {
+        const newList = _.cloneDeep(generateList);
+        const data = _.cloneDeep(appData);
+        const upData = data?.configuration?.appInformation?.workflowConfig?.steps?.find(
+            (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
+        );
+        upData?.variable?.variables?.forEach((item: any) => {
+            if (item?.style === 'MATERIAL') {
+                item.value =
+                    materialType === 'picture'
+                        ? fileList?.map((item) => ({
+                              pictureUrl: item?.response?.data?.url,
+                              type: 'picture'
+                          }))
+                        : tableData?.map((item) => ({
+                              ...item,
+                              type: materialType
+                          }));
+            }
+        });
+        data.configuration.appInformation.workflowConfig.steps = [
+            upData,
+            ...newList,
+            imageRef.current
+                ? imageRef.current?.record
+                : appData.configuration.appInformation.workflowConfig.steps?.find(
+                      (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                  )
+        ];
+        setDetail && setDetail(data);
+    };
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
         const newList = _.cloneDeep(generateList);
@@ -761,7 +800,7 @@ const Lefts = ({
                           (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                       )
             ];
-            newSave(data);
+            newSave(data.executeParam.appInformation);
         } else {
             const styleData = imageRef.current?.record?.variable?.variables?.find(
                 (item: any) => item.field === 'POSTER_STYLE_CONFIG'
@@ -803,6 +842,10 @@ const Lefts = ({
                     }
                 }
             };
+            //传递预览的值
+            if (detail) {
+                emitView();
+            }
             const result = await planModify(data);
             dispatch(
                 openSnackbar({
@@ -859,7 +902,7 @@ const Lefts = ({
     const [tablePre, setTablePre] = useState(0);
     const getTag = (type: string) => {
         return tableData
-            .map((item: any) => item[type])
+            ?.map((item: any) => item[type])
             ?.flat(1)
             ?.filter((item: string) => item);
     };
@@ -1163,6 +1206,7 @@ const Lefts = ({
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <AddStyle
                                     details={appData?.configuration?.appInformation}
+                                    getList={() => getList(true)}
                                     appUid={appData?.appUid}
                                     ref={imageRef}
                                     record={imageMater}
@@ -1180,6 +1224,7 @@ const Lefts = ({
                                     ref={imageRef}
                                     record={imageMater}
                                     mode={2}
+                                    getList={() => getList(true)}
                                     materialType={materialType}
                                 />
                             </Tabs.TabPane>

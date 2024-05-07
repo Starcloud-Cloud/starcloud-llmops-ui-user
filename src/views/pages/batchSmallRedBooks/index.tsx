@@ -13,7 +13,7 @@ import './index.scss';
 import Left from './components/newLeft';
 import Right from './components/right';
 import jsCookie from 'js-cookie';
-const BatcSmallRedBooks = ({ uid, isMyApp }: { uid?: string; isMyApp?: boolean }) => {
+const BatcSmallRedBooks = ({ detail, isMyApp, setDetail }: { detail?: any; isMyApp?: boolean; setDetail: (data: any) => void }) => {
     const navigate = useNavigate();
     const timer: any = useRef([]);
     //批次分页
@@ -255,7 +255,14 @@ const BatcSmallRedBooks = ({ uid, isMyApp }: { uid?: string; isMyApp?: boolean }
             )}
             <div className="flex gap-[20px] mt-4 h-[calc(100%-74px)]">
                 <div className="2xl:w-[500px] xl:w-[410px] lg:w-[370px]  w-[370px] bg-white rounded-lg py-4 pl-2 pr-0">
-                    <Left pre={pre} setCollData={setCollData} newSave={newSave} setPlanUid={setPlanUid} />
+                    <Left
+                        pre={pre}
+                        detail={detail}
+                        setCollData={setCollData}
+                        newSave={newSave}
+                        setDetail={setDetail}
+                        setPlanUid={setPlanUid}
+                    />
                 </div>
                 <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
                     <Right

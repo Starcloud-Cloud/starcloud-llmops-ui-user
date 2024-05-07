@@ -1161,7 +1161,13 @@ const Lefts = ({
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
-                                <AddStyle appUid={appData?.appUid} ref={imageRef} record={imageMater} materialType={materialType} />
+                                <AddStyle
+                                    details={appData?.configuration?.appInformation}
+                                    appUid={appData?.appUid}
+                                    ref={imageRef}
+                                    record={imageMater}
+                                    materialType={materialType}
+                                />
                             </Tabs.TabPane>
                         )}
                         {appData?.executeParam?.appInformation?.workflowConfig?.steps?.find(
@@ -1169,6 +1175,7 @@ const Lefts = ({
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <AddStyle
+                                    details={appData?.configuration?.appInformation}
                                     appUid={appData?.appUid}
                                     ref={imageRef}
                                     record={imageMater}

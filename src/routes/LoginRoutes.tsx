@@ -9,6 +9,7 @@ import Loadable from 'ui-component/Loadable';
 // login routing
 const AuthLogin = Loadable(lazy(() => import('views/pages/authentication/authentication/Login')));
 const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/authentication/Register')));
+const AuthRegisterResult = Loadable(lazy(() => import('views/pages/authentication/authentication/RegisterResult')));
 const AuthForgotPassword = Loadable(lazy(() => import('views/pages/authentication/authentication/ForgotPassword')));
 const PagesPrivacyPolicy = Loadable(lazy(() => import('views/pages/saas-pages/PrivacyPolicy')));
 
@@ -31,6 +32,10 @@ const LoginRoutes = {
         {
             path: '/register',
             element: <AuthRegister />
+        },
+        {
+            path: '/registerResult',
+            element: <AuthRegisterResult />
         },
         {
             path: '/forgot',

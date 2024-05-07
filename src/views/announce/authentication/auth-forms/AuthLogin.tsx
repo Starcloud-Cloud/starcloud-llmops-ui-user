@@ -69,6 +69,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const urlInviteCode = query.get('q');
+    const loginType = query.get('loginType');
     const [refreshCount, setRefreshCount] = useState(0);
     const [needRefresh, setNeedRefresh] = useState(false);
 
@@ -81,6 +82,12 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
     const handleMouseDownPassword = (event: React.MouseEvent) => {
         event.preventDefault()!;
     };
+
+    useEffect(() => {
+        if (loginType === 'pwd') {
+            setOpen(false);
+        }
+    }, [loginType]);
 
     // const getTenantId = async () => {
     //     if (loginData.tenantEnable === 'true') {

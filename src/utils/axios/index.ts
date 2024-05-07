@@ -28,6 +28,10 @@ interface MyResponseData {
 }
 
 const axiosServices = {
+    getOriginal: async <T = any>(option: any) => {
+        const res = await request({ method: 'GET', ...option });
+        return res as unknown as T;
+    },
     get: async <T = any>(option: any) => {
         const res = await request({ method: 'GET', ...option });
         return res.data as unknown as T;

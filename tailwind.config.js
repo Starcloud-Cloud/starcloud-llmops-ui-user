@@ -12,11 +12,9 @@ module.exports = {
             ...defaultTheme.screens
         },
         extend: {
-            screens: {
-                '3xl': '1830px',
-                '4xl': '2100px',
-                '5xl': '2362px',
-            },
+            '3xl': '1830px',
+            '4xl': '2100px',
+            '5xl': '2362px'
         }
     },
     plugins: []

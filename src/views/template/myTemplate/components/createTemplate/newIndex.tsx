@@ -1019,14 +1019,18 @@ function CreateDetail() {
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="流程编排" key="1">
                         <div className="flex justify-center">
-                            <div className="xl:w-[80%] lg:w-full">
+                            <div
+                                className={`xl:w-[${
+                                    segmentedValue === '预览' && detail?.type === 'MEDIA_MATRIX' ? '100%' : '80%'
+                                }] lg:w-full`}
+                            >
                                 <div className="pb-4 flex justify-center">
                                     <Segmented
                                         value={segmentedValue}
                                         onChange={(e) => {
                                             if (detailRef?.current?.type === 'MEDIA_MATRIX') {
-                                                // setViewLoading(true);
-                                                // saveDetail();
+                                                setViewLoading(true);
+                                                saveDetail();
                                             }
                                             setSegmentedValue(e);
                                         }}
@@ -1048,15 +1052,23 @@ function CreateDetail() {
                                         tableDataMove={tableDataMove}
                                     />
                                 )}
-                                {
-                                    segmentedValue === '预览' && (
-                                        // (detail?.type === 'MEDIA_MATRIX' ? (
-                                        //     <Spin spinning={viewLoading} tip="Loading">
-                                        //         <div className="min-h-[300px]">
-                                        //             <CreatePlan uid={detail?.uid} isMyApp={true} />
-                                        //         </div>
-                                        //     </Spin>
-                                        // ) : (
+                                {segmentedValue === '预览' &&
+                                    (detail?.type === 'MEDIA_MATRIX' ? (
+                                        <Spin spinning={viewLoading} tip="Loading">
+                                            <div className="min-h-[300px] bg-[rgb(244,246,248)] px-4 pb-4">
+                                                <CreatePlan
+                                                    detail={detail}
+                                                    setDetail={(data) => {
+                                                        console.log(data);
+                                                        return;
+                                                        detailRef.current = data;
+                                                        setDetail(detailRef.current);
+                                                    }}
+                                                    isMyApp={true}
+                                                />
+                                            </div>
+                                        </Spin>
+                                    ) : (
                                         <div>
                                             <Typography variant="h5" fontSize="1rem" mb={1}>
                                                 {t('market.debug')}
@@ -1098,9 +1110,7 @@ function CreateDetail() {
                                                 />
                                             </Card>
                                         </div>
-                                    )
-                                    // ))
-                                }
+                                    ))}
                             </div>
                         </div>
                     </Tabs.TabPane>

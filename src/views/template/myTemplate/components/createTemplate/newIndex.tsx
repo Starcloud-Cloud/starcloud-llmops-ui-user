@@ -1071,6 +1071,7 @@ function CreateDetail() {
                                                     ref={createPlanRef}
                                                     detail={detail}
                                                     setDetail={(data) => {
+                                                        console.log(data);
                                                         detailRef.current = data;
                                                         setDetail(detailRef.current);
                                                         saveDetail();

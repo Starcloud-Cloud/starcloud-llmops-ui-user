@@ -358,6 +358,7 @@ const Lefts = ({
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else if (detail) {
+            console.log(detail);
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             newList = _.cloneDeep(detail);
         } else {
@@ -819,15 +820,40 @@ const Lefts = ({
             };
             //传递预览的值
             if (detail) {
+                const newData = _.cloneDeep(detail);
+                let arr = newData?.workflowConfig?.steps;
+                arr
+                    .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
+                    .variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                    materialType === 'picture'
+                        ? fileList?.map((item) => ({
+                              pictureUrl: item?.response?.data?.url,
+                              type: 'picture'
+                          }))
+                        : tableData?.map((item) => ({
+                              ...item,
+                              type: materialType
+                          }));
+                arr
+                    .find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                    .variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
+                    ? styleData?.map((item: any) => ({
+                          ...item,
+                          id: undefined,
+                          code: item.id
+                      }))
+                    : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
+                arr = [
+                    arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+                    ...generRef.current,
+                    arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                ];
+
                 setDetail &&
                     setDetail({
                         ...detail,
                         workflowConfig: {
-                            steps: [
-                                detail.workflowConfig.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler'),
-                                ...generRef.current,
-                                detail.workflowConfig.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
-                            ]
+                            steps: arr?.filter((item: any) => item)
                         }
                     });
             }

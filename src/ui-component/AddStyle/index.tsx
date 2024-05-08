@@ -15,7 +15,7 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper';
 import { appModify } from 'api/template';
 
-const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType }: any, ref: any) => {
+const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType, getList }: any, ref: any) => {
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
     const [selectImgs, setSelectImgs] = useState<any>(null);
@@ -370,7 +370,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
             });
 
             appModify(copyDetails).then((res: any) => {
-                console.log(res, 'res');
+                getList();
             });
         }
 
@@ -560,83 +560,85 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                     </div>
                 </div>
             </Drawer>
-            <Modal
-                width={'60%'}
-                open={isModalOpen}
-                zIndex={1001}
-                onCancel={handleCancel}
-                footer={
-                    <div>
-                        <Space>
-                            <Button onClick={() => handleCancel()}>取消</Button>
-                            <Button type="primary" disabled={!switchCheck} onClick={() => handleOk()}>
-                                确定
-                            </Button>
-                        </Space>
-                    </div>
-                }
-            >
-                <div className="flex justify-between mt-6">
-                    <FormControl color="secondary" size="small">
-                        <TextField
-                            disabled={!switchCheck}
-                            size="small"
-                            color="secondary"
-                            label="风格名称"
-                            variant="outlined"
-                            value={currentStyle?.name}
-                            onChange={(e) => {
-                                let value = e.target.value;
-                                setCurrentStyle((pre: any) => ({
-                                    ...pre,
-                                    name: value
-                                }));
-                            }}
-                        />
-                    </FormControl>
-                    <div className="flex justify-center">
-                        <span className="mr-2">开启编辑</span>
-                        <Tooltip
-                            title={
-                                <div>
-                                    <div>开启编辑后，会从系统模版复制一份进行编辑，并且不再与系统模版同步配置</div>
-                                    <div>开启编辑后，如需继续使用系统模版，请删除后重新选择模版</div>
-                                </div>
-                            }
-                        >
-                            <Switch
-                                // 非系统不可编辑
-                                disabled={!currentStyleRef?.current?.system}
-                                checked={switchCheck}
-                                onChange={(checked) => {
-                                    setSwitchCheck(checked);
+            {isModalOpen && (
+                <Modal
+                    width={'60%'}
+                    open={isModalOpen}
+                    zIndex={1001}
+                    onCancel={handleCancel}
+                    footer={
+                        <div>
+                            <Space>
+                                <Button onClick={() => handleCancel()}>取消</Button>
+                                <Button type="primary" disabled={!switchCheck} onClick={() => handleOk()}>
+                                    确定
+                                </Button>
+                            </Space>
+                        </div>
+                    }
+                >
+                    <div className="flex justify-between mt-6">
+                        <FormControl color="secondary" size="small">
+                            <TextField
+                                disabled={!switchCheck}
+                                size="small"
+                                color="secondary"
+                                label="风格名称"
+                                variant="outlined"
+                                value={currentStyle?.name}
+                                onChange={(e) => {
+                                    let value = e.target.value;
                                     setCurrentStyle((pre: any) => ({
                                         ...pre,
-                                        system: !checked
+                                        name: value
                                     }));
                                 }}
                             />
-                        </Tooltip>
+                        </FormControl>
+                        <div className="flex justify-center">
+                            <span className="mr-2">开启编辑</span>
+                            <Tooltip
+                                title={
+                                    <div>
+                                        <div>开启编辑后，会从系统模版复制一份进行编辑，并且不再与系统模版同步配置</div>
+                                        <div>开启编辑后，如需继续使用系统模版，请删除后重新选择模版</div>
+                                    </div>
+                                }
+                            >
+                                <Switch
+                                    // 非系统不可编辑
+                                    disabled={!currentStyleRef?.current?.system}
+                                    checked={switchCheck}
+                                    onChange={(checked) => {
+                                        setSwitchCheck(checked);
+                                        setCurrentStyle((pre: any) => ({
+                                            ...pre,
+                                            system: !checked
+                                        }));
+                                    }}
+                                />
+                            </Tooltip>
+                        </div>
                     </div>
-                </div>
 
-                <StyleTabs
-                    schemaList={[]}
-                    imageStyleData={currentStyle?.templateList || []}
-                    typeList={[]}
-                    appData={{
-                        appUid,
-                        appReqVO: details,
-                        materialType
-                    }}
-                    canEdit={!switchCheck}
-                    setDetailData={(data: any) => {
-                        const copyCurrentStyle = { ...currentStyle };
-                        copyCurrentStyle.templateList = data;
-                        setCurrentStyle(copyCurrentStyle);
-                    }}
-                />
-            </Modal>
+                    <StyleTabs
+                        schemaList={[]}
+                        imageStyleData={currentStyle?.templateList || []}
+                        typeList={[]}
+                        appData={{
+                            appUid,
+                            appReqVO: details,
+                            materialType
+                        }}
+                        canEdit={!switchCheck}
+                        setDetailData={(data: any) => {
+                            const copyCurrentStyle = { ...currentStyle };
+                            copyCurrentStyle.templateList = data;
+                            setCurrentStyle(copyCurrentStyle);
+                        }}
+                    />
+                </Modal>
+            )}
         </div>
     );
 });

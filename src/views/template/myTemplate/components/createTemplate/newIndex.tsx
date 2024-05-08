@@ -1039,7 +1039,7 @@ function CreateDetail() {
                                                     arr?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler'),
                                                     ...createPlanRef.current.getDetail,
                                                     arr?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
-                                                ];
+                                                ]?.filter((item) => item);
                                                 detailRef.current = newData;
                                                 setDetail(detailRef?.current);
                                             }

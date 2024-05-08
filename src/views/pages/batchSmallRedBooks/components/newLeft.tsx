@@ -822,27 +822,30 @@ const Lefts = ({
             if (detail) {
                 const newData = _.cloneDeep(detail);
                 let arr = newData?.workflowConfig?.steps;
-                arr
-                    .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
-                    .variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                    materialType === 'picture'
-                        ? fileList?.map((item) => ({
-                              pictureUrl: item?.response?.data?.url,
-                              type: 'picture'
-                          }))
-                        : tableData?.map((item) => ({
+                const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+                if (a) {
+                    a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                        materialType === 'picture'
+                            ? fileList?.map((item) => ({
+                                  pictureUrl: item?.response?.data?.url,
+                                  type: 'picture'
+                              }))
+                            : tableData?.map((item) => ({
+                                  ...item,
+                                  type: materialType
+                              }));
+                }
+                const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+                if (b) {
+                    b.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
+                        ? styleData?.map((item: any) => ({
                               ...item,
-                              type: materialType
-                          }));
-                arr
-                    .find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-                    .variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
-                    ? styleData?.map((item: any) => ({
-                          ...item,
-                          id: undefined,
-                          code: item.id
-                      }))
-                    : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
+                              id: undefined,
+                              code: item.id
+                          }))
+                        : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
+                }
+
                 arr = [
                     arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
                     ...generRef.current,

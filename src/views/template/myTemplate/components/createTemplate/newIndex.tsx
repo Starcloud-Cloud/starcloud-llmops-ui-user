@@ -1033,7 +1033,15 @@ function CreateDetail() {
                                                 setViewLoading(true);
                                                 saveDetail();
                                             } else {
-                                                console.log(createPlanRef.current.getDetail);
+                                                const newData = _.cloneDeep(detailRef.current);
+                                                const arr = newData.workflowConfig.steps;
+                                                newData.workflowConfig.steps = [
+                                                    arr?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler'),
+                                                    ...createPlanRef.current.getDetail,
+                                                    arr?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
+                                                ];
+                                                detailRef.current = newData;
+                                                setDetail(detailRef?.current);
                                             }
                                             setSegmentedValue(e);
                                         }}
@@ -1058,13 +1066,14 @@ function CreateDetail() {
                                 {segmentedValue === '预览' &&
                                     (detail?.type === 'MEDIA_MATRIX' ? (
                                         <Spin spinning={viewLoading} tip="Loading">
-                                            <div className="min-h-[300px] bg-[rgb(244,246,248)] px-4 pb-4">
+                                            <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
                                                 <CreatePlan
                                                     ref={createPlanRef}
                                                     detail={detail}
                                                     setDetail={(data) => {
                                                         detailRef.current = data;
                                                         setDetail(detailRef.current);
+                                                        saveDetail();
                                                     }}
                                                     isMyApp={true}
                                                 />

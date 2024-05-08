@@ -137,6 +137,7 @@ const Header = ({
     );
 };
 function CreateDetail() {
+    const createPlanRef = useRef<any>(null);
     const categoryList = marketStore((state) => state.categoryList);
     const addStyle = useRef<any>(null);
     //路由跳转
@@ -1028,9 +1029,11 @@ function CreateDetail() {
                                     <Segmented
                                         value={segmentedValue}
                                         onChange={(e) => {
-                                            if (detailRef?.current?.type === 'MEDIA_MATRIX') {
+                                            if (detailRef?.current?.type === 'MEDIA_MATRIX' && e === '预览') {
                                                 setViewLoading(true);
                                                 saveDetail();
+                                            } else {
+                                                console.log(createPlanRef.current.getDetail);
                                             }
                                             setSegmentedValue(e);
                                         }}
@@ -1057,10 +1060,9 @@ function CreateDetail() {
                                         <Spin spinning={viewLoading} tip="Loading">
                                             <div className="min-h-[300px] bg-[rgb(244,246,248)] px-4 pb-4">
                                                 <CreatePlan
+                                                    ref={createPlanRef}
                                                     detail={detail}
                                                     setDetail={(data) => {
-                                                        console.log(data);
-                                                        return;
                                                         detailRef.current = data;
                                                         setDetail(detailRef.current);
                                                     }}

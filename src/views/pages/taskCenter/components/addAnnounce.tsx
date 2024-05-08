@@ -93,6 +93,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
             batchUid: batch,
             status: 'success',
             claim: false,
+            desc: true,
             planUid: values
         });
         setLoading(false);

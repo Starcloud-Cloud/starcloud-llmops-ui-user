@@ -54,6 +54,7 @@ const Lefts = ({
     data,
     saveLoading,
     setCollData,
+    setGetData,
     newSave,
     setDetail,
     setPlanUid
@@ -64,6 +65,7 @@ const Lefts = ({
     data?: any;
     saveLoading?: boolean;
     setCollData?: (data: any) => void;
+    setGetData?: (data: any) => void;
     newSave: (data: any) => void;
     setDetail?: (data: any) => void;
     setPlanUid: (data: any) => void;
@@ -356,12 +358,11 @@ const Lefts = ({
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else if (detail) {
-            result = _.cloneDeep({ configuration: { appInformation: detail } });
-            newList = _.cloneDeep(result?.configuration?.appInformation);
-            setTotalCount(3);
+            result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+            newList = _.cloneDeep(detail);
         } else {
             setTableLoading(true);
-            result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid') });
+            result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
             const res = await marketDeatail({ uid: searchParams.get('appUid') });
             setVersion(res.version);
             newList = _.cloneDeep(result?.configuration?.appInformation);
@@ -714,7 +715,11 @@ const Lefts = ({
     const [totalCount, setTotalCount] = useState<number>(1);
     useEffect(() => {
         const getStatus = async () => {
-            const result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid') });
+            const result = await getPlan({
+                appUid: searchParams.get('appUid') || searchParams.get('uid'),
+                uid: searchParams.get('appUid') ? searchParams.get('uid') : undefined,
+                source: detail ? 'APP' : 'MARKET'
+            });
             appRef.current.status = result?.status;
             setAppData(appRef.current);
         };
@@ -722,37 +727,6 @@ const Lefts = ({
             getStatus();
         }
     }, [pre]);
-    const emitView = () => {
-        const newList = _.cloneDeep(generateList);
-        const data = _.cloneDeep(appData);
-        const upData = data?.configuration?.appInformation?.workflowConfig?.steps?.find(
-            (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
-        );
-        upData?.variable?.variables?.forEach((item: any) => {
-            if (item?.style === 'MATERIAL') {
-                item.value =
-                    materialType === 'picture'
-                        ? fileList?.map((item) => ({
-                              pictureUrl: item?.response?.data?.url,
-                              type: 'picture'
-                          }))
-                        : tableData?.map((item) => ({
-                              ...item,
-                              type: materialType
-                          }));
-            }
-        });
-        data.configuration.appInformation.workflowConfig.steps = [
-            upData,
-            ...newList,
-            imageRef.current
-                ? imageRef.current?.record
-                : appData.configuration.appInformation.workflowConfig.steps?.find(
-                      (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
-                  )
-        ];
-        setDetail && setDetail(data);
-    };
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
         const newList = _.cloneDeep(generateList);
@@ -840,11 +814,22 @@ const Lefts = ({
                             ]
                         }
                     }
-                }
+                },
+                source: detail ? 'APP' : 'MARKET'
             };
             //传递预览的值
             if (detail) {
-                emitView();
+                setDetail &&
+                    setDetail({
+                        ...detail,
+                        workflowConfig: {
+                            steps: [
+                                detail.workflowConfig.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler'),
+                                ...generRef.current,
+                                detail.workflowConfig.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
+                            ]
+                        }
+                    });
             }
             const result = await planModify(data);
             dispatch(
@@ -923,6 +908,12 @@ const Lefts = ({
             setGenerateList(generRef.current);
         }
     }, [JSON.stringify(tableData)]);
+    useEffect(() => {
+        console.log(111111);
+        if (generateList?.length > 0) {
+            setGetData && setGetData(generateList);
+        }
+    }, [JSON.stringify(generateList)]);
     return (
         <>
             <div className="relative h-full">

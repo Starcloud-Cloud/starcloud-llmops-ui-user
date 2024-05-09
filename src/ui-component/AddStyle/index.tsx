@@ -12,10 +12,10 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper';
+import { Pagination } from 'swiper';
 import { appModify } from 'api/template';
 
-const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType, getList }: any, ref: any) => {
+const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true }: any, ref: any) => {
     const [visible, setVisible] = useState(false);
     const [styleData, setStyleData] = useState<any>([]);
     const [selectImgs, setSelectImgs] = useState<any>(null);
@@ -28,11 +28,11 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
     const [type, setType] = useState<any>();
     const [editIndex, setEditIndex] = useState<any>('');
     const [templateList, setTemplateList] = useState<any[]>([]);
+    const [customList, setCustomList] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentStyle, setCurrentStyle] = useState<any>(null);
     const [switchCheck, setSwitchCheck] = useState(false);
     const [updIndex, setUpdIndex] = useState<any>('');
-    const [previewShow, setPreviewShow] = useState(false);
     const [addType, setAddType] = useState(0);
 
     const currentStyleRef: any = useRef(null);
@@ -81,6 +81,9 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
             const sysTempList = tempList.filter((item: any) => item.system);
             setTemplateList(sysTempList);
             templateRef.current = tempList;
+
+            const customList = record?.variable?.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
+            setCustomList(JSON.parse(customList));
         }
     }, [record]);
 
@@ -124,7 +127,8 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
 
     const handleChoose = (index: number) => {
         setChooseImageIndex(index);
-        const list: any = templateList[index];
+        const combineList = [...templateList, ...customList];
+        const list: any = combineList.find((item) => item.uuid === index);
         setSelectImgs(list);
     };
 
@@ -311,6 +315,7 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
         setUpdIndex('');
         setAddType(0);
         setIsModalOpen(false);
+        setCurrentStyle(null);
     };
 
     // 根据Index 来判断
@@ -323,18 +328,17 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
         if (addType === 1) {
             const copyRecord = _.cloneDeep(record);
             const copyDetails = _.cloneDeep(details);
-
-            const indexList = copyRecord.flowStep.variable.variables
-                .find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')
-                .value.map((item: any) => item.index)
+            const valueString = copyRecord.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value;
+            const indexList = JSON.parse(valueString)
+                .map((item: any) => item.index)
                 .filter((item: any) => typeof item === 'number')
                 .filter(Boolean);
 
             const index = Math.max(...indexList);
-            copyRecord.flowStep.variable.variables.forEach((item: any) => {
-                if (item.field === 'SYSTEM_POSTER_STYLE_CONFIG') {
+            copyRecord.variable.variables.forEach((item: any) => {
+                if (item.field === 'CUSTOM_POSTER_STYLE_CONFIG') {
                     item.value = [
-                        ...item.value,
+                        ...JSON.parse(item.value),
                         {
                             ...currentStyle,
                             enable: true,
@@ -391,12 +395,14 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
         setIsModalOpen(false);
         setUpdIndex('');
         setAddType(0);
+        setCurrentStyle(null);
     };
 
     const onCheckboxChange = (e: any, index: number) => {
         // console.log(`checked = ${e.target.checked}`);
         setChooseImageIndex(index);
-        const list: any = templateList[index];
+        const combine = [...templateList, ...customList];
+        const list: any = combine[index];
         setSelectImgs(list);
     };
 
@@ -483,37 +489,40 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                         <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款风格模版供您选择</p>
                     </div>
                     <div>
-                        <Button
-                            onClick={() => {
-                                setAddType(1);
-                                setIsModalOpen(true);
-                            }}
-                        >
-                            创建自定义风格
-                        </Button>
+                        {hasAddStyle && (
+                            <Button
+                                onClick={() => {
+                                    setAddType(1);
+                                    setIsModalOpen(true);
+                                }}
+                            >
+                                创建自定义风格
+                            </Button>
+                        )}
                     </div>
                 </div>
                 <div className="bg-white p-6 h-[calc(100% - 60px)]">
+                    <span className="text-stone-700 font-semibold">系统风格</span>
                     <div className="grid gap-4 grid-cols-4 mt-3">
                         {templateList?.map((item, index) => {
                             return (
                                 <div
                                     className={`flex overflow-x-auto cursor-pointer w-full ${
-                                        hoverIndex === index || chooseImageIndex === index
+                                        hoverIndex === item.uuid || chooseImageIndex === item.uuid
                                             ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
                                             : 'outline outline-offset-2 outline-1 outline-[#ccc]'
                                     } rounded-sm relative`}
                                     // onClick={() => handleChoose(index)}
-                                    onMouseEnter={() => setHoverIndex(index)}
+                                    onMouseEnter={() => setHoverIndex(item.uuid)}
                                     onMouseLeave={() => setHoverIndex('')}
                                 >
                                     <Checkbox
-                                        checked={index === chooseImageIndex}
+                                        checked={item.uuid === chooseImageIndex}
                                         className="absolute z-50 right-[2px]"
                                         onChange={(e) => {
                                             const value = e.target.checked;
                                             if (value) {
-                                                handleChoose(index);
+                                                handleChoose(item.uuid);
                                             } else {
                                                 handleChoose(-1);
                                             }
@@ -558,6 +567,78 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
                             );
                         })}
                     </div>
+
+                    {customList.length > 0 && (
+                        <div className="mt-5">
+                            <span className="text-stone-700 font-semibold">自定义风格</span>
+                            <div className="grid gap-4 grid-cols-4 mt-3">
+                                {customList?.map((item, index) => {
+                                    return (
+                                        <div
+                                            className={`flex overflow-x-auto cursor-pointer w-full ${
+                                                hoverIndex === item.uuid || chooseImageIndex === item.uuid
+                                                    ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
+                                                    : 'outline outline-offset-2 outline-1 outline-[#ccc]'
+                                            } rounded-sm relative`}
+                                            // onClick={() => handleChoose(index)}
+                                            onMouseEnter={() => setHoverIndex(item.uuid)}
+                                            onMouseLeave={() => setHoverIndex('')}
+                                        >
+                                            <Checkbox
+                                                checked={item.uuid === chooseImageIndex}
+                                                className="absolute z-50 right-[2px]"
+                                                onChange={(e) => {
+                                                    const value = e.target.checked;
+                                                    if (value) {
+                                                        handleChoose(item.uuid);
+                                                    } else {
+                                                        handleChoose(-1);
+                                                    }
+                                                }}
+                                            />
+                                            <Swiper
+                                                spaceBetween={30}
+                                                pagination={{
+                                                    clickable: true
+                                                }}
+                                                modules={[Pagination]}
+                                                autoplay
+                                            >
+                                                <div className="w-[145px] h-[200px] flex">
+                                                    {item?.templateList?.map((v: any, vi: number) => (
+                                                        <SwiperSlide>
+                                                            <Image.PreviewGroup
+                                                                items={templateList?.[index]?.templateList?.map(
+                                                                    (item: any) => item.example
+                                                                )}
+                                                            >
+                                                                <Image
+                                                                    style={{
+                                                                        width: '145px'
+                                                                    }}
+                                                                    key={vi}
+                                                                    width={145}
+                                                                    height={200}
+                                                                    src={`${v.example}?x-oss-process=image/resize,w_300/quality,q_80`}
+                                                                    // preview={false}
+                                                                    placeholder={
+                                                                        <div className="w-[145px] h-[200px] flex justify-center items-center">
+                                                                            <Spin />
+                                                                        </div>
+                                                                    }
+                                                                    fallback="data:image/png;base64,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"
+                                                                />
+                                                            </Image.PreviewGroup>
+                                                        </SwiperSlide>
+                                                    ))}
+                                                </div>
+                                            </Swiper>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Drawer>
             {isModalOpen && (

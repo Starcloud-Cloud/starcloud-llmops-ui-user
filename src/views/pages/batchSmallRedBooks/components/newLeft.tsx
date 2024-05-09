@@ -362,7 +362,6 @@ const Lefts = ({
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else if (detail) {
-            console.log(detail);
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             newList = _.cloneDeep(detail);
         } else {
@@ -384,6 +383,8 @@ const Lefts = ({
         setPlanUid(result?.uid);
         appRef.current = result;
         setAppData(appRef.current);
+        console.log(newList);
+
         newList?.workflowConfig?.steps.forEach((item: any) => {
             const arr: any[] = item?.variable?.variables;
 
@@ -444,35 +445,58 @@ const Lefts = ({
         const newMater = newList?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
-
+        const valueList = newList?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value;
+        const picList = result?.configuration?.materialList;
         setMaterialType(newMater);
         if (newMater === 'picture') {
             if (!data) {
                 setFileList(
-                    result?.configuration?.materialList?.map((item: any) => ({
-                        uid: uuidv4(),
-                        thumbUrl: item?.pictureUrl,
-                        response: {
-                            data: {
-                                url: item?.pictureUrl
-                            }
-                        }
-                    }))
+                    picList && picList?.length > 0
+                        ? result?.configuration?.materialList?.map((item: any) => ({
+                              uid: uuidv4(),
+                              thumbUrl: item?.pictureUrl,
+                              response: {
+                                  data: {
+                                      url: item?.pictureUrl
+                                  }
+                              }
+                          }))
+                        : valueList?.map((item: any) => ({
+                              uid: uuidv4(),
+                              thumbUrl: item?.pictureUrl,
+                              response: {
+                                  data: {
+                                      url: item?.pictureUrl
+                                  }
+                              }
+                          }))
                 );
             } else {
                 setFileList(
-                    newList?.workflowConfig?.steps
-                        ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                        ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
-                        ?.value?.map((item: any) => ({
-                            uid: uuidv4(),
-                            thumbUrl: item?.pictureUrl,
-                            response: {
-                                data: {
-                                    url: item?.pictureUrl
-                                }
-                            }
-                        }))
+                    picList && picList?.length > 0
+                        ? valueList?.map((item: any) => ({
+                              uid: uuidv4(),
+                              thumbUrl: item?.pictureUrl,
+                              response: {
+                                  data: {
+                                      url: item?.pictureUrl
+                                  }
+                              }
+                          }))
+                        : newList?.workflowConfig?.steps
+                              ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                              ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
+                              ?.value?.map((item: any) => ({
+                                  uid: uuidv4(),
+                                  thumbUrl: item?.pictureUrl,
+                                  response: {
+                                      data: {
+                                          url: item?.pictureUrl
+                                      }
+                                  }
+                              }))
                 );
             }
         } else {
@@ -482,7 +506,7 @@ const Lefts = ({
                     ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value;
                 setTableData(tableRef.current);
             } else {
-                tableRef.current = result?.configuration?.materialList;
+                tableRef.current = picList && picList?.length > 0 ? picList : valueList;
                 setTableData(tableRef.current);
             }
         }
@@ -499,7 +523,8 @@ const Lefts = ({
         });
         if (result?.configuration?.imageStyleList?.length > 0) {
             newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
-                result?.configuration?.imageStyleList;
+                result?.configuration?.imageStyleList ||
+                newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
         }
         setImagMater(newImage);
     };

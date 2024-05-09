@@ -1060,6 +1060,7 @@ function CreateDetail() {
                                                 }
                                                 const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
                                                 if (index !== -1) {
+                                                    console.log(createPlanRef?.current?.imageMoke);
                                                     arr[index] =
                                                         createPlanRef?.current?.imageMoke ||
                                                         arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
@@ -1099,7 +1100,7 @@ function CreateDetail() {
                                             <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
                                                 <CreatePlan
                                                     ref={createPlanRef}
-                                                    detail={detail}
+                                                    detail={detailRef?.current}
                                                     setDetail={(data) => {
                                                         detailRef.current = data;
                                                         setDetail(detailRef.current);

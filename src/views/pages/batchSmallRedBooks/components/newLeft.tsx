@@ -967,11 +967,10 @@ const Lefts = ({
                 );
         }
     }, [JSON.stringify(tableData), JSON.stringify(fileList)]);
+    const [imageVar, setImageVar] = useState<any>(null);
     useEffect(() => {
-        if (imageMater) {
-            setImageMoke && setImageMoke(imageMater);
-        }
-    }, [JSON.stringify(imageMater)]);
+        setImageMoke && setImageMoke(imageVar || imageMater);
+    }, [imageVar]);
     return (
         <>
             <div className="relative h-full">
@@ -1258,6 +1257,7 @@ const Lefts = ({
                                 <AddStyle
                                     details={appData?.configuration?.appInformation}
                                     hasAddStyle={detail || !detailShow ? false : true}
+                                    setImageVar={setImageVar}
                                     getList={() => getList(true)}
                                     appUid={appData?.appUid}
                                     ref={imageRef}
@@ -1273,6 +1273,7 @@ const Lefts = ({
                                 <AddStyle
                                     details={appData?.configuration?.appInformation}
                                     hasAddStyle={detail || !detailShow ? false : true}
+                                    setImageVar={setImageVar}
                                     appUid={appData?.appUid}
                                     ref={imageRef}
                                     record={imageMater}

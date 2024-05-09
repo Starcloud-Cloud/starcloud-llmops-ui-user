@@ -328,7 +328,8 @@ const AddStyle = React.forwardRef(({ record, details, appUid, mode = 1, material
         if (addType === 1) {
             const copyRecord = _.cloneDeep(record);
             const copyDetails = _.cloneDeep(details);
-            const valueString = copyRecord.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value;
+            const valueString =
+                copyRecord.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
             const indexList = JSON.parse(valueString)
                 .map((item: any) => item.index)
                 .filter((item: any) => typeof item === 'number')

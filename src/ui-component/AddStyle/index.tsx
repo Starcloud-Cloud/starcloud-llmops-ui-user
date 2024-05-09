@@ -351,7 +351,7 @@ const AddStyle = React.forwardRef(
                                 ...currentStyle,
                                 enable: true,
                                 index: index + 1,
-                                system: true,
+                                system: false,
                                 totalImageCount: 0,
                                 uuid: uuidv4()?.split('-')?.join('')
                             }

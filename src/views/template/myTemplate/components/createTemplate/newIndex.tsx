@@ -328,9 +328,10 @@ function CreateDetail() {
                 el.field = el.field.toUpperCase();
             });
             if (item?.flowStep?.handler === 'PosterActionHandler') {
-                if (item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG')) {
+                const variable = item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG');
+                if (variable && typeof variable.value === 'string') {
                     item.flowStep.variable.variables.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG').value = JSON.parse(
-                        item?.flowStep?.variable?.variables?.find((el: any) => el.field === 'SYSTEM_POSTER_STYLE_CONFIG').value
+                        variable.value
                     );
                 } else {
                     item?.flowStep?.variable?.variables?.push({
@@ -547,6 +548,23 @@ function CreateDetail() {
         if (index !== -1) {
             details.workflowConfig.steps[index] = addStyle?.current?.record || details.workflowConfig.steps[index];
         }
+        if (createPlanRef?.current) {
+            let arr = details?.workflowConfig?.steps;
+            const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+            if (a) {
+                a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = createPlanRef?.current?.moke;
+            }
+            const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
+            if (index !== -1) {
+                arr[index] = createPlanRef?.current?.imageMoke;
+            }
+            arr = [
+                arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+                ...createPlanRef.current.getDetail,
+                arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+            ];
+            details.workflowConfig.steps = arr?.filter((item: any) => item);
+        }
         details?.workflowConfig?.steps?.forEach((item: any) => {
             const arr = item?.variable?.variables;
             const arr1 = item?.flowStep?.variable?.variables;
@@ -570,7 +588,7 @@ function CreateDetail() {
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: t('market.modify'),
+                                message: '保存成功',
                                 variant: 'alert',
                                 alert: {
                                     color: 'success'
@@ -1022,30 +1040,40 @@ function CreateDetail() {
                         <div className="flex justify-center">
                             <div
                                 className={`xl:w-[${
-                                    segmentedValue === '预览' && detail?.type === 'MEDIA_MATRIX' ? '100%' : '80%'
+                                    segmentedValue === '预览测试' && detail?.type === 'MEDIA_MATRIX' ? '100%' : '80%'
                                 }] lg:w-full`}
                             >
                                 <div className="pb-4 flex justify-center">
                                     <Segmented
                                         value={segmentedValue}
                                         onChange={(e) => {
-                                            if (detailRef?.current?.type === 'MEDIA_MATRIX' && e === '预览') {
+                                            if (detailRef?.current?.type === 'MEDIA_MATRIX' && e === '预览测试') {
                                                 setViewLoading(true);
                                                 saveDetail();
                                             } else {
                                                 const newData = _.cloneDeep(detailRef.current);
-                                                const arr = newData.workflowConfig.steps;
-                                                newData.workflowConfig.steps = [
-                                                    arr?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler'),
+                                                let arr = newData?.workflowConfig?.steps;
+                                                const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+                                                if (a) {
+                                                    a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                                                        createPlanRef?.current?.moke;
+                                                }
+                                                const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
+                                                if (index !== -1) {
+                                                    arr[index] = createPlanRef?.current?.imageMoke;
+                                                }
+                                                arr = [
+                                                    arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
                                                     ...createPlanRef.current.getDetail,
-                                                    arr?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
-                                                ]?.filter((item) => item);
+                                                    arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                                                ];
+                                                newData.workflowConfig.steps = arr?.filter((item: any) => item);
                                                 detailRef.current = newData;
                                                 setDetail(detailRef?.current);
                                             }
                                             setSegmentedValue(e);
                                         }}
-                                        options={['配置', '预览']}
+                                        options={['配置', '预览测试']}
                                     />
                                 </div>
                                 {segmentedValue === '配置' && detail && (
@@ -1063,7 +1091,7 @@ function CreateDetail() {
                                         tableDataMove={tableDataMove}
                                     />
                                 )}
-                                {segmentedValue === '预览' &&
+                                {segmentedValue === '预览测试' &&
                                     (detail?.type === 'MEDIA_MATRIX' ? (
                                         <Spin spinning={viewLoading} tip="Loading">
                                             <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
@@ -1071,7 +1099,6 @@ function CreateDetail() {
                                                     ref={createPlanRef}
                                                     detail={detail}
                                                     setDetail={(data) => {
-                                                        console.log(data);
                                                         detailRef.current = data;
                                                         setDetail(detailRef.current);
                                                         saveDetail();

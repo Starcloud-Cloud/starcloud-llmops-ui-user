@@ -73,7 +73,14 @@ const EditStyle = ({
     }, []);
     useEffect(() => {
         if (imageStyleData.code) {
+            console.log(imageStyleData, tempList);
+
             const data = tempList.find((v: any) => v.code === imageStyleData?.code);
+            if (imageStyleData?.example !== data?.example) {
+                const newData = _.cloneDeep(imageStyleData);
+                newData.example = data?.example;
+                setData(newData);
+            }
             setCurrentTemp({ ...data });
         }
     }, [imageStyleData, tempList]);

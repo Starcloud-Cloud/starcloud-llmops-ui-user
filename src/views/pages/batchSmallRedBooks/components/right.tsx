@@ -50,9 +50,9 @@ const Right = ({
         }
     };
     return (
-        <div>
+        <>
             {bathList?.length === 0 ? (
-                <div style={{ height: 'calc(100vh - 210px)' }} className="flex justify-center items-center">
+                <div style={{ height: '100%' }} className="flex justify-center items-center">
                     <div className="text-center">
                         {exampleList?.length > 0 ? (
                             <div className="!w-[300px] justify-center flex gap-2">
@@ -160,7 +160,7 @@ const Right = ({
                     />
                 </>
             )}
-        </div>
+        </>
     );
 };
 const RightMemo = (prevProps: any, nextProps: any) => {

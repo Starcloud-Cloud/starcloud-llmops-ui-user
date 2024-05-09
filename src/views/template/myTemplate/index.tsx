@@ -1,5 +1,5 @@
-import { Box, Grid, Pagination, TextField, Typography, Button } from '@mui/material';
-import { TreeSelect } from 'antd';
+import { Box, Pagination, TextField, Typography, Button } from '@mui/material';
+import { TreeSelect, Row, Col } from 'antd';
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
 import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
@@ -159,8 +159,8 @@ function MyTemplate() {
     const timeoutRef = useRef<any>();
     return (
         <Box>
-            <Grid container spacing={2} sx={{ mt: 2 }}>
-                <Grid item lg={3}>
+            <Row className="mt-4" gutter={[16, 16]}>
+                <Col span={6}>
                     <TextField
                         color="secondary"
                         label={t('apply.name')}
@@ -176,48 +176,9 @@ function MyTemplate() {
                         InputLabelProps={{ shrink: true }}
                         fullWidth
                     />
-                </Grid>
-                {/* <Grid item lg={3}>
-                    <FormControl fullWidth>
-                        <InputLabel color="secondary" id="categories">
-                            {t('myApp.categary')}
-                        </InputLabel>
-                        <Select
-                            labelId="categories"
-                            name="categories"
-                            multiple
-                            color="secondary"
-                            value={queryParams?.categories}
-                            onChange={(e) => {
-                                changeParams(e);
-                                clearTimeout(timeoutRef.current);
-                                timeoutRef.current = setTimeout(() => {
-                                    query(e.target);
-                                }, 200);
-                            }}
-                            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                            renderValue={(selected) => (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {selected?.map((value) => (
-                                        <Chip key={value} label={value} />
-                                    ))}
-                                </Box>
-                            )}
-                            label={t('myApp.categary')}
-                        >
-                            {categoryList?.map(
-                                (item) =>
-                                    item.name !== 'All' && (
-                                        <MenuItem key={item.code} value={item.code}>
-                                            {item.name}
-                                        </MenuItem>
-                                    )
-                            )}
-                        </Select>
-                    </FormControl>
-                </Grid> */}
-                <Grid item lg={3}>
-                    <div className="myApp relative">
+                </Col>
+                <Col span={6}>
+                    <div className="myApp relative w-full">
                         <TreeSelect
                             placeholder="请选择类目"
                             className="bg-[#f8fafc]  h-[51px] border border-solid border-[#697586ad] rounded-[6px] antdSel"
@@ -260,8 +221,8 @@ function MyTemplate() {
                             类目
                         </span>
                     </div>
-                </Grid>
-            </Grid>
+                </Col>
+            </Row>
             <Box display="flex" alignItems="end" mt={2} mb={2}>
                 <Typography variant="h3">{t('apply.recommend')}</Typography>
                 <Typography fontSize="12px" ml={1}>

@@ -55,6 +55,8 @@ const Lefts = ({
     saveLoading,
     setCollData,
     setGetData,
+    setImageMoke,
+    setMoke,
     newSave,
     setDetail,
     setPlanUid
@@ -66,6 +68,8 @@ const Lefts = ({
     saveLoading?: boolean;
     setCollData?: (data: any) => void;
     setGetData?: (data: any) => void;
+    setMoke?: (data: any) => void;
+    setImageMoke?: (data: any) => void;
     newSave: (data: any) => void;
     setDetail?: (data: any) => void;
     setPlanUid: (data: any) => void;
@@ -371,7 +375,9 @@ const Lefts = ({
             if (collData) {
                 setCollData && setCollData(collData.split(','));
             }
-            navigate('/batchSmallRedBook?appUid=' + searchParams.get('appUid') + '&uid=' + result.uid, { replace: true });
+            navigate('/batchSmallRedBook?appUid=' + searchParams.get('appUid') + '&uid=' + result.uid + '&source=' + 'MARKET', {
+                replace: true
+            });
         }
         if (flag) setTableLoading(false);
         setTotalCount(result?.totalCount);
@@ -719,7 +725,7 @@ const Lefts = ({
             const result = await getPlan({
                 appUid: searchParams.get('appUid') || searchParams.get('uid'),
                 uid: searchParams.get('appUid') ? searchParams.get('uid') : undefined,
-                source: detail ? 'APP' : 'MARKET'
+                source: searchParams.get('appUid') ? 'MARKET' : detail ? 'APP' : 'MARKET'
             });
             appRef.current.status = result?.status;
             setAppData(appRef.current);
@@ -775,7 +781,7 @@ const Lefts = ({
                           (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                       )
             ];
-            newSave(data.executeParam.appInformation);
+            newSave(data);
         } else {
             const styleData = imageRef.current?.record?.variable?.variables?.find(
                 (item: any) => item.field === 'POSTER_STYLE_CONFIG'
@@ -942,6 +948,30 @@ const Lefts = ({
             setGetData && setGetData(generateList);
         }
     }, [JSON.stringify(generateList)]);
+    useEffect(() => {
+        if (materialType && materialType === 'picture') {
+            setMoke &&
+                setMoke(
+                    fileList?.map((item) => ({
+                        pictureUrl: item?.response?.data?.url,
+                        type: 'picture'
+                    }))
+                );
+        } else if (materialType && materialType !== 'picture') {
+            setMoke &&
+                setMoke(
+                    tableData?.map((item) => ({
+                        ...item,
+                        type: materialType
+                    }))
+                );
+        }
+    }, [JSON.stringify(tableData), JSON.stringify(fileList)]);
+    useEffect(() => {
+        if (imageMater) {
+            setImageMoke && setImageMoke(imageMater);
+        }
+    }, [JSON.stringify(imageMater)]);
     return (
         <>
             <div className="relative h-full">
@@ -987,7 +1017,7 @@ const Lefts = ({
                         height: detailShow
                             ? getTenant() === ENUM_TENANT.AI
                                 ? 'calc(100% - 100px)'
-                                : 'calc(100% - 36px)'
+                                : 'calc(100% - 50px)'
                             : 'calc(100% - 14px)'
                     }}
                     className="overflow-y-auto pb-[72px] pr-2"
@@ -1227,6 +1257,7 @@ const Lefts = ({
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <AddStyle
                                     details={appData?.configuration?.appInformation}
+                                    hasAddStyle={detail || !detailShow ? false : true}
                                     getList={() => getList(true)}
                                     appUid={appData?.appUid}
                                     ref={imageRef}
@@ -1241,6 +1272,7 @@ const Lefts = ({
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <AddStyle
                                     details={appData?.configuration?.appInformation}
+                                    hasAddStyle={detail || !detailShow ? false : true}
                                     appUid={appData?.appUid}
                                     ref={imageRef}
                                     record={imageMater}
@@ -1276,7 +1308,7 @@ const Lefts = ({
                         )}
                     </Tabs>
                 </div>
-                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] pt-4 w-[calc(100%-8px)]">
+                <div className="z-[1000] absolute bottom-[-2px] flex gap-2 bg-[#fff] pt-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <>
                             <Button

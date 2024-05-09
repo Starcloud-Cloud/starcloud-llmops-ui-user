@@ -164,7 +164,7 @@ function Perform({
                                     {item.description}
                                 </Typography>
                             </Box>
-                            <AddStyle record={item} details={details} ref={addStyle} getList={getList} />
+                            <AddStyle record={item} hasAddStyle={false} details={details} ref={addStyle} getList={getList} />
                         </>
                     ) : (
                         item.flowStep?.response.style !== 'BUTTON' && (

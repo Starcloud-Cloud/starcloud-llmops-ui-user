@@ -16,9 +16,13 @@ import jsCookie from 'js-cookie';
 const BatcSmallRedBooks = forwardRef(
     ({ detail, isMyApp, setDetail }: { detail?: any; isMyApp?: boolean; setDetail: (data: any) => void }, ref) => {
         useImperativeHandle(ref, () => ({
-            getDetail: getData
+            getDetail: getData,
+            moke: moke,
+            imageMoke: imageMoke
         }));
         const [getData, setGetData] = useState<any>(null);
+        const [moke, setMoke] = useState<any[]>([]);
+        const [imageMoke, setImageMoke] = useState<any[]>([]);
         const navigate = useNavigate();
         const timer: any = useRef([]);
         //批次分页
@@ -173,7 +177,7 @@ const BatcSmallRedBooks = forwardRef(
                 }
             }
         };
-        const [bathOpen, setBathOpen] = useState(false);
+        const [bathOpen, setBathOpen] = useState(true);
         useEffect(() => {
             if (bathList?.length !== 0 && bathOpen) {
                 const bathId = bathList[0].uid;
@@ -269,6 +273,8 @@ const BatcSmallRedBooks = forwardRef(
                             pre={pre}
                             detail={detail}
                             setGetData={setGetData}
+                            setMoke={setMoke}
+                            setImageMoke={setImageMoke}
                             setCollData={setCollData}
                             newSave={newSave}
                             setDetail={setDetail}

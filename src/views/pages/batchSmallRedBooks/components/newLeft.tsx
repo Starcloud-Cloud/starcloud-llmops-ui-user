@@ -816,10 +816,11 @@ const Lefts = ({
                 totalCount,
                 configuration: {
                     imageStyleList: styleData
-                        ? styleData?.map((item: any) => ({
+                        ? styleData?.map((item: any, index: number) => ({
                               ...item,
                               id: undefined,
-                              code: item.id
+                              code: item.id,
+                              index: index + 1
                           }))
                         : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
                     materialList:

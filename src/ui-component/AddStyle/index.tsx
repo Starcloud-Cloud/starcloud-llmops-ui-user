@@ -14,9 +14,10 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
 import { appModify } from 'api/template';
+import { planModify } from '../../api/redBook/batchIndex';
 
 const AddStyle = React.forwardRef(
-    ({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar }: any, ref: any) => {
+    ({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any, ref: any) => {
         const [visible, setVisible] = useState(false);
         const [styleData, setStyleData] = useState<any>([]);
         const [selectImgs, setSelectImgs] = useState<any>(null);
@@ -70,12 +71,14 @@ const AddStyle = React.forwardRef(
                 setSwitchCheck(true);
             }
         }, [currentStyle?.system]);
-        useEffect(() => {
-            setImageVar(submitData);
-        }, [submitData]);
+
         useImperativeHandle(ref, () => ({
             record: submitData
         }));
+
+        useEffect(() => {
+            setImageVar(submitData);
+        }, [submitData]);
 
         useEffect(() => {
             if (record) {
@@ -332,7 +335,8 @@ const AddStyle = React.forwardRef(
             if (addType === 1) {
                 const copyRecord = _.cloneDeep(record);
                 const copyDetails = _.cloneDeep(details);
-                const valueString = copyRecord.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value;
+                const valueString =
+                    copyRecord.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
                 const indexList = JSON.parse(valueString)
                     .map((item: any) => item.index)
                     .filter((item: any) => typeof item === 'number')
@@ -347,7 +351,7 @@ const AddStyle = React.forwardRef(
                                 ...currentStyle,
                                 enable: true,
                                 index: index + 1,
-                                system: true,
+                                system: false,
                                 totalImageCount: 0,
                                 uuid: uuidv4()?.split('-')?.join('')
                             }
@@ -377,7 +381,17 @@ const AddStyle = React.forwardRef(
                     });
                 });
 
-                appModify(copyDetails).then((res: any) => {
+                const saveData: any = {};
+                saveData.configuration = {
+                    appInformation: copyDetails,
+                    imageStyleList: allData.configuration.imageStyleList,
+                    materialList: allData.configuration.materialList
+                };
+                saveData.source = allData.source;
+                saveData.totalCount = allData.totalCount;
+                saveData.uid = allData.uid;
+
+                planModify(saveData).then((res: any) => {
                     getList();
                 });
             }

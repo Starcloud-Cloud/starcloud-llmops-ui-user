@@ -1281,6 +1281,7 @@ const Lefts = ({
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <AddStyle
+                                    allData={appData}
                                     details={appData?.configuration?.appInformation}
                                     hasAddStyle={detail || !detailShow ? false : true}
                                     setImageVar={setImageVar}

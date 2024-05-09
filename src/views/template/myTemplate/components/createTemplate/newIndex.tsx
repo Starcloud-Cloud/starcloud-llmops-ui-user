@@ -556,7 +556,7 @@ function CreateDetail() {
             }
             const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
             if (index !== -1) {
-                arr[index] = createPlanRef?.current?.imageMoke;
+                arr[index] = createPlanRef?.current?.imageMoke || arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
             }
             arr = [
                 arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
@@ -1060,7 +1060,9 @@ function CreateDetail() {
                                                 }
                                                 const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
                                                 if (index !== -1) {
-                                                    arr[index] = createPlanRef?.current?.imageMoke;
+                                                    arr[index] =
+                                                        createPlanRef?.current?.imageMoke ||
+                                                        arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
                                                 }
                                                 arr = [
                                                     arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),

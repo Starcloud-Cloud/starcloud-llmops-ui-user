@@ -11,6 +11,7 @@ import useUserStore from 'store/user';
 import * as yup from 'yup';
 import _ from 'lodash-es';
 import '../../index.css';
+import { getTenant, ENUM_TENANT } from '../../../../../utils/permission';
 const validationSchema = yup.object({
     name: yup.string().required(t('myApp.isrequire')),
     category: yup.string().required(t('myApp.isrequire'))
@@ -25,7 +26,8 @@ const Basis = forwardRef(({ basisPre, initialValues, appModel, sort, type, setVa
             const obj = {
                 category: _.cloneDeep(formik.values).category,
                 name: _.cloneDeep(formik.values).name,
-                tags: _.cloneDeep(formik.values).tags
+                tags: _.cloneDeep(formik.values).tags,
+                example: _.cloneDeep(formik.values).example
             };
             return Object.values(obj).some((value) => !value);
         }
@@ -41,7 +43,9 @@ const Basis = forwardRef(({ basisPre, initialValues, appModel, sort, type, setVa
         categoryTree().then((res) => {
             const newData = _.cloneDeep(res);
             newData.forEach((item: any) => {
-                item.disabled = true;
+                if (getTenant() === ENUM_TENANT.AI) {
+                    item.disabled = true;
+                }
             });
             setCateTree(newData);
         });
@@ -212,6 +216,22 @@ const Basis = forwardRef(({ basisPre, initialValues, appModel, sort, type, setVa
                         </div>
                     </div>
                 )}
+                <TextField
+                    sx={{ mt: 2 }}
+                    color="secondary"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    multiline
+                    minRows={6}
+                    label="示例"
+                    name="example"
+                    value={formik.values.example}
+                    onChange={(e) => {
+                        formik.handleChange(e);
+                        setValues({ name: e.target.name, value: e.target.value });
+                    }}
+                    variant="outlined"
+                />
             </form>
         </Card>
     );

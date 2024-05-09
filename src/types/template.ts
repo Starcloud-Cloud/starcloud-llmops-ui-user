@@ -38,6 +38,7 @@ export interface Anyevent {
         description: string;
         category: string;
         tags: string[];
+        example?: string;
     };
     appModel: { label: string; value: string }[] | undefined;
     sort: undefined | string;
@@ -46,6 +47,7 @@ export interface Anyevent {
     setDetail_icon: (data: any) => void;
 }
 export type Rows = {
+    name: string;
     field: string;
     group: string;
     label: string;
@@ -57,12 +59,15 @@ export type Rows = {
     description: string;
 };
 export interface Validas {
+    title?: string;
+    handler?: string;
     variable: Rows[];
     variables: Rows[];
-    responent: { style: string };
+    responent: { readOnly?: boolean; style: string; type?: string; output?: { jsonSchema?: string } };
     buttonLabel: string;
     index: number;
     fields: string;
+    variableStyle?: any[];
     allvalida: number | null;
     editChange: (data: { num: number; label: string; value: string; flag?: boolean }) => void;
     basisChange: (data: { e: any; index: number; i: number; flag: boolean | undefined | null; values?: boolean }) => void;
@@ -78,4 +83,5 @@ export interface El {
     defaultValue: null | undefined | string | boolean;
     isShow: boolean;
     style: string;
+    field?: string;
 }

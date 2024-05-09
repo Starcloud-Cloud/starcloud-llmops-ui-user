@@ -7,10 +7,10 @@ export const getTenant = () => {
     const hostname = window.location.hostname;
     if (hostname === 'cn-test.mofaai.com.cn' || hostname === 'www.mofaai.com.cn') {
         return ENUM_TENANT.AI;
-    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn') {
+    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn' || hostname.includes('mofabang')) {
         return ENUM_TENANT.ANNOUNCE;
     } else {
-        return ENUM_TENANT.AI;
+        return ENUM_TENANT.ANNOUNCE;
     }
 };
 
@@ -27,7 +27,14 @@ export const enum ENUM_PERMISSION {
     LAYOUT_SHOW_CHAT_MODAL = 'layout_show_chat_modal', // 是否显示底部聊天弹窗
     LAYOUT_SHOW_SUBSCRIBE_BUTTON = 'layout_show_subscribe_button', // 是否显示顶部订阅按钮
     EQUITY = 'equity', //权益兑换 加入社区等
-    LOGINDESC = 'login_desc' //登录右边的描述
+    LOGINDESC = 'login_desc', //登录右边的描述
+    EXCHANGE_SHOW_COUNT = 'exchange_show_count',
+    EXCHANGE_SHOW_LABEL = 'exchange_show_label',
+    NEW_USER_ACTIVITY = 'new_user_activity', // 新手活动
+    COLLECT = 'collect', // 收藏
+    PHONE_CHECK = 'phone_check', // 手机校验
+    MARKET_VIDEO_MODAL = 'market_video_modal',
+    SPRING_SALE = 'spring_sale'
 }
 
 const list: IList = {
@@ -39,7 +46,14 @@ const list: IList = {
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: true,
     [ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON]: true,
     [ENUM_PERMISSION.EQUITY]: true,
-    [ENUM_PERMISSION.LOGINDESC]: true
+    [ENUM_PERMISSION.LOGINDESC]: true,
+    [ENUM_PERMISSION.EXCHANGE_SHOW_COUNT]: '10魔法豆 5点作图',
+    [ENUM_PERMISSION.EXCHANGE_SHOW_LABEL]: '兑换魔法AI权益',
+    [ENUM_PERMISSION.NEW_USER_ACTIVITY]: true, // 新手互动
+    [ENUM_PERMISSION.COLLECT]: true,
+    [ENUM_PERMISSION.PHONE_CHECK]: true,
+    [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: true,
+    [ENUM_PERMISSION.SPRING_SALE]: true
 };
 
 const announceList: IList = {
@@ -51,16 +65,23 @@ const announceList: IList = {
     [ENUM_PERMISSION.LAYOUT_SHOW_CHAT_MODAL]: false,
     [ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON]: false,
     [ENUM_PERMISSION.EQUITY]: false,
-    [ENUM_PERMISSION.LOGINDESC]: false
+    [ENUM_PERMISSION.LOGINDESC]: false,
+    [ENUM_PERMISSION.EXCHANGE_SHOW_COUNT]: '5矩阵豆',
+    [ENUM_PERMISSION.EXCHANGE_SHOW_LABEL]: '兑换魔法矩阵权益',
+    [ENUM_PERMISSION.NEW_USER_ACTIVITY]: false,
+    [ENUM_PERMISSION.COLLECT]: false,
+    [ENUM_PERMISSION.PHONE_CHECK]: false,
+    [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: false,
+    [ENUM_PERMISSION.SPRING_SALE]: false
 };
 
 export const getPermission = (key: ENUM_PERMISSION) => {
     const hostname = window.location.hostname;
     if (hostname === 'cn-test.mofaai.com.cn' || hostname === 'www.mofaai.com.cn') {
         return list[key];
-    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn') {
+    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn' || hostname.includes('mofabang')) {
         return announceList[key];
     } else {
-        return list[key];
+        return announceList[key];
     }
 };

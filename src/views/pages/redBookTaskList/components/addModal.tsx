@@ -340,6 +340,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                                         newData[i] = data;
                                                         setImageStyleData(newData);
                                                     }}
+                                                    setCopyData={() => {}}
                                                     typeList={typeList}
                                                 />
                                             )

@@ -1,23 +1,64 @@
-import { FormControl, InputLabel, Select, MenuItem, FormHelperText, TextField } from '@mui/material';
-import { DeleteOutlined } from '@ant-design/icons';
-import { Image, Row, Col, Switch, Input } from 'antd';
-import { useEffect, useState } from 'react';
+import { FormControl, FormHelperText, TextField } from '@mui/material';
+import { Input, Popover, Tree, Image, Row, Col, Menu, Switch, Button, Divider } from 'antd';
+import type { TreeDataNode } from 'antd';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import _ from 'lodash-es';
-import Form from 'views/pages/smallRedBook/components/form';
 import { SelectTemplateModal } from './SelectTemplateModal';
-
 import React from 'react';
 import { getImageTemplateTypes } from 'api/template';
-const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; imageStyleData: any; setData: (data: any) => void }) => {
+import VariableInput from './variableInput';
+import { BorderColor } from '@mui/icons-material';
+import { getImageTemplateJSON } from '../../../../api/template/index';
+import { v4 as uuidv4 } from 'uuid';
+const { SubMenu } = Menu;
+const EditStyle = ({
+    schemaList,
+    typeList,
+    imageStyleData,
+    setData,
+    setCopyData,
+    appData = {},
+    canEdit = false
+}: {
+    schemaList?: any[];
+    typeList: any[];
+    imageStyleData: any;
+    setData: (data: any) => void;
+    setCopyData: (data: any) => void;
+    appData?: any;
+    canEdit?: boolean;
+}) => {
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
     const [tempList, setTempList] = React.useState<any>([]);
     const [imageTypeList, setImageTypeList] = React.useState<any[]>([]);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [currentElementId, setCurrentElementId] = useState('');
+    const [currentJson, setCurrentJson] = useState<any>({});
+
+    const imgRef: any = useRef(null);
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     const handleOk = (temp: any) => {
         setCurrentTemp(temp);
         const newData = _.cloneDeep(imageStyleData);
-        newData.id = temp.id;
-        newData.variableList = temp.variableList;
+        newData.example = temp.example;
+        newData.code = temp.code;
+        newData.variableList = temp.variableList?.map((item: any) => ({
+            ...item,
+            uuid: uuidv4()?.split('-')?.join('')
+        }));
         setData(newData);
         setOpen(false);
     };
@@ -31,11 +72,51 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
         });
     }, []);
     useEffect(() => {
-        if (imageStyleData.id) {
-            const data = tempList.find((v: any) => v.id === imageStyleData?.id);
-            setCurrentTemp(data);
+        if (imageStyleData.code) {
+            console.log(imageStyleData, tempList);
+
+            const data = tempList.find((v: any) => v.code === imageStyleData?.code);
+            if (imageStyleData?.example !== data?.example) {
+                const newData = _.cloneDeep(imageStyleData);
+                newData.example = data?.example;
+                setData(newData);
+            }
+            setCurrentTemp({ ...data });
         }
     }, [imageStyleData, tempList]);
+    const [perOpen, setPerOpen] = useState<any[]>([]);
+    const [items, setItem] = useState<any[]>([]);
+    const handleCopy = () => {
+        setCopyData(imageStyleData);
+    };
+    useEffect(() => {
+        setItem(schemaList as any[]);
+    }, []);
+    const handleMenu = ({ index, newValue }: any) => {
+        const newData = _.cloneDeep(imageStyleData);
+        newData.variableList[index].value = newValue;
+        setData(newData);
+    };
+    const wrapperRef: any = useRef(null);
+    const [popoverWidth, setPopoverWidth] = useState(undefined);
+    useEffect(() => {
+        if (wrapperRef.current) {
+            setPopoverWidth(wrapperRef.current?.offsetWidth);
+        }
+    }, [wrapperRef]);
+
+    useEffect(() => {
+        if (currentTemp && currentTemp.code) {
+            getImageTemplateJSON(currentTemp.code).then((res) => {
+                const json = JSON.parse(res.json);
+                setCurrentJson({ ...json });
+            });
+        }
+    }, [currentTemp?.code]);
+
+    const scale = useMemo(() => {
+        return imgRef?.current && currentJson ? imgRef?.current?.offsetWidth / currentJson?.clipPath?.width : 1;
+    }, [currentJson, windowWidth, imgRef?.current]);
 
     return (
         <div className="flex min-h-[250px]">
@@ -43,95 +124,220 @@ const EditStyle = ({ typeList, imageStyleData, setData }: { typeList: any[]; ima
                 {open && (
                     <SelectTemplateModal open={open} imageTypeList={imageTypeList} handleClose={() => setOpen(false)} handleOk={handleOk} />
                 )}
-                <FormControl error={!imageStyleData?.id} sx={{ flex: 1 }} color="secondary" fullWidth>
-                    <TextField
-                        color="secondary"
-                        className="!cursor-pointer"
-                        id="outlined-basic"
-                        label="风格"
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true }}
-                        value={currentTemp?.name}
-                        onClick={() => setOpen(true)}
-                        error={!imageStyleData?.id}
-                    />
-                    <FormHelperText>{!imageStyleData?.id ? '图片风格是必选项' : ' '}</FormHelperText>
-                </FormControl>
-                {imageStyleData?.id && (
+                <div className="pr-4 flex justify-between">
+                    <div className="!w-[40%]">
+                        <FormControl fullWidth error={!imageStyleData?.code} sx={{ flex: 1 }} color="secondary">
+                            <TextField
+                                color="secondary"
+                                className="!cursor-pointer"
+                                id="outlined-basic"
+                                label="图片模版"
+                                variant="outlined"
+                                InputLabelProps={{ shrink: true }}
+                                value={currentTemp?.name}
+                                onClick={() => setOpen(true)}
+                                error={!imageStyleData?.code}
+                                disabled={canEdit}
+                            />
+                            <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
+                        </FormControl>
+                    </div>
+                    <Button className="mt-[7px]" type="primary" onClick={handleCopy}>
+                        复制
+                    </Button>
+                </div>
+                {imageStyleData?.code && (
                     <div>
-                        {(imageStyleData?.variableList?.some((value: any) => value?.field === 'TITLE') ||
-                            imageStyleData?.variableList?.some((value: any) => value?.field === 'SUB_TITLE')) && (
-                            <>
-                                <div className="flex items-center gap-4 min-h-[32px]">
-                                    <span className="w-[112px]">图片标题生成</span>
-                                    <Switch
-                                        checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
-                                        onChange={(e) => {
-                                            const newData = _.cloneDeep(imageStyleData);
-                                            if (e) {
-                                                newData.titleGenerateMode = 'AI';
-                                            } else {
-                                                newData.titleGenerateMode = 'DEFAULT';
-                                            }
-                                            setData(newData);
-                                        }}
-                                    />
-                                    <span className="text-[#673ab7]">
-                                        {imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}
-                                    </span>
-                                    {imageStyleData?.titleGenerateMode === 'AI' && (
-                                        <Input
-                                            className="w-[400px]"
-                                            value={imageStyleData?.titleGenerateRequirement}
-                                            onChange={(e) => {
-                                                const newData = _.cloneDeep(imageStyleData);
-                                                newData.titleGenerateRequirement = e.target.value;
-                                                setData(newData);
-                                            }}
-                                            placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
-                                        />
-                                    )}
+                        <div className="flex">
+                            <div className="w-[40%]">
+                                <div className="text-lg">图片模版示意图</div>
+                                <div className="relative w-[85%] mx-auto" ref={imgRef}>
+                                    <Image preview={false} src={currentTemp?.example + '?x-oss-process=image/quality,q_60'} />
+                                    {currentJson?.objects
+                                        ?.filter((item: any) => item.type === 'image' || item.type.includes('text'))
+                                        ?.map((item: any, index: number) => (
+                                            <div
+                                                key={index}
+                                                onMouseEnter={() => setCurrentElementId(item.id)}
+                                                onMouseLeave={() => setCurrentElementId('')}
+                                                className={`${
+                                                    item.id === currentElementId
+                                                        ? 'outline outline-offset-2 outline-blue-500 w-full'
+                                                        : 'w-full'
+                                                }`}
+                                                style={{
+                                                    width: `${item.width * item.scaleX * scale}px`,
+                                                    height: `${item.height * item.scaleY * scale}px`,
+                                                    left: `${item.left * scale}px`,
+                                                    top: `${item.top * scale}px`,
+                                                    position: 'absolute'
+                                                }}
+                                            />
+                                        ))}
                                 </div>
-                                <div className="flex items-center gap-4 min-h-[32px]">
-                                    <span>图片生成模式</span>
-                                    <Switch
-                                        checked={imageStyleData?.mode === 'SEQUENCE' ? true : false}
-                                        onChange={(e) => {
-                                            const newData = _.cloneDeep(imageStyleData);
-                                            if (e) {
-                                                newData.mode = 'SEQUENCE';
-                                            } else {
-                                                newData.mode = 'RANDOM';
-                                            }
-                                            setData(newData);
-                                        }}
-                                    />
-                                    <span className="text-[#673ab7]">{imageStyleData?.mode === 'SEQUENCE' ? '顺序生成' : '随机生成'}</span>
+                            </div>
+                            <div>
+                                <Divider type="vertical" style={{ height: '100%' }} />
+                            </div>
+                            <div className="flex-1">
+                                <div>
+                                    <div className="text-lg">图片生成配置</div>
+                                    <div className="text-xs text-black/50">
+                                        {appData?.materialType === 'picture'
+                                            ? '用上传素材的图片随机绑定到图片模板上'
+                                            : '用上传素材的图片类型字段绑定到图片模板上的图片位置'}
+                                    </div>
+                                    <div className="flex flex-wrap">
+                                        {appData?.materialType === 'picture' ? (
+                                            <>
+                                                <div className="flex items-center gap-4 min-h-[32px]">
+                                                    <span>图片生成模式</span>
+                                                    <Switch
+                                                        disabled={canEdit}
+                                                        checked={imageStyleData?.mode === 'RANDOM' ? true : false}
+                                                        onChange={(e) => {
+                                                            const newData = _.cloneDeep(imageStyleData);
+                                                            if (e) {
+                                                                newData.mode = 'RANDOM';
+                                                            } else {
+                                                                newData.mode = 'SEQUENCE';
+                                                            }
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                    <span className="text-[#673ab7]">
+                                                        {imageStyleData?.mode === 'RANDOM' ? '随机生成' : '顺序生成'}
+                                                    </span>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            imageStyleData?.variableList?.map(
+                                                (el: any, index: number) =>
+                                                    el.type === 'IMAGE' && (
+                                                        <div
+                                                            className="w-[50%] p-3"
+                                                            ref={wrapperRef}
+                                                            onClick={() => setCurrentElementId(el.field)}
+                                                            onMouseEnter={() => setCurrentElementId(el.field)}
+                                                            onMouseLeave={() => setCurrentElementId('')}
+                                                        >
+                                                            <VariableInput
+                                                                disabled={canEdit}
+                                                                styles={
+                                                                    currentElementId === el.field
+                                                                        ? {
+                                                                              border: '2px solid #673ab7'
+                                                                          }
+                                                                        : {}
+                                                                }
+                                                                open={perOpen[index]}
+                                                                setOpen={(flag) => {
+                                                                    const newData = _.cloneDeep(perOpen);
+                                                                    newData[index] = flag;
+                                                                    setPerOpen(newData);
+                                                                }}
+                                                                code="PosterActionHandler"
+                                                                popoverWidth={popoverWidth}
+                                                                handleMenu={handleMenu}
+                                                                details={appData.appReqVO}
+                                                                index={index}
+                                                                title={el?.label}
+                                                                value={el.value}
+                                                                setValue={(value) => {
+                                                                    const newData = _.cloneDeep(imageStyleData);
+                                                                    newData.variableList[index].value = value;
+                                                                    newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
+                                                                    setData(newData);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )
+                                            )
+                                        )}
+                                    </div>
                                 </div>
-                            </>
-                        )}
-                        <Row className="items-center mt-[20px]" gutter={20}>
-                            {imageStyleData?.variableList?.map(
-                                (el: any, index: number) =>
-                                    el.style === 'INPUT' && (
-                                        <Col key={index} sm={12} xs={24} md={6}>
-                                            <Form
-                                                flag={true}
-                                                index={index}
-                                                changeValue={(data: any) => {
+
+                                {imageStyleData?.variableList?.filter((item: any) => item?.type === 'TEXT')?.length > 0 && (
+                                    <div className="mt-2">
+                                        <div className="text-lg">图片文字配置</div>
+                                        <div className="text-xs text-black/50">可绑定数据或输入内容到图片模版上具体文字位置上</div>
+                                        <div className="flex items-center gap-4 min-h-[32px] ml-3">
+                                            <span>图片标题生成</span>
+                                            <Switch
+                                                disabled={canEdit}
+                                                checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
+                                                onChange={(e) => {
                                                     const newData = _.cloneDeep(imageStyleData);
-                                                    newData.variableList[data.index].value = data.value;
+                                                    if (e) {
+                                                        newData.titleGenerateMode = 'AI';
+                                                    } else {
+                                                        newData.titleGenerateMode = 'DEFAULT';
+                                                    }
                                                     setData(newData);
                                                 }}
-                                                item={el}
                                             />
-                                        </Col>
-                                    )
-                            )}
-                        </Row>
-                        <div className="float-right">
-                            <div className="text-[12px]">风格示例图</div>
-                            <Image width={200} preview={false} src={currentTemp?.example} />
+                                            <span className="text-[#673ab7]">
+                                                {imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}
+                                            </span>
+                                            {imageStyleData?.titleGenerateMode === 'AI' && (
+                                                <Input
+                                                    className="w-[400px]"
+                                                    value={imageStyleData?.titleGenerateRequirement}
+                                                    onChange={(e) => {
+                                                        const newData = _.cloneDeep(imageStyleData);
+                                                        newData.titleGenerateRequirement = e.target.value;
+                                                        setData(newData);
+                                                    }}
+                                                    placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
+                                                />
+                                            )}
+                                        </div>
+                                        <div className="flex flex-wrap">
+                                            {imageStyleData?.variableList?.map(
+                                                (el: any, index: number) =>
+                                                    el.type === 'TEXT' && (
+                                                        <div
+                                                            className="w-[50%] p-3"
+                                                            ref={wrapperRef}
+                                                            onClick={() => setCurrentElementId(el.field)}
+                                                            onMouseEnter={() => setCurrentElementId(el.field)}
+                                                            onMouseLeave={() => setCurrentElementId('')}
+                                                        >
+                                                            <VariableInput
+                                                                disabled={canEdit}
+                                                                styles={
+                                                                    currentElementId === el.field
+                                                                        ? {
+                                                                              border: '2px solid #673ab7'
+                                                                          }
+                                                                        : {}
+                                                                }
+                                                                open={perOpen[index]}
+                                                                setOpen={(flag) => {
+                                                                    const newData = _.cloneDeep(perOpen);
+                                                                    newData[index] = flag;
+                                                                    setPerOpen(newData);
+                                                                }}
+                                                                code=""
+                                                                popoverWidth={popoverWidth}
+                                                                handleMenu={handleMenu}
+                                                                details={appData.appReqVO}
+                                                                index={index}
+                                                                title={el?.label}
+                                                                value={el.value}
+                                                                setValue={(value) => {
+                                                                    const newData = _.cloneDeep(imageStyleData);
+                                                                    newData.variableList[index].value = value;
+                                                                    setData(newData);
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}

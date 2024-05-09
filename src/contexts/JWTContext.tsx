@@ -33,10 +33,10 @@ import { useLocation } from 'react-router-dom';
 import { oriregister } from 'api/login';
 
 import { discountNewUser } from 'api/vip';
+import { spaceJoin } from 'api/section';
 import { useCache, CACHE_KEY } from 'hooks/web/useCache';
 import { dispatch as dispatchs } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { spaceJoin } from 'api/section';
 const { wsCache } = useCache();
 
 // import * as LoginApi from 'api/login';
@@ -218,11 +218,10 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             setAllDetail(result);
             setPreInvite(preInvite + 1);
         };
-        if (location?.pathname !== '/invite') {
+        if (location?.pathname !== '/' && location?.pathname !== '/invite') {
             getList();
         }
     }, [pre]);
-
     if (state.isInitialized !== undefined && !state.isInitialized) {
         return <Loader />;
     }

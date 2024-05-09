@@ -1,71 +1,93 @@
-import {
-    Button,
-    CardActions,
-    CardContent,
-    Checkbox,
-    Divider,
-    FormControl,
-    FormControlLabel,
-    FormGroup,
-    FormLabel,
-    Grid,
-    IconButton,
-    Modal,
-    TextField
-} from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import React from 'react';
-import { ThreeStep } from './threeStep';
-import { getContentDetail } from 'api/redBook';
+import { Button, Modal } from 'antd';
+import ThreeStep from './threeStep';
+import { getContentDetail, getContentDetail1 } from 'api/redBook';
 
 type IAddAiModalProps = {
     open: boolean;
     handleClose: () => void;
+    changeList?: () => void;
     businessUid: string;
+    show?: boolean;
+    executeResult?: any;
 };
 
-export const DetailModal = ({ open, handleClose, businessUid }: IAddAiModalProps) => {
+export const DetailModal = ({ open, handleClose, changeList, businessUid, show, executeResult }: IAddAiModalProps) => {
     const [detail, setDetail] = useState(null);
-
+    const preRef = useRef(0);
+    const [pre, setPre] = useState(0);
+    const [dataStatus, setSataStatus] = useState(false);
+    //是否是生成记录的详情
+    const [exeDetail, setExeDetail] = useState(false);
     useEffect(() => {
-        getContentDetail(businessUid).then((res) => {
-            if (res) {
-                setDetail(res);
+        if (!executeResult) {
+            if (show) {
+                getContentDetail1(businessUid).then((res) => {
+                    if (res) {
+                        setDetail(res);
+                    }
+                });
+            } else {
+                getContentDetail(businessUid).then((res) => {
+                    if (res) {
+                        setDetail(res);
+                    }
+                });
             }
-        });
+        } else {
+            setDetail(executeResult);
+            setExeDetail(true);
+        }
     }, [businessUid]);
+    useEffect(() => {
+        if (pre) {
+            getContentDetail(businessUid).then((res) => {
+                if (res) {
+                    if (res.status !== 'EXECUTING') {
+                        setSataStatus(true);
+                        changeList && changeList();
+                    }
+                    setDetail(res);
+                }
+            });
+        }
+    }, [pre]);
 
     return (
-        <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
-            <MainCard
-                style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)'
-                }}
-                title={'详情'}
-                content={false}
-                className="sm:w-[1200px] xs:w-[300px] h-[92vh]"
-                secondary={
-                    <IconButton onClick={handleClose} size="large" aria-label="close modal">
-                        <CloseIcon fontSize="small" />
-                    </IconButton>
-                }
-            >
-                <CardContent
-                    className="h-[calc(100%-86px)]"
-                    sx={{
-                        p: 2
+        <Modal
+            width={'80%'}
+            open={open}
+            onCancel={handleClose}
+            title="详情"
+            footer={false}
+            style={{ maxWidth: '1400px', top: 30 }}
+
+            // footer={
+            //     <div>
+            //         <Button>上一篇</Button>
+            //         <Button>下一篇</Button>
+            //     </div>
+            // }
+        >
+            <div className="h-[calc(100vh-140px)] p-2">
+                <ThreeStep
+                    data={detail}
+                    show={show}
+                    pre={preRef.current}
+                    dataStatus={dataStatus}
+                    exeDetail={exeDetail}
+                    setSataStatus={setSataStatus}
+                    setPre={(data) => {
+                        preRef.current = data;
+                        setPre(preRef.current);
                     }}
-                >
-                    <ThreeStep data={detail} />
-                </CardContent>
-            </MainCard>
+                />
+            </div>
         </Modal>
     );
 };

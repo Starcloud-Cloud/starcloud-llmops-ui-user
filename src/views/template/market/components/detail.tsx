@@ -1,5 +1,5 @@
 import { Typography, Breadcrumbs, Link, Box, Card, Chip, Divider, CircularProgress } from '@mui/material';
-import { Image, Select, Popover } from 'antd';
+import { Image, Select, Popover, Popconfirm, Button, Form } from 'antd';
 // import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 // import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -8,6 +8,8 @@ import {
     metadata
     // installTemplate
 } from 'api/template';
+import { materialTemplate } from 'api/redBook/batchIndex';
+import { schemeMetadata } from 'api/redBook/copywriting';
 import { favoriteGetMarketInfo, favoriteCollect, favoriteCancel } from 'api/template/collect';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -25,14 +27,16 @@ import useCategory from 'hooks/useCategory';
 import useUserStore from 'store/user';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { GradeOutlined, Grade, ErrorOutline } from '@mui/icons-material';
+import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 interface Items {
     label: string;
     value: string;
 }
 interface AppModels {
-    aiModel?: Items[];
+    llmModelType?: Items[];
     language?: Items[];
     type?: Items[];
+    variableStyle?: Items[];
 }
 function Deatail() {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -50,8 +54,8 @@ function Deatail() {
     //类型 模型类型
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModels, setAiModels] = useState<string>('gpt-3.5-turbo-1106');
-    const aimodeRef = useRef('gpt-3.5-turbo-1106');
+    const [aiModels, setAiModels] = useState<string | undefined>(undefined);
+    const aimodeRef: any = useRef(undefined);
     //执行loading
     const [loadings, setLoadings] = useState<any[]>([]);
     const loadingsRef: any = useRef([]);
@@ -213,9 +217,33 @@ function Deatail() {
         setDetailData(newValue);
     };
     //更改变量的值
-    const variableChange = ({ e, steps, i }: any) => {
+    const variableChange = ({ e, steps, i, type, code }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.style === 'MATERIAL')) {
+            newValue.workflowConfig.steps[steps].variable.variables[
+                newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+            ].value = [];
+            stepRef.current = steps;
+            setStep(stepRef.current);
+            setTableData(type, steps);
+        }
+        if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
+            const num = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REQUIREMENT');
+            const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+            if (e.value === 'RANDOM') {
+                newValue.workflowConfig.steps[steps].variable.variables[num].value = '';
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+            } else if (e.value === 'AI_PARODY') {
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+            } else {
+                newValue.workflowConfig.steps[steps].variable.variables[num1].value = [];
+                newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+            }
+        }
         detailRef.current = newValue;
         setDetailData(newValue);
     };
@@ -243,45 +271,75 @@ function Deatail() {
             });
         }
         const setPlholder = (res: any) => {
-            const newRes = _.cloneDeep(res);
-            if (newRes.isFavorite) {
+            const result = _.cloneDeep(res);
+            if (result.isFavorite) {
                 setActive(true);
             }
-            const result = {
-                ...newRes,
-                workflowConfig: {
-                    ...newRes.workflowConfig,
-                    steps: newRes.workflowConfig.steps.map((item: any) => {
-                        return {
-                            ...item,
-                            flowStep: {
-                                ...item.flowStep,
-                                response: {
-                                    ...item.flowStep.response,
-                                    defaultValue: item.flowStep.response.answer,
-                                    answer: ''
-                                }
-                            },
-                            variable: item.variable
-                                ? {
-                                      variables: item.variable?.variables.map((el: any) => {
-                                          if (el.value) {
-                                              return {
-                                                  ...el,
-                                                  defaultValue: el.value,
-                                                  value: ''
-                                              };
-                                          } else {
-                                              return el;
-                                          }
-                                      })
-                                  }
-                                : null
-                        };
-                    })
+            if (result?.workflowConfig?.steps?.length === 1) {
+                aimodeRef.current =
+                    result?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
+                    'gpt-3.5-turbo-1106';
+                setAiModels(aimodeRef.current);
+            }
+            const newData = _.cloneDeep(result);
+            newData?.workflowConfig?.steps?.forEach((item: any) => {
+                const arr = item?.variable?.variables;
+                if (
+                    arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                    arr?.find((el: any) => el.style === 'MATERIAL') &&
+                    arr?.find((el: any) => el.style === 'MATERIAL')?.value
+                ) {
+                    let list: any;
+
+                    try {
+                        list = JSON.parse(arr?.find((el: any) => el.style === 'MATERIAL')?.value);
+                    } catch (err) {
+                        list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
+                    }
+                    arr.find((el: any) => el.style === 'MATERIAL').value = list;
                 }
-            };
-            detailRef.current = result;
+                if (arr?.find((el: any) => el.style === 'CHECKBOX')) {
+                    let list: any;
+
+                    try {
+                        list = JSON.parse(arr?.find((el: any) => el.style === 'CHECKBOX')?.value);
+                    } catch (err) {
+                        list = arr?.find((el: any) => el.style === 'CHECKBOX')?.value;
+                    }
+                    arr.find((el: any) => el.style === 'CHECKBOX').value = list;
+                }
+                if (arr?.find((el: any) => el.style === 'TAG_BOX')) {
+                    let list: any;
+
+                    try {
+                        list = JSON.parse(arr?.find((el: any) => el.style === 'TAG_BOX')?.value);
+                    } catch (err) {
+                        list = arr?.find((el: any) => el.style === 'TAG_BOX')?.value;
+                    }
+                    arr.find((el: any) => el.style === 'TAG_BOX').value = list;
+                }
+                if (arr?.find((el: any) => el.style === 'IMAGE_LIST')) {
+                    let list: any;
+
+                    try {
+                        list = JSON.parse(arr?.find((el: any) => el.style === 'IMAGE_LIST')?.value);
+                    } catch (err) {
+                        list = arr?.find((el: any) => el.style === 'IMAGE_LIST')?.value;
+                    }
+                    arr.find((el: any) => el.style === 'IMAGE_LIST').value = list;
+                }
+                if (item?.flowStep?.handler === 'PosterActionHandler' && arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')) {
+                    let list: any;
+                    try {
+                        list = JSON.parse(arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value);
+                    } catch (err) {
+                        list = arr?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
+                    }
+                    arr.find((el: any) => el.field === 'POSTER_STYLE_CONFIG').value = list;
+                }
+            });
+            detailRef.current = newData;
+            getStepMater();
             setDetailData(detailRef.current);
         };
         metadata().then((res) => {
@@ -327,6 +385,224 @@ function Deatail() {
     const { Option } = Select;
     //过滤出category
     const categoryList = marketStore((state) => state.categoryList);
+    const getImage = (active: string) => {
+        let image;
+        try {
+            image = require('../../../../assets/images/category/' + active + '.svg');
+        } catch (_) {
+            image =
+                'data:image/png;base64,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';
+        }
+        return image;
+    };
+
+    //获取哪个步骤有素材
+    const stepMarRef = useRef<any[]>([]);
+    const [stepMaterial, setStepMaterial] = useState<any[]>([]);
+    const setTableData = async (type: string, steps: number) => {
+        const res = await materialTemplate(type);
+        const newList = _.cloneDeep(stepMarRef.current);
+        newList[steps] = getHeaders(getHeader(res?.fieldDefine, steps), steps);
+        stepMarRef.current = newList;
+        setStepMaterial(stepMarRef.current);
+    };
+    const getStepMater = async () => {
+        const arr: any[] = [];
+        const newList = detailRef.current?.workflowConfig?.steps.map((item: any) => {
+            const arr = item?.variable?.variables;
+            return arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value;
+        });
+        const allper = newList?.map(async (el: any, index: number) => {
+            if (el) {
+                const res = await materialTemplate(el);
+                arr[index] = getHeader(res?.fieldDefine, index);
+            } else {
+                arr[index] = undefined;
+            }
+        });
+        await Promise.all(allper);
+        stepMarRef.current = arr;
+        setStepMaterial(stepMarRef?.current);
+    };
+    //素材类型的请求接口
+    const stepRef = useRef(0);
+    const [step, setStep] = useState(0);
+    const [materialType, setMaterialType] = useState('');
+    const refersSourceRef = useRef<any>(null);
+    const [refersSource, setRefersSource] = useState<any[]>([]);
+    //获取数据表头
+    const getHeader = (data: any, i: number) => {
+        const newList = data.map((item: any) => ({
+            title: item.desc,
+            align: 'center',
+            width: 200,
+            dataIndex: item.fieldName,
+            render: (_: any, row: any) => (
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    <div className="line-clamp-5">
+                        {item.type === 'image' ? (
+                            row[item.fieldName] ? (
+                                <Image
+                                    fallback={
+                                        'data:image/png;base64,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'
+                                    }
+                                    width={50}
+                                    height={50}
+                                    preview={false}
+                                    src={row[item.fieldName]}
+                                />
+                            ) : (
+                                <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
+                            )
+                        ) : item.fieldName === 'source' ? (
+                            <>
+                                {row[item.fieldName] === 'OTHER'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'OTHER')?.label
+                                    : row[item.fieldName] === 'SMALL_RED_BOOK'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'SMALL_RED_BOOK')?.label
+                                    : row[item.fieldName]}
+                            </>
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
+                </div>
+            ),
+            required: item.required,
+            type: item.type
+        }));
+
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    const getHeaders = (data: any, i: number) => {
+        const newList = data;
+        newList?.splice(newList?.length - 1, 1);
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    //删除
+    const handleDel = (index: number, i: number) => {
+        if (i) {
+            stepRef.current = i;
+            setStep(stepRef.current);
+        }
+        const newValue = _.cloneDeep(detailRef.current);
+        const newList =
+            newValue.workflowConfig.steps[i].variable.variables[
+                newValue.workflowConfig.steps[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+            ].value;
+        newList.splice(index, 1);
+        detailRef.current = newValue;
+        setDetailData(detailRef.current);
+    };
+    const [form] = Form.useForm();
+    const [title, setTitle] = useState('');
+    //编辑
+    const [editOpen, setEditOpen] = useState(false);
+    const [rowIndex, setRowIndex] = useState(0);
+    const handleEdit = (row: any, index: number, i?: number) => {
+        if (i || i === 0) {
+            let newData = _.cloneDeep(stepRef.current);
+            newData = i;
+            stepRef.current = newData;
+            setStep(stepRef.current);
+        }
+        setTitle('编辑');
+        setMaterialType(row.type);
+        form.setFieldsValue(row);
+        setRowIndex(index);
+        setEditOpen(true);
+    };
+    const formOk = (result: any) => {
+        const newValue = _.cloneDeep(detailRef.current);
+        const pubilcList = newValue.workflowConfig.steps[stepRef.current].variable.variables;
+        let newList = pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')]?.value;
+        if (title === '编辑') {
+            newList.splice(rowIndex, 1, { ...result, type: materialType });
+        } else {
+            if (!newList) {
+                newList = [];
+            }
+            newList.unshift({
+                ...result,
+                type: materialType
+            });
+        }
+        pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')].value = newList;
+        detailRef.current = newValue;
+        setDetailData(detailRef.current);
+        setEditOpen(false);
+        form.resetFields();
+    };
+    useEffect(() => {
+        schemeMetadata().then((res) => {
+            refersSourceRef.current = res.refersSource;
+            setRefersSource(refersSourceRef.current);
+        });
+    }, []);
     return (
         <Card ref={ref} elevation={2} sx={{ padding: 2, position: 'relative' }}>
             <div className="absolute right-[20px] top-[20px]">
@@ -430,12 +706,7 @@ function Deatail() {
             <Box display="flex" justifyContent="space-between" alignItems="end">
                 <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
                     {detailData?.icon && (
-                        <Image
-                            preview={false}
-                            className="rounded-lg overflow-hidden"
-                            height={60}
-                            src={require('../../../../assets/images/category/' + detailData?.icon + '.svg')}
-                        />
+                        <Image preview={false} className="rounded-lg overflow-hidden" height={60} src={getImage(detailData?.icon)} />
                     )}
                     <Box>
                         <Box>
@@ -469,7 +740,7 @@ function Deatail() {
                 >
                     {detailData.installStatus?.installStatus === 'UNINSTALLED' ? t('market.down') : t('market.ins')}
                 </LoadingButton> */}
-                {appModels.aiModel && (
+                {detailData?.workflowConfig?.steps?.length === 1 && (
                     <div className="flex items-center">
                         <Popover
                             title="模型介绍"
@@ -500,7 +771,7 @@ function Deatail() {
                                 setAiModels(value);
                             }}
                         >
-                            {appModels.aiModel.map((item: any) => (
+                            {appModels?.llmModelType?.map((item: any) => (
                                 <Option key={item.value} value={item.value}>
                                     {item.label}
                                 </Option>
@@ -511,6 +782,14 @@ function Deatail() {
             </Box>
             <Divider sx={{ my: 1, borderColor: isDarkMode ? '#bdc8f0' : '#ccc' }} />
             <CarryOut
+                columns={stepMaterial}
+                setEditOpen={setEditOpen}
+                setStep={(data: any) => {
+                    stepRef.current = data;
+                    setStep(stepRef.current);
+                }}
+                setMaterialType={setMaterialType}
+                setTitle={setTitle}
                 config={detailData}
                 isShows={isShows}
                 isDisables={isDisables}
@@ -533,6 +812,18 @@ function Deatail() {
                     from={from}
                     handleClose={() => setTokenOpen(false)}
                     title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+                />
+            )}
+            {editOpen && (
+                <FormModal
+                    title={title}
+                    materialType={materialType}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={stepMarRef.current[stepRef.current]}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={refersSource}
                 />
             )}
         </Card>

@@ -2,10 +2,15 @@ import { Box, Grid, Typography, Divider } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { t } from 'hooks/web/useI18n';
 import './index.css';
-import Perform from './perform';
+import Perform from './newPerform';
 import formatDate from 'hooks/useDate';
 
 function CarryOut({
+    columns,
+    setEditOpen,
+    setStep,
+    setMaterialType,
+    setTitle,
     config,
     changeData,
     loadings,
@@ -26,8 +31,14 @@ function CarryOut({
                     <Typography variant="h5" sx={{ fontSize: '1.1rem' }} mb={1}>
                         {config?.description}
                     </Typography>
-                    {config && (
+                    {config && columns?.length > 0 && (
                         <Perform
+                            columns={columns}
+                            setEditOpen={setEditOpen}
+                            setStep={setStep}
+                            setMaterialType={setMaterialType}
+                            setTitle={setTitle}
+                            details={config}
                             config={config?.workflowConfig}
                             detaData={config}
                             changeConfigs={changeConfigs}
@@ -50,20 +61,10 @@ function CarryOut({
                                 alignItems: 'center',
                                 width: 'fit-content',
                                 bgcolor: 'background.paper',
-                                color: 'text.secondary',
-                                '& svg': {
-                                    m: 1.5
-                                },
-                                '& hr': {
-                                    mx: 0.5
-                                }
+                                color: 'text.secondary'
                             }}
                         >
                             {t('market.version')}:{config?.version}
-                            {/* <Divider orientation="vertical" flexItem /> */}
-                            {/* {t('market.plugLevel')}:2 */}
-                            {/* <Divider orientation="vertical" flexItem /> */}
-                            {/* {t('market.plugVersion')}:3 */}
                             <Divider orientation="vertical" flexItem />
                             {searchParams.get('type') === 'collect'
                                 ? `收藏时间:${formatDate(config?.favoriteTime)}`

@@ -30,7 +30,7 @@ import { shouldForwardProp } from '@mui/system';
 
 // styles
 const PopperStyle = styled(Popper, { shouldForwardProp })(({ theme }) => ({
-    zIndex: 1100,
+    zIndex: 10,
     width: '99%',
     top: '-55px !important',
     padding: '0 12px',

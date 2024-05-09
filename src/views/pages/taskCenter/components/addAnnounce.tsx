@@ -6,12 +6,13 @@ import MainCard from 'ui-component/cards/MainCard';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { planPage } from 'api/redBook/batchIndex';
+import { planPages } from 'api/redBook/batchIndex';
 import { contentPage, singleAdd } from 'api/redBook/task';
 import { DetailModal } from '../../redBookContentList/component/detailModal';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import GradeIcon from '@mui/icons-material/Grade';
 import { batchPages } from 'api/redBook/batchIndex';
+import dayjs from 'dayjs';
 
 const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (data: boolean) => void }) => {
     const location = useLocation();
@@ -30,7 +31,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         setDetailOpen(true);
                     }}
                 >
-                    {row.copyWritingTitle}
+                    {row?.executeResult?.copyWriting?.title}
                 </span>
             )
         },
@@ -48,16 +49,16 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
             title: '图片数量',
             align: 'center',
             width: 100,
-            dataIndex: 'pictureNum'
+            render: (_, row) => <div>{row?.executeResult?.imageList?.length}</div>
         },
         {
             title: '图片内容',
             align: 'center',
             dataIndex: 'pictureContent',
             render: (_, row) => (
-                <div className="flex justify-center flex-wrap">
-                    {row.pictureContent.map((item: any) => (
-                        <div className="w-[50px] h-[50px] mr-[10px]">
+                <div className="w-[200px] overflow-x-auto flex gap-2">
+                    {row?.executeResult?.imageList?.map((item: any) => (
+                        <div className="w-[50px] h-[50px]">
                             <Image width={50} height={50} preview={false} src={item.url} />
                         </div>
                     ))}
@@ -66,7 +67,7 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         },
         {
             title: '生成时间',
-            render: (_, row) => <div>{formatDate(row.pictureStartTime)}</div>
+            render: (_, row) => <div>{formatDate(row.startTime)}</div>
         }
     ];
     const [addTable, setAddTable] = useState<any[]>([]);
@@ -89,9 +90,10 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         const result = await contentPage({
             pageNo: addCurrent,
             pageSize: addPageSize,
-            batch,
-            status: 'execute_success',
+            batchUid: batch,
+            status: 'success',
             claim: false,
+            desc: true,
             planUid: values
         });
         setLoading(false);
@@ -110,8 +112,8 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
         }
     }, [addOpen, addCurrent, addPageSize, values, batch]);
     useEffect(() => {
-        planPage({ pageNo: 1, pageSize: 10000 }).then((res) => {
-            setValueList(res?.list);
+        planPages().then((res) => {
+            setValueList(res);
         });
     }, []);
     const handleSave = async () => {
@@ -146,17 +148,18 @@ const AddAnnounce = ({ addOpen, setAddOpen }: { addOpen: boolean; setAddOpen: (d
                         <Select labelId="plans" value={values} label="创作计划" onChange={(e: any) => setValue(e.target.value)}>
                             {valueList?.map((item: any) => (
                                 <MenuItem key={item.uid} value={item.uid}>
-                                    {item.name}
+                                    {item?.configuration?.appInformation?.name}（{item?.creatorName}）
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
                     <FormControl sx={{ ml: 2, mb: 2, width: '300px' }} color="secondary" size="small">
-                        <InputLabel id="batch">创作批次</InputLabel>
-                        <Select labelId="batch" value={batch} label="创作批次" onChange={(e: any) => setBatch(e.target.value)}>
+                        <InputLabel id="uid">创作批次</InputLabel>
+                        <Select labelId="uid" value={batch} label="创作批次" onChange={(e: any) => setBatch(e.target.value)}>
                             {batchList?.map((item: any) => (
-                                <MenuItem key={item.batch} value={item.batch}>
-                                    {item.batch}（{item.totalCount}）
+                                <MenuItem key={item.uid} value={item.uid}>
+                                    {dayjs(item.startTime).format('YYYY-MM-DD hh:mm:ss')}&nbsp;&nbsp;{item.id}&nbsp;&nbsp;（
+                                    {item.totalCount}）
                                 </MenuItem>
                             ))}
                         </Select>

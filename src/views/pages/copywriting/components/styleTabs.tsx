@@ -2,30 +2,68 @@ import { Tabs } from 'antd';
 import { useState, useRef } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import EditStyle from '../../batchSmallRedBooks/components/EditStyle';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const StyleTabs = ({
+    schemaList,
     typeList,
     imageStyleData,
-    setDetailData
+    setDetailData,
+    appData,
+    canEdit = false
 }: {
+    schemaList?: any[];
     typeList: any[];
     imageStyleData: any[];
     setDetailData: (data: any) => void;
+    appData: any;
+    canEdit?: boolean;
 }) => {
+    console.log(appData, 'appData');
     const [activeKey, setActiveKey] = useState('0');
-    const newTabIndex = useRef(1);
     const onChange = (newActiveKey: string) => {
         setActiveKey(newActiveKey);
     };
-    const add = () => {
+    const digui = () => {
+        const newData = imageStyleData.map((i: any) => i.name.split(' ')[1]);
+        if (!newData || newData?.every((i: any) => !i)) {
+            return 1;
+        }
+        return (
+            newData
+                ?.map((item) => Number(item))
+                ?.sort((a: any, b: any) => {
+                    if (typeof a === 'number' && typeof b === 'number' && !isNaN(a) && !isNaN(b)) {
+                        return b - a;
+                    } else if (isNaN(a)) {
+                        return 1; // 把NaN排到最后
+                    } else if (isNaN(b)) {
+                        return -1; // 同理，保证NaN在其他正常数值后
+                    } else {
+                        // 对非数值类型进行某种比较或直接返回0保持原顺序
+                        return a > b ? 1 : a < b ? -1 : 0;
+                    }
+                })[0] *
+                1 +
+            1
+        );
+    };
+    const add = (data?: any) => {
         const newPanes = _.cloneDeep(imageStyleData);
         newPanes.push({
-            id: '',
-            name: `图片 ${newTabIndex.current++}`,
-            key: newTabIndex.current.toString(),
-            titleGenerateMode: 'DEFAULT',
-            variableList: []
+            code: data?.code || '',
+            name: `图片 ${digui()}`,
+            key: digui().toString(),
+            mode: 'SEQUENCE',
+            uuid: uuidv4()?.split('-')?.join(''),
+            titleGenerateMode: data?.titleGenerateMode || 'DEFAULT',
+            example: data?.example || '',
+            variableList:
+                data?.variableList?.map((item: any) => ({
+                    ...item,
+                    uuid: uuidv4()?.split('-')?.join('')
+                })) || []
         });
         setDetailData(newPanes);
         setActiveKey((newPanes.length - 1).toString());
@@ -60,6 +98,7 @@ const StyleTabs = ({
     return (
         <>
             <Tabs
+                hideAdd={canEdit}
                 className="mt-[20px]"
                 type="editable-card"
                 onChange={onChange}
@@ -70,19 +109,23 @@ const StyleTabs = ({
                         label: (
                             <div>
                                 {item.name}
-                                {!item.id && <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />}
+                                {!item.code && <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />}
                             </div>
                         ),
                         key: i.toString(),
-                        closable: i === 0 ? false : true,
+                        closable: canEdit ? false : i === 0 ? false : true,
                         children: (
                             <EditStyle
+                                appData={appData}
+                                schemaList={schemaList}
                                 imageStyleData={item}
+                                canEdit={canEdit}
                                 setData={(data: any) => {
                                     const newData = _.cloneDeep(imageStyleData);
                                     newData[i] = data;
                                     setDetailData(newData);
                                 }}
+                                setCopyData={add}
                                 typeList={typeList}
                             />
                         )

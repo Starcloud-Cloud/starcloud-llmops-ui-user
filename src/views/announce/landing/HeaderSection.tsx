@@ -44,6 +44,7 @@ import useRouteStore from 'store/router';
 import { DASHBOARD_PATH } from 'config';
 import { format } from 'date-fns';
 import dayjs from 'dayjs';
+import useAuth from 'hooks/useAuth';
 
 // styles
 const HeaderImage = styled('img')(({ theme }) => ({
@@ -88,11 +89,14 @@ const HeaderSection = () => {
     const [version, setVersion] = useState('');
     const [macDownload, setMacDownload] = useState('');
     const [releaseDate, setReleaseDate] = useState('');
+    const { isLoggedIn } = useAuth();
+    console.log('🚀 ~ HeaderSection ~ isLoggedIn:', isLoggedIn);
 
     const handleScroll = () => {
         window.scrollTo(0, window.innerHeight - 80);
     };
 
+    console.log(releaseDate, 'releaseDate');
     const headerSX = { fontSize: { xs: '1rem', sm: '2rem', md: '2rem', lg: '2rem' } };
 
     const HeaderAnimationImagememo = useMemo(
@@ -117,7 +121,7 @@ const HeaderSection = () => {
 
     useEffect(() => {
         (async () => {
-            const response = await fetch('https://mofaai-juzhen.oss-cn-hangzhou.aliyuncs.com/client/latest-mac.yml');
+            const response = await fetch(`${process.env.REACT_APP_MOFA_PUSH_CLIENT_URL}/latest-mac.yml`);
             const text = await response.text();
             let match = text.match(/url: (https?:\/\/[^\s]+)/g);
             let secondUrl = match && match[0].replace('url: ', '');
@@ -129,7 +133,7 @@ const HeaderSection = () => {
             if (version) {
                 setVersion(version);
             }
-            let matchReleaseDate = text.match(/releaseDate: "([^"]+)/);
+            let matchReleaseDate = text.match(/releaseDate: '([^']+)/);
             let releaseDate = matchReleaseDate && matchReleaseDate[1];
             if (releaseDate) {
                 setReleaseDate(releaseDate);
@@ -138,6 +142,10 @@ const HeaderSection = () => {
     }, []);
 
     const macClientDownload = async () => {
+        if (!isLoggedIn) {
+            navigate('/login');
+            return;
+        }
         window.open(macDownload);
     };
 

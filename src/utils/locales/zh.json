@@ -837,7 +837,8 @@
     "categoryVaid": "类目是必填的",
     "delApp": "删除应用",
     "json_textarea": "JSON 文本框",
-    "json": " JSON 文本框"
+    "json": " JSON 文本框",
+    "material": "物料库"
   },
   "textToImage": {
     "Enhance": "增强",

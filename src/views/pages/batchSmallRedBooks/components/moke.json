@@ -1,0 +1,2923 @@
+{
+    "uid": "8e793621bdd74eb8b1775b8d037a91e4",
+    "name": "书单号仿写",
+    "model": "COMPLETION",
+    "spell": "shudanhaofangxie",
+    "spellSimple": "schfx",
+    "type": "MEDIA_MATRIX",
+    "source": "WEB",
+    "sort": 1,
+    "category": "COMMON",
+    "tags": [
+        "Writing",
+        "小红书",
+        "Custom",
+        "PracticalConverter"
+    ],
+    "scenes": [
+        "WEB_ADMIN",
+        "WEB_MARKET"
+    ],
+    "images": [
+        "https://download.hotsalecloud.com/mofaai/images/category/common.jpg"
+    ],
+    "icon": "common",
+    "workflowConfig": {
+        "steps": [
+            {
+                "field": "上传素材",
+                "name": "上传素材",
+                "buttonLabel": "上传素材",
+                "description": "上传素材步骤。应用中可以存在一个此步骤。",
+                "flowStep": {
+                    "name": "上传素材",
+                    "type": "WORKFLOW",
+                    "handler": "MaterialActionHandler",
+                    "response": {
+                        "type": "TEXT",
+                        "style": "TEXTAREA",
+                        "isShow": false,
+                        "readOnly": false
+                    },
+                    "description": "上传素材步骤。应用中可以存在一个此步骤。",
+                    "isAuto": true,
+                    "isCanEditStep": true,
+                    "version": 1,
+                    "tags": [
+                        "Material"
+                    ],
+                    "scenes": [
+                        "WEB_ADMIN",
+                        "WEB_MARKET"
+                    ],
+                    "variable": {
+                        "variables": []
+                    },
+                    "icon": "material"
+                },
+                "variable": {
+                    "variables": [
+                        {
+                            "label": "素材类型",
+                            "field": "MATERIAL_TYPE",
+                            "type": "TEXT",
+                            "style": "SELECT",
+                            "group": "SYSTEM",
+                            "order": 1,
+                            "defaultValue": "bookList",
+                            "value": "bookList",
+                            "isShow": false,
+                            "isPoint": true,
+                            "description": "素材类型",
+                            "options": [
+                                {
+                                    "label": "书单",
+                                    "value": "bookList"
+                                },
+                                {
+                                    "label": "合同模板",
+                                    "value": "contract"
+                                },
+                                {
+                                    "label": "普通笔记",
+                                    "value": "note"
+                                },
+                                {
+                                    "label": "普通笔记标题",
+                                    "value": "noteTitle"
+                                },
+                                {
+                                    "label": "普通笔记内容",
+                                    "value": "noteContent"
+                                },
+                                {
+                                    "label": "人设",
+                                    "value": "persona"
+                                },
+                                {
+                                    "label": "图片",
+                                    "value": "picture"
+                                },
+                                {
+                                    "label": "语录号",
+                                    "value": "quotation"
+                                },
+                                {
+                                    "label": "小吃配方",
+                                    "value": "snack"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "素材列表",
+                            "field": "MATERIAL_LIST",
+                            "type": "TEXT",
+                            "style": "MATERIAL",
+                            "group": "SYSTEM",
+                            "order": 1,
+                            "defaultValue": "",
+                            "value": "[]",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "素材列表"
+                        }
+                    ]
+                }
+            },
+            {
+                "field": "标题生成",
+                "name": "标题生成",
+                "buttonLabel": "生成内容",
+                "description": "生成自定义内容。应用中可以存在多个自定义步骤。",
+                "flowStep": {
+                    "name": "Content",
+                    "type": "WORKFLOW",
+                    "handler": "CustomActionHandler",
+                    "response": {
+                        "type": "JSON",
+                        "style": "TEXTAREA",
+                        "isShow": true,
+                        "readOnly": false,
+                        "answer": "",
+                        "output": {
+                            "data": null,
+                            "jsonSchema": "{\n  \"type\" : \"object\",\n  \"properties\" : {\n    \"data\" : {\n      \"type\" : \"string\",\n      \"description\" : \"返回结果\"\n    }\n  }\n}"
+                        }
+                    },
+                    "description": "Content",
+                    "isAuto": true,
+                    "isCanEditStep": true,
+                    "version": 1,
+                    "tags": [
+                        "Custom"
+                    ],
+                    "scenes": [
+                        "WEB_ADMIN",
+                        "WEB_MARKET"
+                    ],
+                    "variable": {
+                        "variables": [
+                            {
+                                "label": "推荐模型",
+                                "field": "model",
+                                "type": "TEXT",
+                                "style": "SELECT",
+                                "group": "MODEL",
+                                "order": 1,
+                                "defaultValue": "gpt-3.5-turbo-1106",
+                                "value": "qwen-turbo",
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "选择一个AI模型来生成您想要的内容。",
+                                "options": [
+                                    {
+                                        "label": "默认模型3.5",
+                                        "value": "gpt-3.5-turbo-1106"
+                                    },
+                                    {
+                                        "label": "默认模型4.0",
+                                        "value": "gpt-4-1106-preview"
+                                    },
+                                    {
+                                        "label": "通义千问",
+                                        "value": "qwen-turbo"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "最大返回Tokens",
+                                "field": "max_tokens",
+                                "type": "TEXT",
+                                "style": "INPUT",
+                                "group": "MODEL",
+                                "order": 2,
+                                "defaultValue": 1000,
+                                "value": 1000,
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "在聊天完成中生成的令牌的最大数量。输入令牌和生成令牌的总长度受模型上下文长度的限制。"
+                            },
+                            {
+                                "label": "温度值",
+                                "field": "temperature",
+                                "type": "TEXT",
+                                "style": "INPUT",
+                                "group": "MODEL",
+                                "order": 3,
+                                "defaultValue": 0.7,
+                                "value": 0.7,
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "采样温度在0到2之间。较高的值(如0.8)将使输出更加随机，而较低的值(如0.2)将使输出更加集中和确定。"
+                            },
+                            {
+                                "label": "Prompt",
+                                "field": "prompt",
+                                "type": "TEXT",
+                                "style": "TEXTAREA",
+                                "group": "MODEL",
+                                "order": 4,
+                                "defaultValue": "",
+                                "value": "你现在是一位小红书创作者，我会给你参考一些优秀文案，你会学习并模仿，然后生成一条针对参考文案进行说明的内容。\n\n## 参考文案：\n```json\n{{REFERS}}\n```\n## 仿照的写一条文案\n1. 请先观察参考文案, 然后随机参考一条文案进行仿写生成一条小红书文案内容。\n2. 生成的内容必须同时满足```{{REQUIREMENT}}```。\n3. 生成每条文案的内容内容不要重复，可以进行必要的修改，保证每条文案内容开始语不相似。\n\n\n4. Your response should be in JSON format.\n  Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\n  Do not include markdown code blocks in your response.\n  Here is the JSON Schema instance your output must adhere to:\n```\n{{STEP_RESP_JSONSCHEMA}}\n```\n\n5. 保证生成的内容完全像人类写的和人类的语气，绝对不会被发现是AI生成的。\n\n----------\n\n## role\n你现在是一位小红书创作者，我会给你一些要求，然后生成内容。\n\n## 要求\n{{REQUIREMENT}}\n\n## flows\n1. 生成符合小红书平台的内容。\n2. 生成的内容必须满足“生成要求”。\n3. 保证生成的内容完全像人类写的和人类的语气，绝对不会被发现是AI生成的。\n4. Your response should be in JSON format.\n  Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\n  Do not include markdown code blocks in your response.\n  Here is the JSON Schema instance your output must adhere to:\n```\n{{STEP_RESP_JSONSCHEMA}}\n```\n## 按照flows过程生成内容，不需要别的内容，注意直接输出内容不要前缀。",
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "生成内容的提示符。最大长度为1000个字符。"
+                            }
+                        ]
+                    },
+                    "icon": "content"
+                },
+                "variable": {
+                    "variables": [
+                        {
+                            "label": "生成模式",
+                            "field": "GENERATE_MODE",
+                            "type": "TEXT",
+                            "style": "SELECT",
+                            "group": "SYSTEM",
+                            "order": 100,
+                            "defaultValue": "AI_PARODY",
+                            "value": "AI_CUSTOM",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "生成模式",
+                            "options": [
+                                {
+                                    "label": "随机获取",
+                                    "value": "RANDOM"
+                                },
+                                {
+                                    "label": "AI仿写",
+                                    "value": "AI_PARODY"
+                                },
+                                {
+                                    "label": "AI自定义",
+                                    "value": "AI_CUSTOM"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "AI参考内容随机获取数量",
+                            "field": "REFERS_COUNT",
+                            "type": "TEXT",
+                            "style": "INPUT",
+                            "group": "SYSTEM",
+                            "order": 1040,
+                            "defaultValue": 3,
+                            "value": 3,
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "AI参考内容随机获取数量"
+                        },
+                        {
+                            "label": "素材类型",
+                            "field": "MATERIAL_TYPE",
+                            "type": "TEXT",
+                            "style": "SELECT",
+                            "group": "SYSTEM",
+                            "order": 10000,
+                            "defaultValue": "",
+                            "value": "noteTitle",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "素材类型",
+                            "options": [
+                                {
+                                    "label": "普通笔记",
+                                    "value": "note"
+                                },
+                                {
+                                    "label": "普通笔记标题",
+                                    "value": "noteTitle"
+                                },
+                                {
+                                    "label": "普通笔记内容",
+                                    "value": "noteContent"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "参考素材",
+                            "field": "REFERS",
+                            "type": "TEXT",
+                            "style": "MATERIAL",
+                            "group": "SYSTEM",
+                            "order": 101,
+                            "defaultValue": "",
+                            "value": "[]",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "参考素材"
+                        },
+                        {
+                            "label": "文案生成要求",
+                            "field": "REQUIREMENT",
+                            "type": "TEXT",
+                            "style": "TEXTAREA",
+                            "group": "SYSTEM",
+                            "order": 103,
+                            "defaultValue": "",
+                            "value": "总结这些书的共性，为这些书写一条推荐的小红书笔记标题，要求10字以内；\n:\"《{{上传素材.docs[0].bookName}}》、\n《{{上传素材.docs[1].bookName}}》、\n《{{上传素材.docs[2].bookName}}》、\n《{{上传素材.docs[3].bookName}}》、\n《{{上传素材.docs[4].bookName}}》、\n《{{上传素材.docs[5].bookName}}》、\n《{{上传素材.docs[6].bookName}}》、\n《{{上传素材.docs[7].bookName}}》\"。",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "文案生成要求"
+                        },
+                        {
+                            "label": "参考素材JsonSchema",
+                            "field": "MATERIAL_JSONSCHEMA",
+                            "type": "TEXT",
+                            "style": "TEXTAREA",
+                            "group": "SYSTEM",
+                            "order": 10001,
+                            "defaultValue": "",
+                            "value": "",
+                            "isShow": false,
+                            "isPoint": true,
+                            "description": "参考素材JsonSchema"
+                        },
+                        {
+                            "label": "步骤返回JsonSchema",
+                            "field": "STEP_RESP_JSONSCHEMA",
+                            "type": "TEXT",
+                            "style": "TEXTAREA",
+                            "group": "SYSTEM",
+                            "order": 10002,
+                            "defaultValue": "",
+                            "value": "",
+                            "isShow": false,
+                            "isPoint": true,
+                            "description": "步骤返回JsonSchema"
+                        }
+                    ]
+                }
+            },
+            {
+                "field": "内容生成",
+                "name": "内容生成",
+                "buttonLabel": "生成内容",
+                "description": "生成自定义内容。应用中可以存在多个自定义步骤。",
+                "flowStep": {
+                    "name": "Content",
+                    "type": "WORKFLOW",
+                    "handler": "CustomActionHandler",
+                    "response": {
+                        "type": "JSON",
+                        "style": "TEXTAREA",
+                        "isShow": true,
+                        "readOnly": false,
+                        "answer": "",
+                        "output": {
+                            "data": null,
+                            "jsonSchema": "{\n  \"type\" : \"object\",\n  \"properties\" : {\n    \"data\" : {\n      \"type\" : \"string\",\n      \"description\" : \"返回结果\"\n    }\n  }\n}"
+                        }
+                    },
+                    "description": "Content",
+                    "isAuto": true,
+                    "isCanEditStep": true,
+                    "version": 1,
+                    "tags": [
+                        "Custom"
+                    ],
+                    "scenes": [
+                        "WEB_ADMIN",
+                        "WEB_MARKET"
+                    ],
+                    "variable": {
+                        "variables": [
+                            {
+                                "label": "推荐模型",
+                                "field": "model",
+                                "type": "TEXT",
+                                "style": "SELECT",
+                                "group": "MODEL",
+                                "order": 1,
+                                "defaultValue": "gpt-3.5-turbo-1106",
+                                "value": "qwen-turbo",
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "选择一个AI模型来生成您想要的内容。",
+                                "options": [
+                                    {
+                                        "label": "默认模型3.5",
+                                        "value": "gpt-3.5-turbo-1106"
+                                    },
+                                    {
+                                        "label": "默认模型4.0",
+                                        "value": "gpt-4-1106-preview"
+                                    },
+                                    {
+                                        "label": "通义千问",
+                                        "value": "qwen-turbo"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "最大返回Tokens",
+                                "field": "max_tokens",
+                                "type": "TEXT",
+                                "style": "INPUT",
+                                "group": "MODEL",
+                                "order": 2,
+                                "defaultValue": 1000,
+                                "value": 1000,
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "在聊天完成中生成的令牌的最大数量。输入令牌和生成令牌的总长度受模型上下文长度的限制。"
+                            },
+                            {
+                                "label": "温度值",
+                                "field": "temperature",
+                                "type": "TEXT",
+                                "style": "INPUT",
+                                "group": "MODEL",
+                                "order": 3,
+                                "defaultValue": 0.7,
+                                "value": 0.7,
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "采样温度在0到2之间。较高的值(如0.8)将使输出更加随机，而较低的值(如0.2)将使输出更加集中和确定。"
+                            },
+                            {
+                                "label": "Prompt",
+                                "field": "prompt",
+                                "type": "TEXT",
+                                "style": "TEXTAREA",
+                                "group": "MODEL",
+                                "order": 4,
+                                "defaultValue": "",
+                                "value": "你现在是一位小红书创作者，我会给你参考一些优秀文案，你会学习并模仿，然后生成一条针对参考文案进行说明的内容。\n\n## 参考文案：\n```json\n{{REFERS}}\n```\n## 仿照的写一条文案\n1. 请先观察参考文案, 然后随机参考一条文案进行仿写生成一条小红书文案内容。\n2. 生成的内容必须同时满足```{{REQUIREMENT}}```。\n3. 生成每条文案的内容内容不要重复，可以进行必要的修改，保证每条文案内容开始语不相似。\n4. Your response should be in JSON format.\n  Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\n  Do not include markdown code blocks in your response.\n  Here is the JSON Schema instance your output must adhere to:\n```\n{{STEP_RESP_JSONSCHEMA}}\n```\n5. 保证生成的内容完全像人类写的和人类的语气，绝对不会被发现是AI生成的。\n\n----------\n\n## role\n你现在是一位小红书创作者，我会给你一些要求，然后生成内容。\n\n## 要求\n{{REQUIREMENT}}\n\n## flows\n1. 生成符合小红书平台的内容。\n2. 生成的内容必须满足“生成要求”。\n3. 保证生成的内容完全像人类写的和人类的语气，绝对不会被发现是AI生成的。\n4. Your response should be in JSON format.\n  Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\n  Do not include markdown code blocks in your response.\n  Here is the JSON Schema instance your output must adhere to:\n```\n{{STEP_RESP_JSONSCHEMA}}\n```\n## 按照flows过程生成内容，不需要别的内容，注意直接输出内容不要前缀。",
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "生成内容的提示符。最大长度为1000个字符。"
+                            }
+                        ]
+                    },
+                    "icon": "content"
+                },
+                "variable": {
+                    "variables": [
+                        {
+                            "label": "生成模式",
+                            "field": "GENERATE_MODE",
+                            "type": "TEXT",
+                            "style": "SELECT",
+                            "group": "SYSTEM",
+                            "order": 100,
+                            "defaultValue": "AI_PARODY",
+                            "value": "AI_CUSTOM",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "生成模式",
+                            "options": [
+                                {
+                                    "label": "随机获取",
+                                    "value": "RANDOM"
+                                },
+                                {
+                                    "label": "AI仿写",
+                                    "value": "AI_PARODY"
+                                },
+                                {
+                                    "label": "AI自定义",
+                                    "value": "AI_CUSTOM"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "AI参考内容随机获取数量",
+                            "field": "REFERS_COUNT",
+                            "type": "TEXT",
+                            "style": "INPUT",
+                            "group": "SYSTEM",
+                            "order": 1040,
+                            "defaultValue": 3,
+                            "value": 3,
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "AI参考内容随机获取数量"
+                        },
+                        {
+                            "label": "素材类型",
+                            "field": "MATERIAL_TYPE",
+                            "type": "TEXT",
+                            "style": "SELECT",
+                            "group": "SYSTEM",
+                            "order": 10000,
+                            "defaultValue": "",
+                            "value": "noteContent",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "素材类型",
+                            "options": [
+                                {
+                                    "label": "普通笔记",
+                                    "value": "note"
+                                },
+                                {
+                                    "label": "普通笔记标题",
+                                    "value": "noteTitle"
+                                },
+                                {
+                                    "label": "普通笔记内容",
+                                    "value": "noteContent"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "参考素材",
+                            "field": "REFERS",
+                            "type": "TEXT",
+                            "style": "MATERIAL",
+                            "group": "SYSTEM",
+                            "order": 101,
+                            "defaultValue": "",
+                            "value": "[]",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "参考素材"
+                        },
+                        {
+                            "label": "文案生成要求",
+                            "field": "REQUIREMENT",
+                            "type": "TEXT",
+                            "style": "TEXTAREA",
+                            "group": "SYSTEM",
+                            "order": 103,
+                            "defaultValue": "",
+                            "value": "总结这些书的共性，为这些书写一条推荐的小红书笔记，要求100字以内；\n:\"《{{上传素材.docs[0].bookName}}》、\n《{{上传素材.docs[1].bookName}}》、\n《{{上传素材.docs[2].bookName}}》、\n《{{上传素材.docs[3].bookName}}》、\n《{{上传素材.docs[4].bookName}}》、\n《{{上传素材.docs[5].bookName}}》、\n《{{上传素材.docs[6].bookName}}》、\n《{{上传素材.docs[7].bookName}}》\"。",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "文案生成要求"
+                        },
+                        {
+                            "label": "参考素材JsonSchema",
+                            "field": "MATERIAL_JSONSCHEMA",
+                            "type": "TEXT",
+                            "style": "TEXTAREA",
+                            "group": "SYSTEM",
+                            "order": 10001,
+                            "defaultValue": "",
+                            "value": "",
+                            "isShow": false,
+                            "isPoint": true,
+                            "description": "参考素材JsonSchema"
+                        },
+                        {
+                            "label": "步骤返回JsonSchema",
+                            "field": "STEP_RESP_JSONSCHEMA",
+                            "type": "TEXT",
+                            "style": "TEXTAREA",
+                            "group": "SYSTEM",
+                            "order": 10002,
+                            "defaultValue": "",
+                            "value": "",
+                            "isShow": false,
+                            "isPoint": true,
+                            "description": "步骤返回JsonSchema"
+                        }
+                    ]
+                }
+            },
+            {
+                "field": "笔记生成",
+                "name": "笔记生成",
+                "buttonLabel": "组装结果",
+                "description": "组装结果。应用中可以存在一个组装步骤。",
+                "flowStep": {
+                    "name": "Assemble",
+                    "type": "WORKFLOW",
+                    "handler": "AssembleActionHandler",
+                    "response": {
+                        "type": "JSON",
+                        "style": "JSON",
+                        "isShow": true,
+                        "readOnly": true,
+                        "output": {
+                            "data": null,
+                            "jsonSchema": "{\n  \"type\" : \"object\",\n  \"id\" : \"urn:jsonschema:com:starcloud:ops:business:app:api:xhs:scheme:dto:AssembleDTO\",\n  \"properties\" : {\n    \"title\" : {\n      \"type\" : \"string\",\n      \"description\" : \"标题\"\n    },\n    \"content\" : {\n      \"type\" : \"string\",\n      \"description\" : \"内容\"\n    }\n  }\n}"
+                        }
+                    },
+                    "description": "Assemble",
+                    "isAuto": true,
+                    "isCanEditStep": true,
+                    "version": 1,
+                    "tags": [
+                        "Assemble"
+                    ],
+                    "scenes": [
+                        "WEB_ADMIN",
+                        "WEB_MARKET"
+                    ],
+                    "variable": {
+                        "variables": [
+                            {
+                                "label": "推荐模型",
+                                "field": "model",
+                                "type": "TEXT",
+                                "style": "SELECT",
+                                "group": "MODEL",
+                                "order": 1,
+                                "defaultValue": "gpt-3.5-turbo-1106",
+                                "value": "gpt-3.5-turbo-1106",
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "选择一个AI模型来生成您想要的内容。",
+                                "options": [
+                                    {
+                                        "label": "默认模型3.5",
+                                        "value": "gpt-3.5-turbo-1106"
+                                    },
+                                    {
+                                        "label": "默认模型4.0",
+                                        "value": "gpt-4-1106-preview"
+                                    },
+                                    {
+                                        "label": "通义千问",
+                                        "value": "qwen-turbo"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "最大返回Tokens",
+                                "field": "max_tokens",
+                                "type": "TEXT",
+                                "style": "INPUT",
+                                "group": "MODEL",
+                                "order": 2,
+                                "defaultValue": 1000,
+                                "value": 1000,
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "在聊天完成中生成的令牌的最大数量。输入令牌和生成令牌的总长度受模型上下文长度的限制。"
+                            },
+                            {
+                                "label": "温度值",
+                                "field": "temperature",
+                                "type": "TEXT",
+                                "style": "INPUT",
+                                "group": "MODEL",
+                                "order": 3,
+                                "defaultValue": 0.7,
+                                "value": 0.7,
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "采样温度在0到2之间。较高的值(如0.8)将使输出更加随机，而较低的值(如0.2)将使输出更加集中和确定。"
+                            },
+                            {
+                                "label": "Prompt",
+                                "field": "prompt",
+                                "type": "TEXT",
+                                "style": "TEXTAREA",
+                                "group": "MODEL",
+                                "order": 4,
+                                "defaultValue": "{STEP.组装.TITLE} \n\n {STEP.组装.CONTENT}",
+                                "value": "{STEP.组装.TITLE} \n\n {STEP.组装.CONTENT}",
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "生成内容的提示符。最大长度为1000个字符。"
+                            }
+                        ]
+                    },
+                    "icon": "assemble"
+                },
+                "variable": {
+                    "variables": [
+                        {
+                            "label": "标题",
+                            "field": "TITLE",
+                            "type": "TEXT",
+                            "style": "INPUT",
+                            "group": "SYSTEM",
+                            "order": 105,
+                            "defaultValue": "",
+                            "value": "{{标题生成.data}}",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "标题"
+                        },
+                        {
+                            "label": "内容",
+                            "field": "CONTENT",
+                            "type": "TEXT",
+                            "style": "TEXTAREA",
+                            "group": "SYSTEM",
+                            "order": 104,
+                            "defaultValue": "",
+                            "value": "1、{{上传素材.docs[0].bookName}}\n{{上传素材.docs[0].introduction}}\n2、{{上传素材.docs[1].bookName}}\n{{上传素材.docs[1].introduction}}\n3、{{上传素材.docs[2].bookName}}\n{{上传素材.docs[2].introduction}}\n4、{{上传素材.docs[3].bookName}}\n{{上传素材.docs[3].introduction}}\n5、{{上传素材.docs[4].bookName}}\n{{上传素材.docs[4].introduction}}\n6、{{上传素材.docs[5].bookName}}\n{{上传素材.docs[5].introduction}}\n7、{{上传素材.docs[6].bookName}}\n{{上传素材.docs[6].introduction}}\n8、{{上传素材.docs[7].bookName}}\n{{上传素材.docs[7].introduction}}\n9、{{上传素材.docs[8].bookName}}\n{{上传素材.docs[8].introduction}}\n-----\n{{上传素材.docs.list('bookName')}}\n-----\n{{上传素材.docs.list('introduction')}}\n-------\n{{内容生成.data}}\n",
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "内容"
+                        }
+                    ]
+                }
+            },
+            {
+                "field": "图片生成",
+                "name": "图片生成",
+                "buttonLabel": "生成图片",
+                "description": "生成笔记图片。应用中可以存在一个此步骤。",
+                "flowStep": {
+                    "name": "图片生成",
+                    "type": "WORKFLOW",
+                    "handler": "PosterActionHandler",
+                    "response": {
+                        "type": "JSON",
+                        "style": "JSON",
+                        "isShow": true,
+                        "readOnly": true,
+                        "output": {
+                            "data": null,
+                            "jsonSchema": "{\n  \"type\" : \"array\",\n  \"items\" : {\n    \"type\" : \"object\",\n    \"id\" : \"urn:jsonschema:com:starcloud:ops:business:app:domain:handler:poster:PosterGenerationHandler:Response\",\n    \"properties\" : {\n      \"id\" : {\n        \"type\" : \"string\",\n        \"description\" : \"图片模板ID\"\n      },\n      \"name\" : {\n        \"type\" : \"string\",\n        \"description\" : \"图片模板名称\"\n      },\n      \"isMain\" : {\n        \"type\" : \"boolean\",\n        \"description\" : \"是否是主图\"\n      },\n      \"index\" : {\n        \"type\" : \"integer\",\n        \"description\" : \"图片序号\"\n      },\n      \"url\" : {\n        \"type\" : \"string\",\n        \"description\" : \"海报图片地址\"\n      }\n    }\n  }\n}"
+                        }
+                    },
+                    "description": "生成笔记图片。应用中可以存在一个此步骤。",
+                    "isAuto": true,
+                    "isCanEditStep": true,
+                    "version": 1,
+                    "tags": [
+                        "Poster"
+                    ],
+                    "scenes": [
+                        "WEB_ADMIN",
+                        "WEB_MARKET"
+                    ],
+                    "variable": {
+                        "variables": [
+                            {
+                                "label": "推荐模型",
+                                "field": "model",
+                                "type": "TEXT",
+                                "style": "SELECT",
+                                "group": "MODEL",
+                                "order": 1,
+                                "defaultValue": "gpt-3.5-turbo-1106",
+                                "value": "qwen-turbo",
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "选择一个AI模型来生成您想要的内容。",
+                                "options": [
+                                    {
+                                        "label": "默认模型3.5",
+                                        "value": "gpt-3.5-turbo-1106"
+                                    },
+                                    {
+                                        "label": "默认模型4.0",
+                                        "value": "gpt-4-1106-preview"
+                                    },
+                                    {
+                                        "label": "通义千问",
+                                        "value": "qwen-turbo"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "最大返回Tokens",
+                                "field": "max_tokens",
+                                "type": "TEXT",
+                                "style": "INPUT",
+                                "group": "MODEL",
+                                "order": 2,
+                                "defaultValue": 1000,
+                                "value": 1000,
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "在聊天完成中生成的令牌的最大数量。输入令牌和生成令牌的总长度受模型上下文长度的限制。"
+                            },
+                            {
+                                "label": "温度值",
+                                "field": "temperature",
+                                "type": "TEXT",
+                                "style": "INPUT",
+                                "group": "MODEL",
+                                "order": 3,
+                                "defaultValue": 0.7,
+                                "value": 0.7,
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "采样温度在0到2之间。较高的值(如0.8)将使输出更加随机，而较低的值(如0.2)将使输出更加集中和确定。"
+                            },
+                            {
+                                "label": "Prompt",
+                                "field": "prompt",
+                                "type": "TEXT",
+                                "style": "TEXTAREA",
+                                "group": "MODEL",
+                                "order": 4,
+                                "defaultValue": "为图片配上一个符合图片场景和意境的标题和副标题，标题在30到50个字内。\n {STEP.图片生成.REQUIREMENT}\n\n 输出格式：\n```\n标题:\n副标题:\n```",
+                                "value": "为图片配上一个符合图片场景和意境的标题和副标题，标题在30到50个字内。\n {STEP.图片生成.REQUIREMENT}\n\n 输出格式：\n```\n标题:\n副标题:\n```",
+                                "isShow": false,
+                                "isPoint": true,
+                                "description": "生成内容的提示符。最大长度为1000个字符。"
+                            }
+                        ]
+                    },
+                    "icon": "poster"
+                },
+                "variable": {
+                    "variables": [
+                        {
+                            "label": "风格参数",
+                            "field": "POSTER_STYLE",
+                            "type": "TEXT",
+                            "style": "JSON",
+                            "group": "SYSTEM",
+                            "order": 2,
+                            "defaultValue": "{}",
+                            "value": "{}",
+                            "isShow": false,
+                            "isPoint": true,
+                            "description": "风格参数"
+                        },
+                        {
+                            "label": "风格配置",
+                            "field": "POSTER_STYLE_CONFIG",
+                            "type": "TEXT",
+                            "style": "JSON",
+                            "group": "SYSTEM",
+                            "order": 3,
+                            "defaultValue": "[]",
+                            "value": [
+                                {
+                                    "id": "1",
+                                    "name": "风格 1",
+                                    "enable": true,
+                                    "templateList": [
+                                        {
+                                            "id": "clu6prt390001swncteeo8lrh",
+                                            "name": "首图",
+                                            "variableList": [
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[0].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "420f7603-4556-4e15-9e98-cc902acef689",
+                                                    "group": "PARAMS",
+                                                    "label": "图片2",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[1].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片2",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d13a3fb2-9c8b-42b7-9b77-58198114f475",
+                                                    "group": "PARAMS",
+                                                    "label": "图片3",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[2].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片3",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "149d8207-b4c5-4637-b67b-ccbe230ad88d",
+                                                    "group": "PARAMS",
+                                                    "label": "图片4",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[3].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片4",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0192159c-8627-4c04-a680-6be0495c5220",
+                                                    "group": "PARAMS",
+                                                    "label": "图片5",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[4].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片5",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "4407184b-6993-4c88-92c0-b3114b28803a",
+                                                    "group": "PARAMS",
+                                                    "label": "图片6",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[5].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片6",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "e91f3412-b9ef-4825-b458-b3040b2d9e08",
+                                                    "group": "PARAMS",
+                                                    "label": "图片7",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[6].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片7",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "01288d03-7a49-4abd-be8f-79db70411ede",
+                                                    "group": "PARAMS",
+                                                    "label": "图片8",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[7].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片8",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": 12,
+                                                    "field": "SUB_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "图片副标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "请相信我们都会变得更强大",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片副标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": 19,
+                                                    "field": "TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "图片主标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{标题生成.data}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片主标题",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 1",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[0].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 2",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[1].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 3",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[2].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 4",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[3].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 5",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[4].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[4].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[4].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[4].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "2",
+                                    "name": "风格 2",
+                                    "enable": true,
+                                    "templateList": [
+                                        {
+                                            "id": "clu6prt390001swncteeo8lrh",
+                                            "name": "首图",
+                                            "variableList": [
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[0].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "420f7603-4556-4e15-9e98-cc902acef689",
+                                                    "group": "PARAMS",
+                                                    "label": "图片2",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[1].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片2",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d13a3fb2-9c8b-42b7-9b77-58198114f475",
+                                                    "group": "PARAMS",
+                                                    "label": "图片3",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[2].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片3",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "149d8207-b4c5-4637-b67b-ccbe230ad88d",
+                                                    "group": "PARAMS",
+                                                    "label": "图片4",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[3].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片4",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0192159c-8627-4c04-a680-6be0495c5220",
+                                                    "group": "PARAMS",
+                                                    "label": "图片5",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[4].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片5",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "4407184b-6993-4c88-92c0-b3114b28803a",
+                                                    "group": "PARAMS",
+                                                    "label": "图片6",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[5].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片6",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "e91f3412-b9ef-4825-b458-b3040b2d9e08",
+                                                    "group": "PARAMS",
+                                                    "label": "图片7",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[6].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片7",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "01288d03-7a49-4abd-be8f-79db70411ede",
+                                                    "group": "PARAMS",
+                                                    "label": "图片8",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[7].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片8",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": 12,
+                                                    "field": "SUB_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "图片副标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "请相信我们都会变得更强大",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片副标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": 19,
+                                                    "field": "TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "图片主标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{标题生成.data}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片主标题",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 1",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[0].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cluc41iy10005swncf2gxnqel",
+                                            "name": "图片 2",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "TEXT_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "文案标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "文案标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d5d6d834-0fb2-4059-9e16-b18bd2b4a54e",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[1].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_CONTENT",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-内容",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-内容",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 3",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[2].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cluc41iy10005swncf2gxnqel",
+                                            "name": "图片 4",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "TEXT_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "文案标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "文案标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d5d6d834-0fb2-4059-9e16-b18bd2b4a54e",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[3].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_CONTENT",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-内容",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-内容",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 5",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[4].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[4].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[4].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[4].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cluc41iy10005swncf2gxnqel",
+                                            "name": "图片 6",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "TEXT_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "文案标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[5].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "文案标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[5].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d5d6d834-0fb2-4059-9e16-b18bd2b4a54e",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[5].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_CONTENT",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-内容",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[5].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-内容",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 7",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[6].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[6].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[6].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[6].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cluc41iy10005swncf2gxnqel",
+                                            "name": "图片 8",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "TEXT_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "文案标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[7].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "文案标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[7].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d5d6d834-0fb2-4059-9e16-b18bd2b4a54e",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[7].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_CONTENT",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-内容",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[7].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-内容",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "3",
+                                    "name": "风格 3",
+                                    "enable": true,
+                                    "templateList": [
+                                        {
+                                            "id": "clu6prt390001swncteeo8lrh",
+                                            "name": "首图",
+                                            "variableList": [
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[0].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "420f7603-4556-4e15-9e98-cc902acef689",
+                                                    "group": "PARAMS",
+                                                    "label": "图片2",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[1].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片2",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d13a3fb2-9c8b-42b7-9b77-58198114f475",
+                                                    "group": "PARAMS",
+                                                    "label": "图片3",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[2].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片3",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "149d8207-b4c5-4637-b67b-ccbe230ad88d",
+                                                    "group": "PARAMS",
+                                                    "label": "图片4",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[3].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片4",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0192159c-8627-4c04-a680-6be0495c5220",
+                                                    "group": "PARAMS",
+                                                    "label": "图片5",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[4].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片5",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "4407184b-6993-4c88-92c0-b3114b28803a",
+                                                    "group": "PARAMS",
+                                                    "label": "图片6",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[5].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片6",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "e91f3412-b9ef-4825-b458-b3040b2d9e08",
+                                                    "group": "PARAMS",
+                                                    "label": "图片7",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[6].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片7",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "01288d03-7a49-4abd-be8f-79db70411ede",
+                                                    "group": "PARAMS",
+                                                    "label": "图片8",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[7].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片8",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": 12,
+                                                    "field": "SUB_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "图片副标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "请相信我们都会变得更强大",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片副标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": 19,
+                                                    "field": "TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "图片主标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{标题生成.data}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片主标题",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cluc41iy10005swncf2gxnqel",
+                                            "name": "图片 1",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "TEXT_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "文案标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "文案标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d5d6d834-0fb2-4059-9e16-b18bd2b4a54e",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[0].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_CONTENT",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-内容",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-内容",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cluc41iy10005swncf2gxnqel",
+                                            "name": "图片 2",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "TEXT_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "文案标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "文案标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d5d6d834-0fb2-4059-9e16-b18bd2b4a54e",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[1].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_CONTENT",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-内容",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-内容",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 3",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[2].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 4",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[3].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "4",
+                                    "name": "风格 4",
+                                    "enable": true,
+                                    "templateList": [
+                                        {
+                                            "id": "clu6prt390001swncteeo8lrh",
+                                            "name": "首图",
+                                            "variableList": [
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[0].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "420f7603-4556-4e15-9e98-cc902acef689",
+                                                    "group": "PARAMS",
+                                                    "label": "图片2",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[1].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片2",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d13a3fb2-9c8b-42b7-9b77-58198114f475",
+                                                    "group": "PARAMS",
+                                                    "label": "图片3",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[2].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片3",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "149d8207-b4c5-4637-b67b-ccbe230ad88d",
+                                                    "group": "PARAMS",
+                                                    "label": "图片4",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[3].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片4",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0192159c-8627-4c04-a680-6be0495c5220",
+                                                    "group": "PARAMS",
+                                                    "label": "图片5",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[4].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片5",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "4407184b-6993-4c88-92c0-b3114b28803a",
+                                                    "group": "PARAMS",
+                                                    "label": "图片6",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[5].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片6",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "e91f3412-b9ef-4825-b458-b3040b2d9e08",
+                                                    "group": "PARAMS",
+                                                    "label": "图片7",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[6].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片7",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "01288d03-7a49-4abd-be8f-79db70411ede",
+                                                    "group": "PARAMS",
+                                                    "label": "图片8",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[7].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片8",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": 12,
+                                                    "field": "SUB_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "图片副标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "请相信我们都会变得更强大",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片副标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": 19,
+                                                    "field": "TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "图片主标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{标题生成.data}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片主标题",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 1",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[0].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[0].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cluc41iy10005swncf2gxnqel",
+                                            "name": "图片 2",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "TEXT_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "文案标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "文案标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d5d6d834-0fb2-4059-9e16-b18bd2b4a54e",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[1].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_CONTENT",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-内容",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[1].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-内容",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "clu6qls060003swncmit7lkrk",
+                                            "name": "图片 3",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "17515a8d-edef-473c-8f65-d54cd0271e5a",
+                                                    "group": "PARAMS",
+                                                    "label": "书名",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "书名",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "255675af-f732-48f3-a4c1-899634a72077",
+                                                    "group": "PARAMS",
+                                                    "label": "作者",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "作者",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "0ecc8d3c-a6e7-44f8-8a04-2e47b4a8a335",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[2].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "97ebe6a5-2efa-480a-ac46-e41b7c1879dd",
+                                                    "group": "PARAMS",
+                                                    "label": "简介",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[2].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "简介",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cluc41iy10005swncf2gxnqel",
+                                            "name": "图片 4",
+                                            "variableList": [
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "TEXT_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "文案标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].bookName}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "文案标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_TITLE",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-标题",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].author}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-标题",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "IMAGE",
+                                                    "count": null,
+                                                    "field": "d5d6d834-0fb2-4059-9e16-b18bd2b4a54e",
+                                                    "group": "PARAMS",
+                                                    "label": "图片1",
+                                                    "order": 2147483647,
+                                                    "style": "IMAGE",
+                                                    "value": "{{上传素材.docs[3].coverUrl}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "图片1",
+                                                    "defaultValue": null
+                                                },
+                                                {
+                                                    "type": "TEXT",
+                                                    "count": null,
+                                                    "field": "PARAGRAPH_ONE_CONTENT",
+                                                    "group": "PARAMS",
+                                                    "label": "段落-1-内容",
+                                                    "order": 2147483647,
+                                                    "style": "INPUT",
+                                                    "value": "{{上传素材.docs[3].introduction}}",
+                                                    "isShow": false,
+                                                    "isPoint": true,
+                                                    "options": [],
+                                                    "description": "段落-1-内容",
+                                                    "defaultValue": null
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            "isShow": true,
+                            "isPoint": true,
+                            "description": "风格配置"
+                        },
+                        {
+                            "label": "生成要求",
+                            "field": "REQUIREMENT",
+                            "type": "TEXT",
+                            "style": "TEXTAREA",
+                            "group": "SYSTEM",
+                            "order": 1009,
+                            "defaultValue": "",
+                            "value": "",
+                            "isShow": false,
+                            "isPoint": true,
+                            "description": "生成要求"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "chatConfig": null,
+    "imageConfig": null,
+    "actionIcons": [
+        "material",
+        "content",
+        "content",
+        "assemble",
+        "poster"
+    ],
+    "description": "书单号仿写",
+    "example": "55924b8a3abc471581ef5c5136a6dd78",
+    "demo": null,
+    "publishUid": "b2a7746f1997440d87f63c640fbd036f-18",
+    "installUid": null,
+    "creator": "274",
+    "creatorName": "nacoyer",
+    "updater": "3",
+    "updaterName": "xhsadmin",
+    "createTime": 1710923288000,
+    "updateTime": 1712631314000,
+    "lastPublish": null,
+    "tenantId": 3
+}

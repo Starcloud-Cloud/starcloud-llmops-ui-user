@@ -13,8 +13,8 @@ module.exports = {
                 ...defaultTheme.screens,
                 '3xl': '1830px',
                 '4xl': '2100px',
-                '5xl': '2362px',
-            },
+                '5xl': '2362px'
+            }
         }
     },
     plugins: []

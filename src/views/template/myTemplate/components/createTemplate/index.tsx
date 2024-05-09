@@ -1,6 +1,6 @@
 import {
     Box,
-    Button,
+    Button as Buttons,
     Card,
     CardHeader,
     Chip,
@@ -14,8 +14,8 @@ import {
     Tabs,
     Typography
 } from '@mui/material';
-import { Image, Select, Popover } from 'antd';
-import { ArrowBack, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
+import { Image, Select, Popover, Form, Popconfirm, Button, Segmented } from 'antd';
+import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
 import { executeApp } from 'api/template/fetch';
@@ -27,24 +27,28 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
-import Perform from 'views/template/carryOut/perform';
+import Perform from '../../../carryOut/newPerform';
 import Arrange from './arrange';
 import Basis from './basis';
 import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import Upload from './upLoad';
-import { del } from 'api/template';
+import { del, copy } from 'api/template';
 import marketStore from 'store/market';
 import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+import { materialTemplate } from 'api/redBook/batchIndex';
+import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
+import { schemeMetadata } from 'api/redBook/copywriting';
 interface Items {
     label: string;
     value: string;
 }
 interface AppModels {
-    aiModel?: Items[];
+    llmModelType?: Items[];
     language?: Items[];
     type?: Items[];
+    variableStyle?: Items[];
 }
 export function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -88,7 +92,7 @@ function CreateDetail() {
     const [from, setFrom] = useState('');
     //类型 模型类型
     const [appModels, setAppModel] = useState<AppModels>({});
-    const [aiModel, setAiModel] = useState('gpt-3.5-turbo-1106');
+    const [aiModel, setAiModel] = useState<undefined | string>(undefined);
     //数组方法封装
     const changeArr = (data: any[], setData: (data: any) => void, index: number, flag: boolean) => {
         const newData = _.cloneDeep(data);
@@ -123,7 +127,6 @@ function CreateDetail() {
                     aiModel,
                     conversationUid
                 });
-
                 const contentData = _.cloneDeep(detailRef.current);
                 contentData.workflowConfig.steps[index].flowStep.response.answer = '';
                 detailRef.current = _.cloneDeep(contentData);
@@ -255,7 +258,31 @@ function CreateDetail() {
                 el.field = el.field.toUpperCase();
             });
         });
+        newValue?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            if (
+                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                arr?.find((el: any) => el.style === 'MATERIAL') &&
+                arr?.find((el: any) => el.style === 'MATERIAL')?.value
+            ) {
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.style === 'MATERIAL')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
+                }
+                arr.find((el: any) => el.style === 'MATERIAL').value = list;
+            }
+        });
         detailRef.current = _.cloneDeep(newValue);
+        if (newValue?.workflowConfig?.steps?.length === 1) {
+            setAiModel(
+                newValue?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
+                    'gpt-3.5-turbo-1106'
+            );
+        }
+        getStepMater();
         setDetail(newValue);
     };
     const [openUpgradeModel, setOpenUpgradeModel] = useState(false);
@@ -282,10 +309,18 @@ function CreateDetail() {
             icon: data
         });
     };
+
     //设置执行的步骤
-    const exeChange = ({ e, steps, i }: any) => {
+    const exeChange = ({ e, steps, i, type }: any) => {
         const newValue = _.cloneDeep(detailRef.current);
         newValue.workflowConfig.steps[steps].variable.variables[i].value = e.value;
+        if (type && newValue.workflowConfig.steps[steps].variable.variables?.find((item: any) => item.style === 'MATERIAL')) {
+            newValue.workflowConfig.steps[steps].variable.variables[
+                newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+            ].value = [];
+            setStep(steps);
+            setMaterialType(type);
+        }
         detailRef.current = _.cloneDeep(newValue);
         setDetail(newValue);
     };
@@ -338,6 +373,17 @@ function CreateDetail() {
         } else {
             if (e.name === 'res') {
                 oldValue.workflowConfig.steps[index].flowStep.response.style = e.value;
+            } else if (e.name === 'type') {
+                oldValue.workflowConfig.steps[index].flowStep.response.type = e.value;
+                if (e.value !== 'JSON') {
+                    oldValue.workflowConfig.steps[index].flowStep.response.output = undefined;
+                }
+            } else if (e.name === 'output') {
+                if (oldValue.workflowConfig.steps[index].flowStep.response.output) {
+                    oldValue.workflowConfig.steps[index].flowStep.response.output.jsonSchema = e.value;
+                } else {
+                    oldValue.workflowConfig.steps[index].flowStep.response.output = { jsonSchema: e.value };
+                }
             } else {
                 if (values) {
                     oldValue.workflowConfig.steps[index].flowStep.variable.variables[i].value = e.value;
@@ -367,9 +413,26 @@ function CreateDetail() {
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const saveDetail = () => {
-        if (detail.name && detail.category) {
+        const details = _.cloneDeep(detailRef.current);
+        details?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            if (
+                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                arr?.find((el: any) => el.style === 'MATERIAL') &&
+                arr?.find((el: any) => el.style === 'MATERIAL')?.value
+            ) {
+                arr.find((el: any) => el.style === 'MATERIAL').value = JSON.stringify(
+                    arr?.find((el: any) => el.style === 'MATERIAL')?.value
+                    // ?.map((i: any) => ({
+                    //     ...i,
+                    //     type: arr?.find((el: any) => el.field === 'MATERIAL_TYPE')?.value
+                    // }))
+                );
+            }
+        });
+        if (details.name && details.category) {
             if (searchParams.get('uid')) {
-                appModify(detail).then((res) => {
+                appModify(details).then((res) => {
                     if (res.data) {
                         setSaveState(saveState + 1);
                         dispatch(
@@ -386,7 +449,7 @@ function CreateDetail() {
                     }
                 });
             } else {
-                appCreate(detail).then((res) => {
+                appCreate(details).then((res) => {
                     if (res.data) {
                         navigate('/createApp?uid=' + res.data.uid);
                         getList(res.data.uid);
@@ -425,19 +488,240 @@ function CreateDetail() {
     };
     const permissions = useUserStore((state) => state.permissions);
     const { Option } = Select;
+
+    //检测 model
+    useEffect(() => {
+        if (detail?.workflowConfig.steps?.length === 1) {
+            setAiModel(detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.find((item: any) => item.field === 'model')?.value);
+        }
+    }, [
+        detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables[
+            detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.findIndex((el: any) => el?.field === 'model')
+        ]?.value
+    ]);
+    //素材类型的请求接口
+    const [step, setStep] = useState(0);
+    const [materialType, setMaterialType] = useState('');
+    const refersSourceRef = useRef<any>(null);
+    const [refersSource, setRefersSource] = useState<any[]>([]);
+    //删除
+    const handleDel = (index: number, i: number) => {
+        if (i) setStep(i);
+        const newValue = _.cloneDeep(detailRef.current);
+        const newList =
+            newValue.workflowConfig.steps[i].variable.variables[
+                newValue.workflowConfig.steps[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+            ].value;
+        newList.splice(index, 1);
+        detailRef.current = newValue;
+        setDetail(detailRef.current);
+    };
+    const [form] = Form.useForm();
+    const [title, setTitle] = useState('');
+    //编辑
+    const [editOpen, setEditOpen] = useState(false);
+    const [rowIndex, setRowIndex] = useState(0);
+    const handleEdit = (row: any, index: number, i?: number) => {
+        if (i) setStep(i);
+        setTitle('编辑');
+        setMaterialType(row.type);
+        form.setFieldsValue(row);
+        setRowIndex(index);
+        setEditOpen(true);
+    };
+    const formOk = (result: any) => {
+        const newValue = _.cloneDeep(detailRef.current);
+        const newList =
+            newValue.workflowConfig.steps[step].variable.variables[
+                newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+            ].value;
+        if (title === '编辑') {
+            newList.splice(rowIndex, 1, { ...result, type: materialType });
+        } else {
+            newList.unshift({
+                ...result,
+                type: materialType
+            });
+        }
+        newValue.workflowConfig.steps[step].variable.variables[
+            newValue.workflowConfig.steps[step].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
+        ].value = newList;
+        detailRef.current = newValue;
+        setDetail(detailRef.current);
+        setEditOpen(false);
+        form.resetFields();
+    };
+    useEffect(() => {
+        if (materialType) {
+            materialTemplate(materialType).then((res) => {
+                stepMarRef.current[step] = getHeader(res?.fieldDefine, step);
+                setStepMaterial(stepMarRef.current);
+                setPerform(perform + 1);
+            });
+        }
+    }, [materialType]);
+    //获取数据表头
+    const getHeader = (data: any, i: number) => {
+        const newList = data.map((item: any) => ({
+            title: item.desc,
+            align: 'center',
+            width: 200,
+            dataIndex: item.fieldName,
+            render: (_: any, row: any) => (
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    <div className="line-clamp-5">
+                        {item.type === 'image' ? (
+                            row[item.fieldName] ? (
+                                <Image
+                                    fallback={
+                                        'data:image/png;base64,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'
+                                    }
+                                    width={50}
+                                    height={50}
+                                    preview={false}
+                                    src={row[item.fieldName]}
+                                />
+                            ) : (
+                                <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
+                            )
+                        ) : item.fieldName === 'source' ? (
+                            <>
+                                {row[item.fieldName] === 'OTHER'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'OTHER')?.label
+                                    : row[item.fieldName] === 'SMALL_RED_BOOK'
+                                    ? refersSourceRef.current?.find((item: any) => item.value === 'SMALL_RED_BOOK')?.label
+                                    : row[item.fieldName]}
+                            </>
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
+                </div>
+            ),
+            type: item.type
+        }));
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    const getHeaders = (data: any, i: number) => {
+        const newList = data;
+        newList?.splice(newList?.length - 1, 1);
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button
+                            onClick={() => {
+                                handleEdit(row, index, i);
+                            }}
+                            size="small"
+                            type="link"
+                        >
+                            编辑
+                        </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否删除？"
+                            okText="确认"
+                            cancelText="取消"
+                            onConfirm={() => handleDel(index, i)}
+                        >
+                            <Button size="small" type="link" danger>
+                                删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )
+            }
+        ];
+    };
+    useEffect(() => {
+        schemeMetadata().then((res) => {
+            refersSourceRef.current = res.refersSource;
+            setRefersSource(refersSourceRef.current);
+        });
+    }, []);
+    //获取哪个步骤有素材
+    const stepMarRef = useRef<any[]>([]);
+    const [stepMaterial, setStepMaterial] = useState<any[]>([]);
+    const getStepMater = async () => {
+        const arr: any[] = [];
+        const newList = detailRef.current?.workflowConfig?.steps.map((item: any) => {
+            const arr = item?.variable?.variables;
+            return arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value;
+        });
+        const allper = newList?.map(async (el: any, index: number) => {
+            if (el) {
+                const res = await materialTemplate(el);
+                arr[index] = getHeader(res?.fieldDefine, index);
+            }
+        });
+        await Promise.all(allper);
+        stepMarRef.current = arr;
+        setStepMaterial(stepMarRef?.current);
+    };
+    const getTableData = (index: number) => {
+        const newList = stepMarRef.current;
+        newList?.splice(index + 1, 0, undefined);
+        const ccc = newList?.map((el: any, i: number) => {
+            if (el) {
+                return getHeaders(el, i);
+            }
+            return undefined;
+        });
+        stepMarRef.current = ccc;
+        setStepMaterial(stepMarRef.current);
+    };
+    const [segmentedValue, setSegmentedValue] = useState<string | number>('配置');
     return (
         <Card>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={
-                    <Button
+                    <Buttons
                         variant="contained"
                         startIcon={<ArrowBack />}
                         color="secondary"
                         onClick={() => navigate('/template/createCenter')}
                     >
                         {t('myApp.back')}
-                    </Button>
+                    </Buttons>
                 }
                 title={<Typography variant="h3">{detail?.name}</Typography>}
                 action={
@@ -484,10 +768,40 @@ function CreateDetail() {
                                     {t('myApp.delApp')}
                                 </Typography>
                             </MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    copy({ uid: searchParams.get('uid') }).then((res) => {
+                                        if (res) {
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '复制成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                    transition: 'SlideDown',
+                                                    close: false
+                                                })
+                                            );
+                                            setDelAnchorEl(null);
+                                            navigate('/my-app');
+                                        }
+                                    });
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <ContentPaste color="secondary" />
+                                </ListItemIcon>
+                                <Typography variant="inherit" noWrap>
+                                    复制应用
+                                </Typography>
+                            </MenuItem>
                         </Menu>
-                        <Button variant="contained" color="secondary" autoFocus onClick={saveDetail}>
+                        <Buttons variant="contained" color="secondary" autoFocus onClick={saveDetail}>
                             {t('myApp.save')}
-                        </Button>
+                        </Buttons>
                     </>
                 }
             ></CardHeader>
@@ -518,7 +832,8 @@ function CreateDetail() {
                                     name: detail?.name,
                                     description: detail?.description,
                                     category: detail?.category,
-                                    tags: detail?.tags
+                                    tags: detail?.tags,
+                                    example: detail?.example
                                 }}
                                 basisPre={basisPre}
                                 sort={detail?.sort}
@@ -556,7 +871,7 @@ function CreateDetail() {
                                         </Box>
                                     </Box>
                                 </Box>
-                                {appModels.aiModel && (
+                                {detail?.workflowConfig?.steps?.length === 1 && (
                                     <div className="flex items-center">
                                         <Popover
                                             title="模型介绍"
@@ -574,6 +889,7 @@ function CreateDetail() {
                                         <Select
                                             style={{ width: 100, height: 23 }}
                                             bordered={false}
+                                            disabled={true}
                                             className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
                                             rootClassName="modelSelect"
                                             popupClassName="modelSelectPopup"
@@ -587,7 +903,7 @@ function CreateDetail() {
                                                 setAiModel(value);
                                             }}
                                         >
-                                            {appModels.aiModel.map((item: any) => (
+                                            {appModels?.llmModelType?.map((item: any) => (
                                                 <Option key={item.value} value={item.value}>
                                                     {item.label}
                                                 </Option>
@@ -604,6 +920,11 @@ function CreateDetail() {
                                 <Perform
                                     key={perform}
                                     isShows={isShows}
+                                    columns={stepMaterial}
+                                    setEditOpen={setEditOpen}
+                                    setStep={setStep}
+                                    setMaterialType={setMaterialType}
+                                    setTitle={setTitle}
                                     config={_.cloneDeep(detailRef.current.workflowConfig)}
                                     changeConfigs={changeConfigs}
                                     changeSon={changeData}
@@ -623,111 +944,122 @@ function CreateDetail() {
                 </Grid>
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <Grid container spacing={2}>
-                    <Grid item lg={6} sx={{ width: '100%' }}>
-                        {detail?.workflowConfig && (
-                            <Arrange
-                                detail={detail}
-                                config={_.cloneDeep(detail.workflowConfig)}
-                                editChange={editChange}
-                                basisChange={basisChange}
-                                statusChange={statusChange}
-                                changeConfigs={changeConfigs}
-                            />
-                        )}
-                    </Grid>
-                    <Grid item lg={6}>
-                        <Typography variant="h5" fontSize="1rem" mb={1}>
-                            {t('market.debug')}
-                        </Typography>
-                        <Card elevation={2} sx={{ p: 2 }}>
-                            <div className="flex justify-between items-center">
-                                <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-                                    {detail?.icon && (
-                                        <Image
-                                            preview={false}
-                                            height={60}
-                                            className="rounded-lg overflow-hidden"
-                                            src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
-                                        />
-                                    )}
-                                    <Box>
-                                        <Typography variant="h1" sx={{ fontSize: '2rem' }}>
-                                            {detail?.name}
-                                        </Typography>
+                <div>
+                    <div className="pb-4 flex justify-center">
+                        <Segmented value={segmentedValue} onChange={setSegmentedValue} options={['配置', '预料']} />
+                    </div>
+                    {segmentedValue === '配置' && detail && (
+                        <Arrange
+                            detail={detail}
+                            variableStyle={appModels?.variableStyle}
+                            config={_.cloneDeep(detail.workflowConfig)}
+                            editChange={editChange}
+                            basisChange={basisChange}
+                            statusChange={statusChange}
+                            changeConfigs={changeConfigs}
+                            getTableData={getTableData}
+                        />
+                    )}
+                    {segmentedValue === '预料' && (
+                        <div className="w-[80%]">
+                            <Typography variant="h5" fontSize="1rem" mb={1}>
+                                {t('market.debug')}
+                            </Typography>
+                            <Card elevation={2} sx={{ p: 2 }}>
+                                <div className="flex justify-between items-center">
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+                                        {detail?.icon && (
+                                            <Image
+                                                preview={false}
+                                                height={60}
+                                                className="rounded-lg overflow-hidden"
+                                                src={require('../../../../../assets/images/category/' + detail?.icon + '.svg')}
+                                            />
+                                        )}
                                         <Box>
-                                            <span>#{detail?.category}</span>
-                                            {detail?.tags?.map((el: any) => (
-                                                <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
-                                            ))}
+                                            <Typography variant="h1" sx={{ fontSize: '2rem' }}>
+                                                {detail?.name}
+                                            </Typography>
+                                            <Box>
+                                                <span>#{detail?.category}</span>
+                                                {detail?.tags?.map((el: any) => (
+                                                    <Chip key={el} sx={{ marginLeft: 1 }} size="small" label={el} variant="outlined" />
+                                                ))}
+                                            </Box>
                                         </Box>
                                     </Box>
-                                </Box>
-                                {appModels.aiModel && (
-                                    <div className="flex items-center">
-                                        <Popover
-                                            title="模型介绍"
-                                            content={
-                                                <>
-                                                    <div>
-                                                        - 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
-                                                    </div>
-                                                    <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
-                                                </>
-                                            }
-                                        >
-                                            <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
-                                        </Popover>
-                                        <Select
-                                            style={{ width: 100, height: 23 }}
-                                            bordered={false}
-                                            className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                            rootClassName="modelSelect"
-                                            popupClassName="modelSelectPopup"
-                                            value={aiModel}
-                                            onChange={(value) => {
-                                                if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
-                                                    setOpenUpgradeModel(true);
-                                                    return;
+                                    {detail?.workflowConfig?.steps?.length === 1 && (
+                                        <div className="flex items-center">
+                                            <Popover
+                                                title="模型介绍"
+                                                content={
+                                                    <>
+                                                        <div>
+                                                            - 默认模型集成多个LLM，自动适配提供最佳回复方式和内容。4.0比3.5效果更好推荐使用
+                                                        </div>
+                                                        <div>- 通义千问是国内知名模型，拥有完善智能的中文内容支持</div>
+                                                    </>
                                                 }
-                                                setPerform(perform + 1);
-                                                setAiModel(value);
-                                            }}
-                                        >
-                                            {appModels.aiModel.map((item: any) => (
-                                                <Option key={item.value} value={item.value}>
-                                                    {item.label}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </div>
+                                            >
+                                                <ErrorOutline sx={{ color: '#697586', mr: '5px', cursor: 'pointer' }} />
+                                            </Popover>
+                                            <Select
+                                                style={{ width: 100, height: 23 }}
+                                                bordered={false}
+                                                disabled={true}
+                                                className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                                rootClassName="modelSelect"
+                                                popupClassName="modelSelectPopup"
+                                                value={aiModel}
+                                                onChange={(value) => {
+                                                    if (value === 'gpt-4' && !permissions.includes('app:execute:llm:gpt4')) {
+                                                        setOpenUpgradeModel(true);
+                                                        return;
+                                                    }
+                                                    setPerform(perform + 1);
+                                                    setAiModel(value);
+                                                }}
+                                            >
+                                                {appModels?.llmModelType?.map((item: any) => (
+                                                    <Option key={item.value} value={item.value}>
+                                                        {item.label}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                    )}
+                                </div>
+                                <Divider sx={{ my: 1 }} />
+                                <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
+                                    {detail?.description}
+                                </Typography>
+                                {detail && value === 1 && (
+                                    <Perform
+                                        key={perform}
+                                        columns={stepMaterial}
+                                        setEditOpen={setEditOpen}
+                                        setStep={setStep}
+                                        setMaterialType={setMaterialType}
+                                        setTitle={setTitle}
+                                        isShows={isShows}
+                                        config={_.cloneDeep(detailRef.current.workflowConfig)}
+                                        changeConfigs={changeConfigs}
+                                        changeSon={changeData}
+                                        changeanswer={changeanswer}
+                                        loadings={loadings}
+                                        isDisables={isDisables}
+                                        variableChange={exeChange}
+                                        promptChange={promptChange}
+                                        isallExecute={(flag: boolean) => {
+                                            isAllExecute = flag;
+                                        }}
+                                        source="myApp"
+                                    />
                                 )}
-                            </div>
-                            <Divider sx={{ my: 1 }} />
-                            <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
-                                {detail?.description}
-                            </Typography>
-                            {detail && value === 1 && (
-                                <Perform
-                                    key={perform}
-                                    isShows={isShows}
-                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
-                                    changeConfigs={changeConfigs}
-                                    changeSon={changeData}
-                                    changeanswer={changeanswer}
-                                    loadings={loadings}
-                                    isDisables={isDisables}
-                                    variableChange={exeChange}
-                                    promptChange={promptChange}
-                                    isallExecute={(flag: boolean) => {
-                                        isAllExecute = flag;
-                                    }}
-                                    source="myApp"
-                                />
-                            )}
-                        </Card>
-                    </Grid>
-                </Grid>
+                            </Card>
+                        </div>
+                    )}
+                </div>
             </TabPanel>
             <TabPanel value={value} index={2}>
                 {value === 2 && detailRef.current?.uid && searchParams.get('uid') && (
@@ -753,6 +1085,18 @@ function CreateDetail() {
                     open={tokenOpen}
                     handleClose={() => setTokenOpen(false)}
                     title={'当前魔法豆不足，升级会员，立享五折优惠！'}
+                />
+            )}
+            {editOpen && (
+                <FormModal
+                    title={title}
+                    materialType={materialType}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={stepMaterial[step]}
+                    form={form}
+                    formOk={formOk}
+                    sourceList={refersSource}
                 />
             )}
         </Card>

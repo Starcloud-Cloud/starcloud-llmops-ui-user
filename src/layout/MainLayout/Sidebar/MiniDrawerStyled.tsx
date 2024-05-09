@@ -8,7 +8,7 @@ import { drawerWidth } from 'store/constant';
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
     borderRight: 'none',
-    zIndex: 1099,
+    zIndex: 1,
     background: theme.palette.background.default,
     overflowX: 'hidden',
     position: 'absolute',
@@ -22,7 +22,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
 
 const closedMixin = (theme: Theme): CSSObject => ({
     borderRight: 'none',
-    zIndex: 1099,
+    zIndex: 1,
     background: theme.palette.background.default,
     overflowX: 'hidden',
     width: 72,

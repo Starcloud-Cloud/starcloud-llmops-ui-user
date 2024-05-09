@@ -82,21 +82,23 @@ const Header = () => {
 
     useEffect(() => {
         if (allDetail?.allDetail?.id) {
-            const dateTime = localStorage.getItem(`tipsEndTime-${allDetail?.allDetail?.id}`);
-            if (dateTime) {
-                if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+            if (getPermission(ENUM_PERMISSION.COLLECT)) {
+                const dateTime = localStorage.getItem(`tipsEndTime-${allDetail?.allDetail?.id}`);
+                if (dateTime) {
+                    if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
+                        // 5分钟后出来
+                        setTimeout(() => {
+                            setLogoPopoverOpen(true);
+                        }, 1000 * 60 * 5);
+                    } else {
+                        setLogoPopoverOpen(false);
+                    }
+                } else {
                     // 5分钟后出来
                     setTimeout(() => {
                         setLogoPopoverOpen(true);
                     }, 1000 * 60 * 5);
-                } else {
-                    setLogoPopoverOpen(false);
                 }
-            } else {
-                // 5分钟后出来
-                setTimeout(() => {
-                    setLogoPopoverOpen(true);
-                }, 1000 * 60 * 5);
             }
         }
     }, [allDetail]);

@@ -48,9 +48,9 @@ const useUserStore = create<UserStore>((set) => ({
             return null;
         }
         let userInfo = wsCache.get(CACHE_KEY.INFO);
-        if (!userInfo) {
-            userInfo = await getInfo();
-        }
+        // if (!userInfo) {
+        userInfo = await getInfo();
+        // }
         set({
             permissions: userInfo.permissions,
             roles: userInfo.roles,

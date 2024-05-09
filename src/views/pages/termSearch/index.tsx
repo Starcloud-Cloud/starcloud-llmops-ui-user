@@ -14,6 +14,7 @@ import { PermissionUpgradeModal } from '../../template/myChat/createChat/compone
 import {
     KeywordMetadataExtendPrepare,
     KeywordMetadataExtendAsin,
+    KeywordMetadataPage,
     exportExtendAsin,
     userRighsLimitUsedCount,
     userRighsLimitUse
@@ -222,7 +223,7 @@ const TermSearch = () => {
         link.click();
     };
     return (
-        <div style={{ height: 'calc(100vh - 128px)' }} className="overflow-y-auto overflow-x-hidden">
+        <div>
             <SubCard
                 sx={{ mb: 3 }}
                 contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}

@@ -8,7 +8,7 @@ import { useRef, useEffect, memo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash-es';
 import copy from 'clipboard-copy';
-import FormExecute from 'views/template/components/validaForm';
+import FormExecute from 'views/template/components/newValidaForm';
 import { translateText } from 'api/picture/create';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +27,12 @@ function Perform({
     changeanswer,
     history = false,
     isShows,
-    changeConfigs
+    changeConfigs,
+    columns,
+    setEditOpen,
+    setTitle,
+    setStep,
+    setMaterialType
 }: any) {
     const refs = useRef<any>([]);
     //点击全部执行
@@ -71,11 +76,7 @@ function Perform({
     //执行按钮是否禁用
     const disSteps = (index: number) => {
         const model = config?.steps[index].flowStep.variable?.variables.map((el: El) => {
-            // if (!el.isShow) {
             return el.value || el.value === false || el.defaultValue || el.defaultValue === false ? false : true;
-            // } else {
-            //     return el.defaultValue || el.defaultValue === false ? false : true;
-            // }
         });
         const variable = config?.steps[index].variable?.variables.map((el: El) => {
             if (el.isShow) {
@@ -201,16 +202,50 @@ function Perform({
                                 </Box>
                                 <form>
                                     <Grid container spacing={1}>
-                                        {item.variable?.variables?.map((el: any, i: number) =>
-                                            el.isShow ? (
-                                                <Grid item key={i} md={el.style === 'JSON' ? 12 : el.style === 'TEXTAREA' ? 6 : 3} xs={12}>
-                                                    <FormExecute item={el} onChange={(e: any) => variableChange({ e, steps, i })} />
-                                                </Grid>
-                                            ) : null
+                                        {item.variable?.variables?.map(
+                                            (el: any, i: number) =>
+                                                el.isShow && (
+                                                    <Grid
+                                                        item
+                                                        key={i}
+                                                        md={
+                                                            el.style === 'JSON' || el.style === 'MATERIAL'
+                                                                ? 12
+                                                                : el.style === 'TEXTAREA'
+                                                                ? 6
+                                                                : 3
+                                                        }
+                                                        xs={12}
+                                                    >
+                                                        <FormExecute
+                                                            item={el}
+                                                            history={history}
+                                                            columns={columns ? columns[steps] : []}
+                                                            setEditOpen={setEditOpen}
+                                                            setTitle={setTitle}
+                                                            setStep={() => setStep(steps)}
+                                                            setMaterialType={() => {
+                                                                setMaterialType(
+                                                                    config?.steps[steps]?.variable?.variables?.find(
+                                                                        (item: any) => item.field === 'MATERIAL_TYPE'
+                                                                    )?.value
+                                                                );
+                                                            }}
+                                                            onChange={(e: any) => {
+                                                                variableChange({
+                                                                    e,
+                                                                    steps,
+                                                                    i,
+                                                                    type: e.name === 'MATERIAL_TYPE' ? e.value : undefined
+                                                                });
+                                                            }}
+                                                        />
+                                                    </Grid>
+                                                )
                                         )}
-                                        {item.flowStep?.variable?.variables.length !== 0 &&
-                                            item.flowStep?.variable?.variables?.map((el: any, i: number) =>
-                                                el.isShow ? (
+                                        {item.flowStep?.variable?.variables?.map(
+                                            (el: any, i: number) =>
+                                                el.isShow && (
                                                     <Grid
                                                         item
                                                         lg={el.field === 'prompt' ? 12 : el.style === 'TEXTAREA' ? 6 : 3}
@@ -220,12 +255,14 @@ function Perform({
                                                     >
                                                         <FormExecute item={el} onChange={(e: any) => promptChange({ e, steps, i })} />
                                                     </Grid>
-                                                ) : null
-                                            )}
+                                                )
+                                        )}
                                     </Grid>
                                 </form>
                                 <Box my={1}>
-                                    {item.flowStep.response.style === 'TEXTAREA' || item.flowStep.response.style === 'INPUT' ? (
+                                    {item.flowStep.response.style === 'TEXTAREA' ||
+                                    item.flowStep.response.style === 'INPUT' ||
+                                    item.flowStep.response.style === 'JSON' ? (
                                         // <>
                                         //     <Typography color="#697586" ml={1} mb={-1.5} display="flex" alignItems="center">
                                         //         <AutoAwesomeIcon fontSize="small" />
@@ -291,27 +328,39 @@ function Perform({
                                         //     </Box>
                                         // </>
                                         <>
-                                            <TextField
-                                                sx={{ mt: 2 }}
-                                                inputRef={(el) => (mdRef.current[steps] = el)}
-                                                fullWidth
-                                                color="secondary"
-                                                InputLabelProps={{ shrink: true }}
-                                                label={
-                                                    <Box display="flex" alignItems="center">
-                                                        <AutoAwesome fontSize="small" />
-                                                        {t('myApp.execuent')}
-                                                    </Box>
-                                                }
-                                                onChange={(e) => {
-                                                    changeanswer({ value: e.target.value, index: steps });
-                                                }}
-                                                value={item.flowStep.response.answer}
-                                                placeholder={item.flowStep.response.defaultValue}
-                                                multiline
-                                                minRows={item.flowStep.response.style === 'TEXTAREA' ? 5 : 1}
-                                                maxRows={item.flowStep.response.style === 'TEXTAREA' ? 7 : 2}
-                                            />
+                                            {item?.flowStep?.response?.isShow && (
+                                                <TextField
+                                                    sx={{ mt: 2 }}
+                                                    inputRef={(el) => (mdRef.current[steps] = el)}
+                                                    fullWidth
+                                                    color="secondary"
+                                                    InputLabelProps={{ shrink: true }}
+                                                    label={
+                                                        <Box display="flex" alignItems="center">
+                                                            <AutoAwesome fontSize="small" />
+                                                            {t('myApp.execuent')}
+                                                        </Box>
+                                                    }
+                                                    onChange={(e) => {
+                                                        changeanswer({ value: e.target.value, index: steps });
+                                                    }}
+                                                    value={item.flowStep.response.answer}
+                                                    placeholder={item.flowStep.response.defaultValue}
+                                                    multiline
+                                                    minRows={
+                                                        item.flowStep.response.style === 'TEXTAREA' ||
+                                                        item.flowStep.response.style === 'JSON'
+                                                            ? 5
+                                                            : 1
+                                                    }
+                                                    maxRows={
+                                                        item.flowStep.response.style === 'TEXTAREA' ||
+                                                        item.flowStep.response.style === 'JSON'
+                                                            ? 7
+                                                            : 2
+                                                    }
+                                                />
+                                            )}
                                             {item.flowStep.response.answer && isShows[steps] && (
                                                 <Box width="100%" display="flex" justifyContent="space-between" overflow="hidden">
                                                     <Box>
@@ -386,6 +435,7 @@ function Perform({
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
+        JSON.stringify(prevProps?.columns) === JSON.stringify(nextProps?.columns) &&
         JSON.stringify(prevProps?.loadings) === JSON.stringify(nextProps?.loadings) &&
         JSON.stringify(prevProps?.isDisables) === JSON.stringify(nextProps?.isDisables) &&
         JSON.stringify(prevProps?.isShows) === JSON.stringify(nextProps?.isShows)

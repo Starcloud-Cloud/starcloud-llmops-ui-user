@@ -89,7 +89,7 @@ const Sidebar = () => {
                     sx={{
                         '& .MuiDrawer-paper': {
                             mt: matchDownMd ? 0 : 11,
-                            zIndex: 1099,
+                            zIndex: 1,
                             width: drawerWidth,
                             background: theme.palette.background.default,
                             color: theme.palette.text.primary,

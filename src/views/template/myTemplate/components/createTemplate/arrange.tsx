@@ -26,6 +26,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import HelpIcon from '@mui/icons-material/Help';
 import Add from '@mui/icons-material/Add';
 import AddCircleSharpIcon from '@mui/icons-material/AddCircleSharp';
@@ -79,7 +82,7 @@ const validationSchema = yup.object({
     label: yup.string().required('label is required')
 });
 
-function Arrange({ detail, config, editChange, basisChange, statusChange, changeConfigs }: any) {
+function Arrange({ detail, config, variableStyle, editChange, basisChange, statusChange, changeConfigs, getTableData }: any) {
     const [stepTitle, setStepTitle] = useState<string[]>([]);
     const formik = useFormik({
         initialValues: {
@@ -88,6 +91,7 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
             defaultValue: '',
             description: '',
             style: 'INPUT',
+            group: 'PARAMS',
             isShow: true
         },
         validationSchema,
@@ -138,12 +142,6 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
     //弹窗
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('');
-    const typeList = [
-        { label: t('myApp.input'), value: 'INPUT' },
-        { label: t('myApp.textarea'), value: 'TEXTAREA' },
-        { label: t('myApp.json_textarea'), value: 'JSON' },
-        { label: t('myApp.select'), value: 'SELECT' }
-    ];
     //关闭弹窗
     const handleClose = () => {
         formik.resetForm();
@@ -217,6 +215,32 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         newValue.steps.splice(index, 1);
         changeConfigs(newValue);
     };
+    //复制步骤
+    const copyStep = (step: any, index: number) => {
+        const newStep = _.cloneDeep(step);
+        beforeCopy(index, newStep.name, newStep, config.steps);
+    };
+    const beforeCopy = (index: number, name: string, newStep: any, steps: any) => {
+        if (steps.some((item: { name: string }) => item.name === name + '-copy')) {
+            beforeCopy(index, name + '-copy', newStep, steps);
+        } else {
+            const Name = _.cloneDeep(newStep);
+            Name.name = name + '-copy';
+            Name.field = name + '-copy';
+            const newValue = _.cloneDeep(config);
+            newValue.steps.splice(index + 1, 0, Name);
+            changeConfigs(newValue);
+        }
+    };
+    //移动步骤
+    const stepMove = (index: number, direction: number) => {
+        const newData = _.cloneDeep(config);
+        const temp = newData?.steps[index];
+        newData.steps[index] = newData?.steps[index + direction];
+        newData.steps[index + direction] = temp;
+        changeConfigs(newData);
+        setPre(pre + 1);
+    };
     //增加步骤
     const [stepLists, setStepList] = useState<{ name: string; field: string; description: string }[]>([]);
     const [addAnchorEl, setAddAnchorEl] = useState<(null | HTMLElement)[]>([]);
@@ -248,20 +272,20 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
         }
     };
     const addStep = (step: any, index: number) => {
+        getTableData(index);
         const newStep = _.cloneDeep(step);
         stepEtch(index + 1, newStep.name, config.steps, newStep, index);
     };
+    const [pre, setPre] = useState(0);
     useEffect(() => {
         if (config) {
             setStepTitle(config.steps.map((item: { name: string }) => item.name));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [config?.steps?.length, pre]);
     useEffect(() => {
         setallvalidas(
-            config?.steps.map((item: any) => {
-                return item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value);
-            })
+            config?.steps.map((item: any) => item.flowStep.variable?.variables?.some((el: { value: string | null }) => !el.value))
         );
     }, [expanded]);
 
@@ -493,32 +517,73 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                                         <DeleteIcon color="error" />
                                         {t('market.delete')}
                                     </MenuItem>
+                                    <MenuItem
+                                        onClick={() => {
+                                            copyStep(item, index);
+                                            const newVal = [...anchorEl];
+                                            newVal[index] = null;
+                                            setAnchorEl(newVal);
+                                        }}
+                                    >
+                                        <ContentPasteIcon color="secondary" />
+                                        复制
+                                    </MenuItem>
+                                    <MenuItem
+                                        disabled={index === 0}
+                                        onClick={() => {
+                                            stepMove(index, -1);
+                                            const newVal = [...anchorEl];
+                                            newVal[index] = null;
+                                            setAnchorEl(newVal);
+                                        }}
+                                    >
+                                        <ExpandLessIcon color="secondary" />
+                                        向上移动
+                                    </MenuItem>
+                                    <MenuItem
+                                        disabled={index === config?.steps.length - 1}
+                                        onClick={() => {
+                                            stepMove(index, 1);
+                                            const newVal = [...anchorEl];
+                                            newVal[index] = null;
+                                            setAnchorEl(newVal);
+                                        }}
+                                    >
+                                        <ExpandMoreIcon color="secondary" />
+                                        向下移动
+                                    </MenuItem>
                                 </Menu>
                             </Box>
                         </Box>
                         {expanded[index] && <Divider />}
-                        <Box sx={{ display: expanded[index] ? 'block' : 'none' }}>
-                            <Valida
-                                key={item.field}
-                                variable={item.variable?.variables}
-                                variables={item.flowStep.variable?.variables}
-                                responent={item.flowStep.response}
-                                buttonLabel={item.buttonLabel}
-                                basisChange={basisChange}
-                                index={index}
-                                allvalida={allvalida[index]}
-                                fields={item.field}
-                                setModal={(i) => {
-                                    setModal(i);
-                                }}
-                                setOpen={setOpen}
-                                setTitle={setTitle}
-                                editChange={editChange}
-                                statusChange={statusChange}
-                                editModal={editModal}
-                                delModal={delModal}
-                            />
-                        </Box>
+                        {expanded[index] && (
+                            <Box
+                            // sx={{ display: expanded[index] ? 'block' : 'none' }}
+                            >
+                                <Valida
+                                    key={item.field}
+                                    title={item.name}
+                                    handler={item?.flowStep?.handler}
+                                    variable={item.variable?.variables}
+                                    variables={item.flowStep.variable?.variables}
+                                    responent={item.flowStep.response}
+                                    buttonLabel={item.buttonLabel}
+                                    basisChange={basisChange}
+                                    index={index}
+                                    allvalida={allvalida[index]}
+                                    fields={item.field}
+                                    setModal={(i) => {
+                                        setModal(i);
+                                    }}
+                                    setOpen={setOpen}
+                                    setTitle={setTitle}
+                                    editChange={editChange}
+                                    statusChange={statusChange}
+                                    editModal={editModal}
+                                    delModal={delModal}
+                                />
+                            </Box>
+                        )}
                     </SubCard>
                     <Box textAlign="center" fontSize="25px" fontWeight={600} mt={1}>
                         |
@@ -628,10 +693,35 @@ function Arrange({ detail, config, editChange, basisChange, statusChange, change
                             InputLabelProps={{ shrink: true }}
                             helperText={' '}
                         />
-                        <FormControl fullWidth sx={{ mt: 2 }}>
+                        {detail?.type === 'MEDIA_MATRIX' && (
+                            <FormControl fullWidth sx={{ mt: 2 }}>
+                                <InputLabel>变量分组</InputLabel>
+                                <Select onChange={formik.handleChange} name="group" value={formik.values.group} label="变量分组">
+                                    <MenuItem value={'ADVANCED'}>
+                                        <div className="w-full flex justify-between items-end">
+                                            <div>高级变量</div>
+                                            <div className="text-xs text-black/50">创建者在配置页面可编辑删除，普通用户不能编辑删除</div>
+                                        </div>
+                                    </MenuItem>
+                                    <MenuItem value={'PARAMS'}>
+                                        <div className="w-full flex justify-between items-end">
+                                            <div>通用变量</div>
+                                            <div className="text-xs text-black/50">所有用户都可编辑删除</div>
+                                        </div>
+                                    </MenuItem>
+                                    <MenuItem disabled={true} value={'SYSTEM'}>
+                                        <div className="w-full flex justify-between items-end">
+                                            <div>系统变量</div>
+                                            <div className="text-xs text-black/50">所有用户都不可编辑删除</div>
+                                        </div>
+                                    </MenuItem>
+                                </Select>
+                            </FormControl>
+                        )}
+                        <FormControl fullWidth sx={{ mt: detail?.type === 'MEDIA_MATRIX' ? 4 : 2 }}>
                             <InputLabel>{t('myApp.type')}</InputLabel>
                             <Select onChange={formik.handleChange} name="style" value={formik.values.style} label={t('myApp.type')}>
-                                {typeList.map((el: any) => (
+                                {variableStyle?.map((el: any) => (
                                     <MenuItem key={el.value} value={el.value}>
                                         {el.label}
                                     </MenuItem>

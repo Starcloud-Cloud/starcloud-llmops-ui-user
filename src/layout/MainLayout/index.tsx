@@ -385,22 +385,10 @@ const MainLayout = () => {
     useEffect(() => {
         if (allDetail?.allDetail) {
             if (allDetail?.allDetail?.isNewUser) {
-                // setTimeout(() => {
-                handleShowNewUserVip();
-                // }, 1000 * 60 * 3);
+                if (getPermission(ENUM_PERMISSION.NEW_USER_ACTIVITY)) {
+                    handleShowNewUserVip();
+                }
             }
-            //  else {
-            //     const dateTime = localStorage.getItem(`inviteUserVipEndTime-${allDetail?.allDetail?.id}`);
-            //     if (dateTime) {
-            //         if (new Date().getTime() - new Date(dateTime).getTime() > 0) {
-            //             setOpenInvite(true);
-            //         } else {
-            //             setOpenInvite(false);
-            //         }
-            //     } else {
-            //         setOpenInvite(true);
-            //     }
-            // }
         }
     }, [location.pathname, allDetail]);
 
@@ -433,19 +421,26 @@ const MainLayout = () => {
         };
     }, []);
     useEffect(() => {
-        const arr = allDetail?.allDetail?.teamRights || allDetail?.allDetail?.rights;
-        if (arr) {
-            if (status) {
-                if (use?.mobile === '' && !storage.get('phonenumber') && !use?.mobile && JSON.stringify(twoUser) !== JSON.stringify(arr)) {
-                    setTimeout(() => {
-                        setPhoneOpen(true);
-                    }, 1000 * 60 * 6);
+        if (getPermission(ENUM_PERMISSION.PHONE_CHECK)) {
+            const arr = allDetail?.allDetail?.teamRights || allDetail?.allDetail?.rights;
+            if (arr) {
+                if (status) {
+                    if (
+                        use?.mobile === '' &&
+                        !storage.get('phonenumber') &&
+                        !use?.mobile &&
+                        JSON.stringify(twoUser) !== JSON.stringify(arr)
+                    ) {
+                        setTimeout(() => {
+                            setPhoneOpen(true);
+                        }, 1000 * 60 * 6);
+                    } else {
+                        setPhoneOpen(false);
+                    }
                 } else {
-                    setPhoneOpen(false);
+                    setStatus(true);
+                    setTwoUser(arr);
                 }
-            } else {
-                setStatus(true);
-                setTwoUser(arr);
             }
         }
     }, [
@@ -495,15 +490,17 @@ const MainLayout = () => {
     return (
         <ListingProvider>
             <div className="w-full">
-                <div className="w-full">
-                    <img
-                        src={require('../../assets/images/header/present.jpeg')}
-                        className="cursor-pointer w-full"
-                        onClick={() => {
-                            navigate('/subscribe');
-                        }}
-                    />
-                </div>
+                {getPermission(ENUM_PERMISSION.SPRING_SALE) && (
+                    <div className="w-full">
+                        <img
+                            src={require('../../assets/images/header/present.jpeg')}
+                            className="cursor-pointer w-full"
+                            onClick={() => {
+                                navigate('/subscribe');
+                            }}
+                        />
+                    </div>
+                )}
                 <div className="flex flex-col">
                     {timeOutObj && (
                         <div className="flex justify-center bg-[#f4f6f8] py-1">
@@ -537,7 +534,7 @@ const MainLayout = () => {
                                 position="absolute"
                                 color="inherit"
                                 elevation={0}
-                                sx={{ bgcolor: theme.palette.background.default }}
+                                sx={{ bgcolor: theme.palette.background.default, zIndex: 10 }}
                             >
                                 {header}
                             </AppBar>
@@ -553,8 +550,12 @@ const MainLayout = () => {
                                 {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                                 {!isLarge ? (
                                     <Container
-                                        className={`max-w-[1300px] h-full ${isMobile && '!px-0'}`}
-                                        {...(!container && { sx: { px: { xs: 0 } } })}
+                                        className={
+                                            // `${isMobile && '!p-0'}
+                                            `!p-0 max-w-[1300px] overflow-y-auto`
+                                        }
+                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'})` }}
+                                        // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         {/* breadcrumb */}
                                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
@@ -563,8 +564,12 @@ const MainLayout = () => {
                                 ) : (
                                     <Container
                                         maxWidth={false}
-                                        className={`h-full ${isMobile && '!px-0'}`}
-                                        {...(!container && { sx: { px: { xs: 0 } } })}
+                                        className={
+                                            // `${isMobile && '!p-0'}
+                                            `!p-0 overflow-y-scroll`
+                                        }
+                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'})` }}
+                                        // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
                                         <Outlet />

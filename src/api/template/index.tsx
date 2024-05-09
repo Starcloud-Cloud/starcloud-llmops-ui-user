@@ -13,7 +13,7 @@ export const categoryTree = () => {
     return request.get({ url: '/llm/app/categoryTree' });
 };
 //模板市场详情
-export const marketDeatail = (data: { uid: string }) => {
+export const marketDeatail = (data: any) => {
     return request.get({ url: `/llm/app/market/get/${data.uid}` });
 };
 //删除模板市场
@@ -53,6 +53,10 @@ export const appPage = (params: { pageNo: number; pageSize: number; mode?: strin
 //删除应用
 export const del = (uid: string) => {
     return request.delete({ url: `/llm/app/delete/${uid}` });
+};
+//复制应用
+export const copy = (data: any) => {
+    return request.post({ url: `/llm/app/copy`, data });
 };
 //应用类型
 export const metadata = () => {
@@ -94,11 +98,11 @@ export const detailApp = (data: any) => {
 };
 
 //获取我的应用
-export const getApp = (data: { uid: string }) => {
+export const getApp = (data: any) => {
     return request.get({ url: `/llm/app/get/${data.uid}` });
 };
 //获取推荐
-export const getRecommendApp = (data: { recommend: string }) => {
+export const getRecommendApp = (data: any) => {
     return request.get({ url: `/llm/app/getRecommendApp/${data.recommend}` });
 };
 //创建应用
@@ -196,5 +200,14 @@ export const xhsApp = (uid: any) => {
 
 // 获取模版分类
 export const getImageTemplateTypes = () => {
-    return request.get({ url: `/llm/creative/scheme/templateGroupByType` });
+    return request.get({ url: `/llm/creative/scheme/listPosterTemplateType` });
+};
+
+// 获取template json
+export const getImageTemplateJSON = (templateId: string) => {
+    return request.get({ url: `/llm/creative/scheme/posterTemplate?templateId=${templateId}` });
+};
+// 获取template json
+export const dictData = (label = '', type = 'prompt_template') => {
+    return request.get({ url: `system/dict-data/page?pageNo=1&pageSize=100&dictType=${type}&label=${label}` });
 };

@@ -9,7 +9,7 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 const Market = Loadable(lazy(() => import('views/template/market')));
 const MarketDetail = Loadable(lazy(() => import('views/template/market/components/detail')));
 const CreateCenter = Loadable(lazy(() => import('views/template/myTemplate')));
-const CreateDetail = Loadable(lazy(() => import('views/template/myTemplate/components/createTemplate')));
+const CreateDetail = Loadable(lazy(() => import('views/template/myTemplate/components/createTemplate/newIndex')));
 
 // Rewards
 const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
@@ -83,8 +83,8 @@ const MainRoutes = {
             element: <AppUserAccountProfile />
         },
         {
-            path: '/appMarket',
-            element: <Market />
+            // path: '/appMarket',
+            // element: <Market />
             // children: [
             //     {
             //         path: 'list',

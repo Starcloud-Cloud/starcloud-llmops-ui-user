@@ -1,0 +1,7 @@
+.addStyle .ant-image-preview-operations-wrapper {
+    z-index: 999999;
+}
+.addStyle .ant-image-preview-wrap {
+    z-index: 99999;
+}
+

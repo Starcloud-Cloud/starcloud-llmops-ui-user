@@ -1,7 +1,24 @@
-import { Avatar, Card, CollapseProps, Divider, Space, Button, Spin, Input, UploadProps, Upload, Modal } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
+import {
+    Avatar,
+    Card,
+    CollapseProps,
+    Divider,
+    Space,
+    Button,
+    Spin,
+    Input,
+    UploadProps,
+    Upload,
+    Modal,
+    Select,
+    Drawer,
+    Progress,
+    Popover
+} from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import './threeStep.css';
 import 'swiper/css/pagination';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -15,10 +32,31 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { Tooltip } from '@mui/material';
 import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
+import Left from '../../batchSmallRedBooks/components/newLeft';
+import { useAllDetail } from 'contexts/JWTContext';
+import jsCookie from 'js-cookie';
+import copy from 'clipboard-copy';
 
-export const ThreeStep = ({ data }: { data: any }) => {
+const ThreeStep = ({
+    data,
+    show,
+    pre,
+    exeDetail,
+    dataStatus,
+    setSataStatus,
+    setPre
+}: {
+    data: any;
+    show?: boolean;
+    pre: number;
+    exeDetail: boolean;
+    dataStatus: boolean;
+    setSataStatus: (data: boolean) => void;
+    setPre: (data: number) => void;
+}) => {
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
+    const [tags, setTags] = React.useState<any>([]);
     // const [images, setImages] = React.useState<any[]>([]);
     const [swiperRef, setSwiperRef] = React.useState<any>(null);
     const [imageList, setImageList] = React.useState([]);
@@ -28,23 +66,42 @@ export const ThreeStep = ({ data }: { data: any }) => {
     const [previewOpen, setPreviewOpen] = React.useState(false);
     const [previewImage, setPreviewImage] = React.useState('');
     const [claim, setClaim] = React.useState(true);
+    const all_detail = useAllDetail();
+
+    const handleChange = (value: any) => {
+        setTags(value);
+    };
 
     const handleModify = async () => {
         setLoading(true);
         try {
             const res = await modify({
-                planUid: data.planUid,
-                businessUid: data.businessUid,
-                copyWritingTitle: title,
-                copyWritingContent: text,
-                pictureContent: imageList.map((item: any, index) => ({
-                    index: index + 1,
-                    url: item.url,
-                    isMain: index === 0
-                }))
+                uid: data.uid,
+                executeResult: {
+                    copyWriting: { content: text, tagList: tags, title },
+                    imageList: imageList.map((item: any, index) => ({
+                        index: index + 1,
+                        url: item.url,
+                        isMain: index === 0
+                    }))
+                }
             });
             setEditType(false);
             setLoading(false);
+            if (res) {
+                setTags(res?.executeResult?.copyWriting?.tagList);
+                setText(res?.executeResult?.copyWriting?.content);
+                setTitle(res?.executeResult?.copyWriting?.title);
+                setClaim(res?.claim);
+                const imgs = res?.executeResult?.imageList?.map((item: any) => ({
+                    uid: item.index,
+                    status: 'done',
+                    name: item.url,
+                    url: item.url,
+                    isMain: item.isMain
+                }));
+                setImageList(imgs);
+            }
             dispatch(
                 openSnackbar({
                     anchorOrigin: {
@@ -67,11 +124,12 @@ export const ThreeStep = ({ data }: { data: any }) => {
 
     useEffect(() => {
         if (data) {
-            setText(data?.copyWritingContent);
-            setTitle(data?.copyWritingTitle);
+            setTags(data?.executeResult?.copyWriting?.tagList);
+            setText(data?.executeResult?.copyWriting?.content);
+            setTitle(data?.executeResult?.copyWriting?.title);
             setClaim(data?.claim);
             // setImages(data?.pictureContent || []);
-            const imgs = data?.pictureContent.map((item: any) => ({
+            const imgs = data?.executeResult?.imageList?.map((item: any) => ({
                 uid: item.index,
                 status: 'done',
                 name: item.url,
@@ -83,22 +141,19 @@ export const ThreeStep = ({ data }: { data: any }) => {
     }, [data]);
 
     const doRetry = async () => {
-        const res = await retryContent(data.businessUid);
-        if (res) {
-            setText(res.copyWritingContent);
-            setTitle(res.copyWritingTitle);
-
-            const imgs = res?.pictureContent.map((item: any) => ({
-                uid: item.index,
-                status: 'done',
-                name: item.url,
-                url: item.url,
-                isMain: item.isMain
-            }));
-            setImageList(imgs);
-        }
+        setOpen(true);
     };
-
+    useEffect(() => {
+        return () => {
+            clearInterval(timer.current);
+        };
+    }, []);
+    useEffect(() => {
+        if (dataStatus) {
+            clearInterval(timer.current);
+            setAginLoading(false);
+        }
+    }, [dataStatus]);
     const props: UploadProps = {
         name: 'image',
         multiple: true,
@@ -134,34 +189,63 @@ export const ThreeStep = ({ data }: { data: any }) => {
             setPreviewOpen(true);
         }
     };
+    //重新生成
+    const [open, setOpen] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
+    const [aginLoading, setAginLoading] = useState(false);
+    const timer = useRef<any>(null);
 
     return (
-        <div className="h-full">
+        <div
+            className="h-full"
+            style={{
+                position: 'relative'
+                // background: token.colorFillAlter,
+                // border: `1px solid ${token.colorBorderSecondary}`,
+                // borderRadius: token.borderRadiusLG
+            }}
+        >
             <Card
                 className="h-full"
-                title="小红书生成"
+                // title="小红书生成"
                 bodyStyle={{
-                    height: 'calc(100% - 30px)',
-                    overflow: 'hidden'
+                    // height: 'calc(100% - 30px)'
+                    height: '100%',
+                    padding: 0
                 }}
-                extra={
-                    <>
-                        <Button onClick={doRetry}>重新生成</Button>
-                        <Divider type="vertical" />
-                        {!editType ? (
-                            <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
-                                编辑
-                            </Button>
-                        ) : (
-                            <Button type="primary" onClick={handleModify}>
-                                保存
-                            </Button>
-                        )}
-                    </>
-                }
             >
-                <div className="w-full grid grid-cols-3 h-full">
-                    <div className="col-span-2 relative h-full overflow-hidden">
+                {/* <Spin spinning={aginLoading}> */}
+                <div className="w-full  h-full relative grid grid-cols-3">
+                    {!show && !exeDetail && (
+                        <div
+                            className="flex gap-2"
+                            style={{
+                                position: 'absolute',
+                                right: '12px',
+                                top: '-48px'
+                            }}
+                        >
+                            {/* {jsCookie.get('isClient')&&
+                            <Button>加入代发布列表</Button>
+                            } */}
+                            <Button onClick={doRetry}>重新生成</Button>
+                            {!editType ? (
+                                <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
+                                    编辑
+                                </Button>
+                            ) : (
+                                <Space>
+                                    <Button type="primary" onClick={handleModify}>
+                                        保存
+                                    </Button>
+                                    <Button type="default" onClick={() => setEditType(false)}>
+                                        取消
+                                    </Button>
+                                </Space>
+                            )}
+                        </div>
+                    )}
+                    <div className="relative h-full overflow-hidden col-span-2">
                         {imageList?.length > 0 &&
                             (editType ? (
                                 <Upload {...props}>
@@ -198,7 +282,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                                 spaceBetween={30}
                                                 centeredSlides={false}
                                                 loop
-                                                pagination={{ clickable: true }}
+                                                // pagination={{ clickable: true }}
                                                 modules={[Pagination]}
                                                 className="mySwiper h-full"
                                                 autoplay={{
@@ -208,7 +292,7 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                             >
                                                 {imageList.map((item: any, index) => (
                                                     <SwiperSlide key={index}>
-                                                        <img className="w-full h-full object-contain" src={item.url} />
+                                                        <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
                                                     </SwiperSlide>
                                                 ))}
                                             </Swiper>
@@ -217,14 +301,13 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                 </>
                             ))}
                     </div>
-                    <div className="col-span-1 h-full overflow-auto">
+                    <div className="h-full overflow-auto col-span-1">
                         {
-                            <div className="w-full h-full p-4">
+                            <div className="w-full h-full p-4 !pl-2">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
                                         <Avatar />
-
-                                        <span className="text-[rgba(51,51,51,0.8)] text-base ml-2">不沾果酱</span>
+                                        <span className="text-[rgba(51,51,51,0.8)] text-base ml-2"> {all_detail?.allDetail?.nickname}</span>
                                     </div>
                                     <div
                                         className="bg-[#ff2e4d] text-white text-base w-[96px] font-semibold px-6 h-[40px] cursor-pointer rounded-2xl text-center"
@@ -240,32 +323,111 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                         value={title}
                                     />
                                 ) : (
-                                    <CopyToClipboard
-                                        text={title}
-                                        onCopy={() =>
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '复制成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    close: false,
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideLeft'
-                                                })
-                                            )
-                                        }
-                                    >
-                                        <Tooltip title="点击复制">
-                                            <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap cursor-pointer select-none">
-                                                {title}
-                                            </div>
-                                        </Tooltip>
-                                    </CopyToClipboard>
+                                    <div className="font-semibold text-lg mb-2 mt-8 whitespace-pre-wrap select-none">
+                                        <div>
+                                            {!exeDetail && (
+                                                <Space>
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(title);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        复制标题
+                                                    </Button>
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(`${title}${text}${tags}`);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        复制全部
+                                                    </Button>
+                                                </Space>
+                                            )}
+                                        </div>
+                                        <div>{title}</div>
+                                    </div>
                                 )}
                                 <Divider />
+                                <div>
+                                    {!exeDetail && (
+                                        <Space>
+                                            <Button
+                                                type="primary"
+                                                size="small"
+                                                onClick={() => {
+                                                    copy(text);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideLeft'
+                                                        })
+                                                    );
+                                                }}
+                                            >
+                                                复制内容
+                                            </Button>
+                                            <Button
+                                                type="primary"
+                                                size="small"
+                                                onClick={() => {
+                                                    copy(`${tags}`);
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            transition: 'SlideLeft'
+                                                        })
+                                                    );
+                                                }}
+                                            >
+                                                复制标签
+                                            </Button>
+                                        </Space>
+                                    )}
+                                </div>
                                 <div className="max-h-[calc(100%-150px)] ">
                                     {editType ? (
                                         <Input.TextArea
@@ -275,46 +437,98 @@ export const ThreeStep = ({ data }: { data: any }) => {
                                             rows={16}
                                         />
                                     ) : (
-                                        <CopyToClipboard
-                                            text={text}
-                                            onCopy={() =>
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: '复制成功',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'success'
-                                                        },
-                                                        close: false,
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                        transition: 'SlideLeft'
-                                                    })
-                                                )
-                                            }
-                                        >
-                                            <Tooltip title="点击复制">
-                                                <div className="text-base mb-2 whitespace-pre-wrap cursor-pointer select-none">{text}</div>
-                                            </Tooltip>
-                                        </CopyToClipboard>
+                                        <div className="text-base mb-2 whitespace-pre-wrap select-none">{text}</div>
                                     )}
-                                    <div className="flex gap-4 flex-wrap text-lg">
-                                        {data?.tags?.map((item: string) => (
-                                            <span key={item} className="text-[#13386c] cursor-pointer">
-                                                #{item}
-                                            </span>
-                                        ))}
-                                    </div>
+                                    {editType ? (
+                                        <div className="flex gap-4 flex-wrap text-lg">
+                                            {/* {data?.executeResult?.copyWriting?.tagList?.map((item: string) => (
+                                                <span key={item} className="text-[#13386c] cursor-pointer">
+                                                    #{item}
+                                                </span>
+                                            ))} */}
+                                            <Select
+                                                mode="tags"
+                                                style={{ width: '100%' }}
+                                                placeholder="标签"
+                                                value={tags}
+                                                onChange={handleChange}
+                                                options={[]}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="flex gap-4 flex-wrap text-lg">
+                                            {tags?.map((item: string) => (
+                                                <span key={item} className="text-[#13386c]">
+                                                    #{item}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         }
                     </div>
+                    {aginLoading && (
+                        <div className="z-[1000] absolute w-full h-full flex justify-center items-center bg-black/50">
+                            <div className="flex flex-col gap-2 justify-center items-center bg-white w-[200px] h-[200px] rounded-lg">
+                                <Progress
+                                    type="circle"
+                                    percent={Math.floor((data?.progress?.currentStepIndex / data?.progress?.totalStepCount) * 100)}
+                                />
+                                <Popover content={'执行到第几步/总步数'}>
+                                    <div className="font-[500] cursor-pointer">
+                                        {data?.progress?.currentStepIndex || '-'}/{data?.progress?.totalStepCount || '-'}
+                                    </div>
+                                </Popover>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Card>
 
-            <Modal style={{ zIndex: 9999 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
+            <Modal style={{ zIndex: 8000 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
                 <img alt="example" style={{ width: '100%' }} src={previewImage} />
             </Modal>
+            <Drawer
+                width={700}
+                // style={{ zIndex: 9999 }}
+                style={{ transform: 'none !important' }}
+                rootStyle={{
+                    transform: 'none !important'
+                }}
+                open={open}
+                title={'重新生成'}
+                footer={null}
+                getContainer={false}
+                onClose={() => setOpen(false)}
+            >
+                <div className="mt-[-24px] h-[calc(100%+24px)]">
+                    <Left
+                        detailShow={false}
+                        data={data}
+                        saveLoading={saveLoading}
+                        newSave={async (data: any) => {
+                            setSaveLoading(true);
+                            setSataStatus(false);
+                            await retryContent(data);
+                            setSaveLoading(false);
+                            setOpen(false);
+                            setAginLoading(true);
+                            timer.current = setInterval(() => {
+                                setPre(Math.random() + Math.random());
+                            }, 2000);
+                        }}
+                        setPlanUid={(uid: any) => {
+                            console.log(uid);
+                        }}
+                    />
+                </div>
+            </Drawer>
         </div>
     );
 };
+const prop = (newValue: any, oldValue: any) => {
+    return JSON.stringify(newValue.data) === JSON.stringify(oldValue.data) && JSON.stringify(newValue.pre) === JSON.stringify(oldValue.pre);
+};
+
+export default memo(ThreeStep, prop);

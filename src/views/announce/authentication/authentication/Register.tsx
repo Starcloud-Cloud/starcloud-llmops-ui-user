@@ -19,22 +19,9 @@ import AuthRegister from '../auth-forms/AuthRegister';
 import imgMain from 'assets/images/auth/img-a2-signup.svg';
 import { t } from 'hooks/web/useI18n';
 import { useEffect, useState } from 'react';
+import { items } from './Login';
 
 // carousel items
-const items: AuthSliderProps[] = [
-    {
-        title: '应用市场',
-        description: '集成了300+跨境工作的预训练应用，10S生成文案'
-    },
-    {
-        title: '自由绘图',
-        description: '一步生成精美图片，快速抠图，提升图片质量'
-    },
-    {
-        title: '定制机器人',
-        description: '通过角色设定和学习素材，生成定制版机器人'
-    }
-];
 
 // ===============================|| AUTH2 - REGISTER ||=============================== //
 

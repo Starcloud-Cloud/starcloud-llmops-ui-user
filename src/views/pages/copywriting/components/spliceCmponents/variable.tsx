@@ -16,7 +16,7 @@ import {
 import MainCard from 'ui-component/cards/MainCard';
 import { Error, Add, Delete, Settings } from '@mui/icons-material';
 import { t } from 'hooks/web/useI18n';
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import _ from 'lodash-es';
 import VariableModal from '../variableModal';
 interface Variable {
@@ -25,8 +25,6 @@ interface Variable {
 }
 
 const CreateVariable = ({ rows, setRows }: Variable) => {
-    console.log(rows);
-
     const [title, setTitle] = useState('');
     const [variableOpen, setVariableOpen] = useState(false);
     const [varIndex, setVarIndex] = useState(-1);
@@ -47,6 +45,11 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
             setVariableOpen(false);
         }
     };
+    useEffect(() => {
+        if (!variableOpen) {
+            setItemData({});
+        }
+    }, [variableOpen]);
     return (
         <>
             <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
@@ -77,7 +80,6 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                             <TableRow>
                                 <TableCell>{t('myApp.field')}</TableCell>
                                 <TableCell>{t('myApp.name')}</TableCell>
-                                <TableCell>变量默认值</TableCell>
                                 <TableCell>{t('myApp.type')}</TableCell>
                                 <TableCell>{t('myApp.operation')}</TableCell>
                             </TableRow>
@@ -88,7 +90,6 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                                     <TableRow hover key={row.field}>
                                         <TableCell>{row.field}</TableCell>
                                         <TableCell>{row.label}</TableCell>
-                                        <TableCell>{row.defaultValue}</TableCell>
                                         <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
                                         <TableCell sx={{ width: 120 }}>
                                             <IconButton
@@ -114,7 +115,7 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                                                 okText={t('myApp.confirm')}
                                                 cancelText={t('myApp.cancel')}
                                             >
-                                                <IconButton color="error">
+                                                <IconButton disabled={row?.group === 'ADVANCED'} color="error">
                                                     <Delete />
                                                 </IconButton>
                                             </Popconfirm>

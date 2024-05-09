@@ -1,6 +1,5 @@
 import {
     Box,
-    Grid,
     FormControl,
     InputLabel,
     Select as Selects,
@@ -15,7 +14,7 @@ import {
     Paper,
     Pagination,
     TextField,
-    Button,
+    Button as Button2,
     Drawer,
     Card,
     Divider,
@@ -25,12 +24,12 @@ import {
     Tooltip,
     Link
 } from '@mui/material';
-import { Tag, Image, Select } from 'antd';
+import { Row, Col, Tag, Image, Select, Button } from 'antd';
 import formatDate from 'hooks/useDate';
 import CloseIcon from '@mui/icons-material/Close';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Chart, { Props } from 'react-apexcharts';
 import { logStatistics, statisticsByAppUid, infoPage, infoPageByAppUid, logMetaData, detailImage, detailApp } from 'api/template';
@@ -41,11 +40,15 @@ import marketStore from 'store/market';
 import PicModal from 'views/picture/create/Modal';
 import { getChatRecord } from 'api/chat';
 import { metadata } from 'api/template';
+import { schemeMetadata } from 'api/redBook/copywriting';
+import { materialTemplate } from 'api/redBook/batchIndex';
 import { ChatRecord } from '../myChat/createChat/components/ChatRecord';
 import ImageDetail from 'views/picture/components/detail';
 import Echarts from './components/echart';
 import useUserStore from 'store/user';
 import { Charts } from 'types/chat';
+import { DetailModal } from 'views/pages/redBookContentList/component/detailModal';
+import _ from 'lodash-es';
 interface LogStatistics {
     createDate: string;
     completionCostPoints: number;
@@ -112,7 +115,7 @@ function ApplicationAnalysis({
     value = 2,
     type = 'GENERATE_RECORD'
 }: {
-    appUid: string | null;
+    appUid: string | null | undefined;
     value: number;
     type: string;
 }) {
@@ -216,7 +219,7 @@ function ApplicationAnalysis({
             setAppScene(res.appScene);
         });
         metadata().then((res) => {
-            setExeList(res.aiModel);
+            setExeList(res.llmModelType);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -360,21 +363,110 @@ function ApplicationAnalysis({
     //智能抠图弹窗
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>({});
+    //小红书弹窗
+    const [redBookOpen, setRedBookOpen] = useState(false);
+    const [executeResult, setExecuteResult] = useState<any>(null);
     //接口请求出来的全部内容
     const [result, setResult] = useState<any>({});
     const [aimodel, setAiModel] = useState('');
+    const detailRef = useRef<any>(null);
     const [exeDetail, setExeDetail] = useState<any>({});
     //聊天
     const [chatVisible, setChatVisible] = useState(false);
     //绘话id
     const [conversationUid, setConversationUid] = useState('');
     const navigate = useNavigate();
+    const getImage = (active: string) => {
+        let image;
+        try {
+            image = require('../../../assets/images/category/' + active + '.svg');
+        } catch (_) {
+            image =
+                'data:image/png;base64,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';
+        }
+        return image;
+    };
+
+    const stepMarRef = useRef<any[]>([]);
+    const [stepMaterial, setStepMaterial] = useState<any[]>([]);
+    const getStepMater = async () => {
+        const arr: any[] = [];
+        const newList = detailRef.current?.workflowConfig?.steps.map((item: any) => {
+            const arr = item?.variable?.variables;
+            return arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value;
+        });
+        const allper = newList?.map(async (el: any, index: number) => {
+            if (el) {
+                const res = await materialTemplate(el);
+                arr[index] = getHeader(res?.fieldDefine, index);
+            } else {
+                arr[index] = undefined;
+            }
+        });
+        await Promise.all(allper);
+        stepMarRef.current = arr;
+        setStepMaterial(stepMarRef?.current);
+    };
+    //获取数据表头
+    const getHeader = (data: any, i: number) => {
+        const newList = data.map((item: any) => ({
+            title: item.desc,
+            align: 'center',
+            width: 200,
+            dataIndex: item.fieldName,
+            render: (_: any, row: any) => (
+                <div className="flex justify-center items-center flex-wrap break-all gap-2">
+                    <div className="line-clamp-5">
+                        {item.type === 'image' ? (
+                            row[item.fieldName] ? (
+                                <Image
+                                    fallback={
+                                        'data:image/png;base64,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'
+                                    }
+                                    width={50}
+                                    height={50}
+                                    preview={false}
+                                    src={row[item.fieldName]}
+                                />
+                            ) : (
+                                <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
+                            )
+                        ) : (
+                            row[item.fieldName]
+                        )}
+                    </div>
+                </div>
+            ),
+            type: item.type
+        }));
+
+        return [
+            ...newList,
+            {
+                title: '操作',
+                align: 'center',
+                width: 100,
+                fixed: 'right',
+                render: (_: any, row: any, index: number) => (
+                    <div className="flex justify-center">
+                        <Button disabled={true} size="small" type="link">
+                            编辑
+                        </Button>
+
+                        <Button disabled={true} size="small" type="link" danger>
+                            删除
+                        </Button>
+                    </div>
+                )
+            }
+        ];
+    };
     return (
         <Box>
-            <Grid sx={{ mb: 2 }} container spacing={2} alignItems="center">
+            <Row className="my-4" gutter={[20, 20]}>
                 {!appUid && (
                     <>
-                        <Grid item md={4} lg={3} xs={12}>
+                        <Col md={8} lg={6} xs={12}>
                             <TextField
                                 label={t('generateLog.name')}
                                 value={queryParams.appName}
@@ -384,8 +476,8 @@ function ApplicationAnalysis({
                                 onChange={handleChange}
                                 fullWidth
                             />
-                        </Grid>
-                        <Grid item md={4} lg={3} xs={12}>
+                        </Col>
+                        <Col md={8} lg={6} xs={12}>
                             <TextField
                                 label={'用户 ID'}
                                 value={queryParams.userId}
@@ -395,8 +487,8 @@ function ApplicationAnalysis({
                                 onChange={handleChange}
                                 fullWidth
                             />
-                        </Grid>
-                        <Grid item md={4} lg={3} xs={12}>
+                        </Col>
+                        <Col md={8} lg={6} xs={12}>
                             <FormControl fullWidth>
                                 <InputLabel id="appMode">模式</InputLabel>
                                 <Selects
@@ -412,10 +504,10 @@ function ApplicationAnalysis({
                                     ))}
                                 </Selects>
                             </FormControl>
-                        </Grid>
+                        </Col>
                     </>
                 )}
-                <Grid item md={4} lg={3} xs={12}>
+                <Col md={8} lg={6} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="fromScene">场景</InputLabel>
                         <Selects labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
@@ -424,8 +516,8 @@ function ApplicationAnalysis({
                             ))}
                         </Selects>
                     </FormControl>
-                </Grid>
-                <Grid item md={4} lg={3} xs={12}>
+                </Col>
+                <Col md={8} lg={6} xs={12}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
                         <Selects
@@ -442,13 +534,13 @@ function ApplicationAnalysis({
                             ))}
                         </Selects>
                     </FormControl>
-                </Grid>
-                <Grid item md={4} lg={3} xs={12}>
-                    <Button onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
+                </Col>
+                <Col md={8} lg={6} xs={12}>
+                    <Button2 onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
                         {t('generateLog.search')}
-                    </Button>
-                </Grid>
-            </Grid>
+                    </Button2>
+                </Col>
+            </Row>
             <Echarts generate={generate} list={list} />
             <TableContainer component={Paper} sx={{ mt: 2 }}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -460,15 +552,19 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.mode')}
                             </TableCell>
-                            <TableCell sx={{ minWidth: '100px' }} align="center">
-                                执行场景
-                            </TableCell>
+                            {permissions?.includes('log:app:page:adminColumns') && (
+                                <TableCell sx={{ minWidth: '100px' }} align="center">
+                                    执行场景
+                                </TableCell>
+                            )}
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.totalAnswerTokens')}
                             </TableCell>
-                            <TableCell sx={{ minWidth: '100px' }} align="center">
-                                {t('generate.totalElapsed')} (s)
-                            </TableCell>
+                            {permissions?.includes('log:app:page:adminColumns') && (
+                                <TableCell sx={{ minWidth: '100px' }} align="center">
+                                    {t('generate.totalElapsed')} (s)
+                                </TableCell>
+                            )}
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 用户
                             </TableCell>
@@ -498,9 +594,13 @@ function ApplicationAnalysis({
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell align="center">{row.appName}</TableCell>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
-                                <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
+                                {permissions?.includes('log:app:page:adminColumns') && (
+                                    <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
+                                )}
                                 <TableCell align="center">{row?.appMode === 'IMAGE' ? row.imagePoints : row.costPoints}</TableCell>
-                                <TableCell align="center">{row.totalElapsed}</TableCell>
+                                {permissions?.includes('log:app:page:adminColumns') && (
+                                    <TableCell align="center">{row.totalElapsed}</TableCell>
+                                )}
                                 <TableCell align="center">{row.appExecutor}</TableCell>
                                 <TableCell align="center">
                                     {row.status !== 'SUCCESS' ? (
@@ -583,7 +683,7 @@ function ApplicationAnalysis({
                                     </TableCell>
                                 )}
                                 <TableCell align="center">
-                                    <Button
+                                    <Button2
                                         color="secondary"
                                         size="small"
                                         onClick={() => {
@@ -591,12 +691,37 @@ function ApplicationAnalysis({
                                                 getDeList(row);
                                             } else if (row.appMode === 'COMPLETION') {
                                                 detailApp({ appConversationUid: row.uid }).then((res) => {
-                                                    if (res) {
-                                                        setExeDetail(res.appInfo);
-                                                        setAiModel(res.aiModel);
-                                                        setResult(res);
-                                                        setConversationUid(res.conversationUid);
+                                                    if (!res?.executeResult) {
+                                                        const newData = _.cloneDeep(res);
+                                                        newData?.appInfo?.workflowConfig?.steps?.forEach((item: any) => {
+                                                            const arr = item?.variable?.variables;
+                                                            if (
+                                                                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
+                                                                arr?.find((el: any) => el.style === 'MATERIAL') &&
+                                                                arr?.find((el: any) => el.style === 'MATERIAL')?.value
+                                                            ) {
+                                                                let list: any;
+
+                                                                try {
+                                                                    list = JSON.parse(
+                                                                        arr?.find((el: any) => el.style === 'MATERIAL')?.value
+                                                                    );
+                                                                } catch (err) {
+                                                                    list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
+                                                                }
+                                                                arr.find((el: any) => el.style === 'MATERIAL').value = list;
+                                                            }
+                                                        });
+                                                        detailRef.current = newData.appInfo;
+                                                        setExeDetail(detailRef.current);
+                                                        setAiModel(newData.aiModel);
+                                                        setResult(newData);
+                                                        setConversationUid(newData.conversationUid);
+                                                        getStepMater();
                                                         setExeOpen(true);
+                                                    } else {
+                                                        setExecuteResult(res);
+                                                        setRedBookOpen(true);
                                                     }
                                                 });
                                             } else if (row.appMode === 'CHAT') {
@@ -616,7 +741,7 @@ function ApplicationAnalysis({
                                         }}
                                     >
                                         {t('generate.detail')}
-                                    </Button>
+                                    </Button2>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -672,13 +797,14 @@ function ApplicationAnalysis({
                     sx={{ '& .MuiDrawer-paper': { overflowY: 'auto' } }}
                     onClose={() => {
                         setExeOpen(false);
-                        setExeDetail({});
+                        detailRef.current = {};
+                        setExeDetail(detailRef.current);
                         setAiModel('');
                         setResult({});
                         setConversationUid('');
                     }}
                 >
-                    <div className="bg-[#f4f6f8] w-[1000px] md:w-[800px] flex justify-center">
+                    <div className="bg-[#f4f6f8] w-[1100px] md:w-[900px] flex justify-center">
                         <div className="m-[10px] bg-[#fff] h-[calc(100vh-20px)] w-[100%] rounded-lg">
                             <MainCard
                                 title={
@@ -712,7 +838,7 @@ function ApplicationAnalysis({
                                                         preview={false}
                                                         height={60}
                                                         className="rounded-lg overflow-hidden"
-                                                        src={require('../../../assets/images/category/' + exeDetail?.icon + '.svg')}
+                                                        src={getImage(exeDetail?.icon)}
                                                     />
                                                 )}
                                                 <Box ml={1}>
@@ -739,21 +865,23 @@ function ApplicationAnalysis({
                                                     </Box>
                                                 </Box>
                                             </Box>
-                                            <Select
-                                                style={{ width: 100, height: 23 }}
-                                                bordered={false}
-                                                className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
-                                                rootClassName="modelSelect"
-                                                popupClassName="modelSelectPopup"
-                                                value={aimodel}
-                                                disabled
-                                            >
-                                                {exeList?.map((item: any) => (
-                                                    <Option key={item.value} value={item.value}>
-                                                        {item.label}
-                                                    </Option>
-                                                ))}
-                                            </Select>
+                                            {exeDetail?.workflowConfig?.steps?.length == 1 && (
+                                                <Select
+                                                    style={{ width: 100, height: 23 }}
+                                                    bordered={false}
+                                                    className="rounded-2xl border-[0.5px] border-[#673ab7] border-solid"
+                                                    rootClassName="modelSelect"
+                                                    popupClassName="modelSelectPopup"
+                                                    value={aimodel}
+                                                    disabled
+                                                >
+                                                    {exeList?.map((item: any) => (
+                                                        <Option key={item.value} value={item.value}>
+                                                            {item.label}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            )}
                                         </Box>
                                         {result.status !== 'ERROR' && <Divider sx={{ my: 1 }} />}
                                         <Typography variant="h5" sx={{ fontSize: '1.1rem', mb: 3 }}>
@@ -762,6 +890,7 @@ function ApplicationAnalysis({
                                         <Perform
                                             history={true}
                                             config={exeDetail.workflowConfig}
+                                            columns={stepMaterial}
                                             changeConfigs={() => {}}
                                             changeSon={() => {}}
                                             changeanswer={() => {}}
@@ -781,6 +910,9 @@ function ApplicationAnalysis({
                 </Drawer>
             )}
             {detailOpen && <ImageDetail detailOpen={detailOpen} detailData={detailData} handleClose={() => setDetailOpen(false)} />}
+            {redBookOpen && (
+                <DetailModal open={redBookOpen} handleClose={() => setRedBookOpen(false)} executeResult={executeResult} businessUid={''} />
+            )}
         </Box>
     );
 }

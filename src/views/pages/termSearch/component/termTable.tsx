@@ -561,6 +561,7 @@ const TermTable = ({
             tableRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [JSON.stringify(tableData)]);
+
     return (
         <div ref={tableRef}>
             <div className="sticky top-0 z-[3] bg-[#fff] flex items-center justify-between p-[20px] pt-[12px] h-[76px]">

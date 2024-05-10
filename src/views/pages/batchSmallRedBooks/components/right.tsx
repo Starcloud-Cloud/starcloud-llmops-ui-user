@@ -1,13 +1,14 @@
-import { Collapse, Spin, Tag, Popover } from 'antd';
+import { Collapse, Spin, Tag, Popover, Button } from 'antd';
 import { CopyrightOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
-import { memo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import PlanList from './PlanList';
 import Good from '../good';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const Right = ({
+    batchTotal,
     bathList,
     exampleList,
     collapseActive,
@@ -19,6 +20,7 @@ const Right = ({
     handleScroll,
     timeFailure
 }: {
+    batchTotal: number;
     bathList: any[];
     exampleList: any[];
     collapseActive: any;
@@ -49,9 +51,18 @@ const Right = ({
                 return <Tag>待执行</Tag>;
         }
     };
+    const [pageNum, setPageNum] = useState(10);
+    const [batchPageList, setBatchPageList] = useState<any[]>([]);
+    useEffect(() => {
+        const newList = bathList?.slice(0, pageNum);
+        setBatchPageList(newList);
+    }, [bathList, pageNum]);
+    const getMore = () => {
+        setPageNum(pageNum + 10);
+    };
     return (
         <>
-            {bathList?.length === 0 ? (
+            {batchPageList?.length === 0 ? (
                 <div style={{ height: '100%' }} className="flex justify-center items-center">
                     <div className="text-center">
                         {exampleList?.length > 0 ? (
@@ -82,7 +93,7 @@ const Right = ({
                     <Collapse
                         onChange={changeCollapse}
                         activeKey={collapseActive}
-                        items={bathList?.map((item) => {
+                        items={batchPageList?.map((item) => {
                             return {
                                 key: item.uid,
                                 label: (
@@ -158,6 +169,13 @@ const Right = ({
                         })}
                         accordion
                     />
+                    {batchTotal > pageNum && (
+                        <div className="flex justify-center mt-4">
+                            <Button size="small" type="primary" onClick={getMore}>
+                                更多
+                            </Button>
+                        </div>
+                    )}
                 </>
             )}
         </>

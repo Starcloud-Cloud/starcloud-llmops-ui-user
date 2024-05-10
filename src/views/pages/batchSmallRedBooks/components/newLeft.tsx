@@ -49,6 +49,7 @@ import { PermissionUpgradeModal } from 'views/template/myChat/createChat/compone
 import { useNavigate } from 'react-router-dom';
 const Lefts = ({
     detailShow = true,
+    planState,
     pre,
     detail,
     data,
@@ -62,6 +63,7 @@ const Lefts = ({
     setPlanUid
 }: {
     detailShow?: boolean;
+    planState?: number;
     pre?: number;
     detail?: any;
     data?: any;
@@ -474,6 +476,18 @@ const Lefts = ({
                           }))
                 );
             } else {
+                const resul = newList?.workflowConfig?.steps
+                    ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                    ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
+                    ?.value?.map((item: any) => ({
+                        uid: uuidv4(),
+                        thumbUrl: item?.pictureUrl,
+                        response: {
+                            data: {
+                                url: item?.pictureUrl
+                            }
+                        }
+                    }));
                 setFileList(
                     picList && picList?.length > 0
                         ? valueList?.map((item: any) => ({
@@ -485,18 +499,9 @@ const Lefts = ({
                                   }
                               }
                           }))
-                        : newList?.workflowConfig?.steps
-                              ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                              ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
-                              ?.value?.map((item: any) => ({
-                                  uid: uuidv4(),
-                                  thumbUrl: item?.pictureUrl,
-                                  response: {
-                                      data: {
-                                          url: item?.pictureUrl
-                                      }
-                                  }
-                              }))
+                        : resul
+                        ? resul
+                        : []
                 );
             }
         } else {
@@ -504,10 +509,10 @@ const Lefts = ({
                 tableRef.current = newList?.workflowConfig?.steps
                     ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
                     ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value;
-                setTableData(tableRef.current);
+                setTableData(tableRef.current || []);
             } else {
                 tableRef.current = picList && picList?.length > 0 ? picList : valueList;
-                setTableData(tableRef.current);
+                setTableData(tableRef.current || []);
             }
         }
         generRef.current = newList?.workflowConfig?.steps?.filter(
@@ -759,6 +764,12 @@ const Lefts = ({
             getStatus();
         }
     }, [pre]);
+    useEffect(() => {
+        if (planState) {
+            handleSaveClick(exeState);
+        }
+    }, [planState]);
+    const [exeState, setExeState] = useState(false);
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
         const newList = _.cloneDeep(generateList);
@@ -808,9 +819,10 @@ const Lefts = ({
             ];
             newSave(data);
         } else {
-            const styleData = imageRef.current?.record?.variable?.variables?.find(
-                (item: any) => item.field === 'POSTER_STYLE_CONFIG'
-            )?.value;
+            let styleData = imageRef.current?.record?.variable?.variables?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value;
+            if (typeof styleData === 'string') {
+                styleData = JSON.parse(styleData);
+            }
             const data = {
                 uid: appData?.uid,
                 totalCount,
@@ -850,48 +862,6 @@ const Lefts = ({
                 },
                 source: detail ? 'APP' : 'MARKET'
             };
-            //传递预览的值
-            if (detail) {
-                const newData = _.cloneDeep(detail);
-                let arr = newData?.workflowConfig?.steps;
-                const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
-                if (a) {
-                    a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                        materialType === 'picture'
-                            ? fileList?.map((item) => ({
-                                  pictureUrl: item?.response?.data?.url,
-                                  type: 'picture'
-                              }))
-                            : tableData?.map((item) => ({
-                                  ...item,
-                                  type: materialType
-                              }));
-                }
-                const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
-                if (b) {
-                    b.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
-                        ? styleData?.map((item: any) => ({
-                              ...item,
-                              id: undefined,
-                              code: item.id
-                          }))
-                        : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
-                }
-
-                arr = [
-                    arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
-                    ...generRef.current,
-                    arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-                ];
-
-                setDetail &&
-                    setDetail({
-                        ...detail,
-                        workflowConfig: {
-                            steps: arr?.filter((item: any) => item)
-                        }
-                    });
-            }
             const result = await planModify(data);
             dispatch(
                 openSnackbar({
@@ -912,6 +882,7 @@ const Lefts = ({
                 }
                 newSave(result);
             }
+            setExeState(false);
         }
     };
     const [tabKey, setTabKey] = useState('1');
@@ -975,21 +946,25 @@ const Lefts = ({
         }
     }, [JSON.stringify(generateList)]);
     useEffect(() => {
+        console.log(tableData, fileList);
+
         if (materialType && materialType === 'picture') {
             setMoke &&
                 setMoke(
                     fileList?.map((item) => ({
                         pictureUrl: item?.response?.data?.url,
                         type: 'picture'
-                    }))
+                    })) || []
                 );
         } else if (materialType && materialType !== 'picture') {
+            console.log(setMoke);
+
             setMoke &&
                 setMoke(
                     tableData?.map((item) => ({
                         ...item,
                         type: materialType
-                    }))
+                    })) || []
                 );
         }
     }, [JSON.stringify(tableData), JSON.stringify(fileList)]);
@@ -1339,15 +1314,73 @@ const Lefts = ({
                 <div className="z-[1000] absolute bottom-[-2px] flex gap-2 bg-[#fff] pt-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <>
+                            {!detail && (
+                                <Button
+                                    className="w-full"
+                                    icon={<SaveOutlined rev={undefined} />}
+                                    onClick={() => handleSaveClick(false)}
+                                    type="primary"
+                                >
+                                    保存配置
+                                </Button>
+                            )}
                             <Button
                                 className="w-full"
-                                icon={<SaveOutlined rev={undefined} />}
-                                onClick={() => handleSaveClick(false)}
                                 type="primary"
+                                onClick={() => {
+                                    if (!detail) {
+                                        handleSaveClick(true);
+                                    } else {
+                                        const newData = _.cloneDeep(detail);
+                                        let arr = newData?.workflowConfig?.steps;
+                                        const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+                                        if (a) {
+                                            a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                                                materialType === 'picture'
+                                                    ? fileList?.map((item) => ({
+                                                          pictureUrl: item?.response?.data?.url,
+                                                          type: 'picture'
+                                                      }))
+                                                    : tableData?.map((item) => ({
+                                                          ...item,
+                                                          type: materialType
+                                                      }));
+                                        }
+                                        const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+                                        if (b) {
+                                            let styleData = imageRef.current?.record?.variable?.variables?.find(
+                                                (item: any) => item.field === 'POSTER_STYLE_CONFIG'
+                                            )?.value;
+                                            if (typeof styleData === 'string') {
+                                                styleData = JSON.parse(styleData);
+                                            }
+                                            b.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
+                                                ? styleData?.map((item: any) => ({
+                                                      ...item,
+                                                      id: undefined,
+                                                      code: item.id
+                                                  }))
+                                                : imageMater?.variable?.variables?.find(
+                                                      (item: any) => item?.field === 'POSTER_STYLE_CONFIG'
+                                                  )?.value;
+                                        }
+
+                                        arr = [
+                                            arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+                                            ...generRef.current,
+                                            arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                                        ];
+                                        setExeState(true);
+                                        setDetail &&
+                                            setDetail({
+                                                ...detail,
+                                                workflowConfig: {
+                                                    steps: arr?.filter((item: any) => item)
+                                                }
+                                            });
+                                    }
+                                }}
                             >
-                                保存配置
-                            </Button>
-                            <Button className="w-full" type="primary" onClick={() => handleSaveClick(true)}>
                                 保存并开始生成
                             </Button>
                         </>

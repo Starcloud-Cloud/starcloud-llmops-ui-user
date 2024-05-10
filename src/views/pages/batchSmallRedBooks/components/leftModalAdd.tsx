@@ -24,9 +24,9 @@ const LeftModalAdd = ({
     return (
         <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
             <div className="flex gap-2 justify-end my-[20px]">
-                <Button type="primary" onClick={() => setOpen(true)}>
+                {/* <Button type="primary" onClick={() => setOpen(true)}>
                     AI 字段生成
-                </Button>
+                </Button> */}
                 <Button
                     type="primary"
                     onClick={() => {

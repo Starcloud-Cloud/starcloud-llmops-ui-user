@@ -65,6 +65,7 @@ const VariableInput = ({
         for (const key in json.properties) {
             const property = json.properties[key];
             if (property.type === 'object') {
+                console.log(property, name);
                 const convertedProperty = getjsonschma(property, name);
                 arr.push(convertedProperty);
             } else if (property.type === 'array') {
@@ -264,7 +265,8 @@ const VariableInput = ({
                                 ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
                                 : []
                         };
-                    });
+                    })
+                    ?.filter((item: any) => item?.children?.length > 0);
                 setSchemaList(newList);
             });
         }

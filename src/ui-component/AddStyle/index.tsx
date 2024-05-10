@@ -77,7 +77,7 @@ const AddStyle = React.forwardRef(
         }));
 
         useEffect(() => {
-            setImageVar(submitData);
+            setImageVar && setImageVar(submitData);
         }, [submitData]);
 
         useEffect(() => {

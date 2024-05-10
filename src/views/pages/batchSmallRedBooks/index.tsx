@@ -14,7 +14,10 @@ import Left from './components/newLeft';
 import Right from './components/right';
 import jsCookie from 'js-cookie';
 const BatcSmallRedBooks = forwardRef(
-    ({ detail, isMyApp, setDetail }: { detail?: any; isMyApp?: boolean; setDetail: (data: any) => void }, ref) => {
+    (
+        { planState, detail, isMyApp, setDetail }: { planState: number; detail?: any; isMyApp?: boolean; setDetail: (data: any) => void },
+        ref
+    ) => {
         useImperativeHandle(ref, () => ({
             getDetail: getData,
             moke: moke,
@@ -26,7 +29,8 @@ const BatcSmallRedBooks = forwardRef(
         const navigate = useNavigate();
         const timer: any = useRef([]);
         //批次分页
-        const batchPage = { pageNo: 1, pageSize: 100 };
+        const batchPage = { pageNo: 1, pageSize: 1000 };
+        const [batchTotal, setBatchTotal] = useState(0);
         const [batchUid, setBatchUid] = useState('');
         const [bathList, setBathList] = useState<any[]>([]);
         const [batchOpen, setbatchOpen] = useState(false);
@@ -52,8 +56,9 @@ const BatcSmallRedBooks = forwardRef(
         const newSave = async (uid: string) => {
             setBathOpen(true);
             await planExecute({ uid });
-            const res = await batchPages({ ...batchPage, planUid: uid });
+            const res = await batchPages({ ...{ batchPage }, planUid: uid });
             setBathList(res.list);
+            setBatchTotal(res.total);
             setPre(pre + 1);
             dispatch(
                 openSnackbar({
@@ -230,6 +235,7 @@ const BatcSmallRedBooks = forwardRef(
         const getbatchPages = () => {
             batchPages({ ...batchPage, planUid: PlanUid }).then((res) => {
                 setBathList(res.list);
+                setBatchTotal(res.total);
             });
         };
         useEffect(() => {
@@ -271,6 +277,7 @@ const BatcSmallRedBooks = forwardRef(
                     <div className="2xl:w-[500px] xl:w-[410px] lg:w-[370px]  w-[370px] bg-white rounded-lg py-4 pl-2 pr-0">
                         <Left
                             pre={pre}
+                            planState={planState}
                             detail={detail}
                             setGetData={setGetData}
                             setMoke={setMoke}
@@ -283,6 +290,7 @@ const BatcSmallRedBooks = forwardRef(
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
                         <Right
+                            batchTotal={batchTotal}
                             bathList={bathList}
                             exampleList={exampleList}
                             collapseActive={collapseActive}

@@ -542,6 +542,7 @@ function CreateDetail() {
     //判断基础设置
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
+    const [planState, setPlanState] = useState(0); //更新之后调计划的保存
     const saveDetail = () => {
         const details = _.cloneDeep(detailRef.current);
         const index: number = details?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
@@ -584,7 +585,12 @@ function CreateDetail() {
                 appModify(details).then((res) => {
                     setViewLoading(false);
                     if (res.data) {
+                        if (createPlanRef?.current) {
+                            setPlanState(planState + 1);
+                        }
+
                         setSaveState(saveState + 1);
+
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -1047,32 +1053,36 @@ function CreateDetail() {
                                     <Segmented
                                         value={segmentedValue}
                                         onChange={(e) => {
-                                            if (detailRef?.current?.type === 'MEDIA_MATRIX' && e === '预览测试') {
-                                                setViewLoading(true);
-                                                saveDetail();
-                                            } else {
-                                                const newData = _.cloneDeep(detailRef.current);
-                                                let arr = newData?.workflowConfig?.steps;
-                                                const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
-                                                if (a) {
-                                                    a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                                                        createPlanRef?.current?.moke;
+                                            if (detailRef?.current?.type === 'MEDIA_MATRIX') {
+                                                if (e === '预览测试') {
+                                                    setViewLoading(true);
+                                                    saveDetail();
+                                                } else {
+                                                    const newData = _.cloneDeep(detailRef.current);
+                                                    let arr = newData?.workflowConfig?.steps;
+                                                    const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+                                                    if (a) {
+                                                        a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                                                            createPlanRef?.current?.moke;
+                                                    }
+                                                    const index = arr.findIndex(
+                                                        (item: any) => item.flowStep.handler === 'PosterActionHandler'
+                                                    );
+                                                    if (index !== -1) {
+                                                        console.log(createPlanRef?.current?.imageMoke);
+                                                        arr[index] =
+                                                            createPlanRef?.current?.imageMoke ||
+                                                            arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+                                                    }
+                                                    arr = [
+                                                        arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+                                                        ...createPlanRef.current.getDetail,
+                                                        arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                                                    ];
+                                                    newData.workflowConfig.steps = arr?.filter((item: any) => item);
+                                                    detailRef.current = newData;
+                                                    setDetail(detailRef?.current);
                                                 }
-                                                const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
-                                                if (index !== -1) {
-                                                    console.log(createPlanRef?.current?.imageMoke);
-                                                    arr[index] =
-                                                        createPlanRef?.current?.imageMoke ||
-                                                        arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
-                                                }
-                                                arr = [
-                                                    arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
-                                                    ...createPlanRef.current.getDetail,
-                                                    arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-                                                ];
-                                                newData.workflowConfig.steps = arr?.filter((item: any) => item);
-                                                detailRef.current = newData;
-                                                setDetail(detailRef?.current);
                                             }
                                             setSegmentedValue(e);
                                         }}
@@ -1100,6 +1110,7 @@ function CreateDetail() {
                                             <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
                                                 <CreatePlan
                                                     ref={createPlanRef}
+                                                    planState={planState}
                                                     detail={detailRef?.current}
                                                     setDetail={(data) => {
                                                         detailRef.current = data;

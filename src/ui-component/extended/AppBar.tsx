@@ -70,13 +70,15 @@ const AppBar = ({ ...others }) => {
     return (
         <ElevationScroll {...others}>
             <MuiAppBar>
-                <img
-                    src={require('../../assets/images/header/present.jpeg')}
-                    className="cursor-pointer w-full"
-                    onClick={() => {
-                        navigate('/subscribe');
-                    }}
-                />
+                {getPermission(ENUM_PERMISSION.SPRING_SALE) && (
+                    <img
+                        src={require('../../assets/images/header/present.jpeg')}
+                        className="cursor-pointer w-full"
+                        onClick={() => {
+                            navigate('/subscribe');
+                        }}
+                    />
+                )}
                 <Container>
                     <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', py: 2.5, px: `0 !important` }}>
                         <Logo />

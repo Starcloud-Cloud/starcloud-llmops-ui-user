@@ -18,7 +18,8 @@ const Right = ({
     setBusinessUid,
     setDetailOpen,
     handleScroll,
-    timeFailure
+    timeFailure,
+    getbatchPages
 }: {
     batchTotal: number;
     bathList: any[];
@@ -30,7 +31,8 @@ const Right = ({
     setBusinessUid: (data: any) => void;
     setDetailOpen: (data: any) => void;
     handleScroll: (data: any) => void;
-    timeFailure: (data: number) => void;
+    timeFailure: (data: any) => void;
+    getbatchPages: (data: any) => void;
 }) => {
     const scrollRef: any = useRef(null);
     const getStatus = (status: any) => {
@@ -51,18 +53,14 @@ const Right = ({
                 return <Tag>待执行</Tag>;
         }
     };
-    const [pageNum, setPageNum] = useState(10);
-    const [batchPageList, setBatchPageList] = useState<any[]>([]);
-    useEffect(() => {
-        const newList = bathList?.slice(0, pageNum);
-        setBatchPageList(newList);
-    }, [bathList, pageNum]);
+    const [pageNum, setPageNum] = useState(1);
     const getMore = () => {
-        setPageNum(pageNum + 10);
+        getbatchPages({ pageNo: pageNum + 1, pageSize: 10 });
+        setPageNum(pageNum + 1);
     };
     return (
         <>
-            {batchPageList?.length === 0 ? (
+            {bathList?.length === 0 ? (
                 <div style={{ height: '100%' }} className="flex justify-center items-center">
                     <div className="text-center">
                         {exampleList?.length > 0 ? (
@@ -93,7 +91,7 @@ const Right = ({
                     <Collapse
                         onChange={changeCollapse}
                         activeKey={collapseActive}
-                        items={batchPageList?.map((item) => {
+                        items={bathList?.map((item, i) => {
                             return {
                                 key: item.uid,
                                 label: (
@@ -160,7 +158,7 @@ const Right = ({
                                                 planList={planList}
                                                 setBusinessUid={setBusinessUid}
                                                 setDetailOpen={setDetailOpen}
-                                                timeFailure={timeFailure}
+                                                timeFailure={(index) => timeFailure({ i, index })}
                                             />
                                         </div>
                                     </Spin>
@@ -169,7 +167,7 @@ const Right = ({
                         })}
                         accordion
                     />
-                    {batchTotal > pageNum && (
+                    {batchTotal > pageNum * 10 && (
                         <div className="flex justify-center mt-4">
                             <Button size="small" type="primary" onClick={getMore}>
                                 更多

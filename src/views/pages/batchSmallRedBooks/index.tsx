@@ -29,7 +29,7 @@ const BatcSmallRedBooks = forwardRef(
         const navigate = useNavigate();
         const timer: any = useRef([]);
         //批次分页
-        const batchPage = { pageNo: 1, pageSize: 1000 };
+        const batchPage = { pageNo: 1, pageSize: 10 };
         const [batchTotal, setBatchTotal] = useState(0);
         const [batchUid, setBatchUid] = useState('');
         const [bathList, setBathList] = useState<any[]>([]);
@@ -56,7 +56,7 @@ const BatcSmallRedBooks = forwardRef(
         const newSave = async (uid: string) => {
             setBathOpen(true);
             await planExecute({ uid });
-            const res = await batchPages({ ...{ batchPage }, planUid: uid });
+            const res = await batchPages({ batchPage, planUid: uid });
             setBathList(res.list);
             setBatchTotal(res.total);
             setPre(pre + 1);
@@ -133,7 +133,6 @@ const BatcSmallRedBooks = forwardRef(
                             ?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE')
                     ) {
                         setBathOpen(false);
-                        getbatchPages();
                         setPre(pre + 1);
                         clearInterval(timer.current[queryPage.pageNo - 1]);
                         return;
@@ -173,7 +172,6 @@ const BatcSmallRedBooks = forwardRef(
                         ) {
                             clearInterval(timer.current[0]);
                             setBathOpen(false);
-                            getbatchPages();
                             setPre(pre + 1);
                             return;
                         }
@@ -213,7 +211,6 @@ const BatcSmallRedBooks = forwardRef(
                         ) {
                             clearInterval(timer.current[0]);
                             setBathOpen(false);
-                            getbatchPages();
                             setPre(pre + 1);
                             return;
                         }
@@ -232,9 +229,13 @@ const BatcSmallRedBooks = forwardRef(
         };
         //编辑获列表
         const [PlanUid, setPlanUid] = useState('');
-        const getbatchPages = () => {
-            batchPages({ ...batchPage, planUid: PlanUid }).then((res) => {
-                setBathList(res.list);
+        const getbatchPages = (data?: any) => {
+            batchPages({ ...(data ? data : batchPage), planUid: PlanUid }).then((res) => {
+                if (data) {
+                    setBathList([...bathList, ...res.list]);
+                } else {
+                    setBathList(res.list);
+                }
                 setBatchTotal(res.total);
             });
         };
@@ -243,6 +244,10 @@ const BatcSmallRedBooks = forwardRef(
                 getbatchPages();
             }
         }, [PlanUid]);
+
+        //批次号下的列表
+        const batchDataListRef = useRef<any[]>([]);
+        const [batchDataList, setBatchDataList] = useState<any[]>([]);
         return (
             <div
                 style={{
@@ -301,9 +306,10 @@ const BatcSmallRedBooks = forwardRef(
                                 setBusinessUid(data.uid);
                                 setBusinessIndex(data.index);
                             }}
+                            getbatchPages={getbatchPages}
                             setDetailOpen={(data: any) => setDetailOpen(data)}
                             handleScroll={(data: any) => handleScroll(data)}
-                            timeFailure={(index: number) => {
+                            timeFailure={({ i, index }: { i: number; index: number }) => {
                                 const pageNo = Number((index / 20).toFixed(0)) + 1;
                                 clearInterval(timer.current[pageNo]);
                                 timer.current[pageNo] = getLists(pageNo);
@@ -318,7 +324,11 @@ const BatcSmallRedBooks = forwardRef(
                                     ) {
                                         clearInterval(timer.current[pageNo]);
                                         setBathOpen(false);
-                                        getbatchPages();
+                                        const num: number = (i / 10 + 1) | 0;
+                                        batchPages({ pageNo: num, pageSize: 10, planUid: PlanUid }).then((res) => {
+                                            const newList = _.cloneDeep(bathList);
+                                            newList.splice(i, 10, res.list);
+                                        });
                                         setPre(pre + 1);
                                         return;
                                     }

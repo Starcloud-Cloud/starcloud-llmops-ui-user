@@ -77,7 +77,7 @@ const AddStyle = React.forwardRef(
         }));
 
         useEffect(() => {
-            setImageVar(submitData);
+            setImageVar && setImageVar(submitData);
         }, [submitData]);
 
         useEffect(() => {
@@ -591,8 +591,8 @@ const AddStyle = React.forwardRef(
                             </div>
                         </div>
 
-                        <div className="bg-white p-3 mt-2">
-                            {customList.length > 0 && (
+                        {customList.length > 0 && (
+                            <div className="bg-white p-3 mt-2">
                                 <div>
                                     <span className="text-stone-700 font-semibold">自定义风格</span>
                                     <div className="grid gap-4 grid-cols-4 mt-3">
@@ -661,8 +661,8 @@ const AddStyle = React.forwardRef(
                                         })}
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </Drawer>
                 {isModalOpen && (

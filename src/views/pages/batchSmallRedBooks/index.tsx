@@ -29,7 +29,7 @@ const BatcSmallRedBooks = forwardRef(
         const navigate = useNavigate();
         const timer: any = useRef([]);
         //批次分页
-        const batchPage = { pageNo: 1, pageSize: 10 };
+        const [batchPage, setBatchPage] = useState({ pageNo: 1, pageSize: 10 });
         const [batchTotal, setBatchTotal] = useState(0);
         const [batchUid, setBatchUid] = useState('');
         const [bathList, setBathList] = useState<any[]>([]);
@@ -53,10 +53,14 @@ const BatcSmallRedBooks = forwardRef(
             };
         }, []);
         const [pre, setPre] = useState(0);
+        const [rightPage, setRightPage] = useState(0);
+        const collIndexRef = useRef(0);
+        const [collIndex, setCollIndex] = useState(0);
         const newSave = async (uid: string) => {
             setBathOpen(true);
             await planExecute({ uid });
             const res = await batchPages({ batchPage, planUid: uid });
+            setRightPage(rightPage + 1);
             setBathList(res.list);
             setBatchTotal(res.total);
             setPre(pre + 1);
@@ -73,12 +77,9 @@ const BatcSmallRedBooks = forwardRef(
                 })
             );
         };
-
         //页面滚动
         const [exampleList, setExampleList] = useState<any[]>([]);
         const [total, setTotal] = useState(0);
-        const [planList, setPlanList] = useState<any[]>([]);
-        const plabListRef: any = useRef(null);
         const [queryPage, setQueryPage] = useState({
             pageNo: 1,
             pageSize: 20
@@ -104,9 +105,13 @@ const BatcSmallRedBooks = forwardRef(
                 batchUid: batch || batchUid
             }).then((res) => {
                 setTotal(res.total);
-                plabListRef.current = [...plabListRef.current, ...res.list];
-                setPlanList(plabListRef.current);
-                setbatchOpen(false);
+                const newList = _.cloneDeep(batchDataListRef.current);
+                newList[collIndexRef.current] = res.list;
+                batchDataListRef.current = newList;
+                setBatchDataList(batchDataListRef.current);
+                setTimeout(() => {
+                    setbatchOpen(false);
+                }, 500);
             });
         };
         const getLists = (pageNo: number, batch?: string) => {
@@ -116,11 +121,26 @@ const BatcSmallRedBooks = forwardRef(
                 batchUid: batch || batchUid
             }).then((res) => {
                 setTotal(res.total);
-                const newList = _.cloneDeep(plabListRef.current);
-                newList.splice((queryRef.current.pageNo - 1) * queryRef.current.pageSize, queryRef.current.pageSize, ...res.list);
-                plabListRef.current = newList;
-                setPlanList(plabListRef.current);
-                setbatchOpen(false);
+                const result = res?.list?.every((item: any) => {
+                    return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
+                });
+                if (result) {
+                    batchPages({ pageNo: (collIndex / 10) | (0 + 1), pageSize: 10, planUid: PlanUid }).then((res) => {
+                        const newList = _.cloneDeep(bathList);
+                        newList?.splice(((collIndex / 10) | 0) * 10, (((collIndex / 10) | 0) + 1) * 10, ...res.list);
+                        setBathList(newList);
+                        setBatchTotal(res.total);
+                    });
+                }
+                const newList = _.cloneDeep(batchDataListRef.current);
+                newList[collIndexRef.current]?.splice(
+                    (queryRef.current.pageNo - 1) * queryRef.current.pageSize,
+                    queryRef.current.pageSize,
+                    ...res.list
+                );
+
+                batchDataListRef.current = newList;
+                setBatchDataList(batchDataListRef.current);
             });
         };
         useEffect(() => {
@@ -128,8 +148,8 @@ const BatcSmallRedBooks = forwardRef(
                 getList();
                 timer.current[queryPage.pageNo - 1] = setInterval(() => {
                     if (
-                        plabListRef.current
-                            .slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
+                        batchDataListRef.current[collIndexRef.current]
+                            ?.slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
                             ?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE')
                     ) {
                         setBathOpen(false);
@@ -144,29 +164,21 @@ const BatcSmallRedBooks = forwardRef(
         const [collapseActive, setcollapseActive] = useState<any[]>([]);
         //手风琴的开关
         const changeCollapse = (e: any) => {
-            setcollapseActive(e);
             timer.current?.map((item: any) => {
                 clearInterval(item);
             });
             timer.current = [];
-            plabListRef.current = [];
-
             if (e.length > 0) {
-                setbatchOpen(true);
-                queryRef.current = {
-                    pageNo: 1,
-                    pageSize: 20
-                };
-                setQueryPage(queryRef.current);
-                setBatchUid(e[0]);
-                if (bathList?.find((item) => item.uid == e[0])?.status === 'SUCCESS') {
-                    getList(e[0]);
-                } else {
-                    getList(e[0]);
+                const newList = _.cloneDeep(batchDataListRef.current);
+                const index = bathList?.findIndex((item: any) => item.uid === e[0]);
+                collIndexRef.current = index;
+                setCollIndex(collIndexRef.current);
+                if (newList[index] && newList[index]?.length > 0) {
+                    setcollapseActive(e);
                     timer.current[0] = setInterval(() => {
                         if (
-                            plabListRef.current?.length === 0 ||
-                            plabListRef.current.slice(0, 20)?.every((item: any) => {
+                            batchDataListRef.current[collIndexRef.current]?.length === 0 ||
+                            batchDataListRef.current[collIndexRef.current]?.slice(0, 20)?.every((item: any) => {
                                 return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
                             })
                         ) {
@@ -177,20 +189,50 @@ const BatcSmallRedBooks = forwardRef(
                         }
                         getLists(1, e[0]);
                     }, 2000);
+                } else {
+                    setcollapseActive(e);
+                    setbatchOpen(true);
+                    queryRef.current = {
+                        pageNo: 1,
+                        pageSize: 20
+                    };
+                    setQueryPage(queryRef.current);
+                    setBatchUid(e[0]);
+                    if (bathList?.find((item) => item.uid == e[0])?.status === 'SUCCESS') {
+                        getList(e[0]);
+                    } else {
+                        getList(e[0]);
+                        timer.current[0] = setInterval(() => {
+                            if (
+                                batchDataListRef.current[collIndexRef.current]?.length === 0 ||
+                                batchDataListRef.current[collIndexRef.current]?.slice(0, 20)?.every((item: any) => {
+                                    return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
+                                })
+                            ) {
+                                clearInterval(timer.current[0]);
+                                setBathOpen(false);
+                                setPre(pre + 1);
+                                return;
+                            }
+                            getLists(1, e[0]);
+                        }, 2000);
+                    }
                 }
+            } else {
+                setcollapseActive(e);
             }
         };
         const [bathOpen, setBathOpen] = useState(true);
         useEffect(() => {
             if (bathList?.length !== 0 && bathOpen) {
+                collIndexRef.current = 0;
+                setCollIndex(collIndexRef.current);
+                const newList = _.cloneDeep(batchDataListRef.current);
+                newList.unshift(undefined);
+                batchDataListRef.current = newList;
+                setBatchDataList(batchDataListRef.current);
                 const bathId = bathList[0].uid;
                 setcollapseActive([bathId]);
-                timer.current?.map((item: any) => {
-                    clearInterval(item);
-                });
-                timer.current = [];
-                plabListRef.current = [];
-                // setPlanList([]);
                 setbatchOpen(true);
                 queryRef.current = {
                     pageNo: 1,
@@ -204,8 +246,8 @@ const BatcSmallRedBooks = forwardRef(
                     getList(bathId);
                     timer.current[0] = setInterval(() => {
                         if (
-                            plabListRef.current?.length === 0 ||
-                            plabListRef.current.slice(0, 20)?.every((item: any) => {
+                            batchDataListRef.current[collIndexRef.current]?.length === 0 ||
+                            batchDataListRef.current[collIndexRef.current]?.slice(0, 20)?.every((item: any) => {
                                 return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
                             })
                         ) {
@@ -223,8 +265,11 @@ const BatcSmallRedBooks = forwardRef(
         const [detailOpen, setDetailOpen] = useState(false);
         const [businessUid, setBusinessUid] = useState('');
         const [businessIndex, setBusinessIndex] = useState(0);
-        const changeList = () => {
-            const pageNo = Number((businessIndex / 20).toFixed(0)) + 1;
+        const changeList = (data: string) => {
+            const index = bathList?.findIndex((item: any) => item.uid === data);
+            collIndexRef.current = index;
+            setCollIndex(collIndexRef.current);
+            const pageNo = Number((businessIndex / 20) | 0) + 1;
             getLists(pageNo);
         };
         //编辑获列表
@@ -295,13 +340,14 @@ const BatcSmallRedBooks = forwardRef(
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
                         <Right
+                            rightPage={rightPage}
                             batchTotal={batchTotal}
                             bathList={bathList}
                             exampleList={exampleList}
                             collapseActive={collapseActive}
                             batchOpen={batchOpen}
                             changeCollapse={(data: any) => changeCollapse(data)}
-                            planList={planList}
+                            batchDataList={batchDataList}
                             setBusinessUid={(data: any) => {
                                 setBusinessUid(data.uid);
                                 setBusinessIndex(data.index);
@@ -310,13 +356,15 @@ const BatcSmallRedBooks = forwardRef(
                             setDetailOpen={(data: any) => setDetailOpen(data)}
                             handleScroll={(data: any) => handleScroll(data)}
                             timeFailure={({ i, index }: { i: number; index: number }) => {
-                                const pageNo = Number((index / 20).toFixed(0)) + 1;
+                                collIndexRef.current = i;
+                                setCollIndex(collIndexRef.current);
+                                const pageNo = Number((index / 20) | 0) + 1;
                                 clearInterval(timer.current[pageNo]);
                                 timer.current[pageNo] = getLists(pageNo);
                                 timer.current[pageNo] = setInterval(() => {
                                     if (
-                                        plabListRef.current
-                                            .slice((pageNo - 1) * queryPage.pageSize, pageNo * queryPage.pageSize)
+                                        batchDataListRef.current[collIndexRef.current]
+                                            ?.slice((pageNo - 1) * queryPage.pageSize, pageNo * queryPage.pageSize)
                                             ?.every(
                                                 (item: any) =>
                                                     item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
@@ -324,11 +372,6 @@ const BatcSmallRedBooks = forwardRef(
                                     ) {
                                         clearInterval(timer.current[pageNo]);
                                         setBathOpen(false);
-                                        const num: number = (i / 10 + 1) | 0;
-                                        batchPages({ pageNo: num, pageSize: 10, planUid: PlanUid }).then((res) => {
-                                            const newList = _.cloneDeep(bathList);
-                                            newList.splice(i, 10, res.list);
-                                        });
                                         setPre(pre + 1);
                                         return;
                                     }

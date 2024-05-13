@@ -8,26 +8,28 @@ import Good from '../good';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const Right = ({
+    rightPage,
     batchTotal,
     bathList,
     exampleList,
     collapseActive,
     batchOpen,
     changeCollapse,
-    planList,
+    batchDataList,
     setBusinessUid,
     setDetailOpen,
     handleScroll,
     timeFailure,
     getbatchPages
 }: {
+    rightPage: number;
     batchTotal: number;
     bathList: any[];
     exampleList: any[];
     collapseActive: any;
     batchOpen: boolean;
     changeCollapse: (data: any) => void;
-    planList: any[];
+    batchDataList: any[];
     setBusinessUid: (data: any) => void;
     setDetailOpen: (data: any) => void;
     handleScroll: (data: any) => void;
@@ -58,6 +60,9 @@ const Right = ({
         getbatchPages({ pageNo: pageNum + 1, pageSize: 10 });
         setPageNum(pageNum + 1);
     };
+    useEffect(() => {
+        if (rightPage) setPageNum(1);
+    }, [rightPage]);
     return (
         <>
             {bathList?.length === 0 ? (
@@ -155,7 +160,7 @@ const Right = ({
                                             onScroll={() => handleScroll(scrollRef.current)}
                                         >
                                             <PlanList
-                                                planList={planList}
+                                                batchDataList={batchDataList[i]}
                                                 setBusinessUid={setBusinessUid}
                                                 setDetailOpen={setDetailOpen}
                                                 timeFailure={(index) => timeFailure({ i, index })}
@@ -184,7 +189,7 @@ const RightMemo = (prevProps: any, nextProps: any) => {
         JSON.stringify(prevProps?.bathList) === JSON.stringify(nextProps?.bathList) &&
         JSON.stringify(prevProps?.collapseActive) === JSON.stringify(nextProps?.collapseActive) &&
         JSON.stringify(prevProps?.batchOpen) === JSON.stringify(nextProps?.batchOpen) &&
-        JSON.stringify(prevProps?.planList) === JSON.stringify(nextProps?.planList) &&
+        JSON.stringify(prevProps?.batchDataList) === JSON.stringify(nextProps?.batchDataList) &&
         JSON.stringify(prevProps?.exampleList) === JSON.stringify(nextProps?.exampleList)
     );
 };

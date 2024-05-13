@@ -385,7 +385,6 @@ const Lefts = ({
         setPlanUid(result?.uid);
         appRef.current = result;
         setAppData(appRef.current);
-        console.log(newList);
 
         newList?.workflowConfig?.steps.forEach((item: any) => {
             const arr: any[] = item?.variable?.variables;
@@ -946,8 +945,6 @@ const Lefts = ({
         }
     }, [JSON.stringify(generateList)]);
     useEffect(() => {
-        console.log(tableData, fileList);
-
         if (materialType && materialType === 'picture') {
             setMoke &&
                 setMoke(
@@ -957,8 +954,6 @@ const Lefts = ({
                     })) || []
                 );
         } else if (materialType && materialType !== 'picture') {
-            console.log(setMoke);
-
             setMoke &&
                 setMoke(
                     tableData?.map((item) => ({

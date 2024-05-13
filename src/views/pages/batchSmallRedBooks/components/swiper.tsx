@@ -17,7 +17,7 @@ const Swipers = ({ item }: { item: any }) => {
                     setSwiperRef(swiper);
                 }}
                 slidesPerView={1}
-                spaceBetween={30}
+                // spaceBetween={30}
                 centeredSlides={false}
                 loop
                 pagination={{ clickable: true }}

@@ -1,4 +1,4 @@
-import { Modal, Button, Table, Radio, Input, Switch, Tabs, Checkbox, InputNumber } from 'antd';
+import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag } from 'antd';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { customMaterialGenerate } from 'api/template/fetch';
 import { dispatch } from 'store';
@@ -39,7 +39,20 @@ const LeftModalAdd = ({
             ?.filter((item) => item.type !== 'image')
             ?.map((item) => item?.dataIndex);
     }, [columns]);
-    // AI 字段生成1
+    const checkedList = useMemo(() => {
+        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image');
+    }, [columns]);
+    //AI 字段补齐
+    const [selOpen, setSelOpen] = useState(false);
+    const [selList, setSelList] = useState<any[]>([]);
+    const rowSelection = {
+        onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+            setSelList(selectedRows);
+        }
+    };
+    //loading 弹窗
+    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(true);
+    // AI 批量生成
     const [exeLoading, setExeLoading] = useState(false);
     const [variableData, setVariableData] = useState<any>({
         fieldList: MokeList,
@@ -150,7 +163,7 @@ const LeftModalAdd = ({
         <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
             <div className="flex gap-2 justify-end my-[20px]">
                 <Button type="primary" onClick={() => setOpen(true)}>
-                    AI 字段生成
+                    AI 素材生成
                 </Button>
                 <Button
                     type="primary"
@@ -183,28 +196,31 @@ const LeftModalAdd = ({
                     items={[
                         {
                             key: '0',
-                            disabled: true,
                             label: 'AI 字段补齐',
                             children: (
                                 <div>
                                     <div className="text-[16px] font-bold mb-4">1.选择需要 AI 补齐的字段</div>
-                                    <Radio.Group defaultValue="c" buttonStyle="solid">
-                                        {columns?.map((item) => (
-                                            <Radio.Button key={item.title} value={item.title}>
-                                                {item.title}
-                                            </Radio.Button>
+                                    <Checkbox.Group value={variableData.checkedFieldList}>
+                                        {checkedList?.map((item) => (
+                                            <Checkbox value={item.dataIndex}>{item.title}</Checkbox>
                                         ))}
-                                    </Radio.Group>
+                                    </Checkbox.Group>
+                                    <Button type="primary" size="small" onClick={() => setSelOpen(true)}>
+                                        选择素材
+                                    </Button>
                                     <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
-                                    <TextArea />
+                                    <TextArea rows={10} />
                                     <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
-                                    <div className="flex gap-2 items-center text-xs text-black/50">
-                                        <Switch />
-                                        <span>字段为空时生成</span>
+                                    <div className="flex justify-center gap-2">
+                                        <Button size="small" type="primary">
+                                            处理选中的素材({selList?.length})
+                                        </Button>
+                                        <Button size="small" type="primary">
+                                            处理全部素材({tableData?.length})
+                                        </Button>
                                     </div>
                                     <div className="flex justify-center gap-6 mt-6">
-                                        <Button type="primary">处理一条素材</Button>
-                                        <Button type="primary">处理全部素材</Button>
+                                        <Button type="primary">保存配置</Button>
                                     </div>
                                 </div>
                             )
@@ -216,7 +232,7 @@ const LeftModalAdd = ({
                                 <div>
                                     <div className="text-[16px] font-bold mb-4">1.选择需要 AI 补齐的字段</div>
                                     <Checkbox.Group value={variableData.checkedFieldList}>
-                                        {columns?.slice(1, columns?.length - 1)?.map((item) => (
+                                        {checkedList?.map((item) => (
                                             <Checkbox disabled={true} value={item.dataIndex}>
                                                 {item.title}
                                             </Checkbox>
@@ -276,31 +292,99 @@ const LeftModalAdd = ({
                     defaultActiveKey="1"
                 ></Tabs>
             </Modal>
-            <Modal width={800} title="素材预览" open={preview} onCancel={() => setPreView(false)} footer={false}>
-                <div className="min-h-[300px] max-h-[80vh] overflow-y-auto">
-                    <ChatMarkdown textContent={materialValue} />
-                </div>
-                <div className="flex justify-center mt-4">
-                    <Button
-                        disabled={downLoading}
-                        type="primary"
-                        onClick={() => {
-                            try {
-                                const data = JSON.parse(materialValue);
-                                if (data && data.length > 0) {
-                                    setOpen(false);
-                                    setPreView(false);
-                                    downTableData(data);
+            {/* 素材导入 */}
+            {preview && (
+                <Modal width={800} title="素材预览" open={preview} onCancel={() => setPreView(false)} footer={false}>
+                    <div className="min-h-[300px] max-h-[80vh] overflow-y-auto">
+                        <ChatMarkdown textContent={materialValue} />
+                    </div>
+                    <div className="flex justify-center mt-4">
+                        <Button
+                            disabled={downLoading}
+                            type="primary"
+                            onClick={() => {
+                                try {
+                                    const data = JSON.parse(materialValue);
+                                    if (data && data.length > 0) {
+                                        setOpen(false);
+                                        setPreView(false);
+                                        downTableData(data);
+                                    }
+                                } catch (err) {
+                                    downTableData([]);
                                 }
-                            } catch (err) {
-                                downTableData([]);
+                            }}
+                        >
+                            导入素材
+                        </Button>
+                    </div>
+                </Modal>
+            )}
+            {/* 选择素材 */}
+            {selOpen && (
+                <Modal
+                    title="选择素材"
+                    width={800}
+                    open={selOpen}
+                    onCancel={() => {
+                        setSelList([]);
+                        setSelOpen(false);
+                    }}
+                    footer={false}
+                >
+                    <div className="flex justify-end">
+                        <Button onClick={() => setSelOpen(false)} type="primary" size="small">
+                            确认选择({selList?.length})
+                        </Button>
+                    </div>
+                    <Table
+                        scroll={{ y: 500 }}
+                        rowKey={(record, index) => {
+                            return record[Object.keys(record)[1]] + index;
+                        }}
+                        pagination={{
+                            showSizeChanger: true,
+                            onChange: (page) => {
+                                setPage(page);
                             }
                         }}
-                    >
-                        导入素材
-                    </Button>
-                </div>
-            </Modal>
+                        loading={tableLoading}
+                        size="small"
+                        virtual
+                        rowSelection={{
+                            type: 'checkbox',
+                            ...rowSelection,
+                            fixed: true,
+                            columnWidth: 50
+                        }}
+                        columns={columns}
+                        dataSource={tableData}
+                    />
+                </Modal>
+            )}
+            {/* 素材执行 loading */}
+            {materialExecutionOpen && (
+                <Modal open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>
+                    <div className="flex justify-center flex-col items-center gap-4">
+                        <div className="font-bold">AI 处理中，请勿刷新页面···</div>
+                        <Progress percent={60} type="circle" />
+                    </div>
+                    <div className="flex gap-2 justify-center mt-4 text-xs">
+                        <div>
+                            <Tag>全部：12</Tag>
+                        </div>
+                        <div>
+                            <Tag color="processing">待执行：11</Tag>
+                        </div>
+                        <div>
+                            <Tag color="success">执行完成：34</Tag>
+                        </div>
+                        <div>
+                            <Tag color="error">执行失败：1</Tag>
+                        </div>
+                    </div>
+                </Modal>
+            )}
         </Modal>
     );
 };

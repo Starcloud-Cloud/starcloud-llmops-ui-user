@@ -393,7 +393,11 @@ const Lefts = ({
         setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
         appRef.current = result;
-        appRef.current.configuration.appInformation = newList;
+        if (data) {
+            appRef.current.executeParam.appInformation = newList;
+        } else {
+            appRef.current.configuration.appInformation = newList;
+        }
         setAppData(appRef.current);
 
         newList?.workflowConfig?.steps.forEach((item: any) => {

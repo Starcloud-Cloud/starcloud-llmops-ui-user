@@ -51,9 +51,10 @@ const LeftModalAdd = ({
         }
     };
     //loading 弹窗
-    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(true);
+    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
     // AI 批量生成
     const [exeLoading, setExeLoading] = useState(false);
+    const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [variableData, setVariableData] = useState<any>({
         fieldList: MokeList,
         checkedFieldList,
@@ -196,6 +197,7 @@ const LeftModalAdd = ({
                     items={[
                         {
                             key: '0',
+                            disabled: true,
                             label: 'AI 字段补齐',
                             children: (
                                 <div>
@@ -231,17 +233,25 @@ const LeftModalAdd = ({
                             children: (
                                 <div>
                                     <div className="text-[16px] font-bold mb-4">1.选择需要 AI 补齐的字段</div>
-                                    <Checkbox.Group value={variableData.checkedFieldList}>
+                                    <Checkbox.Group
+                                        onChange={(e) => {
+                                            setVariableData({
+                                                ...variableData,
+                                                checkedFieldList: e
+                                            });
+                                        }}
+                                        value={variableData.checkedFieldList}
+                                    >
                                         {checkedList?.map((item) => (
-                                            <Checkbox disabled={true} value={item.dataIndex}>
-                                                {item.title}
-                                            </Checkbox>
+                                            <Checkbox value={item.dataIndex}>{item.title}</Checkbox>
                                         ))}
                                     </Checkbox.Group>
                                     <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
                                     <TextArea
                                         value={variableData.requirement}
+                                        status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}
                                         onChange={(e) => {
+                                            setrequirementStatusOpen(true);
                                             setVariableData({
                                                 ...variableData,
                                                 requirement: e.target.value
@@ -268,6 +278,10 @@ const LeftModalAdd = ({
                                     <div className="flex justify-center gap-6 mt-6">
                                         <Button
                                             onClick={() => {
+                                                if (!variableData.requirement) {
+                                                    setrequirementStatusOpen(true);
+                                                    return false;
+                                                }
                                                 setcustom && setcustom(JSON.stringify(variableData));
                                             }}
                                             type="primary"
@@ -278,6 +292,10 @@ const LeftModalAdd = ({
                                             type="primary"
                                             loading={exeLoading}
                                             onClick={() => {
+                                                if (!variableData.requirement) {
+                                                    setrequirementStatusOpen(true);
+                                                    return false;
+                                                }
                                                 setExeLoading(true);
                                                 getTextStream();
                                             }}

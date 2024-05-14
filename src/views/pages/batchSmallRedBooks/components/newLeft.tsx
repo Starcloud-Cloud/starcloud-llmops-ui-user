@@ -162,7 +162,8 @@ const Lefts = ({
     const [tableData, setTableData] = useState<any[]>([]);
     const [columns, setColumns] = useState<any[]>([]);
     const downTableData = (data: any) => {
-        setTableData([...data, ...tableData]);
+        tableRef.current = [...data, ...tableData];
+        setTableData(tableRef.current);
     };
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);

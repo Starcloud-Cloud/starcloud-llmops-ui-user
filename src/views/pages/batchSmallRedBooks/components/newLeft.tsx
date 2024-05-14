@@ -1447,6 +1447,10 @@ const Lefts = ({
                     tableData={tableData}
                     setTitle={setTitle}
                     setEditOpen={setEditOpen}
+                    changeTableValue={(data) => {
+                        tableRef.current = data;
+                        setTableData(tableRef.current);
+                    }}
                     MokeList={MokeList}
                     setPage={setPage}
                     downTableData={downTableData}

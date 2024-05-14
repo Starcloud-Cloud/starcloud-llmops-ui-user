@@ -559,19 +559,8 @@ const Lefts = ({
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         ).variable.variables = step;
         appRef.current = newData;
-        dispatch(
-            openSnackbar({
-                open: true,
-                message: '保存成功',
-                variant: 'alert',
-                alert: {
-                    color: 'success'
-                },
-                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                close: false
-            })
-        );
         setAppData(appRef.current);
+        handleSaveClick(false);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
@@ -826,7 +815,7 @@ const Lefts = ({
             });
         });
         if (detailShow) {
-            const data = _.cloneDeep(appData);
+            const data = _.cloneDeep(appRef.current);
             const upData = data?.executeParam?.appInformation?.workflowConfig?.steps?.find(
                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
             );
@@ -853,7 +842,7 @@ const Lefts = ({
                 ...newList,
                 imageRef.current
                     ? imageRef.current?.record
-                    : appData.executeParam.appInformation.workflowConfig.steps?.find(
+                    : appRef.current.executeParam.appInformation.workflowConfig.steps?.find(
                           (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                       )
             ];
@@ -864,7 +853,7 @@ const Lefts = ({
                 styleData = JSON.parse(styleData);
             }
             const data = {
-                uid: appData?.uid,
+                uid: appRef.current?.uid,
                 totalCount,
                 configuration: {
                     imageStyleList: styleData
@@ -886,14 +875,14 @@ const Lefts = ({
                                   type: materialType
                               })),
                     appInformation: {
-                        ...appData.configuration.appInformation,
+                        ...appRef.current.configuration.appInformation,
                         workflowConfig: {
                             steps: [
-                                ...appData.configuration.appInformation.workflowConfig.steps?.filter(
+                                ...appRef.current.configuration.appInformation.workflowConfig.steps?.filter(
                                     (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                                 ),
                                 ...newList,
-                                ...appData.configuration.appInformation.workflowConfig.steps?.filter(
+                                ...appRef.current.configuration.appInformation.workflowConfig.steps?.filter(
                                     (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                                 )
                             ]

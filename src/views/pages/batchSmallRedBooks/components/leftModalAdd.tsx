@@ -50,6 +50,11 @@ const LeftModalAdd = ({
             setSelList(selectedRows);
         }
     };
+    const [fieldCompletionData, setFieldCompletionData] = useState({
+        fieldList: MokeList,
+        checkedFieldList,
+        requirement: ''
+    });
     //loading 弹窗
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
     // AI 批量生成
@@ -202,7 +207,15 @@ const LeftModalAdd = ({
                             children: (
                                 <div>
                                     <div className="text-[16px] font-bold mb-4">1.选择需要 AI 补齐的字段</div>
-                                    <Checkbox.Group value={variableData.checkedFieldList}>
+                                    <Checkbox.Group
+                                        onChange={(e) =>
+                                            setFieldCompletionData({
+                                                ...fieldCompletionData,
+                                                checkedFieldList: e
+                                            })
+                                        }
+                                        value={fieldCompletionData.checkedFieldList}
+                                    >
                                         {checkedList?.map((item) => (
                                             <Checkbox value={item.dataIndex}>{item.title}</Checkbox>
                                         ))}
@@ -211,7 +224,11 @@ const LeftModalAdd = ({
                                         选择素材
                                     </Button>
                                     <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
-                                    <TextArea rows={10} />
+                                    <TextArea
+                                        value={fieldCompletionData.requirement}
+                                        onChange={(e) => setFieldCompletionData({ ...fieldCompletionData, requirement: e.target.value })}
+                                        rows={10}
+                                    />
                                     <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
                                     <div className="flex justify-center gap-2">
                                         <Button size="small" type="primary">

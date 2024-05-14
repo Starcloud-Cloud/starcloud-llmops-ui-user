@@ -60,7 +60,9 @@ const Lefts = ({
     setMoke,
     newSave,
     setDetail,
-    setPlanUid
+    setPlanUid,
+    defaultVariableData,
+    setDefaultVariableData
 }: {
     detailShow?: boolean;
     planState?: number;
@@ -68,6 +70,7 @@ const Lefts = ({
     detail?: any;
     data?: any;
     saveLoading?: boolean;
+    defaultVariableData?: boolean;
     setCollData?: (data: any) => void;
     setGetData?: (data: any) => void;
     setMoke?: (data: any) => void;
@@ -75,6 +78,7 @@ const Lefts = ({
     newSave: (data: any) => void;
     setDetail?: (data: any) => void;
     setPlanUid: (data: any) => void;
+    setDefaultVariableData?: (data: any) => void;
 }) => {
     const { token } = theme.useToken();
     const navigate = useNavigate();
@@ -157,12 +161,16 @@ const Lefts = ({
     const tableRef = useRef<any[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);
     const [columns, setColumns] = useState<any[]>([]);
+    const downTableData = (data: any) => {
+        setTableData([...data, ...tableData]);
+    };
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
     const [bookOpen, setBookOpen] = useState(false);
     const [bookValue, setBookValue] = useState('');
     const [bookLoading, setBookLoading] = useState(false);
     const [parseUid, setParseUid] = useState(''); //上传之后获取的 uid
+    const [MokeList, setMokeList] = useState<any[]>([]);
     //获取表头数据
     const typeList = [
         { label: '小红书', value: 'SMALL_RED_BOOK' },
@@ -170,6 +178,7 @@ const Lefts = ({
     ];
     const getTableHeader = async () => {
         const result = await materialTemplate(materialType);
+        setMokeList(result.fieldDefine);
         const newList = result?.fieldDefine?.map((item: any) => {
             return {
                 title: item.desc,
@@ -384,6 +393,7 @@ const Lefts = ({
         setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
         appRef.current = result;
+        appRef.current.configuration.appInformation = newList;
         setAppData(appRef.current);
 
         newList?.workflowConfig?.steps.forEach((item: any) => {
@@ -443,9 +453,11 @@ const Lefts = ({
                 arr.find((el: any) => el.field === 'POSTER_STYLE_CONFIG').value = list;
             }
         });
-        const newMater = newList?.workflowConfig?.steps
-            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
+        const materiallist = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables;
+        const newMater = materiallist?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
+        const customData = materiallist?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value;
+        setDefaultVariableData && setDefaultVariableData(customData && customData !== '{}' ? JSON.parse(customData) : null);
         const valueList = newList?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value;
@@ -531,6 +543,30 @@ const Lefts = ({
                 newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
         }
         setImagMater(newImage);
+    };
+    const setcustom = (data: any) => {
+        const newData = _.cloneDeep(appRef.current);
+        const step = newData.configuration.appInformation.workflowConfig.steps.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        ).variable.variables;
+        step.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value = data;
+        newData.configuration.appInformation.workflowConfig.steps.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        ).variable.variables = step;
+        appRef.current = newData;
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '保存成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                close: false
+            })
+        );
+        setAppData(appRef.current);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
@@ -916,6 +952,7 @@ const Lefts = ({
     }, [bookOpen]);
     //监听素材上传发生变化
     const [tablePre, setTablePre] = useState(0);
+
     const getTag = (type: string) => {
         return tableData
             ?.map((item: any) => item[type])
@@ -967,6 +1004,16 @@ const Lefts = ({
     useEffect(() => {
         setImageMoke && setImageMoke(imageVar || imageMater);
     }, [imageVar]);
+    useEffect(() => {
+        const materiallist = appData?.configuration?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value;
+        setDefaultVariableData && setDefaultVariableData(materiallist && materiallist !== '{}' ? JSON.parse(materiallist) : null);
+    }, [
+        appData?.configuration?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value
+    ]);
     return (
         <>
             <div className="relative h-full">
@@ -1093,7 +1140,7 @@ const Lefts = ({
                                                     }
                                                 }}
                                                 rowKey={(record, index) => {
-                                                    return String(index);
+                                                    return record[Object.keys(record)[1]] + index;
                                                 }}
                                                 loading={tableLoading}
                                                 size="small"
@@ -1400,11 +1447,15 @@ const Lefts = ({
                     zoomOpen={zoomOpen}
                     setZoomOpen={setZoomOpen}
                     tableLoading={tableLoading}
+                    defaultVariableData={defaultVariableData}
+                    setcustom={setcustom}
                     columns={columns}
                     tableData={tableData}
                     setTitle={setTitle}
                     setEditOpen={setEditOpen}
+                    MokeList={MokeList}
                     setPage={setPage}
+                    downTableData={downTableData}
                 />
             )}
             <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>

@@ -21,8 +21,10 @@ const BatcSmallRedBooks = forwardRef(
         useImperativeHandle(ref, () => ({
             getDetail: getData,
             moke: moke,
-            imageMoke: imageMoke
+            imageMoke: imageMoke,
+            mokeAI: defaultVariableData
         }));
+        const [defaultVariableData, setDefaultVariableData] = useState<any>(null);
         const [getData, setGetData] = useState<any>(null);
         const [moke, setMoke] = useState<any[]>([]);
         const [imageMoke, setImageMoke] = useState<any[]>([]);
@@ -336,6 +338,8 @@ const BatcSmallRedBooks = forwardRef(
                             newSave={newSave}
                             setDetail={setDetail}
                             setPlanUid={setPlanUid}
+                            defaultVariableData={defaultVariableData}
+                            setDefaultVariableData={setDefaultVariableData}
                         />
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">

@@ -160,6 +160,7 @@ const Right = ({
                                             onScroll={() => handleScroll(scrollRef.current)}
                                         >
                                             <PlanList
+                                                key={item.uid}
                                                 batchDataList={batchDataList[i]}
                                                 setBusinessUid={setBusinessUid}
                                                 setDetailOpen={setDetailOpen}

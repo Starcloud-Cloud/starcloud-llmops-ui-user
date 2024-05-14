@@ -7,3 +7,7 @@ export const executeMarket = (data: any) => {
 export const executeApp = (data: any) => {
     return fetch('/llm/app/execute/app', 'post', data);
 };
+//AI 字段生成
+export const customMaterialGenerate = (data: any) => {
+    return fetch(`/llm/creative/material/customMaterialGenerate`, 'post', data);
+};

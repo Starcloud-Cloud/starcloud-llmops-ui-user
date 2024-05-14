@@ -268,8 +268,6 @@ const AppModal = ({
                         detailRef.current = _.cloneDeep(contentData1);
                         setDetail(contentData1);
                     } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
-                        console.log(1);
-
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -284,15 +282,11 @@ const AppModal = ({
                         );
                         allChangeArr(detail.workflowConfig.steps.length, false);
                     } else if (bufferObj?.code === 2004008003) {
-                        console.log(2);
-
                         setFrom(`${bufferObj?.scene}_${bufferObj?.bizUid}`);
                         setTokenOpen(true);
                         allChangeArr(detail.workflowConfig.steps.length, false);
                         return;
                     } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
-                        console.log(3);
-
                         dispatch(
                             openSnackbar({
                                 open: true,

@@ -362,15 +362,12 @@ const AiCreate = ({
                                         value={fieldCompletionData.checkedFieldList}
                                     >
                                         {checkedList?.map((item) => (
-                                            <Checkbox disabled={item.required} value={item.dataIndex}>
+                                            <Checkbox value={item.dataIndex}>
                                                 {item.title}
                                                 {item.required ? '*' : ''}
                                             </Checkbox>
                                         ))}
                                     </Checkbox.Group>
-                                    <Button type="primary" size="small" onClick={() => setSelOpen(true)}>
-                                        选择素材
-                                    </Button>
                                     <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
                                     <TextArea
                                         value={fieldCompletionData.requirement}
@@ -385,34 +382,73 @@ const AiCreate = ({
                                         <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
                                     )}
                                     <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
-                                    <div className="flex justify-center gap-2">
+                                    <Button className="mb-4" type="primary" size="small" onClick={() => setSelOpen(true)}>
+                                        选择素材
+                                    </Button>
+                                    <div className="flex gap-2">
                                         <Button
+                                            className="h-[50px]"
                                             disabled={selList?.length === 0}
                                             onClick={() => {
                                                 if (!fieldCompletionData.requirement) {
                                                     setrequirementStatusOpen(true);
                                                     return false;
                                                 }
+                                                if (fieldCompletionData.checkedFieldList?.length === 0) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: 'AI 补齐字段最少选一个',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
                                                 handleMaterial(1);
                                             }}
-                                            size="small"
                                             type="primary"
                                         >
-                                            处理选中的素材({selList?.length})
+                                            <div className="flex flex-col items-center">
+                                                处理选中的素材
+                                                <div>({selList?.length})</div>
+                                            </div>
                                         </Button>
                                         <Button
+                                            className="h-[50px]"
                                             disabled={tableData?.length === 0}
                                             onClick={() => {
                                                 setrequirementStatusOpen(true);
                                                 if (!fieldCompletionData.requirement) {
                                                     return false;
                                                 }
+                                                if (fieldCompletionData.checkedFieldList?.length === 0) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: 'AI 补齐字段最少选一个',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
                                                 handleMaterial(2);
                                             }}
-                                            size="small"
                                             type="primary"
                                         >
-                                            处理全部素材({tableData?.length})
+                                            <div className="flex flex-col items-center">
+                                                处理全部素材
+                                                <div>({tableData?.length})</div>
+                                            </div>
                                         </Button>
                                     </div>
                                     <div className="flex justify-center gap-6 mt-6">
@@ -420,6 +456,21 @@ const AiCreate = ({
                                             onClick={() => {
                                                 if (!fieldCompletionData.requirement) {
                                                     setrequirementStatusOpen(true);
+                                                    return false;
+                                                }
+                                                if (fieldCompletionData.checkedFieldList?.length === 0) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: 'AI 补齐字段最少选一个',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            close: false
+                                                        })
+                                                    );
                                                     return false;
                                                 }
                                                 setField && setField(JSON.stringify(fieldCompletionData));

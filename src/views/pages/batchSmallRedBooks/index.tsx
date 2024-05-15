@@ -22,9 +22,11 @@ const BatcSmallRedBooks = forwardRef(
             getDetail: getData,
             moke: moke,
             imageMoke: imageMoke,
-            mokeAI: defaultVariableData
+            mokeAI: defaultVariableData,
+            fieldAI: defaultField
         }));
         const [defaultVariableData, setDefaultVariableData] = useState<any>(null);
+        const [defaultField, setDefaultField] = useState<any>(null);
         const [getData, setGetData] = useState<any>(null);
         const [moke, setMoke] = useState<any[]>([]);
         const [imageMoke, setImageMoke] = useState<any[]>([]);
@@ -289,7 +291,9 @@ const BatcSmallRedBooks = forwardRef(
                             setDetail={setDetail}
                             setPlanUid={setPlanUid}
                             defaultVariableData={defaultVariableData}
+                            defaultField={defaultField}
                             setDefaultVariableData={setDefaultVariableData}
+                            setDefaultField={setDefaultField}
                         />
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">

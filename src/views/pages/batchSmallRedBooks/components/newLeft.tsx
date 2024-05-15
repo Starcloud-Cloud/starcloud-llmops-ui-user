@@ -47,6 +47,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { useAllDetail } from 'contexts/JWTContext';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { useNavigate } from 'react-router-dom';
+import AiCreate from './AICreate';
 const Lefts = ({
     detailShow = true,
     planState,
@@ -62,7 +63,9 @@ const Lefts = ({
     setDetail,
     setPlanUid,
     defaultVariableData,
-    setDefaultVariableData
+    defaultField,
+    setDefaultVariableData,
+    setDefaultField
 }: {
     detailShow?: boolean;
     planState?: number;
@@ -71,6 +74,7 @@ const Lefts = ({
     data?: any;
     saveLoading?: boolean;
     defaultVariableData?: boolean;
+    defaultField?: boolean;
     setCollData?: (data: any) => void;
     setGetData?: (data: any) => void;
     setMoke?: (data: any) => void;
@@ -79,6 +83,7 @@ const Lefts = ({
     setDetail?: (data: any) => void;
     setPlanUid: (data: any) => void;
     setDefaultVariableData?: (data: any) => void;
+    setDefaultField?: (data: any) => void;
 }) => {
     const { token } = theme.useToken();
     const navigate = useNavigate();
@@ -161,9 +166,14 @@ const Lefts = ({
     const tableRef = useRef<any[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);
     const [columns, setColumns] = useState<any[]>([]);
-    const downTableData = (data: any) => {
-        tableRef.current = [...data, ...tableData];
-        setTableData(tableRef.current);
+    const downTableData = (data: any, flag?: boolean) => {
+        if (flag) {
+            tableRef.current = data;
+            setTableData(tableRef.current);
+        } else {
+            tableRef.current = [...data, ...tableData];
+            setTableData(tableRef.current);
+        }
     };
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -463,6 +473,8 @@ const Lefts = ({
         const newMater = materiallist?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
         const customData = materiallist?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value;
         setDefaultVariableData && setDefaultVariableData(customData && customData !== '{}' ? JSON.parse(customData) : null);
+        const fieldAI = materiallist?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value;
+        setDefaultField && setDefaultField(fieldAI && fieldAI !== '{}' ? JSON.parse(fieldAI) : null);
         const valueList = newList?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value;
@@ -555,6 +567,19 @@ const Lefts = ({
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         ).variable.variables;
         step.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value = data;
+        newData.configuration.appInformation.workflowConfig.steps.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        ).variable.variables = step;
+        appRef.current = newData;
+        setAppData(appRef.current);
+        handleSaveClick(false);
+    };
+    const setField = (data: any) => {
+        const newData = _.cloneDeep(appRef.current);
+        const step = newData.configuration.appInformation.workflowConfig.steps.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        ).variable.variables;
+        step.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG').value = data;
         newData.configuration.appInformation.workflowConfig.steps.find(
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         ).variable.variables = step;
@@ -1008,6 +1033,16 @@ const Lefts = ({
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value
     ]);
+    useEffect(() => {
+        const materiallist = appData?.configuration?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value;
+        setDefaultField && setDefaultField(materiallist && materiallist !== '{}' ? JSON.parse(materiallist) : null);
+    }, [
+        appData?.configuration?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value
+    ]);
     return (
         <>
             <div className="relative h-full">
@@ -1112,9 +1147,18 @@ const Lefts = ({
                                                     >
                                                         批量导入
                                                     </Button>
-                                                    {/* <Button size="small" type="primary">
-                                            选择已有素材
-                                        </Button> */}
+                                                    <AiCreate
+                                                        title="AI 生成"
+                                                        columns={columns}
+                                                        MokeList={MokeList}
+                                                        tableData={tableData}
+                                                        defaultVariableData={defaultVariableData}
+                                                        defaultField={defaultField}
+                                                        setPage={setPage}
+                                                        setcustom={setcustom}
+                                                        setField={setField}
+                                                        downTableData={downTableData}
+                                                    />
                                                 </div>
                                                 <div className="flex gap-2 items-end">
                                                     <div className="text-xs text-black/50">点击放大编辑</div>
@@ -1343,12 +1387,7 @@ const Lefts = ({
                                             生成数量
                                         </span>
                                     </div>
-                                    <div
-                                        onClick={() => navigate('/subscribe')}
-                                        className="text-xs text-slate-500 cursor-pointer hover:underline hover:text-[#673ab7]"
-                                    >
-                                        想要生成更多，请升级
-                                    </div>
+                                    <div className="text-xs text-slate-500">想要生成更多，请升级</div>
                                 </div>
                             </Tabs.TabPane>
                         )}
@@ -1449,7 +1488,9 @@ const Lefts = ({
                     setZoomOpen={setZoomOpen}
                     tableLoading={tableLoading}
                     defaultVariableData={defaultVariableData}
+                    defaultField={defaultField}
                     setcustom={setcustom}
+                    setField={setField}
                     columns={columns}
                     tableData={tableData}
                     setTitle={setTitle}

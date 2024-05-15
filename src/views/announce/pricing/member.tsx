@@ -251,7 +251,7 @@ const planListDefault = (value: number) => [
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
             </div>,
-            'AI创作一次生成数量：3',
+            'AI创作裂变数量：3',
             '账号管理数量：3', // 0
             '账号分组数量：0', // 1
             '账号云同步', // 2
@@ -272,7 +272,7 @@ const planListDefault = (value: number) => [
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
             </div>,
-            'AI创作一次裂变数量：8',
+            'AI创作裂变数量：8',
             '账号管理数量：10',
             '账号分组数量：3',
             '账号云同步',
@@ -293,7 +293,7 @@ const planListDefault = (value: number) => [
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
             </div>,
-            'AI创作一次裂变数量：16',
+            'AI创作裂变数量：16',
             '账号管理数量：30',
             '账号分组数量：10',
             '账号云同步',
@@ -314,7 +314,7 @@ const planListDefault = (value: number) => [
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
             </div>,
-            'AI创作一次裂变数量：32',
+            'AI创作裂变数量：32',
             '账号管理数量：80',
             '账号分组数量：30',
             '账号云同步',

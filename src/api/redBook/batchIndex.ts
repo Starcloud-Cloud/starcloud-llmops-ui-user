@@ -102,3 +102,8 @@ export const planUpgrade = (data: any) => {
 export const materialParse = (data: any) => {
     return request.post({ url: `/llm/material/parse`, data });
 };
+
+//ai 素材
+export const materialGenerate = (data: any) => {
+    return request.post({ url: `/llm/creative/material/materialGenerate`, data });
+};

@@ -18,7 +18,6 @@ const Right = ({
     batchDataList,
     setBusinessUid,
     setDetailOpen,
-    handleScroll,
     timeFailure,
     getbatchPages
 }: {
@@ -32,7 +31,6 @@ const Right = ({
     batchDataList: any[];
     setBusinessUid: (data: any) => void;
     setDetailOpen: (data: any) => void;
-    handleScroll: (data: any) => void;
     timeFailure: (data: any) => void;
     getbatchPages: (data: any) => void;
 }) => {
@@ -133,32 +131,26 @@ const Right = ({
                                             </Popover>
                                             <span className="font-[600]">生成时间：</span>
                                             {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}
-                                            <div className="inline-block whitespace-nowrap">
+                                            <div className="w-[71px] inline-block whitespace-nowrap">
                                                 <span className="font-[600]">版本号：</span>
                                                 {item?.version}
                                             </div>
                                         </div>
-                                        <div>
-                                            <span className="font-[600]">执行人：</span>
-                                            {item?.creator}&nbsp;&nbsp;
-                                            <span className="font-[600]">生成成功数：</span>
-                                            {item?.successCount}&nbsp;&nbsp;
-                                            <span className="font-[600]">生成失败数：</span>
-                                            {item?.failureCount}&nbsp;&nbsp;
-                                            <div className="inline-block whitespace-nowrap">
-                                                <span className="font-[600]">生成总数：</span>
-                                                {item?.totalCount}
-                                            </div>
+                                        <div className="flex gap-1 flex-wrap">
+                                            <span className="font-[600]">执行人:</span>
+                                            <div className="!w-[50px] line-clamp-1">{item?.creator}</div>
+                                            <span className="font-[600]">生成成功数:</span>
+                                            <span className="w-[17px]">{item?.successCount}</span>
+                                            <span className="font-[600]">生成失败数:</span>
+                                            <span className="w-[17px]">{item?.failureCount}</span>
+                                            <span className="font-[600]">生成总数:</span>
+                                            <span className="w-[17px]">{item?.totalCount}</span>
                                         </div>
                                     </div>
                                 ),
                                 children: (
                                     <Spin className="!max-h-full" spinning={batchOpen}>
-                                        <div
-                                            className="h-[600px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2"
-                                            ref={scrollRef}
-                                            onScroll={() => handleScroll(scrollRef.current)}
-                                        >
+                                        <div className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2" ref={scrollRef}>
                                             <PlanList
                                                 key={item.uid}
                                                 batchDataList={batchDataList[i]}

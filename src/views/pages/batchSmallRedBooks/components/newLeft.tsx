@@ -162,7 +162,8 @@ const Lefts = ({
     const [tableData, setTableData] = useState<any[]>([]);
     const [columns, setColumns] = useState<any[]>([]);
     const downTableData = (data: any) => {
-        setTableData([...data, ...tableData]);
+        tableRef.current = [...data, ...tableData];
+        setTableData(tableRef.current);
     };
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -558,19 +559,8 @@ const Lefts = ({
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         ).variable.variables = step;
         appRef.current = newData;
-        dispatch(
-            openSnackbar({
-                open: true,
-                message: '保存成功',
-                variant: 'alert',
-                alert: {
-                    color: 'success'
-                },
-                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                close: false
-            })
-        );
         setAppData(appRef.current);
+        handleSaveClick(false);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
@@ -825,7 +815,7 @@ const Lefts = ({
             });
         });
         if (detailShow) {
-            const data = _.cloneDeep(appData);
+            const data = _.cloneDeep(appRef.current);
             const upData = data?.executeParam?.appInformation?.workflowConfig?.steps?.find(
                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
             );
@@ -852,7 +842,7 @@ const Lefts = ({
                 ...newList,
                 imageRef.current
                     ? imageRef.current?.record
-                    : appData.executeParam.appInformation.workflowConfig.steps?.find(
+                    : appRef.current.executeParam.appInformation.workflowConfig.steps?.find(
                           (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                       )
             ];
@@ -863,7 +853,7 @@ const Lefts = ({
                 styleData = JSON.parse(styleData);
             }
             const data = {
-                uid: appData?.uid,
+                uid: appRef.current?.uid,
                 totalCount,
                 configuration: {
                     imageStyleList: styleData
@@ -885,14 +875,14 @@ const Lefts = ({
                                   type: materialType
                               })),
                     appInformation: {
-                        ...appData.configuration.appInformation,
+                        ...appRef.current.configuration.appInformation,
                         workflowConfig: {
                             steps: [
-                                ...appData.configuration.appInformation.workflowConfig.steps?.filter(
+                                ...appRef.current.configuration.appInformation.workflowConfig.steps?.filter(
                                     (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                                 ),
                                 ...newList,
-                                ...appData.configuration.appInformation.workflowConfig.steps?.filter(
+                                ...appRef.current.configuration.appInformation.workflowConfig.steps?.filter(
                                     (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                                 )
                             ]
@@ -1333,8 +1323,8 @@ const Lefts = ({
                         )}
                         {detailShow && (
                             <Tabs.TabPane key={'4'} tab="批量生成参数">
-                                <div>
-                                    <div className="relative mt-[16px] max-w-[300px]">
+                                <div className="mt-[16px] flex gap-2 items-center">
+                                    <div className="relative max-w-[300px]">
                                         <InputNumber
                                             className="bg-[#f8fafc] w-full"
                                             size="large"
@@ -1347,10 +1337,17 @@ const Lefts = ({
                                                 setTotalCount(e);
                                             }}
                                             min={1}
+                                            max={all_detail?.levels[0]?.levelConfigDTO?.aiCreationCount || 8}
                                         />
                                         <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
                                             生成数量
                                         </span>
+                                    </div>
+                                    <div
+                                        onClick={() => navigate('/subscribe')}
+                                        className="text-xs text-slate-500 cursor-pointer hover:underline hover:text-[#673ab7]"
+                                    >
+                                        想要生成更多，请升级
                                     </div>
                                 </div>
                             </Tabs.TabPane>
@@ -1457,6 +1454,10 @@ const Lefts = ({
                     tableData={tableData}
                     setTitle={setTitle}
                     setEditOpen={setEditOpen}
+                    changeTableValue={(data) => {
+                        tableRef.current = data;
+                        setTableData(tableRef.current);
+                    }}
                     MokeList={MokeList}
                     setPage={setPage}
                     downTableData={downTableData}

@@ -1,9 +1,11 @@
 import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag } from 'antd';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { customMaterialGenerate } from 'api/template/fetch';
+import { materialGenerate } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import ChatMarkdown from 'ui-component/Markdown';
+import _ from 'lodash-es';
 const LeftModalAdd = ({
     zoomOpen,
     setZoomOpen,
@@ -13,6 +15,7 @@ const LeftModalAdd = ({
     MokeList,
     setTitle,
     setEditOpen,
+    changeTableValue,
     setPage,
     defaultVariableData,
     setcustom,
@@ -26,6 +29,7 @@ const LeftModalAdd = ({
     tableData: any[];
     setTitle: (data: string) => void;
     setEditOpen: (data: boolean) => void;
+    changeTableValue: (data: any) => void;
     setPage: (data: any) => void;
     setcustom?: (data: any) => void;
     downTableData: (data: any) => void;
@@ -33,6 +37,15 @@ const LeftModalAdd = ({
 }) => {
     const { TextArea } = Input;
     const [open, setOpen] = useState(false);
+    const [selTableList, setSelTableList] = useState<any[]>([]);
+    const handleDels = () => {
+        const newList = selTableList?.map((item) => JSON.stringify(item));
+        const newData = tableData?.filter((item) => {
+            return !newList.includes(JSON.stringify(item));
+        });
+        setSelTableList([]);
+        changeTableValue(newData);
+    };
     const checkedFieldList = useMemo(() => {
         return columns
             ?.slice(1, columns?.length - 1)
@@ -50,10 +63,22 @@ const LeftModalAdd = ({
             setSelList(selectedRows);
         }
     };
+    const [fieldCompletionData, setFieldCompletionData] = useState({
+        fieldList: MokeList,
+        checkedFieldList,
+        requirement: ''
+    });
+    const handleMaterial = async (num: number) => {
+        const result = await materialGenerate({
+            materialList: num === 1 ? selList : tableData,
+            ...fieldCompletionData
+        });
+    };
     //loading 弹窗
-    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(true);
+    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
     // AI 批量生成
     const [exeLoading, setExeLoading] = useState(false);
+    const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [variableData, setVariableData] = useState<any>({
         fieldList: MokeList,
         checkedFieldList,
@@ -161,19 +186,24 @@ const LeftModalAdd = ({
     }, [open]);
     return (
         <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
-            <div className="flex gap-2 justify-end my-[20px]">
-                <Button type="primary" onClick={() => setOpen(true)}>
-                    AI 素材生成
+            <div className="flex gap-2 justify-between my-[20px]">
+                <Button disabled={selTableList.length === 0} type="primary" onClick={handleDels}>
+                    批量删除({selTableList.length})
                 </Button>
-                <Button
-                    type="primary"
-                    onClick={() => {
-                        setTitle('新增');
-                        setEditOpen(true);
-                    }}
-                >
-                    新增
-                </Button>
+                <div className="flex gap-2">
+                    <Button type="primary" onClick={() => setOpen(true)}>
+                        AI 素材生成
+                    </Button>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setTitle('新增');
+                            setEditOpen(true);
+                        }}
+                    >
+                        新增
+                    </Button>
+                </div>
             </div>
             <Table
                 scroll={{ y: 500 }}
@@ -188,6 +218,14 @@ const LeftModalAdd = ({
                 loading={tableLoading}
                 size="small"
                 virtual
+                rowSelection={{
+                    type: 'checkbox',
+                    fixed: true,
+                    columnWidth: 50,
+                    onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+                        setSelTableList(selectedRows);
+                    }
+                }}
                 columns={columns}
                 dataSource={tableData}
             />
@@ -195,53 +233,37 @@ const LeftModalAdd = ({
                 <Tabs
                     items={[
                         {
-                            key: '0',
-                            label: 'AI 字段补齐',
-                            children: (
-                                <div>
-                                    <div className="text-[16px] font-bold mb-4">1.选择需要 AI 补齐的字段</div>
-                                    <Checkbox.Group value={variableData.checkedFieldList}>
-                                        {checkedList?.map((item) => (
-                                            <Checkbox value={item.dataIndex}>{item.title}</Checkbox>
-                                        ))}
-                                    </Checkbox.Group>
-                                    <Button type="primary" size="small" onClick={() => setSelOpen(true)}>
-                                        选择素材
-                                    </Button>
-                                    <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
-                                    <TextArea rows={10} />
-                                    <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
-                                    <div className="flex justify-center gap-2">
-                                        <Button size="small" type="primary">
-                                            处理选中的素材({selList?.length})
-                                        </Button>
-                                        <Button size="small" type="primary">
-                                            处理全部素材({tableData?.length})
-                                        </Button>
-                                    </div>
-                                    <div className="flex justify-center gap-6 mt-6">
-                                        <Button type="primary">保存配置</Button>
-                                    </div>
-                                </div>
-                            )
-                        },
-                        {
                             key: '1',
                             label: 'AI 批量生成',
                             children: (
                                 <div>
-                                    <div className="text-[16px] font-bold mb-4">1.选择需要 AI 补齐的字段</div>
-                                    <Checkbox.Group value={variableData.checkedFieldList}>
+                                    <div className="text-xs text-black/50">
+                                        <span className="font-bold text-[#faad14]">Tips：</span>
+                                        告诉AI你想生成的素材描述，越详细越好。AI会自动生成多条素材内容。
+                                    </div>
+                                    <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
+                                    <Checkbox.Group
+                                        onChange={(e) => {
+                                            setVariableData({
+                                                ...variableData,
+                                                checkedFieldList: e
+                                            });
+                                        }}
+                                        value={variableData.checkedFieldList}
+                                    >
                                         {checkedList?.map((item) => (
-                                            <Checkbox disabled={true} value={item.dataIndex}>
+                                            <Checkbox disabled={item.required} value={item.dataIndex}>
                                                 {item.title}
+                                                {item.required ? '*' : ''}
                                             </Checkbox>
                                         ))}
                                     </Checkbox.Group>
                                     <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
                                     <TextArea
                                         value={variableData.requirement}
+                                        status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}
                                         onChange={(e) => {
+                                            setrequirementStatusOpen(true);
                                             setVariableData({
                                                 ...variableData,
                                                 requirement: e.target.value
@@ -249,17 +271,22 @@ const LeftModalAdd = ({
                                         }}
                                         rows={10}
                                     />
+                                    {!variableData.requirement && requirementStatusOpen && (
+                                        <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
+                                    )}
                                     <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
                                     <div className="flex gap-2 items-center text-xs">
                                         <div>生成多少条素材</div>
                                         <InputNumber
                                             value={variableData.generateCount}
-                                            onChange={(value) =>
-                                                setVariableData({
-                                                    ...variableData,
-                                                    generateCount: value
-                                                })
-                                            }
+                                            onChange={(value) => {
+                                                if (value) {
+                                                    setVariableData({
+                                                        ...variableData,
+                                                        generateCount: value
+                                                    });
+                                                }
+                                            }}
                                             className="w-[200px]"
                                             min={1}
                                             max={10}
@@ -268,6 +295,10 @@ const LeftModalAdd = ({
                                     <div className="flex justify-center gap-6 mt-6">
                                         <Button
                                             onClick={() => {
+                                                if (!variableData.requirement) {
+                                                    setrequirementStatusOpen(true);
+                                                    return false;
+                                                }
                                                 setcustom && setcustom(JSON.stringify(variableData));
                                             }}
                                             type="primary"
@@ -278,12 +309,75 @@ const LeftModalAdd = ({
                                             type="primary"
                                             loading={exeLoading}
                                             onClick={() => {
+                                                if (!variableData.requirement) {
+                                                    setrequirementStatusOpen(true);
+                                                    return false;
+                                                }
                                                 setExeLoading(true);
                                                 getTextStream();
                                             }}
                                         >
                                             AI 生成素材
                                         </Button>
+                                    </div>
+                                </div>
+                            )
+                        },
+                        {
+                            key: '0',
+                            disabled: true,
+                            label: 'AI 字段补齐',
+                            children: (
+                                <div>
+                                    <div className="text-xs text-black/50">
+                                        <span className="font-bold text-[#faad14]">Tips：</span>
+                                        <p>先选择已选素材上想要补齐内容的字段，然后告诉AI你想生成的素材描述，越详细越好。</p>
+                                        <p>AI会自动生成已选素材的空缺字段的内容。</p>
+                                    </div>
+                                    <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
+                                    <Checkbox.Group
+                                        onChange={(e) =>
+                                            setFieldCompletionData({
+                                                ...fieldCompletionData,
+                                                checkedFieldList: e
+                                            })
+                                        }
+                                        value={fieldCompletionData.checkedFieldList}
+                                    >
+                                        {checkedList?.map((item) => (
+                                            <Checkbox value={item.dataIndex}>{item.title}</Checkbox>
+                                        ))}
+                                    </Checkbox.Group>
+                                    <Button type="primary" size="small" onClick={() => setSelOpen(true)}>
+                                        选择素材
+                                    </Button>
+                                    <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
+                                    <TextArea
+                                        value={fieldCompletionData.requirement}
+                                        onChange={(e) => setFieldCompletionData({ ...fieldCompletionData, requirement: e.target.value })}
+                                        rows={10}
+                                    />
+                                    <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
+                                    <div className="flex justify-center gap-2">
+                                        <Button
+                                            disabled={selList?.length === 0}
+                                            onClick={() => handleMaterial(1)}
+                                            size="small"
+                                            type="primary"
+                                        >
+                                            处理选中的素材({selList?.length})
+                                        </Button>
+                                        <Button
+                                            disabled={tableData?.length === 0}
+                                            onClick={() => handleMaterial(2)}
+                                            size="small"
+                                            type="primary"
+                                        >
+                                            处理全部素材({tableData?.length})
+                                        </Button>
+                                    </div>
+                                    <div className="flex justify-center gap-6 mt-6">
+                                        <Button type="primary">保存配置</Button>
                                     </div>
                                 </div>
                             )

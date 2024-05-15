@@ -81,32 +81,15 @@ const BatcSmallRedBooks = forwardRef(
         };
         //页面滚动
         const [exampleList, setExampleList] = useState<any[]>([]);
-        const [total, setTotal] = useState(0);
-        const [queryPage, setQueryPage] = useState({
+        const queryPage = {
             pageNo: 1,
-            pageSize: 20
-        });
-        const queryRef: any = useRef({ pageNo: 1, pageSize: 20 });
-        const handleScroll = (current: any) => {
-            if (current) {
-                if (
-                    current.scrollHeight - current.scrollTop === current.clientHeight &&
-                    queryRef.current.pageNo * queryRef.current.pageSize < total
-                ) {
-                    queryRef.current = {
-                        pageNo: queryRef.current.pageNo + 1,
-                        pageSize: queryRef.current.pageSize
-                    };
-                    setQueryPage(queryRef.current);
-                }
-            }
+            pageSize: 40
         };
         const getList = (batch?: string) => {
             getContentPage({
-                ...queryRef.current,
+                ...queryPage,
                 batchUid: batch || batchUid
             }).then((res) => {
-                setTotal(res.total);
                 const newList = _.cloneDeep(batchDataListRef.current);
                 newList[collIndexRef.current] = res.list;
                 batchDataListRef.current = newList;
@@ -118,11 +101,10 @@ const BatcSmallRedBooks = forwardRef(
         };
         const getLists = (pageNo: number, batch?: string) => {
             getContentPage({
-                ...queryRef.current,
+                ...queryPage,
                 pageNo,
                 batchUid: batch || batchUid
             }).then((res) => {
-                setTotal(res.total);
                 const result = res?.list?.every((item: any) => {
                     return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
                 });
@@ -135,34 +117,12 @@ const BatcSmallRedBooks = forwardRef(
                     });
                 }
                 const newList = _.cloneDeep(batchDataListRef.current);
-                newList[collIndexRef.current]?.splice(
-                    (queryRef.current.pageNo - 1) * queryRef.current.pageSize,
-                    queryRef.current.pageSize,
-                    ...res.list
-                );
+                newList[collIndexRef.current] = res.list;
 
                 batchDataListRef.current = newList;
                 setBatchDataList(batchDataListRef.current);
             });
         };
-        useEffect(() => {
-            if (queryPage.pageNo > 1) {
-                getList();
-                timer.current[queryPage.pageNo - 1] = setInterval(() => {
-                    if (
-                        batchDataListRef.current[collIndexRef.current]
-                            ?.slice((queryPage.pageNo - 1) * queryPage.pageSize, queryPage.pageNo * queryPage.pageSize)
-                            ?.every((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE')
-                    ) {
-                        setBathOpen(false);
-                        setPre(pre + 1);
-                        clearInterval(timer.current[queryPage.pageNo - 1]);
-                        return;
-                    }
-                    getLists(queryPage.pageNo);
-                }, 2000);
-            }
-        }, [queryPage.pageNo]);
         const [collapseActive, setcollapseActive] = useState<any[]>([]);
         //手风琴的开关
         const changeCollapse = (e: any) => {
@@ -194,11 +154,6 @@ const BatcSmallRedBooks = forwardRef(
                 } else {
                     setcollapseActive(e);
                     setbatchOpen(true);
-                    queryRef.current = {
-                        pageNo: 1,
-                        pageSize: 20
-                    };
-                    setQueryPage(queryRef.current);
                     setBatchUid(e[0]);
                     if (bathList?.find((item) => item.uid == e[0])?.status === 'SUCCESS') {
                         getList(e[0]);
@@ -236,11 +191,6 @@ const BatcSmallRedBooks = forwardRef(
                 const bathId = bathList[0].uid;
                 setcollapseActive([bathId]);
                 setbatchOpen(true);
-                queryRef.current = {
-                    pageNo: 1,
-                    pageSize: 20
-                };
-                setQueryPage(queryRef.current);
                 setBatchUid(bathId);
                 if (bathList?.find((item) => item.uid == bathId)?.status === 'SUCCESS') {
                     getList(bathId);
@@ -358,7 +308,6 @@ const BatcSmallRedBooks = forwardRef(
                             }}
                             getbatchPages={getbatchPages}
                             setDetailOpen={(data: any) => setDetailOpen(data)}
-                            handleScroll={(data: any) => handleScroll(data)}
                             timeFailure={({ i, index }: { i: number; index: number }) => {
                                 collIndexRef.current = i;
                                 setCollIndex(collIndexRef.current);
@@ -367,12 +316,10 @@ const BatcSmallRedBooks = forwardRef(
                                 timer.current[pageNo] = getLists(pageNo);
                                 timer.current[pageNo] = setInterval(() => {
                                     if (
-                                        batchDataListRef.current[collIndexRef.current]
-                                            ?.slice((pageNo - 1) * queryPage.pageSize, pageNo * queryPage.pageSize)
-                                            ?.every(
-                                                (item: any) =>
-                                                    item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
-                                            )
+                                        batchDataListRef.current[collIndexRef.current]?.every(
+                                            (item: any) =>
+                                                item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
+                                        )
                                     ) {
                                         clearInterval(timer.current[pageNo]);
                                         setBathOpen(false);

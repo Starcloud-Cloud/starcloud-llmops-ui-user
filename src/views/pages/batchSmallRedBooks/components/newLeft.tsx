@@ -168,10 +168,19 @@ const Lefts = ({
     const [columns, setColumns] = useState<any[]>([]);
     const downTableData = (data: any, flag?: boolean) => {
         if (flag) {
-            tableRef.current = data;
+            tableRef.current = data?.map((item: any) => ({
+                ...item,
+                uuid: uuidv4()
+            }));
             setTableData(tableRef.current);
         } else {
-            tableRef.current = [...data, ...tableData];
+            tableRef.current = [
+                ...data?.map((item: any) => ({
+                    ...item,
+                    uuid: uuidv4()
+                })),
+                ...tableData
+            ];
             setTableData(tableRef.current);
         }
     };
@@ -303,7 +312,10 @@ const Lefts = ({
                 if (result?.complete) {
                     setTableLoading(false);
                     clearInterval(timer.current);
-                    tableRef.current = result?.materialDTOList;
+                    tableRef.current = result?.materialDTOList?.map((item: any) => ({
+                        ...item,
+                        uuid: uuidv4()
+                    }));
                     setTableData(tableRef.current);
                 }
             });
@@ -536,10 +548,23 @@ const Lefts = ({
             if (data) {
                 tableRef.current = newList?.workflowConfig?.steps
                     ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                    ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value;
+                    ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
+                    ?.value?.map((item: any) => ({
+                        ...item,
+                        uuid: uuidv4()
+                    }));
                 setTableData(tableRef.current || []);
             } else {
-                tableRef.current = picList && picList?.length > 0 ? picList : valueList;
+                tableRef.current =
+                    picList && picList?.length > 0
+                        ? picList?.map((item: any) => ({
+                              ...item,
+                              uuid: uuidv4()
+                          }))
+                        : valueList?.map((item: any) => ({
+                              ...item,
+                              uuid: uuidv4()
+                          }));
                 setTableData(tableRef.current || []);
             }
         }
@@ -1178,7 +1203,7 @@ const Lefts = ({
                                                     }
                                                 }}
                                                 rowKey={(record, index) => {
-                                                    return record[Object.keys(record)[1]] + index;
+                                                    return record.uuid;
                                                 }}
                                                 loading={tableLoading}
                                                 size="small"
@@ -1496,7 +1521,10 @@ const Lefts = ({
                     setTitle={setTitle}
                     setEditOpen={setEditOpen}
                     changeTableValue={(data) => {
-                        tableRef.current = data;
+                        tableRef.current = data?.map((item: any) => ({
+                            ...item,
+                            uuid: uuidv4()
+                        }));
                         setTableData(tableRef.current);
                     }}
                     MokeList={MokeList}
@@ -1530,7 +1558,10 @@ const Lefts = ({
                     setBookLoading(true);
                     try {
                         const result = await materialParse({ noteUrlList: bookValue?.split(/\r?\n/), materialType });
-                        tableRef.current = result;
+                        tableRef.current = result?.map((item: any) => ({
+                            ...item,
+                            uuid: uuidv4()
+                        }));
                         setTableData(tableRef.current);
                         setBookLoading(false);
                         setBookOpen(false);

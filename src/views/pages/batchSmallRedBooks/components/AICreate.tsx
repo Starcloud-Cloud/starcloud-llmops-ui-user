@@ -100,18 +100,33 @@ const AiCreate = ({
                 materialList: item,
                 ...fieldCompletionData
             });
+            clearInterval(timer.current);
             resArr[index] = res;
             setSuccessCount(item?.length);
         });
         await Promise.all(result);
         let newList = _.cloneDeep(tableData);
+        console.log(resArr);
+
         if (num === 1) {
             for (let i = 0; i < arr.flat().length; i++) {
-                newList[indexList[i]] = resArr.flat()[i];
+                const obj: any = {};
+                Object.keys(resArr.flat()[i]).map((item) => {
+                    obj[item] = resArr.flat()[i][item];
+                });
+                newList[indexList[i]] = {
+                    ...newList[indexList[i]],
+                    ...obj
+                };
             }
         } else {
-            newList = resArr.flat();
+            newList = newList?.map((item, index) => ({
+                ...item,
+                ...resArr.flat()[index]
+            }));
         }
+        console.log(newList);
+        setSelList([]);
         downTableData(newList, true);
         setMaterialExecutionOpen(false);
         setOpen(false);
@@ -254,7 +269,7 @@ const AiCreate = ({
                     items={[
                         {
                             key: '1',
-                            label: 'AI 批量生成',
+                            label: '批量生成',
                             children: (
                                 <div>
                                     <div className="text-xs text-black/50">
@@ -344,7 +359,7 @@ const AiCreate = ({
                         },
                         {
                             key: '0',
-                            label: 'AI 字段补齐',
+                            label: '字段补齐',
                             children: (
                                 <div>
                                     <div className="text-xs text-black/50">
@@ -516,46 +531,43 @@ const AiCreate = ({
                 </Modal>
             )}
             {/* 选择素材 */}
-            {selOpen && (
-                <Modal
-                    title="选择素材"
-                    width={800}
-                    open={selOpen}
-                    onCancel={() => {
-                        setSelList([]);
-                        setSelOpen(false);
+            <Modal
+                title="选择素材"
+                width={800}
+                open={selOpen}
+                onCancel={() => {
+                    setSelOpen(false);
+                }}
+                footer={false}
+            >
+                <div className="flex justify-end">
+                    <Button onClick={() => setSelOpen(false)} type="primary" size="small">
+                        确认选择({selList?.length})
+                    </Button>
+                </div>
+                <Table
+                    scroll={{ y: 500 }}
+                    rowKey={(record, index) => {
+                        return record.uuid;
                     }}
-                    footer={false}
-                >
-                    <div className="flex justify-end">
-                        <Button onClick={() => setSelOpen(false)} type="primary" size="small">
-                            确认选择({selList?.length})
-                        </Button>
-                    </div>
-                    <Table
-                        scroll={{ y: 500 }}
-                        rowKey={(record, index) => {
-                            return record[Object.keys(record)[1]] + index;
-                        }}
-                        pagination={{
-                            showSizeChanger: true,
-                            onChange: (page) => {
-                                setPage(page);
-                            }
-                        }}
-                        size="small"
-                        virtual
-                        rowSelection={{
-                            type: 'checkbox',
-                            ...rowSelection,
-                            fixed: true,
-                            columnWidth: 50
-                        }}
-                        columns={columns}
-                        dataSource={tableData}
-                    />
-                </Modal>
-            )}
+                    pagination={{
+                        showSizeChanger: true,
+                        onChange: (page) => {
+                            setPage(page);
+                        }
+                    }}
+                    size="small"
+                    virtual
+                    rowSelection={{
+                        type: 'checkbox',
+                        ...rowSelection,
+                        fixed: true,
+                        columnWidth: 50
+                    }}
+                    columns={columns}
+                    dataSource={tableData}
+                />
+            </Modal>
             {/* 素材执行 loading */}
             {materialExecutionOpen && (
                 <Modal open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>

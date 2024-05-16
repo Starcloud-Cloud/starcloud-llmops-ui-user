@@ -1,12 +1,6 @@
-import { Modal, Button, Table, Input } from 'antd';
-import { useEffect, useMemo, useState, useRef } from 'react';
-import { customMaterialGenerate } from 'api/template/fetch';
-import { materialGenerate } from 'api/redBook/batchIndex';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/slices/snackbar';
+import { Modal, Button, Table } from 'antd';
+import { useState } from 'react';
 import AiCreate from './AICreate';
-import ChatMarkdown from 'ui-component/Markdown';
-import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 const LeftModalAdd = ({
     zoomOpen,
@@ -44,11 +38,7 @@ const LeftModalAdd = ({
     const [selTableList, setSelTableList] = useState<any[]>([]);
     const handleDels = () => {
         const newList = selTableList?.map((item) => JSON.stringify(item));
-        console.log(newList);
-        console.log(tableData);
-
         const newData = tableData?.filter((item) => {
-            console.log(newList.includes(JSON.stringify(item)));
             return !newList.includes(JSON.stringify(item));
         });
         changeTableValue(newData);
@@ -87,9 +77,10 @@ const LeftModalAdd = ({
             <Table
                 scroll={{ y: 500 }}
                 rowKey={(record, index) => {
-                    return record[Object.keys(record)[1]] + index;
+                    return record.uuid;
                 }}
                 pagination={{
+                    showSizeChanger: true,
                     onChange: (page) => {
                         setPage(page);
                     }

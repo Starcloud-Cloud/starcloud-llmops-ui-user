@@ -36,20 +36,6 @@ const AiCreate = ({
     }, [MokeList]);
     const { TextArea } = Input;
     const [open, setOpen] = useState(false);
-    // const checkedFieldList = useMemo(() => {
-    //     console.log(
-    //         columns,
-    //         columns
-    //             ?.slice(1, columns?.length - 1)
-    //             ?.filter((item) => item.type !== 'image')
-    //             ?.map((item) => item?.dataIndex)
-    //     );
-
-    //     return columns
-    //         ?.slice(1, columns?.length - 1)
-    //         ?.filter((item) => item.type !== 'image')
-    //         ?.map((item) => item?.dataIndex);
-    // }, [columns]);
     useEffect(() => {
         if (columns?.length > 0) {
             setFieldCompletionData({
@@ -83,63 +69,77 @@ const AiCreate = ({
         checkedFieldList: [],
         requirement: ''
     });
-    function groupArrayByFive(inputArray: any[]) {
-        // 使用reduce方法分组
-        return inputArray.reduce((acc: any, currentValue, index) => {
-            // 计算当前元素属于哪一组，通过index除以5的商
-            const groupIndex = Math.floor(index / 5);
-            // 初始化对应组，如果还没有创建的话
-            if (!acc[groupIndex]) {
-                acc[groupIndex] = [];
-            }
-            // 将当前元素添加到对应的组里
-            acc[groupIndex].push(currentValue);
-            return acc;
-        }, []);
+    function chunkArray(myArray: any[], chunk_size: any) {
+        var index = 0;
+        var arrayLength = myArray.length;
+        var tempArray = [];
+
+        for (index = 0; index < arrayLength; index += chunk_size) {
+            let myChunk = myArray.slice(index, index + chunk_size);
+            tempArray.push(myChunk);
+        }
+        return tempArray;
     }
     //处理过的素材数据
+    const totalCountRef = useRef(0);
     const [totalCount, setTotalCount] = useState(0);
+    const successCountRef = useRef(0);
     const [successCount, setSuccessCount] = useState(0);
+    const errorCountRef = useRef(0);
     const [errorCount, setErrorCount] = useState(0);
+    const [errorMessage, setErrorMessage] = useState<any>('');
     const timer = useRef<any>(null);
     const handleMaterial = async (num: number) => {
         setMaterialExecutionOpen(true);
         timer.current = setInterval(() => {
             if (materialPreRef.current < 99) {
-                materialPreRef.current += 1;
+                materialPreRef.current = ((successCountRef.current / totalCountRef.current) * 100) | 0;
                 setMaterialPre(materialPreRef.current);
             } else {
                 clearInterval(timer.current);
             }
-        }, 100);
-        //批量数据还是选中数据
-        const arr = num === 1 ? groupArrayByFive(selList) : groupArrayByFive(tableData);
+        }, 1000);
         //记录原有数据下标
-        const newTableList = selList?.map((item) => JSON.stringify(item));
         const indexList: any[] = [];
         tableData?.map((item, index) => {
-            if (newTableList.includes(JSON.stringify(item))) {
+            if (selList?.find((el) => el.uuid === item.uuid)) {
                 indexList.push(index);
             }
         });
-        setTotalCount(num === 1 ? selList.length : tableData.length);
+        totalCountRef.current = num === 1 ? selList.length : tableData.length;
+        setTotalCount(totalCountRef.current);
         const resArr: any[] = [];
-        const result = arr.map(async (item: any, index: number) => {
-            const res = await materialGenerate({
-                materialList: item,
-                fieldList: MokeList,
-                ...fieldCompletionData
-            });
-            clearInterval(timer.current);
-            resArr[index] = res;
-            setSuccessCount(item?.length);
-        });
-        await Promise.all(result);
+        let index = 0;
+        const chunks = chunkArray(num === 1 ? selList : tableData, 3);
+        while (index < chunks.length) {
+            const currentBatch = chunks.slice(index, index + 3);
+            try {
+                await Promise.all(
+                    currentBatch.map(async (group, i) => {
+                        try {
+                            const res = await materialGenerate({
+                                materialList: group,
+                                fieldList: MokeList,
+                                ...fieldCompletionData
+                            });
+                            resArr[index + i] = res;
+                            successCountRef.current += currentBatch?.length;
+                            setSuccessCount(successCountRef.current);
+                        } catch (err: any) {
+                            console.log(err);
+                            setErrorMessage(err.msg);
+                        }
+                    })
+                );
+            } catch (error) {
+                errorCountRef.current += currentBatch?.length;
+                setErrorCount(errorCountRef.current);
+            }
+            index += 3;
+        }
         let newList = _.cloneDeep(tableData);
-        console.log(resArr);
-
         if (num === 1) {
-            for (let i = 0; i < arr.flat().length; i++) {
+            for (let i = 0; i < chunks.flat().length; i++) {
                 const obj: any = {};
                 Object.keys(resArr.flat()[i]).map((item) => {
                     obj[item] = resArr.flat()[i][item];
@@ -251,11 +251,14 @@ const AiCreate = ({
             setDownLoading(false);
         }
     };
-
     useEffect(() => {
         if (!materialExecutionOpen) {
             materialPreRef.current = 0;
             setMaterialPre(materialPreRef.current);
+            errorCountRef.current = 0;
+            setErrorCount(errorCountRef.current);
+            successCountRef.current = 0;
+            setSuccessCount(successCountRef.current);
         }
     }, [materialExecutionOpen]);
     useEffect(() => {
@@ -266,12 +269,9 @@ const AiCreate = ({
     }, [preview]);
     useEffect(() => {
         if (defaultVariableData) {
-            console.log(defaultVariableData);
-
             setVariableData(defaultVariableData);
         }
         if (defaultField) {
-            console.log(defaultField);
             setFieldCompletionData(defaultField);
         }
     }, []);
@@ -416,7 +416,7 @@ const AiCreate = ({
                                     <Button className="mb-4" type="primary" size="small" onClick={() => setSelOpen(true)}>
                                         选择素材
                                     </Button>
-                                    <div className="flex gap-2">
+                                    <div className="flex justify-center gap-2">
                                         <Button
                                             className="h-[50px]"
                                             disabled={selList?.length === 0}
@@ -549,7 +549,7 @@ const AiCreate = ({
             {/* 选择素材 */}
             <Modal
                 title="选择素材"
-                width={800}
+                width={'80%'}
                 open={selOpen}
                 onCancel={() => {
                     setSelOpen(false);
@@ -568,6 +568,8 @@ const AiCreate = ({
                     }}
                     pagination={{
                         showSizeChanger: true,
+                        defaultPageSize: 20,
+                        pageSizeOptions: [20, 50, 100, 300, 500],
                         onChange: (page) => {
                             setPage(page);
                         }
@@ -591,6 +593,12 @@ const AiCreate = ({
                         <div className="font-bold">AI 处理中，请勿刷新页面···</div>
                         <Progress percent={materialPre} type="circle" />
                     </div>
+                    {errorMessage && (
+                        <div className="my-4 text-[#ff4d4f] text-xs flex justify-center">
+                            <span className="font-bold">错误信息：</span>
+                            {errorMessage}
+                        </div>
+                    )}
                     <div className="flex gap-2 justify-center mt-4 text-xs">
                         <div>
                             <Tag>全部：{totalCount}</Tag>

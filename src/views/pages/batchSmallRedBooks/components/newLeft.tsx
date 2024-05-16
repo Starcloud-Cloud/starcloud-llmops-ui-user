@@ -95,7 +95,7 @@ const Lefts = ({
     const appRef = useRef<any>(null);
     const [appData, setAppData] = useState<any>(null);
     const [version, setVersion] = useState(0);
-    const getStatus = (status: any) => {
+    const getStatus1 = (status: any) => {
         switch (status) {
             case 'PENDING':
                 return <Tag>待执行</Tag>;
@@ -836,7 +836,9 @@ const Lefts = ({
                 uid: searchParams.get('appUid') ? searchParams.get('uid') : undefined,
                 source: searchParams.get('appUid') ? 'MARKET' : detail ? 'APP' : 'MARKET'
             });
-            appRef.current.status = result?.status;
+            const newData = _.cloneDeep(appRef.current);
+            newData.status = result?.status;
+            appRef.current = newData;
             setAppData(appRef.current);
         };
         if (pre && pre > 0) {
@@ -1076,7 +1078,7 @@ const Lefts = ({
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         {!detail && (
                             <div>
-                                状态：{getStatus(appData?.status)}
+                                状态：{getStatus1(appData?.status)}
                                 <div className="inline-block whitespace-nowrap">
                                     {appData?.version !== version ? (
                                         <Popconfirm

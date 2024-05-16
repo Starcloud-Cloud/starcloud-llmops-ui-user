@@ -197,7 +197,7 @@ const FormModal = ({
                                         allowClear
                                     />
                                 ) : item.title === '内容' || item.type === 'textBox' ? (
-                                    <TextArea rows={4} />
+                                    <TextArea rows={8} />
                                 ) : item.type === 'listStr' ? (
                                     <Select mode="tags" options={[]} />
                                 ) : (

@@ -61,7 +61,11 @@ const BatcSmallRedBooks = forwardRef(
         const collIndexRef = useRef(0);
         const [collIndex, setCollIndex] = useState(0);
         const newSave = async (uid: string) => {
-            setBathOpen(true);
+            timer.current?.map((item: any) => {
+                clearInterval(item);
+            });
+            batchOpenRef.current = true;
+            setBathOpen(batchOpenRef.current);
             await planExecute({ uid });
             const res = await batchPages({ batchPage, planUid: uid });
             setRightPage(rightPage + 1);
@@ -120,9 +124,9 @@ const BatcSmallRedBooks = forwardRef(
                 }
                 const newList = _.cloneDeep(batchDataListRef.current);
                 newList[collIndexRef.current] = res.list;
-
                 batchDataListRef.current = newList;
                 setBatchDataList(batchDataListRef.current);
+                setbatchOpen(false);
             });
         };
         const [collapseActive, setcollapseActive] = useState<any[]>([]);
@@ -147,7 +151,8 @@ const BatcSmallRedBooks = forwardRef(
                             })
                         ) {
                             clearInterval(timer.current[0]);
-                            setBathOpen(false);
+                            batchOpenRef.current = false;
+                            setBathOpen(batchOpenRef.current);
                             setPre(pre + 1);
                             return;
                         }
@@ -169,7 +174,8 @@ const BatcSmallRedBooks = forwardRef(
                                 })
                             ) {
                                 clearInterval(timer.current[0]);
-                                setBathOpen(false);
+                                batchOpenRef.current = false;
+                                setBathOpen(batchOpenRef.current);
                                 setPre(pre + 1);
                                 return;
                             }
@@ -181,9 +187,10 @@ const BatcSmallRedBooks = forwardRef(
                 setcollapseActive(e);
             }
         };
+        const batchOpenRef = useRef(true);
         const [bathOpen, setBathOpen] = useState(true);
         useEffect(() => {
-            if (bathList?.length !== 0 && bathOpen) {
+            if (bathList?.length !== 0 && batchOpenRef.current) {
                 collIndexRef.current = 0;
                 setCollIndex(collIndexRef.current);
                 const newList = _.cloneDeep(batchDataListRef.current);
@@ -206,13 +213,14 @@ const BatcSmallRedBooks = forwardRef(
                             })
                         ) {
                             clearInterval(timer.current[0]);
-                            setBathOpen(false);
                             setPre(pre + 1);
                             return;
                         }
                         getLists(1, bathId);
                     }, 2000);
                 }
+                batchOpenRef.current = false;
+                setBathOpen(batchOpenRef.current);
             }
         }, [bathList]);
 
@@ -326,12 +334,13 @@ const BatcSmallRedBooks = forwardRef(
                                         )
                                     ) {
                                         clearInterval(timer.current[pageNo]);
-                                        setBathOpen(false);
                                         setPre(pre + 1);
                                         return;
                                     }
                                     getLists(pageNo);
                                 }, 2000);
+                                batchOpenRef.current = false;
+                                setBathOpen(batchOpenRef.current);
                             }}
                         />
                     </div>

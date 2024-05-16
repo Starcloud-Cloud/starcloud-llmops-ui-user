@@ -37,9 +37,8 @@ const LeftModalAdd = ({
 }) => {
     const [selTableList, setSelTableList] = useState<any[]>([]);
     const handleDels = () => {
-        const newList = selTableList?.map((item) => JSON.stringify(item));
         const newData = tableData?.filter((item) => {
-            return !newList.includes(JSON.stringify(item));
+            return !selTableList?.find((el: any) => el?.uuid === item.uuid);
         });
         changeTableValue(newData);
         setSelTableList([]);
@@ -81,6 +80,8 @@ const LeftModalAdd = ({
                 }}
                 pagination={{
                     showSizeChanger: true,
+                    defaultPageSize: 20,
+                    pageSizeOptions: [20, 50, 100, 300, 500],
                     onChange: (page) => {
                         setPage(page);
                     }

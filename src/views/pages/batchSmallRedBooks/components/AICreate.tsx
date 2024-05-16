@@ -30,13 +30,43 @@ const AiCreate = ({
     defaultVariableData?: any;
     defaultField?: any;
 }) => {
+    useEffect(() => {
+        if (MokeList?.length > 0) {
+        }
+    }, [MokeList]);
     const { TextArea } = Input;
     const [open, setOpen] = useState(false);
-    const checkedFieldList = useMemo(() => {
-        return columns
-            ?.slice(1, columns?.length - 1)
-            ?.filter((item) => item.type !== 'image')
-            ?.map((item) => item?.dataIndex);
+    // const checkedFieldList = useMemo(() => {
+    //     console.log(
+    //         columns,
+    //         columns
+    //             ?.slice(1, columns?.length - 1)
+    //             ?.filter((item) => item.type !== 'image')
+    //             ?.map((item) => item?.dataIndex)
+    //     );
+
+    //     return columns
+    //         ?.slice(1, columns?.length - 1)
+    //         ?.filter((item) => item.type !== 'image')
+    //         ?.map((item) => item?.dataIndex);
+    // }, [columns]);
+    useEffect(() => {
+        if (columns?.length > 0) {
+            setFieldCompletionData({
+                ...fieldCompletionData,
+                checkedFieldList: columns
+                    ?.slice(1, columns?.length - 1)
+                    ?.filter((item) => item.type !== 'image')
+                    ?.map((item) => item?.dataIndex)
+            });
+            setVariableData({
+                ...variableData,
+                checkedFieldList: columns
+                    ?.slice(1, columns?.length - 1)
+                    ?.filter((item) => item.type !== 'image')
+                    ?.map((item) => item?.dataIndex)
+            });
+        }
     }, [columns]);
     const checkedList = useMemo(() => {
         return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image');
@@ -49,9 +79,8 @@ const AiCreate = ({
             setSelList(selectedRows);
         }
     };
-    const [fieldCompletionData, setFieldCompletionData] = useState({
-        fieldList: MokeList,
-        checkedFieldList,
+    const [fieldCompletionData, setFieldCompletionData] = useState<any>({
+        checkedFieldList: [],
         requirement: ''
     });
     function groupArrayByFive(inputArray: any[]) {
@@ -98,6 +127,7 @@ const AiCreate = ({
         const result = arr.map(async (item: any, index: number) => {
             const res = await materialGenerate({
                 materialList: item,
+                fieldList: MokeList,
                 ...fieldCompletionData
             });
             clearInterval(timer.current);
@@ -125,7 +155,6 @@ const AiCreate = ({
                 ...resArr.flat()[index]
             }));
         }
-        console.log(newList);
         setSelList([]);
         downTableData(newList, true);
         setMaterialExecutionOpen(false);
@@ -139,8 +168,7 @@ const AiCreate = ({
     const [exeLoading, setExeLoading] = useState(false);
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [variableData, setVariableData] = useState<any>({
-        fieldList: MokeList,
-        checkedFieldList,
+        checkedFieldList: [],
         requirement: undefined,
         generateCount: 1
     });
@@ -151,7 +179,7 @@ const AiCreate = ({
     const [materialValue, setMaterialValue] = useState('');
     const getTextStream = async () => {
         try {
-            const result: any = await customMaterialGenerate(variableData);
+            const result: any = await customMaterialGenerate({ ...variableData, fieldList: MokeList });
             const reader = result.getReader();
             const textDecoder = new TextDecoder();
             let outerJoins: any;
@@ -237,28 +265,16 @@ const AiCreate = ({
         }
     }, [preview]);
     useEffect(() => {
-        if (!open) {
-            setVariableData({
-                fieldList: MokeList,
-                checkedFieldList,
-                requirement: undefined,
-                generateCount: 1
-            });
-            setFieldCompletionData({
-                fieldList: MokeList,
-                checkedFieldList,
-                requirement: ''
-            });
-            setSelList([]);
-        } else {
-            if (defaultVariableData) {
-                setVariableData(defaultVariableData);
-            }
-            if (defaultField) {
-                setFieldCompletionData(defaultField);
-            }
+        if (defaultVariableData) {
+            console.log(defaultVariableData);
+
+            setVariableData(defaultVariableData);
         }
-    }, [open]);
+        if (defaultField) {
+            console.log(defaultField);
+            setFieldCompletionData(defaultField);
+        }
+    }, []);
     return (
         <div>
             <Button size={title === 'AI 生成' ? 'small' : 'middle'} onClick={() => setOpen(true)} type="primary">

@@ -1,5 +1,5 @@
 import { Modal, Button, Table } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AiCreate from './AICreate';
 import _ from 'lodash-es';
 const LeftModalAdd = ({
@@ -15,9 +15,11 @@ const LeftModalAdd = ({
     setPage,
     defaultVariableData,
     defaultField,
+    selectedRowKeys,
     setcustom,
     setField,
-    downTableData
+    downTableData,
+    setSelectedRowKeys
 }: {
     zoomOpen: boolean;
     setZoomOpen: (data: boolean) => void;
@@ -31,23 +33,23 @@ const LeftModalAdd = ({
     setPage: (data: any) => void;
     setcustom?: (data: any) => void;
     setField?: (data: any) => void;
-    downTableData: (data: any, _?: boolean) => void;
+    downTableData: (data: any) => void;
+    setSelectedRowKeys: (data: any) => void;
     defaultVariableData?: any;
     defaultField?: any;
+    selectedRowKeys?: any;
 }) => {
-    const [selTableList, setSelTableList] = useState<any[]>([]);
     const handleDels = () => {
         const newData = tableData?.filter((item) => {
-            return !selTableList?.find((el: any) => el?.uuid === item.uuid);
+            return !selectedRowKeys?.find((el: any) => el === item.uuid);
         });
         changeTableValue(newData);
-        setSelTableList([]);
     };
     return (
         <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
             <div className="flex gap-2 justify-between my-[20px]">
-                <Button disabled={selTableList.length === 0} type="primary" onClick={handleDels}>
-                    批量删除({selTableList.length})
+                <Button disabled={selectedRowKeys?.length === 0} type="primary" onClick={handleDels}>
+                    批量删除({selectedRowKeys?.length})
                 </Button>
                 <div className="flex gap-2">
                     <AiCreate
@@ -60,6 +62,7 @@ const LeftModalAdd = ({
                         setPage={setPage}
                         setcustom={setcustom}
                         setField={setField}
+                        setSelectedRowKeys={setSelectedRowKeys}
                         downTableData={downTableData}
                     />
                     <Button
@@ -93,8 +96,9 @@ const LeftModalAdd = ({
                     type: 'checkbox',
                     fixed: true,
                     columnWidth: 50,
+                    selectedRowKeys: selectedRowKeys,
                     onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-                        setSelTableList(selectedRows);
+                        setSelectedRowKeys(selectedRowKeys);
                     }
                 }}
                 columns={columns}

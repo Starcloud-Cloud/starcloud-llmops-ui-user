@@ -1,10 +1,9 @@
 import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag } from 'antd';
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { customMaterialGenerate } from 'api/template/fetch';
-import { materialGenerate } from 'api/redBook/batchIndex';
+import { materialGenerate, customMaterialGenerate } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import ChatMarkdown from 'ui-component/Markdown';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 
 const AiCreate = ({
@@ -17,7 +16,8 @@ const AiCreate = ({
     setPage,
     setcustom,
     setField,
-    downTableData
+    downTableData,
+    setSelectedRowKeys
 }: {
     title: string;
     columns: any[];
@@ -26,7 +26,8 @@ const AiCreate = ({
     setPage: (data: any) => void;
     setcustom?: (data: any) => void;
     setField?: (data: any) => void;
-    downTableData: (data: any, _?: boolean) => void;
+    downTableData: (data: any) => void;
+    setSelectedRowKeys: (data: any) => void;
     defaultVariableData?: any;
     defaultField?: any;
 }) => {
@@ -83,22 +84,24 @@ const AiCreate = ({
     //处理过的素材数据
     const totalCountRef = useRef(0);
     const [totalCount, setTotalCount] = useState(0);
+    const executionCountRef = useRef(0);
+    const [executionCount, setExecutionCount] = useState(0);
     const successCountRef = useRef(0);
     const [successCount, setSuccessCount] = useState(0);
     const errorCountRef = useRef(0);
     const [errorCount, setErrorCount] = useState(0);
     const [errorMessage, setErrorMessage] = useState<any>('');
-    const timer = useRef<any>(null);
+    const [cancelExeLoading, setcancelExeLoading] = useState(false);
+    const materialPre = useMemo(() => {
+        return ((successCountRef.current / totalCountRef.current) * 100) | 0;
+    }, [successCount, totalCount]);
+    const aref = useRef(false);
     const handleMaterial = async (num: number) => {
+        uuidListsRef.current = [];
+        setUuidLists(uuidListsRef.current);
+        setErrorMessage('');
+        aref.current = false;
         setMaterialExecutionOpen(true);
-        timer.current = setInterval(() => {
-            if (materialPreRef.current < 99) {
-                materialPreRef.current = ((successCountRef.current / totalCountRef.current) * 100) | 0;
-                setMaterialPre(materialPreRef.current);
-            } else {
-                clearInterval(timer.current);
-            }
-        }, 1000);
         //记录原有数据下标
         const indexList: any[] = [];
         tableData?.map((item, index) => {
@@ -108,165 +111,158 @@ const AiCreate = ({
         });
         totalCountRef.current = num === 1 ? selList.length : tableData.length;
         setTotalCount(totalCountRef.current);
-        const resArr: any[] = [];
         let index = 0;
         const chunks = chunkArray(num === 1 ? selList : tableData, 3);
-        while (index < chunks.length) {
+        while (index < chunks.length && !aref.current) {
+            const resArr: any[] = [];
+            const uuidList: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
+            executionCountRef.current = currentBatch?.flat()?.length;
+            setExecutionCount(executionCountRef.current);
             try {
                 await Promise.all(
                     currentBatch.map(async (group, i) => {
-                        try {
-                            const res = await materialGenerate({
-                                materialList: group,
-                                fieldList: MokeList,
-                                ...fieldCompletionData
-                            });
+                        const res = await materialGenerate({
+                            materialList: group,
+                            fieldList: MokeList,
+                            ...fieldCompletionData
+                        });
+                        if (res?.length === group?.length) {
                             resArr[index + i] = res;
-                            successCountRef.current += currentBatch?.length;
-                            setSuccessCount(successCountRef.current);
-                        } catch (err: any) {
-                            console.log(err);
-                            setErrorMessage(err.msg);
+                        } else if (res?.length !== group?.length && res.length === 1) {
+                            resArr[index + i] = [...res, {}, {}];
                         }
+
+                        executionCountRef.current = executionCountRef.current - group?.length;
+                        successCountRef.current += group?.length;
+                        setExecutionCount(executionCountRef.current);
+                        setSuccessCount(successCountRef.current);
                     })
                 );
-            } catch (error) {
-                errorCountRef.current += currentBatch?.length;
+                let newList = _.cloneDeep(tableData);
+                if (num === 1) {
+                    for (let i = 0; i < chunks.flat().length; i++) {
+                        const obj: any = {};
+                        resArr.flat()[i] &&
+                            Object.keys(resArr.flat()[i]).map((item) => {
+                                obj[item] = resArr.flat()[i][item];
+                            });
+                        uuidList.push(newList[indexList[i]]?.uuid);
+                        newList[indexList[i]] = {
+                            ...newList[indexList[i]],
+                            ...obj
+                        };
+                    }
+                } else {
+                    newList = newList?.map((item, index) => {
+                        uuidList.push(item?.uuid);
+                        return {
+                            ...item,
+                            ...resArr.flat()[index]
+                        };
+                    });
+                }
+                const newL = _.cloneDeep(uuidListsRef.current);
+                newL?.push(...uuidList);
+                uuidListsRef.current = newL;
+                setUuidLists(uuidListsRef.current);
+                downTableData(newList);
+            } catch (error: any) {
+                console.log(error);
+                setErrorMessage(error.msg);
+                executionCountRef.current = 0;
+                setExecutionCount(executionCountRef.current);
+                errorCountRef.current += currentBatch?.flat()?.length;
+                if (errorCountRef.current >= 9) {
+                    aref.current = true;
+                    setErrorMessage('服务器繁忙，请稍后再试');
+                }
                 setErrorCount(errorCountRef.current);
             }
             index += 3;
         }
-        let newList = _.cloneDeep(tableData);
-        if (num === 1) {
-            for (let i = 0; i < chunks.flat().length; i++) {
-                const obj: any = {};
-                Object.keys(resArr.flat()[i]).map((item) => {
-                    obj[item] = resArr.flat()[i][item];
-                });
-                newList[indexList[i]] = {
-                    ...newList[indexList[i]],
-                    ...obj
-                };
-            }
-        } else {
-            newList = newList?.map((item, index) => ({
-                ...item,
-                ...resArr.flat()[index]
-            }));
-        }
+        executionCountRef.current = 0;
+        setExecutionCount(executionCountRef.current);
+        setcancelExeLoading(false);
         setSelList([]);
-        downTableData(newList, true);
-        setMaterialExecutionOpen(false);
-        setOpen(false);
     };
     //loading 弹窗
-    const materialPreRef = useRef<any>(0);
-    const [materialPre, setMaterialPre] = useState(0);
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
     // AI 批量生成
-    const [exeLoading, setExeLoading] = useState(false);
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [variableData, setVariableData] = useState<any>({
         checkedFieldList: [],
         requirement: undefined,
         generateCount: 1
     });
-    const [downLoading, setDownLoading] = useState(false);
     //素材预览
-    const [preview, setPreView] = useState(false);
-    const materialRef = useRef('');
-    const [materialValue, setMaterialValue] = useState('');
     const getTextStream = async () => {
-        try {
-            const result: any = await customMaterialGenerate({ ...variableData, fieldList: MokeList });
-            const reader = result.getReader();
-            const textDecoder = new TextDecoder();
-            let outerJoins: any;
-            setDownLoading(true);
-            setTimeout(() => {
-                setPreView(true);
-                setExeLoading(false);
-            }, 1000);
-            while (1) {
-                let joins = outerJoins;
-                const { done, value } = await reader.read();
-                if (done) {
-                    setDownLoading(false);
-                    break;
-                }
-                let str = textDecoder.decode(value);
-                const lines = str.split('\n');
-                lines.forEach((message, i: number) => {
-                    if (i === 0 && joins) {
-                        message = joins + message;
-                        joins = undefined;
-                    }
-                    if (i === lines.length - 1) {
-                        if (message && message.indexOf('}') === -1) {
-                            joins = message;
-                            return;
+        uuidListsRef.current = [];
+        setUuidLists(uuidListsRef.current);
+        setErrorMessage('');
+        aref.current = false;
+        setMaterialExecutionOpen(true);
+        const i = Array.from({ length: variableData.generateCount }, (_, index) => index);
+        totalCountRef.current = i?.length;
+        setTotalCount(totalCountRef.current);
+        const chunks = chunkArray(i, 3);
+        let index = 0;
+        while (index < chunks?.length && !aref.current) {
+            const resArr: any[] = [];
+            const currentBatch = chunks.slice(index, index + 3);
+            executionCountRef.current = currentBatch?.flat()?.length;
+            setExecutionCount(executionCountRef.current);
+            try {
+                await Promise.all(
+                    currentBatch.map(async (group, i) => {
+                        const res = await customMaterialGenerate({ ...variableData, fieldList: MokeList, generateCount: group?.length });
+                        if (res?.length === group?.length) {
+                            resArr.push(...res?.map((item: any) => ({ ...item, uuid: uuidv4() })));
                         }
-                    }
-                    let bufferObj;
-                    if (message?.startsWith('data:')) {
-                        bufferObj = message.substring(5) && JSON.parse(message.substring(5));
-                    }
-                    if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
-                        materialRef.current = materialRef.current + bufferObj.content;
-                        materialRef.current = materialRef.current;
-                        setMaterialValue(materialRef.current);
-                    } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: bufferObj.content,
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                close: false
-                            })
-                        );
-                    } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: '请求错误',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'error'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                close: false
-                            })
-                        );
-                    }
-                });
-                outerJoins = joins;
+                        executionCountRef.current = executionCountRef.current - group?.length;
+                        successCountRef.current += group?.length;
+                        setExecutionCount(executionCountRef.current);
+                        setSuccessCount(successCountRef.current);
+                    })
+                );
+                let newList = _.cloneDeep(tableData);
+                newList.unshift(...resArr);
+                const newL = _.cloneDeep(uuidListsRef.current);
+                newL?.push(...resArr?.map((item) => item.uuid));
+                uuidListsRef.current = newL;
+                setUuidLists(uuidListsRef.current);
+                downTableData(newList);
+            } catch (error: any) {
+                console.log(error);
+                setErrorMessage(error.msg);
+                executionCountRef.current = 0;
+                setExecutionCount(executionCountRef.current);
+                errorCountRef.current += currentBatch?.flat()?.length;
+                if (errorCountRef.current >= 9) {
+                    aref.current = true;
+                    setErrorMessage('服务器繁忙，请稍后再试');
+                }
+                setErrorCount(errorCountRef.current);
             }
-        } catch (err) {
-            setExeLoading(false);
-            setDownLoading(false);
+            index += 3;
         }
+        executionCountRef.current = 0;
+        setExecutionCount(executionCountRef.current);
+        setcancelExeLoading(false);
     };
+    //监听生成的 uuid
+    const uuidListsRef = useRef<any[]>([]);
+    const [uuidLists, setUuidLists] = useState<any[]>([]);
     useEffect(() => {
         if (!materialExecutionOpen) {
-            materialPreRef.current = 0;
-            setMaterialPre(materialPreRef.current);
+            executionCountRef.current = 0;
+            setExecutionCount(executionCountRef.current);
             errorCountRef.current = 0;
             setErrorCount(errorCountRef.current);
             successCountRef.current = 0;
             setSuccessCount(successCountRef.current);
         }
     }, [materialExecutionOpen]);
-    useEffect(() => {
-        if (!preview) {
-            materialRef.current = '';
-            setMaterialValue(materialRef.current);
-        }
-    }, [preview]);
     useEffect(() => {
         if (defaultVariableData) {
             setVariableData(defaultVariableData);
@@ -339,7 +335,7 @@ const AiCreate = ({
                                             }}
                                             className="w-[200px]"
                                             min={1}
-                                            max={10}
+                                            max={100}
                                         />
                                     </div>
                                     <div className="flex justify-center gap-6 mt-6">
@@ -357,13 +353,11 @@ const AiCreate = ({
                                         </Button>
                                         <Button
                                             type="primary"
-                                            loading={exeLoading}
                                             onClick={() => {
                                                 if (!variableData.requirement) {
                                                     setrequirementStatusOpen(true);
                                                     return false;
                                                 }
-                                                setExeLoading(true);
                                                 getTextStream();
                                             }}
                                         >
@@ -454,9 +448,9 @@ const AiCreate = ({
                                             disabled={tableData?.length === 0}
                                             onClick={() => {
                                                 setrequirementStatusOpen(true);
-                                                if (!fieldCompletionData.requirement) {
-                                                    return false;
-                                                }
+                                                // if (!fieldCompletionData.requirement) {
+                                                //     return false;
+                                                // }
                                                 if (fieldCompletionData.checkedFieldList?.length === 0) {
                                                     dispatch(
                                                         openSnackbar({
@@ -518,34 +512,6 @@ const AiCreate = ({
                     defaultActiveKey="1"
                 ></Tabs>
             </Modal>
-            {/* 素材导入 */}
-            {preview && (
-                <Modal width={800} title="素材预览" open={preview} onCancel={() => setPreView(false)} footer={false}>
-                    <div className="min-h-[300px] max-h-[80vh] overflow-y-auto">
-                        <ChatMarkdown textContent={materialValue} />
-                    </div>
-                    <div className="flex justify-center mt-4">
-                        <Button
-                            disabled={downLoading}
-                            type="primary"
-                            onClick={() => {
-                                try {
-                                    const data = JSON.parse(materialValue);
-                                    if (data && data.length > 0) {
-                                        setOpen(false);
-                                        setPreView(false);
-                                        downTableData(data);
-                                    }
-                                } catch (err) {
-                                    downTableData([]);
-                                }
-                            }}
-                        >
-                            导入素材
-                        </Button>
-                    </div>
-                </Modal>
-            )}
             {/* 选择素材 */}
             <Modal
                 title="选择素材"
@@ -604,7 +570,10 @@ const AiCreate = ({
                             <Tag>全部：{totalCount}</Tag>
                         </div>
                         <div>
-                            <Tag color="processing">待执行：{totalCount - successCount - errorCount}</Tag>
+                            <Tag color="processing">待执行：{totalCount - successCount - errorCount - executionCount}</Tag>
+                        </div>
+                        <div>
+                            <Tag color="processing">执行中：{executionCount}</Tag>
                         </div>
                         <div>
                             <Tag color="success">执行完成：{successCount}</Tag>
@@ -612,6 +581,35 @@ const AiCreate = ({
                         <div>
                             <Tag color="error">执行失败：{errorCount}</Tag>
                         </div>
+                    </div>
+                    <div className="flex justify-center mt-4">
+                        {executionCount === 0 && (
+                            <Button
+                                onClick={() => {
+                                    setMaterialExecutionOpen(false);
+                                    setOpen(false);
+                                    setSelectedRowKeys(uuidLists);
+                                }}
+                                className="w-[100px]"
+                                size="small"
+                                type="primary"
+                            >
+                                确认
+                            </Button>
+                        )}
+                        {executionCount > 0 && (
+                            <Button
+                                loading={cancelExeLoading}
+                                size="small"
+                                type="primary"
+                                onClick={() => {
+                                    setcancelExeLoading(true);
+                                    aref.current = true;
+                                }}
+                            >
+                                取消执行
+                            </Button>
+                        )}
                     </div>
                 </Modal>
             )}

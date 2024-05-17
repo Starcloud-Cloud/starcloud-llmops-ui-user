@@ -166,23 +166,12 @@ const Lefts = ({
     const tableRef = useRef<any[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);
     const [columns, setColumns] = useState<any[]>([]);
-    const downTableData = (data: any, flag?: boolean) => {
-        if (flag) {
-            tableRef.current = data?.map((item: any) => ({
-                ...item,
-                uuid: uuidv4()
-            }));
-            setTableData(tableRef.current);
-        } else {
-            tableRef.current = [
-                ...data?.map((item: any) => ({
-                    ...item,
-                    uuid: uuidv4()
-                })),
-                ...tableData
-            ];
-            setTableData(tableRef.current);
-        }
+    //让列表插入数据
+    const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
+    //插入数据
+    const downTableData = (data: any) => {
+        tableRef.current = data;
+        setTableData(tableRef.current);
     };
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -549,10 +538,19 @@ const Lefts = ({
                 tableRef.current = newList?.workflowConfig?.steps
                     ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
                     ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
-                    ?.value?.map((item: any) => ({
-                        ...item,
-                        uuid: uuidv4()
-                    }));
+                    ?.value?.map((item: any, index: number) => {
+                        if (index === 0) {
+                            return {
+                                ...item,
+                                uuid: '123'
+                            };
+                        } else {
+                            return {
+                                ...item,
+                                uuid: uuidv4()
+                            };
+                        }
+                    });
                 setTableData(tableRef.current || []);
             } else {
                 tableRef.current =
@@ -1185,6 +1183,10 @@ const Lefts = ({
                                                         setcustom={setcustom}
                                                         setField={setField}
                                                         downTableData={downTableData}
+                                                        setSelectedRowKeys={(data) => {
+                                                            setZoomOpen(true);
+                                                            setSelectedRowKeys(data);
+                                                        }}
                                                     />
                                                 </div>
                                                 <div className="flex gap-2 items-end">
@@ -1516,6 +1518,7 @@ const Lefts = ({
                     tableLoading={tableLoading}
                     defaultVariableData={defaultVariableData}
                     defaultField={defaultField}
+                    selectedRowKeys={selectedRowKeys}
                     setcustom={setcustom}
                     setField={setField}
                     columns={columns}
@@ -1532,6 +1535,10 @@ const Lefts = ({
                     MokeList={MokeList}
                     setPage={setPage}
                     downTableData={downTableData}
+                    setSelectedRowKeys={(data) => {
+                        setZoomOpen(true);
+                        setSelectedRowKeys(data);
+                    }}
                 />
             )}
             <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>

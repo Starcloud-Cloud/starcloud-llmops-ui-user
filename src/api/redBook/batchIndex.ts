@@ -107,3 +107,7 @@ export const materialParse = (data: any) => {
 export const materialGenerate = (data: any) => {
     return request.post({ url: `/llm/creative/material/materialGenerate`, data, timeout: 3000000 });
 };
+//ai 批量生成
+export const customMaterialGenerate = (data: any) => {
+    return request.post({ url: `/llm/creative/material/customMaterialGenerate`, data, timeout: 3000000 });
+};

@@ -11,7 +11,7 @@ import { getContentDetail, getContentDetail1 } from 'api/redBook';
 type IAddAiModalProps = {
     open: boolean;
     handleClose: () => void;
-    changeList?: () => void;
+    changeList?: (data: any) => void;
     businessUid: string;
     show?: boolean;
     executeResult?: any;
@@ -50,7 +50,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
                 if (res) {
                     if (res.status !== 'EXECUTING') {
                         setSataStatus(true);
-                        changeList && changeList();
+                        changeList && changeList(businessUid);
                     }
                     setDetail(res);
                 }

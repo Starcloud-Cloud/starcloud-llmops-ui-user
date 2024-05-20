@@ -18,6 +18,8 @@ const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookConten
 const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
 const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
 const Market = Loadable(lazy(() => import('views/template/market')));
+const ManageMarket = Loadable(lazy(() => import('views/manageMarket')));
+const MyTemplate = Loadable(lazy(() => import('views/template/myTemplate')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -39,7 +41,9 @@ const JuzhengRoutes = {
         { path: '/redBookTaskList', element: <RedBookTaskList /> },
         { path: '/copywritingModal', element: <CopywritingModal /> },
         { path: '/batchSmallRedBook', element: <BatchSmallRedBook /> },
-        { path: '/redBookContentList', element: <RedBookContentList /> }
+        { path: '/redBookContentList', element: <RedBookContentList /> },
+        { path: '/manageMarket', element: <ManageMarket /> },
+        { path: '/myTemplate', element: <MyTemplate /> }
     ]
 };
 

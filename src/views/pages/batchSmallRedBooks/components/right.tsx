@@ -8,29 +8,31 @@ import Good from '../good';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const Right = ({
+    rightPage,
     batchTotal,
     bathList,
     exampleList,
     collapseActive,
     batchOpen,
     changeCollapse,
-    planList,
+    batchDataList,
     setBusinessUid,
     setDetailOpen,
-    handleScroll,
-    timeFailure
+    timeFailure,
+    getbatchPages
 }: {
+    rightPage: number;
     batchTotal: number;
     bathList: any[];
     exampleList: any[];
     collapseActive: any;
     batchOpen: boolean;
     changeCollapse: (data: any) => void;
-    planList: any[];
+    batchDataList: any[];
     setBusinessUid: (data: any) => void;
     setDetailOpen: (data: any) => void;
-    handleScroll: (data: any) => void;
-    timeFailure: (data: number) => void;
+    timeFailure: (data: any) => void;
+    getbatchPages: (data: any) => void;
 }) => {
     const scrollRef: any = useRef(null);
     const getStatus = (status: any) => {
@@ -51,18 +53,17 @@ const Right = ({
                 return <Tag>待执行</Tag>;
         }
     };
-    const [pageNum, setPageNum] = useState(10);
-    const [batchPageList, setBatchPageList] = useState<any[]>([]);
-    useEffect(() => {
-        const newList = bathList?.slice(0, pageNum);
-        setBatchPageList(newList);
-    }, [bathList, pageNum]);
+    const [pageNum, setPageNum] = useState(1);
     const getMore = () => {
-        setPageNum(pageNum + 10);
+        getbatchPages({ pageNo: pageNum + 1, pageSize: 10 });
+        setPageNum(pageNum + 1);
     };
+    useEffect(() => {
+        if (rightPage) setPageNum(1);
+    }, [rightPage]);
     return (
         <>
-            {batchPageList?.length === 0 ? (
+            {bathList?.length === 0 ? (
                 <div style={{ height: '100%' }} className="flex justify-center items-center">
                     <div className="text-center">
                         {exampleList?.length > 0 ? (
@@ -93,7 +94,7 @@ const Right = ({
                     <Collapse
                         onChange={changeCollapse}
                         activeKey={collapseActive}
-                        items={batchPageList?.map((item) => {
+                        items={bathList?.map((item, i) => {
                             return {
                                 key: item.uid,
                                 label: (
@@ -130,37 +131,32 @@ const Right = ({
                                             </Popover>
                                             <span className="font-[600]">生成时间：</span>
                                             {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}
-                                            <div className="inline-block whitespace-nowrap">
+                                            <div className="w-[71px] inline-block whitespace-nowrap">
                                                 <span className="font-[600]">版本号：</span>
                                                 {item?.version}
                                             </div>
                                         </div>
-                                        <div>
-                                            <span className="font-[600]">执行人：</span>
-                                            {item?.creator}&nbsp;&nbsp;
-                                            <span className="font-[600]">生成成功数：</span>
-                                            {item?.successCount}&nbsp;&nbsp;
-                                            <span className="font-[600]">生成失败数：</span>
-                                            {item?.failureCount}&nbsp;&nbsp;
-                                            <div className="inline-block whitespace-nowrap">
-                                                <span className="font-[600]">生成总数：</span>
-                                                {item?.totalCount}
-                                            </div>
+                                        <div className="flex gap-1 flex-wrap">
+                                            <span className="font-[600]">执行人:</span>
+                                            <div className="!w-[50px] line-clamp-1">{item?.creator}</div>
+                                            <span className="font-[600]">生成成功数:</span>
+                                            <span className="w-[17px]">{item?.successCount}</span>
+                                            <span className="font-[600]">生成失败数:</span>
+                                            <span className="w-[17px]">{item?.failureCount}</span>
+                                            <span className="font-[600]">生成总数:</span>
+                                            <span className="w-[17px]">{item?.totalCount}</span>
                                         </div>
                                     </div>
                                 ),
                                 children: (
                                     <Spin className="!max-h-full" spinning={batchOpen}>
-                                        <div
-                                            className="h-[600px] overflow-y-auto overflow-x-hidden flex flex-wrap gap-2"
-                                            ref={scrollRef}
-                                            onScroll={() => handleScroll(scrollRef.current)}
-                                        >
+                                        <div className="overflow-y-auto overflow-x-hidden flex flex-wrap gap-2" ref={scrollRef}>
                                             <PlanList
-                                                planList={planList}
+                                                key={item.uid}
+                                                batchDataList={batchDataList[i]}
                                                 setBusinessUid={setBusinessUid}
                                                 setDetailOpen={setDetailOpen}
-                                                timeFailure={timeFailure}
+                                                timeFailure={(index) => timeFailure({ i, index })}
                                             />
                                         </div>
                                     </Spin>
@@ -169,7 +165,7 @@ const Right = ({
                         })}
                         accordion
                     />
-                    {batchTotal > pageNum && (
+                    {batchTotal > pageNum * 10 && (
                         <div className="flex justify-center mt-4">
                             <Button size="small" type="primary" onClick={getMore}>
                                 更多
@@ -186,7 +182,7 @@ const RightMemo = (prevProps: any, nextProps: any) => {
         JSON.stringify(prevProps?.bathList) === JSON.stringify(nextProps?.bathList) &&
         JSON.stringify(prevProps?.collapseActive) === JSON.stringify(nextProps?.collapseActive) &&
         JSON.stringify(prevProps?.batchOpen) === JSON.stringify(nextProps?.batchOpen) &&
-        JSON.stringify(prevProps?.planList) === JSON.stringify(nextProps?.planList) &&
+        JSON.stringify(prevProps?.batchDataList) === JSON.stringify(nextProps?.batchDataList) &&
         JSON.stringify(prevProps?.exampleList) === JSON.stringify(nextProps?.exampleList)
     );
 };

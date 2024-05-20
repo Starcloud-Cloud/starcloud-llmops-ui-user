@@ -543,7 +543,7 @@ function CreateDetail() {
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
-    const saveDetail = () => {
+    const saveDetail = (flag?: boolean) => {
         const details = _.cloneDeep(detailRef.current);
         const index: number = details?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {
@@ -554,6 +554,8 @@ function CreateDetail() {
             const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
             if (a) {
                 a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = createPlanRef?.current?.moke;
+                a.variable.variables.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value =
+                    createPlanRef?.current?.mokeAI;
             }
             const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
             if (index !== -1) {
@@ -585,10 +587,9 @@ function CreateDetail() {
                 appModify(details).then((res) => {
                     setViewLoading(false);
                     if (res.data) {
-                        if (createPlanRef?.current) {
+                        if (createPlanRef?.current && !flag) {
                             setPlanState(planState + 1);
                         }
-
                         setSaveState(saveState + 1);
 
                         dispatch(
@@ -1012,7 +1013,7 @@ function CreateDetail() {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                        <Buttons variant="contained" color="secondary" autoFocus onClick={saveDetail}>
+                        <Buttons variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
                             {t('myApp.save')}
                         </Buttons>
                     </>
@@ -1056,7 +1057,7 @@ function CreateDetail() {
                                             if (detailRef?.current?.type === 'MEDIA_MATRIX') {
                                                 if (e === '预览测试') {
                                                     setViewLoading(true);
-                                                    saveDetail();
+                                                    saveDetail(true);
                                                 } else {
                                                     const newData = _.cloneDeep(detailRef.current);
                                                     let arr = newData?.workflowConfig?.steps;

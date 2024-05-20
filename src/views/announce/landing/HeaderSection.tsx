@@ -89,8 +89,8 @@ const HeaderSection = () => {
     const [version, setVersion] = useState('');
     const [macDownload, setMacDownload] = useState('');
     const [releaseDate, setReleaseDate] = useState('');
+    const [winDownload, setWinDownload] = useState('');
     const { isLoggedIn } = useAuth();
-    console.log('🚀 ~ HeaderSection ~ isLoggedIn:', isLoggedIn);
 
     const handleScroll = () => {
         window.scrollTo(0, window.innerHeight - 80);
@@ -122,11 +122,18 @@ const HeaderSection = () => {
     useEffect(() => {
         (async () => {
             const response = await fetch(`${process.env.REACT_APP_MOFA_PUSH_CLIENT_URL}/latest-mac.yml`);
+            const responseWin = await fetch(`${process.env.REACT_APP_MOFA_PUSH_CLIENT_URL}/latest.yml`);
             const text = await response.text();
+            const winText = await responseWin.text();
             let match = text.match(/url: (https?:\/\/[^\s]+)/g);
+            let winMatch = winText.match(/url: (https?:\/\/[^\s]+)/g);
             let secondUrl = match && match[0].replace('url: ', '');
+            let winSecondUrl = winMatch && winMatch[0].replace('url: ', '');
             if (secondUrl) {
                 setMacDownload(secondUrl);
+            }
+            if (winSecondUrl) {
+                setWinDownload(winSecondUrl);
             }
             let matchVersion = text.match(/version: ([^\s]+)/);
             let version = matchVersion && matchVersion[1];
@@ -147,6 +154,14 @@ const HeaderSection = () => {
             return;
         }
         window.open(macDownload);
+    };
+
+    const winClientDownload = async () => {
+        if (!isLoggedIn) {
+            navigate('/login');
+            return;
+        }
+        window.open(winDownload);
     };
 
     return (
@@ -267,9 +282,11 @@ const HeaderSection = () => {
                                             >
                                                 开始免费创作
                                             </Button> */}
-                                        <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center">
+                                        <div className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center cursor-pointer">
                                             <Image width={20} src={windowsFill} preview={false} />
-                                            <div className="ml-[5px] mt-[4px]">Windows 下载</div>
+                                            <div className="ml-[5px] mt-[4px]" onClick={() => winClientDownload()}>
+                                                Windows 下载
+                                            </div>
                                         </div>
                                         <div
                                             className="flex w-[175px] h-[50px] rounded-[50px] bg-[#673ab7] text-[16px] text-[#fff] items-center justify-center cursor-pointer"

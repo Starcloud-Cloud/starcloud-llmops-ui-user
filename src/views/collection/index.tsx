@@ -1,16 +1,21 @@
-import { TextField, InputAdornment, Grid, FormControl, OutlinedInput, IconButton } from '@mui/material';
+import { InputAdornment, FormControl, OutlinedInput, IconButton } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import MarketTemplate from 'views/template/myTemplate/components/content/marketTemplate';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { favoriteList } from 'api/template/collect';
+import { getTenant, ENUM_TENANT } from 'utils/permission';
 const Collection = () => {
     const navigate = useNavigate();
     const [collectList, setCollectList] = useState<any[]>([]);
     const [newList, setNewList] = useState<any[]>([]);
     const [value, setValue] = useState('');
     const handleDetail = (data: any) => {
-        navigate(`/appMarketDetail/${data.favoriteUid}?type=collect`);
+        if (getTenant() === ENUM_TENANT.AI) {
+            navigate(`/appMarketDetail/${data.favoriteUid}?type=collect`);
+        } else {
+            navigate(`/batchSmallRedBook?appUid=${data.uid}`);
+        }
     };
     const searchList = () => {
         const newData = collectList.filter(

@@ -17,7 +17,11 @@ const AiCreate = ({
     setcustom,
     setField,
     downTableData,
-    setSelectedRowKeys
+    setSelectedRowKeys,
+    setFieldCompletionData,
+    fieldCompletionData,
+    setVariableData,
+    variableData
 }: {
     title: string;
     columns: any[];
@@ -30,6 +34,10 @@ const AiCreate = ({
     setSelectedRowKeys: (data: any) => void;
     defaultVariableData?: any;
     defaultField?: any;
+    setFieldCompletionData: (data: any) => void;
+    fieldCompletionData: any;
+    setVariableData: (data: any) => void;
+    variableData: any;
 }) => {
     useEffect(() => {
         if (MokeList?.length > 0) {
@@ -48,10 +56,7 @@ const AiCreate = ({
             setSelList(selectedRows);
         }
     };
-    const [fieldCompletionData, setFieldCompletionData] = useState<any>({
-        checkedFieldList: [],
-        requirement: ''
-    });
+
     function chunkArray(myArray: any[], chunk_size: any) {
         var index = 0;
         var arrayLength = myArray.length;
@@ -172,11 +177,7 @@ const AiCreate = ({
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
     // AI 批量生成
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
-    const [variableData, setVariableData] = useState<any>({
-        checkedFieldList: [],
-        requirement: undefined,
-        generateCount: 1
-    });
+
     //素材预览
     const getTextStream = async () => {
         uuidListsRef.current = [];
@@ -245,30 +246,7 @@ const AiCreate = ({
             setSuccessCount(successCountRef.current);
         }
     }, [materialExecutionOpen]);
-    useEffect(() => {
-        if (defaultVariableData) {
-            setVariableData(defaultVariableData);
-        } else {
-            setVariableData({
-                ...variableData,
-                checkedFieldList: columns
-                    ?.slice(1, columns?.length - 1)
-                    ?.filter((item) => item.type !== 'image')
-                    ?.map((item) => item?.dataIndex)
-            });
-        }
-        if (defaultField) {
-            setFieldCompletionData(defaultField);
-        } else {
-            setFieldCompletionData({
-                ...fieldCompletionData,
-                checkedFieldList: columns
-                    ?.slice(1, columns?.length - 1)
-                    ?.filter((item) => item.type !== 'image')
-                    ?.map((item) => item?.dataIndex)
-            });
-        }
-    }, []);
+
     return (
         <div>
             <Button size={title === 'AI 生成' ? 'small' : 'middle'} onClick={() => setOpen(true)} type="primary">

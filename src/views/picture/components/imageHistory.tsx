@@ -187,7 +187,7 @@ const ImageHistory = () => {
     const [detailData, setDetailData] = useState<any>({});
     return (
         <div>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} className="mt-[1px]">
                 <Grid item md={3} xs={12}>
                     <FormControl color="secondary" fullWidth>
                         <InputLabel id="demo-multiple-chip-label">类型</InputLabel>

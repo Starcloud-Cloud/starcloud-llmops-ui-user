@@ -1069,6 +1069,41 @@ const Lefts = ({
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value
     ]);
+
+    //公共数据
+    const [variableData, setVariableData] = useState<any>({
+        checkedFieldList: [],
+        requirement: undefined,
+        generateCount: 1
+    });
+    const [fieldCompletionData, setFieldCompletionData] = useState<any>({
+        checkedFieldList: [],
+        requirement: ''
+    });
+    useEffect(() => {
+        if (defaultVariableData) {
+            setVariableData(defaultVariableData);
+        } else {
+            setVariableData({
+                ...variableData,
+                checkedFieldList: columns
+                    ?.slice(1, columns?.length - 1)
+                    ?.filter((item) => item.type !== 'image')
+                    ?.map((item) => item?.dataIndex)
+            });
+        }
+        if (defaultField) {
+            setFieldCompletionData(defaultField);
+        } else {
+            setFieldCompletionData({
+                ...fieldCompletionData,
+                checkedFieldList: columns
+                    ?.slice(1, columns?.length - 1)
+                    ?.filter((item) => item.type !== 'image')
+                    ?.map((item) => item?.dataIndex)
+            });
+        }
+    }, [columns]);
     return (
         <>
             <div className="relative h-full">
@@ -1188,6 +1223,10 @@ const Lefts = ({
                                                             setZoomOpen(true);
                                                             setSelectedRowKeys(data);
                                                         }}
+                                                        setFieldCompletionData={setFieldCompletionData}
+                                                        fieldCompletionData={fieldCompletionData}
+                                                        setVariableData={setVariableData}
+                                                        variableData={variableData}
                                                     />
                                                 </div>
                                                 <div className="flex gap-2 items-end">
@@ -1540,6 +1579,10 @@ const Lefts = ({
                         setZoomOpen(true);
                         setSelectedRowKeys(data);
                     }}
+                    setFieldCompletionData={setFieldCompletionData}
+                    fieldCompletionData={fieldCompletionData}
+                    setVariableData={setVariableData}
+                    variableData={variableData}
                 />
             )}
             <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>

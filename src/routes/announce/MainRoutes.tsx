@@ -4,6 +4,8 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
+import jsCookie from 'js-cookie';
+import MinimalLayout from 'layout/MinimalLayout';
 
 // template routing
 const Market = Loadable(lazy(() => import('views/template/market')));
@@ -72,11 +74,7 @@ const AppUserAccountProfile = Loadable(lazy(() => import('views/application/user
 
 const MainRoutes = {
     path: '/',
-    element: (
-        <AuthGuard>
-            <MainLayout />
-        </AuthGuard>
-    ),
+    element: <AuthGuard>{jsCookie.get('isClient') ? <MinimalLayout /> : <MainLayout />}</AuthGuard>,
     children: [
         {
             path: '/user/account-profile/profile',

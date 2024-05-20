@@ -476,9 +476,10 @@ const Lefts = ({
         setDefaultVariableData && setDefaultVariableData(customData && customData !== '{}' ? JSON.parse(customData) : null);
         const fieldAI = materiallist?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value;
         setDefaultField && setDefaultField(fieldAI && fieldAI !== '{}' ? JSON.parse(fieldAI) : null);
-        const valueList = newList?.workflowConfig?.steps
-            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-            ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value;
+        const valueList =
+            newList?.workflowConfig?.steps
+                ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value || [];
         const picList = result?.configuration?.materialList;
         setMaterialType(newMater);
         if (newMater === 'picture') {

@@ -276,7 +276,7 @@ const AiCreate = ({
             <Button size={title === 'AI 生成' ? 'small' : 'middle'} onClick={() => setOpen(true)} type="primary">
                 {title}
             </Button>
-            <Modal maskClosable={false} width={'60%'} open={open} footer={null} onCancel={() => setOpen(false)}>
+            <Modal title="素材AI生成" maskClosable={false} width={'60%'} open={open} footer={null} onCancel={() => setOpen(false)}>
                 <Tabs
                     items={[
                         {
@@ -548,7 +548,7 @@ const AiCreate = ({
                         fixed: true,
                         columnWidth: 50
                     }}
-                    columns={columns}
+                    columns={columns?.slice(0, columns?.length - 1)}
                     dataSource={tableData}
                 />
             </Modal>

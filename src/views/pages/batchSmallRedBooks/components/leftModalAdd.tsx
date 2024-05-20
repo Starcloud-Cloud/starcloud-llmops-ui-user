@@ -58,13 +58,13 @@ const LeftModalAdd = ({
     const [colOpen, setColOpen] = useState(false);
     const materialColumns: TableProps<any>['columns'] = [
         {
-            title: '字段 CODE',
-            dataIndex: 'code',
+            title: '字段 Code',
+            dataIndex: 'fieldName',
             align: 'center'
         },
         {
             title: '字段名称',
-            dataIndex: 'name',
+            dataIndex: 'desc',
             align: 'center'
         },
         {
@@ -134,9 +134,9 @@ const LeftModalAdd = ({
                     批量删除({selectedRowKeys?.length})
                 </Button>
                 <div className="flex gap-2">
-                    {/* <Button type="primary" onClick={() => setColOpen(true)}>
+                    <Button type="primary" onClick={() => setColOpen(true)}>
                         素材字段配置
-                    </Button> */}
+                    </Button>
                     <AiCreate
                         title="AI 素材生成"
                         columns={columns}
@@ -193,7 +193,7 @@ const LeftModalAdd = ({
                 columns={columns}
                 dataSource={tableData}
             />
-            <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} title="素材字段配置">
+            <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
                 <div className="flex justify-end">
                     <Button
                         size="small"
@@ -210,6 +210,9 @@ const LeftModalAdd = ({
                     </Button>
                 </div>
                 <Table columns={materialColumns} dataSource={materialTableData} />
+                <div className="flex justify-center mt-4">
+                    <Button type="primary">保存</Button>
+                </div>
             </Modal>
             <Modal
                 title={materialTitle}
@@ -232,10 +235,10 @@ const LeftModalAdd = ({
                 }}
             >
                 <Form labelCol={{ span: 6 }} form={form}>
-                    <Form.Item label="字段 Code" name="code" rules={[{ required: true, message: '请输入字段 Code' }]}>
+                    <Form.Item label="字段 Code" name="fieldName" rules={[{ required: true, message: '请输入字段 Code' }]}>
                         <Input />
                     </Form.Item>
-                    <Form.Item label="字段名称" name="name" rules={[{ required: true, message: '请输入字段名称' }]}>
+                    <Form.Item label="字段名称" name="desc" rules={[{ required: true, message: '请输入字段名称' }]}>
                         <Input />
                     </Form.Item>
                     <Form.Item label="字段类型" name="type" rules={[{ required: true, message: '请选择字段类型' }]}>
@@ -247,7 +250,7 @@ const LeftModalAdd = ({
                     <Form.Item
                         initialValue={false}
                         label="是否必填"
-                        name=" require"
+                        name="required"
                         rules={[{ required: true, message: '请选择是否必填' }]}
                     >
                         <Switch />

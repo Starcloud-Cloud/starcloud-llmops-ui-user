@@ -104,9 +104,9 @@ const AiCreate = ({
             const resArr: any[] = [];
             const uuidList: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
-            executionCountRef.current = currentBatch?.flat()?.length;
-            setExecutionCount(executionCountRef.current);
             try {
+                executionCountRef.current = currentBatch?.flat()?.length;
+                setExecutionCount(executionCountRef.current);
                 await Promise.all(
                     currentBatch.map(async (group, i) => {
                         const res = await materialGenerate({
@@ -127,28 +127,20 @@ const AiCreate = ({
                     })
                 );
                 let newList = _.cloneDeep(tableData);
-                if (num === 1) {
-                    for (let i = 0; i < chunks.flat().length; i++) {
-                        const obj: any = {};
-                        resArr.flat()[i] &&
-                            Object.keys(resArr.flat()[i]).map((item) => {
-                                obj[item] = resArr.flat()[i][item];
-                            });
-                        uuidList.push(newList[indexList[i]]?.uuid);
-                        newList[indexList[i]] = {
-                            ...newList[indexList[i]],
-                            ...obj
-                        };
-                    }
-                } else {
-                    newList = newList?.map((item, index) => {
-                        uuidList.push(item?.uuid);
-                        return {
-                            ...item,
-                            ...resArr.flat()[index]
-                        };
-                    });
+                for (let i = 0; i < chunks.flat().length; i++) {
+                    const obj: any = {};
+                    resArr.flat()[i] &&
+                        Object.keys(resArr.flat()[i]).map((item) => {
+                            obj[item] = resArr.flat()[i][item];
+                        });
+                    uuidList.push(newList[indexList[i]]?.uuid);
+                    newList[indexList[i]] = {
+                        ...newList[indexList[i]],
+                        ...obj
+                    };
                 }
+                console.log(newList, uuidListsRef.current);
+
                 const newL = _.cloneDeep(uuidListsRef.current);
                 newL?.push(...uuidList);
                 uuidListsRef.current = newL;
@@ -424,9 +416,9 @@ const AiCreate = ({
                                             disabled={tableData?.length === 0}
                                             onClick={() => {
                                                 setrequirementStatusOpen(true);
-                                                // if (!fieldCompletionData.requirement) {
-                                                //     return false;
-                                                // }
+                                                if (!fieldCompletionData.requirement) {
+                                                    return false;
+                                                }
                                                 if (fieldCompletionData.checkedFieldList?.length === 0) {
                                                     dispatch(
                                                         openSnackbar({
@@ -531,10 +523,10 @@ const AiCreate = ({
             {/* 素材执行 loading */}
             {materialExecutionOpen && (
                 <Modal open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>
-                    <div className="flex justify-center flex-col items-center gap-4">
-                        <div className="font-bold">AI 处理中，请勿刷新页面···</div>
+                    <div className="flex justify-center ">
                         <Progress percent={materialPre} type="circle" />
                     </div>
+                    {executionCount !== 0 && <div className="font-bold text-center mt-4">AI 处理中，请勿刷新页面···</div>}
                     {errorMessage && (
                         <div className="my-4 text-[#ff4d4f] text-xs flex justify-center">
                             <span className="font-bold">错误信息：</span>

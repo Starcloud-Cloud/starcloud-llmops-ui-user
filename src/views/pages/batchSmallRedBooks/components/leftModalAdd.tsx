@@ -52,6 +52,7 @@ const LeftModalAdd = ({
                     批量删除({selectedRowKeys?.length})
                 </Button>
                 <div className="flex gap-2">
+                    {/* <Button>素材字段配置</Button> */}
                     <AiCreate
                         title="AI 素材生成"
                         columns={columns}

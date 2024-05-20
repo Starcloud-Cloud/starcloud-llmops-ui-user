@@ -37,24 +37,6 @@ const AiCreate = ({
     }, [MokeList]);
     const { TextArea } = Input;
     const [open, setOpen] = useState(false);
-    useEffect(() => {
-        if (columns?.length > 0) {
-            setFieldCompletionData({
-                ...fieldCompletionData,
-                checkedFieldList: columns
-                    ?.slice(1, columns?.length - 1)
-                    ?.filter((item) => item.type !== 'image')
-                    ?.map((item) => item?.dataIndex)
-            });
-            setVariableData({
-                ...variableData,
-                checkedFieldList: columns
-                    ?.slice(1, columns?.length - 1)
-                    ?.filter((item) => item.type !== 'image')
-                    ?.map((item) => item?.dataIndex)
-            });
-        }
-    }, [columns]);
     const checkedList = useMemo(() => {
         return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image');
     }, [columns]);
@@ -266,9 +248,25 @@ const AiCreate = ({
     useEffect(() => {
         if (defaultVariableData) {
             setVariableData(defaultVariableData);
+        } else {
+            setVariableData({
+                ...variableData,
+                checkedFieldList: columns
+                    ?.slice(1, columns?.length - 1)
+                    ?.filter((item) => item.type !== 'image')
+                    ?.map((item) => item?.dataIndex)
+            });
         }
         if (defaultField) {
             setFieldCompletionData(defaultField);
+        } else {
+            setFieldCompletionData({
+                ...fieldCompletionData,
+                checkedFieldList: columns
+                    ?.slice(1, columns?.length - 1)
+                    ?.filter((item) => item.type !== 'image')
+                    ?.map((item) => item?.dataIndex)
+            });
         }
     }, []);
     return (

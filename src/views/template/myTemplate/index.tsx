@@ -1,5 +1,5 @@
 import { Box, Pagination, TextField, Typography, Button } from '@mui/material';
-import { TreeSelect, Row, Col } from 'antd';
+import { TreeSelect, Row, Col, Modal } from 'antd';
 import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
 import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
@@ -7,7 +7,9 @@ import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel
 import { recommends, appPage, categoryTree } from 'api/template/index';
 
 import { useState, useRef, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -22,6 +24,7 @@ import { useAllDetail } from 'contexts/JWTContext';
 import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import './index.css';
+import { getRecommendApp, appCreate } from 'api/template/index';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -57,8 +60,9 @@ const RightArrow = () => {
 };
 
 function MyTemplate() {
-    //路由跳转
     const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
     const [recommendList, setRecommends] = useState([]);
     const [appList, setAppList] = useState<any[]>([]);
     const [newAppList, setNewApp] = useState<any[]>([]);
@@ -143,12 +147,19 @@ function MyTemplate() {
     const allDetail = useAllDetail();
     const { user } = useUserStore();
     //弹窗
+    const [open, setOpen] = useState(false);
+    const [appNameOpen, setAppNameOpen] = useState(false);
+    const [appName, setAppName] = useState('');
+    const [saveDetail, setSaveDetail] = useState<any>(null);
     const handleDetail = (data: { uid: string }) => {
         if (
             allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp === -1 ||
             totalList.filter((item) => Number(item.creator) === user.id).length < allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp
         ) {
-            navigate('/createApp?recommend=' + data.uid);
+            getRecommendApp({ recommend: data.uid as string }).then((res) => {
+                setSaveDetail(res);
+                setOpen(true);
+            });
         } else if (
             totalList.filter((item) => Number(item.creator) === user.id).length >=
             allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp
@@ -257,6 +268,51 @@ function MyTemplate() {
                     </Box>
                 </Box>
             )}
+            <Modal
+                title="创建应用"
+                open={open}
+                onCancel={() => setOpen(false)}
+                onOk={() => {
+                    if (!appName) {
+                        setAppNameOpen(true);
+                        return false;
+                    }
+                    appCreate({
+                        ...saveDetail,
+                        name: appName
+                    }).then((res) => {
+                        if (res.data) {
+                            navigate('/createApp?uid=' + res.data.uid);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: t('market.create'),
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    close: false
+                                })
+                            );
+                        }
+                    });
+                }}
+            >
+                <TextField
+                    color="secondary"
+                    label="应用名称"
+                    placeholder="请输入需要创建的应用名称"
+                    onChange={(e) => {
+                        setAppNameOpen(true);
+                        setAppName(e.target.value);
+                    }}
+                    error={!appName && appNameOpen ? true : false}
+                    helperText={!appName && appNameOpen ? '应用名称不能为空' : ''}
+                    value={appName}
+                    InputLabelProps={{ shrink: true }}
+                    fullWidth
+                />
+            </Modal>
         </Box>
     );
 }

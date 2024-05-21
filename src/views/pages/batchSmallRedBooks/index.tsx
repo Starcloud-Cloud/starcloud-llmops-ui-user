@@ -21,13 +21,15 @@ const BatcSmallRedBooks = forwardRef(
         useImperativeHandle(ref, () => ({
             getDetail: getData,
             moke: moke,
-            imageMoke: imageMoke,
-            mokeAI: defaultVariableData,
-            fieldAI: defaultField
+            imageMoke: imageMoke, //图片
+            mokeAI: defaultVariableData, //批量生成
+            fieldAI: defaultField, //字段补齐
+            fieldHead: fieldHead //上传素材表头
         }));
         const [defaultVariableData, setDefaultVariableData] = useState<any>(null);
         const [defaultField, setDefaultField] = useState<any>(null);
         const [getData, setGetData] = useState<any>(null);
+        const [fieldHead, setFieldHead] = useState(null);
         const [moke, setMoke] = useState<any[]>([]);
         const [imageMoke, setImageMoke] = useState<any[]>([]);
         const navigate = useNavigate();
@@ -292,6 +294,7 @@ const BatcSmallRedBooks = forwardRef(
                             planState={planState}
                             detail={detail}
                             setGetData={setGetData}
+                            setFieldHead={setFieldHead}
                             setMoke={setMoke}
                             setImageMoke={setImageMoke}
                             setCollData={setCollData}
@@ -300,6 +303,7 @@ const BatcSmallRedBooks = forwardRef(
                             setPlanUid={setPlanUid}
                             defaultVariableData={defaultVariableData}
                             defaultField={defaultField}
+                            fieldHead={fieldHead}
                             setDefaultVariableData={setDefaultVariableData}
                             setDefaultField={setDefaultField}
                         />

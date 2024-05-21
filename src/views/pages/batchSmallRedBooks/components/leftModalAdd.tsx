@@ -17,10 +17,12 @@ const LeftModalAdd = ({
     setPage,
     defaultVariableData,
     defaultField,
+    fieldHead,
     materialType,
     selectedRowKeys,
     setcustom,
     setField,
+    setFieldHeads,
     downTableData,
     setSelectedRowKeys,
     setFieldCompletionData,
@@ -41,10 +43,12 @@ const LeftModalAdd = ({
     setPage: (data: any) => void;
     setcustom?: (data: any) => void;
     setField?: (data: any) => void;
+    setFieldHeads?: (data: any) => void;
     downTableData: (data: any) => void;
     setSelectedRowKeys: (data: any) => void;
     defaultVariableData?: any;
     defaultField?: any;
+    fieldHead?: any;
     selectedRowKeys?: any;
     setFieldCompletionData: (data: any) => void;
     fieldCompletionData: any;
@@ -129,6 +133,11 @@ const LeftModalAdd = ({
         { label: '图片', value: 'image' },
         { label: '富文本', value: 'textBox' }
     ];
+    useEffect(() => {
+        if (fieldHead) {
+            setMaterialTableData(fieldHead);
+        }
+    }, [fieldHead]);
     return (
         <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
             <div className="flex gap-2 justify-between my-[20px]">
@@ -196,7 +205,16 @@ const LeftModalAdd = ({
                 columns={columns}
                 dataSource={tableData}
             />
-            <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
+            <Modal
+                width={'80%'}
+                open={colOpen}
+                onCancel={() => {
+                    setFieldHeads && setFieldHeads(JSON.stringify(materialTableData?.sort((a, b) => a.order - b.order)));
+                    setColOpen(false);
+                }}
+                footer={false}
+                title="素材字段配置"
+            >
                 <div className="flex justify-end">
                     <Button
                         size="small"
@@ -214,7 +232,15 @@ const LeftModalAdd = ({
                 </div>
                 <Table columns={materialColumns} dataSource={materialTableData} />
                 <div className="flex justify-center mt-4">
-                    <Button type="primary">保存</Button>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setFieldHeads && setFieldHeads(JSON.stringify(materialTableData?.sort((a, b) => a.order - b.order)));
+                            setColOpen(false);
+                        }}
+                    >
+                        保存
+                    </Button>
                 </div>
             </Modal>
             <Modal

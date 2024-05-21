@@ -362,6 +362,16 @@ function CreateDetail() {
                 }
                 arr.find((el: any) => el.style === 'MATERIAL').value = list;
             }
+            if (arr?.find((el: any) => el.field === 'MATERIAL_DEFINE')?.value) {
+                let list: any;
+
+                try {
+                    list = JSON.parse(arr?.find((el: any) => el.field === 'MATERIAL_DEFINE')?.value);
+                } catch (err) {
+                    list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
+                }
+                arr.find((el: any) => el.field === 'MATERIAL_DEFINE').value = list;
+            }
             if (arr?.find((el: any) => el.style === 'CHECKBOX')) {
                 let list: any;
 

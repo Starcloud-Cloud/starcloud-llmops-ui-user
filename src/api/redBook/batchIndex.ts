@@ -78,8 +78,8 @@ export const materialImport = (data: any) => {
     return request.upload({ url: `/llm/material/import`, data });
 };
 //下载素材
-export const materialExport = (data: any) => {
-    return request.download({ url: `/llm/material/export/${data}` });
+export const materialExport = (params: any) => {
+    return request.download({ url: `/llm/material/download/template`, params });
 };
 //查询导入结果
 export const materialResilt = (parseUid: any) => {

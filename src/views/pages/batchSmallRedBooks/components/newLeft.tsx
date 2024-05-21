@@ -57,6 +57,7 @@ const Lefts = ({
     saveLoading,
     setCollData,
     setGetData,
+    setFieldHead,
     setImageMoke,
     setMoke,
     newSave,
@@ -64,6 +65,7 @@ const Lefts = ({
     setPlanUid,
     defaultVariableData,
     defaultField,
+    fieldHead,
     setDefaultVariableData,
     setDefaultField
 }: {
@@ -75,8 +77,10 @@ const Lefts = ({
     saveLoading?: boolean;
     defaultVariableData?: boolean;
     defaultField?: boolean;
+    fieldHead?: any;
     setCollData?: (data: any) => void;
     setGetData?: (data: any) => void;
+    setFieldHead?: (data: any) => void;
     setMoke?: (data: any) => void;
     setImageMoke?: (data: any) => void;
     newSave: (data: any) => void;
@@ -185,10 +189,10 @@ const Lefts = ({
         { label: '小红书', value: 'SMALL_RED_BOOK' },
         { label: '其他', value: 'OTHER' }
     ];
-    const getTableHeader = async () => {
-        const result = await materialTemplate(materialType);
-        setMokeList(result.fieldDefine);
-        const newList = result?.fieldDefine?.map((item: any) => {
+    const getTableHeader = async (list: any[]) => {
+        // const result = await materialTemplate(materialType);
+        setMokeList(list);
+        const newList = list?.map((item: any) => {
             return {
                 title: item.desc,
                 align: 'center',
@@ -280,10 +284,13 @@ const Lefts = ({
     };
     //下载模板
     const handleDownLoad = async () => {
-        const res = await materialExport(materialType);
+        const res = await materialExport({
+            planSource: detail ? 'app' : 'market',
+            uid: searchParams.get('uid')
+        });
         const downloadLink = document.createElement('a');
         downloadLink.href = window.URL.createObjectURL(res);
-        downloadLink.download = materialType + '.zip';
+        downloadLink.download = searchParams.get('uid') + '-' + detail ? 'app' : 'market' + '.zip';
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
@@ -351,11 +358,11 @@ const Lefts = ({
         };
     }, [parseUid]);
     //获取素材上传表格
-    useEffect(() => {
-        if (materialType) {
-            getTableHeader();
-        }
-    }, [materialType]);
+    // useEffect(() => {
+    //     if (materialType) {
+    //         getTableHeader();
+    //     }
+    // }, [materialType]);
     //模拟上传进度
     const timer1: any = useRef(null);
     useEffect(() => {
@@ -387,6 +394,20 @@ const Lefts = ({
         } else if (detail) {
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             newList = _.cloneDeep(detail);
+            newList?.workflowConfig?.steps?.forEach((item: any) => {
+                const arr = item?.variable?.variables;
+                const arr1 = item?.flowStep?.variable?.variables;
+                arr?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+                arr1?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+            });
         } else {
             setTableLoading(true);
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
@@ -474,6 +495,10 @@ const Lefts = ({
         const newMater = materiallist?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
         const customData = materiallist?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value;
         setDefaultVariableData && setDefaultVariableData(customData && customData !== '{}' ? JSON.parse(customData) : null);
+        console.log(materiallist?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value);
+
+        const fieldHeadcon = materiallist?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value;
+        setFieldHead && setFieldHead(fieldHeadcon && fieldHeadcon !== '[]' ? JSON.parse(fieldHeadcon) : null);
         const fieldAI = materiallist?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value;
         setDefaultField && setDefaultField(fieldAI && fieldAI !== '{}' ? JSON.parse(fieldAI) : null);
         const valueList =
@@ -578,7 +603,11 @@ const Lefts = ({
                 item.value = JSON.parse(item.value);
             }
         });
+        console.log(result);
+
         if (result?.configuration?.imageStyleList?.length > 0) {
+            console.log(newImage, result?.configuration);
+
             newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
                 result?.configuration?.imageStyleList ||
                 newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
@@ -591,6 +620,19 @@ const Lefts = ({
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         ).variable.variables;
         step.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value = data;
+        newData.configuration.appInformation.workflowConfig.steps.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        ).variable.variables = step;
+        appRef.current = newData;
+        setAppData(appRef.current);
+        handleSaveClick(false);
+    };
+    const setFieldHeads = (data: any) => {
+        const newData = _.cloneDeep(appRef.current);
+        const step = newData.configuration.appInformation.workflowConfig.steps.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        ).variable.variables;
+        step.find((item: any) => item.field === 'MATERIAL_DEFINE').value = data;
         newData.configuration.appInformation.workflowConfig.steps.find(
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         ).variable.variables = step;
@@ -1058,6 +1100,18 @@ const Lefts = ({
         appData?.configuration?.appInformation?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value
+    ]);
+    useEffect(() => {
+        const materiallist = appData?.configuration?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value;
+
+        getTableHeader(materiallist && materiallist !== '[]' ? JSON.parse(materiallist) : []);
+        setFieldHead && setFieldHead(materiallist && materiallist !== '[]' ? JSON.parse(materiallist) : null);
+    }, [
+        appData?.configuration?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value
     ]);
     useEffect(() => {
         const materiallist = appData?.configuration?.appInformation?.workflowConfig?.steps
@@ -1559,9 +1613,11 @@ const Lefts = ({
                     tableLoading={tableLoading}
                     defaultVariableData={defaultVariableData}
                     defaultField={defaultField}
+                    fieldHead={fieldHead}
                     selectedRowKeys={selectedRowKeys}
                     setcustom={setcustom}
                     setField={setField}
+                    setFieldHeads={setFieldHeads}
                     materialType={materialType}
                     columns={columns}
                     tableData={tableData}

@@ -25,6 +25,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { PayModal } from '../PayModal';
 import dayjs from 'dayjs';
+import jsCookie from 'js-cookie';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -126,6 +127,13 @@ const Record: React.FC = () => {
     const forceUpdate = () => setCount((pre) => pre + 1);
 
     useEffect(() => {
+        jsCookie.remove('client-redemption');
+        return () => {
+            jsCookie.remove('client-redemption');
+        };
+    }, []);
+
+    useEffect(() => {
         const fetchPageData = async () => {
             const pageVO = { pageNo: page + 1, pageSize: rowsPerPage };
             // const encodedPageVO = encodeURIComponent(JSON.stringify(pageVO));
@@ -220,6 +228,9 @@ const Record: React.FC = () => {
         interval = setInterval(() => {
             getOrderIsPay({ id: record.id }).then((isPayRes) => {
                 if (isPayRes) {
+                    // 出入token 供客户端
+                    jsCookie.set('client-redemption', 'true');
+
                     handleClose();
                     clearInterval(interval);
                     setOpenPayDialog(true);

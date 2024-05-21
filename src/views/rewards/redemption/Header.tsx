@@ -11,11 +11,12 @@ import wechat2 from 'assets/images/landing/wechat_2.png';
 import { styled } from '@mui/system';
 import { redeemBenefits } from 'api/rewards';
 import { t } from 'hooks/web/useI18n';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
 import { ENUM_PERMISSION, ENUM_TENANT, getPermission, getTenant } from 'utils/permission';
+import jsCookie from 'js-cookie';
 
 const CustomMainCard = styled(MainCard)({
     '& .MuiCardContent-root': {
@@ -29,6 +30,10 @@ const CustomMainCard = styled(MainCard)({
 const RedemptionHeader = () => {
     const theme = useTheme();
     const [code, setCode] = useState(''); // 创建一个状态变量来保存用户的输入
+
+    useEffect(() => {
+        jsCookie.remove('client-redemption');
+    }, []);
 
     const alertSuccess = () => {
         dispatch(
@@ -61,6 +66,8 @@ const RedemptionHeader = () => {
     const handleRedeem = async () => {
         const res: { data: any; msg: string } = await redeemBenefits(code);
         if (res.data) {
+            // 注入token 用作客户端刷新用户权益
+            jsCookie.set('client-redemption', 'true');
             alertSuccess();
         } else {
             alertFailed(res.msg);

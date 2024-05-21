@@ -5,9 +5,11 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
+import Item from 'antd/es/list/Item';
 
 const AiCreate = ({
     title,
+    materialType,
     columns,
     MokeList,
     tableData,
@@ -24,6 +26,7 @@ const AiCreate = ({
     variableData
 }: {
     title: string;
+    materialType: any;
     columns: any[];
     MokeList: any[];
     tableData: any[];
@@ -91,11 +94,19 @@ const AiCreate = ({
         setMaterialExecutionOpen(true);
         //记录原有数据下标
         const indexList: any[] = [];
-        tableData?.map((item, index) => {
-            if (selList?.find((el) => el.uuid === item.uuid)) {
+        let theStaging = _.cloneDeep(tableData);
+        if (num === 1) {
+            tableData?.map((item, index) => {
+                if (selList?.find((el) => el.uuid === item.uuid)) {
+                    indexList.push(index);
+                }
+            });
+        } else {
+            tableData?.map((item, index) => {
                 indexList.push(index);
-            }
-        });
+            });
+        }
+
         totalCountRef.current = num === 1 ? selList.length : tableData.length;
         setTotalCount(totalCountRef.current);
         let index = 0;
@@ -104,11 +115,13 @@ const AiCreate = ({
             const resArr: any[] = [];
             const uuidList: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
-            try {
-                executionCountRef.current = currentBatch?.flat()?.length;
-                setExecutionCount(executionCountRef.current);
-                await Promise.all(
-                    currentBatch.map(async (group, i) => {
+            // try {
+            executionCountRef.current = currentBatch?.flat()?.length;
+            setExecutionCount(executionCountRef.current);
+
+            await Promise.all(
+                currentBatch.map(async (group, i) => {
+                    try {
                         const res = await materialGenerate({
                             materialList: group,
                             fieldList: MokeList,
@@ -118,46 +131,65 @@ const AiCreate = ({
                             resArr[index + i] = res;
                         } else if (res?.length !== group?.length && res.length === 1) {
                             resArr[index + i] = [...res, {}, {}];
+                        } else if (res?.length !== group?.length && res.length === 2) {
+                            resArr[index + i] = [...res, {}];
                         }
-
                         executionCountRef.current = executionCountRef.current - group?.length;
                         successCountRef.current += group?.length;
                         setExecutionCount(executionCountRef.current);
                         setSuccessCount(successCountRef.current);
-                    })
-                );
-                let newList = _.cloneDeep(tableData);
-                for (let i = 0; i < chunks.flat().length; i++) {
-                    const obj: any = {};
-                    resArr.flat()[i] &&
-                        Object.keys(resArr.flat()[i]).map((item) => {
-                            obj[item] = resArr.flat()[i][item];
+                    } catch (error: any) {
+                        group?.map((item) => {
+                            if (!resArr[index + i]) {
+                                resArr[index + i] = [{}];
+                            } else {
+                                resArr[index + i].push({});
+                            }
                         });
-                    uuidList.push(newList[indexList[i]]?.uuid);
-                    newList[indexList[i]] = {
-                        ...newList[indexList[i]],
-                        ...obj
-                    };
-                }
-                console.log(newList, uuidListsRef.current);
-
-                const newL = _.cloneDeep(uuidListsRef.current);
-                newL?.push(...uuidList);
-                uuidListsRef.current = newL;
-                setUuidLists(uuidListsRef.current);
-                downTableData(newList);
-            } catch (error: any) {
-                console.log(error);
-                setErrorMessage(error.msg);
-                executionCountRef.current = 0;
-                setExecutionCount(executionCountRef.current);
-                errorCountRef.current += currentBatch?.flat()?.length;
-                if (errorCountRef.current >= 9) {
-                    aref.current = true;
-                    setErrorMessage('服务器繁忙，请稍后再试');
-                }
-                setErrorCount(errorCountRef.current);
+                        console.log(error);
+                        setErrorMessage(error.msg);
+                        executionCountRef.current -= group?.length;
+                        setExecutionCount(executionCountRef.current);
+                        errorCountRef.current += group?.length;
+                        if (errorCountRef.current >= 9) {
+                            aref.current = true;
+                            setErrorMessage('服务器繁忙，请稍后再试');
+                        }
+                        setErrorCount(errorCountRef.current);
+                    }
+                })
+            );
+            let newList = _.cloneDeep(theStaging);
+            for (let i = 0; i < currentBatch.flat().length; i++) {
+                const obj: any = {};
+                resArr.flat()[i] &&
+                    Object.keys(resArr.flat()[i]).map((item) => {
+                        obj[item] = resArr.flat()[i][item];
+                    });
+                uuidList.push(newList[indexList[i + index * 3]]?.uuid);
+                newList[indexList[i + index * 3]] = {
+                    ...newList[indexList[i + index * 3]],
+                    ...obj
+                };
             }
+            const newL = _.cloneDeep(uuidListsRef.current);
+            newL?.push(...uuidList);
+            uuidListsRef.current = newL;
+            setUuidLists(uuidListsRef.current);
+            theStaging = _.cloneDeep(newList);
+            downTableData(theStaging);
+            // } catch (error: any) {
+            //     console.log(error);
+            //     setErrorMessage(error.msg);
+            //     executionCountRef.current = 0;
+            //     setExecutionCount(executionCountRef.current);
+            //     errorCountRef.current += currentBatch?.flat()?.length;
+            //     if (errorCountRef.current >= 9) {
+            //         aref.current = true;
+            //         setErrorMessage('服务器繁忙，请稍后再试');
+            //     }
+            //     setErrorCount(errorCountRef.current);
+            // }
             index += 3;
         }
         executionCountRef.current = 0;
@@ -182,43 +214,46 @@ const AiCreate = ({
         setTotalCount(totalCountRef.current);
         const chunks = chunkArray(i, 3);
         let index = 0;
+        let theStaging = _.cloneDeep(tableData);
         while (index < chunks?.length && !aref.current) {
             const resArr: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             executionCountRef.current = currentBatch?.flat()?.length;
             setExecutionCount(executionCountRef.current);
-            try {
-                await Promise.all(
-                    currentBatch.map(async (group, i) => {
+            await Promise.all(
+                currentBatch.map(async (group, i) => {
+                    try {
                         const res = await customMaterialGenerate({ ...variableData, fieldList: MokeList, generateCount: group?.length });
-                        if (res?.length === group?.length) {
-                            resArr.push(...res?.map((item: any) => ({ ...item, uuid: uuidv4() })));
-                        }
+
+                        resArr.push(...res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType })));
+
                         executionCountRef.current = executionCountRef.current - group?.length;
                         successCountRef.current += group?.length;
                         setExecutionCount(executionCountRef.current);
                         setSuccessCount(successCountRef.current);
-                    })
-                );
-                let newList = _.cloneDeep(tableData);
-                newList.unshift(...resArr);
-                const newL = _.cloneDeep(uuidListsRef.current);
-                newL?.push(...resArr?.map((item) => item.uuid));
-                uuidListsRef.current = newL;
-                setUuidLists(uuidListsRef.current);
-                downTableData(newList);
-            } catch (error: any) {
-                console.log(error);
-                setErrorMessage(error.msg);
-                executionCountRef.current = 0;
-                setExecutionCount(executionCountRef.current);
-                errorCountRef.current += currentBatch?.flat()?.length;
-                if (errorCountRef.current >= 9) {
-                    aref.current = true;
-                    setErrorMessage('服务器繁忙，请稍后再试');
-                }
-                setErrorCount(errorCountRef.current);
-            }
+                    } catch (error: any) {
+                        console.log(error);
+                        setErrorMessage(error.msg);
+                        executionCountRef.current -= group?.length;
+                        setExecutionCount(executionCountRef.current);
+                        errorCountRef.current += group?.length;
+                        if (errorCountRef.current >= 9) {
+                            aref.current = true;
+                            setErrorMessage('服务器繁忙，请稍后再试');
+                        }
+                        setErrorCount(errorCountRef.current);
+                    }
+                })
+            );
+            let newList = _.cloneDeep(theStaging);
+            newList.unshift(...resArr);
+            theStaging = _.cloneDeep(newList);
+            const newL = _.cloneDeep(uuidListsRef.current);
+            newL?.push(...resArr?.map((item) => item.uuid));
+            uuidListsRef.current = newL;
+            setUuidLists(uuidListsRef.current);
+            downTableData(theStaging);
+
             index += 3;
         }
         executionCountRef.current = 0;
@@ -531,6 +566,11 @@ const AiCreate = ({
                         <div className="my-4 text-[#ff4d4f] text-xs flex justify-center">
                             <span className="font-bold">错误信息：</span>
                             {errorMessage}
+                        </div>
+                    )}
+                    {totalCount === successCount + errorCount && (
+                        <div className="my-4 text-xs flex justify-center">
+                            <span className="font-bold">已经生成完成，点击确认导入素材</span>
                         </div>
                     )}
                     <div className="flex gap-2 justify-center mt-4 text-xs">

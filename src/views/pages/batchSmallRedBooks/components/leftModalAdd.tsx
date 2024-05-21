@@ -17,6 +17,7 @@ const LeftModalAdd = ({
     setPage,
     defaultVariableData,
     defaultField,
+    materialType,
     selectedRowKeys,
     setcustom,
     setField,
@@ -32,6 +33,7 @@ const LeftModalAdd = ({
     tableLoading: boolean;
     columns: any[];
     MokeList: any[];
+    materialType: any;
     tableData: any[];
     setTitle: (data: string) => void;
     setEditOpen: (data: boolean) => void;
@@ -139,6 +141,7 @@ const LeftModalAdd = ({
                     </Button>
                     <AiCreate
                         title="AI 素材生成"
+                        materialType={materialType}
                         columns={columns}
                         MokeList={MokeList}
                         tableData={tableData}

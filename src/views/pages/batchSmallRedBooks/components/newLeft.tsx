@@ -1210,6 +1210,7 @@ const Lefts = ({
                                                     </Button>
                                                     <AiCreate
                                                         title="AI 生成"
+                                                        materialType={materialType}
                                                         columns={columns}
                                                         MokeList={MokeList}
                                                         tableData={tableData}
@@ -1561,6 +1562,7 @@ const Lefts = ({
                     selectedRowKeys={selectedRowKeys}
                     setcustom={setcustom}
                     setField={setField}
+                    materialType={materialType}
                     columns={columns}
                     tableData={tableData}
                     setTitle={setTitle}
@@ -1571,6 +1573,7 @@ const Lefts = ({
                             uuid: uuidv4()
                         }));
                         setTableData(tableRef.current);
+                        setSelectedRowKeys([]);
                     }}
                     MokeList={MokeList}
                     setPage={setPage}

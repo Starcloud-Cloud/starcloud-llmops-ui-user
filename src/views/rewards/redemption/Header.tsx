@@ -33,6 +33,9 @@ const RedemptionHeader = () => {
 
     useEffect(() => {
         jsCookie.remove('client-redemption');
+        return () => {
+            jsCookie.remove('client-redemption');
+        };
     }, []);
 
     const alertSuccess = () => {

@@ -283,8 +283,6 @@ const AiCreate = ({
             <Button
                 size={title === 'AI 生成' ? 'small' : 'middle'}
                 onClick={() => {
-                    console.log(columns?.filter((item) => item.title !== '序号' && item.title !== '操作'));
-
                     if (columns?.filter((item) => item.title !== '序号' && item.title !== '操作')?.length === 0) {
                         confirm({
                             title: '提示',
@@ -369,6 +367,21 @@ const AiCreate = ({
                                     <div className="flex justify-center gap-6 mt-6">
                                         <Button
                                             onClick={() => {
+                                                if (variableData.checkedFieldList?.length === 0) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: 'AI 补齐字段最少选一个',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
                                                 if (!variableData.requirement) {
                                                     setrequirementStatusOpen(true);
                                                     return false;
@@ -382,6 +395,21 @@ const AiCreate = ({
                                         <Button
                                             type="primary"
                                             onClick={() => {
+                                                if (variableData.checkedFieldList?.length === 0) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: 'AI 补齐字段最少选一个',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
                                                 if (!variableData.requirement) {
                                                     setrequirementStatusOpen(true);
                                                     return false;

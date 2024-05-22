@@ -76,8 +76,8 @@ const Lefts = ({
     detail?: any;
     data?: any;
     saveLoading?: boolean;
-    defaultVariableData?: boolean;
-    defaultField?: boolean;
+    defaultVariableData?: any;
+    defaultField?: any;
     fieldHead?: any;
     setCollData?: (data: any) => void;
     setGetData?: (data: any) => void;
@@ -200,7 +200,7 @@ const Lefts = ({
                 width: 200,
                 dataIndex: item.fieldName,
                 render: (_: any, row: any) => (
-                    <div className="flex justify-center items-center gap-2">
+                    <div className="flex justify-center items-center gap-2 min-w-[200px]">
                         {item.type === 'image' ? (
                             row[item.fieldName] ? (
                                 <Image
@@ -623,7 +623,11 @@ const Lefts = ({
         ).variable.variables = step;
         appRef.current = newData;
         setAppData(appRef.current);
-        handleSaveClick(false);
+        if (!detail) {
+            handleSaveClick(false);
+        } else {
+            gessaveApp();
+        }
     };
     const setField = (data: any) => {
         const newData = _.cloneDeep(appRef.current);
@@ -1125,30 +1129,82 @@ const Lefts = ({
         requirement: ''
     });
     useEffect(() => {
+        const newList = columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image');
         if (defaultVariableData) {
-            setVariableData(defaultVariableData);
+            const list = newList
+                ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
+                ?.map((item) => item.dataIndex);
+            setVariableData({
+                ...defaultVariableData,
+                checkedFieldList: list
+            });
         } else {
             setVariableData({
                 ...variableData,
-                checkedFieldList: columns
-                    ?.slice(1, columns?.length - 1)
-                    ?.filter((item) => item.type !== 'image')
-                    ?.map((item) => item?.dataIndex)
+                checkedFieldList: newList?.map((item: any) => item?.dataIndex)
             });
         }
         if (defaultField) {
-            setFieldCompletionData(defaultField);
+            const list = newList
+                ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
+                ?.map((item) => item.dataIndex);
+            setFieldCompletionData({
+                ...defaultField,
+                checkedFieldList: list
+            });
         } else {
             setFieldCompletionData({
                 ...fieldCompletionData,
-                checkedFieldList: columns
-                    ?.slice(1, columns?.length - 1)
-                    ?.filter((item) => item.type !== 'image')
-                    ?.map((item) => item?.dataIndex)
+                checkedFieldList: newList?.map((item) => item?.dataIndex)
             });
         }
     }, [columns]);
     //素材字段配置弹框
+    const gessaveApp = () => {
+        const newData = _.cloneDeep(detail);
+        let arr = newData?.workflowConfig?.steps;
+        const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+        if (a) {
+            a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                materialType === 'picture'
+                    ? fileList?.map((item) => ({
+                          pictureUrl: item?.response?.data?.url,
+                          type: 'picture'
+                      }))
+                    : tableData?.map((item) => ({
+                          ...item,
+                          type: materialType
+                      }));
+        }
+        const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+        if (b) {
+            let styleData = imageRef.current?.record?.variable?.variables?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value;
+            if (typeof styleData === 'string') {
+                styleData = JSON.parse(styleData);
+            }
+            b.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
+                ? styleData?.map((item: any) => ({
+                      ...item,
+                      id: undefined,
+                      code: item.id
+                  }))
+                : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
+        }
+
+        arr = [
+            arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+            ...generRef.current,
+            arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+        ];
+        setExeState(true);
+        setDetail &&
+            setDetail({
+                ...detail,
+                workflowConfig: {
+                    steps: arr?.filter((item: any) => item)
+                }
+            });
+    };
     const [colOpen, setColOpen] = useState(false);
     return (
         <>
@@ -1530,53 +1586,7 @@ const Lefts = ({
                                     if (!detail) {
                                         handleSaveClick(true);
                                     } else {
-                                        const newData = _.cloneDeep(detail);
-                                        let arr = newData?.workflowConfig?.steps;
-                                        const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
-                                        if (a) {
-                                            a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                                                materialType === 'picture'
-                                                    ? fileList?.map((item) => ({
-                                                          pictureUrl: item?.response?.data?.url,
-                                                          type: 'picture'
-                                                      }))
-                                                    : tableData?.map((item) => ({
-                                                          ...item,
-                                                          type: materialType
-                                                      }));
-                                        }
-                                        const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
-                                        if (b) {
-                                            let styleData = imageRef.current?.record?.variable?.variables?.find(
-                                                (item: any) => item.field === 'POSTER_STYLE_CONFIG'
-                                            )?.value;
-                                            if (typeof styleData === 'string') {
-                                                styleData = JSON.parse(styleData);
-                                            }
-                                            b.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
-                                                ? styleData?.map((item: any) => ({
-                                                      ...item,
-                                                      id: undefined,
-                                                      code: item.id
-                                                  }))
-                                                : imageMater?.variable?.variables?.find(
-                                                      (item: any) => item?.field === 'POSTER_STYLE_CONFIG'
-                                                  )?.value;
-                                        }
-
-                                        arr = [
-                                            arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
-                                            ...generRef.current,
-                                            arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-                                        ];
-                                        setExeState(true);
-                                        setDetail &&
-                                            setDetail({
-                                                ...detail,
-                                                workflowConfig: {
-                                                    steps: arr?.filter((item: any) => item)
-                                                }
-                                            });
+                                        gessaveApp();
                                     }
                                 }}
                             >

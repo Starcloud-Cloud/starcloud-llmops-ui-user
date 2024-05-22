@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import AiCreate from './AICreate';
 import _ from 'lodash-es';
 import { PlusOutlined } from '@ant-design/icons';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const LeftModalAdd = ({
     zoomOpen,
     setZoomOpen,
@@ -135,11 +137,6 @@ const LeftModalAdd = ({
     const [formOpen, setFormOpen] = useState(false);
     const [materialTitle, setMaterialTitle] = useState('');
     const [form] = Form.useForm();
-    const options = [
-        { label: '字符串', value: 'string' },
-        { label: '图片', value: 'image' },
-        { label: '富文本', value: 'textBox' }
-    ];
     useEffect(() => {
         if (fieldHead) {
             setMaterialTableData(fieldHead);
@@ -236,9 +233,31 @@ const LeftModalAdd = ({
                 <div className="flex justify-center mt-4">
                     <Button
                         type="primary"
+                        disabled={materialTableData?.length === 0}
                         onClick={() => {
-                            setFieldHeads && setFieldHeads(JSON.stringify(materialTableData));
-                            setColOpen(false);
+                            let flag = false;
+                            for (let item of materialTableData) {
+                                if (item.required && !tableData?.every((el) => el[item.fieldName])) {
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '素材上传表格中' + item.desc + '必填',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'error'
+                                            },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                            close: false
+                                        })
+                                    );
+                                    flag = true;
+                                    break;
+                                }
+                            }
+                            if (!flag) {
+                                setFieldHeads && setFieldHeads(JSON.stringify(materialTableData));
+                                setColOpen(false);
+                            }
                         }}
                     >
                         保存
@@ -249,10 +268,12 @@ const LeftModalAdd = ({
                 title={materialTitle}
                 onOk={async () => {
                     const result = await form.validateFields();
+                    const newData = _.cloneDeep(materialTableData);
                     if (rowIndex === -1) {
-                        setMaterialTableData([result, ...materialTableData]);
+                        newData.unshift(result);
+                        newData?.sort((a, b) => a.order - b.order);
+                        setMaterialTableData(newData);
                     } else {
-                        const newData = [...materialTableData];
                         newData.splice(rowIndex, 1, result);
                         newData?.sort((a, b) => a.order - b.order);
                         setMaterialTableData(newData);

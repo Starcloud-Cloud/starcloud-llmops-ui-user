@@ -260,6 +260,7 @@ const Record: React.FC = () => {
         interval = setInterval(() => {
             getOrderIsPay({ id: row.id }).then((isPayRes) => {
                 if (isPayRes) {
+                    jsCookie.set('client-redemption', 'true');
                     handleClose();
                     clearInterval(interval);
                     setOpenPayDialog(true);

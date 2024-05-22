@@ -151,7 +151,7 @@ function FormExecute({
                 if (result?.complete) {
                     setTableLoading(false);
                     clearInterval(timer.current);
-                    const res = result?.materialDTOList;
+                    const res = result?.materialList;
                     onChange({ name: item.field, value: res });
                 }
             });

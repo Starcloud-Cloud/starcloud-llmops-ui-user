@@ -5,16 +5,19 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
-import Item from 'antd/es/list/Item';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+const { confirm } = Modal;
 
 const AiCreate = ({
     title,
+    setColOpen,
     materialType,
     columns,
     MokeList,
     tableData,
     defaultVariableData,
     defaultField,
+
     setPage,
     setcustom,
     setField,
@@ -26,6 +29,7 @@ const AiCreate = ({
     variableData
 }: {
     title: string;
+    setColOpen: (data: boolean) => void;
     materialType: any;
     columns: any[];
     MokeList: any[];
@@ -276,7 +280,28 @@ const AiCreate = ({
 
     return (
         <div>
-            <Button size={title === 'AI 生成' ? 'small' : 'middle'} onClick={() => setOpen(true)} type="primary">
+            <Button
+                size={title === 'AI 生成' ? 'small' : 'middle'}
+                onClick={() => {
+                    console.log(columns?.filter((item) => item.title !== '序号' && item.title !== '操作'));
+
+                    if (columns?.filter((item) => item.title !== '序号' && item.title !== '操作')?.length === 0) {
+                        confirm({
+                            title: '提示',
+                            content: '还未配置素材字段',
+                            icon: <ExclamationCircleFilled rev={undefined} />,
+                            okText: '去配置',
+                            cancelText: '再想想',
+                            onOk() {
+                                setColOpen(true);
+                            }
+                        });
+                    } else {
+                        setOpen(true);
+                    }
+                }}
+                type="primary"
+            >
                 {title}
             </Button>
             <Modal title="素材AI生成" maskClosable={false} width={'60%'} open={open} footer={null} onCancel={() => setOpen(false)}>
@@ -338,7 +363,7 @@ const AiCreate = ({
                                             }}
                                             className="w-[200px]"
                                             min={1}
-                                            max={100}
+                                            max={20}
                                         />
                                     </div>
                                     <div className="flex justify-center gap-6 mt-6">

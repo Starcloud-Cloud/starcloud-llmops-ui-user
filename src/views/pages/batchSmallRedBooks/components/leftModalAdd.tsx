@@ -7,10 +7,13 @@ import { PlusOutlined } from '@ant-design/icons';
 const LeftModalAdd = ({
     zoomOpen,
     setZoomOpen,
+    colOpen,
+    setColOpen,
     tableLoading,
     columns,
     tableData,
     MokeList,
+    materialFieldTypeList,
     setTitle,
     setEditOpen,
     changeTableValue,
@@ -32,9 +35,12 @@ const LeftModalAdd = ({
 }: {
     zoomOpen: boolean;
     setZoomOpen: (data: boolean) => void;
+    colOpen: boolean;
+    setColOpen: (data: boolean) => void;
     tableLoading: boolean;
     columns: any[];
     MokeList: any[];
+    materialFieldTypeList: any[];
     materialType: any;
     tableData: any[];
     setTitle: (data: string) => void;
@@ -61,7 +67,6 @@ const LeftModalAdd = ({
         });
         changeTableValue(newData);
     };
-    const [colOpen, setColOpen] = useState(false);
     const materialColumns: TableProps<any>['columns'] = [
         {
             title: '字段 Code',
@@ -75,7 +80,7 @@ const LeftModalAdd = ({
         },
         {
             title: '字段类型',
-            dataIndex: 'type',
+            render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label,
             align: 'center'
         },
         {
@@ -96,6 +101,8 @@ const LeftModalAdd = ({
                     <Button
                         type="link"
                         onClick={() => {
+                            console.log(row);
+
                             form.setFieldsValue(row);
                             setRowIndex(index);
                             setMaterialTitle('编辑');
@@ -141,15 +148,27 @@ const LeftModalAdd = ({
     return (
         <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
             <div className="flex gap-2 justify-between my-[20px]">
-                <Button disabled={selectedRowKeys?.length === 0} type="primary" onClick={handleDels}>
-                    批量删除({selectedRowKeys?.length})
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setTitle('新增');
+                            setEditOpen(true);
+                        }}
+                    >
+                        新增素材
+                    </Button>
+                    <Button disabled={selectedRowKeys?.length === 0} type="primary" onClick={handleDels}>
+                        批量删除({selectedRowKeys?.length})
+                    </Button>
+                </div>
                 <div className="flex gap-2">
                     <Button type="primary" onClick={() => setColOpen(true)}>
                         素材字段配置
                     </Button>
                     <AiCreate
                         title="AI 素材生成"
+                        setColOpen={setColOpen}
                         materialType={materialType}
                         columns={columns}
                         MokeList={MokeList}
@@ -166,15 +185,6 @@ const LeftModalAdd = ({
                         setVariableData={setVariableData}
                         variableData={variableData}
                     />
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            setTitle('新增');
-                            setEditOpen(true);
-                        }}
-                    >
-                        新增
-                    </Button>
                 </div>
             </div>
             <Table
@@ -205,18 +215,10 @@ const LeftModalAdd = ({
                 columns={columns}
                 dataSource={tableData}
             />
-            <Modal
-                width={'80%'}
-                open={colOpen}
-                onCancel={() => {
-                    setFieldHeads && setFieldHeads(JSON.stringify(materialTableData?.sort((a, b) => a.order - b.order)));
-                    setColOpen(false);
-                }}
-                footer={false}
-                title="素材字段配置"
-            >
+            <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
                 <div className="flex justify-end">
                     <Button
+                        disabled={materialTableData?.length === 20}
                         size="small"
                         className="mb-4"
                         onClick={() => {
@@ -227,7 +229,7 @@ const LeftModalAdd = ({
                         icon={<PlusOutlined rev={undefined} />}
                         type="primary"
                     >
-                        新增
+                        新增({materialTableData?.length || 0}/20)
                     </Button>
                 </div>
                 <Table columns={materialColumns} dataSource={materialTableData} />
@@ -235,7 +237,7 @@ const LeftModalAdd = ({
                     <Button
                         type="primary"
                         onClick={() => {
-                            setFieldHeads && setFieldHeads(JSON.stringify(materialTableData?.sort((a, b) => a.order - b.order)));
+                            setFieldHeads && setFieldHeads(JSON.stringify(materialTableData));
                             setColOpen(false);
                         }}
                     >
@@ -252,6 +254,7 @@ const LeftModalAdd = ({
                     } else {
                         const newData = [...materialTableData];
                         newData.splice(rowIndex, 1, result);
+                        newData?.sort((a, b) => a.order - b.order);
                         setMaterialTableData(newData);
                     }
                     form.resetFields();
@@ -264,24 +267,34 @@ const LeftModalAdd = ({
                 }}
             >
                 <Form labelCol={{ span: 6 }} form={form}>
-                    <Form.Item label="字段 Code" name="fieldName" rules={[{ required: true, message: '请输入字段 Code' }]}>
+                    <Form.Item
+                        label="字段 Code"
+                        name="fieldName"
+                        rules={[
+                            { required: true, message: '请输入字段 Code' },
+                            {
+                                validator: (rule, value, callback) => {
+                                    if (value && !/^[a-zA-Z]+$/.test(value)) {
+                                        callback('只能是大小写英文字母');
+                                    } else {
+                                        callback();
+                                    }
+                                }
+                            }
+                        ]}
+                    >
                         <Input />
                     </Form.Item>
                     <Form.Item label="字段名称" name="desc" rules={[{ required: true, message: '请输入字段名称' }]}>
                         <Input />
                     </Form.Item>
                     <Form.Item label="字段类型" name="type" rules={[{ required: true, message: '请选择字段类型' }]}>
-                        <Select options={options} />
+                        <Select options={materialFieldTypeList} />
                     </Form.Item>
-                    <Form.Item label="字段排序" name="order" rules={[{ required: true, message: '请输入字段排序' }]}>
-                        <InputNumber className="w-full" min={1} />
+                    <Form.Item initialValue={0} label="字段排序" name="order" rules={[{ required: true, message: '请输入字段排序' }]}>
+                        <InputNumber className="w-full" min={0} />
                     </Form.Item>
-                    <Form.Item
-                        initialValue={false}
-                        label="是否必填"
-                        name="required"
-                        rules={[{ required: true, message: '请选择是否必填' }]}
-                    >
+                    <Form.Item initialValue={false} label="是否必填" name="required" valuePropName="checked">
                         <Switch />
                     </Form.Item>
                 </Form>

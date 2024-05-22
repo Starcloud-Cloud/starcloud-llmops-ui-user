@@ -31,7 +31,8 @@ import {
     getPlan,
     planModify,
     planUpgrade,
-    materialParse
+    materialParse,
+    metadata
 } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
 import FormModal from './formModal';
@@ -290,7 +291,7 @@ const Lefts = ({
         });
         const downloadLink = document.createElement('a');
         downloadLink.href = window.URL.createObjectURL(res);
-        downloadLink.download = searchParams.get('uid') + '-' + detail ? 'app' : 'market' + '.zip';
+        downloadLink.download = searchParams.get('uid') + '-' + (detail ? 'app' : 'market') + '.zip';
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
@@ -308,7 +309,7 @@ const Lefts = ({
                 if (result?.complete) {
                     setTableLoading(false);
                     clearInterval(timer.current);
-                    tableRef.current = result?.materialDTOList?.map((item: any) => ({
+                    tableRef.current = result?.materialList?.map((item: any) => ({
                         ...item,
                         uuid: uuidv4()
                     }));
@@ -510,25 +511,15 @@ const Lefts = ({
         if (newMater === 'picture') {
             if (!data) {
                 setFileList(
-                    picList && picList?.length > 0
-                        ? result?.configuration?.materialList?.map((item: any) => ({
-                              uid: uuidv4(),
-                              thumbUrl: item?.pictureUrl,
-                              response: {
-                                  data: {
-                                      url: item?.pictureUrl
-                                  }
-                              }
-                          }))
-                        : valueList?.map((item: any) => ({
-                              uid: uuidv4(),
-                              thumbUrl: item?.pictureUrl,
-                              response: {
-                                  data: {
-                                      url: item?.pictureUrl
-                                  }
-                              }
-                          }))
+                    result?.configuration?.materialList?.map((item: any) => ({
+                        uid: uuidv4(),
+                        thumbUrl: item?.pictureUrl,
+                        response: {
+                            data: {
+                                url: item?.pictureUrl
+                            }
+                        }
+                    }))
                 );
             } else {
                 const resul = newList?.workflowConfig?.steps
@@ -579,16 +570,10 @@ const Lefts = ({
                     });
                 setTableData(tableRef.current || []);
             } else {
-                tableRef.current =
-                    picList && picList?.length > 0
-                        ? picList?.map((item: any) => ({
-                              ...item,
-                              uuid: uuidv4()
-                          }))
-                        : valueList?.map((item: any) => ({
-                              ...item,
-                              uuid: uuidv4()
-                          }));
+                tableRef.current = picList?.map((item: any) => ({
+                    ...item,
+                    uuid: uuidv4()
+                }));
                 setTableData(tableRef.current || []);
             }
         }
@@ -1123,7 +1108,12 @@ const Lefts = ({
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value
     ]);
-
+    const [materialFieldTypeList, setMaterialFieldTypeList] = useState<any[]>([]);
+    useEffect(() => {
+        metadata().then((res) => {
+            setMaterialFieldTypeList(res.MaterialFieldTypeEnum);
+        });
+    }, []);
     //公共数据
     const [variableData, setVariableData] = useState<any>({
         checkedFieldList: [],
@@ -1158,6 +1148,8 @@ const Lefts = ({
             });
         }
     }, [columns]);
+    //素材字段配置弹框
+    const [colOpen, setColOpen] = useState(false);
     return (
         <>
             <div className="relative h-full">
@@ -1265,6 +1257,7 @@ const Lefts = ({
                                                     <AiCreate
                                                         title="AI 生成"
                                                         materialType={materialType}
+                                                        setColOpen={setColOpen}
                                                         columns={columns}
                                                         MokeList={MokeList}
                                                         tableData={tableData}
@@ -1610,8 +1603,11 @@ const Lefts = ({
                 <LeftModalAdd
                     zoomOpen={zoomOpen}
                     setZoomOpen={setZoomOpen}
+                    colOpen={colOpen}
+                    setColOpen={setColOpen}
                     tableLoading={tableLoading}
                     defaultVariableData={defaultVariableData}
+                    materialFieldTypeList={materialFieldTypeList}
                     defaultField={defaultField}
                     fieldHead={fieldHead}
                     selectedRowKeys={selectedRowKeys}

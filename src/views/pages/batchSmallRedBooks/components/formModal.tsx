@@ -35,6 +35,13 @@ const FormModal = ({
     const [linkLoading, setLinkLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectImg, setSelectImg] = useState<any>(null);
+    const [imageDataIndex, setImageDataIndex] = useState<string>('');
+
+    useEffect(() => {
+        if (selectImg && imageDataIndex) {
+            form.setFieldValue(imageDataIndex, selectImg?.largeImageURL);
+        }
+    }, [selectImg]);
 
     const propShow: UploadProps = {
         name: 'image',
@@ -153,6 +160,7 @@ const FormModal = ({
                                                         onClick={(e) => {
                                                             setIsModalOpen(true);
                                                             e.stopPropagation();
+                                                            setImageDataIndex(item.dataIndex);
                                                         }}
                                                     />
                                                 </div>

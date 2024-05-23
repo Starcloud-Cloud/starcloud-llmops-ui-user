@@ -410,29 +410,37 @@ const AddStyle = React.forwardRef(
                 saveData.totalCount = allData.totalCount;
                 saveData.uid = allData.uid;
 
-                planModify(saveData).then((res: any) => {
-                    getList();
-                });
-            }
-
-            const copyStyleData = _.cloneDeep(styleData);
-            // 非系统的uuid需要变
-            if (!currentStyle.system) {
-                currentStyle.uuid = uuidv4()?.split('-')?.join('');
-                currentStyle.templateList.forEach((item: any) => {
-                    item.uuid = uuidv4()?.split('-')?.join('');
-                    item.variableList.forEach((item1: any) => {
-                        item1.uuid = uuidv4()?.split('-')?.join('');
+                planModify(saveData)
+                    .then((res: any) => {
+                        setIsModalOpen(false);
+                        setUpdIndex('');
+                        setAddType(0);
+                        setCurrentStyle(null);
+                        getList();
+                    })
+                    .catch((e: any) => {
+                        return;
                     });
-                });
-            }
+            } else {
+                const copyStyleData = _.cloneDeep(styleData);
+                // 非系统的uuid需要变
+                if (!currentStyle.system) {
+                    currentStyle.uuid = uuidv4()?.split('-')?.join('');
+                    currentStyle.templateList.forEach((item: any) => {
+                        item.uuid = uuidv4()?.split('-')?.join('');
+                        item.variableList.forEach((item1: any) => {
+                            item1.uuid = uuidv4()?.split('-')?.join('');
+                        });
+                    });
+                }
 
-            copyStyleData[updIndex] = currentStyle;
-            setStyleData(copyStyleData);
-            setIsModalOpen(false);
-            setUpdIndex('');
-            setAddType(0);
-            setCurrentStyle(null);
+                copyStyleData[updIndex] = currentStyle;
+                setStyleData(copyStyleData);
+                setIsModalOpen(false);
+                setUpdIndex('');
+                setAddType(0);
+                setCurrentStyle(null);
+            }
         };
 
         const onCheckboxChange = (e: any, index: number) => {

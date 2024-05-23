@@ -251,14 +251,17 @@ const LeftModalAdd = ({
                 title={materialTitle}
                 onOk={async () => {
                     const result = await form.validateFields();
+                    console.log(result);
                     const newData = _.cloneDeep(materialTableData);
                     if (rowIndex === -1) {
                         newData.unshift(result);
                         newData?.sort((a, b) => a.order - b.order);
                         setMaterialTableData(newData);
                     } else {
-                        newData.splice(rowIndex, 1, result);
+                        newData.splice(rowIndex, 1, { ...newData[rowIndex], ...result });
                         newData?.sort((a, b) => a.order - b.order);
+                        console.log(newData);
+
                         setMaterialTableData(newData);
                     }
                     form.resetFields();
@@ -276,7 +279,7 @@ const LeftModalAdd = ({
                         name="desc"
                         rules={[
                             { required: true, message: '请输入字段名称' },
-                            { max: 10, message: '字段名称不能超过 10 个字' }
+                            { max: 10, message: '字段名称不能超过 20 个字' }
                         ]}
                     >
                         <Input />

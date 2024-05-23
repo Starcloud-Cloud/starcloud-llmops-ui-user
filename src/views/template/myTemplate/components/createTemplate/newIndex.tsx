@@ -566,6 +566,8 @@ function CreateDetail() {
                 a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = createPlanRef?.current?.moke;
                 a.variable.variables.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value =
                     createPlanRef?.current?.mokeAI;
+
+                a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value = createPlanRef?.current?.fieldHead;
             }
             const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
             if (index !== -1) {

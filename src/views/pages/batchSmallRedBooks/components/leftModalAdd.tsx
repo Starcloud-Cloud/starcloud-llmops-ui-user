@@ -6,6 +6,7 @@ import _ from 'lodash-es';
 import { PlusOutlined } from '@ant-design/icons';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { materialFieldCode } from 'api/redBook/batchIndex';
 const LeftModalAdd = ({
     zoomOpen,
     setZoomOpen,
@@ -71,11 +72,6 @@ const LeftModalAdd = ({
     };
     const materialColumns: TableProps<any>['columns'] = [
         {
-            title: '字段 Code',
-            dataIndex: 'fieldName',
-            align: 'center'
-        },
-        {
             title: '字段名称',
             dataIndex: 'desc',
             align: 'center'
@@ -87,7 +83,7 @@ const LeftModalAdd = ({
         },
         {
             title: '是否必填',
-            render: (_, row) => <Tag color="processing">{row?.required ? '必填' : '不必填'}</Tag>,
+            render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : ''),
             align: 'center'
         },
         {
@@ -229,34 +225,21 @@ const LeftModalAdd = ({
                         新增({materialTableData?.length || 0}/20)
                     </Button>
                 </div>
-                <Table columns={materialColumns} dataSource={materialTableData} />
+                <Table pagination={false} columns={materialColumns} dataSource={materialTableData} />
                 <div className="flex justify-center mt-4">
                     <Button
                         type="primary"
                         disabled={materialTableData?.length === 0}
-                        onClick={() => {
-                            let flag = false;
-                            for (let item of materialTableData) {
-                                if (item.required && !tableData?.every((el) => el[item.fieldName])) {
-                                    dispatch(
-                                        openSnackbar({
-                                            open: true,
-                                            message: '素材上传表格中' + item.desc + '必填',
-                                            variant: 'alert',
-                                            alert: {
-                                                color: 'error'
-                                            },
-                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                            close: false
-                                        })
-                                    );
-                                    flag = true;
-                                    break;
-                                }
-                            }
-                            if (!flag) {
-                                setFieldHeads && setFieldHeads(JSON.stringify(materialTableData));
+                        onClick={async () => {
+                            const result = await materialFieldCode({
+                                fieldConfigDTOList: materialTableData
+                            });
+                            setMaterialTableData(result);
+                            try {
+                                setFieldHeads && setFieldHeads(JSON.stringify(result));
                                 setColOpen(false);
+                            } catch (err) {
+                                console.log(err);
                             }
                         }}
                     >
@@ -289,24 +272,13 @@ const LeftModalAdd = ({
             >
                 <Form labelCol={{ span: 6 }} form={form}>
                     <Form.Item
-                        label="字段 Code"
-                        name="fieldName"
+                        label="字段名称"
+                        name="desc"
                         rules={[
-                            { required: true, message: '请输入字段 Code' },
-                            {
-                                validator: (rule, value, callback) => {
-                                    if (value && !/^[a-zA-Z]+$/.test(value)) {
-                                        callback('只能是大小写英文字母');
-                                    } else {
-                                        callback();
-                                    }
-                                }
-                            }
+                            { required: true, message: '请输入字段名称' },
+                            { max: 10, message: '字段名称不能超过 10 个字' }
                         ]}
                     >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item label="字段名称" name="desc" rules={[{ required: true, message: '请输入字段名称' }]}>
                         <Input />
                     </Form.Item>
                     <Form.Item label="字段类型" name="type" rules={[{ required: true, message: '请选择字段类型' }]}>

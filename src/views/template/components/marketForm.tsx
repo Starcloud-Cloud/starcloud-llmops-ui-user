@@ -28,6 +28,8 @@ function FormExecute({
     setMaterialType,
     history
 }: any) {
+    console.log(item);
+
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const mt = {
@@ -330,46 +332,48 @@ function FormExecute({
                     </div>
                 </div>
             ) : item.style === 'TAG_BOX' ? (
-                <div className="mt-4">
-                    <FormControl key={item?.value} color="secondary" size="small" fullWidth>
-                        <Autocomplete
-                            sx={{ mt: 2 }}
-                            multiple
-                            size="small"
-                            id="tags-filled"
-                            color="secondary"
-                            options={[]}
-                            defaultValue={item?.value || []}
-                            freeSolo
-                            renderTags={(value: readonly string[], getTagProps) =>
-                                value?.map((option: string, index: number) => (
-                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                                ))
-                            }
-                            onChange={(e: any, newValue) => {
-                                onChange({ name: item?.field, value: newValue });
-                            }}
-                            renderInput={(param) => (
-                                <TextField
-                                    onBlur={(e: any) => {
-                                        if (e.target.value) {
-                                            let newValue: any = item?.value;
-                                            if (!newValue) {
-                                                newValue = [];
+                <>
+                    <div className="mt-4">
+                        <FormControl key={item?.value} color="secondary" size="small" fullWidth>
+                            <Autocomplete
+                                sx={{ mt: 2 }}
+                                multiple
+                                size="small"
+                                id="tags-filled"
+                                color="secondary"
+                                options={[]}
+                                defaultValue={item?.value || []}
+                                freeSolo
+                                renderTags={(value: readonly string[], getTagProps) =>
+                                    value?.map((option: string, index: number) => (
+                                        <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                    ))
+                                }
+                                onChange={(e: any, newValue) => {
+                                    onChange({ name: item?.field, value: newValue });
+                                }}
+                                renderInput={(param) => (
+                                    <TextField
+                                        onBlur={(e: any) => {
+                                            if (e.target.value) {
+                                                let newValue: any = item?.value;
+                                                if (!newValue) {
+                                                    newValue = [];
+                                                }
+                                                newValue.push(e.target.value);
+                                                onChange({ name: item?.field, value: newValue });
                                             }
-                                            newValue.push(e.target.value);
-                                            onChange({ name: item?.field, value: newValue });
-                                        }
-                                    }}
-                                    color="secondary"
-                                    {...param}
-                                    label={item.label}
-                                    placeholder="请输入标签然后回车"
-                                />
-                            )}
-                        />
-                    </FormControl>
-                </div>
+                                        }}
+                                        color="secondary"
+                                        {...param}
+                                        label={item.label}
+                                        placeholder="请输入标签然后回车"
+                                    />
+                                )}
+                            />
+                        </FormControl>
+                    </div>
+                </>
             ) : item.style === 'IMAGE_LIST' ? (
                 <>
                     <div className="mt-4 mb-2 font-bold text-xs">参考图片</div>

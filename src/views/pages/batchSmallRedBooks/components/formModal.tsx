@@ -201,7 +201,7 @@ const FormModal = ({
                                 ) : item.type === 'listStr' ? (
                                     <Select mode="tags" options={[]} />
                                 ) : (
-                                    <Input />
+                                    <Input disabled={item.type === 'document'} />
                                 )}
                             </Form.Item>
                         ) : (

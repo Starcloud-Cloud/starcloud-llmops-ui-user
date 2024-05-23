@@ -45,6 +45,10 @@ export const planGet = (data: any) => {
 export const planModify = (data: any) => {
     return request.post({ url: '/llm/creative/plan/modify', data });
 };
+//编辑ziduan
+export const planModifyConfig = (data: any) => {
+    return request.post({ url: '/llm/creative/plan/modifyConfig', data });
+};
 //执行
 export const planExecute = (data: any) => {
     return request.post({ url: '/llm/creative/plan/execute', data });
@@ -110,4 +114,8 @@ export const materialGenerate = (data: any) => {
 //ai 批量生成
 export const customMaterialGenerate = (data: any) => {
     return request.post({ url: `/llm/creative/material/customMaterialGenerate`, data, timeout: 60000 });
+};
+//获取表格 Code
+export const materialFieldCode = (data: any) => {
+    return request.post({ url: `/llm/creative/material/fieldCode`, data });
 };

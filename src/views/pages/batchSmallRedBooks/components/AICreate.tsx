@@ -53,7 +53,7 @@ const AiCreate = ({
     const { TextArea } = Input;
     const [open, setOpen] = useState(false);
     const checkedList = useMemo(() => {
-        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image');
+        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image' && item.type !== 'document');
     }, [columns]);
     //AI 字段补齐
     const [selOpen, setSelOpen] = useState(false);

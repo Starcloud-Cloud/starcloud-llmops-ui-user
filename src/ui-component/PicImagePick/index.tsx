@@ -113,10 +113,10 @@ export const PicImagePick = ({
                             }));
                         }}
                     >
-                        <Option value={'ALL'}>全部</Option>
-                        <Option value={'PHOTO'}>照片</Option>
-                        <Option value={'ILLUSTRATION'}>插画</Option>
-                        <Option value={'VECTOR'}>向量</Option>
+                        <Option value={'all'}>全部</Option>
+                        <Option value={'photo'}>照片</Option>
+                        <Option value={'illustration'}>插画</Option>
+                        <Option value={'vector'}>向量</Option>
                     </Select>
                     <Select
                         style={{ width: '120px' }}
@@ -128,9 +128,9 @@ export const PicImagePick = ({
                             }));
                         }}
                     >
-                        <Option value={'ALL'}>全部</Option>
-                        <Option value={'HORIZONTAL'}>水平</Option>
-                        <Option value={'VERTICAL'}>垂直</Option>
+                        <Option value={'all'}>全部</Option>
+                        <Option value={'horizontal'}>水平</Option>
+                        <Option value={'vertical'}>垂直</Option>
                     </Select>
                     <Popover
                         placement="bottom"

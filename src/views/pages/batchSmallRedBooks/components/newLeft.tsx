@@ -662,12 +662,15 @@ const Lefts = ({
                 arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
             ];
             setDetail &&
-                setDetail({
-                    ...detail,
-                    workflowConfig: {
-                        steps: arr?.filter((item: any) => item)
-                    }
-                });
+                setDetail(
+                    {
+                        ...detail,
+                        workflowConfig: {
+                            steps: arr?.filter((item: any) => item)
+                        }
+                    },
+                    true
+                );
         }
     };
     const setField = (data: any) => {
@@ -856,7 +859,6 @@ const Lefts = ({
             newValue[i].variable.variables[newValue[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')].value;
         newList.splice(index, 1);
         generRef.current = newValue;
-        console.log(2);
 
         setGenerateList(generRef.current);
     };
@@ -918,8 +920,10 @@ const Lefts = ({
         }
     }, [pre]);
     useEffect(() => {
-        if (planState) {
+        if (planState && planState > 0) {
             handleSaveClick(exeState);
+        } else if (planState && planState < 0) {
+            handleSaveClick(exeState, false, true);
         }
     }, [planState]);
     const [exeState, setExeState] = useState(false);
@@ -1016,6 +1020,7 @@ const Lefts = ({
                 source: detail ? 'APP' : 'MARKET'
             };
             let result;
+
             if (!fieldShow) {
                 result = await planModify(data);
             } else {
@@ -1096,7 +1101,6 @@ const Lefts = ({
             conList.find((item: any) => item.field === 'REFERS_TAG').value = TagList;
             newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables = conList;
             generRef.current = newList;
-            console.log(2);
             setGenerateList(generRef.current);
         }
     }, [JSON.stringify(tableData)]);
@@ -1505,7 +1509,6 @@ const Lefts = ({
                                                                         }
                                                                     }
                                                                     generRef.current = newList;
-                                                                    console.log(2);
                                                                     setGenerateList(generRef.current);
                                                                 }}
                                                             />
@@ -1525,7 +1528,6 @@ const Lefts = ({
                                                                             const newList = _.cloneDeep(generateList);
                                                                             newList[index].variable.variables[de].value = data.value;
                                                                             generRef.current = newList;
-                                                                            console.log(2);
                                                                             setGenerateList(generRef.current);
                                                                         }}
                                                                         flag={false}
@@ -1541,7 +1543,6 @@ const Lefts = ({
                                                                 const newList = _.cloneDeep(generateList);
                                                                 newList[index].variable.variables = data;
                                                                 generRef.current = newList;
-                                                                console.log(2);
                                                                 setGenerateList(generRef.current);
                                                             }}
                                                         />

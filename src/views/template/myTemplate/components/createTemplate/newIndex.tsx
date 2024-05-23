@@ -598,13 +598,13 @@ function CreateDetail() {
                     setViewLoading(false);
                     if (res.data) {
                         if (createPlanRef?.current && !flag) {
-                            setPlanState(planState + 1);
+                            if (fieldShow) {
+                                planState < 0 ? setPlanState(planState - 1) : setPlanState(-1);
+                            } else {
+                                planState > 0 ? setPlanState(planState + 1) : setPlanState(1);
+                            }
                         }
-                        if (fieldShow) {
-                            saveState < 0 ? setSaveState(saveState - 1) : setSaveState(-1);
-                        } else {
-                            setSaveState(saveState + 1);
-                        }
+                        setSaveState(saveState + 1);
                         dispatch(
                             openSnackbar({
                                 open: true,

@@ -1,4 +1,20 @@
-import { Button, Divider, Image, Dropdown, Space, Drawer, Collapse, Modal, Switch, message, Tooltip, Spin, Checkbox, Tag } from 'antd';
+import {
+    Button,
+    Divider,
+    Image,
+    Dropdown,
+    Space,
+    Drawer,
+    Collapse,
+    Modal,
+    Switch,
+    message,
+    Tooltip,
+    Spin,
+    Checkbox,
+    Tag,
+    Popconfirm
+} from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, TextField } from '@mui/material';
@@ -15,6 +31,7 @@ import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
 import { appModify } from 'api/template';
 import { planModify } from '../../api/redBook/batchIndex';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const AddStyle = React.forwardRef(
     ({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any, ref: any) => {
@@ -426,6 +443,58 @@ const AddStyle = React.forwardRef(
             setSelectImgs(list);
         };
 
+        const handleDel = (index: number) => {
+            const copyRecord = _.cloneDeep(record);
+            const copyDetails = _.cloneDeep(details);
+            const valueString =
+                copyRecord?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
+            const value = JSON.parse(valueString);
+            value.splice(index, 1);
+            console.log(value, 'del');
+
+            copyRecord.variable.variables.forEach((item: any) => {
+                if (item.field === 'CUSTOM_POSTER_STYLE_CONFIG') {
+                    item.value = value;
+                }
+            });
+
+            copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                if (item.flowStep.handler === 'PosterActionHandler') {
+                    // 将该步骤的属性值更改为 copyRecord 的值
+                    Object.assign(item, copyRecord);
+                }
+            });
+
+            copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                const arr = item?.variable?.variables;
+                const arr1 = item?.flowStep?.variable?.variables;
+                arr?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+                arr1?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+            });
+
+            const saveData: any = {};
+            saveData.configuration = {
+                appInformation: copyDetails,
+                imageStyleList: allData.configuration.imageStyleList,
+                materialList: allData.configuration.materialList
+            };
+            saveData.source = allData.source;
+            saveData.totalCount = allData.totalCount;
+            saveData.uid = allData.uid;
+
+            planModify(saveData).then((res: any) => {
+                getList();
+            });
+        };
+
         return (
             <div className="addStyle">
                 {mode === 1 && (
@@ -508,7 +577,7 @@ const AddStyle = React.forwardRef(
                             />
                             <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款风格模版供您选择</p>
                         </div>
-                        <div>
+                        {/* <div>
                             {hasAddStyle && (
                                 <Button
                                     onClick={() => {
@@ -519,7 +588,7 @@ const AddStyle = React.forwardRef(
                                     创建自定义风格
                                 </Button>
                             )}
-                        </div>
+                        </div> */}
                     </div>
                     <div className="h-[calc(100% - 60px)]">
                         <div className="bg-white p-3">
@@ -571,6 +640,7 @@ const AddStyle = React.forwardRef(
                                                                     }}
                                                                     key={vi}
                                                                     height={200}
+                                                                    width={150}
                                                                     src={`${v.example}?x-oss-process=image/resize,w_300/quality,q_80`}
                                                                     // preview={false}
                                                                     placeholder={
@@ -591,11 +661,28 @@ const AddStyle = React.forwardRef(
                             </div>
                         </div>
 
-                        {customList.length > 0 && (
+                        {hasAddStyle && (
                             <div className="bg-white p-3 mt-2">
                                 <div>
                                     <span className="text-stone-700 font-semibold">自定义风格</span>
                                     <div className="grid gap-4 grid-cols-4 mt-3">
+                                        <div
+                                            className={`flex overflow-x-auto cursor-pointer w-full outline outline-offset-2 outline-1 outline-[#ccc] rounded-sm relative  h-[200px]`}
+                                            onClick={() => {
+                                                setAddType(1);
+                                                setIsModalOpen(true);
+                                            }}
+                                        >
+                                            <div className="flex flex-col justify-center items-center w-full h-[200px]">
+                                                <PlusOutlined
+                                                    rev={undefined}
+                                                    style={{
+                                                        fontSize: '24px'
+                                                    }}
+                                                />
+                                                <span className="mt-3">创建自定义风格</span>
+                                            </div>
+                                        </div>
                                         {customList?.map((item, index) => {
                                             return (
                                                 <div
@@ -604,7 +691,6 @@ const AddStyle = React.forwardRef(
                                                             ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
                                                             : 'outline outline-offset-2 outline-1 outline-[#ccc]'
                                                     } rounded-sm relative`}
-                                                    // onClick={() => handleChoose(index)}
                                                     onMouseEnter={() => setHoverIndex(item.uuid)}
                                                     onMouseLeave={() => setHoverIndex('')}
                                                 >
@@ -620,6 +706,19 @@ const AddStyle = React.forwardRef(
                                                             }
                                                         }}
                                                     />
+                                                    <Popconfirm
+                                                        placement="top"
+                                                        title={'确认删除'}
+                                                        // description={description}
+                                                        okText="是"
+                                                        cancelText="否"
+                                                        onConfirm={() => handleDel(index)}
+                                                    >
+                                                        <DeleteOutlined
+                                                            rev={undefined}
+                                                            className="absolute z-50 py-[3px] left-[2px] text-red-600"
+                                                        />
+                                                    </Popconfirm>
                                                     <Swiper
                                                         spaceBetween={30}
                                                         pagination={{
@@ -638,12 +737,12 @@ const AddStyle = React.forwardRef(
                                                                     >
                                                                         <Image
                                                                             style={{
-                                                                                width: '100%'
+                                                                                width: '150px'
                                                                             }}
+                                                                            width={150}
                                                                             key={vi}
                                                                             height={200}
                                                                             src={`${v.example}?x-oss-process=image/resize,w_300/quality,q_80`}
-                                                                            // preview={false}
                                                                             placeholder={
                                                                                 <div className="w-[145px] h-[200px] flex justify-center items-center">
                                                                                     <Spin />

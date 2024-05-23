@@ -1,5 +1,5 @@
 import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select } from 'antd';
-import { LoadingOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, EyeOutlined, SelectOutlined } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import { getAccessToken } from 'utils/auth';
 import { dispatch } from 'store';
@@ -8,6 +8,8 @@ import { noteDetail } from 'api/redBook/copywriting';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import '../index.scss';
+import { PicImagePick } from '../../../../ui-component/PicImagePick/index';
+
 const FormModal = ({
     title,
     editOpen,
@@ -31,6 +33,9 @@ const FormModal = ({
     const uploadRef = useRef<any>([]);
     const [uploadLoading, setUploadLoading] = useState([]);
     const [linkLoading, setLinkLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectImg, setSelectImg] = useState<any>(null);
+
     const propShow: UploadProps = {
         name: 'image',
         action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
@@ -67,6 +72,7 @@ const FormModal = ({
     const [open, setOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const [fileList, setFileList] = useState<any[]>([]);
+
     return (
         <Modal
             zIndex={1000}
@@ -126,19 +132,28 @@ const FormModal = ({
                                                     width={102}
                                                     height={102}
                                                     src={
+                                                        selectImg?.largeImageURL ||
                                                         form.getFieldValue(item.dataIndex) +
-                                                        '?x-oss-process=image/resize,w_300/quality,q_80'
+                                                            '?x-oss-process=image/resize,w_300/quality,q_80'
                                                     }
                                                 />
                                                 <div className="top-0 left-0 z-[100] absolute w-full h-full hover:bg-black/30 flex justify-center items-center opacity-0 hover:opacity-100">
                                                     <EyeOutlined
                                                         onClick={(e) => {
-                                                            setImageUrl(form.getFieldValue(item.dataIndex));
+                                                            setImageUrl(selectImg?.largeImageURL || form.getFieldValue(item.dataIndex));
                                                             setOpen(true);
                                                             e.stopPropagation();
                                                         }}
                                                         rev={undefined}
                                                         className="text-white/60 hover:text-white"
+                                                    />
+                                                    <SelectOutlined
+                                                        rev={undefined}
+                                                        className="text-white/60 hover:text-white ml-3"
+                                                        onClick={(e) => {
+                                                            setIsModalOpen(true);
+                                                            e.stopPropagation();
+                                                        }}
                                                     />
                                                 </div>
                                             </div>
@@ -272,6 +287,7 @@ const FormModal = ({
                 }}
                 src={imageUrl}
             />
+            {isModalOpen && <PicImagePick isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} setSelectImg={setSelectImg} />}
         </Modal>
     );
 };

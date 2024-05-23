@@ -73,7 +73,7 @@ export const SelectTemplateModal = ({
                         <div className="w-[155px] overflow-y-auto h-[520px] pb-[30px]">
                             <Menu onClick={onClick} style={{ width: 150 }} selectedKeys={type} mode="inline" items={menuList} />
                         </div>
-                        {templateList.length ? (
+                        {templateList?.length ? (
                             <div className="grid grid-cols-4 gap-4 ml-3 overflow-y-auto h-[520px] flex-1 p-[3px] pb-[55px]">
                                 {templateList.map((v: any, i) => (
                                     <img

@@ -139,7 +139,7 @@ const LeftModalAdd = ({
         }
     }, [fieldHead]);
     return (
-        <Modal maskClosable={false} width={'70%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
+        <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
             <div className="flex gap-2 justify-between my-[20px]">
                 <div className="flex gap-2">
                     <Button

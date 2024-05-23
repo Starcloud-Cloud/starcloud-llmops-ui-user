@@ -32,7 +32,8 @@ import {
     planModify,
     planUpgrade,
     materialParse,
-    metadata
+    metadata,
+    planModifyConfig
 } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
 import FormModal from './formModal';
@@ -85,7 +86,7 @@ const Lefts = ({
     setMoke?: (data: any) => void;
     setImageMoke?: (data: any) => void;
     newSave: (data: any) => void;
-    setDetail?: (data: any) => void;
+    setDetail?: (data: any, fieldShow?: boolean) => void;
     setPlanUid: (data: any) => void;
     setDefaultVariableData?: (data: any) => void;
     setDefaultField?: (data: any) => void;
@@ -496,8 +497,6 @@ const Lefts = ({
         const newMater = materiallist?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
         const customData = materiallist?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value;
         setDefaultVariableData && setDefaultVariableData(customData && customData !== '{}' ? JSON.parse(customData) : null);
-        console.log(materiallist?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value);
-
         const fieldHeadcon = materiallist?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value;
         setFieldHead && setFieldHead(fieldHeadcon && fieldHeadcon !== '[]' ? JSON.parse(fieldHeadcon) : null);
         const fieldAI = materiallist?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value;
@@ -577,8 +576,10 @@ const Lefts = ({
                 setTableData(tableRef.current || []);
             }
         }
-        generRef.current = newList?.workflowConfig?.steps?.filter(
-            (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
+        generRef.current = _.cloneDeep(
+            newList?.workflowConfig?.steps?.filter(
+                (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
+            )
         );
         setGenerateList(generRef.current);
         getStepMater();
@@ -588,11 +589,7 @@ const Lefts = ({
                 item.value = JSON.parse(item.value);
             }
         });
-        console.log(result);
-
         if (result?.configuration?.imageStyleList?.length > 0) {
-            console.log(newImage, result?.configuration);
-
             newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
                 result?.configuration?.imageStyleList ||
                 newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
@@ -626,21 +623,64 @@ const Lefts = ({
         if (!detail) {
             handleSaveClick(false);
         } else {
-            gessaveApp();
+            const newData = _.cloneDeep(detail);
+            let arr = newData?.workflowConfig?.steps;
+            const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+            if (a) {
+                a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                    materialType === 'picture'
+                        ? fileList?.map((item) => ({
+                              pictureUrl: item?.response?.data?.url,
+                              type: 'picture'
+                          }))
+                        : tableData?.map((item) => ({
+                              ...item,
+                              type: materialType
+                          }));
+                a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value = data;
+            }
+            const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+            if (b) {
+                let styleData = imageRef.current?.record?.variable?.variables?.find(
+                    (item: any) => item.field === 'POSTER_STYLE_CONFIG'
+                )?.value;
+                if (typeof styleData === 'string') {
+                    styleData = JSON.parse(styleData);
+                }
+                b.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
+                    ? styleData?.map((item: any) => ({
+                          ...item,
+                          id: undefined,
+                          code: item.id
+                      }))
+                    : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
+            }
+
+            arr = [
+                arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+                ..._.cloneDeep(generRef.current),
+                arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+            ];
+            setDetail &&
+                setDetail({
+                    ...detail,
+                    workflowConfig: {
+                        steps: arr?.filter((item: any) => item)
+                    }
+                });
         }
     };
     const setField = (data: any) => {
-        const newData = _.cloneDeep(appRef.current);
-        const step = newData.configuration.appInformation.workflowConfig.steps.find(
+        const newData1 = _.cloneDeep(appRef.current);
+        const step = newData1.configuration.appInformation.workflowConfig.steps.find(
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         ).variable.variables;
         step.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG').value = data;
-        newData.configuration.appInformation.workflowConfig.steps.find(
+        newData1.configuration.appInformation.workflowConfig.steps.find(
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         ).variable.variables = step;
-        appRef.current = newData;
+        appRef.current = newData1;
         setAppData(appRef.current);
-        handleSaveClick(false);
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
@@ -816,6 +856,8 @@ const Lefts = ({
             newValue[i].variable.variables[newValue[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')].value;
         newList.splice(index, 1);
         generRef.current = newValue;
+        console.log(2);
+
         setGenerateList(generRef.current);
     };
     const [forms] = Form.useForm();
@@ -882,9 +924,9 @@ const Lefts = ({
     }, [planState]);
     const [exeState, setExeState] = useState(false);
     //保存
-    const handleSaveClick = async (flag: boolean, detailShow?: boolean) => {
-        const newList = _.cloneDeep(generateList);
-        newList?.forEach((item) => {
+    const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
+        const newList = _.cloneDeep(generRef.current);
+        newList?.forEach((item: any) => {
             item?.variable?.variables?.forEach((el: any) => {
                 if (el.value && typeof el.value === 'object') {
                     el.value = JSON.stringify(el.value);
@@ -973,7 +1015,12 @@ const Lefts = ({
                 },
                 source: detail ? 'APP' : 'MARKET'
             };
-            const result = await planModify(data);
+            let result;
+            if (!fieldShow) {
+                result = await planModify(data);
+            } else {
+                result = await planModifyConfig(data);
+            }
             dispatch(
                 openSnackbar({
                     open: true,
@@ -1049,6 +1096,7 @@ const Lefts = ({
             conList.find((item: any) => item.field === 'REFERS_TAG').value = TagList;
             newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables = conList;
             generRef.current = newList;
+            console.log(2);
             setGenerateList(generRef.current);
         }
     }, [JSON.stringify(tableData)]);
@@ -1129,7 +1177,7 @@ const Lefts = ({
         requirement: ''
     });
     useEffect(() => {
-        const newList = columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image');
+        const newList = columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image' && item.type !== 'document');
         if (defaultVariableData) {
             const list = newList
                 ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
@@ -1175,6 +1223,10 @@ const Lefts = ({
                           ...item,
                           type: materialType
                       }));
+            a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value =
+                appRef.current.configuration?.appInformation?.workflowConfig?.steps
+                    ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
+                    .variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE').value;
         }
         const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
         if (b) {
@@ -1193,7 +1245,7 @@ const Lefts = ({
 
         arr = [
             arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
-            ...generRef.current,
+            ..._.cloneDeep(generRef.current),
             arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
         ];
         setExeState(true);
@@ -1453,6 +1505,7 @@ const Lefts = ({
                                                                         }
                                                                     }
                                                                     generRef.current = newList;
+                                                                    console.log(2);
                                                                     setGenerateList(generRef.current);
                                                                 }}
                                                             />
@@ -1472,6 +1525,7 @@ const Lefts = ({
                                                                             const newList = _.cloneDeep(generateList);
                                                                             newList[index].variable.variables[de].value = data.value;
                                                                             generRef.current = newList;
+                                                                            console.log(2);
                                                                             setGenerateList(generRef.current);
                                                                         }}
                                                                         flag={false}
@@ -1487,6 +1541,7 @@ const Lefts = ({
                                                                 const newList = _.cloneDeep(generateList);
                                                                 newList[index].variable.variables = data;
                                                                 generRef.current = newList;
+                                                                console.log(2);
                                                                 setGenerateList(generRef.current);
                                                             }}
                                                         />

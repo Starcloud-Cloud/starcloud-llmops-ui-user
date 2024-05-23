@@ -553,8 +553,8 @@ function CreateDetail() {
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
-    const saveDetail = (flag?: boolean) => {
-        const details = _.cloneDeep(detailRef.current);
+    const saveDetail = (flag?: boolean, fieldShow?: boolean) => {
+        const details = detailRef.current;
         const index: number = details?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {
             details.workflowConfig.steps[index] = addStyle?.current?.record || details.workflowConfig.steps[index];
@@ -581,14 +581,12 @@ function CreateDetail() {
             details.workflowConfig.steps = arr?.filter((item: any) => item);
         }
         details?.workflowConfig?.steps?.forEach((item: any) => {
-            const arr = item?.variable?.variables;
-            const arr1 = item?.flowStep?.variable?.variables;
-            arr?.forEach((el: any) => {
+            item?.variable?.variables?.forEach((el: any) => {
                 if (el.value && typeof el.value === 'object') {
                     el.value = JSON.stringify(el.value);
                 }
             });
-            arr1?.forEach((el: any) => {
+            item?.flowStep?.variable?.variables?.forEach((el: any) => {
                 if (el.value && typeof el.value === 'object') {
                     el.value = JSON.stringify(el.value);
                 }
@@ -602,8 +600,11 @@ function CreateDetail() {
                         if (createPlanRef?.current && !flag) {
                             setPlanState(planState + 1);
                         }
-                        setSaveState(saveState + 1);
-
+                        if (fieldShow) {
+                            saveState < 0 ? setSaveState(saveState - 1) : setSaveState(-1);
+                        } else {
+                            setSaveState(saveState + 1);
+                        }
                         dispatch(
                             openSnackbar({
                                 open: true,
@@ -641,6 +642,19 @@ function CreateDetail() {
             setBasisPre(basisPre + 1);
             setValue('0');
         }
+    };
+    const saveDetails = (data: any, flag?: boolean) => {
+        const newList = _.cloneDeep(data);
+        detailRef.current = newList;
+        setTimeout(() => {
+            if (flag) {
+                saveDetail(false, true);
+            } else {
+                saveDetail();
+            }
+        }, 100);
+
+        // setDetail(detailRef.current);
     };
     //tabs
     const [value, setValue] = useState('0');
@@ -897,7 +911,6 @@ function CreateDetail() {
         const newData = _.cloneDeep(stepMarRef.current);
         const temp = _.cloneDeep(newData[index]);
         newData.splice(index, 0, temp);
-        console.log(newData);
 
         const ccc = newData?.map((el: any, i: number) => {
             if (el) {
@@ -1082,7 +1095,6 @@ function CreateDetail() {
                                                         (item: any) => item.flowStep.handler === 'PosterActionHandler'
                                                     );
                                                     if (index !== -1) {
-                                                        console.log(createPlanRef?.current?.imageMoke);
                                                         arr[index] =
                                                             createPlanRef?.current?.imageMoke ||
                                                             arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
@@ -1124,12 +1136,8 @@ function CreateDetail() {
                                                 <CreatePlan
                                                     ref={createPlanRef}
                                                     planState={planState}
-                                                    detail={detailRef?.current}
-                                                    setDetail={(data) => {
-                                                        detailRef.current = data;
-                                                        setDetail(detailRef.current);
-                                                        saveDetail();
-                                                    }}
+                                                    detail={_.cloneDeep(detailRef.current)}
+                                                    setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
                                                     isMyApp={true}
                                                 />
                                             </div>

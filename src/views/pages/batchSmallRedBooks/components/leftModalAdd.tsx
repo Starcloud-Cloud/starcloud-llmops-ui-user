@@ -279,7 +279,7 @@ const LeftModalAdd = ({
                         name="desc"
                         rules={[
                             { required: true, message: '请输入字段名称' },
-                            { max: 10, message: '字段名称不能超过 20 个字' }
+                            { max: 20, message: '字段名称不能超过 20 个字' }
                         ]}
                     >
                         <Input />

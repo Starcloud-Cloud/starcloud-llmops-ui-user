@@ -190,7 +190,7 @@ export const PicImagePick = ({
                         onChange={(value) => {
                             setQuery((pre: any) => ({
                                 ...pre,
-                                image_type: value.join(',')
+                                colors: value.join(',')
                             }));
                         }}
                     >

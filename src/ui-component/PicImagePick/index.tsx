@@ -29,6 +29,8 @@ export const PicImagePick = ({
 
     useEffect(() => {
         setCurrentPage(1);
+        setHits([]);
+        setTotalHits(0);
     }, [query]);
 
     useEffect(() => {

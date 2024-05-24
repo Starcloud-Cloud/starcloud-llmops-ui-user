@@ -28,12 +28,6 @@ export const PicImagePick = ({
     const currentPageRef = React.useRef(currentPage);
 
     useEffect(() => {
-        setCurrentPage(1);
-        setHits([]);
-        setTotalHits(0);
-    }, [query]);
-
-    useEffect(() => {
         totalHitsRef.current = totalHits;
     }, [totalHits]);
 
@@ -77,6 +71,7 @@ export const PicImagePick = ({
         setTotalHits(0);
     };
     useEffect(() => {
+        console.log(hits, 'hits');
         imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query }).then(
             (res) => {
                 const { totalHits, hits: newData } = res;
@@ -109,6 +104,9 @@ export const PicImagePick = ({
                         style={{ width: '120px' }}
                         placeholder="图片类型"
                         onChange={(value) => {
+                            setCurrentPage(1);
+                            setHits([]);
+                            setTotalHits(0);
                             setQuery((pre: any) => ({
                                 ...pre,
                                 image_type: value
@@ -124,6 +122,9 @@ export const PicImagePick = ({
                         style={{ width: '120px' }}
                         placeholder="图像方向"
                         onChange={(value) => {
+                            setCurrentPage(1);
+                            setHits([]);
+                            setTotalHits(0);
                             setQuery((pre: any) => ({
                                 ...pre,
                                 orientation: value
@@ -164,6 +165,9 @@ export const PicImagePick = ({
                                     <Button
                                         type="primary"
                                         onClick={() => {
+                                            setCurrentPage(1);
+                                            setHits([]);
+                                            setTotalHits(0);
                                             setQuery((pre: any) => ({
                                                 ...pre,
                                                 ...size
@@ -190,6 +194,9 @@ export const PicImagePick = ({
                         placeholder="颜色"
                         mode="multiple"
                         onChange={(value) => {
+                            setCurrentPage(1);
+                            setHits([]);
+                            setTotalHits(0);
                             setQuery((pre: any) => ({
                                 ...pre,
                                 colors: value.join(',')

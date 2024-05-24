@@ -152,7 +152,11 @@ const Lefts = ({
         beforeUpload: async (file, fileList) => {
             setUploadLoading(true);
             try {
-                const result = await materialImport({ file });
+                const result = await materialImport({
+                    planSource: detail ? 'app' : 'market',
+                    uid: searchParams.get('uid'),
+                    file
+                });
                 perRef.current = 100;
                 setPercent(perRef.current);
                 setTableLoading(true);

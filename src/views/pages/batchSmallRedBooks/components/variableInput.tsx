@@ -64,7 +64,7 @@ const VariableInput = ({
         return newList;
     }, [details]);
     const setData = (data: string, flag?: boolean) => {
-        let newValue = _.cloneDeep(value);
+        let newValue = _.cloneDeep(newValues);
         if (!newValue) {
             newValue = '';
         }
@@ -72,6 +72,7 @@ const VariableInput = ({
         const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
         newValue = flag ? `${part1}{${data}}${part2}` : `${part1}{{${data}}}${part2}`;
         setOpen(false);
+        setNewValue(newValue);
         handleMenu({ index, newValue });
     };
     const [schemaList, setSchemaList] = useState<any[]>([]);
@@ -81,7 +82,6 @@ const VariableInput = ({
         for (const key in json.properties) {
             const property = json.properties[key];
             if (property.type === 'object') {
-                console.log(property, name);
                 const convertedProperty = getjsonschma(property, name);
                 arr.push(convertedProperty);
             } else if (property.type === 'array') {
@@ -287,6 +287,10 @@ const VariableInput = ({
             });
         }
     }, [open]);
+    const [newValues, setNewValue] = useState('');
+    useEffect(() => {
+        setNewValue(value);
+    }, []);
     return (
         <Popover
             trigger="click"
@@ -310,10 +314,14 @@ const VariableInput = ({
                     disabled={disabled}
                     style={styles}
                     rows={row || 1}
-                    status={!value && status ? 'error' : ''}
-                    value={value}
+                    status={!newValues && status ? 'error' : ''}
+                    value={newValues}
                     ref={(ref) => (inputList.current[index] = ref)}
                     onChange={(e) => {
+                        setNewValue(e.target.value);
+                        e.stopPropagation();
+                    }}
+                    onBlur={(e) => {
                         setValue(e.target.value);
                         e.stopPropagation();
                     }}

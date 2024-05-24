@@ -36,6 +36,9 @@ const BatcSmallRedBooks = forwardRef(
         const [defaultVariableData, setDefaultVariableData] = useState<any>(null);
         const [defaultField, setDefaultField] = useState<any>(null);
         const [getData, setGetData] = useState<any>(null);
+        useEffect(() => {
+            console.log(getData);
+        }, [getData]);
         const [fieldHead, setFieldHead] = useState(null);
         const [moke, setMoke] = useState<any[]>([]);
         const [imageMoke, setImageMoke] = useState<any[]>([]);

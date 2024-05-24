@@ -554,33 +554,16 @@ function CreateDetail() {
     //保存更改
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
     const saveDetail = (flag?: boolean, fieldShow?: boolean) => {
-        const details = detailRef.current;
-        const index: number = details?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
-        if (index !== -1) {
-            details.workflowConfig.steps[index] = addStyle?.current?.record || details.workflowConfig.steps[index];
-        }
-        if (createPlanRef?.current) {
-            let arr = details?.workflowConfig?.steps;
-            const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
-            if (a) {
-                a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = createPlanRef?.current?.moke;
-                a.variable.variables.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value =
-                    createPlanRef?.current?.mokeAI;
+        const newList = _.cloneDeep(detailRef.current);
+        console.log(newList);
 
-                a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value = createPlanRef?.current?.fieldHead;
-            }
-            const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
-            if (index !== -1) {
-                arr[index] = createPlanRef?.current?.imageMoke || arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
-            }
-            arr = [
-                arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
-                ...createPlanRef.current.getDetail,
-                arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-            ];
-            details.workflowConfig.steps = arr?.filter((item: any) => item);
+        const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
+        console.log(index);
+
+        if (index !== -1) {
+            newList.workflowConfig.steps[index] = addStyle?.current?.record || newList.workflowConfig.steps[index];
         }
-        details?.workflowConfig?.steps?.forEach((item: any) => {
+        newList?.workflowConfig?.steps?.forEach((item: any) => {
             item?.variable?.variables?.forEach((el: any) => {
                 if (el.value && typeof el.value === 'object') {
                     el.value = JSON.stringify(el.value);
@@ -592,9 +575,47 @@ function CreateDetail() {
                 }
             });
         });
-        if (details.name && details.category) {
+        if (createPlanRef?.current) {
+            let arr = _.cloneDeep(newList?.workflowConfig?.steps);
+            const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+            if (a) {
+                const newMokeAI = _.cloneDeep(createPlanRef?.current?.mokeAI);
+                const newMoke = _.cloneDeep(createPlanRef?.current?.moke);
+                const newFieldHead = _.cloneDeep(createPlanRef?.current?.fieldHead);
+                a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = JSON.stringify(newMoke);
+                a.variable.variables.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value =
+                    JSON.stringify(newMokeAI);
+
+                a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value = JSON.stringify(newFieldHead);
+            }
+            const newImageMoke = _.cloneDeep(createPlanRef?.current?.imageMoke);
+            const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
+            if (index !== -1) {
+                arr[index] = newImageMoke || arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+            }
+            const newData = _.cloneDeep(createPlanRef.current.getDetail);
+            newData?.forEach((item: any) => {
+                item?.variable?.variables?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+                item?.flowStep?.variable?.variables?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+            });
+            arr = [
+                arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+                ...newData,
+                arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+            ];
+            newList.workflowConfig.steps = arr?.filter((item: any) => item);
+        }
+        if (newList.name && newList.category) {
             if (searchParams.get('uid')) {
-                appModify(details).then((res) => {
+                appModify(newList).then((res) => {
                     setViewLoading(false);
                     if (res.data) {
                         if (createPlanRef?.current && !flag) {
@@ -619,7 +640,7 @@ function CreateDetail() {
                     }
                 });
             } else {
-                appCreate(details).then((res) => {
+                appCreate(newList).then((res) => {
                     setViewLoading(false);
                     if (res.data) {
                         navigate('/createApp?uid=' + res.data.uid);

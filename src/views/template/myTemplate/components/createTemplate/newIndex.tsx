@@ -555,11 +555,7 @@ function CreateDetail() {
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
     const saveDetail = (flag?: boolean, fieldShow?: boolean) => {
         const newList = _.cloneDeep(detailRef.current);
-        console.log(newList);
-
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
-        console.log(index);
-
         if (index !== -1) {
             newList.workflowConfig.steps[index] = addStyle?.current?.record || newList.workflowConfig.steps[index];
         }
@@ -591,6 +587,18 @@ function CreateDetail() {
             const newImageMoke = _.cloneDeep(createPlanRef?.current?.imageMoke);
             const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
             if (index !== -1) {
+                if (newImageMoke) {
+                    newImageMoke?.variable?.variables?.forEach((item: any) => {
+                        if (typeof item.value === 'object') {
+                            item.value = JSON.stringify(item.value);
+                        }
+                    });
+                    newImageMoke?.flowStep.variable?.variables?.forEach((item: any) => {
+                        if (typeof item.value === 'object') {
+                            item.value = JSON.stringify(item.value);
+                        }
+                    });
+                }
                 arr[index] = newImageMoke || arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
             }
             const newData = _.cloneDeep(createPlanRef.current.getDetail);

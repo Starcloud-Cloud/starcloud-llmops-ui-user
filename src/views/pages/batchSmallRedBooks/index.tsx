@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
-import { Popconfirm } from 'antd';
 import { getContentPage } from 'api/redBook';
 import { planExecute, batchPages, getListExample } from 'api/redBook/batchIndex';
 import SubCard from 'ui-component/cards/SubCard';
@@ -289,26 +288,7 @@ const BatcSmallRedBooks = forwardRef(
                             </IconButton>
                             <span className="text-[#000c] font-[500]">应用市场</span>
                         </div>
-                        <div>
-                            {/* <Popconfirm
-                                title="更新提示"
-                                description={
-                                    <div>
-                                        <div>当前应用最新版本为：{1}</div>
-                                        <div>你使用的应用版本为：{2}</div>
-                                        <div>
-                                            是否需要初始化配置，
-                                            <span className="text-[#ff4d4f]">注意会覆盖已有的应用配置，请自行备份相关内容</span>
-                                        </div>
-                                    </div>
-                                }
-                                onConfirm={() => {}}
-                                okText="更新"
-                                cancelText="取消"
-                            >
-                                <MoreOutlined rev={undefined} />
-                            </Popconfirm> */}
-                        </div>
+                        <div></div>
                     </SubCard>
                 )}
                 <div

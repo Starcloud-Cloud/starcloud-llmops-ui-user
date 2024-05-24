@@ -257,7 +257,7 @@ const VariableInput = ({
                 ...JSON.parse(item.inJsonSchema),
                 properties: {
                     ...JSON.parse(item.inJsonSchema).properties,
-                    ...JSON.parse(item.outJsonSchema)
+                    ...JSON.parse(item.outJsonSchema).properties
                 }
             };
         } catch (err) {

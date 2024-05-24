@@ -33,6 +33,7 @@ import useUserStore from 'store/user';
 import { vipSwitch } from 'utils/vipSwtich';
 import { useAllDetail } from 'contexts/JWTContext';
 import { deptList, spaceCheckout } from 'api/section';
+import { getPermission, ENUM_PERMISSION } from 'utils/permission';
 // styles
 
 const CardStyle = styled(Card)(({ theme, level }: { theme: any; level: any }) => ({
@@ -100,8 +101,8 @@ interface BenefitItem {
 function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
     const theme = useTheme();
     const list = info?.allDetail?.teamRights
-        ? info?.allDetail?.teamRights?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type))
-        : info?.allDetail?.rights?.filter((v: any) => ['MAGIC_BEAN', 'MAGIC_IMAGE'].includes(v.type));
+        ? info?.allDetail?.teamRights?.filter((v: any) => (getPermission(ENUM_PERMISSION.SHOW_RIGHTS) as any).includes(v.type))
+        : info?.allDetail?.rights?.filter((v: any) => (getPermission(ENUM_PERMISSION.SHOW_RIGHTS) as any).includes(v.type));
     return (
         <Box>
             {list?.map((item: BenefitItem) => (
@@ -118,7 +119,7 @@ function LinearProgressWithLabel({ info }: LinearProgressWithLabelProps) {
                                                 : themesLight(vipSwitch(info?.allDetail?.levels[0]?.levelId), theme, 3)
                                     }}
                                 >
-                                    {t('user.' + item.name)}
+                                    {item.name}
                                 </Typography>
                             </Grid>
                             <Grid item>

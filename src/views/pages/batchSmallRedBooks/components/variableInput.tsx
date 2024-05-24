@@ -300,11 +300,17 @@ const VariableInput = ({
             onOpenChange={() => setOpen(false)}
             content={
                 <div style={{ width: popoverWidth + 'px', maxWidth: '1024px', minWidth: '512px' }} className={'flex items-stretch gap-2'}>
-                    <Menu inlineIndent={12} className="flex-1 h-[300px] overflow-y-auto" defaultSelectedKeys={[]} mode="inline">
-                        {renderMenuItems(schemaList, index)}
-                    </Menu>
-                    <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4 whitespace-pre-wrap">
-                        {tipValue}
+                    <div className="flex flex-col flex-1 h-[310px]">
+                        <span className="text-sm text-gray-500">变量选择</span>
+                        <Menu inlineIndent={12} className="flex-1 h-[300px] overflow-y-auto" defaultSelectedKeys={[]} mode="inline">
+                            {renderMenuItems(schemaList, index)}
+                        </Menu>
+                    </div>
+                    <div className="flex flex-col flex-1 h-[310px]">
+                        <span className="text-sm text-gray-500">使用说明</span>
+                        <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4 whitespace-pre-wrap">
+                            {tipValue}
+                        </div>
                     </div>
                 </div>
             }

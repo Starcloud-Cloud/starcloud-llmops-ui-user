@@ -10,6 +10,7 @@ import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { failureRetry } from 'api/redBook/batchIndex';
 import './index.scss';
+import BackupIcon from '@mui/icons-material/Backup';
 const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) => {
     const navigate = useNavigate();
     const [likeOpen, setLikeOpen] = useState(item?.liked);
@@ -70,7 +71,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
     };
     const [loading, setLoading] = useState(false);
     return (
-        <div className=" w-full aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff] h-[550px]">
+        <div className=" w-full aspect-[200/266] rounded-[16px] shadow p-[10px] border border-solid border-[#EBEEF5] bg-[#fff] h-[565px]">
             {item.status !== 'SUCCESS' ? (
                 <div>
                     <div className="w-full h-[330px] aspect-[250/335] flex justify-center items-center relative gu">
@@ -163,7 +164,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                     >
                         <div className="flex justify-between items-start">
                             <div className="line-clamp-2 h-[44px] text-[14px] font-bold">{item?.executeResult?.copyWriting?.title}</div>
-                            {!show && (
+                            {/* {!show && (
                                 <div>
                                     {likeOpen ? (
                                         <GradeIcon
@@ -215,7 +216,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                         />
                                     )}
                                 </div>
-                            )}
+                            )} */}
                         </div>
                         <Popover
                             content={
@@ -254,6 +255,69 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                                 <div className="text-[#15273799] text-[12px] line-clamp-1">
                                     <span className="font-[600]">时间：</span>
                                     {formatDate(item.startTime)}到{formatDate(item.endTime)}
+                                </div>
+                                <div className="flex justify-around items-center">
+                                    <div>
+                                        {likeOpen ? (
+                                            <GradeIcon
+                                                className="cursor-pointer"
+                                                onClick={async (e: any) => {
+                                                    e.stopPropagation();
+                                                    const result = await contentUnlike({ uid: item.uid });
+                                                    if (result) {
+                                                        setLikeOpen(false);
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '取消点赞成功',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'success'
+                                                                },
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                transition: 'SlideDown',
+                                                                close: false
+                                                            })
+                                                        );
+                                                    }
+                                                }}
+                                                sx={{ color: '#ecc94b99' }}
+                                            />
+                                        ) : (
+                                            <GradeOutlinedIcon
+                                                className="cursor-pointer"
+                                                onClick={async (e: any) => {
+                                                    e.stopPropagation();
+                                                    const result = await contentLike({ uid: item.uid });
+                                                    if (result) {
+                                                        setLikeOpen(true);
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '点赞成功',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'success'
+                                                                },
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                transition: 'SlideDown',
+                                                                close: false
+                                                            })
+                                                        );
+                                                    }
+                                                }}
+                                                sx={{ color: '#0003' }}
+                                            />
+                                        )}
+                                    </div>
+                                    <div>
+                                        <BackupIcon
+                                            className="text-gray-500 cursor-pointer"
+                                            onClick={async (e: any) => {
+                                                e.stopPropagation();
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                             </>
                         )}

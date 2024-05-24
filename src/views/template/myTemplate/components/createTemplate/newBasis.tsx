@@ -24,7 +24,6 @@ export interface Anyevent {
     setValues: (data: { name: string; value: any }) => void;
 }
 const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
-    console.log(appModel);
     const { Option } = Select;
     const permissions = useUserStore((state) => state.permissions);
     const [cateTree, setCateTree] = useState<any[]>([]);

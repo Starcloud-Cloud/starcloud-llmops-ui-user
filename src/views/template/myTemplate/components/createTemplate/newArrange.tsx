@@ -31,7 +31,6 @@ function Arrange({
     tableDataDel,
     tableDataMove
 }: any) {
-    console.log(detail, 'detail');
     const [stepTitle, setStepTitle] = useState<string[]>([]);
     const [modal, setModal] = useState<number>(0);
     const [stepIndex, setStepIndex] = useState<number>(0);

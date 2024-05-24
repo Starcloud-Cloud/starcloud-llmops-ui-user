@@ -28,8 +28,6 @@ function FormExecute({
     setMaterialType,
     history
 }: any) {
-    console.log(item);
-
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const mt = {

@@ -202,7 +202,7 @@ const Lefts = ({
             return {
                 title: item.desc,
                 align: 'center',
-                width: 200,
+                width: item.type === 'textBox' ? 400 : 200,
                 dataIndex: item.fieldName,
                 render: (_: any, row: any) => (
                     <div className="flex justify-center items-center gap-2 min-w-[200px]">
@@ -296,7 +296,7 @@ const Lefts = ({
         });
         const downloadLink = document.createElement('a');
         downloadLink.href = window.URL.createObjectURL(res);
-        downloadLink.download = searchParams.get('uid') + '-' + (detail ? 'app' : 'market') + '.zip';
+        downloadLink.download = appData?.configuration?.appInformation?.name + '-模版.zip';
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
@@ -398,8 +398,6 @@ const Lefts = ({
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else if (detail) {
-            console.log(1111111);
-
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             newList = _.cloneDeep(detail);
             newList?.workflowConfig?.steps?.forEach((item: any) => {
@@ -587,8 +585,6 @@ const Lefts = ({
                 (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
             )
         );
-        console.log(3);
-
         setGenerateList(generRef.current);
         getStepMater();
         const newImage = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
@@ -618,8 +614,6 @@ const Lefts = ({
         handleSaveClick(false);
     };
     const setFieldHeads = (data: any) => {
-        console.log(1);
-
         const newData = _.cloneDeep(appRef.current);
         const step = newData.configuration.appInformation.workflowConfig.steps.find(
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
@@ -633,44 +627,7 @@ const Lefts = ({
         if (!detail) {
             handleSaveClick(false);
         } else {
-            const newData = _.cloneDeep(detail);
-            let arr = newData?.workflowConfig?.steps;
-            const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
-            if (a) {
-                a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                    materialType === 'picture'
-                        ? fileList?.map((item) => ({
-                              pictureUrl: item?.response?.data?.url,
-                              type: 'picture'
-                          }))
-                        : tableData?.map((item) => ({
-                              ...item,
-                              type: materialType
-                          }));
-                a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value = data;
-            }
-            const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
-            if (b) {
-                let styleData = imageRef.current?.record?.variable?.variables?.find(
-                    (item: any) => item.field === 'POSTER_STYLE_CONFIG'
-                )?.value;
-                if (typeof styleData === 'string') {
-                    styleData = JSON.parse(styleData);
-                }
-                b.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
-                    ? styleData?.map((item: any) => ({
-                          ...item,
-                          id: undefined,
-                          code: item.id
-                      }))
-                    : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
-            }
-
-            arr = [
-                arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
-                ..._.cloneDeep(generRef.current),
-                arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-            ];
+            const arr = headerSaveAll(data);
             setDetail &&
                 setDetail(
                     {
@@ -869,7 +826,6 @@ const Lefts = ({
             newValue[i].variable.variables[newValue[i].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')].value;
         newList.splice(index, 1);
         generRef.current = newValue;
-        console.log(3);
         setGenerateList(generRef.current);
     };
     const [forms] = Form.useForm();
@@ -907,7 +863,6 @@ const Lefts = ({
         }
         pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')].value = newList;
         generRef.current = newValue;
-        console.log(3);
         setGenerateList(generRef.current);
         setEditOpens(false);
         forms.resetFields();
@@ -1112,17 +1067,14 @@ const Lefts = ({
             conList.find((item: any) => item.field === 'REFERS_TAG').value = TagList;
             newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables = conList;
             generRef.current = newList;
-            console.log(3);
             setGenerateList(generRef.current);
         }
     }, [JSON.stringify(tableData)]);
     useEffect(() => {
-        console.log(generateList);
-
         if (generateList?.length > 0) {
             setGetData && setGetData(generateList);
         }
-    }, [JSON.stringify(_.cloneDeep(generateList))]);
+    }, [generateList]);
     useEffect(() => {
         if (materialType && materialType === 'picture') {
             setMoke &&
@@ -1225,25 +1177,23 @@ const Lefts = ({
             });
         }
     }, [columns]);
-    //素材字段配置弹框
-    const gessaveApp = () => {
-        console.log(3);
-
+    const headerSaveAll = (data?: any) => {
         const newData = _.cloneDeep(detail);
         let arr = newData?.workflowConfig?.steps;
         const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
         if (a) {
             a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
                 materialType === 'picture'
-                    ? fileList?.map((item) => ({
+                    ? fileList?.map((item: any) => ({
                           pictureUrl: item?.response?.data?.url,
                           type: 'picture'
                       }))
-                    : tableData?.map((item) => ({
+                    : tableData?.map((item: any) => ({
                           ...item,
                           type: materialType
                       }));
             a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value =
+                data ||
                 appRef.current.configuration?.appInformation?.workflowConfig?.steps
                     ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
                     .variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE').value;
@@ -1262,12 +1212,16 @@ const Lefts = ({
                   }))
                 : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
         }
-
         arr = [
             arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
             ..._.cloneDeep(generRef.current),
             arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
         ];
+        return arr;
+    };
+    //素材字段配置弹框
+    const gessaveApp = () => {
+        let arr = headerSaveAll();
         setExeState(true);
         setDetail &&
             setDetail({
@@ -1278,10 +1232,6 @@ const Lefts = ({
             });
     };
     const [colOpen, setColOpen] = useState(false);
-    console.log(generateList);
-    useEffect(() => {
-        console.log(generateList);
-    }, [generateList]);
     return (
         <>
             <div className="relative h-full">
@@ -1292,15 +1242,38 @@ const Lefts = ({
                             <div>
                                 状态：{getStatus1(appData?.status)}
                                 <div className="inline-block whitespace-nowrap">
-                                    {appData?.version !== version ? (
+                                    {appData?.version || 0 !== version ? (
                                         <Popconfirm
                                             title="更新提示"
                                             description={
-                                                <div>
-                                                    <div>当前应用最新版本为：{version}</div>
-                                                    <div>你使用的应用版本为：{appData?.version}</div>
-                                                    <div>是否需要更新版本，获得最佳创作效果</div>
-                                                </div>
+                                                <Tabs
+                                                    defaultActiveKey="0"
+                                                    items={[
+                                                        {
+                                                            key: '0',
+                                                            label: '更新应用',
+                                                            children: (
+                                                                <div className="w-[240px]">
+                                                                    <div>当前应用最新版本为：{version}</div>
+                                                                    <div>你使用的应用版本为：{appData?.version}</div>
+                                                                    <div>是否需要更新版本，获得最佳创作效果</div>
+                                                                </div>
+                                                            )
+                                                        },
+                                                        {
+                                                            key: '1',
+                                                            label: '初始化应用',
+                                                            children: (
+                                                                <div className="w-[240px]">
+                                                                    是否需要初始化为最新的应用配置。
+                                                                    <br />
+                                                                    <span className="text-[#ff4d4f]">注意:</span>
+                                                                    会覆盖所有已修改的应用配置，请自行备份相关内容
+                                                                </div>
+                                                            )
+                                                        }
+                                                    ]}
+                                                ></Tabs>
                                             }
                                             onConfirm={() => upDateVersion()}
                                             okText="更新"
@@ -1314,7 +1287,7 @@ const Lefts = ({
                                         </Popconfirm>
                                     ) : (
                                         <span>
-                                            版本号： <span className="font-blod">{appData?.version || 0}</span>
+                                            版本号： <span className="font-blod">{appData?.version || '-'}</span>
                                         </span>
                                     )}
                                 </div>
@@ -1537,7 +1510,6 @@ const Lefts = ({
                                                                         }
                                                                     }
                                                                     generRef.current = newList;
-                                                                    console.log(3);
                                                                     setGenerateList(generRef.current);
                                                                 }}
                                                             />
@@ -1557,7 +1529,6 @@ const Lefts = ({
                                                                             const newList = _.cloneDeep(generRef.current);
                                                                             newList[index].variable.variables[de].value = data.value;
                                                                             generRef.current = newList;
-                                                                            console.log(3);
                                                                             setGenerateList(generRef.current);
                                                                         }}
                                                                         flag={false}
@@ -1573,7 +1544,6 @@ const Lefts = ({
                                                                 const newList = _.cloneDeep(generRef.current);
                                                                 newList[index].variable.variables = data;
                                                                 generRef.current = newList;
-                                                                console.log(3);
                                                                 setGenerateList(generRef.current);
                                                             }}
                                                         />
@@ -1668,16 +1638,27 @@ const Lefts = ({
                 <div className="z-[1000] absolute bottom-[-2px] flex gap-2 bg-[#fff] pt-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <>
-                            {!detail && (
-                                <Button
-                                    className="w-full"
-                                    icon={<SaveOutlined rev={undefined} />}
-                                    onClick={() => handleSaveClick(false)}
-                                    type="primary"
-                                >
-                                    保存配置
-                                </Button>
-                            )}
+                            <Button
+                                className="w-full"
+                                icon={<SaveOutlined rev={undefined} />}
+                                onClick={() => {
+                                    if (!detail) {
+                                        handleSaveClick(false);
+                                    } else {
+                                        const arr = headerSaveAll();
+                                        setDetail &&
+                                            setDetail({
+                                                ...detail,
+                                                workflowConfig: {
+                                                    steps: arr?.filter((item: any) => item)
+                                                }
+                                            });
+                                    }
+                                }}
+                                type="primary"
+                            >
+                                保存配置
+                            </Button>
                             <Button
                                 className="w-full"
                                 type="primary"

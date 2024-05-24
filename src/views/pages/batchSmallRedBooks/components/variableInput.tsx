@@ -1,7 +1,7 @@
 import { Popover, Menu, Input, Checkbox, Button } from 'antd';
 import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { schemeOptions } from 'api/redBook/copywriting';
 import image from 'assets/images/icons/image.svg';
 import string from 'assets/images/icons/string.svg';
@@ -47,6 +47,22 @@ const VariableInput = ({
     const inputList: any = useRef([]);
     const tipRef = useRef<any>('');
     const [tipValue, setTipValue] = useState('');
+    const newDeatil = useMemo(() => {
+        const newList = _.cloneDeep(details);
+        newList?.workflowConfig?.steps?.forEach((item: any) => {
+            item?.variable?.variables?.forEach((el: any) => {
+                if (typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+            item?.flowStep.variable?.variables?.forEach((el: any) => {
+                if (typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+        });
+        return newList;
+    }, [details]);
     const setData = (data: string, flag?: boolean) => {
         let newValue = _.cloneDeep(value);
         if (!newValue) {
@@ -251,7 +267,7 @@ const VariableInput = ({
     };
     useEffect(() => {
         if (open) {
-            schemeOptions({ stepCode, appReqVO: details }).then((res) => {
+            schemeOptions({ stepCode, appReqVO: newDeatil }).then((res) => {
                 const newList = res
                     ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
                     ?.map((item: any) => {

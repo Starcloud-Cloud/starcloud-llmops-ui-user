@@ -75,7 +75,7 @@ export const PicImagePick = ({
         setTotalHits(0);
     };
     useEffect(() => {
-        imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'ZH', ...query } : { page: currentPage, per_page: 20, ...query }).then(
+        imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query }).then(
             (res) => {
                 const { totalHits, hits: newData } = res;
                 setHits([...hits, ...newData]);

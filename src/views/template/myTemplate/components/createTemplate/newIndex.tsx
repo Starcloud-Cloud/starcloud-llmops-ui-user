@@ -594,30 +594,30 @@ function CreateDetail() {
         });
         if (details.name && details.category) {
             if (searchParams.get('uid')) {
-                // appModify(details).then((res) => {
-                setViewLoading(false);
-                //     if (res.data) {
-                //         if (createPlanRef?.current && !flag) {
-                //             if (fieldShow) {
-                //                 planState < 0 ? setPlanState(planState - 1) : setPlanState(-1);
-                //             } else {
-                //                 planState > 0 ? setPlanState(planState + 1) : setPlanState(1);
-                //             }
-                //         }
-                //         setSaveState(saveState + 1);
-                //         dispatch(
-                //             openSnackbar({
-                //                 open: true,
-                //                 message: '保存成功',
-                //                 variant: 'alert',
-                //                 alert: {
-                //                     color: 'success'
-                //                 },
-                //                 close: false
-                //             })
-                //         );
-                //     }
-                // });
+                appModify(details).then((res) => {
+                    setViewLoading(false);
+                    if (res.data) {
+                        if (createPlanRef?.current && !flag) {
+                            if (fieldShow) {
+                                planState < 0 ? setPlanState(planState - 1) : setPlanState(-1);
+                            } else {
+                                planState > 0 ? setPlanState(planState + 1) : setPlanState(1);
+                            }
+                        }
+                        setSaveState(saveState + 1);
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '保存成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
+                    }
+                });
             } else {
                 appCreate(details).then((res) => {
                     setViewLoading(false);

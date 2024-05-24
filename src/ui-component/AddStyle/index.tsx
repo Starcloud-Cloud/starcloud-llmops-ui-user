@@ -30,7 +30,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
 import { appModify } from 'api/template';
-import { planModify } from '../../api/redBook/batchIndex';
+import { planModifyConfig } from '../../api/redBook/batchIndex';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const AddStyle = React.forwardRef(
@@ -107,7 +107,12 @@ const AddStyle = React.forwardRef(
 
                 const customList =
                     record?.variable?.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
-                setCustomList(JSON.parse(customList));
+                const json = JSON.parse(customList);
+                const list = json.map((item: any) => ({
+                    ...item,
+                    uuid: uuidv4()?.split('-')?.join('')
+                }));
+                setCustomList([...list]);
             }
         }, [record]);
 
@@ -410,7 +415,7 @@ const AddStyle = React.forwardRef(
                 saveData.totalCount = allData.totalCount;
                 saveData.uid = allData.uid;
 
-                planModify(saveData)
+                planModifyConfig({ ...saveData, validate: false })
                     .then((res: any) => {
                         setIsModalOpen(false);
                         setUpdIndex('');
@@ -498,7 +503,7 @@ const AddStyle = React.forwardRef(
             saveData.totalCount = allData.totalCount;
             saveData.uid = allData.uid;
 
-            planModify(saveData).then((res: any) => {
+            planModifyConfig({ ...saveData, validate: false }).then((res: any) => {
                 getList();
             });
         };

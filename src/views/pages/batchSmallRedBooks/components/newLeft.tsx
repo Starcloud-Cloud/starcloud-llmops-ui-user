@@ -19,7 +19,7 @@ import {
     Badge,
     theme
 } from 'antd';
-import { PlusOutlined, SaveOutlined, ZoomInOutlined } from '@ant-design/icons';
+import { PlusOutlined, SaveOutlined, ZoomInOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef } from 'react';
@@ -1340,6 +1340,10 @@ const Lefts = ({
                                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                             )) && (
                             <Tabs.TabPane key={'1'} tab="素材上传">
+                                <div className="flex items-center">
+                                    <InfoCircleOutlined rev={undefined} />
+                                    <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
+                                </div>
                                 <div>
                                     {materialType === 'picture' ? (
                                         <>
@@ -1453,6 +1457,10 @@ const Lefts = ({
                             }
                             tab="笔记生成"
                         >
+                            <div className="flex items-center">
+                                <InfoCircleOutlined rev={undefined} />
+                                <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
+                            </div>
                             <Collapse
                                 defaultActiveKey={['0']}
                                 style={{ background: token.colorBgContainer, border: 'none' }}
@@ -1587,6 +1595,12 @@ const Lefts = ({
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
+                                <div className="flex items-center mb-1">
+                                    <InfoCircleOutlined rev={undefined} />
+                                    <span className="text-sm ml-1 text-stone-600">
+                                        配置笔记图片生成的风格模版，支持不同风格模版组合生成
+                                    </span>
+                                </div>
                                 <AddStyle
                                     allData={appData}
                                     details={appData?.configuration?.appInformation}
@@ -1604,6 +1618,12 @@ const Lefts = ({
                             (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
+                                <div className="flex items-center">
+                                    <InfoCircleOutlined rev={undefined} />
+                                    <span className="text-sm ml-1 text-stone-600">
+                                        配置笔记图片生成的风格模版，支持不同风格模版组合生成
+                                    </span>
+                                </div>
                                 <AddStyle
                                     details={appData?.configuration?.appInformation}
                                     hasAddStyle={detail || !detailShow ? false : true}
@@ -1799,7 +1819,9 @@ const Lefts = ({
                     sourceList={typeList}
                 />
             )}
-            {botOpen && <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`生成数量不足`} from={''} />}
+            {botOpen && (
+                <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`权益不足，去升级`} from={''} />
+            )}
         </>
     );
 };

@@ -15,7 +15,7 @@ export const getTenant = () => {
 };
 
 type IList = {
-    [key: string]: string | number | boolean;
+    [key: string]: string | number | boolean | any[];
 };
 
 export const enum ENUM_PERMISSION {
@@ -34,7 +34,8 @@ export const enum ENUM_PERMISSION {
     COLLECT = 'collect', // 收藏
     PHONE_CHECK = 'phone_check', // 手机校验
     MARKET_VIDEO_MODAL = 'market_video_modal',
-    SPRING_SALE = 'spring_sale'
+    SPRING_SALE = 'spring_sale',
+    SHOW_RIGHTS = 'show_rights'
 }
 
 const list: IList = {
@@ -53,7 +54,8 @@ const list: IList = {
     [ENUM_PERMISSION.COLLECT]: true,
     [ENUM_PERMISSION.PHONE_CHECK]: true,
     [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: true,
-    [ENUM_PERMISSION.SPRING_SALE]: true
+    [ENUM_PERMISSION.SPRING_SALE]: true,
+    [ENUM_PERMISSION.SHOW_RIGHTS]: ['MAGIC_BEAN', 'MAGIC_IMAGE']
 };
 
 const announceList: IList = {
@@ -72,7 +74,8 @@ const announceList: IList = {
     [ENUM_PERMISSION.COLLECT]: false,
     [ENUM_PERMISSION.PHONE_CHECK]: false,
     [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: false,
-    [ENUM_PERMISSION.SPRING_SALE]: false
+    [ENUM_PERMISSION.SPRING_SALE]: false,
+    [ENUM_PERMISSION.SHOW_RIGHTS]: ['MATRIX_BEAN']
 };
 
 export const getPermission = (key: ENUM_PERMISSION) => {

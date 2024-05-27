@@ -32,11 +32,14 @@ import { Pagination } from 'swiper';
 import { appModify } from 'api/template';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 const AddStyle = React.forwardRef(
     ({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any, ref: any) => {
         const [visible, setVisible] = useState(false);
-        const [styleData, setStyleData] = useState<any>([]);
+        const [styleData, setStyleData] = useState<any>([]); //列表展示结果
         const [selectImgs, setSelectImgs] = useState<any>(null);
 
         const [query, setQuery] = useState<any | null>({
@@ -52,7 +55,8 @@ const AddStyle = React.forwardRef(
         const [currentStyle, setCurrentStyle] = useState<any>(null);
         const [switchCheck, setSwitchCheck] = useState(false);
         const [updIndex, setUpdIndex] = useState<any>('');
-        const [addType, setAddType] = useState(0);
+        const [updDrawIndex, setUpdDrawIndex] = useState<any>('');
+        const [addType, setAddType] = useState(0); // 1创建自定义风格
 
         const currentStyleRef: any = useRef(null);
         const collapseIndexRef: any = useRef(null);
@@ -161,85 +165,107 @@ const AddStyle = React.forwardRef(
             setSelectImgs(list);
         };
 
-        const items: any =
-            mode === 1
-                ? [
-                      {
-                          key: '0',
-                          label: (
-                              <span
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      const index: any = collapseIndexRef.current;
-                                      const copyStyleData = [...styleData];
-                                      const item = copyStyleData[index];
-                                      setCurrentStyle(item);
-                                      currentStyleRef.current = item;
-                                      setIsModalOpen(true);
-                                      setUpdIndex(index);
-                                  }}
-                              >
-                                  编辑
-                              </span>
-                          )
-                      },
-                      {
-                          key: '1',
-                          label: (
-                              <span
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      const index: any = collapseIndexRef.current;
-                                      const copyStyleData = [...styleData];
-                                      copyStyleData.splice(index, 1);
-                                      setStyleData(copyStyleData);
-                                  }}
-                              >
-                                  删除
-                              </span>
-                          )
-                      },
-                      {
-                          key: '2',
-                          label: (
-                              <span
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      const index: any = collapseIndexRef.current;
-                                      let copyStyleData = [...styleData];
-                                      copyStyleData = [
-                                          ...copyStyleData,
-                                          { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }
-                                      ];
-                                      setStyleData(copyStyleData);
-                                  }}
-                              >
-                                  复制
-                              </span>
-                          )
-                      }
-                  ]
-                : [
-                      {
-                          key: '0',
-                          label: (
-                              <span
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      const index: any = collapseIndexRef.current;
-                                      const copyStyleData = [...styleData];
-                                      const item = copyStyleData[index];
-                                      setCurrentStyle(item);
-                                      currentStyleRef.current = item;
-                                      setIsModalOpen(true);
-                                      setUpdIndex(index);
-                                  }}
-                              >
-                                  编辑
-                              </span>
-                          )
-                      }
-                  ];
+        const items = [
+            {
+                key: '0',
+                label: (
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const index: any = collapseIndexRef.current;
+                            const copyStyleData = [...styleData];
+                            const item = copyStyleData[index];
+                            setCurrentStyle(item);
+                            currentStyleRef.current = item;
+                            setIsModalOpen(true);
+                            setUpdIndex(index);
+                        }}
+                    >
+                        查看
+                    </span>
+                )
+            }
+        ];
+
+        // const items: any =
+        //     mode === 1
+        //         ? [
+        //               {
+        //                   key: '0',
+        //                   label: (
+        //                       <span
+        //                           onClick={(e) => {
+        //                               e.stopPropagation();
+        //                               const index: any = collapseIndexRef.current;
+        //                               const copyStyleData = [...styleData];
+        //                               const item = copyStyleData[index];
+        //                               setCurrentStyle(item);
+        //                               currentStyleRef.current = item;
+        //                               setIsModalOpen(true);
+        //                               setUpdIndex(index);
+        //                           }}
+        //                       >
+        //                           编辑
+        //                       </span>
+        //                   )
+        //               },
+        //               {
+        //                   key: '1',
+        //                   label: (
+        //                       <span
+        //                           onClick={(e) => {
+        //                               e.stopPropagation();
+        //                               const index: any = collapseIndexRef.current;
+        //                               const copyStyleData = [...styleData];
+        //                               copyStyleData.splice(index, 1);
+        //                               setStyleData(copyStyleData);
+        //                           }}
+        //                       >
+        //                           删除
+        //                       </span>
+        //                   )
+        //               },
+        //               {
+        //                   key: '2',
+        //                   label: (
+        //                       <span
+        //                           onClick={(e) => {
+        //                               e.stopPropagation();
+        //                               const index: any = collapseIndexRef.current;
+        //                               let copyStyleData = [...styleData];
+        //                               copyStyleData = [
+        //                                   ...copyStyleData,
+        //                                   { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }
+        //                               ];
+        //                               setStyleData(copyStyleData);
+        //                           }}
+        //                       >
+        //                           复制
+        //                       </span>
+        //                   )
+        //               }
+        //           ]
+        //         : [
+        //               {
+        //                   key: '0',
+        //                   label: (
+        //                       <span
+        //                           onClick={(e) => {
+        //                               e.stopPropagation();
+        //                               const index: any = collapseIndexRef.current;
+        //                               const copyStyleData = [...styleData];
+        //                               const item = copyStyleData[index];
+        //                               setCurrentStyle(item);
+        //                               currentStyleRef.current = item;
+        //                               setIsModalOpen(true);
+        //                               setUpdIndex(index);
+        //                           }}
+        //                       >
+        //                           编辑
+        //                       </span>
+        //                   )
+        //               }
+        //           ];
 
         const handleOK = () => {
             if (!selectImgs) {
@@ -282,10 +308,16 @@ const AddStyle = React.forwardRef(
                         </span>
                         <div className="flex justify-center">
                             <span>共{item?.templateList?.length || 0}张图片</span>
-                            <Dropdown menu={{ items }} placement="bottom" arrow>
+                            <Dropdown
+                                menu={{ items }}
+                                placement="bottom"
+                                arrow
+                                onOpenChange={() => {
+                                    collapseIndexRef.current = index;
+                                }}
+                            >
                                 <span
                                     onClick={(e) => {
-                                        collapseIndexRef.current = index;
                                         e.stopPropagation();
                                     }}
                                 >
@@ -316,6 +348,9 @@ const AddStyle = React.forwardRef(
                                                     <Spin />
                                                 </div>
                                             }
+                                            preview={{
+                                                src: item.example
+                                            }}
                                         />
                                     </div>
                                 ))}
@@ -347,6 +382,79 @@ const AddStyle = React.forwardRef(
             setAddType(0);
             setIsModalOpen(false);
             setCurrentStyle(null);
+        };
+
+        const handleCopy = (recordIndex: number) => {
+            const copyRecord = _.cloneDeep(record);
+            const copyDetails = _.cloneDeep(details);
+            const valueString =
+                copyRecord.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
+            const indexList = JSON.parse(valueString)
+                .map((item: any) => item.index)
+                .filter((item: any) => typeof item === 'number')
+                .filter(Boolean);
+
+            const index = Math.max(...indexList);
+            copyRecord.variable.variables.forEach((item: any) => {
+                if (item.field === 'CUSTOM_POSTER_STYLE_CONFIG') {
+                    const list = JSON.parse(item.value);
+                    item.value = [
+                        ...list,
+                        {
+                            ...list[recordIndex],
+                            enable: true,
+                            index: index + 1,
+                            system: false,
+                            totalImageCount: 0,
+                            uuid: uuidv4()?.split('-')?.join('')
+                        }
+                    ];
+                }
+            });
+
+            copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                if (item.flowStep.handler === 'PosterActionHandler') {
+                    // 将该步骤的属性值更改为 copyRecord 的值
+                    Object.assign(item, copyRecord);
+                }
+            });
+
+            copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                const arr = item?.variable?.variables;
+                const arr1 = item?.flowStep?.variable?.variables;
+                arr?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+                arr1?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+            });
+
+            const saveData: any = {};
+            saveData.configuration = {
+                appInformation: copyDetails,
+                imageStyleList: allData.configuration.imageStyleList,
+                materialList: allData.configuration.materialList
+            };
+            saveData.source = allData.source;
+            saveData.totalCount = allData.totalCount;
+            saveData.uid = allData.uid;
+
+            planModifyConfig({ ...saveData, validate: false })
+                .then((res: any) => {
+                    setIsModalOpen(false);
+                    setUpdIndex('');
+                    setAddType(0);
+                    setCurrentStyle(null);
+                    getList();
+                })
+                .catch((e: any) => {
+                    return;
+                });
         };
 
         // 根据Index 来判断
@@ -382,6 +490,90 @@ const AddStyle = React.forwardRef(
                         ];
                     }
                 });
+
+                copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                    if (item.flowStep.handler === 'PosterActionHandler') {
+                        // 将该步骤的属性值更改为 copyRecord 的值
+                        Object.assign(item, copyRecord);
+                    }
+                });
+
+                copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                    const arr = item?.variable?.variables;
+                    const arr1 = item?.flowStep?.variable?.variables;
+                    arr?.forEach((el: any) => {
+                        if (el.value && typeof el.value === 'object') {
+                            el.value = JSON.stringify(el.value);
+                        }
+                    });
+                    arr1?.forEach((el: any) => {
+                        if (el.value && typeof el.value === 'object') {
+                            el.value = JSON.stringify(el.value);
+                        }
+                    });
+                });
+
+                const saveData: any = {};
+                saveData.configuration = {
+                    appInformation: copyDetails,
+                    imageStyleList: allData.configuration.imageStyleList,
+                    materialList: allData.configuration.materialList
+                };
+                saveData.source = allData.source;
+                saveData.totalCount = allData.totalCount;
+                saveData.uid = allData.uid;
+
+                planModifyConfig({ ...saveData, validate: false })
+                    .then((res: any) => {
+                        setIsModalOpen(false);
+                        setUpdIndex('');
+                        setAddType(0);
+                        setCurrentStyle(null);
+                        getList();
+                    })
+                    .catch((e: any) => {
+                        return;
+                    });
+            } else if (addType === 3) {
+                const copyRecord = _.cloneDeep(record);
+                const copyDetails = _.cloneDeep(details);
+                const valueString =
+                    copyRecord.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
+
+                const valueJson = JSON.parse(valueString);
+                valueJson[updDrawIndex] = {
+                    ...valueJson[updDrawIndex],
+                    ...currentStyle
+                };
+                console.log('🚀 ~ handleOk ~ valueJson:', valueJson);
+
+                copyRecord.variable.variables.forEach((item: any) => {
+                    if (item.field === 'CUSTOM_POSTER_STYLE_CONFIG') {
+                        item.value = valueJson;
+                    }
+                });
+
+                // const indexList = JSON.parse(valueString)
+                //     .map((item: any) => item.index)
+                //     .filter((item: any) => typeof item === 'number')
+                //     .filter(Boolean);
+
+                // const index = Math.max(...indexList);
+                // copyRecord.variable.variables.forEach((item: any) => {
+                //     if (item.field === 'CUSTOM_POSTER_STYLE_CONFIG') {
+                //         item.value = [
+                //             ...JSON.parse(item.value),
+                //             {
+                //                 ...currentStyle,
+                //                 enable: true,
+                //                 index: index + 1,
+                //                 system: false,
+                //                 totalImageCount: 0,
+                //                 uuid: uuidv4()?.split('-')?.join('')
+                //             }
+                //         ];
+                //     }
+                // });
 
                 copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
                     if (item.flowStep.handler === 'PosterActionHandler') {
@@ -719,19 +911,43 @@ const AddStyle = React.forwardRef(
                                                             }
                                                         }}
                                                     />
-                                                    <Popconfirm
-                                                        placement="top"
-                                                        title={'确认删除'}
-                                                        // description={description}
-                                                        okText="是"
-                                                        cancelText="否"
-                                                        onConfirm={() => handleDel(index)}
-                                                    >
-                                                        <DeleteOutlined
-                                                            rev={undefined}
-                                                            className="absolute z-50 py-[3px] left-[2px] text-red-600"
-                                                        />
-                                                    </Popconfirm>
+
+                                                    <div className="absolute z-50 bottom-0 w-[150px] flex justify-around bg-[rgba(0,0,0,0.4)] py-1">
+                                                        <Tooltip title="复制">
+                                                            <span onClick={() => handleCopy(index)}>
+                                                                <ContentCopyIcon className="text-sm text-white" />
+                                                            </span>
+                                                        </Tooltip>
+                                                        <Tooltip title="修改">
+                                                            <span
+                                                                onClick={() => {
+                                                                    // const index: any = collapseIndexRef.current;
+                                                                    // const copyStyleData = [...styleData];
+                                                                    // const item = copyStyleData[index];
+                                                                    setCurrentStyle(item);
+                                                                    currentStyleRef.current = item;
+                                                                    setIsModalOpen(true);
+                                                                    // setUpdIndex(index);
+                                                                    setUpdDrawIndex(index);
+                                                                    setAddType(3);
+                                                                }}
+                                                            >
+                                                                <EditIcon className="text-sm text-white" />
+                                                            </span>
+                                                        </Tooltip>
+                                                        <Popconfirm
+                                                            placement="top"
+                                                            title={'确认删除'}
+                                                            // description={description}
+                                                            okText="是"
+                                                            cancelText="否"
+                                                            onConfirm={() => handleDel(index)}
+                                                        >
+                                                            <Tooltip title="删除">
+                                                                <DeleteIcon className="text-sm text-white" />
+                                                            </Tooltip>
+                                                        </Popconfirm>
+                                                    </div>
                                                     <Swiper
                                                         spaceBetween={30}
                                                         pagination={{
@@ -740,11 +956,11 @@ const AddStyle = React.forwardRef(
                                                         modules={[Pagination]}
                                                         autoplay
                                                     >
-                                                        <div className="w-[145px] h-[200px] flex">
+                                                        <div className="w-[145px] h-[200px] flex relative">
                                                             {item?.templateList?.map((v: any, vi: number) => (
                                                                 <SwiperSlide>
                                                                     <Image.PreviewGroup
-                                                                        items={templateList?.[index]?.templateList?.map(
+                                                                        items={customList?.[index]?.templateList?.map(
                                                                             (item: any) => item.example
                                                                         )}
                                                                     >

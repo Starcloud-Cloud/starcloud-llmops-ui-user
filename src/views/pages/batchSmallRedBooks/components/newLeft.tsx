@@ -419,7 +419,7 @@ const Lefts = ({
             setTableLoading(true);
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
             const res = await marketDeatail({ uid: searchParams.get('appUid') });
-            setVersion(res.version);
+            setVersion(res?.version || 0);
             newList = _.cloneDeep(result?.configuration?.appInformation);
             const collData: any = result?.configuration?.appInformation?.example;
             if (collData) {
@@ -864,7 +864,7 @@ const Lefts = ({
             }
             newList.unshift({
                 ...result,
-                type: materialType
+                type: materialTypes
             });
         }
         pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')].value = newList;
@@ -1471,7 +1471,7 @@ const Lefts = ({
                                                                 columns={stepMaterial[index]}
                                                                 setMaterialType={() => {
                                                                     setMaterialTypes(
-                                                                        el?.variable?.variables?.find(
+                                                                        item?.variable?.variables?.find(
                                                                             (i: any) => i.field === 'MATERIAL_TYPE'
                                                                         )?.value
                                                                     );

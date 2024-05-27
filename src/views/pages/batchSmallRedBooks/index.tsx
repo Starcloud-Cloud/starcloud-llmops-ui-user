@@ -56,6 +56,9 @@ const BatcSmallRedBooks = forwardRef(
         const searchParams = new URLSearchParams(location.search);
         useEffect(() => {
             (async () => {
+                if (!searchParams.get('appUid')) {
+                    return false;
+                }
                 const res = await marketDeatail({ uid: searchParams.get('appUid') });
                 if (res.description) {
                     const urlPattern = /https?:\/\/[^\s]+(?:\.com|\.cn|\.org|\.net|\.edu\.com.cn)/g;

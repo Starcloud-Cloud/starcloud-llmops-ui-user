@@ -1089,7 +1089,7 @@ const Lefts = ({
                         type: 'picture'
                     })) || []
                 );
-        } else if (materialTypeStatus) {
+        } else {
             setMoke &&
                 setMoke(
                     tableData?.map((item) => ({

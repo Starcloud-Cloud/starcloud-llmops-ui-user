@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
 import { getContentPage } from 'api/redBook';
@@ -13,7 +13,8 @@ import './index.scss';
 import Left from './components/newLeft';
 import Right from './components/right';
 import jsCookie from 'js-cookie';
-import { MoreOutlined } from '@ant-design/icons';
+import { MoreOutlined, SwapOutlined } from '@ant-design/icons';
+import { marketDeatail } from 'api/template';
 const BatcSmallRedBooks = forwardRef(
     (
         {
@@ -32,6 +33,8 @@ const BatcSmallRedBooks = forwardRef(
             fieldAI: defaultField, //字段补齐
             fieldHead: fieldHead //上传素材表头
         }));
+        const [appDescription, setAppDescription] = useState('');
+
         const [defaultVariableData, setDefaultVariableData] = useState<any>(null);
         const [defaultField, setDefaultField] = useState<any>(null);
         const [getData, setGetData] = useState<any>(null);
@@ -51,6 +54,21 @@ const BatcSmallRedBooks = forwardRef(
         const [batchOpen, setbatchOpen] = useState(false);
         //手风琴的数据
         const [collData, setCollData] = useState([]);
+
+        const location = useLocation();
+        const searchParams = new URLSearchParams(location.search);
+        useEffect(() => {
+            (async () => {
+                const res = await marketDeatail({ uid: searchParams.get('appUid') });
+                if (res.description) {
+                    const urlPattern = /(https?:\/\/[^\s]+)/g;
+                    const urls = res?.description?.match(urlPattern);
+                    console.log('🚀 ~ urls:', urls);
+                    setAppDescription(urls[0] || '');
+                }
+            })();
+        }, []);
+
         //监听手风琴有值的时候请求数据
         useEffect(() => {
             if (collData?.length != 0) {
@@ -287,6 +305,16 @@ const BatcSmallRedBooks = forwardRef(
                                 <KeyboardBackspace fontSize="small" />
                             </IconButton>
                             <span className="text-[#000c] font-[500]">应用市场</span>
+                            {appDescription && (
+                                <span
+                                    className="2xl:ml-[430px] xl:ml-[340px] lg:ml-[300px]  ml-[300px] text-[#673ab7] cursor-pointer"
+                                    onClick={() => {
+                                        window.open(appDescription);
+                                    }}
+                                >
+                                    应用说明
+                                </span>
+                            )}
                         </div>
                         <div></div>
                     </SubCard>

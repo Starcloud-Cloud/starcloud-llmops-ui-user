@@ -31,10 +31,9 @@ import template from 'assets/images/landing/pre-apps/template.jpg';
 import { DASHBOARD_PATH } from 'config';
 
 import account from 'assets/images/landing/juzhen/juzhen-account.png';
-import dataCenter from 'assets/images/landing/juzhen/juzhen-dataCenter.png';
-import push from 'assets/images/landing/juzhen/juzhen-push.png';
 import createApp from 'assets/images/landing/juzhen/juzhen-create-app.png';
-import appMarket from 'assets/images/landing/juzhen/juzhen-app_market.png';
+import push from 'assets/images/landing/juzhen/juzhen-push.png';
+import dataCenter from 'assets/images/landing/juzhen/juzhen-dataCenter.png';
 
 // styles
 const Images = styled('img')({

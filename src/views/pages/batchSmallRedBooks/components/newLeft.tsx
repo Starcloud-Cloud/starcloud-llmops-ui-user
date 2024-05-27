@@ -33,7 +33,8 @@ import {
     planUpgrade,
     materialParse,
     metadata,
-    planModifyConfig
+    planModifyConfig,
+    materialJudge
 } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
 import FormModal from './formModal';
@@ -121,6 +122,7 @@ const Lefts = ({
     };
     //上传素材
     const [materialType, setMaterialType] = useState('');
+    const [materialTypeStatus, setMaterialTypeStatus] = useState(false); //获取状态 true图片 false 表格
     //上传图片
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
@@ -498,6 +500,11 @@ const Lefts = ({
         });
         const materiallist = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables;
+        const judge = await materialJudge({
+            uid: detail ? detail?.uid : result.uid,
+            planSource: detail ? 'app' : 'market'
+        });
+        setMaterialTypeStatus(judge);
         const newMater = materiallist?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
         const customData = materiallist?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value;
         setDefaultVariableData && setDefaultVariableData(customData && customData !== '{}' ? JSON.parse(customData) : null);
@@ -1016,12 +1023,13 @@ const Lefts = ({
     };
     const [tabKey, setTabKey] = useState('1');
     const [page, setPage] = useState(1);
-    const upDateVersion = async () => {
+    const upDateVersion = async (updataTip: string) => {
         const result = await planUpgrade({
             uid: appData?.uid,
             appUid: searchParams.get('appUid'),
             configuration: appData?.configuration,
-            totalCount
+            totalCount,
+            isFullCover: updataTip === '0' ? undefined : true
         });
         dispatch(
             openSnackbar({
@@ -1232,6 +1240,7 @@ const Lefts = ({
             });
     };
     const [colOpen, setColOpen] = useState(false);
+    const [updataTip, setUpdataTip] = useState('0');
     return (
         <>
             <div className="relative h-full">
@@ -1242,40 +1251,43 @@ const Lefts = ({
                             <div>
                                 状态：{getStatus1(appData?.status)}
                                 <div className="inline-block whitespace-nowrap">
-                                    {appData?.version || 0 !== version ? (
+                                    {(appData?.version ? appData?.version : 0) !== version ? (
                                         <Popconfirm
                                             title="更新提示"
                                             description={
-                                                <Tabs
-                                                    defaultActiveKey="0"
-                                                    items={[
-                                                        {
-                                                            key: '0',
-                                                            label: '更新应用',
-                                                            children: (
-                                                                <div className="w-[240px]">
-                                                                    <div>当前应用最新版本为：{version}</div>
-                                                                    <div>你使用的应用版本为：{appData?.version}</div>
-                                                                    <div>是否需要更新版本，获得最佳创作效果</div>
-                                                                </div>
-                                                            )
-                                                        },
-                                                        {
-                                                            key: '1',
-                                                            label: '初始化应用',
-                                                            children: (
-                                                                <div className="w-[240px]">
-                                                                    是否需要初始化为最新的应用配置。
-                                                                    <br />
-                                                                    <span className="text-[#ff4d4f]">注意:</span>
-                                                                    会覆盖所有已修改的应用配置，请自行备份相关内容
-                                                                </div>
-                                                            )
-                                                        }
-                                                    ]}
-                                                ></Tabs>
+                                                <div className="ml-[-24px]">
+                                                    <Tabs
+                                                        activeKey={updataTip}
+                                                        onChange={(e) => setUpdataTip(e)}
+                                                        items={[
+                                                            {
+                                                                key: '0',
+                                                                label: '更新应用',
+                                                                children: (
+                                                                    <div className="w-[240px] mb-4">
+                                                                        <div>当前应用最新版本为：{version}</div>
+                                                                        <div>你使用的应用版本为：{appData?.version}</div>
+                                                                        <div>是否需要更新版本，获得最佳创作效果</div>
+                                                                    </div>
+                                                                )
+                                                            },
+                                                            {
+                                                                key: '1',
+                                                                label: '初始化应用',
+                                                                children: (
+                                                                    <div className="w-[240px] mb-4">
+                                                                        是否需要初始化为最新的应用配置。
+                                                                        <br />
+                                                                        <span className="text-[#ff4d4f]">注意:</span>
+                                                                        会覆盖所有已修改的应用配置，请自行备份相关内容
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        ]}
+                                                    ></Tabs>
+                                                </div>
                                             }
-                                            onConfirm={() => upDateVersion()}
+                                            onConfirm={() => upDateVersion(updataTip)}
                                             okText="更新"
                                             cancelText="取消"
                                         >
@@ -1318,7 +1330,7 @@ const Lefts = ({
                                     <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
                                 </div>
                                 <div>
-                                    {materialType === 'picture' ? (
+                                    {materialTypeStatus ? (
                                         <>
                                             <div className="text-[12px] font-[500] flex items-center justify-between">
                                                 <div>图片总量：{fileList?.length}</div>

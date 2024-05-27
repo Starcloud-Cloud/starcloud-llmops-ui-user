@@ -119,3 +119,7 @@ export const customMaterialGenerate = (data: any) => {
 export const materialFieldCode = (data: any) => {
     return request.post({ url: `/llm/creative/material/fieldCode`, data });
 };
+//判断是表格还是图片
+export const materialJudge = (params: any) => {
+    return request.post({ url: `/llm/creative/material/judge`, params });
+};

@@ -30,6 +30,11 @@ import social from 'assets/images/landing/pre-apps/social.jpg';
 import template from 'assets/images/landing/pre-apps/template.jpg';
 import { DASHBOARD_PATH } from 'config';
 
+import account from 'assets/images/landing/juzhen/juzhen-account.png';
+import createApp from 'assets/images/landing/juzhen/juzhen-create-app.png';
+import push from 'assets/images/landing/juzhen/juzhen-push.png';
+import dataCenter from 'assets/images/landing/juzhen/juzhen-dataCenter.png';
+
 // styles
 const Images = styled('img')({
     width: '60% !important',
@@ -219,29 +224,29 @@ const PreBuildDashBoard = () => {
                                 title="多平台账号登录"
                                 subTitle="多平台账号登录"
                                 description="支持小红书等多个主流内容创作平台等多个账号同时登录；保存长时间在线状态；一站式管理您多平台账号，提高内容运营效率。"
-                                image={theme.palette.mode === 'dark' ? market : market}
-                                link={DASHBOARD_PATH}
+                                image={theme.palette.mode === 'dark' ? account : account}
+                                link={''}
                             />
                             <Items
                                 title="多平台内容AI一键批量创作"
                                 subTitle="多平台内容AI一键批量创作"
                                 description="支持多种平台和场景的文案AI生成，可精细化控制AI生成的内容。同时支持图片自动拼接，图片内容识别等最新多模态大模型能力。"
-                                image={theme.palette.mode === 'dark' ? amzon : amzon}
-                                link={DASHBOARD_PATH}
+                                image={theme.palette.mode === 'dark' ? createApp : createApp}
+                                link={''}
                             />
                             <Items
                                 title="多平台作品一键发布"
                                 subTitle="多平台作品一键发布"
                                 description="支持一键分发多个作品到多个主流媒体平台；减少重复性工作，提高内容发布效率与管理效率"
-                                image={theme.palette.mode === 'dark' ? site : site}
-                                link={DASHBOARD_PATH}
+                                image={theme.palette.mode === 'dark' ? push : push}
+                                link={''}
                             />
                             <Items
                                 title="多平台数据综合分析"
                                 subTitle="多平台数据综合分析"
                                 description="支持小红书等多个主流内容创作平台的账号作品数据，粉丝数据以及互动数据进行聚合查看，并支持指定时间段数据统计与图表展示；提高数据分析效率，助力您的数据运营。"
-                                image={theme.palette.mode === 'dark' ? social : social}
-                                link={DASHBOARD_PATH}
+                                image={theme.palette.mode === 'dark' ? dataCenter : dataCenter}
+                                link={''}
                             />
                         </Carousel>
                     </Box>

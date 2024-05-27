@@ -84,7 +84,8 @@ const AiCreate = ({
     const [successCount, setSuccessCount] = useState(0);
     const errorCountRef = useRef(0);
     const [errorCount, setErrorCount] = useState(0);
-    const [errorMessage, setErrorMessage] = useState<any>('');
+    const errorMessageRef = useRef<any[]>([]);
+    const [errorMessage, setErrorMessage] = useState<any[]>([]);
     const [cancelExeLoading, setcancelExeLoading] = useState(false);
     const materialPre = useMemo(() => {
         return ((successCountRef.current / totalCountRef.current) * 100) | 0;
@@ -93,7 +94,6 @@ const AiCreate = ({
     const handleMaterial = async (num: number) => {
         uuidListsRef.current = [];
         setUuidLists(uuidListsRef.current);
-        setErrorMessage('');
         aref.current = false;
         setMaterialExecutionOpen(true);
         //记录原有数据下标
@@ -151,13 +151,15 @@ const AiCreate = ({
                             }
                         });
                         console.log(error);
-                        setErrorMessage(error.msg);
+                        const newList = _.cloneDeep(errorMessageRef.current);
+                        newList.push(error.msg);
+                        errorMessageRef.current = newList;
+                        setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
                         setExecutionCount(executionCountRef.current);
                         errorCountRef.current += group?.length;
                         if (errorCountRef.current >= 9) {
                             aref.current = true;
-                            setErrorMessage('服务器繁忙，请稍后再试');
                         }
                         setErrorCount(errorCountRef.current);
                     }
@@ -210,7 +212,6 @@ const AiCreate = ({
     const getTextStream = async () => {
         uuidListsRef.current = [];
         setUuidLists(uuidListsRef.current);
-        setErrorMessage('');
         aref.current = false;
         setMaterialExecutionOpen(true);
         const i = Array.from({ length: variableData.generateCount }, (_, index) => index);
@@ -237,13 +238,15 @@ const AiCreate = ({
                         setSuccessCount(successCountRef.current);
                     } catch (error: any) {
                         console.log(error);
-                        setErrorMessage(error.msg);
+                        const newList = _.cloneDeep(errorMessageRef.current);
+                        newList.push(error.msg);
+                        errorMessageRef.current = newList;
+                        setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
                         setExecutionCount(executionCountRef.current);
                         errorCountRef.current += group?.length;
                         if (errorCountRef.current >= 9) {
                             aref.current = true;
-                            setErrorMessage('服务器繁忙，请稍后再试');
                         }
                         setErrorCount(errorCountRef.current);
                     }
@@ -269,6 +272,8 @@ const AiCreate = ({
     const [uuidLists, setUuidLists] = useState<any[]>([]);
     useEffect(() => {
         if (!materialExecutionOpen) {
+            errorMessageRef.current = [];
+            setErrorMessage(errorMessageRef.current);
             executionCountRef.current = 0;
             setExecutionCount(executionCountRef.current);
             errorCountRef.current = 0;
@@ -507,21 +512,21 @@ const AiCreate = ({
                                                 if (!fieldCompletionData.requirement) {
                                                     return false;
                                                 }
-                                                if (fieldCompletionData.checkedFieldList?.length === 0) {
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: 'AI 补齐字段最少选一个',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'error'
-                                                            },
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            close: false
-                                                        })
-                                                    );
-                                                    return false;
-                                                }
+                                                // if (fieldCompletionData.checkedFieldList?.length === 0) {
+                                                //     dispatch(
+                                                //         openSnackbar({
+                                                //             open: true,
+                                                //             message: 'AI 补齐字段最少选一个',
+                                                //             variant: 'alert',
+                                                //             alert: {
+                                                //                 color: 'error'
+                                                //             },
+                                                //             anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                //             close: false
+                                                //         })
+                                                //     );
+                                                //     return false;
+                                                // }
                                                 handleMaterial(2);
                                             }}
                                             type="primary"
@@ -615,13 +620,16 @@ const AiCreate = ({
                         <Progress percent={materialPre} type="circle" />
                     </div>
                     {executionCount !== 0 && <div className="font-bold text-center mt-4">AI 处理中，请勿刷新页面···</div>}
-                    {errorMessage && (
-                        <div className="my-4 text-[#ff4d4f] text-xs flex justify-center">
-                            <span className="font-bold">错误信息：</span>
-                            {errorMessage}
-                        </div>
-                    )}
-                    {totalCount === successCount + errorCount && (
+                    <div className="my-4">
+                        {errorMessage?.length > 0 &&
+                            errorMessage?.map((item, i) => (
+                                <div className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
+                                    <span className="font-bold">错误信息 {i + 1}：</span>
+                                    {item}
+                                </div>
+                            ))}
+                    </div>
+                    {totalCount === successCount + errorCount && successCount !== 0 && (
                         <div className="my-4 text-xs flex justify-center">
                             <span className="font-bold">已经生成完成，点击确认导入素材</span>
                         </div>

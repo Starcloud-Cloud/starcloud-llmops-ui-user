@@ -392,7 +392,6 @@ const Lefts = ({
     const [generateList, setGenerateList] = useState<any[]>([]); //笔记生成
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
-
     const getList = async (flag?: boolean) => {
         let result;
         let newList: any;
@@ -518,7 +517,7 @@ const Lefts = ({
                 ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value || [];
         const picList = result?.configuration?.materialList;
         setMaterialType(newMater);
-        if (newMater === 'picture') {
+        if (judge) {
             if (!data) {
                 setFileList(
                     result?.configuration?.materialList?.map((item: any) => ({
@@ -922,20 +921,19 @@ const Lefts = ({
             );
             upData?.variable?.variables?.forEach((item: any) => {
                 if (item?.style === 'MATERIAL') {
-                    item.value =
-                        materialType === 'picture'
-                            ? JSON.stringify(
-                                  fileList?.map((item) => ({
-                                      pictureUrl: item?.response?.data?.url,
-                                      type: 'picture'
-                                  }))
-                              )
-                            : JSON.stringify(
-                                  tableData?.map((item) => ({
-                                      ...item,
-                                      type: materialType
-                                  }))
-                              );
+                    item.value = materialTypeStatus
+                        ? JSON.stringify(
+                              fileList?.map((item) => ({
+                                  pictureUrl: item?.response?.data?.url,
+                                  type: 'picture'
+                              }))
+                          )
+                        : JSON.stringify(
+                              tableData?.map((item) => ({
+                                  ...item,
+                                  type: materialType
+                              }))
+                          );
                 }
             });
             data.executeParam.appInformation.workflowConfig.steps = [
@@ -965,16 +963,15 @@ const Lefts = ({
                               index: index + 1
                           }))
                         : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
-                    materialList:
-                        materialType === 'picture'
-                            ? fileList?.map((item) => ({
-                                  pictureUrl: item?.response?.data?.url,
-                                  type: 'picture'
-                              }))
-                            : tableData?.map((item) => ({
-                                  ...item,
-                                  type: materialType
-                              })),
+                    materialList: materialTypeStatus
+                        ? fileList?.map((item) => ({
+                              pictureUrl: item?.response?.data?.url,
+                              type: 'picture'
+                          }))
+                        : tableData?.map((item) => ({
+                              ...item,
+                              type: materialType
+                          })),
                     appInformation: {
                         ...appRef.current.configuration.appInformation,
                         workflowConfig: {
@@ -1084,7 +1081,7 @@ const Lefts = ({
         }
     }, [generateList]);
     useEffect(() => {
-        if (materialType && materialType === 'picture') {
+        if (materialTypeStatus) {
             setMoke &&
                 setMoke(
                     fileList?.map((item) => ({
@@ -1092,7 +1089,7 @@ const Lefts = ({
                         type: 'picture'
                     })) || []
                 );
-        } else if (materialType && materialType !== 'picture') {
+        } else if (materialTypeStatus) {
             setMoke &&
                 setMoke(
                     tableData?.map((item) => ({
@@ -1190,16 +1187,15 @@ const Lefts = ({
         let arr = newData?.workflowConfig?.steps;
         const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
         if (a) {
-            a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                materialType === 'picture'
-                    ? fileList?.map((item: any) => ({
-                          pictureUrl: item?.response?.data?.url,
-                          type: 'picture'
-                      }))
-                    : tableData?.map((item: any) => ({
-                          ...item,
-                          type: materialType
-                      }));
+            a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = materialTypeStatus
+                ? fileList?.map((item: any) => ({
+                      pictureUrl: item?.response?.data?.url,
+                      type: 'picture'
+                  }))
+                : tableData?.map((item: any) => ({
+                      ...item,
+                      type: materialType
+                  }));
             a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value =
                 data ||
                 appRef.current.configuration?.appInformation?.workflowConfig?.steps
@@ -1251,57 +1247,54 @@ const Lefts = ({
                             <div>
                                 状态：{getStatus1(appData?.status)}
                                 <div className="inline-block whitespace-nowrap">
-                                    {(appData?.version ? appData?.version : 0) !== version ? (
-                                        <Popconfirm
-                                            title="更新提示"
-                                            description={
-                                                <div className="ml-[-24px]">
-                                                    <Tabs
-                                                        activeKey={updataTip}
-                                                        onChange={(e) => setUpdataTip(e)}
-                                                        items={[
-                                                            {
-                                                                key: '0',
-                                                                label: '更新应用',
-                                                                children: (
-                                                                    <div className="w-[240px] mb-4">
-                                                                        <div>当前应用最新版本为：{version}</div>
-                                                                        <div>你使用的应用版本为：{appData?.version}</div>
-                                                                        <div>是否需要更新版本，获得最佳创作效果</div>
-                                                                    </div>
-                                                                )
-                                                            },
-                                                            {
-                                                                key: '1',
-                                                                label: '初始化应用',
-                                                                children: (
-                                                                    <div className="w-[240px] mb-4">
-                                                                        是否需要初始化为最新的应用配置。
-                                                                        <br />
-                                                                        <span className="text-[#ff4d4f]">注意:</span>
-                                                                        会覆盖所有已修改的应用配置，请自行备份相关内容
-                                                                    </div>
-                                                                )
-                                                            }
-                                                        ]}
-                                                    ></Tabs>
-                                                </div>
-                                            }
-                                            onConfirm={() => upDateVersion(updataTip)}
-                                            okText="更新"
-                                            cancelText="取消"
-                                        >
-                                            <Badge dot>
-                                                <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
-                                                    版本号： <span className="font-blod">{appData?.version || 0}</span>
-                                                </span>
-                                            </Badge>
-                                        </Popconfirm>
-                                    ) : (
-                                        <span>
-                                            版本号： <span className="font-blod">{appData?.version || '-'}</span>
-                                        </span>
-                                    )}
+                                    <Popconfirm
+                                        title="更新提示"
+                                        description={
+                                            <div className="ml-[-24px]">
+                                                <Tabs
+                                                    activeKey={updataTip}
+                                                    onChange={(e) => setUpdataTip(e)}
+                                                    items={[
+                                                        {
+                                                            key: '0',
+                                                            label: '更新应用',
+                                                            children: (
+                                                                <div className="w-[240px] mb-4">
+                                                                    <div>当前应用最新版本为：{version}</div>
+                                                                    <div>你使用的应用版本为：{appData?.version}</div>
+                                                                    <div>是否需要更新版本，获得最佳创作效果</div>
+                                                                </div>
+                                                            )
+                                                        },
+                                                        {
+                                                            key: '1',
+                                                            label: '初始化应用',
+                                                            children: (
+                                                                <div className="w-[240px] mb-4">
+                                                                    是否需要初始化为最新的应用配置。
+                                                                    <br />
+                                                                    <span className="text-[#ff4d4f]">注意:</span>
+                                                                    会覆盖所有已修改的应用配置，请自行备份相关内容
+                                                                </div>
+                                                            )
+                                                        }
+                                                    ]}
+                                                ></Tabs>
+                                            </div>
+                                        }
+                                        okButtonProps={{
+                                            disabled: (appData?.version ? appData?.version : 0) === version && updataTip === '0'
+                                        }}
+                                        onConfirm={() => upDateVersion(updataTip)}
+                                        okText="更新"
+                                        cancelText="取消"
+                                    >
+                                        <Badge count={(appData?.version ? appData?.version : 0) !== version ? 1 : 0} dot>
+                                            <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                                版本号： <span className="font-blod">{appData?.version || 0}</span>
+                                            </span>
+                                        </Badge>
+                                    </Popconfirm>
                                 </div>
                             </div>
                         )}
@@ -1740,6 +1733,7 @@ const Lefts = ({
                     fieldCompletionData={fieldCompletionData}
                     setVariableData={setVariableData}
                     variableData={variableData}
+                    setMaterialTypeStatus={setMaterialTypeStatus}
                 />
             )}
             <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>

@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import AiCreate from './AICreate';
 import _ from 'lodash-es';
 import { PlusOutlined } from '@ant-design/icons';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/slices/snackbar';
+import { materialJudge } from 'api/redBook/batchIndex';
 import { materialFieldCode } from 'api/redBook/batchIndex';
+import { useLocation } from 'react-router-dom';
 const LeftModalAdd = ({
     zoomOpen,
     setZoomOpen,
@@ -34,7 +34,8 @@ const LeftModalAdd = ({
     setFieldCompletionData,
     fieldCompletionData,
     setVariableData,
-    variableData
+    variableData,
+    setMaterialTypeStatus
 }: {
     zoomOpen: boolean;
     setZoomOpen: (data: boolean) => void;
@@ -62,8 +63,11 @@ const LeftModalAdd = ({
     setFieldCompletionData: (data: any) => void;
     fieldCompletionData: any;
     setVariableData: (data: any) => void;
+    setMaterialTypeStatus: (data: any) => void;
     variableData: any;
 }) => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
     const handleDels = () => {
         const newData = tableData?.filter((item) => {
             return !selectedRowKeys?.find((el: any) => el === item.uuid);
@@ -241,6 +245,12 @@ const LeftModalAdd = ({
                             } catch (err) {
                                 console.log(err);
                             }
+                            const judge = await materialJudge({
+                                uid: searchParams.get('uid'),
+                                planSource: searchParams.get('appUid') ? 'market' : 'app'
+                            });
+
+                            setMaterialTypeStatus(judge);
                         }}
                     >
                         保存

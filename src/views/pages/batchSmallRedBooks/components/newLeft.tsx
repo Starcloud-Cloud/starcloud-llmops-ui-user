@@ -1313,7 +1313,7 @@ const Lefts = ({
                                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                             )) && (
                             <Tabs.TabPane key={'1'} tab="素材上传">
-                                <div className="flex items-center">
+                                <div className="flex items-center mb-2">
                                     <InfoCircleOutlined rev={undefined} />
                                     <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
                                 </div>

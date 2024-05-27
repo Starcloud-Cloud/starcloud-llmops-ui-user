@@ -1442,7 +1442,7 @@ const Lefts = ({
                             }
                             tab="笔记生成"
                         >
-                            <div className="flex items-center">
+                            <div className="flex items-center mb-2">
                                 <InfoCircleOutlined rev={undefined} />
                                 <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
                             </div>
@@ -1577,7 +1577,7 @@ const Lefts = ({
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
-                                <div className="flex items-center mb-1">
+                                <div className="flex items-center mb-2">
                                     <InfoCircleOutlined rev={undefined} />
                                     <span className="text-sm ml-1 text-stone-600">
                                         配置笔记图片生成的风格模版，支持不同风格模版组合生成
@@ -1600,7 +1600,7 @@ const Lefts = ({
                             (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
-                                <div className="flex items-center">
+                                <div className="flex items-center mb-2">
                                     <InfoCircleOutlined rev={undefined} />
                                     <span className="text-sm ml-1 text-stone-600">
                                         配置笔记图片生成的风格模版，支持不同风格模版组合生成

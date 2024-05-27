@@ -1,7 +1,8 @@
-import { Popover, Menu, Input, Checkbox, Button } from 'antd';
+import { Popover, Menu, Input, Checkbox, Button, Tooltip } from 'antd';
 import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { schemeOptions } from 'api/redBook/copywriting';
 import image from 'assets/images/icons/image.svg';
 import string from 'assets/images/icons/string.svg';
@@ -211,6 +212,23 @@ const VariableInput = ({
                                 setData(key);
                             }
                         }}
+                        icon={
+                            item.desc?.split('-')[1] && (
+                                <img
+                                    className="w-[15px]"
+                                    src={
+                                        item.desc?.split('-')[1] === 'image'
+                                            ? image
+                                            : item.desc?.split('-')[1] === 'string'
+                                            ? string
+                                            : item.desc?.split('-')[1] === 'textBox'
+                                            ? textBox
+                                            : number
+                                    }
+                                    alt=""
+                                />
+                            )
+                        }
                         key={item.key}
                     >
                         <div
@@ -221,23 +239,6 @@ const VariableInput = ({
                             className="w-full flex justify-between items-center"
                         >
                             <div className="flex gap-1 items-center">
-                                <div className="w-[15px]">
-                                    {item.desc?.split('-')[1] && (
-                                        <img
-                                            className="w-[15px]"
-                                            src={
-                                                item.desc?.split('-')[1] === 'image'
-                                                    ? image
-                                                    : item.desc?.split('-')[1] === 'string'
-                                                    ? string
-                                                    : item.desc?.split('-')[1] === 'textBox'
-                                                    ? textBox
-                                                    : number
-                                            }
-                                            alt=""
-                                        />
-                                    )}
-                                </div>
                                 <div className="flex items-center gap-1">
                                     <div>{item.type === '*' && <Checkbox checked={varableOpen[i]} value={item.label}></Checkbox>}</div>
                                     <div>{item.label}</div>
@@ -257,7 +258,7 @@ const VariableInput = ({
                 ...JSON.parse(item.inJsonSchema),
                 properties: {
                     ...JSON.parse(item.inJsonSchema).properties,
-                    ...JSON.parse(item.outJsonSchema).properties
+                    ...(item.code === '基础信息' ? {} : JSON.parse(item.outJsonSchema).properties)
                 }
             };
         } catch (err) {
@@ -270,18 +271,16 @@ const VariableInput = ({
             schemeOptions({ stepCode, appReqVO: newDeatil }).then((res) => {
                 const newList = res
                     ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
-                    ?.map((item: any) => {
-                        return {
-                            label: item.name,
-                            key: item.code,
-                            description: item.description,
-                            children: item.inJsonSchema
-                                ? getjsonschma(getJSON(item), item.name)
-                                : item.outJsonSchema
-                                ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
-                                : []
-                        };
-                    })
+                    ?.map((item: any) => ({
+                        label: item.name,
+                        key: item.code,
+                        description: item.description,
+                        children: item.inJsonSchema
+                            ? getjsonschma(getJSON(item), item.name)
+                            : item.outJsonSchema
+                            ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
+                            : []
+                    }))
                     ?.filter((item: any) => item?.children?.length > 0);
                 setSchemaList(newList);
             });
@@ -301,13 +300,17 @@ const VariableInput = ({
             content={
                 <div style={{ width: popoverWidth + 'px', maxWidth: '1024px', minWidth: '512px' }} className={'flex items-stretch gap-2'}>
                     <div className="flex flex-col flex-1 h-[310px]">
-                        <span className="text-sm text-gray-500">变量选择</span>
+                        <span className="text-sm text-gray-500 mb-2">
+                            <span className="mr-2">变量选择</span>
+                            <Tooltip title={'可选择上游步骤支持的变量，执行时会自动替换为具体的值'}>
+                                <ExclamationCircleOutlined rev={undefined} />
+                            </Tooltip>
+                        </span>
                         <Menu inlineIndent={12} className="flex-1 h-[300px] overflow-y-auto" defaultSelectedKeys={[]} mode="inline">
                             {renderMenuItems(schemaList, index)}
                         </Menu>
                     </div>
                     <div className="flex flex-col flex-1 h-[310px]">
-                        <span className="text-sm text-gray-500">使用说明</span>
                         <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4 whitespace-pre-wrap">
                             {tipValue}
                         </div>

@@ -1103,8 +1103,6 @@ function CreateDetail() {
                                 setValue(key);
                             } else if (key === '4') {
                                 setValue(key);
-                                setViewLoading(true);
-                                saveDetail(true);
                             } else {
                                 setValue(key);
                             }

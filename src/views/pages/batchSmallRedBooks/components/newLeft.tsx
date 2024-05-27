@@ -207,7 +207,7 @@ const Lefts = ({
                 width: item.type === 'textBox' ? 400 : 200,
                 dataIndex: item.fieldName,
                 render: (_: any, row: any) => (
-                    <div className="flex justify-center items-center gap-2 min-w-[200px]">
+                    <div className="flex justify-center items-center gap-2">
                         {item.type === 'image' ? (
                             row[item.fieldName] ? (
                                 <Image

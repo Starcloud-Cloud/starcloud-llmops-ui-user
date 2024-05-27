@@ -344,9 +344,13 @@ const Lefts = ({
         setEditOpen(true);
     };
     const formOk = (result: any) => {
+        console.log(result);
+
         const newList = _.cloneDeep(tableRef.current) || [];
         if (title === '编辑') {
-            newList.splice((page - 1) * 10 + rowIndex, 1, result);
+            newList.splice((page - 1) * 10 + rowIndex, 1, { ...result, uuid: newList[(page - 1) * 10 + rowIndex]?.uuid });
+            console.log(newList);
+
             tableRef.current = newList;
             setTableData(tableRef.current);
         } else {
@@ -1245,6 +1249,9 @@ const Lefts = ({
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         {!detail && (
                             <div>
+                                <Button type="primary" size="small" className="mr-1">
+                                    创作同款应用
+                                </Button>
                                 状态：{getStatus1(appData?.status)}
                                 <div className="inline-block whitespace-nowrap">
                                     <Popconfirm

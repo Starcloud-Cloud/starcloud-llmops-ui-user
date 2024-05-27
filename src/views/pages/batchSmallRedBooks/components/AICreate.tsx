@@ -512,21 +512,21 @@ const AiCreate = ({
                                                 if (!fieldCompletionData.requirement) {
                                                     return false;
                                                 }
-                                                // if (fieldCompletionData.checkedFieldList?.length === 0) {
-                                                //     dispatch(
-                                                //         openSnackbar({
-                                                //             open: true,
-                                                //             message: 'AI 补齐字段最少选一个',
-                                                //             variant: 'alert',
-                                                //             alert: {
-                                                //                 color: 'error'
-                                                //             },
-                                                //             anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                //             close: false
-                                                //         })
-                                                //     );
-                                                //     return false;
-                                                // }
+                                                if (fieldCompletionData.checkedFieldList?.length === 0) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: 'AI 补齐字段最少选一个',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            close: false
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
                                                 handleMaterial(2);
                                             }}
                                             type="primary"

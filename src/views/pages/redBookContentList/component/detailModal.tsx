@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import React from 'react';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Tooltip } from 'antd';
 import ThreeStep from './threeStep';
 import { getContentDetail, getContentDetail1 } from 'api/redBook';
 import GradeIcon from '@mui/icons-material/Grade';
@@ -31,8 +31,6 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
     //是否是生成记录的详情
     const [exeDetail, setExeDetail] = useState(false);
     const [count, setCount] = useState(1);
-
-    console.log(detail, 'detail');
 
     useEffect(() => {
         if (!executeResult) {
@@ -77,66 +75,70 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
             title={
                 <div className="flex">
                     <span>详情</span>
-                    <div className="flex justify-around items-center w-[80px]">
-                        <div>
+                    <div className="flex justify-around items-center ml-2">
+                        <div className="cursor-pointer">
                             {detail?.liked ? (
-                                <GradeIcon
-                                    onClick={async (e: any) => {
-                                        e.stopPropagation();
-                                        const result = await contentUnlike({ uid: detail.uid });
-                                        if (result) {
-                                            setCount((pre) => pre + 1);
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '取消点赞成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                        }
-                                    }}
-                                    sx={{ color: '#ecc94b99' }}
-                                />
+                                <Tooltip title="取消点赞">
+                                    <GradeIcon
+                                        onClick={async (e: any) => {
+                                            e.stopPropagation();
+                                            const result = await contentUnlike({ uid: detail.uid });
+                                            if (result) {
+                                                setCount((pre) => pre + 1);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '取消点赞成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                        transition: 'SlideDown',
+                                                        close: false
+                                                    })
+                                                );
+                                            }
+                                        }}
+                                        sx={{ color: '#ecc94b99' }}
+                                    />
+                                </Tooltip>
                             ) : (
-                                <GradeOutlinedIcon
-                                    onClick={async (e: any) => {
-                                        e.stopPropagation();
-                                        const result = await contentLike({ uid: detail.uid });
-                                        if (result) {
-                                            setCount((pre) => pre + 1);
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '点赞成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                        }
-                                    }}
-                                    sx={{ color: '#0003' }}
-                                />
+                                <Tooltip title="点赞">
+                                    <GradeOutlinedIcon
+                                        onClick={async (e: any) => {
+                                            e.stopPropagation();
+                                            const result = await contentLike({ uid: detail.uid });
+                                            if (result) {
+                                                setCount((pre) => pre + 1);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '点赞成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                        transition: 'SlideDown',
+                                                        close: false
+                                                    })
+                                                );
+                                            }
+                                        }}
+                                        sx={{ color: '#0003' }}
+                                    />
+                                </Tooltip>
                             )}
                         </div>
-                        <div>
+                        {/* <div>
                             <BackupIcon
                                 className="text-gray-500"
                                 onClick={async (e: any) => {
                                     e.stopPropagation();
                                 }}
                             />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             }

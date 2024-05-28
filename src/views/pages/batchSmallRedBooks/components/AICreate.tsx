@@ -1,4 +1,4 @@
-import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag } from 'antd';
+import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover } from 'antd';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { materialGenerate, customMaterialGenerate } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
@@ -6,6 +6,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import { ExclamationCircleFilled } from '@ant-design/icons';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 const { confirm } = Modal;
 
 const AiCreate = ({
@@ -283,6 +284,24 @@ const AiCreate = ({
         }
     }, [materialExecutionOpen]);
 
+    const items: TabsProps['items'] = [
+        {
+            key: '1',
+            label: '示例',
+            children: (
+                <div className="text-xs max-w-[600px] leading-5">
+                    <span>
+                        帮我生成一些唐诗，包括：古诗名称，作者，一句诗句 <br />
+                    </span>
+                    <span className="font-semibold">标题</span> ：古诗名
+                    <br />
+                    <span className="font-semibold">语句1</span>：一句诗句
+                    <br />
+                </div>
+            )
+        }
+    ];
+
     return (
         <div>
             <Button
@@ -335,7 +354,24 @@ const AiCreate = ({
                                             </Checkbox>
                                         ))}
                                     </Checkbox.Group>
-                                    <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
+                                    <div className="text-[16px] font-bold my-4 flex items-center">
+                                        <span>2.告诉 AI 如何生成这些字段内容</span>
+                                        <Popover
+                                            content={
+                                                <div className="max-w-[230px] sm:max-w-[600px]">
+                                                    <div>
+                                                        <Tabs size="small" defaultActiveKey="1" items={items} />
+                                                    </div>
+                                                </div>
+                                            }
+                                            title="如何设置角色描述？使用万能句式"
+                                            placement="bottomLeft"
+                                            arrow={false}
+                                            trigger="hover"
+                                        >
+                                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                                        </Popover>
+                                    </div>
                                     <TextArea
                                         value={variableData.requirement}
                                         status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}

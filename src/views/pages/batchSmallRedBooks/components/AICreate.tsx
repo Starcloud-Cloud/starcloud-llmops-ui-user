@@ -287,15 +287,32 @@ const AiCreate = ({
     const items: TabsProps['items'] = [
         {
             key: '1',
-            label: '示例',
+            label: '示例1',
             children: (
                 <div className="text-xs max-w-[600px] leading-5">
                     <span>
                         帮我生成一些唐诗，包括：古诗名称，作者，一句诗句 <br />
                     </span>
-                    <span className="font-semibold">标题</span> ：古诗名
+                    <span>标题：古诗名</span>
                     <br />
-                    <span className="font-semibold">语句1</span>：一句诗句
+                    <span>语句：一句诗句</span>
+                    <br />
+                </div>
+            )
+        },
+        {
+            key: '2',
+            label: '示例2',
+            children: (
+                <div className="text-xs max-w-[600px] leading-5">
+                    <span>
+                        作为小红书养生博主，结合主题“这6种食物千万别二次加热“，生成6种食物信息
+                        <br />
+                    </span>
+                    <span>返回的字段要求：</span> <br />
+                    <span>标题：食物名称，不超过6个汉字</span> <br />
+                    <span>节内容：一句话说明为什么不能二次加热的原因，不少于过20个汉字</span>
+                    <span>节内容2：为什么不能二次加热的详细原因，不少于100个汉字</span>
                     <br />
                 </div>
             )
@@ -364,7 +381,6 @@ const AiCreate = ({
                                                     </div>
                                                 </div>
                                             }
-                                            title="如何设置角色描述？使用万能句式"
                                             placement="bottomLeft"
                                             arrow={false}
                                             trigger="hover"

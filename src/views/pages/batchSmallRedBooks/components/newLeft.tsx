@@ -61,6 +61,8 @@ import { PermissionUpgradeModal } from 'views/template/myChat/createChat/compone
 import { useNavigate } from 'react-router-dom';
 import AiCreate from './AICreate';
 import { PicImagePick } from 'ui-component/PicImagePick';
+import './newLeft.scss';
+
 const Lefts = ({
     detailShow = true,
     planState,
@@ -250,6 +252,7 @@ const Lefts = ({
                                     <div className="w-[80px] h-[80px] rounded-md border border-solid border-black/10"></div>
                                 )} */}
                                 <Upload
+                                    className='table_upload'
                                     {...propShow}
                                     showUploadList={false}
                                     listType="picture-card"

@@ -145,7 +145,7 @@ const FormModal = ({
                                                             '?x-oss-process=image/resize,w_300/quality,q_80'
                                                     }
                                                 />
-                                                <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.4)]">
+                                                <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
                                                     <Tooltip title="查看">
                                                         <EyeOutlined
                                                             onClick={(e) => {
@@ -154,19 +154,19 @@ const FormModal = ({
                                                                 e.stopPropagation();
                                                             }}
                                                             rev={undefined}
-                                                            className="text-white/60 hover:text-white"
+                                                            className="text-white/80 hover:text-white"
                                                         />
                                                     </Tooltip>
                                                     <Tooltip title="上传">
                                                         <CloudUploadOutlined
                                                             rev={undefined}
-                                                            className="text-white/60 hover:text-white ml-3"
+                                                            className="text-white/80 hover:text-white ml-3"
                                                         />
                                                     </Tooltip>
                                                     <Tooltip title="搜索">
                                                         <SelectOutlined
                                                             rev={undefined}
-                                                            className="text-white/60 hover:text-white ml-3"
+                                                            className="text-white/80 hover:text-white ml-3"
                                                             onClick={(e) => {
                                                                 setIsModalOpen(true);
                                                                 e.stopPropagation();

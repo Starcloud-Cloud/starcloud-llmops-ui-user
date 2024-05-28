@@ -56,11 +56,14 @@ const AddStyle = React.forwardRef(
         const [switchCheck, setSwitchCheck] = useState(false);
         const [updIndex, setUpdIndex] = useState<any>('');
         const [updDrawIndex, setUpdDrawIndex] = useState<any>('');
-        const [addType, setAddType] = useState(0); // 1创建自定义风格
+        const [addType, setAddType] = useState(0); // 1创建自定义风格 // 3修改自定义风格
 
         const currentStyleRef: any = useRef(null);
         const collapseIndexRef: any = useRef(null);
         const templateRef: any = useRef(null);
+
+        console.log(styleData, 'styleData');
+        console.log(customList, 'customList');
 
         const submitData = React.useMemo(() => {
             const copyRecord = _.cloneDeep(record);
@@ -112,11 +115,7 @@ const AddStyle = React.forwardRef(
                 const customList =
                     record?.variable?.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
                 const json = JSON.parse(customList);
-                const list = json.map((item: any) => ({
-                    ...item,
-                    uuid: uuidv4()?.split('-')?.join('')
-                }));
-                setCustomList([...list]);
+                setCustomList([...json]);
             }
         }, [record]);
 
@@ -384,6 +383,7 @@ const AddStyle = React.forwardRef(
             setCurrentStyle(null);
         };
 
+        // 复制uid需要改变
         const handleCopy = (recordIndex: number) => {
             const copyRecord = _.cloneDeep(record);
             const copyDetails = _.cloneDeep(details);
@@ -463,7 +463,7 @@ const AddStyle = React.forwardRef(
                 message.warning('请填写风格名称');
                 return;
             }
-            // 新增
+            // 新增uuid 需要改变
             if (addType === 1) {
                 const copyRecord = _.cloneDeep(record);
                 const copyDetails = _.cloneDeep(details);
@@ -535,6 +535,7 @@ const AddStyle = React.forwardRef(
                         return;
                     });
             } else if (addType === 3) {
+                // 修改uuid的不需要改变
                 const copyRecord = _.cloneDeep(record);
                 const copyDetails = _.cloneDeep(details);
                 const valueString =
@@ -545,35 +546,12 @@ const AddStyle = React.forwardRef(
                     ...valueJson[updDrawIndex],
                     ...currentStyle
                 };
-                console.log('🚀 ~ handleOk ~ valueJson:', valueJson);
 
                 copyRecord.variable.variables.forEach((item: any) => {
                     if (item.field === 'CUSTOM_POSTER_STYLE_CONFIG') {
                         item.value = valueJson;
                     }
                 });
-
-                // const indexList = JSON.parse(valueString)
-                //     .map((item: any) => item.index)
-                //     .filter((item: any) => typeof item === 'number')
-                //     .filter(Boolean);
-
-                // const index = Math.max(...indexList);
-                // copyRecord.variable.variables.forEach((item: any) => {
-                //     if (item.field === 'CUSTOM_POSTER_STYLE_CONFIG') {
-                //         item.value = [
-                //             ...JSON.parse(item.value),
-                //             {
-                //                 ...currentStyle,
-                //                 enable: true,
-                //                 index: index + 1,
-                //                 system: false,
-                //                 totalImageCount: 0,
-                //                 uuid: uuidv4()?.split('-')?.join('')
-                //             }
-                //         ];
-                //     }
-                // });
 
                 copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
                     if (item.flowStep.handler === 'PosterActionHandler') {

@@ -17,9 +17,18 @@ import {
     Col,
     Input,
     Badge,
-    theme
+    theme,
+    Tooltip
 } from 'antd';
-import { PlusOutlined, SaveOutlined, ZoomInOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+    PlusOutlined,
+    SaveOutlined,
+    ZoomInOutlined,
+    InfoCircleOutlined,
+    EyeOutlined,
+    CloudUploadOutlined,
+    SelectOutlined
+} from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef } from 'react';
@@ -37,7 +46,7 @@ import {
     materialJudge
 } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
-import FormModal from './formModal';
+import FormModal, { propShow } from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import CreateVariable from '../../copywriting/components/spliceCmponents/variable';
 import LeftModalAdd from './leftModalAdd';
@@ -51,6 +60,7 @@ import { useAllDetail } from 'contexts/JWTContext';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { useNavigate } from 'react-router-dom';
 import AiCreate from './AICreate';
+import { PicImagePick } from 'ui-component/PicImagePick';
 const Lefts = ({
     detailShow = true,
     planState,
@@ -102,6 +112,20 @@ const Lefts = ({
     const appRef = useRef<any>(null);
     const [appData, setAppData] = useState<any>(null);
     const [version, setVersion] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectImg, setSelectImg] = useState<any>(null);
+    const [imageDataIndex, setImageDataIndex] = useState(0);
+    const [filedName, setFiledName] = useState('');
+
+    useEffect(() => {
+        if (tableRef.current.length && selectImg.largeImageURL) {
+            const data = tableRef.current;
+            data[imageDataIndex][filedName] = selectImg.largeImageURL;
+            tableRef.current = data;
+            setTableData([...data]);
+        }
+    }, [selectImg]);
+
     const getStatus1 = (status: any) => {
         switch (status) {
             case 'PENDING':
@@ -127,6 +151,8 @@ const Lefts = ({
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
     const [fileList, setFileList] = useState<any[]>([]);
+    const [previewUrl, setPreviewUrl] = useState('');
+    const [previewOpen, setPreviewOpen] = useState(false);
     const props: UploadProps = {
         name: 'image',
         multiple: true,
@@ -206,22 +232,87 @@ const Lefts = ({
                 align: 'center',
                 width: item.type === 'textBox' ? 400 : 200,
                 dataIndex: item.fieldName,
-                render: (_: any, row: any) => (
+                render: (_: any, row: any, index: number) => (
                     <div className="flex justify-center items-center gap-2 min-w-[200px]">
                         {item.type === 'image' ? (
-                            row[item.fieldName] ? (
-                                <Image
-                                    fallback={
-                                        'data:image/png;base64,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'
-                                    }
-                                    width={50}
-                                    height={50}
-                                    preview={false}
-                                    src={row[item.fieldName] + '?x-oss-process=image/resize,w_300/quality,q_80'}
-                                />
-                            ) : (
-                                <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
-                            )
+                            <div className="relative">
+                                {/* {row[item.fieldName] ? (
+                                    <Image
+                                        fallback={
+                                            'data:image/png;base64,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'
+                                        }
+                                        width={80}
+                                        height={80}
+                                        preview={false}
+                                        src={row[item.fieldName] + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                    />
+                                ) : (
+                                    <div className="w-[80px] h-[80px] rounded-md border border-solid border-black/10"></div>
+                                )} */}
+                                <Upload
+                                    {...propShow}
+                                    showUploadList={false}
+                                    listType="picture-card"
+                                    maxCount={1}
+                                    onChange={(info) => {
+                                        if (info.file.status === 'done') {
+                                            const data = tableRef.current;
+                                            data[index][item.fieldName] = info?.file?.response?.data?.url;
+                                            tableRef.current = data;
+                                            setTableData([...data]);
+                                        }
+                                    }}
+                                >
+                                    {row[item.fieldName] ? (
+                                        <div className="relative">
+                                            <Image
+                                                preview={false}
+                                                width={82}
+                                                height={82}
+                                                src={
+                                                    row[item.fieldName]
+                                                    // selectImg?.largeImageURL ||
+                                                    // form.getFieldValue(item.dataIndex) + '?x-oss-process=image/resize,w_300/quality,q_80'
+                                                }
+                                            />
+                                            <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.4)]">
+                                                <Tooltip title="查看">
+                                                    <EyeOutlined
+                                                        onClick={(e) => {
+                                                            // setImageUrl(selectImg?.largeImageURL || form.getFieldValue(item.dataIndex));
+                                                            setPreviewUrl(row[item.fieldName]);
+                                                            setPreviewOpen(true);
+                                                            e.stopPropagation();
+                                                        }}
+                                                        rev={undefined}
+                                                        className="text-white/60 hover:text-white"
+                                                    />
+                                                </Tooltip>
+                                                <Tooltip title="上传">
+                                                    <CloudUploadOutlined rev={undefined} className="text-white/60 hover:text-white ml-3" />
+                                                </Tooltip>
+                                                <Tooltip title="搜索">
+                                                    <SelectOutlined
+                                                        rev={undefined}
+                                                        className="text-white/60 hover:text-white ml-3"
+                                                        onClick={(e) => {
+                                                            setIsModalOpen(true);
+                                                            e.stopPropagation();
+                                                            setImageDataIndex(index);
+                                                            setFiledName(item.fieldName);
+                                                        }}
+                                                    />
+                                                </Tooltip>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                            <PlusOutlined rev={undefined} />
+                                            <div style={{ marginTop: 8 }}>Upload</div>
+                                        </div>
+                                    )}
+                                </Upload>
+                            </div>
                         ) : item.type === 'listImage' ? (
                             <div className="flex gap-1 flex-wrap">
                                 {row[item.fieldName]?.map((item: any) => (
@@ -386,6 +477,8 @@ const Lefts = ({
             setPercent(0);
         }
     }, [uploadLoading]);
+
+    console.log(tableRef.current, 'tableRef.current');
 
     //笔记生成
     const generRef = useRef<any>(null);
@@ -1809,6 +1902,18 @@ const Lefts = ({
             {botOpen && (
                 <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`权益不足，去升级`} from={''} />
             )}
+            <Image
+                className="hidden"
+                width={400}
+                preview={{
+                    visible: previewOpen,
+                    onVisibleChange: (visible) => {
+                        setPreviewOpen(visible);
+                    }
+                }}
+                src={previewUrl}
+            />
+            {isModalOpen && <PicImagePick isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} setSelectImg={setSelectImg} />}
         </>
     );
 };

@@ -233,7 +233,7 @@ const Lefts = ({
                 width: item.type === 'textBox' ? 400 : 200,
                 dataIndex: item.fieldName,
                 render: (_: any, row: any, index: number) => (
-                    <div className="flex justify-center items-center gap-2 min-w-[200px]">
+                    <div className="flex justify-center items-center gap-2">
                         {item.type === 'image' ? (
                             <div className="relative">
                                 {/* {row[item.fieldName] ? (
@@ -435,9 +435,13 @@ const Lefts = ({
         setEditOpen(true);
     };
     const formOk = (result: any) => {
+        console.log(result);
+
         const newList = _.cloneDeep(tableRef.current) || [];
         if (title === '编辑') {
-            newList.splice((page - 1) * 10 + rowIndex, 1, result);
+            newList.splice((page - 1) * 10 + rowIndex, 1, { ...result, uuid: newList[(page - 1) * 10 + rowIndex]?.uuid });
+            console.log(newList);
+
             tableRef.current = newList;
             setTableData(tableRef.current);
         } else {
@@ -1182,7 +1186,7 @@ const Lefts = ({
                         type: 'picture'
                     })) || []
                 );
-        } else if (materialTypeStatus) {
+        } else {
             setMoke &&
                 setMoke(
                     tableData?.map((item) => ({
@@ -1338,6 +1342,9 @@ const Lefts = ({
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         {!detail && (
                             <div>
+                                <Button type="primary" size="small" className="mr-1">
+                                    创作同款应用
+                                </Button>
                                 状态：{getStatus1(appData?.status)}
                                 <div className="inline-block whitespace-nowrap">
                                     <Popconfirm

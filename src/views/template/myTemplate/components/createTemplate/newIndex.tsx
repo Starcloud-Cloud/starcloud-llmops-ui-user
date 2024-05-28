@@ -25,7 +25,6 @@ import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { TabsProps } from 'types';
 import { Details, Execute } from 'types/template';
 import Perform from 'views/template/carryOut/newPerform';
 import Arrange from './newArrange';
@@ -1075,7 +1074,43 @@ function CreateDetail() {
             ></CardHeader>
             <Divider />
             <div className="p-4">
-                <Tabs activeKey={value} onChange={setValue}>
+                <Tabs
+                    activeKey={value}
+                    onChange={(key: string) => {
+                        if (detailRef?.current?.type === 'MEDIA_MATRIX') {
+                            if (value === '4') {
+                                const newData = _.cloneDeep(detailRef.current);
+                                let arr = newData?.workflowConfig?.steps;
+                                const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+                                if (a) {
+                                    a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                                        createPlanRef?.current?.moke;
+                                }
+                                const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
+                                if (index !== -1) {
+                                    arr[index] =
+                                        createPlanRef?.current?.imageMoke ||
+                                        arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+                                }
+                                arr = [
+                                    arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+                                    ...createPlanRef.current.getDetail,
+                                    arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                                ];
+                                newData.workflowConfig.steps = arr?.filter((item: any) => item);
+                                detailRef.current = newData;
+                                setDetail(detailRef?.current);
+                                setValue(key);
+                            } else if (key === '4') {
+                                setValue(key);
+                            } else {
+                                setValue(key);
+                            }
+                        } else {
+                            setValue(key);
+                        }
+                    }}
+                >
                     <Tabs.TabPane tab=" 基础设置" key="0">
                         <div className="flex justify-center ">
                             <div className="xl:w-[80%] lg:w-full">
@@ -1104,45 +1139,6 @@ function CreateDetail() {
                                     segmentedValue === '预览测试' && detail?.type === 'MEDIA_MATRIX' ? '100%' : '80%'
                                 }] lg:w-full`}
                             >
-                                <div className="pb-4 flex justify-center">
-                                    <Segmented
-                                        value={segmentedValue}
-                                        onChange={(e) => {
-                                            if (detailRef?.current?.type === 'MEDIA_MATRIX') {
-                                                if (e === '预览测试') {
-                                                    setViewLoading(true);
-                                                    saveDetail(true);
-                                                } else {
-                                                    const newData = _.cloneDeep(detailRef.current);
-                                                    let arr = newData?.workflowConfig?.steps;
-                                                    const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
-                                                    if (a) {
-                                                        a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                                                            createPlanRef?.current?.moke;
-                                                    }
-                                                    const index = arr.findIndex(
-                                                        (item: any) => item.flowStep.handler === 'PosterActionHandler'
-                                                    );
-                                                    if (index !== -1) {
-                                                        arr[index] =
-                                                            createPlanRef?.current?.imageMoke ||
-                                                            arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
-                                                    }
-                                                    arr = [
-                                                        arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
-                                                        ...createPlanRef.current.getDetail,
-                                                        arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-                                                    ];
-                                                    newData.workflowConfig.steps = arr?.filter((item: any) => item);
-                                                    detailRef.current = newData;
-                                                    setDetail(detailRef?.current);
-                                                }
-                                            }
-                                            setSegmentedValue(e);
-                                        }}
-                                        options={['配置', '预览测试']}
-                                    />
-                                </div>
                                 {segmentedValue === '配置' && detail && (
                                     <Arrange
                                         detail={detail}
@@ -1215,6 +1211,65 @@ function CreateDetail() {
                                         </div>
                                     ))}
                             </div>
+                        </div>
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="运行应用" key="4">
+                        <div className="w-full">
+                            {detail?.type === 'MEDIA_MATRIX' ? (
+                                <Spin spinning={viewLoading} tip="Loading">
+                                    <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
+                                        <CreatePlan
+                                            ref={createPlanRef}
+                                            planState={planState}
+                                            detail={_.cloneDeep(detailRef.current)}
+                                            setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
+                                            isMyApp={true}
+                                        />
+                                    </div>
+                                </Spin>
+                            ) : (
+                                <div>
+                                    <Typography variant="h5" fontSize="1rem" mb={1}>
+                                        {t('market.debug')}
+                                    </Typography>
+                                    <Card elevation={2} sx={{ p: 2 }}>
+                                        <Header
+                                            permissions={permissions}
+                                            detail={detail}
+                                            aiModel={aiModel}
+                                            setOpenUpgradeModel={setOpenUpgradeModel}
+                                            setAiModel={setAiModel}
+                                            appModels={appModels}
+                                        />
+                                        <Perform
+                                            columns={stepMaterial}
+                                            setEditOpen={setEditOpen}
+                                            setStep={(data: any) => {
+                                                stepRef.current = data;
+                                                setStep(stepRef.current);
+                                            }}
+                                            getList={getList}
+                                            setMaterialType={setMaterialType}
+                                            setTitle={setTitle}
+                                            isShows={isShows}
+                                            details={_.cloneDeep(detailRef.current)}
+                                            config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                                            changeConfigs={changeConfigs}
+                                            changeSon={changeData}
+                                            changeanswer={changeanswer}
+                                            loadings={loadings}
+                                            isDisables={isDisables}
+                                            variableChange={exeChange}
+                                            promptChange={promptChange}
+                                            isallExecute={(flag: boolean) => {
+                                                isAllExecute = flag;
+                                            }}
+                                            addStyle={addStyle}
+                                            source="myApp"
+                                        />
+                                    </Card>
+                                </div>
+                            )}
                         </div>
                     </Tabs.TabPane>
                     {detailRef.current?.uid && searchParams.get('uid') && (

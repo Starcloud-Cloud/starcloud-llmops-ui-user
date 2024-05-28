@@ -160,7 +160,7 @@ const FormModal = ({
                                                     <Tooltip title="上传">
                                                         <CloudUploadOutlined
                                                             rev={undefined}
-                                                            className="text-white/80 hover:text-white ml-3"
+                                                            className="text-white/80 hover:text-white !cursor-pointer"
                                                         />
                                                     </Tooltip>
                                                     <Tooltip title="搜索">

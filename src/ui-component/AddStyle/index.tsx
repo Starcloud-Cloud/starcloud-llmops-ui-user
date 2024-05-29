@@ -185,6 +185,22 @@ const AddStyle = React.forwardRef(
                         查看
                     </span>
                 )
+            },
+            {
+                key: '1',
+                label: (
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const index: any = collapseIndexRef.current;
+                            const copyStyleData = [...styleData];
+                            copyStyleData.splice(index, 1);
+                            setStyleData(copyStyleData);
+                        }}
+                    >
+                        删除
+                    </span>
+                )
             }
         ];
 

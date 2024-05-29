@@ -469,9 +469,9 @@ const AiCreate = ({
                                         </Popover>
                                     </div>
                                     <TextArea
-                                        value={variableData.requirement}
+                                        defaultValue={variableData.requirement}
                                         status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}
-                                        onChange={(e) => {
+                                        onBlur={(e) => {
                                             setrequirementStatusOpen(true);
                                             setVariableData({
                                                 ...variableData,
@@ -610,9 +610,9 @@ const AiCreate = ({
                                     </Checkbox.Group>
                                     <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
                                     <TextArea
-                                        value={fieldCompletionData.requirement}
+                                        defaultValue={fieldCompletionData.requirement}
                                         status={!fieldCompletionData.requirement && requirementStatusOpen ? 'error' : ''}
-                                        onChange={(e) => {
+                                        onBlur={(e) => {
                                             setFieldCompletionData({ ...fieldCompletionData, requirement: e.target.value });
                                             setrequirementStatusOpen(true);
                                         }}

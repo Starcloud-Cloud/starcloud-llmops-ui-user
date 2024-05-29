@@ -32,8 +32,6 @@ import { Pagination } from 'swiper';
 import { appModify } from 'api/template';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
-
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -853,9 +851,6 @@ const AddStyleApp = React.forwardRef(
                                 <span>生成图片时会按照风格模板的顺序去使用</span>
                             </div>
                         </div>
-                        <Button type="primary" size="small">
-                            增加系统模版
-                        </Button>
                     </div>
                 )}
                 <div>
@@ -1220,36 +1215,6 @@ const AddStyleApp = React.forwardRef(
                         />
                     </Modal>
                 )}
-                {/* <Modal open={true}>
-                <CreateTab
-                                                                key={el?.field}
-                                                                appData={{ materialType, appReqVO: detail }}
-                                                                imageStyleData={el.value}
-                                                                setImageStyleData={(data) => {
-                                                                    basisChange({
-                                                                        e: { name: el.field, value: data },
-                                                                        index,
-                                                                        i,
-                                                                        values: true
-                                                                    });
-                                                                }}
-                                                                focuActive={focuActive}
-                                                                setFocuActive={setFocuActive}
-                                                                digui={() => {
-                                                                    const newData = el.value?.map((i: any) => i.name.split(' ')[1]);
-                                                                    if (!newData || newData?.every((i: any) => !i)) {
-                                                                        return 1;
-                                                                    }
-                                                                    return (
-                                                                        newData
-                                                                            ?.map((i: any) => Number(i))
-                                                                            ?.sort((a: any, b: any) => b - a)[0] *
-                                                                            1 +
-                                                                        1
-                                                                    );
-                                                                }}
-                                                            />
-                </Modal> */}
             </div>
         );
     }

@@ -99,8 +99,10 @@ const AddStyle = React.forwardRef(
                     }
                 }
             });
+            copyRecord.flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG').value =
+                JSON.stringify(systemVariable);
             return copyRecord;
-        }, [styleData, record]);
+        }, [styleData, record, systemVariable]);
 
         // useEffect(() => {
         //     // 系统的初始化为关闭
@@ -512,22 +514,27 @@ const AddStyle = React.forwardRef(
             <div className="addStyle">
                 {mode === 1 && (
                     <div className="pb-3 flex">
-                        <Button size="small" type="primary" onClick={() => handleAdd()}>
-                            增加风格
-                        </Button>
-                        <div className="ml-3 flex items-center justify-center">
-                            <InfoIcon
-                                style={{
-                                    fontSize: '12px'
-                                }}
-                            />
-                            <span>生成图片时会按照风格模板的顺序去使用</span>
+                        <div>
+                            <Button size="small" type="primary" onClick={() => handleAdd()}>
+                                增加风格
+                            </Button>
+                            <div className="ml-3 flex items-center justify-center">
+                                <InfoIcon
+                                    style={{
+                                        fontSize: '12px'
+                                    }}
+                                />
+                                <span>生成图片时会按照风格模板的顺序去使用</span>
+                            </div>
                         </div>
                     </div>
                 )}
-                <div>
-                    <Collapse items={collapseList} defaultActiveKey={[0]} />
+                <div className="my-4">
+                    <Button type="primary" onClick={() => setSystemOPen(true)}>
+                        增加系统模版
+                    </Button>
                 </div>
+                <Collapse items={collapseList} defaultActiveKey={[0]} />
                 <Drawer
                     // zIndex={99999}
                     title="选择风格模版"
@@ -858,7 +865,7 @@ const AddStyle = React.forwardRef(
                         />
                     </Modal>
                 )}
-                <Modal width={'80%'} open={systemOPen} onCancel={() => setSystemOPen(false)}>
+                <Modal width={'80%'} open={systemOPen} onCancel={() => setSystemOPen(false)} footer={false}>
                     <CreateTab
                         appData={{ materialType, appReqVO: details }}
                         imageStyleData={systemVariable}

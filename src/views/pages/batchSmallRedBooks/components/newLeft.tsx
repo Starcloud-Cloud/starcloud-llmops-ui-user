@@ -1101,9 +1101,11 @@ const Lefts = ({
                                     (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                                 ),
                                 ...newList,
-                                ...appRef.current.configuration.appInformation.workflowConfig.steps?.filter(
-                                    (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
-                                )
+                                imageRef.current
+                                    ? imageRef.current?.record
+                                    : appRef.current.configuration.appInformation.workflowConfig.steps?.find(
+                                          (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                                      )
                             ]
                         }
                     }
@@ -1322,7 +1324,7 @@ const Lefts = ({
         } else {
             setVariableData({
                 ...variableData,
-                checkedFieldList: maxLength?.length >= 6 ? reList : [...reList, ...resizeList]?.slice(0, 6)
+                checkedFieldList: reList
             });
         }
         if (defaultField) {
@@ -1346,7 +1348,7 @@ const Lefts = ({
         } else {
             setFieldCompletionData({
                 ...fieldCompletionData,
-                checkedFieldList: maxLength?.length >= 6 ? reList : [...reList, ...resizeList]?.slice(0, 6)
+                checkedFieldList: []
             });
         }
     }, [columns]);
@@ -1370,25 +1372,13 @@ const Lefts = ({
                     ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
                     .variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE').value;
         }
-        const b = arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
-        if (b) {
-            let styleData = imageRef.current?.record?.variable?.variables?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value;
-            if (typeof styleData === 'string') {
-                styleData = JSON.parse(styleData);
-            }
-            b.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value = styleData
-                ? styleData?.map((item: any) => ({
-                      ...item,
-                      id: undefined,
-                      code: item.id
-                  }))
-                : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value;
+        let b = _.cloneDeep(imageRef.current?.record);
+        if (!b) {
+            b = appRef.current.configuration?.appInformation?.workflowConfig?.variable.variables.find(
+                (item: any) => item.field === 'POSTER_STYLE_CONFIG'
+            );
         }
-        arr = [
-            arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
-            ..._.cloneDeep(generRef.current),
-            arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-        ];
+        arr = [arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'), ..._.cloneDeep(generRef.current), b];
         return arr;
     };
     //素材字段配置弹框

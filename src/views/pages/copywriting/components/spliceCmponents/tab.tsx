@@ -78,7 +78,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                 )}
                             </div>
                         ),
-                        key: item.index?.toString(),
+                        key: item.uuid,
                         children: (
                             <div>
                                 <div className="bg-[#edf0f2]/80 rounded py-[12px] px-[16px] flex justify-between items-center">

@@ -86,6 +86,8 @@ const AddStyleApp = React.forwardRef(
             return copyRecord;
         }, [styleData, record]);
 
+        console.log('111,1111,+++++++');
+
         // useEffect(() => {
         //     // 系统的初始化为关闭
         //     if (currentStyle?.system) {
@@ -140,6 +142,7 @@ const AddStyleApp = React.forwardRef(
         const handleAdd = () => {
             setType(0);
             setVisible(true);
+            setSwitchCheck(true);
         };
 
         const handleQuery = ({ label, value }: { label: string; value: string }) => {
@@ -284,33 +287,66 @@ const AddStyleApp = React.forwardRef(
         //               }
         //           ];
         const handleOkV2 = () => {
-            const copyOriginStyleData = [...originStyleData];
-            const imageStyleList = [...copyOriginStyleData, selectImgs];
+            if (type === 0) {
+                // 新增
+                const copyOriginStyleData = [...originStyleData];
+                const imageStyleList = [...copyOriginStyleData, selectImgs];
 
-            const saveData: any = {};
-            saveData.configuration = {
-                appInformation: allData.configuration.appInformation,
-                imageStyleList: imageStyleList.map((item, index) => ({ ...item, index: index + 1 })),
-                materialList: allData.configuration.materialList
-            };
-            saveData.source = allData.source;
-            saveData.totalCount = allData.totalCount;
-            saveData.uid = allData.uid;
+                const saveData: any = {};
+                saveData.configuration = {
+                    appInformation: allData.configuration.appInformation,
+                    imageStyleList: imageStyleList.map((item, index) => ({ ...item, index: index + 1 })),
+                    materialList: allData.configuration.materialList
+                };
+                saveData.source = allData.source;
+                saveData.totalCount = allData.totalCount;
+                saveData.uid = allData.uid;
 
-            planModifyConfig({ ...saveData, validate: false })
-                .then((res: any) => {
-                    setIsModalOpen(false);
-                    setUpdIndex('');
-                    setAddType(0);
-                    setCurrentStyle(null);
-                    getList();
-                    setVisible(false);
-                    setSelectImgs(null);
-                    setChooseImageIndex('');
-                })
-                .catch((e: any) => {
-                    return;
-                });
+                planModifyConfig({ ...saveData, validate: false })
+                    .then((res: any) => {
+                        setIsModalOpen(false);
+                        setUpdIndex('');
+                        setAddType(0);
+                        setCurrentStyle(null);
+                        getList();
+                        setVisible(false);
+                        setSelectImgs(null);
+                        setChooseImageIndex('');
+                    })
+                    .catch((e: any) => {
+                        return;
+                    });
+            }
+            if (type === 1) {
+                //切换
+                const copyOriginStyleData: any = [...originStyleData];
+                copyOriginStyleData[editIndex] = selectImgs;
+
+                const saveData: any = {};
+                saveData.configuration = {
+                    appInformation: allData.configuration.appInformation,
+                    imageStyleList: copyOriginStyleData.map((item: any, index: number) => ({ ...item, index: index + 1 })),
+                    materialList: allData.configuration.materialList
+                };
+                saveData.source = allData.source;
+                saveData.totalCount = allData.totalCount;
+                saveData.uid = allData.uid;
+
+                planModifyConfig({ ...saveData, validate: false })
+                    .then((res: any) => {
+                        setIsModalOpen(false);
+                        setUpdIndex('');
+                        setAddType(0);
+                        setCurrentStyle(null);
+                        getList();
+                        setVisible(false);
+                        setSelectImgs(null);
+                        setChooseImageIndex('');
+                    })
+                    .catch((e: any) => {
+                        return;
+                    });
+            }
         };
 
         const handleOK = () => {

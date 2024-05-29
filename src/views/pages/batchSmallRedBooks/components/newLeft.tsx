@@ -52,7 +52,7 @@ import MarketForm from '../../../template/components/marketForm';
 import CreateVariable from '../../copywriting/components/spliceCmponents/variable';
 import LeftModalAdd from './leftModalAdd';
 import AddStyleApp from 'ui-component/AddStyle/indexApp';
-import AddStyle from 'ui-component/AddStyle';
+import AddStyle from 'ui-component/AddStyle/index';
 import { useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Forms from '../../smallRedBook/components/form';
@@ -1803,31 +1803,18 @@ const Lefts = ({
                                         配置笔记图片生成的风格模版，支持不同风格模版组合生成
                                     </span>
                                 </div>
-                                {detail ? (
-                                    <AddStyle
-                                        details={appData?.configuration?.appInformation}
-                                        hasAddStyle={detail || !detailShow ? false : true}
-                                        setImageVar={setImageVar}
-                                        appUid={appData?.appUid}
-                                        ref={imageRef}
-                                        record={imageMater}
-                                        mode={2}
-                                        getList={() => getList(true)}
-                                        materialType={materialType}
-                                    />
-                                ) : (
-                                    <AddStyleApp
-                                        allData={appData}
-                                        details={appData?.configuration?.appInformation}
-                                        hasAddStyle={detail || !detailShow ? false : true}
-                                        setImageVar={setImageVar}
-                                        getList={() => getList(true)}
-                                        appUid={appData?.appUid}
-                                        ref={imageRef}
-                                        record={imageMater}
-                                        materialType={materialType}
-                                    />
-                                )}
+                                <AddStyle
+                                    canAddCustomStyle={false}
+                                    details={appData?.configuration?.appInformation}
+                                    hasAddStyle={true}
+                                    setImageVar={setImageVar}
+                                    appUid={appData?.appUid}
+                                    ref={imageRef}
+                                    record={imageMater}
+                                    mode={2}
+                                    getList={() => getList(true)}
+                                    materialType={materialType}
+                                />
                             </Tabs.TabPane>
                         )}
                         {detailShow && (

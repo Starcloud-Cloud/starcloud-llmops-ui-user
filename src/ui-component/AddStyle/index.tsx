@@ -38,7 +38,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 const AddStyle = React.forwardRef(
-    ({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any, ref: any) => {
+    (
+        {
+            record,
+            details,
+            appUid,
+            mode = 1,
+            materialType,
+            getList,
+            hasAddStyle = true,
+            setImageVar,
+            allData,
+            canAddCustomStyle = true
+        }: any,
+        ref: any
+    ) => {
         const [visible, setVisible] = useState(false);
 
         const [systemOPen, setSystemOPen] = useState(false);
@@ -88,15 +102,15 @@ const AddStyle = React.forwardRef(
             return copyRecord;
         }, [styleData, record]);
 
-        useEffect(() => {
-            // 系统的初始化为关闭
-            if (currentStyle?.system) {
-                setSwitchCheck(false);
-            } else {
-                // 自定义的只能是开启 不能关闭
-                setSwitchCheck(true);
-            }
-        }, [currentStyle?.system]);
+        // useEffect(() => {
+        //     // 系统的初始化为关闭
+        //     if (currentStyle?.system) {
+        //         setSwitchCheck(false);
+        //     } else {
+        //         // 自定义的只能是开启 不能关闭
+        //         setSwitchCheck(true);
+        //     }
+        // }, [currentStyle?.system]);
 
         useImperativeHandle(ref, () => ({
             record: submitData
@@ -172,85 +186,60 @@ const AddStyle = React.forwardRef(
             setSelectImgs(list);
         };
 
-        const items: any =
-            mode === 1
-                ? [
-                      {
-                          key: '0',
-                          label: (
-                              <span
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      const index: any = collapseIndexRef.current;
-                                      const copyStyleData = [...styleData];
-                                      const item = copyStyleData[index];
-                                      setCurrentStyle(item);
-                                      currentStyleRef.current = item;
-                                      setIsModalOpen(true);
-                                      setUpdIndex(index);
-                                  }}
-                              >
-                                  编辑
-                              </span>
-                          )
-                      },
-                      {
-                          key: '1',
-                          label: (
-                              <span
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      const index: any = collapseIndexRef.current;
-                                      const copyStyleData = [...styleData];
-                                      copyStyleData.splice(index, 1);
-                                      setStyleData(copyStyleData);
-                                  }}
-                              >
-                                  删除
-                              </span>
-                          )
-                      },
-                      {
-                          key: '2',
-                          label: (
-                              <span
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      const index: any = collapseIndexRef.current;
-                                      let copyStyleData = [...styleData];
-                                      copyStyleData = [
-                                          ...copyStyleData,
-                                          { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }
-                                      ];
-                                      setStyleData(copyStyleData);
-                                  }}
-                              >
-                                  复制
-                              </span>
-                          )
-                      }
-                  ]
-                : [
-                      {
-                          key: '0',
-                          label: (
-                              <span
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      const index: any = collapseIndexRef.current;
-                                      const copyStyleData = [...styleData];
-                                      const item = copyStyleData[index];
-                                      setCurrentStyle(item);
-                                      currentStyleRef.current = item;
-                                      setIsModalOpen(true);
-                                      setUpdIndex(index);
-                                  }}
-                              >
-                                  编辑
-                              </span>
-                          )
-                      }
-                  ];
+        const items: any = [
+            {
+                key: '0',
+                label: (
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const index: any = collapseIndexRef.current;
+                            const copyStyleData = [...styleData];
+                            const item = copyStyleData[index];
+                            setCurrentStyle(item);
+                            currentStyleRef.current = item;
+                            setIsModalOpen(true);
+                            setUpdIndex(index);
+                            setSwitchCheck(false);
+                        }}
+                    >
+                        查看
+                    </span>
+                )
+            },
+            {
+                key: '1',
+                label: (
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const index: any = collapseIndexRef.current;
+                            const copyStyleData = [...styleData];
+                            copyStyleData.splice(index, 1);
+                            setStyleData(copyStyleData);
+                        }}
+                    >
+                        删除
+                    </span>
+                )
+            }
+            // {
+            //     key: '2',
+            //     label: (
+            //         <span
+            //             onClick={(e) => {
+            //                 e.stopPropagation();
+            //                 const index: any = collapseIndexRef.current;
+            //                 let copyStyleData = [...styleData];
+            //                 copyStyleData = [...copyStyleData, { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }];
+            //                 setStyleData(copyStyleData);
+            //             }}
+            //         >
+            //             复制
+            //         </span>
+            //     )
+            // }
+        ];
 
         const handleOK = () => {
             if (!selectImgs) {
@@ -293,15 +282,15 @@ const AddStyle = React.forwardRef(
                         </span>
                         <div className="flex justify-center">
                             <span>共{item?.templateList?.length || 0}张图片</span>
-                            <Dropdown menu={{ items }} placement="bottom" arrow>
-                                <span
-                                    onClick={(e) => {
-                                        collapseIndexRef.current = index;
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <MoreVertIcon className="cursor-pointer" />
-                                </span>
+                            <Dropdown
+                                menu={{ items }}
+                                placement="bottom"
+                                arrow
+                                onOpenChange={() => {
+                                    collapseIndexRef.current = index;
+                                }}
+                            >
+                                <MoreVertIcon className="cursor-pointer" />
                             </Dropdown>
                         </div>
                     </div>
@@ -690,23 +679,25 @@ const AddStyle = React.forwardRef(
                                 <div>
                                     <span className="text-stone-700 font-semibold">自定义风格</span>
                                     <div className="grid gap-4 grid-cols-4 mt-3">
-                                        <div
-                                            className={`flex overflow-x-auto cursor-pointer w-full outline outline-offset-2 outline-1 outline-[#ccc] rounded-sm relative  h-[200px]`}
-                                            onClick={() => {
-                                                setAddType(1);
-                                                setIsModalOpen(true);
-                                            }}
-                                        >
-                                            <div className="flex flex-col justify-center items-center w-full h-[200px]">
-                                                <PlusOutlined
-                                                    rev={undefined}
-                                                    style={{
-                                                        fontSize: '24px'
-                                                    }}
-                                                />
-                                                <span className="mt-3">创建自定义风格</span>
+                                        {canAddCustomStyle && (
+                                            <div
+                                                className={`flex overflow-x-auto cursor-pointer w-full outline outline-offset-2 outline-1 outline-[#ccc] rounded-sm relative  h-[200px]`}
+                                                onClick={() => {
+                                                    setAddType(1);
+                                                    setIsModalOpen(true);
+                                                }}
+                                            >
+                                                <div className="flex flex-col justify-center items-center w-full h-[200px]">
+                                                    <PlusOutlined
+                                                        rev={undefined}
+                                                        style={{
+                                                            fontSize: '24px'
+                                                        }}
+                                                    />
+                                                    <span className="mt-3">创建自定义风格</span>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                         {customList?.map((item, index) => {
                                             return (
                                                 <div
@@ -823,7 +814,7 @@ const AddStyle = React.forwardRef(
                                     }}
                                 />
                             </FormControl>
-                            <div className="flex justify-center">
+                            {/* <div className="flex justify-center">
                                 <span className="mr-2">开启编辑</span>
                                 <Tooltip
                                     title={
@@ -846,7 +837,7 @@ const AddStyle = React.forwardRef(
                                         }}
                                     />
                                 </Tooltip>
-                            </div>
+                            </div> */}
                         </div>
 
                         <StyleTabs

@@ -153,6 +153,8 @@ const BatcSmallRedBooks = forwardRef(
                 }
                 const newList = _.cloneDeep(batchDataListRef.current);
                 newList[collIndexRef.current] = res.list;
+                console.log(newList, collIndexRef.current);
+
                 batchDataListRef.current = newList;
                 setBatchDataList(batchDataListRef.current);
                 setbatchOpen(false);
@@ -257,7 +259,16 @@ const BatcSmallRedBooks = forwardRef(
         const [businessUid, setBusinessUid] = useState('');
         const [businessIndex, setBusinessIndex] = useState(0);
         const changeList = (data: string) => {
-            const index = bathList?.findIndex((item: any) => item.uid === data);
+            console.log(data, batchDataListRef.current);
+            let index = -1;
+            batchDataListRef.current?.map((item, d) => {
+                item?.map((i: any) => {
+                    if (i.uid === data) {
+                        index = d;
+                    }
+                });
+            });
+            bathList?.findIndex((item: any) => item.uid === data);
             collIndexRef.current = index;
             setCollIndex(collIndexRef.current);
             const pageNo = Number((businessIndex / 20) | 0) + 1;

@@ -37,7 +37,7 @@ const AiCreate = ({
     setPage: (data: any) => void;
     setcustom?: (data: any) => void;
     setField?: (data: any) => void;
-    downTableData: (data: any) => void;
+    downTableData: (data: any, num: number) => void;
     setSelectedRowKeys: (data: any) => void;
     defaultVariableData?: any;
     defaultField?: any;
@@ -92,6 +92,8 @@ const AiCreate = ({
     }, [successCount, totalCount]);
     const aref = useRef(false);
     const handleMaterial = async (num: number) => {
+        materialzanListRef.current = [];
+        setMaterialzanList(materialzanListRef.current);
         uuidListsRef.current = [];
         setUuidLists(uuidListsRef.current);
         aref.current = false;
@@ -110,7 +112,6 @@ const AiCreate = ({
                 indexList.push(index);
             });
         }
-
         totalCountRef.current = num === 1 ? selList.length : tableData.length;
         setTotalCount(totalCountRef.current);
         let index = 0;
@@ -166,42 +167,33 @@ const AiCreate = ({
                 })
             );
             let newList = _.cloneDeep(theStaging);
+            const newArr = _.cloneDeep(materialzanListRef.current);
             for (let i = 0; i < currentBatch.flat().length; i++) {
                 const obj: any = {};
                 resArr.flat()[i] &&
                     Object.keys(resArr.flat()[i]).map((item) => {
                         obj[item] = resArr.flat()[i][item];
                     });
+                newArr.push(obj);
                 uuidList.push(newList[indexList[i + index * 3]]?.uuid);
                 newList[indexList[i + index * 3]] = {
                     ...newList[indexList[i + index * 3]],
                     ...obj
                 };
             }
+            materialzanListRef.current = newArr;
+            setMaterialzanList(materialzanListRef.current);
             const newL = _.cloneDeep(uuidListsRef.current);
             newL?.push(...uuidList);
             uuidListsRef.current = newL;
             setUuidLists(uuidListsRef.current);
             theStaging = _.cloneDeep(newList);
-            downTableData(theStaging);
-            // } catch (error: any) {
-            //     console.log(error);
-            //     setErrorMessage(error.msg);
-            //     executionCountRef.current = 0;
-            //     setExecutionCount(executionCountRef.current);
-            //     errorCountRef.current += currentBatch?.flat()?.length;
-            //     if (errorCountRef.current >= 9) {
-            //         aref.current = true;
-            //         setErrorMessage('服务器繁忙，请稍后再试');
-            //     }
-            //     setErrorCount(errorCountRef.current);
-            // }
+            materialFieldexeDataRef.current = theStaging;
             index += 3;
         }
         executionCountRef.current = 0;
         setExecutionCount(executionCountRef.current);
         setcancelExeLoading(false);
-        setSelList([]);
     };
     //loading 弹窗
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
@@ -210,6 +202,8 @@ const AiCreate = ({
 
     //素材预览
     const getTextStream = async () => {
+        materialzanListRef.current = [];
+        setMaterialzanList(materialzanListRef.current);
         uuidListsRef.current = [];
         setUuidLists(uuidListsRef.current);
         aref.current = false;
@@ -219,7 +213,7 @@ const AiCreate = ({
         setTotalCount(totalCountRef.current);
         const chunks = chunkArray(i, 3);
         let index = 0;
-        let theStaging = _.cloneDeep(tableData);
+        // let theStaging = _.cloneDeep(tableData);
         while (index < chunks?.length && !aref.current) {
             const resArr: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
@@ -252,14 +246,17 @@ const AiCreate = ({
                     }
                 })
             );
-            let newList = _.cloneDeep(theStaging);
-            newList.unshift(...resArr);
-            theStaging = _.cloneDeep(newList);
+            // let newList = _.cloneDeep(theStaging);
+            materialzanListRef.current = resArr;
+            setMaterialzanList(materialzanListRef.current);
+            // newList.unshift(...resArr);
+            // theStaging = _.cloneDeep(newList);
             const newL = _.cloneDeep(uuidListsRef.current);
             newL?.push(...resArr?.map((item) => item.uuid));
             uuidListsRef.current = newL;
             setUuidLists(uuidListsRef.current);
-            downTableData(theStaging);
+
+            // downTableData(theStaging);
 
             index += 3;
         }
@@ -283,6 +280,61 @@ const AiCreate = ({
         }
     }, [materialExecutionOpen]);
 
+    //AI 素材生成
+    const aimaterialCreate = () => {
+        setSelectValue('batch');
+        if (variableData.checkedFieldList?.length === 0) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: 'AI 补齐字段最少选一个',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+            return false;
+        }
+        if (!variableData.requirement) {
+            setrequirementStatusOpen(true);
+            return false;
+        }
+        getTextStream();
+    };
+    //处理素材
+    const editMaterial = (num: number) => {
+        setSelectValue('field');
+        if (!fieldCompletionData.requirement) {
+            setrequirementStatusOpen(true);
+            return false;
+        }
+        if (fieldCompletionData.checkedFieldList?.length === 0) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: 'AI 补齐字段最少选一个',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+            return false;
+        }
+        batchNum.current = num;
+        handleMaterial(num);
+    };
+    //新增插入表格
+    const [selectValue, setSelectValue] = useState('');
+    const batchNum = useRef(-1);
+    const materialFieldexeDataRef = useRef<any>(null);
+    const materialzanListRef = useRef<any[]>([]);
+    const [materialzanList, setMaterialzanList] = useState<any[]>([]);
     return (
         <div>
             <Button
@@ -321,10 +373,39 @@ const AiCreate = ({
                                     <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
                                     <Checkbox.Group
                                         onChange={(e) => {
-                                            setVariableData({
-                                                ...variableData,
-                                                checkedFieldList: e
-                                            });
+                                            if (variableData.checkedFieldList.length > e.length) {
+                                                setVariableData({
+                                                    ...variableData,
+                                                    checkedFieldList: e
+                                                });
+                                            } else {
+                                                if (e.length > 6) {
+                                                    if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
+                                                        setVariableData({
+                                                            ...variableData,
+                                                            checkedFieldList: e
+                                                        });
+                                                    } else {
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '最多只能选择6个字段',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'error'
+                                                                },
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                close: false
+                                                            })
+                                                        );
+                                                    }
+                                                } else {
+                                                    setVariableData({
+                                                        ...variableData,
+                                                        checkedFieldList: e
+                                                    });
+                                                }
+                                            }
                                         }}
                                         value={variableData.checkedFieldList}
                                     >
@@ -397,31 +478,7 @@ const AiCreate = ({
                                         >
                                             保存配置
                                         </Button>
-                                        <Button
-                                            type="primary"
-                                            onClick={() => {
-                                                if (variableData.checkedFieldList?.length === 0) {
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: 'AI 补齐字段最少选一个',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'error'
-                                                            },
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            close: false
-                                                        })
-                                                    );
-                                                    return false;
-                                                }
-                                                if (!variableData.requirement) {
-                                                    setrequirementStatusOpen(true);
-                                                    return false;
-                                                }
-                                                getTextStream();
-                                            }}
-                                        >
+                                        <Button type="primary" onClick={aimaterialCreate}>
                                             AI 生成素材
                                         </Button>
                                     </div>
@@ -439,12 +496,41 @@ const AiCreate = ({
                                     </div>
                                     <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
                                     <Checkbox.Group
-                                        onChange={(e) =>
-                                            setFieldCompletionData({
-                                                ...fieldCompletionData,
-                                                checkedFieldList: e
-                                            })
-                                        }
+                                        onChange={(e) => {
+                                            if (fieldCompletionData.checkedFieldList.length > e.length) {
+                                                setFieldCompletionData({
+                                                    ...fieldCompletionData,
+                                                    checkedFieldList: e
+                                                });
+                                            } else {
+                                                if (e.length > 6) {
+                                                    if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
+                                                        setFieldCompletionData({
+                                                            ...fieldCompletionData,
+                                                            checkedFieldList: e
+                                                        });
+                                                    } else {
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '最多只能选择6个字段',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'error'
+                                                                },
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                close: false
+                                                            })
+                                                        );
+                                                    }
+                                                } else {
+                                                    setFieldCompletionData({
+                                                        ...fieldCompletionData,
+                                                        checkedFieldList: e
+                                                    });
+                                                }
+                                            }
+                                        }}
                                         value={fieldCompletionData.checkedFieldList}
                                     >
                                         {checkedList?.map((item) => (
@@ -475,28 +561,7 @@ const AiCreate = ({
                                         <Button
                                             className="h-[50px]"
                                             disabled={selList?.length === 0}
-                                            onClick={() => {
-                                                if (!fieldCompletionData.requirement) {
-                                                    setrequirementStatusOpen(true);
-                                                    return false;
-                                                }
-                                                if (fieldCompletionData.checkedFieldList?.length === 0) {
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: 'AI 补齐字段最少选一个',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'error'
-                                                            },
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            close: false
-                                                        })
-                                                    );
-                                                    return false;
-                                                }
-                                                handleMaterial(1);
-                                            }}
+                                            onClick={() => editMaterial(1)}
                                             type="primary"
                                         >
                                             <div className="flex flex-col items-center">
@@ -508,26 +573,7 @@ const AiCreate = ({
                                             className="h-[50px]"
                                             disabled={tableData?.length === 0}
                                             onClick={() => {
-                                                setrequirementStatusOpen(true);
-                                                if (!fieldCompletionData.requirement) {
-                                                    return false;
-                                                }
-                                                if (fieldCompletionData.checkedFieldList?.length === 0) {
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: 'AI 补齐字段最少选一个',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'error'
-                                                            },
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            close: false
-                                                        })
-                                                    );
-                                                    return false;
-                                                }
-                                                handleMaterial(2);
+                                                editMaterial(2);
                                             }}
                                             type="primary"
                                         >
@@ -615,7 +661,7 @@ const AiCreate = ({
             </Modal>
             {/* 素材执行 loading */}
             {materialExecutionOpen && (
-                <Modal open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>
+                <Modal width={'80%'} open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>
                     <div className="flex justify-center ">
                         <Progress percent={materialPre} type="circle" />
                     </div>
@@ -634,7 +680,7 @@ const AiCreate = ({
                             <span className="font-bold">已经生成完成，点击确认导入素材</span>
                         </div>
                     )}
-                    <div className="flex gap-2 justify-center mt-4 text-xs">
+                    <div className="flex gap-2 justify-center my-4 text-xs">
                         <div>
                             <Tag>全部：{totalCount}</Tag>
                         </div>
@@ -651,20 +697,58 @@ const AiCreate = ({
                             <Tag color="error">执行失败：{errorCount}</Tag>
                         </div>
                     </div>
-                    <div className="flex justify-center mt-4">
+                    <Table
+                        columns={
+                            selectValue === 'field'
+                                ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
+                                : columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex))
+                        }
+                        dataSource={materialzanList}
+                    />
+                    <div className="flex justify-center gap-2 mt-4">
                         {executionCount === 0 && (
-                            <Button
-                                onClick={() => {
-                                    setMaterialExecutionOpen(false);
-                                    setOpen(false);
-                                    setSelectedRowKeys(uuidLists);
-                                }}
-                                className="w-[100px]"
-                                size="small"
-                                type="primary"
-                            >
-                                确认
-                            </Button>
+                            <>
+                                <Button
+                                    className="w-[100px]"
+                                    size="small"
+                                    onClick={() => {
+                                        errorCountRef.current = 0;
+                                        successCountRef.current = 0;
+                                        executionCountRef.current = 0;
+                                        setErrorCount(errorCountRef.current);
+                                        setSuccessCount(successCountRef.current);
+                                        setExecutionCount(executionCountRef.current);
+                                        if (selectValue === 'batch') {
+                                            aimaterialCreate();
+                                        } else {
+                                            editMaterial(batchNum.current);
+                                        }
+                                    }}
+                                >
+                                    重试
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        if (selectValue === 'batch') {
+                                            downTableData(materialzanList, 1);
+                                            setMaterialExecutionOpen(false);
+                                            setOpen(false);
+                                            setSelectedRowKeys(uuidLists);
+                                        } else {
+                                            setSelList([]);
+                                            downTableData(materialFieldexeDataRef.current, 2);
+                                            setMaterialExecutionOpen(false);
+                                            setOpen(false);
+                                            setSelectedRowKeys(uuidLists);
+                                        }
+                                    }}
+                                    className="w-[100px]"
+                                    size="small"
+                                    type="primary"
+                                >
+                                    确认
+                                </Button>
+                            </>
                         )}
                         {executionCount > 0 && (
                             <Button

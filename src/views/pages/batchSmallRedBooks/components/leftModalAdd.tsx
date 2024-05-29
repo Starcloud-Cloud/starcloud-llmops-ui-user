@@ -1,4 +1,4 @@
-import { Modal, Button, Table, Popconfirm, Form, Input, Select, Switch, InputNumber, Tag } from 'antd';
+import { Modal, Button, Table, Popconfirm, Form, Input, Select, Switch, InputNumber, Tag, Tooltip } from 'antd';
 import type { TableProps } from 'antd';
 import { useEffect, useState } from 'react';
 import AiCreate from './AICreate';
@@ -7,6 +7,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { materialJudge } from 'api/redBook/batchIndex';
 import { materialFieldCode } from 'api/redBook/batchIndex';
 import { useLocation } from 'react-router-dom';
+import FieldImage from 'assets/images/icons/field.svg';
 const LeftModalAdd = ({
     zoomOpen,
     setZoomOpen,
@@ -54,7 +55,7 @@ const LeftModalAdd = ({
     setcustom?: (data: any) => void;
     setField?: (data: any) => void;
     setFieldHeads?: (data: any) => void;
-    downTableData: (data: any) => void;
+    downTableData: (data: any, num: number) => void;
     setSelectedRowKeys: (data: any) => void;
     defaultVariableData?: any;
     defaultField?: any;
@@ -159,10 +160,7 @@ const LeftModalAdd = ({
                         批量删除({selectedRowKeys?.length})
                     </Button>
                 </div>
-                <div className="flex gap-2">
-                    <Button type="primary" onClick={() => setColOpen(true)}>
-                        素材字段配置
-                    </Button>
+                <div className="flex items-center gap-2">
                     <AiCreate
                         title="AI 素材生成"
                         setColOpen={setColOpen}
@@ -182,6 +180,9 @@ const LeftModalAdd = ({
                         setVariableData={setVariableData}
                         variableData={variableData}
                     />
+                    <Tooltip title="素材字段配置">
+                        <img className="w-[28px] cursor-pointer" src={FieldImage} />
+                    </Tooltip>
                 </div>
             </div>
             <Table
@@ -289,7 +290,7 @@ const LeftModalAdd = ({
                         name="desc"
                         rules={[
                             { required: true, message: '请输入字段名称' },
-                            { max: 20, message: '字段名称不能超过 20 个字' }
+                            { max: 30, message: '字段名称不能超过 30 个字' }
                         ]}
                     >
                         <Input />

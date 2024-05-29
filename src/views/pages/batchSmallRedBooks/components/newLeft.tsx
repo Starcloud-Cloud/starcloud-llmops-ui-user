@@ -181,9 +181,16 @@ const Lefts = ({
     //让列表插入数据
     const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
     //插入数据
-    const downTableData = (data: any) => {
-        tableRef.current = data;
-        setTableData(tableRef.current);
+    const downTableData = (data: any[], num: number) => {
+        if (num === 1) {
+            const newList = _.cloneDeep(tableRef.current);
+            newList.unshift(...data);
+            tableRef.current = newList;
+            setTableData(tableRef.current);
+        } else {
+            tableRef.current = data;
+            setTableData(tableRef.current);
+        }
     };
     //上传素材弹框
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -344,13 +351,9 @@ const Lefts = ({
         setEditOpen(true);
     };
     const formOk = (result: any) => {
-        console.log(result);
-
         const newList = _.cloneDeep(tableRef.current) || [];
         if (title === '编辑') {
             newList.splice((page - 1) * 10 + rowIndex, 1, { ...result, uuid: newList[(page - 1) * 10 + rowIndex]?.uuid });
-            console.log(newList);
-
             tableRef.current = newList;
             setTableData(tableRef.current);
         } else {
@@ -447,11 +450,7 @@ const Lefts = ({
         newList?.workflowConfig?.steps.forEach((item: any) => {
             const arr: any[] = item?.variable?.variables;
 
-            if (
-                arr?.find((el: any) => el.field === 'MATERIAL_TYPE') &&
-                arr?.find((el: any) => el.style === 'MATERIAL') &&
-                arr?.find((el: any) => el.style === 'MATERIAL')?.value
-            ) {
+            if (arr?.find((el: any) => el.style === 'MATERIAL')?.value) {
                 let list: any;
 
                 try {
@@ -504,7 +503,7 @@ const Lefts = ({
         const materiallist = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables;
         const judge = await materialJudge({
-            uid: detail ? detail?.uid : result.uid,
+            uid: searchParams.get('uid') ? searchParams.get('uid') : detail ? detail?.uid : result.uid,
             planSource: detail ? 'app' : 'market'
         });
         setMaterialTypeStatus(judge);
@@ -1108,34 +1107,55 @@ const Lefts = ({
         setImageMoke && setImageMoke(imageVar || imageMater);
     }, [imageVar]);
     useEffect(() => {
-        const materiallist = appData?.configuration?.appInformation?.workflowConfig?.steps
-            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-            ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value;
+        const materiallist = appData?.configuration
+            ? appData?.configuration?.appInformation?.workflowConfig?.steps
+                  ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                  ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value
+            : appData?.executeParam?.appInformation?.workflowConfig?.steps
+                  ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                  ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value;
         setDefaultVariableData && setDefaultVariableData(materiallist && materiallist !== '{}' ? JSON.parse(materiallist) : null);
     }, [
         appData?.configuration?.appInformation?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value,
+        appData?.executeParam?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG')?.value
     ]);
     useEffect(() => {
-        const materiallist = appData?.configuration?.appInformation?.workflowConfig?.steps
-            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value;
-
+        const materiallist = appData?.configuration
+            ? appData?.configuration?.appInformation?.workflowConfig?.steps
+                  ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                  ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value
+            : appData?.executeParam?.appInformation?.workflowConfig?.steps
+                  ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                  ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value;
         getTableHeader(materiallist && materiallist !== '[]' ? JSON.parse(materiallist) : []);
         setFieldHead && setFieldHead(materiallist && materiallist !== '[]' ? JSON.parse(materiallist) : null);
     }, [
         appData?.configuration?.appInformation?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value,
+        appData?.executeParam?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value
     ]);
     useEffect(() => {
-        const materiallist = appData?.configuration?.appInformation?.workflowConfig?.steps
-            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value;
+        const materiallist = appData?.configuration
+            ? appData?.configuration?.appInformation?.workflowConfig?.steps
+                  ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                  ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value
+            : appData?.executeParam?.appInformation?.workflowConfig?.steps
+                  ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                  ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value;
+
         setDefaultField && setDefaultField(materiallist && materiallist !== '{}' ? JSON.parse(materiallist) : null);
     }, [
         appData?.configuration?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value,
+        appData?.executeParam?.appInformation?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_GENERATE_CONFIG')?.value
     ]);
@@ -1157,32 +1177,53 @@ const Lefts = ({
     });
     useEffect(() => {
         const newList = columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image' && item.type !== 'document');
+        const maxLength = newList?.filter((item) => item.required);
+        const reList = newList?.filter((item) => item.required)?.map((i: any) => i?.dataIndex);
+        const resizeList = newList?.filter((item) => !item.required)?.map((i: any) => i?.dataIndex);
         if (defaultVariableData) {
-            const list = newList
-                ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
-                ?.map((item) => item.dataIndex);
-            setVariableData({
-                ...defaultVariableData,
-                checkedFieldList: list
-            });
+            const list = maxLength?.map((item) => item.dataIndex);
+            if (maxLength?.length >= 6) {
+                setVariableData({
+                    ...defaultVariableData,
+                    checkedFieldList: list
+                });
+            } else {
+                const list1 = newList
+                    ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
+                    ?.map((item) => item.dataIndex);
+                setVariableData({
+                    ...variableData,
+                    checkedFieldList: list1?.slice(0, 6)
+                });
+            }
         } else {
             setVariableData({
                 ...variableData,
-                checkedFieldList: newList?.map((item: any) => item?.dataIndex)
+                checkedFieldList: maxLength?.length >= 6 ? reList : [...reList, ...resizeList]?.slice(0, 6)
             });
         }
         if (defaultField) {
-            const list = newList
-                ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
-                ?.map((item) => item.dataIndex);
-            setFieldCompletionData({
-                ...defaultField,
-                checkedFieldList: list
-            });
+            const maxLength = newList?.filter((item) => item.required);
+            const list = maxLength?.map((item) => item.dataIndex);
+            if (maxLength?.length >= 6) {
+                setFieldCompletionData({
+                    ...defaultField,
+                    checkedFieldList: list
+                });
+            } else {
+                const list1 = newList
+
+                    ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
+                    ?.map((item) => item.dataIndex);
+                setFieldCompletionData({
+                    ...defaultField,
+                    checkedFieldList: list1?.slice(0, 6)
+                });
+            }
         } else {
             setFieldCompletionData({
                 ...fieldCompletionData,
-                checkedFieldList: newList?.map((item) => item?.dataIndex)
+                checkedFieldList: maxLength?.length >= 6 ? reList : [...reList, ...resizeList]?.slice(0, 6)
             });
         }
     }, [columns]);

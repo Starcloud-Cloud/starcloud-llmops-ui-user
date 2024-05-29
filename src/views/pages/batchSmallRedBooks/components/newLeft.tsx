@@ -1324,7 +1324,7 @@ const Lefts = ({
         } else {
             setVariableData({
                 ...variableData,
-                checkedFieldList: maxLength?.length >= 6 ? reList : [...reList, ...resizeList]?.slice(0, 6)
+                checkedFieldList: reList
             });
         }
         if (defaultField) {
@@ -1348,7 +1348,7 @@ const Lefts = ({
         } else {
             setFieldCompletionData({
                 ...fieldCompletionData,
-                checkedFieldList: maxLength?.length >= 6 ? reList : [...reList, ...resizeList]?.slice(0, 6)
+                checkedFieldList: []
             });
         }
     }, [columns]);

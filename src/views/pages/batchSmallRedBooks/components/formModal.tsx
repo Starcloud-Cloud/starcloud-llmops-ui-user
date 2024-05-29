@@ -1,5 +1,5 @@
-import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select } from 'antd';
-import { LoadingOutlined, PlusOutlined, EyeOutlined, SelectOutlined } from '@ant-design/icons';
+import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select, Tooltip } from 'antd';
+import { LoadingOutlined, PlusOutlined, EyeOutlined, SelectOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import { getAccessToken } from 'utils/auth';
 import { dispatch } from 'store';
@@ -10,6 +10,13 @@ import _ from 'lodash-es';
 import '../index.scss';
 import { PicImagePick } from '../../../../ui-component/PicImagePick/index';
 
+export const propShow: UploadProps = {
+    name: 'image',
+    action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+    headers: {
+        Authorization: 'Bearer ' + getAccessToken()
+    }
+};
 const FormModal = ({
     title,
     editOpen,
@@ -43,13 +50,6 @@ const FormModal = ({
         }
     }, [selectImg]);
 
-    const propShow: UploadProps = {
-        name: 'image',
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
-        headers: {
-            Authorization: 'Bearer ' + getAccessToken()
-        }
-    };
     const [seleVal, setSeleVal] = useState('');
     useEffect(() => {
         const newList = columns?.find((item) => item.type === 'listImage');
@@ -114,6 +114,7 @@ const FormModal = ({
                                         {...propShow}
                                         showUploadList={false}
                                         listType="picture-card"
+                                        maxCount={1}
                                         onChange={(info) => {
                                             if (info.file.status === 'uploading') {
                                                 const newList = _.cloneDeep(uploadRef.current);
@@ -144,25 +145,35 @@ const FormModal = ({
                                                             '?x-oss-process=image/resize,w_300/quality,q_80'
                                                     }
                                                 />
-                                                <div className="top-0 left-0 z-[100] absolute w-full h-full hover:bg-black/30 flex justify-center items-center opacity-0 hover:opacity-100">
-                                                    <EyeOutlined
-                                                        onClick={(e) => {
-                                                            setImageUrl(selectImg?.largeImageURL || form.getFieldValue(item.dataIndex));
-                                                            setOpen(true);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        rev={undefined}
-                                                        className="text-white/60 hover:text-white"
-                                                    />
-                                                    <SelectOutlined
-                                                        rev={undefined}
-                                                        className="text-white/60 hover:text-white ml-3"
-                                                        onClick={(e) => {
-                                                            setIsModalOpen(true);
-                                                            e.stopPropagation();
-                                                            setImageDataIndex(item.dataIndex);
-                                                        }}
-                                                    />
+                                                <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
+                                                    <Tooltip title="查看">
+                                                        <EyeOutlined
+                                                            onClick={(e) => {
+                                                                setImageUrl(selectImg?.largeImageURL || form.getFieldValue(item.dataIndex));
+                                                                setOpen(true);
+                                                                e.stopPropagation();
+                                                            }}
+                                                            rev={undefined}
+                                                            className="text-white/80 hover:text-white"
+                                                        />
+                                                    </Tooltip>
+                                                    <Tooltip title="上传">
+                                                        <CloudUploadOutlined
+                                                            rev={undefined}
+                                                            className="text-white/80 hover:text-white !cursor-pointer"
+                                                        />
+                                                    </Tooltip>
+                                                    <Tooltip title="搜索">
+                                                        <SelectOutlined
+                                                            rev={undefined}
+                                                            className="text-white/80 hover:text-white ml-3"
+                                                            onClick={(e) => {
+                                                                setIsModalOpen(true);
+                                                                e.stopPropagation();
+                                                                setImageDataIndex(item.dataIndex);
+                                                            }}
+                                                        />
+                                                    </Tooltip>
                                                 </div>
                                             </div>
                                         ) : (

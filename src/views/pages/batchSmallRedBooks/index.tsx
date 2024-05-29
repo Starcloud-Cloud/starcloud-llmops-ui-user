@@ -63,8 +63,7 @@ const BatcSmallRedBooks = forwardRef(
                 if (res.description) {
                     const urlPattern = /https?:\/\/[^\s]+(?:\.com|\.cn|\.org|\.net|\.edu\.com.cn)/g;
                     const urls = res?.description?.match(urlPattern);
-                    console.log('🚀 ~ urls:', urls);
-                    setAppDescription(urls[0] || '');
+                    setAppDescription(urls?.[0] || '');
                 }
             })();
         }, []);

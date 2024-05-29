@@ -1,4 +1,4 @@
-import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag } from 'antd';
+import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover } from 'antd';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { materialGenerate, customMaterialGenerate } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
@@ -6,6 +6,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import { ExclamationCircleFilled } from '@ant-design/icons';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 const { confirm } = Modal;
 
 const AiCreate = ({
@@ -335,6 +336,40 @@ const AiCreate = ({
     const materialFieldexeDataRef = useRef<any>(null);
     const materialzanListRef = useRef<any[]>([]);
     const [materialzanList, setMaterialzanList] = useState<any[]>([]);
+    const items: TabsProps['items'] = [
+        {
+            key: '1',
+            label: '示例1',
+            children: (
+                <div className="text-xs max-w-[600px] leading-5">
+                    <span>
+                        帮我生成一些唐诗，包括：古诗名称，作者，一句诗句 <br />
+                    </span>
+                    <span>标题：古诗名</span>
+                    <br />
+                    <span>语句：一句诗句</span>
+                    <br />
+                </div>
+            )
+        },
+        {
+            key: '2',
+            label: '示例2',
+            children: (
+                <div className="text-xs max-w-[600px] leading-5">
+                    <span>
+                        作为小红书养生博主，结合主题“这6种食物千万别二次加热“，生成6种食物信息
+                        <br />
+                    </span>
+                    <span>返回的字段要求：</span> <br />
+                    <span>标题：食物名称，不超过6个汉字</span> <br />
+                    <span>节内容：一句话说明为什么不能二次加热的原因，不少于过20个汉字</span> <br />
+                    <span>节内容2：为什么不能二次加热的详细原因，不少于100个汉字</span>
+                    <br />
+                </div>
+            )
+        }
+    ];
     return (
         <div>
             <Button
@@ -416,7 +451,23 @@ const AiCreate = ({
                                             </Checkbox>
                                         ))}
                                     </Checkbox.Group>
-                                    <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
+                                    <div className="text-[16px] font-bold my-4 flex items-center">
+                                        <span>2.告诉 AI 如何生成这些字段内容</span>
+                                        <Popover
+                                            content={
+                                                <div className="max-w-[230px] sm:max-w-[600px]">
+                                                    <div>
+                                                        <Tabs size="small" defaultActiveKey="1" items={items} />
+                                                    </div>
+                                                </div>
+                                            }
+                                            placement="bottomLeft"
+                                            arrow={false}
+                                            trigger="hover"
+                                        >
+                                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                                        </Popover>
+                                    </div>
                                     <TextArea
                                         value={variableData.requirement}
                                         status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}

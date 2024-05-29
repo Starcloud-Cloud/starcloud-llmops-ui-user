@@ -808,6 +808,42 @@ const AddStyle = React.forwardRef(
                                                     }
                                                 }}
                                             />
+                                            <div className="absolute z-50 bottom-0 w-[150px] flex justify-around bg-[rgba(0,0,0,0.4)] py-1">
+                                                <Tooltip title="复制">
+                                                    <span onClick={() => handleCopy(index)}>
+                                                        <ContentCopyIcon className="text-sm text-white" />
+                                                    </span>
+                                                </Tooltip>
+                                                <Tooltip title="修改">
+                                                    <span
+                                                        onClick={() => {
+                                                            // const index: any = collapseIndexRef.current;
+                                                            // const copyStyleData = [...styleData];
+                                                            // const item = copyStyleData[index];
+                                                            setCurrentStyle(item);
+                                                            currentStyleRef.current = item;
+                                                            setIsModalOpen(true);
+                                                            // setUpdIndex(index);
+                                                            setUpdDrawIndex(index);
+                                                            setAddType(3);
+                                                        }}
+                                                    >
+                                                        <EditIcon className="text-sm text-white" />
+                                                    </span>
+                                                </Tooltip>
+                                                <Popconfirm
+                                                    placement="top"
+                                                    title={'确认删除'}
+                                                    // description={description}
+                                                    okText="是"
+                                                    cancelText="否"
+                                                    onConfirm={() => handleDel(index)}
+                                                >
+                                                    <Tooltip title="删除">
+                                                        <DeleteIcon className="text-sm text-white" />
+                                                    </Tooltip>
+                                                </Popconfirm>
+                                            </div>
                                             <Swiper
                                                 spaceBetween={30}
                                                 pagination={{

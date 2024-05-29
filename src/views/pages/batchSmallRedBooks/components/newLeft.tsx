@@ -62,6 +62,7 @@ import { useNavigate } from 'react-router-dom';
 import AiCreate from './AICreate';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import './newLeft.scss';
+import { SearchOutlined } from '@ant-design/icons';
 
 const Lefts = ({
     detailShow = true,
@@ -311,7 +312,7 @@ const Lefts = ({
                                                     />
                                                 </Tooltip>
                                                 <Tooltip title="搜索">
-                                                    <SelectOutlined
+                                                    <SearchOutlined
                                                         rev={undefined}
                                                         className="text-white/60 hover:text-white ml-3"
                                                         onClick={(e) => {
@@ -333,7 +334,7 @@ const Lefts = ({
                                             <div style={{ marginTop: 8 }}>Upload</div>
                                             <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
                                                 <Tooltip title="搜索">
-                                                    <SelectOutlined
+                                                    <SearchOutlined
                                                         rev={undefined}
                                                         className="text-white/80 hover:text-white"
                                                         onClick={(e) => {

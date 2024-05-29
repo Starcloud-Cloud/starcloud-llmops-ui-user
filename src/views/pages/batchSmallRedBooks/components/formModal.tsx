@@ -1,5 +1,5 @@
 import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select, Tooltip } from 'antd';
-import { LoadingOutlined, PlusOutlined, EyeOutlined, SelectOutlined, CloudUploadOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, CloudUploadOutlined, SearchOutlined } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import { getAccessToken } from 'utils/auth';
 import { dispatch } from 'store';
@@ -165,7 +165,7 @@ const FormModal = ({
                                                         />
                                                     </Tooltip>
                                                     <Tooltip title="搜索">
-                                                        <SelectOutlined
+                                                        <SearchOutlined
                                                             rev={undefined}
                                                             className="text-white/80 hover:text-white ml-3"
                                                             onClick={(e) => {
@@ -187,7 +187,7 @@ const FormModal = ({
                                                 <div style={{ marginTop: 8 }}>Upload</div>
                                                 <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
                                                     <Tooltip title="搜索">
-                                                        <SelectOutlined
+                                                        <SearchOutlined
                                                             rev={undefined}
                                                             className="text-white/80 hover:text-white"
                                                             onClick={(e) => {

@@ -224,8 +224,13 @@ const AiCreate = ({
                 currentBatch.map(async (group, i) => {
                     try {
                         const res = await customMaterialGenerate({ ...variableData, fieldList: MokeList, generateCount: group?.length });
-                        const timers = new Date();
-                        resArr.push(...res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType, group: timers })));
+                        const timers = new Date().getTime();
+                        const newMaterialzan = _.cloneDeep(materialzanListRef.current);
+                        const newRes = res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType, group: timers }));
+                        newMaterialzan.push(...newRes);
+                        resArr.push(...newRes);
+                        materialzanListRef.current = newMaterialzan;
+                        setMaterialzanList(materialzanListRef.current);
                         executionCountRef.current = executionCountRef.current - group?.length;
                         successCountRef.current += group?.length;
                         setExecutionCount(executionCountRef.current);
@@ -247,19 +252,13 @@ const AiCreate = ({
                 })
             );
             // let newList = _.cloneDeep(theStaging);
-            const newMaterialzan = _.cloneDeep(materialzanListRef.current);
-            newMaterialzan.push(...resArr);
-            materialzanListRef.current = newMaterialzan;
-            setMaterialzanList(materialzanListRef.current);
             // newList.unshift(...resArr);
             // theStaging = _.cloneDeep(newList);
             const newL = _.cloneDeep(uuidListsRef.current);
             newL?.push(...resArr?.map((item) => item.uuid));
             uuidListsRef.current = newL;
             setUuidLists(uuidListsRef.current);
-
             // downTableData(theStaging);
-
             index += 3;
         }
         executionCountRef.current = 0;
@@ -485,6 +484,23 @@ const AiCreate = ({
                                         <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
                                     )}
                                     <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
+                                    <div className="flex gap-2 items-center text-xs mb-4">
+                                        <div>一组生成多少条</div>
+                                        <InputNumber
+                                            value={variableData.generateCount}
+                                            onChange={(value) => {
+                                                if (value) {
+                                                    setVariableData({
+                                                        ...variableData,
+                                                        generateCount: value
+                                                    });
+                                                }
+                                            }}
+                                            className="w-[200px]"
+                                            min={1}
+                                            max={20}
+                                        />
+                                    </div>
                                     <div className="flex gap-2 items-center text-xs">
                                         <div>共生成几组素材</div>
                                         <InputNumber
@@ -494,23 +510,6 @@ const AiCreate = ({
                                                     setVariableData({
                                                         ...variableData,
                                                         groupNum: value
-                                                    });
-                                                }
-                                            }}
-                                            className="w-[200px]"
-                                            min={1}
-                                            max={20}
-                                        />
-                                    </div>
-                                    <div className="flex gap-2 items-center text-xs mt-4">
-                                        <div>一组生成多少条</div>
-                                        <InputNumber
-                                            value={variableData.generateCount}
-                                            onChange={(value) => {
-                                                if (value) {
-                                                    setVariableData({
-                                                        ...variableData,
-                                                        generateCount: value
                                                     });
                                                 }
                                             }}
@@ -799,10 +798,12 @@ const AiCreate = ({
                                 <Button
                                     onClick={() => {
                                         if (selectValue === 'batch') {
-                                            downTableData(materialzanList, 1);
+                                            console.log(materialzanListRef.current);
+                                            console.log(uuidListsRef.current);
+                                            downTableData(materialzanListRef.current, 1);
                                             setMaterialExecutionOpen(false);
                                             setOpen(false);
-                                            setSelectedRowKeys(uuidLists);
+                                            setSelectedRowKeys(uuidListsRef.current);
                                         } else {
                                             setSelList([]);
                                             downTableData(materialFieldexeDataRef.current, 2);

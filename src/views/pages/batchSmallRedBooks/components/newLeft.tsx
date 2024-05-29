@@ -473,7 +473,11 @@ const Lefts = ({
     const formOk = (result: any) => {
         const newList = _.cloneDeep(tableRef.current) || [];
         if (title === '编辑') {
-            newList.splice((page - 1) * 10 + rowIndex, 1, { ...result, uuid: newList[(page - 1) * 10 + rowIndex]?.uuid });
+            newList.splice((page - 1) * 10 + rowIndex, 1, {
+                ...result,
+                uuid: newList[(page - 1) * 10 + rowIndex]?.uuid,
+                group: newList[(page - 1) * 10 + rowIndex]?.group
+            });
             tableRef.current = newList;
             setTableData(tableRef.current);
         } else {

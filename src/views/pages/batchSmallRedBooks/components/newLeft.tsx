@@ -1826,6 +1826,7 @@ const Lefts = ({
                                     if (!detail) {
                                         handleSaveClick(false);
                                     } else {
+                                        // 我的应用
                                         const arr = headerSaveAll();
                                         setDetail &&
                                             setDetail({

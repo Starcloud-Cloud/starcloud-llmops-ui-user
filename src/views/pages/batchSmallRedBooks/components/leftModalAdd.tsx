@@ -216,7 +216,7 @@ const LeftModalAdd = ({
             <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
                 <div className="flex justify-end">
                     <Button
-                        disabled={materialTableData?.length === 20}
+                        disabled={materialTableData?.length === 30}
                         size="small"
                         className="mb-4"
                         onClick={() => {
@@ -227,7 +227,7 @@ const LeftModalAdd = ({
                         icon={<PlusOutlined rev={undefined} />}
                         type="primary"
                     >
-                        新增({materialTableData?.length || 0}/20)
+                        新增({materialTableData?.length || 0}/30)
                     </Button>
                 </div>
                 <Table pagination={false} columns={materialColumns} dataSource={materialTableData} />
@@ -290,7 +290,7 @@ const LeftModalAdd = ({
                         name="desc"
                         rules={[
                             { required: true, message: '请输入字段名称' },
-                            { max: 30, message: '字段名称不能超过 30 个字' }
+                            { max: 20, message: '字段名称不能超过 20 个字' }
                         ]}
                     >
                         <Input />

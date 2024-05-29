@@ -209,10 +209,10 @@ const AiCreate = ({
         setUuidLists(uuidListsRef.current);
         aref.current = false;
         setMaterialExecutionOpen(true);
-        const i = Array.from({ length: variableData.generateCount }, (_, index) => index);
+        const i = Array.from({ length: variableData.generateCount * variableData.groupNum }, (_, index) => index);
         totalCountRef.current = i?.length;
         setTotalCount(totalCountRef.current);
-        const chunks = chunkArray(i, 3);
+        const chunks = chunkArray(i, variableData.generateCount);
         let index = 0;
         // let theStaging = _.cloneDeep(tableData);
         while (index < chunks?.length && !aref.current) {
@@ -247,7 +247,9 @@ const AiCreate = ({
                 })
             );
             // let newList = _.cloneDeep(theStaging);
-            materialzanListRef.current = resArr;
+            const newMaterialzan = _.cloneDeep(materialzanListRef.current);
+            newMaterialzan.push(...resArr);
+            materialzanListRef.current = newMaterialzan;
             setMaterialzanList(materialzanListRef.current);
             // newList.unshift(...resArr);
             // theStaging = _.cloneDeep(newList);
@@ -483,7 +485,7 @@ const AiCreate = ({
                                         <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
                                     )}
                                     <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
-                                    {/* <div className="flex gap-2 items-center text-xs">
+                                    <div className="flex gap-2 items-center text-xs">
                                         <div>共生成几组素材</div>
                                         <InputNumber
                                             value={variableData.groupNum}
@@ -499,7 +501,7 @@ const AiCreate = ({
                                             min={1}
                                             max={20}
                                         />
-                                    </div> */}
+                                    </div>
                                     <div className="flex gap-2 items-center text-xs mt-4">
                                         <div>一组生成多少条</div>
                                         <InputNumber

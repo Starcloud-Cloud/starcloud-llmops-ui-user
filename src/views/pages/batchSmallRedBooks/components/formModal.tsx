@@ -43,8 +43,10 @@ const FormModal = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectImg, setSelectImg] = useState<any>(null);
     const [imageDataIndex, setImageDataIndex] = useState<string>('');
+    const [canUpload, setCanUpload] = useState(true);
 
     useEffect(() => {
+        console.log(selectImg, imageDataIndex);
         if (selectImg && imageDataIndex) {
             form.setFieldValue(imageDataIndex, selectImg?.largeImageURL);
         }
@@ -113,6 +115,7 @@ const FormModal = ({
                                     <Upload
                                         {...propShow}
                                         showUploadList={false}
+                                        disabled={!canUpload}
                                         listType="picture-card"
                                         maxCount={1}
                                         onChange={(info) => {
@@ -130,13 +133,16 @@ const FormModal = ({
                                                 uploadRef.current = newList;
                                                 setUploadLoading(uploadRef.current);
                                                 form.setFieldValue(item.dataIndex, info?.file?.response?.data?.url);
+                                                setSelectImg({
+                                                    largeImageURL: info?.file?.response?.data?.url
+                                                });
                                             }
                                         }}
                                     >
-                                        {form.getFieldValue(item.dataIndex) ? (
+                                        {selectImg?.largeImageURL || form.getFieldValue(item.dataIndex) ? (
                                             <div className="relative">
                                                 <Image
-                                                    preview={false}
+                                                    onClick={(e) => e.stopPropagation()}
                                                     width={102}
                                                     height={102}
                                                     src={
@@ -146,21 +152,12 @@ const FormModal = ({
                                                     }
                                                 />
                                                 <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
-                                                    <Tooltip title="查看">
-                                                        <EyeOutlined
-                                                            onClick={(e) => {
-                                                                setImageUrl(selectImg?.largeImageURL || form.getFieldValue(item.dataIndex));
-                                                                setOpen(true);
-                                                                e.stopPropagation();
-                                                            }}
-                                                            rev={undefined}
-                                                            className="text-white/80 hover:text-white"
-                                                        />
-                                                    </Tooltip>
                                                     <Tooltip title="上传">
                                                         <CloudUploadOutlined
                                                             rev={undefined}
                                                             className="text-white/80 hover:text-white !cursor-pointer"
+                                                            onMouseEnter={() => setCanUpload(true)}
+                                                            onMouseLeave={() => setCanUpload(false)}
                                                         />
                                                     </Tooltip>
                                                     <Tooltip title="搜索">
@@ -177,13 +174,26 @@ const FormModal = ({
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                            <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative">
                                                 {uploadLoading[index] ? (
                                                     <LoadingOutlined rev={undefined} />
                                                 ) : (
                                                     <PlusOutlined rev={undefined} />
                                                 )}
                                                 <div style={{ marginTop: 8 }}>Upload</div>
+                                                <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
+                                                    <Tooltip title="搜索">
+                                                        <SelectOutlined
+                                                            rev={undefined}
+                                                            className="text-white/80 hover:text-white"
+                                                            onClick={(e) => {
+                                                                setIsModalOpen(true);
+                                                                e.stopPropagation();
+                                                                setImageDataIndex(item.dataIndex);
+                                                            }}
+                                                        />
+                                                    </Tooltip>
+                                                </div>
                                             </div>
                                         )}
                                     </Upload>

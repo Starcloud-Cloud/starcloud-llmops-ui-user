@@ -225,7 +225,9 @@ const Lefts = ({
         { label: '小红书', value: 'SMALL_RED_BOOK' },
         { label: '其他', value: 'OTHER' }
     ];
-    const getTableHeader = async (list: any[]) => {
+    const [canUpload, setCanUpload] = useState(true);
+
+    const getTableHeader = (list: any[]) => {
         // const result = await materialTemplate(materialType);
         setMokeList(list);
         const newList = list?.map((item: any) => {
@@ -252,11 +254,12 @@ const Lefts = ({
                                     <div className="w-[80px] h-[80px] rounded-md border border-solid border-black/10"></div>
                                 )} */}
                                 <Upload
-                                    className='table_upload'
+                                    className="table_upload"
                                     {...propShow}
                                     showUploadList={false}
                                     listType="picture-card"
                                     maxCount={1}
+                                    disabled={!canUpload}
                                     onChange={(info) => {
                                         if (info.file.status === 'done') {
                                             const data = tableRef.current;
@@ -269,7 +272,7 @@ const Lefts = ({
                                     {row[item.fieldName] ? (
                                         <div className="relative">
                                             <Image
-                                                preview={false}
+                                                onClick={(e) => e.stopPropagation()}
                                                 width={82}
                                                 height={82}
                                                 src={
@@ -279,7 +282,7 @@ const Lefts = ({
                                                 }
                                             />
                                             <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.4)]">
-                                                <Tooltip title="查看">
+                                                {/* <Tooltip title="查看">
                                                     <EyeOutlined
                                                         onClick={(e) => {
                                                             // setImageUrl(selectImg?.largeImageURL || form.getFieldValue(item.dataIndex));
@@ -290,9 +293,14 @@ const Lefts = ({
                                                         rev={undefined}
                                                         className="text-white/60 hover:text-white"
                                                     />
-                                                </Tooltip>
+                                                </Tooltip> */}
                                                 <Tooltip title="上传">
-                                                    <CloudUploadOutlined rev={undefined} className="text-white/60 hover:text-white ml-3" />
+                                                    <CloudUploadOutlined
+                                                        rev={undefined}
+                                                        className="text-white/60 hover:text-white"
+                                                        onMouseEnter={() => setCanUpload(true)}
+                                                        onMouseLeave={() => setCanUpload(false)}
+                                                    />
                                                 </Tooltip>
                                                 <Tooltip title="搜索">
                                                     <SelectOutlined
@@ -309,9 +317,23 @@ const Lefts = ({
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                        <div className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative">
                                             <PlusOutlined rev={undefined} />
                                             <div style={{ marginTop: 8 }}>Upload</div>
+                                            <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
+                                                <Tooltip title="搜索">
+                                                    <SelectOutlined
+                                                        rev={undefined}
+                                                        className="text-white/80 hover:text-white"
+                                                        onClick={(e) => {
+                                                            setIsModalOpen(true);
+                                                            e.stopPropagation();
+                                                            setImageDataIndex(index);
+                                                            setFiledName(item.fieldName);
+                                                        }}
+                                                    />
+                                                </Tooltip>
+                                            </div>
                                         </div>
                                     )}
                                 </Upload>
@@ -1223,7 +1245,8 @@ const Lefts = ({
     }, [
         appData?.configuration?.appInformation?.workflowConfig?.steps
             ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value
+            ?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE')?.value,
+        canUpload
     ]);
     useEffect(() => {
         const materiallist = appData?.configuration?.appInformation?.workflowConfig?.steps

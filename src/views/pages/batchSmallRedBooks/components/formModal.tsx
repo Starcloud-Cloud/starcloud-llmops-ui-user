@@ -142,6 +142,10 @@ const FormModal = ({
                                         {selectImg?.largeImageURL || form.getFieldValue(item.dataIndex) ? (
                                             <div className="relative">
                                                 <Image
+                                                    preview={{
+                                                        src: selectImg?.largeImageURL || form.getFieldValue(item.dataIndex)
+                                                    }}
+                                                    onMouseEnter={() => setCanUpload(false)}
                                                     onClick={(e) => e.stopPropagation()}
                                                     width={102}
                                                     height={102}

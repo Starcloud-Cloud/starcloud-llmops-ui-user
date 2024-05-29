@@ -279,6 +279,7 @@ const Lefts = ({
                                     {row[item.fieldName] ? (
                                         <div className="relative">
                                             <Image
+                                                onMouseEnter={() => setCanUpload(false)}
                                                 onClick={(e) => e.stopPropagation()}
                                                 width={82}
                                                 height={82}
@@ -324,7 +325,10 @@ const Lefts = ({
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative">
+                                        <div
+                                            className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
+                                            onMouseEnter={() => setCanUpload(true)}
+                                        >
                                             <PlusOutlined rev={undefined} />
                                             <div style={{ marginTop: 8 }}>Upload</div>
                                             <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">

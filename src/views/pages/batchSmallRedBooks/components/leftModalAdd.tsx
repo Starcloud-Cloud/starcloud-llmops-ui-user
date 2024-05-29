@@ -181,7 +181,7 @@ const LeftModalAdd = ({
                         variableData={variableData}
                     />
                     <Tooltip title="素材字段配置">
-                        <img className="w-[28px] cursor-pointer" src={FieldImage} />
+                        <img onClick={() => setColOpen(true)} className="w-[28px] cursor-pointer" src={FieldImage} />
                     </Tooltip>
                 </div>
             </div>

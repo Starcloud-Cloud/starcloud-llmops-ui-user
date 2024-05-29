@@ -224,9 +224,8 @@ const AiCreate = ({
                 currentBatch.map(async (group, i) => {
                     try {
                         const res = await customMaterialGenerate({ ...variableData, fieldList: MokeList, generateCount: group?.length });
-
-                        resArr.push(...res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType })));
-
+                        const timers = new Date();
+                        resArr.push(...res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType, group: timers })));
                         executionCountRef.current = executionCountRef.current - group?.length;
                         successCountRef.current += group?.length;
                         setExecutionCount(executionCountRef.current);
@@ -484,8 +483,25 @@ const AiCreate = ({
                                         <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
                                     )}
                                     <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
-                                    <div className="flex gap-2 items-center text-xs">
-                                        <div>生成多少条素材</div>
+                                    {/* <div className="flex gap-2 items-center text-xs">
+                                        <div>共生成几组素材</div>
+                                        <InputNumber
+                                            value={variableData.groupNum}
+                                            onChange={(value) => {
+                                                if (value) {
+                                                    setVariableData({
+                                                        ...variableData,
+                                                        groupNum: value
+                                                    });
+                                                }
+                                            }}
+                                            className="w-[200px]"
+                                            min={1}
+                                            max={20}
+                                        />
+                                    </div> */}
+                                    <div className="flex gap-2 items-center text-xs mt-4">
+                                        <div>一组生成多少条</div>
                                         <InputNumber
                                             value={variableData.generateCount}
                                             onChange={(value) => {

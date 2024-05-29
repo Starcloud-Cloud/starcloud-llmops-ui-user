@@ -121,9 +121,9 @@ const Lefts = ({
     const [filedName, setFiledName] = useState('');
 
     useEffect(() => {
-        if (tableRef.current.length && selectImg.largeImageURL) {
+        if (tableRef.current.length && selectImg?.largeImageURL) {
             const data = tableRef.current;
-            data[imageDataIndex][filedName] = selectImg.largeImageURL;
+            data[imageDataIndex][filedName] = selectImg?.largeImageURL;
             tableRef.current = data;
             setTableData([...data]);
         }
@@ -1293,6 +1293,7 @@ const Lefts = ({
     const [variableData, setVariableData] = useState<any>({
         checkedFieldList: [],
         requirement: undefined,
+        groupNum: 1,
         generateCount: 1
     });
     const [fieldCompletionData, setFieldCompletionData] = useState<any>({
@@ -1304,7 +1305,10 @@ const Lefts = ({
         const maxLength = newList?.filter((item) => item.required);
         const reList = newList?.filter((item) => item.required)?.map((i: any) => i?.dataIndex);
         const resizeList = newList?.filter((item) => !item.required)?.map((i: any) => i?.dataIndex);
+        console.log(defaultVariableData);
+
         if (defaultVariableData) {
+            console.log(maxLength);
             const list = maxLength?.map((item) => item.dataIndex);
             if (maxLength?.length >= 6) {
                 setVariableData({
@@ -1316,7 +1320,7 @@ const Lefts = ({
                     ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
                     ?.map((item) => item.dataIndex);
                 setVariableData({
-                    ...variableData,
+                    ...defaultVariableData,
                     checkedFieldList: list1?.slice(0, 6)
                 });
             }

@@ -43,7 +43,8 @@ import {
     materialParse,
     metadata,
     planModifyConfig,
-    materialJudge
+    materialJudge,
+    createSameApp
 } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
 import FormModal, { propShow } from './formModal';
@@ -1413,6 +1414,9 @@ const Lefts = ({
     };
     const [colOpen, setColOpen] = useState(false);
     const [updataTip, setUpdataTip] = useState('0');
+
+    //创作同款应用状态
+    const [createAppStatus, setCreateAppStatus] = useState(false);
     return (
         <>
             <div className="relative h-full">
@@ -1421,9 +1425,25 @@ const Lefts = ({
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
                         {!detail && (
                             <div>
-                                <Button type="primary" size="small" className="mr-1">
-                                    创作同款应用
-                                </Button>
+                                {!detail && (
+                                    <Button
+                                        loading={createAppStatus}
+                                        onClick={async () => {
+                                            setCreateAppStatus(true);
+                                            const result = await createSameApp({
+                                                appMarketUid: searchParams.get('appUid'),
+                                                planUid: searchParams.get('uid')
+                                            });
+                                            navigate('createApp?uid=' + result);
+                                            setCreateAppStatus(false);
+                                        }}
+                                        type="primary"
+                                        size="small"
+                                        className="mr-1"
+                                    >
+                                        创作同款应用
+                                    </Button>
+                                )}
                                 状态：{getStatus1(appData?.status)}
                                 <div className="inline-block whitespace-nowrap">
                                     <Popconfirm

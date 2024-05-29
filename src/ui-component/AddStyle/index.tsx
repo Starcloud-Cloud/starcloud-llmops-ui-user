@@ -33,7 +33,6 @@ import { appModify } from 'api/template';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
-
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -41,7 +40,12 @@ import EditIcon from '@mui/icons-material/Edit';
 const AddStyle = React.forwardRef(
     ({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any, ref: any) => {
         const [visible, setVisible] = useState(false);
+
+        const [systemOPen, setSystemOPen] = useState(false);
         const [styleData, setStyleData] = useState<any>([]); //列表展示结果
+        const [systemVariable, setSystemVariable] = useState<any>([]); //系统变量
+        //新增文案与风格
+        const [focuActive, setFocuActive] = useState<any[]>([]);
         const [selectImgs, setSelectImgs] = useState<any>(null);
 
         const [query, setQuery] = useState<any | null>({
@@ -132,9 +136,11 @@ const AddStyle = React.forwardRef(
                 } else {
                     list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
                 }
-
+                const systemList =
+                    record.flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
                 const typeList = list?.map((item: any) => ({ ...item, type: 1 }));
                 setStyleData(typeList);
+                setSystemVariable(systemList);
             }
         }, [record, mode]);
 
@@ -1057,36 +1063,24 @@ const AddStyle = React.forwardRef(
                         />
                     </Modal>
                 )}
-                {/* <Modal open={true}>
-                <CreateTab
-                                                                key={el?.field}
-                                                                appData={{ materialType, appReqVO: detail }}
-                                                                imageStyleData={el.value}
-                                                                setImageStyleData={(data) => {
-                                                                    basisChange({
-                                                                        e: { name: el.field, value: data },
-                                                                        index,
-                                                                        i,
-                                                                        values: true
-                                                                    });
-                                                                }}
-                                                                focuActive={focuActive}
-                                                                setFocuActive={setFocuActive}
-                                                                digui={() => {
-                                                                    const newData = el.value?.map((i: any) => i.name.split(' ')[1]);
-                                                                    if (!newData || newData?.every((i: any) => !i)) {
-                                                                        return 1;
-                                                                    }
-                                                                    return (
-                                                                        newData
-                                                                            ?.map((i: any) => Number(i))
-                                                                            ?.sort((a: any, b: any) => b - a)[0] *
-                                                                            1 +
-                                                                        1
-                                                                    );
-                                                                }}
-                                                            />
-                </Modal> */}
+                <Modal width={'80%'} open={systemOPen} onCancel={() => setSystemOPen(false)}>
+                    <CreateTab
+                        appData={{ materialType, appReqVO: details }}
+                        imageStyleData={systemVariable}
+                        setImageStyleData={(data) => {
+                            setSystemVariable(data);
+                        }}
+                        focuActive={focuActive}
+                        setFocuActive={setFocuActive}
+                        digui={() => {
+                            const newData = systemVariable?.map((i: any) => i.name.split(' ')[1]);
+                            if (!newData || newData?.every((i: any) => !i)) {
+                                return 1;
+                            }
+                            return newData?.map((i: any) => Number(i))?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                        }}
+                    />
+                </Modal>
             </div>
         );
     }

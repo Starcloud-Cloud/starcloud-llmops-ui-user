@@ -483,7 +483,7 @@ const AiCreate = ({
                                     {!variableData.requirement && requirementStatusOpen && (
                                         <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
                                     )}
-                                    <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
+                                    <div className="text-[16px] font-bold my-4">3.如何生成素材</div>
                                     <div className="flex gap-2 items-center text-xs mb-4">
                                         <div>一组生成多少条</div>
                                         <InputNumber
@@ -498,7 +498,7 @@ const AiCreate = ({
                                             }}
                                             className="w-[200px]"
                                             min={1}
-                                            max={20}
+                                            max={12}
                                         />
                                     </div>
                                     <div className="flex gap-2 items-center text-xs">
@@ -766,11 +766,12 @@ const AiCreate = ({
                         </div>
                     </div>
                     <Table
-                        columns={
-                            selectValue === 'field'
+                        columns={[
+                            { title: '序号', width: 60, render: (_, row, index) => <span>{index + 1}</span> },
+                            ...(selectValue === 'field'
                                 ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
-                                : columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex))
-                        }
+                                : columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex)))
+                        ]}
                         dataSource={materialzanList}
                     />
                     <div className="flex justify-center gap-2 mt-4">

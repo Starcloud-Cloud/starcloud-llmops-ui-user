@@ -123,3 +123,7 @@ export const materialFieldCode = (data: any) => {
 export const materialJudge = (params: any) => {
     return request.post({ url: `/llm/creative/material/judge`, params });
 };
+//判断是表格还是图片
+export const createSameApp = (data: any) => {
+    return request.post({ url: `/llm/creative/plan/createSameApp`, data });
+};

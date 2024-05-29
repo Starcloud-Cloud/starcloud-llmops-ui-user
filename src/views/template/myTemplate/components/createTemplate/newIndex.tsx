@@ -5,13 +5,10 @@ import {
     CardHeader,
     Chip,
     Divider,
-    Grid,
     IconButton,
     ListItemIcon,
     Menu,
     MenuItem,
-    Tab,
-    // Tabs,
     Typography
 } from '@mui/material';
 import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented, Spin } from 'antd';
@@ -33,13 +30,13 @@ import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import Upload from './upLoad';
 import { del, copy } from 'api/template';
 import marketStore from 'store/market';
-import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { materialTemplate } from 'api/redBook/batchIndex';
 import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 import { schemeMetadata } from 'api/redBook/copywriting';
 import CreatePlan from 'views/pages/batchSmallRedBooks';
+import useUserStore from 'store/user';
 interface Items {
     label: string;
     value: string;
@@ -974,7 +971,6 @@ function CreateDetail() {
         stepMarRef.current = ccc;
         setStepMaterial(stepMarRef.current);
     };
-    const [segmentedValue, setSegmentedValue] = useState<string | number>('配置');
     const [viewLoading, setViewLoading] = useState(false);
     return (
         <Card sx={{ height: '100%', overflowY: 'auto' }}>
@@ -1132,17 +1128,13 @@ function CreateDetail() {
                             </div>
                         </div>
                     </Tabs.TabPane>
-                    <Tabs.TabPane tab="流程编排" key="1">
-                        <div className="flex justify-center">
-                            <div
-                                className={`xl:w-[${
-                                    segmentedValue === '预览测试' && detail?.type === 'MEDIA_MATRIX' ? '100%' : '80%'
-                                }] lg:w-full`}
-                            >
-                                {segmentedValue === '配置' && detail && (
+                    {permissions.includes('app:flow') && (
+                        <Tabs.TabPane tab="流程编排" key="1">
+                            <div className="flex justify-center">
+                                <div className={`xl:w-[80%] lg:w-full`}>
                                     <Arrange
                                         detail={detail}
-                                        config={detail.workflowConfig}
+                                        config={detail?.workflowConfig}
                                         variableStyle={appModels?.variableStyle}
                                         editChange={editChange}
                                         basisChange={basisChange}
@@ -1153,131 +1145,77 @@ function CreateDetail() {
                                         tableDataDel={tableDataDel}
                                         tableDataMove={tableDataMove}
                                     />
-                                )}
-                                {segmentedValue === '预览测试' &&
-                                    (detail?.type === 'MEDIA_MATRIX' ? (
-                                        <Spin spinning={viewLoading} tip="Loading">
-                                            <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
-                                                <CreatePlan
-                                                    ref={createPlanRef}
-                                                    planState={planState}
-                                                    detail={_.cloneDeep(detailRef.current)}
-                                                    setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
-                                                    isMyApp={true}
-                                                />
-                                            </div>
-                                        </Spin>
-                                    ) : (
-                                        <div>
-                                            <Typography variant="h5" fontSize="1rem" mb={1}>
-                                                {t('market.debug')}
-                                            </Typography>
-                                            <Card elevation={2} sx={{ p: 2 }}>
-                                                <Header
-                                                    permissions={permissions}
-                                                    detail={detail}
-                                                    aiModel={aiModel}
-                                                    setOpenUpgradeModel={setOpenUpgradeModel}
-                                                    setAiModel={setAiModel}
-                                                    appModels={appModels}
-                                                />
-                                                <Perform
-                                                    columns={stepMaterial}
-                                                    setEditOpen={setEditOpen}
-                                                    setStep={(data: any) => {
-                                                        stepRef.current = data;
-                                                        setStep(stepRef.current);
-                                                    }}
-                                                    getList={getList}
-                                                    setMaterialType={setMaterialType}
-                                                    setTitle={setTitle}
-                                                    isShows={isShows}
-                                                    details={_.cloneDeep(detailRef.current)}
-                                                    config={_.cloneDeep(detailRef.current.workflowConfig)}
-                                                    changeConfigs={changeConfigs}
-                                                    changeSon={changeData}
-                                                    changeanswer={changeanswer}
-                                                    loadings={loadings}
-                                                    isDisables={isDisables}
-                                                    variableChange={exeChange}
-                                                    promptChange={promptChange}
-                                                    isallExecute={(flag: boolean) => {
-                                                        isAllExecute = flag;
-                                                    }}
-                                                    addStyle={addStyle}
-                                                    source="myApp"
-                                                />
-                                            </Card>
-                                        </div>
-                                    ))}
-                            </div>
-                        </div>
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab="运行应用" key="4">
-                        <div className="w-full">
-                            {detail?.type === 'MEDIA_MATRIX' ? (
-                                <Spin spinning={viewLoading} tip="Loading">
-                                    <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
-                                        <CreatePlan
-                                            ref={createPlanRef}
-                                            planState={planState}
-                                            detail={_.cloneDeep(detailRef.current)}
-                                            setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
-                                            isMyApp={true}
-                                        />
-                                    </div>
-                                </Spin>
-                            ) : (
-                                <div>
-                                    <Typography variant="h5" fontSize="1rem" mb={1}>
-                                        {t('market.debug')}
-                                    </Typography>
-                                    <Card elevation={2} sx={{ p: 2 }}>
-                                        <Header
-                                            permissions={permissions}
-                                            detail={detail}
-                                            aiModel={aiModel}
-                                            setOpenUpgradeModel={setOpenUpgradeModel}
-                                            setAiModel={setAiModel}
-                                            appModels={appModels}
-                                        />
-                                        <Perform
-                                            columns={stepMaterial}
-                                            setEditOpen={setEditOpen}
-                                            setStep={(data: any) => {
-                                                stepRef.current = data;
-                                                setStep(stepRef.current);
-                                            }}
-                                            getList={getList}
-                                            setMaterialType={setMaterialType}
-                                            setTitle={setTitle}
-                                            isShows={isShows}
-                                            details={_.cloneDeep(detailRef.current)}
-                                            config={_.cloneDeep(detailRef.current?.workflowConfig)}
-                                            changeConfigs={changeConfigs}
-                                            changeSon={changeData}
-                                            changeanswer={changeanswer}
-                                            loadings={loadings}
-                                            isDisables={isDisables}
-                                            variableChange={exeChange}
-                                            promptChange={promptChange}
-                                            isallExecute={(flag: boolean) => {
-                                                isAllExecute = flag;
-                                            }}
-                                            addStyle={addStyle}
-                                            source="myApp"
-                                        />
-                                    </Card>
                                 </div>
-                            )}
-                        </div>
-                    </Tabs.TabPane>
-                    {detailRef.current?.uid && searchParams.get('uid') && (
+                            </div>
+                        </Tabs.TabPane>
+                    )}
+                    {permissions.includes('app:run') && (
+                        <Tabs.TabPane tab="运行应用" key="4">
+                            <div className="w-full">
+                                {detail?.type === 'MEDIA_MATRIX' ? (
+                                    <Spin spinning={viewLoading} tip="Loading">
+                                        <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
+                                            <CreatePlan
+                                                ref={createPlanRef}
+                                                planState={planState}
+                                                detail={_.cloneDeep(detailRef.current)}
+                                                setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
+                                                isMyApp={true}
+                                            />
+                                        </div>
+                                    </Spin>
+                                ) : (
+                                    <div>
+                                        <Typography variant="h5" fontSize="1rem" mb={1}>
+                                            {t('market.debug')}
+                                        </Typography>
+                                        <Card elevation={2} sx={{ p: 2 }}>
+                                            <Header
+                                                permissions={permissions}
+                                                detail={detail}
+                                                aiModel={aiModel}
+                                                setOpenUpgradeModel={setOpenUpgradeModel}
+                                                setAiModel={setAiModel}
+                                                appModels={appModels}
+                                            />
+                                            <Perform
+                                                columns={stepMaterial}
+                                                setEditOpen={setEditOpen}
+                                                setStep={(data: any) => {
+                                                    stepRef.current = data;
+                                                    setStep(stepRef.current);
+                                                }}
+                                                getList={getList}
+                                                setMaterialType={setMaterialType}
+                                                setTitle={setTitle}
+                                                isShows={isShows}
+                                                details={_.cloneDeep(detailRef.current)}
+                                                config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                                                changeConfigs={changeConfigs}
+                                                changeSon={changeData}
+                                                changeanswer={changeanswer}
+                                                loadings={loadings}
+                                                isDisables={isDisables}
+                                                variableChange={exeChange}
+                                                promptChange={promptChange}
+                                                isallExecute={(flag: boolean) => {
+                                                    isAllExecute = flag;
+                                                }}
+                                                addStyle={addStyle}
+                                                source="myApp"
+                                            />
+                                        </Card>
+                                    </div>
+                                )}
+                            </div>
+                        </Tabs.TabPane>
+                    )}
+                    {detailRef.current?.uid && searchParams.get('uid') && permissions.includes('app:analyze') && (
                         <Tabs.TabPane tab="应用分析" key="2">
                             <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
                         </Tabs.TabPane>
                     )}
-                    {searchParams.get('uid') && (
+                    {searchParams.get('uid') && permissions.includes('app:publish') && (
                         <Tabs.TabPane tab="应用发布" key="3">
                             <Upload
                                 appUid={searchParams.get('uid') as string}

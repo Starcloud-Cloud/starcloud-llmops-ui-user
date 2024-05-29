@@ -332,7 +332,7 @@ const Lefts = ({
                                         >
                                             <PlusOutlined rev={undefined} />
                                             <div style={{ marginTop: 8 }}>Upload</div>
-                                            <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
+                                            <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
                                                 <Tooltip title="搜索">
                                                     <SearchOutlined
                                                         rev={undefined}

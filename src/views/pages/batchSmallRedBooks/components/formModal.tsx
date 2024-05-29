@@ -157,23 +157,28 @@ const FormModal = ({
                                                 />
                                                 <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
                                                     <Tooltip title="上传">
-                                                        <CloudUploadOutlined
-                                                            rev={undefined}
-                                                            className="text-white/80 hover:text-white !cursor-pointer"
+                                                        <div
+                                                            className="flex-1 flex justify-center !cursor-pointer"
                                                             onMouseEnter={() => setCanUpload(true)}
                                                             onMouseLeave={() => setCanUpload(false)}
-                                                        />
+                                                        >
+                                                            <CloudUploadOutlined
+                                                                rev={undefined}
+                                                                className="text-white/80 hover:text-white !cursor-pointer"
+                                                            />
+                                                        </div>
                                                     </Tooltip>
                                                     <Tooltip title="搜索">
-                                                        <SearchOutlined
-                                                            rev={undefined}
-                                                            className="text-white/80 hover:text-white ml-3"
+                                                        <div
+                                                            className="flex-1 flex justify-center !cursor-pointer"
                                                             onClick={(e) => {
                                                                 setIsModalOpen(true);
                                                                 e.stopPropagation();
                                                                 setImageDataIndex(item.dataIndex);
                                                             }}
-                                                        />
+                                                        >
+                                                            <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                                        </div>
                                                     </Tooltip>
                                                 </div>
                                             </div>
@@ -185,19 +190,18 @@ const FormModal = ({
                                                     <PlusOutlined rev={undefined} />
                                                 )}
                                                 <div style={{ marginTop: 8 }}>Upload</div>
-                                                <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
-                                                    <Tooltip title="搜索">
-                                                        <SearchOutlined
-                                                            rev={undefined}
-                                                            className="text-white/80 hover:text-white"
-                                                            onClick={(e) => {
-                                                                setIsModalOpen(true);
-                                                                e.stopPropagation();
-                                                                setImageDataIndex(item.dataIndex);
-                                                            }}
-                                                        />
-                                                    </Tooltip>
-                                                </div>
+                                                <Tooltip title="搜索">
+                                                    <div
+                                                        className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]"
+                                                        onClick={(e) => {
+                                                            setIsModalOpen(true);
+                                                            e.stopPropagation();
+                                                            setImageDataIndex(item.dataIndex);
+                                                        }}
+                                                    >
+                                                        <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                                    </div>
+                                                </Tooltip>
                                             </div>
                                         )}
                                     </Upload>

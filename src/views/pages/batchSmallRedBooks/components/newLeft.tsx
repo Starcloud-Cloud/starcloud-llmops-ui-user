@@ -293,37 +293,27 @@ const Lefts = ({
                                                 }
                                             />
                                             <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.4)]">
-                                                {/* <Tooltip title="查看">
-                                                    <EyeOutlined
-                                                        onClick={(e) => {
-                                                            // setImageUrl(selectImg?.largeImageURL || form.getFieldValue(item.dataIndex));
-                                                            setPreviewUrl(row[item.fieldName]);
-                                                            setPreviewOpen(true);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        rev={undefined}
-                                                        className="text-white/60 hover:text-white"
-                                                    />
-                                                </Tooltip> */}
                                                 <Tooltip title="上传">
-                                                    <CloudUploadOutlined
-                                                        rev={undefined}
-                                                        className="text-white/60 hover:text-white"
+                                                    <div
+                                                        className="flex-1 flex justify-center"
                                                         onMouseEnter={() => setCanUpload(true)}
                                                         onMouseLeave={() => setCanUpload(false)}
-                                                    />
+                                                    >
+                                                        <CloudUploadOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                                    </div>
                                                 </Tooltip>
                                                 <Tooltip title="搜索">
-                                                    <SearchOutlined
-                                                        rev={undefined}
-                                                        className="text-white/60 hover:text-white ml-3"
+                                                    <div
+                                                        className="flex-1 flex justify-center !cursor-pointer"
                                                         onClick={(e) => {
                                                             setIsModalOpen(true);
                                                             e.stopPropagation();
                                                             setImageDataIndex(index);
                                                             setFiledName(item.fieldName);
                                                         }}
-                                                    />
+                                                    >
+                                                        <SearchOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                                    </div>
                                                 </Tooltip>
                                             </div>
                                         </div>
@@ -334,20 +324,19 @@ const Lefts = ({
                                         >
                                             <PlusOutlined rev={undefined} />
                                             <div style={{ marginTop: 8 }}>Upload</div>
-                                            <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
-                                                <Tooltip title="搜索">
-                                                    <SearchOutlined
-                                                        rev={undefined}
-                                                        className="text-white/80 hover:text-white"
-                                                        onClick={(e) => {
-                                                            setIsModalOpen(true);
-                                                            e.stopPropagation();
-                                                            setImageDataIndex(index);
-                                                            setFiledName(item.fieldName);
-                                                        }}
-                                                    />
-                                                </Tooltip>
-                                            </div>
+                                            <Tooltip title="搜索">
+                                                <div
+                                                    className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]"
+                                                    onClick={(e) => {
+                                                        setIsModalOpen(true);
+                                                        e.stopPropagation();
+                                                        setImageDataIndex(index);
+                                                        setFiledName(item.fieldName);
+                                                    }}
+                                                >
+                                                    <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                                </div>
+                                            </Tooltip>
                                         </div>
                                     )}
                                 </Upload>

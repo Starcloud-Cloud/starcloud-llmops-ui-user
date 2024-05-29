@@ -35,6 +35,8 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const AddStyleApp = React.forwardRef(
     ({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any, ref: any) => {
@@ -310,6 +312,18 @@ const AddStyleApp = React.forwardRef(
                         setVisible(false);
                         setSelectImgs(null);
                         setChooseImageIndex('');
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '操作成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
                     })
                     .catch((e: any) => {
                         return;
@@ -340,6 +354,18 @@ const AddStyleApp = React.forwardRef(
                         setVisible(false);
                         setSelectImgs(null);
                         setChooseImageIndex('');
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '操作成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
                     })
                     .catch((e: any) => {
                         return;
@@ -532,6 +558,18 @@ const AddStyleApp = React.forwardRef(
                     setAddType(0);
                     setCurrentStyle(null);
                     getList();
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: '操作成功',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            close: false
+                        })
+                    );
                 })
                 .catch((e: any) => {
                     return;
@@ -606,6 +644,18 @@ const AddStyleApp = React.forwardRef(
                     setAddType(0);
                     setCurrentStyle(null);
                     getList();
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: '操作成功',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            close: false
+                        })
+                    );
                 })
                 .catch((e: any) => {
                     return;
@@ -686,6 +736,18 @@ const AddStyleApp = React.forwardRef(
                         setAddType(0);
                         setCurrentStyle(null);
                         getList();
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '操作成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
                     })
                     .catch((e: any) => {
                         return;
@@ -748,6 +810,18 @@ const AddStyleApp = React.forwardRef(
                         setAddType(0);
                         setCurrentStyle(null);
                         getList();
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '操作成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
                     })
                     .catch((e: any) => {
                         return;
@@ -831,6 +905,18 @@ const AddStyleApp = React.forwardRef(
 
             planModifyConfig({ ...saveData, validate: false }).then((res: any) => {
                 getList();
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '操作成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        close: false
+                    })
+                );
             });
         };
 

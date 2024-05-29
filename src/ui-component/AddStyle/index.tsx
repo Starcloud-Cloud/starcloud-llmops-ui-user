@@ -36,6 +36,8 @@ import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const AddStyle = React.forwardRef(
     (
@@ -424,6 +426,18 @@ const AddStyle = React.forwardRef(
                         setAddType(0);
                         setCurrentStyle(null);
                         getList();
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '操作成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
                     })
                     .catch((e: any) => {
                         return;
@@ -507,6 +521,18 @@ const AddStyle = React.forwardRef(
 
             planModifyConfig({ ...saveData, validate: false }).then((res: any) => {
                 getList();
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '操作成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        close: false
+                    })
+                );
             });
         };
 

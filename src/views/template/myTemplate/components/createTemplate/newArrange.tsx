@@ -210,6 +210,7 @@ function Arrange({
         const filterData: any = materialData?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_TYPE');
         return filterData?.value || filterData?.defaultValue;
     }, [detail]);
+    console.log(config);
 
     return (
         <Box>

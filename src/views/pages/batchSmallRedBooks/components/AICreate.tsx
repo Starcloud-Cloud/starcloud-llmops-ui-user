@@ -139,6 +139,8 @@ const AiCreate = ({
                             resArr[index + i] = [...res, {}, {}];
                         } else if (res?.length !== group?.length && res.length === 2) {
                             resArr[index + i] = [...res, {}];
+                        } else {
+                            resArr[index + i] = res;
                         }
                         executionCountRef.current = executionCountRef.current - group?.length;
                         successCountRef.current += group?.length;
@@ -169,6 +171,7 @@ const AiCreate = ({
             );
             let newList = _.cloneDeep(theStaging);
             const newArr = _.cloneDeep(materialzanListRef.current);
+            console.log(newArr, currentBatch, resArr);
             for (let i = 0; i < currentBatch.flat().length; i++) {
                 const obj: any = {};
                 resArr.flat()[i] &&

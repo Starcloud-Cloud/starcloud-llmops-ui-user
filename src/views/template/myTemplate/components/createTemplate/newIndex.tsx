@@ -1088,12 +1088,15 @@ function CreateDetail() {
                                         createPlanRef?.current?.imageMoke ||
                                         arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
                                 }
+                                console.log(createPlanRef?.current?.imageMoke);
+
                                 arr = [
                                     arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
                                     ...createPlanRef.current.getDetail,
                                     arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
                                 ];
                                 newData.workflowConfig.steps = arr?.filter((item: any) => item);
+                                console.log(newData);
                                 detailRef.current = newData;
                                 setDetail(detailRef?.current);
                                 setValue(key);

@@ -1751,7 +1751,10 @@ const Lefts = ({
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <div className="flex items-center mb-2">
-                                    <InfoCircleOutlined rev={undefined} />
+                                    <Tooltip title="生成图片时会按照风格模板的顺序去使用">
+                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                    </Tooltip>
+
                                     <span className="text-sm ml-1 text-stone-600">
                                         配置笔记图片生成的风格模版，支持不同风格模版组合生成
                                     </span>
@@ -1764,7 +1767,6 @@ const Lefts = ({
                                         appUid={appData?.appUid}
                                         ref={imageRef}
                                         record={imageMater}
-                                        mode={2}
                                         getList={() => getList(true)}
                                         materialType={materialType}
                                     />
@@ -1788,7 +1790,9 @@ const Lefts = ({
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <div className="flex items-center mb-2">
-                                    <InfoCircleOutlined rev={undefined} />
+                                    <Tooltip title="生成图片时会按照风格模板的顺序去使用">
+                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                    </Tooltip>
                                     <span className="text-sm ml-1 text-stone-600">
                                         配置笔记图片生成的风格模版，支持不同风格模版组合生成
                                     </span>

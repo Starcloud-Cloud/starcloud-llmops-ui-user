@@ -17,7 +17,7 @@ import {
 } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, TextField } from '@mui/material';
+import { FormControl, TextField } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import React from 'react';
 import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
@@ -29,13 +29,9 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
-import { appModify } from 'api/template';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 
@@ -539,27 +535,23 @@ const AddStyle = React.forwardRef(
         return (
             <div className="addStyle">
                 {mode === 1 && (
-                    <div className="pb-3 flex">
+                    <div className="pb-3 flex justify-between">
                         <div>
                             <Button size="small" type="primary" onClick={() => handleAdd()}>
                                 增加风格
                             </Button>
-                            <div className="ml-3 flex items-center justify-center">
-                                <InfoIcon
-                                    style={{
-                                        fontSize: '12px'
-                                    }}
-                                />
-                                <span>生成图片时会按照风格模板的顺序去使用</span>
-                            </div>
                         </div>
+                        <Tooltip title="增加系统模版">
+                            <Button
+                                icon={<SettingOutlined rev={undefined} />}
+                                shape="circle"
+                                size="small"
+                                type="primary"
+                                onClick={() => setSystemOPen(true)}
+                            />
+                        </Tooltip>
                     </div>
                 )}
-                <div className="my-4">
-                    <Button type="primary" onClick={() => setSystemOPen(true)}>
-                        增加系统模版
-                    </Button>
-                </div>
                 <Collapse items={collapseList} defaultActiveKey={[0]} />
                 <Drawer
                     // zIndex={99999}

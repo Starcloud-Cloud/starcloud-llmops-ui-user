@@ -928,14 +928,6 @@ const AddStyleApp = React.forwardRef(
                             <Button size="small" type="primary" onClick={() => handleAdd()}>
                                 增加风格
                             </Button>
-                            <div className="ml-3 flex items-center justify-center">
-                                <InfoIcon
-                                    style={{
-                                        fontSize: '12px'
-                                    }}
-                                />
-                                <span>生成图片时会按照风格模板的顺序去使用</span>
-                            </div>
                         </div>
                     </div>
                 )}

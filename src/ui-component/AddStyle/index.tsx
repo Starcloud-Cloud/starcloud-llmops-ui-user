@@ -81,7 +81,7 @@ const AddStyle = React.forwardRef(
 
         const submitData = React.useMemo(() => {
             const copyRecord = _.cloneDeep(record);
-            copyRecord.variable.variables.forEach((item: any) => {
+            copyRecord?.variable?.variables?.forEach((item: any) => {
                 // addType
                 if (addType === 1) {
                 } else {
@@ -151,7 +151,7 @@ const AddStyle = React.forwardRef(
                     list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
                 }
                 const systemList =
-                    record.flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
+                    record?.flowStep?.variable?.variables?.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
                 const typeList = list?.map((item: any) => ({ ...item, type: 1 }));
                 setStyleData(typeList);
                 setSystemVariable(systemList);
@@ -746,7 +746,7 @@ const AddStyle = React.forwardRef(
                                                             }
                                                         }}
                                                     />
-                                                    <Popconfirm
+                                                    {/* <Popconfirm
                                                         placement="top"
                                                         title={'确认删除'}
                                                         // description={description}
@@ -758,7 +758,7 @@ const AddStyle = React.forwardRef(
                                                             rev={undefined}
                                                             className="absolute z-50 py-[3px] left-[2px] text-red-600"
                                                         />
-                                                    </Popconfirm>
+                                                    </Popconfirm> */}
                                                     <Swiper
                                                         spaceBetween={30}
                                                         pagination={{

@@ -1,6 +1,6 @@
 import { Modal, Button, Table, Popconfirm, Form, Input, Select, Switch, InputNumber, Tag, Tooltip } from 'antd';
 import type { TableProps } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import AiCreate from './AICreate';
 import _ from 'lodash-es';
 import { PlusOutlined } from '@ant-design/icons';
@@ -145,74 +145,75 @@ const LeftModalAdd = ({
     }, [fieldHead]);
     return (
         <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
-            <div className="flex gap-2 justify-between my-[20px]">
-                <div className="flex gap-2">
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            setTitle('新增');
-                            setEditOpen(true);
-                        }}
-                    >
-                        新增素材
-                    </Button>
-                    <Button disabled={selectedRowKeys?.length === 0} type="primary" onClick={handleDels}>
-                        批量删除({selectedRowKeys?.length})
-                    </Button>
+            <div className="max-h-[60vh] overflow-y-auto">
+                <div className="flex gap-2 justify-between my-[20px]">
+                    <div className="flex gap-2">
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                setTitle('新增');
+                                setEditOpen(true);
+                            }}
+                        >
+                            新增素材
+                        </Button>
+                        <Button disabled={selectedRowKeys?.length === 0} type="primary" onClick={handleDels}>
+                            批量删除({selectedRowKeys?.length})
+                        </Button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <AiCreate
+                            title="AI 素材生成"
+                            setColOpen={setColOpen}
+                            materialType={materialType}
+                            columns={columns}
+                            MokeList={MokeList}
+                            tableData={tableData}
+                            defaultVariableData={defaultVariableData}
+                            defaultField={defaultField}
+                            setPage={setPage}
+                            setcustom={setcustom}
+                            setField={setField}
+                            setSelectedRowKeys={setSelectedRowKeys}
+                            downTableData={downTableData}
+                            setFieldCompletionData={setFieldCompletionData}
+                            fieldCompletionData={fieldCompletionData}
+                            setVariableData={setVariableData}
+                            variableData={variableData}
+                        />
+                        <Tooltip title="素材字段配置">
+                            <img onClick={() => setColOpen(true)} className="w-[28px] cursor-pointer" src={FieldImage} />
+                        </Tooltip>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <AiCreate
-                        title="AI 素材生成"
-                        setColOpen={setColOpen}
-                        materialType={materialType}
-                        columns={columns}
-                        MokeList={MokeList}
-                        tableData={tableData}
-                        defaultVariableData={defaultVariableData}
-                        defaultField={defaultField}
-                        setPage={setPage}
-                        setcustom={setcustom}
-                        setField={setField}
-                        setSelectedRowKeys={setSelectedRowKeys}
-                        downTableData={downTableData}
-                        setFieldCompletionData={setFieldCompletionData}
-                        fieldCompletionData={fieldCompletionData}
-                        setVariableData={setVariableData}
-                        variableData={variableData}
-                    />
-                    <Tooltip title="素材字段配置">
-                        <img onClick={() => setColOpen(true)} className="w-[28px] cursor-pointer" src={FieldImage} />
-                    </Tooltip>
-                </div>
+                <Table
+                    rowKey={(record, index) => {
+                        return record.uuid;
+                    }}
+                    pagination={{
+                        showSizeChanger: true,
+                        defaultPageSize: 20,
+                        pageSizeOptions: [20, 50, 100, 300, 500],
+                        onChange: (page) => {
+                            setPage(page);
+                        }
+                    }}
+                    loading={tableLoading}
+                    size="small"
+                    virtual
+                    rowSelection={{
+                        type: 'checkbox',
+                        fixed: true,
+                        columnWidth: 50,
+                        selectedRowKeys: selectedRowKeys,
+                        onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+                            setSelectedRowKeys(selectedRowKeys);
+                        }
+                    }}
+                    columns={columns}
+                    dataSource={tableData}
+                />
             </div>
-            <Table
-                scroll={{ y: 500 }}
-                rowKey={(record, index) => {
-                    return record.uuid;
-                }}
-                pagination={{
-                    showSizeChanger: true,
-                    defaultPageSize: 20,
-                    pageSizeOptions: [20, 50, 100, 300, 500],
-                    onChange: (page) => {
-                        setPage(page);
-                    }
-                }}
-                loading={tableLoading}
-                size="small"
-                virtual
-                rowSelection={{
-                    type: 'checkbox',
-                    fixed: true,
-                    columnWidth: 50,
-                    selectedRowKeys: selectedRowKeys,
-                    onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-                        setSelectedRowKeys(selectedRowKeys);
-                    }
-                }}
-                columns={columns}
-                dataSource={tableData}
-            />
             <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
                 <div className="flex justify-end">
                     <Button
@@ -309,4 +310,22 @@ const LeftModalAdd = ({
         </Modal>
     );
 };
-export default LeftModalAdd;
+const memoLeftModal = (pre: any, next: any) => {
+    return (
+        JSON.stringify(pre.zoomOpen) === JSON.stringify(next.zoomOpen) &&
+        JSON.stringify(pre.colOpen) === JSON.stringify(next.colOpen) &&
+        JSON.stringify(pre.tableLoading) === JSON.stringify(next.tableLoading) &&
+        JSON.stringify(pre.columns) === JSON.stringify(next.columns) &&
+        JSON.stringify(pre.MokeList) === JSON.stringify(next.MokeList) &&
+        JSON.stringify(pre.materialFieldTypeList) === JSON.stringify(next.materialFieldTypeList) &&
+        JSON.stringify(pre.materialType) === JSON.stringify(next.materialType) &&
+        JSON.stringify(pre.tableData) === JSON.stringify(next.tableData) &&
+        JSON.stringify(pre.defaultVariableData) === JSON.stringify(next.defaultVariableData) &&
+        JSON.stringify(pre.defaultField) === JSON.stringify(next.defaultField) &&
+        JSON.stringify(pre.fieldHead) === JSON.stringify(next.fieldHead) &&
+        JSON.stringify(pre.selectedRowKeys) === JSON.stringify(next.selectedRowKeys) &&
+        JSON.stringify(pre.fieldCompletionData) === JSON.stringify(next.fieldCompletionData) &&
+        JSON.stringify(pre.variableData) === JSON.stringify(next.variableData)
+    );
+};
+export default memo(LeftModalAdd, memoLeftModal);

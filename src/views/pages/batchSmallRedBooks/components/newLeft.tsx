@@ -738,7 +738,18 @@ const Lefts = ({
         ).variable.variables = step;
         appRef.current = newData;
         setAppData(appRef.current);
-        handleSaveClick(false);
+        if (detail) {
+            const arr = headerSaveAll();
+            setDetail &&
+                setDetail({
+                    ...detail,
+                    workflowConfig: {
+                        steps: arr?.filter((item: any) => item)
+                    }
+                });
+        } else {
+            handleSaveClick(false);
+        }
     };
     const setFieldHeads = (data: any) => {
         const newData = _.cloneDeep(appRef.current);
@@ -778,6 +789,18 @@ const Lefts = ({
         ).variable.variables = step;
         appRef.current = newData1;
         setAppData(appRef.current);
+        if (detail) {
+            const arr = headerSaveAll();
+            setDetail &&
+                setDetail({
+                    ...detail,
+                    workflowConfig: {
+                        steps: arr?.filter((item: any) => item)
+                    }
+                });
+        } else {
+            handleSaveClick(false);
+        }
     };
     //页面进入给 Tabs 分配值
     useEffect(() => {
@@ -1314,7 +1337,7 @@ const Lefts = ({
                 });
             } else {
                 const list1 = newList
-                    ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
+                    ?.filter((item) => item.required || defaultVariableData?.checkedFieldList?.includes(item.dataIndex))
                     ?.map((item) => item.dataIndex);
                 setVariableData({
                     ...defaultVariableData,
@@ -1338,7 +1361,7 @@ const Lefts = ({
             } else {
                 const list1 = newList
 
-                    ?.filter((item) => item.required || defaultVariableData?.variableData?.include(item.dataIndex))
+                    ?.filter((item) => item.required || defaultField?.checkedFieldList?.includes(item.dataIndex))
                     ?.map((item) => item.dataIndex);
                 setFieldCompletionData({
                     ...defaultField,
@@ -1355,27 +1378,32 @@ const Lefts = ({
     const headerSaveAll = (data?: any) => {
         const newData = _.cloneDeep(detail);
         let arr = newData?.workflowConfig?.steps;
-        const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+        const a = appRef.current.configuration?.appInformation?.workflowConfig?.steps?.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        );
         if (a) {
             a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = materialTypeStatus
                 ? fileList?.map((item: any) => ({
-                      pictureUrl: item?.response?.data?.url,
-                      type: 'picture'
+                      pictureUrl: item?.response?.data?.url
                   }))
                 : tableData?.map((item: any) => ({
-                      ...item,
-                      type: materialType
+                      ...item
                   }));
             a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value =
                 data ||
                 appRef.current.configuration?.appInformation?.workflowConfig?.steps
                     ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
                     .variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE').value;
+            arr[
+                appRef.current.configuration?.appInformation?.workflowConfig?.steps?.findIndex(
+                    (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+                )
+            ] = a;
         }
         let b = _.cloneDeep(imageRef.current?.record);
         if (!b) {
-            b = appRef.current.configuration?.appInformation?.workflowConfig?.variable.variables.find(
-                (item: any) => item.field === 'POSTER_STYLE_CONFIG'
+            b = appRef.current.configuration?.appInformation?.workflowConfig?.steps?.find(
+                (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
             );
         }
         arr = [arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'), ..._.cloneDeep(generRef.current), b];

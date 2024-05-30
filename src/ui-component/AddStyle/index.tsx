@@ -901,6 +901,18 @@ const AddStyle = React.forwardRef(
                         }}
                         footer={false}
                     >
+                        <div className="flex justify-end my-4">
+                            <Button
+                                className="w-[100px]"
+                                type="primary"
+                                onClick={() => {
+                                    setSystemVariable(_.cloneDeep(syszanVariable));
+                                    setSystemOPen(false);
+                                }}
+                            >
+                                保存
+                            </Button>
+                        </div>
                         <CreateTab
                             appData={{ materialType, appReqVO: details }}
                             imageStyleData={syszanVariable}
@@ -917,18 +929,6 @@ const AddStyle = React.forwardRef(
                                 return newData?.map((i: any) => Number(i))?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
                             }}
                         />
-                        <div className="flex justify-center mt-4">
-                            <Button
-                                className="w-[100px]"
-                                type="primary"
-                                onClick={() => {
-                                    setSystemVariable(_.cloneDeep(syszanVariable));
-                                    setSystemOPen(false);
-                                }}
-                            >
-                                保存
-                            </Button>
-                        </div>
                     </Modal>
                 )}
             </div>

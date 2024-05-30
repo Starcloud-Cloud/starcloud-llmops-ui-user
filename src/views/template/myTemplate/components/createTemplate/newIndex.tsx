@@ -567,7 +567,7 @@ function CreateDetail() {
                 }
             });
         });
-        if (createPlanRef?.current) {
+        if (value === '4') {
             let arr = _.cloneDeep(newList?.workflowConfig?.steps);
             const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
             if (a) {
@@ -622,7 +622,7 @@ function CreateDetail() {
                 appModify(newList).then((res) => {
                     setViewLoading(false);
                     if (res.data) {
-                        if (createPlanRef?.current && !flag) {
+                        if (value === '4' && !flag) {
                             if (fieldShow) {
                                 planState < 0 ? setPlanState(planState - 1) : setPlanState(-1);
                             } else {
@@ -1087,9 +1087,15 @@ function CreateDetail() {
                                     arr[index] =
                                         createPlanRef?.current?.imageMoke ||
                                         arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+                                    const sysdata = arr[index].flowStep.variable.variables.find(
+                                        (i: any) => i.field === 'SYSTEM_POSTER_STYLE_CONFIG'
+                                    ).value;
+                                    if (typeof sysdata === 'string') {
+                                        arr[index].flowStep.variable.variables.find(
+                                            (i: any) => i.field === 'SYSTEM_POSTER_STYLE_CONFIG'
+                                        ).value = JSON.parse(sysdata);
+                                    }
                                 }
-                                console.log(createPlanRef?.current?.imageMoke);
-
                                 arr = [
                                     arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
                                     ...createPlanRef.current.getDetail,

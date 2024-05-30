@@ -112,7 +112,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                         />
                                     )}
                                     <div className="flex gap-2 items-center">
-                                        <div className="flex gap-2 items-center">
+                                        {/* <div className="flex gap-2 items-center">
                                             <span className="text-xs">是否设为系统</span>
                                             <Switch
                                                 checked={item?.system}
@@ -131,7 +131,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                                     setImageStyleData(newData);
                                                 }}
                                             />
-                                        </div>
+                                        </div> */}
                                         <Dropdown
                                             placement="bottom"
                                             trigger={['click']}

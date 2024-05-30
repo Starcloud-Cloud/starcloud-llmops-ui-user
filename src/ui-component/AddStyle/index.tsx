@@ -55,6 +55,7 @@ const AddStyle = React.forwardRef(
 
         const [systemOPen, setSystemOPen] = useState(false);
         const [systemVariable, setSystemVariable] = useState<any>([]); //系统变量
+        const [syszanVariable, setSyszanVariable] = useState<any>([]);
         //新增文案与风格
         const [focuActive, setFocuActive] = useState<any[]>([]);
         const [styleData, setStyleData] = useState<any>([]);
@@ -117,7 +118,11 @@ const AddStyle = React.forwardRef(
         }));
 
         useEffect(() => {
-            setImageVar && setImageVar(submitData);
+            const newList = _.cloneDeep(submitData);
+            newList.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value = JSON.parse(
+                newList.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value
+            );
+            setImageVar && setImageVar(newList);
         }, [submitData]);
 
         useEffect(() => {
@@ -547,7 +552,10 @@ const AddStyle = React.forwardRef(
                                 shape="circle"
                                 size="small"
                                 type="primary"
-                                onClick={() => setSystemOPen(true)}
+                                onClick={() => {
+                                    setSyszanVariable(_.cloneDeep(systemVariable));
+                                    setSystemOPen(true);
+                                }}
                             />
                         </Tooltip>
                     </div>
@@ -883,24 +891,46 @@ const AddStyle = React.forwardRef(
                         />
                     </Modal>
                 )}
-                <Modal width={'80%'} open={systemOPen} onCancel={() => setSystemOPen(false)} footer={false}>
-                    <CreateTab
-                        appData={{ materialType, appReqVO: details }}
-                        imageStyleData={systemVariable}
-                        setImageStyleData={(data) => {
-                            setSystemVariable(data);
+                {systemOPen && (
+                    <Modal
+                        width={'80%'}
+                        open={systemOPen}
+                        onCancel={() => {
+                            setSystemOPen(false);
+                            setSyszanVariable([]);
                         }}
-                        focuActive={focuActive}
-                        setFocuActive={setFocuActive}
-                        digui={() => {
-                            const newData = systemVariable?.map((i: any) => i.name.split(' ')[1]);
-                            if (!newData || newData?.every((i: any) => !i)) {
-                                return 1;
-                            }
-                            return newData?.map((i: any) => Number(i))?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
-                        }}
-                    />
-                </Modal>
+                        footer={false}
+                    >
+                        <CreateTab
+                            appData={{ materialType, appReqVO: details }}
+                            imageStyleData={syszanVariable}
+                            setImageStyleData={(data) => {
+                                setSyszanVariable(data);
+                            }}
+                            focuActive={focuActive}
+                            setFocuActive={setFocuActive}
+                            digui={() => {
+                                const newData = syszanVariable?.map((i: any) => i.name.split(' ')[1]);
+                                if (!newData || newData?.every((i: any) => !i)) {
+                                    return 1;
+                                }
+                                return newData?.map((i: any) => Number(i))?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                            }}
+                        />
+                        <div className="flex justify-center mt-4">
+                            <Button
+                                className="w-[100px]"
+                                type="primary"
+                                onClick={() => {
+                                    setSystemVariable(_.cloneDeep(syszanVariable));
+                                    setSystemOPen(false);
+                                }}
+                            >
+                                保存
+                            </Button>
+                        </div>
+                    </Modal>
+                )}
             </div>
         );
     }

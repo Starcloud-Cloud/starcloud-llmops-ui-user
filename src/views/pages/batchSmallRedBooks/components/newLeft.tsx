@@ -510,8 +510,6 @@ const Lefts = ({
         }
     }, [uploadLoading]);
 
-    console.log(tableRef.current, 'tableRef.current');
-
     //笔记生成
     const generRef = useRef<any>(null);
     const [generateList, setGenerateList] = useState<any[]>([]); //笔记生成
@@ -1325,10 +1323,7 @@ const Lefts = ({
         const maxLength = newList?.filter((item) => item.required);
         const reList = newList?.filter((item) => item.required)?.map((i: any) => i?.dataIndex);
         const resizeList = newList?.filter((item) => !item.required)?.map((i: any) => i?.dataIndex);
-        console.log(defaultVariableData);
-
         if (defaultVariableData) {
-            console.log(maxLength);
             const list = maxLength?.map((item) => item.dataIndex);
             if (maxLength?.length >= 6) {
                 setVariableData({
@@ -1361,7 +1356,7 @@ const Lefts = ({
             } else {
                 const list1 = newList
 
-                    ?.filter((item) => item.required || defaultField?.checkedFieldList?.includes(item.dataIndex))
+                    ?.filter((item) => defaultField?.checkedFieldList?.includes(item.dataIndex))
                     ?.map((item) => item.dataIndex);
                 setFieldCompletionData({
                     ...defaultField,

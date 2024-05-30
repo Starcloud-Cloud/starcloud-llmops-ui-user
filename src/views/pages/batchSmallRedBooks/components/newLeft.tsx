@@ -619,7 +619,7 @@ const Lefts = ({
         const materiallist = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables;
         const judge = await materialJudge({
-            uid: searchParams.get('uid') ? searchParams.get('uid') : detail ? detail?.uid : result.uid,
+            uid: data ? result.planUid : searchParams.get('uid') ? searchParams.get('uid') : detail ? detail?.uid : result.uid,
             planSource: detail ? 'app' : 'market'
         });
         setMaterialTypeStatus(judge);
@@ -1780,7 +1780,12 @@ const Lefts = ({
                                         border: 'none'
                                     }
                                 }))}
-                            />
+                            >
+                                {/* {generateList?.map((item: any, index: number) => (
+                                        <Panel header="This is panel header 1" key="0">
+
+</Panel>))} */}
+                            </Collapse>
                         </Tabs.TabPane>
                         {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'

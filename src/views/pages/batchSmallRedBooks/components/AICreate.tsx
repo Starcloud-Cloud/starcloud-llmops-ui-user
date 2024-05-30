@@ -698,6 +698,7 @@ const AiCreate = ({
             </Modal>
             {/* 选择素材 */}
             <Modal
+                className="relative"
                 title="选择素材"
                 width={'80%'}
                 open={selOpen}
@@ -707,7 +708,7 @@ const AiCreate = ({
                 footer={false}
             >
                 <div className="max-h-[60vh] overflow-y-auto">
-                    <div className="flex justify-end">
+                    <div className="flex justify-end mr-4 absolute right-[30px] top-[-14px]">
                         <Button onClick={() => setSelOpen(false)} type="primary" size="small">
                             确认选择({selList?.length})
                         </Button>

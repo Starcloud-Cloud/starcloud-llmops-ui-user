@@ -87,7 +87,6 @@ const AiCreate = ({
     const [errorCount, setErrorCount] = useState(0);
     const errorMessageRef = useRef<any[]>([]);
     const [errorMessage, setErrorMessage] = useState<any[]>([]);
-    const [cancelExeLoading, setcancelExeLoading] = useState(false);
     const materialPre = useMemo(() => {
         return ((successCountRef.current / totalCountRef.current) * 100) | 0;
     }, [successCount, totalCount]);
@@ -133,19 +132,21 @@ const AiCreate = ({
                             fieldList: MokeList,
                             ...fieldCompletionData
                         });
-                        if (res?.length === group?.length) {
-                            resArr[index + i] = res;
-                        } else if (res?.length !== group?.length && res.length === 1) {
-                            resArr[index + i] = [...res, {}, {}];
-                        } else if (res?.length !== group?.length && res.length === 2) {
-                            resArr[index + i] = [...res, {}];
-                        } else {
-                            resArr[index + i] = res;
+                        if (!aref.current) {
+                            if (res?.length === group?.length) {
+                                resArr[index + i] = res;
+                            } else if (res?.length !== group?.length && res.length === 1) {
+                                resArr[index + i] = [...res, {}, {}];
+                            } else if (res?.length !== group?.length && res.length === 2) {
+                                resArr[index + i] = [...res, {}];
+                            } else {
+                                resArr[index + i] = res;
+                            }
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            successCountRef.current += group?.length;
+                            setExecutionCount(executionCountRef.current);
+                            setSuccessCount(successCountRef.current);
                         }
-                        executionCountRef.current = executionCountRef.current - group?.length;
-                        successCountRef.current += group?.length;
-                        setExecutionCount(executionCountRef.current);
-                        setSuccessCount(successCountRef.current);
                     } catch (error: any) {
                         group?.map((item) => {
                             if (!resArr[index + i]) {
@@ -169,35 +170,36 @@ const AiCreate = ({
                     }
                 })
             );
-            let newList = _.cloneDeep(theStaging);
-            const newArr = _.cloneDeep(materialzanListRef.current);
-            console.log(newArr, currentBatch, resArr);
-            for (let i = 0; i < currentBatch.flat().length; i++) {
-                const obj: any = {};
-                resArr.flat()[i] &&
-                    Object.keys(resArr.flat()[i]).map((item) => {
-                        obj[item] = resArr.flat()[i][item];
-                    });
-                newArr.push(obj);
-                uuidList.push(newList[indexList[i + index * 3]]?.uuid);
-                newList[indexList[i + index * 3]] = {
-                    ...newList[indexList[i + index * 3]],
-                    ...obj
-                };
+            if (!aref.current) {
+                let newList = _.cloneDeep(theStaging);
+                const newArr = _.cloneDeep(materialzanListRef.current);
+                console.log(newArr, currentBatch, resArr);
+                for (let i = 0; i < currentBatch.flat().length; i++) {
+                    const obj: any = {};
+                    resArr.flat()[i] &&
+                        Object.keys(resArr.flat()[i]).map((item) => {
+                            obj[item] = resArr.flat()[i][item];
+                        });
+                    newArr.push(obj);
+                    uuidList.push(newList[indexList[i + index * 3]]?.uuid);
+                    newList[indexList[i + index * 3]] = {
+                        ...newList[indexList[i + index * 3]],
+                        ...obj
+                    };
+                }
+                materialzanListRef.current = newArr;
+                setMaterialzanList(materialzanListRef.current);
+                const newL = _.cloneDeep(uuidListsRef.current);
+                newL?.push(...uuidList);
+                uuidListsRef.current = newL;
+                setUuidLists(uuidListsRef.current);
+                theStaging = _.cloneDeep(newList);
+                materialFieldexeDataRef.current = theStaging;
+                index += 3;
             }
-            materialzanListRef.current = newArr;
-            setMaterialzanList(materialzanListRef.current);
-            const newL = _.cloneDeep(uuidListsRef.current);
-            newL?.push(...uuidList);
-            uuidListsRef.current = newL;
-            setUuidLists(uuidListsRef.current);
-            theStaging = _.cloneDeep(newList);
-            materialFieldexeDataRef.current = theStaging;
-            index += 3;
         }
         executionCountRef.current = 0;
         setExecutionCount(executionCountRef.current);
-        setcancelExeLoading(false);
     };
     //loading 弹窗
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
@@ -227,17 +229,19 @@ const AiCreate = ({
                 currentBatch.map(async (group, i) => {
                     try {
                         const res = await customMaterialGenerate({ ...variableData, fieldList: MokeList, generateCount: group?.length });
-                        const timers = new Date().getTime();
-                        const newMaterialzan = _.cloneDeep(materialzanListRef.current);
-                        const newRes = res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType, group: timers }));
-                        newMaterialzan.push(...newRes);
-                        resArr.push(...newRes);
-                        materialzanListRef.current = newMaterialzan;
-                        setMaterialzanList(materialzanListRef.current);
-                        executionCountRef.current = executionCountRef.current - group?.length;
-                        successCountRef.current += group?.length;
-                        setExecutionCount(executionCountRef.current);
-                        setSuccessCount(successCountRef.current);
+                        if (!aref.current) {
+                            const timers = new Date().getTime();
+                            const newMaterialzan = _.cloneDeep(materialzanListRef.current);
+                            const newRes = res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType, group: timers }));
+                            newMaterialzan.push(...newRes);
+                            resArr.push(...newRes);
+                            materialzanListRef.current = newMaterialzan;
+                            setMaterialzanList(materialzanListRef.current);
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            successCountRef.current += group?.length;
+                            setExecutionCount(executionCountRef.current);
+                            setSuccessCount(successCountRef.current);
+                        }
                     } catch (error: any) {
                         console.log(error);
                         const newList = _.cloneDeep(errorMessageRef.current);
@@ -257,16 +261,18 @@ const AiCreate = ({
             // let newList = _.cloneDeep(theStaging);
             // newList.unshift(...resArr);
             // theStaging = _.cloneDeep(newList);
-            const newL = _.cloneDeep(uuidListsRef.current);
-            newL?.push(...resArr?.map((item) => item.uuid));
-            uuidListsRef.current = newL;
-            setUuidLists(uuidListsRef.current);
+            if (!aref.current) {
+                const newL = _.cloneDeep(uuidListsRef.current);
+                newL?.push(...resArr?.map((item) => item.uuid));
+                uuidListsRef.current = newL;
+                setUuidLists(uuidListsRef.current);
+            }
+
             // downTableData(theStaging);
             index += 3;
         }
         executionCountRef.current = 0;
         setExecutionCount(executionCountRef.current);
-        setcancelExeLoading(false);
     };
     //监听生成的 uuid
     const uuidListsRef = useRef<any[]>([]);
@@ -700,35 +706,36 @@ const AiCreate = ({
                 }}
                 footer={false}
             >
-                <div className="flex justify-end">
-                    <Button onClick={() => setSelOpen(false)} type="primary" size="small">
-                        确认选择({selList?.length})
-                    </Button>
+                <div className="max-h-[60vh] overflow-y-auto">
+                    <div className="flex justify-end">
+                        <Button onClick={() => setSelOpen(false)} type="primary" size="small">
+                            确认选择({selList?.length})
+                        </Button>
+                    </div>
+                    <Table
+                        rowKey={(record, index) => {
+                            return record.uuid;
+                        }}
+                        pagination={{
+                            showSizeChanger: true,
+                            defaultPageSize: 20,
+                            pageSizeOptions: [20, 50, 100, 300, 500],
+                            onChange: (page) => {
+                                setPage(page);
+                            }
+                        }}
+                        size="small"
+                        virtual
+                        rowSelection={{
+                            type: 'checkbox',
+                            ...rowSelection,
+                            fixed: true,
+                            columnWidth: 50
+                        }}
+                        columns={columns?.slice(0, columns?.length - 1)}
+                        dataSource={tableData}
+                    />
                 </div>
-                <Table
-                    scroll={{ y: 500 }}
-                    rowKey={(record, index) => {
-                        return record.uuid;
-                    }}
-                    pagination={{
-                        showSizeChanger: true,
-                        defaultPageSize: 20,
-                        pageSizeOptions: [20, 50, 100, 300, 500],
-                        onChange: (page) => {
-                            setPage(page);
-                        }
-                    }}
-                    size="small"
-                    virtual
-                    rowSelection={{
-                        type: 'checkbox',
-                        ...rowSelection,
-                        fixed: true,
-                        columnWidth: 50
-                    }}
-                    columns={columns?.slice(0, columns?.length - 1)}
-                    dataSource={tableData}
-                />
             </Modal>
             {/* 素材执行 loading */}
             {materialExecutionOpen && (
@@ -826,11 +833,11 @@ const AiCreate = ({
                         )}
                         {executionCount > 0 && (
                             <Button
-                                loading={cancelExeLoading}
                                 size="small"
                                 type="primary"
                                 onClick={() => {
-                                    setcancelExeLoading(true);
+                                    executionCountRef.current = 0;
+                                    setExecutionCount(executionCountRef.current);
                                     aref.current = true;
                                 }}
                             >

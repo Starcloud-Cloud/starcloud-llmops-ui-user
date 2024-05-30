@@ -47,10 +47,12 @@ const AddStyle = React.forwardRef(
             hasAddStyle = true,
             setImageVar,
             allData,
-            canAddCustomStyle = true
+            canAddCustomStyle = true,
+            saveTemplate
         }: any,
         ref: any
     ) => {
+        console.log(record, 'record');
         const [visible, setVisible] = useState(false);
 
         const [systemOPen, setSystemOPen] = useState(false);
@@ -278,6 +280,9 @@ const AddStyle = React.forwardRef(
             setVisible(false);
             setSelectImgs(null);
             setChooseImageIndex('');
+            setTimeout(() => {
+                saveTemplate && saveTemplate();
+            });
         };
 
         const handleOkV2 = () => {

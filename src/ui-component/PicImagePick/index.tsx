@@ -1,8 +1,10 @@
 import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button } from 'antd';
 import { imageSearch } from 'api/redBook/imageSearch';
+import axios from 'axios';
 import { debounce } from 'lodash-es';
 import React, { useCallback, useEffect, useState } from 'react';
 import Masonry from 'react-responsive-masonry';
+import { getAccessToken } from 'utils/auth';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -59,8 +61,27 @@ export const PicImagePick = ({
         };
     }, [handleScroll]);
 
-    const handleOk = () => {
-        setSelectImg(checkItem);
+    const handleOk = async () => {
+        const response = await axios.get(checkItem.largeImageURL, { responseType: 'blob' });
+        const imageBlob = response.data;
+
+        // Step 2: 创建FormData对象
+        const formData = new FormData();
+        formData.append('image', imageBlob, 'image.jpg'); // 'file' 是服务器端接收图片的字段名，'downloaded-image.jpg' 是文件名
+
+        // Step 3: 上传到服务器
+        const uploadResponse = await axios.post(
+            `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+            formData,
+            {
+                headers: {
+                    Authorization: 'Bearer ' + getAccessToken()
+                }
+            }
+        );
+        const url = uploadResponse.data.data.url;
+
+        setSelectImg({ ...checkItem, largeImageURL: url });
         handleCancel();
     };
     const handleCancel = () => {

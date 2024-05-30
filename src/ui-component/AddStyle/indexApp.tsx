@@ -86,8 +86,6 @@ const AddStyleApp = React.forwardRef(
             return copyRecord;
         }, [styleData, record]);
 
-        console.log('111,1111,+++++++');
-
         // useEffect(() => {
         //     // 系统的初始化为关闭
         //     if (currentStyle?.system) {

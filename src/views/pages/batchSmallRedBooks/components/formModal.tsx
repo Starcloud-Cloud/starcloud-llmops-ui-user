@@ -46,7 +46,6 @@ const FormModal = ({
     const [canUpload, setCanUpload] = useState(true);
 
     useEffect(() => {
-        console.log(selectImg, imageDataIndex);
         if (selectImg && imageDataIndex) {
             form.setFieldValue(imageDataIndex, selectImg?.largeImageURL);
         }

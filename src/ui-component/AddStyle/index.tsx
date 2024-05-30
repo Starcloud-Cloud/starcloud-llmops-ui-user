@@ -47,10 +47,12 @@ const AddStyle = React.forwardRef(
             hasAddStyle = true,
             setImageVar,
             allData,
-            canAddCustomStyle = true
+            canAddCustomStyle = true,
+            saveTemplate
         }: any,
         ref: any
     ) => {
+        console.log(record, 'record');
         const [visible, setVisible] = useState(false);
 
         const [systemOPen, setSystemOPen] = useState(false);
@@ -75,6 +77,7 @@ const AddStyle = React.forwardRef(
         const [switchCheck, setSwitchCheck] = useState(false);
         const [updIndex, setUpdIndex] = useState<any>('');
         const [addType, setAddType] = useState(0);
+        const [originStyleData, setOriginStyleData] = useState([]);
 
         const currentStyleRef: any = useRef(null);
         const collapseIndexRef: any = useRef(null);
@@ -82,7 +85,7 @@ const AddStyle = React.forwardRef(
 
         const submitData = React.useMemo(() => {
             const copyRecord = _.cloneDeep(record);
-            copyRecord.variable.variables.forEach((item: any) => {
+            copyRecord?.variable?.variables?.forEach((item: any) => {
                 // addType
                 if (addType === 1) {
                 } else {
@@ -156,8 +159,9 @@ const AddStyle = React.forwardRef(
                     list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
                 }
                 const systemList =
-                    record.flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
+                    record?.flowStep?.variable?.variables?.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
                 const typeList = list?.map((item: any) => ({ ...item, type: 1 }));
+                setOriginStyleData(typeList);
                 setStyleData(typeList);
                 setSystemVariable(systemList);
             }
@@ -246,6 +250,7 @@ const AddStyle = React.forwardRef(
             // }
         ];
 
+        // 重试
         const handleOK = () => {
             if (!selectImgs) {
                 message.warning('请选择图片模版');
@@ -275,6 +280,96 @@ const AddStyle = React.forwardRef(
             setVisible(false);
             setSelectImgs(null);
             setChooseImageIndex('');
+            setTimeout(() => {
+                saveTemplate && saveTemplate();
+            });
+        };
+
+        const handleOkV2 = () => {
+            if (type === 0) {
+                // 新增
+                const copyOriginStyleData = [...originStyleData];
+                const imageStyleList = [...copyOriginStyleData, selectImgs];
+
+                const saveData: any = {};
+                saveData.configuration = {
+                    appInformation: allData.configuration.appInformation,
+                    imageStyleList: imageStyleList.map((item, index) => ({ ...item, index: index + 1 })),
+                    materialList: allData.configuration.materialList
+                };
+                saveData.source = allData.source;
+                saveData.totalCount = allData.totalCount;
+                saveData.uid = allData.uid;
+
+                planModifyConfig({ ...saveData, validate: false })
+                    .then((res: any) => {
+                        setIsModalOpen(false);
+                        setUpdIndex('');
+                        setAddType(0);
+                        setCurrentStyle(null);
+                        getList();
+                        setVisible(false);
+                        setSelectImgs(null);
+                        setChooseImageIndex('');
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '操作成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
+                    })
+                    .catch((e: any) => {
+                        return;
+                    });
+            }
+            if (type === 1) {
+                //切换
+                const copyOriginStyleData: any = [...originStyleData];
+                copyOriginStyleData[editIndex] = selectImgs;
+
+                const saveData: any = {};
+                saveData.configuration = {
+                    appInformation: allData.configuration.appInformation,
+                    imageStyleList: copyOriginStyleData.map((item: any, index: number) => ({ ...item, index: index + 1 })),
+                    materialList: allData.configuration.materialList
+                };
+                saveData.source = allData.source;
+                saveData.totalCount = allData.totalCount;
+                saveData.uid = allData.uid;
+
+                planModifyConfig({ ...saveData, validate: false })
+                    .then((res: any) => {
+                        setIsModalOpen(false);
+                        setUpdIndex('');
+                        setAddType(0);
+                        setCurrentStyle(null);
+                        getList();
+                        setVisible(false);
+                        setSelectImgs(null);
+                        setChooseImageIndex('');
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '操作成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
+                    })
+                    .catch((e: any) => {
+                        return;
+                    });
+            }
         };
 
         const collapseList = React.useMemo(() => {
@@ -754,7 +849,7 @@ const AddStyle = React.forwardRef(
                                                             }
                                                         }}
                                                     />
-                                                    <Popconfirm
+                                                    {/* <Popconfirm
                                                         placement="top"
                                                         title={'确认删除'}
                                                         // description={description}
@@ -766,7 +861,7 @@ const AddStyle = React.forwardRef(
                                                             rev={undefined}
                                                             className="absolute z-50 py-[3px] left-[2px] text-red-600"
                                                         />
-                                                    </Popconfirm>
+                                                    </Popconfirm> */}
                                                     <Swiper
                                                         spaceBetween={30}
                                                         pagination={{

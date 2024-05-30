@@ -1409,6 +1409,19 @@ const Lefts = ({
         arr = [arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'), ..._.cloneDeep(generRef.current), b];
         return arr;
     };
+
+    // 我的应用保存
+    const saveTemplate = () => {
+        const arr = headerSaveAll();
+        setDetail &&
+            setDetail({
+                ...detail,
+                workflowConfig: {
+                    steps: arr?.filter((item: any) => item)
+                }
+            });
+    };
+
     //素材字段配置弹框
     const gessaveApp = () => {
         let arr = headerSaveAll();
@@ -1789,6 +1802,7 @@ const Lefts = ({
                                 </div>
                                 {detail ? (
                                     <AddStyle
+                                        saveTemplate={saveTemplate}
                                         details={appData?.configuration?.appInformation}
                                         hasAddStyle={detail || !detailShow ? false : true}
                                         setImageVar={setImageVar}

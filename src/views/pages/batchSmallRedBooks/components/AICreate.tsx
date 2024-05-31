@@ -707,7 +707,7 @@ const AiCreate = ({
                 footer={false}
             >
                 <div className="max-h-[60vh] overflow-y-auto">
-                    <div className="flex justify-end mr-4 absolute right-[30px] top-[-14px]">
+                    <div className="flex justify-end mr-4 absolute right-[30px] top-[16px]">
                         <Button onClick={() => setSelOpen(false)} type="primary" size="small">
                             确认选择({selList?.length})
                         </Button>

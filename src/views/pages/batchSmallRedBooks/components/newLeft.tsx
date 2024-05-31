@@ -518,11 +518,11 @@ const Lefts = ({
     const getList = async (flag?: boolean, appUpdate?: boolean) => {
         let result;
         let newList: any;
+        setTableLoading(true);
         if (data) {
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else if (appUpdate) {
-            setTableLoading(true);
             if (searchParams.get('appUid')) {
                 result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
                 newList = _.cloneDeep(result?.configuration?.appInformation);
@@ -548,7 +548,6 @@ const Lefts = ({
                 });
             });
         } else {
-            setTableLoading(true);
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
             const res = await marketDeatail({ uid: searchParams.get('appUid') });
             setVersion(res?.version || 0);
@@ -733,6 +732,7 @@ const Lefts = ({
                 newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
         }
         setImagMater(newImage);
+        setTableLoading(false);
     };
     const setcustom = (data: any) => {
         const newData = _.cloneDeep(appRef.current);
@@ -1463,7 +1463,7 @@ const Lefts = ({
                                                 appMarketUid: searchParams.get('appUid'),
                                                 planUid: searchParams.get('uid')
                                             });
-                                            navigate('createApp?uid=' + result);
+                                            navigate('/createApp?uid=' + result);
                                             setCreateAppStatus(false);
                                         }}
                                         type="primary"

@@ -52,7 +52,6 @@ const AddStyle = React.forwardRef(
         }: any,
         ref: any
     ) => {
-        console.log(record, 'record');
         const [visible, setVisible] = useState(false);
 
         const [systemOPen, setSystemOPen] = useState(false);
@@ -1024,6 +1023,19 @@ const AddStyle = React.forwardRef(
                                 return newData?.map((i: any) => Number(i))?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
                             }}
                         />
+                        <div className="flex justify-center mt-4">
+                            <Button
+                                className="w-[100px]"
+                                type="primary"
+                                onClick={() => {
+                                    setSystemVariable(_.cloneDeep(syszanVariable));
+                                    setSystemOPen(false);
+                                    saveTemplate && saveTemplate();
+                                }}
+                            >
+                                保存
+                            </Button>
+                        </div>
                     </Modal>
                 )}
             </div>

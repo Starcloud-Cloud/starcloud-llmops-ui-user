@@ -515,13 +515,13 @@ const Lefts = ({
     const [generateList, setGenerateList] = useState<any[]>([]); //笔记生成
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
-    const getList = async (flag?: boolean) => {
+    const getList = async (flag?: boolean, appUpdate?: boolean) => {
         let result;
         let newList: any;
         if (data) {
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
-        } else if (detail) {
+        } else if (detail && !appUpdate) {
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             newList = _.cloneDeep(detail);
             newList?.workflowConfig?.steps?.forEach((item: any) => {
@@ -1957,10 +1957,7 @@ const Lefts = ({
                     setTitle={setTitle}
                     setEditOpen={setEditOpen}
                     changeTableValue={(data) => {
-                        tableRef.current = data?.map((item: any) => ({
-                            ...item,
-                            uuid: uuidv4()
-                        }));
+                        tableRef.current = data;
                         setTableData(tableRef.current);
                         setSelectedRowKeys([]);
                     }}

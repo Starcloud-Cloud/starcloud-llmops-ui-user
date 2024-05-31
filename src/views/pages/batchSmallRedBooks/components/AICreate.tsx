@@ -1,5 +1,5 @@
 import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover } from 'antd';
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef, memo } from 'react';
 import { materialGenerate, customMaterialGenerate } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -18,7 +18,6 @@ const AiCreate = ({
     tableData,
     defaultVariableData,
     defaultField,
-
     setPage,
     setcustom,
     setField,
@@ -851,4 +850,15 @@ const AiCreate = ({
         </div>
     );
 };
-export default AiCreate;
+const memoAiCreate = (pre: any, next: any) => {
+    return (
+        JSON.stringify(pre.title) === JSON.stringify(JSON.stringify(next.title)) &&
+        JSON.stringify(pre.materialType) === JSON.stringify(JSON.stringify(next.materialType)) &&
+        JSON.stringify(pre.columns) === JSON.stringify(JSON.stringify(next.columns)) &&
+        JSON.stringify(pre.MokeList) === JSON.stringify(JSON.stringify(next.MokeList)) &&
+        JSON.stringify(pre.tableData) === JSON.stringify(JSON.stringify(next.tableData)) &&
+        JSON.stringify(pre.fieldCompletionData) === JSON.stringify(JSON.stringify(next.fieldCompletionData)) &&
+        JSON.stringify(pre.variableData) === JSON.stringify(JSON.stringify(next.variableData))
+    );
+};
+export default memo(AiCreate, memoAiCreate);

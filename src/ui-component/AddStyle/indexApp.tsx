@@ -17,7 +17,7 @@ import {
 } from 'antd';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, TextField } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, InputAdornment, IconButton, TextField, FormHelperText } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import React from 'react';
 import StyleTabs from '../../views/pages/copywriting/components/styleTabs';
@@ -43,6 +43,7 @@ const AddStyleApp = React.forwardRef(
         const [visible, setVisible] = useState(false);
         const [styleData, setStyleData] = useState<any>([]); //列表展示结果
         const [selectImgs, setSelectImgs] = useState<any>(null);
+        const [modalError, setModalError] = useState(false);
 
         const [query, setQuery] = useState<any | null>({
             picNum: ''
@@ -373,7 +374,8 @@ const AddStyleApp = React.forwardRef(
 
         const handleOK = () => {
             if (!selectImgs) {
-                message.warning('请选择图片模版');
+                // message.warning('请选择图片模版');
+                setModalError(true);
                 return;
             }
 
@@ -486,6 +488,7 @@ const AddStyleApp = React.forwardRef(
             setAddType(0);
             setIsModalOpen(false);
             setCurrentStyle(null);
+            setModalError(false);
         };
 
         // 复制uid需要改变
@@ -507,6 +510,7 @@ const AddStyleApp = React.forwardRef(
                         ...list,
                         {
                             ...list[recordIndex],
+                            name: list[recordIndex]?.name + '_copy',
                             enable: true,
                             index: index + 1,
                             system: false,
@@ -593,6 +597,7 @@ const AddStyleApp = React.forwardRef(
                         ...list,
                         {
                             ...templateList[recordIndex],
+                            name: templateList[recordIndex]?.name + '_copy',
                             enable: true,
                             index: index + 1,
                             system: false,
@@ -662,10 +667,11 @@ const AddStyleApp = React.forwardRef(
 
         // 根据Index 来判断
         const handleModalOk = () => {
-            if (!currentStyle.name) {
-                message.warning('请填写风格名称');
+            if (!currentStyle?.name) {
+                setModalError(true);
                 return;
             }
+            setModalError(false);
             // 新增uuid 需要改变
             if (addType === 1) {
                 const copyRecord = _.cloneDeep(record);
@@ -1156,7 +1162,7 @@ const AddStyleApp = React.forwardRef(
                                                         </Tooltip>
                                                         <Popconfirm
                                                             placement="top"
-                                                            title={'确认删除'}
+                                                            title={`确认删除${item?.name}`}
                                                             // description={description}
                                                             okText="是"
                                                             cancelText="否"
@@ -1237,7 +1243,9 @@ const AddStyleApp = React.forwardRef(
                                     color="secondary"
                                     label="风格名称"
                                     variant="outlined"
+                                    InputLabelProps={{ shrink: true }}
                                     value={currentStyle?.name}
+                                    error={modalError}
                                     onChange={(e) => {
                                         let value = e.target.value;
                                         setCurrentStyle((pre: any) => ({
@@ -1246,36 +1254,13 @@ const AddStyleApp = React.forwardRef(
                                         }));
                                     }}
                                 />
+                                {modalError && <FormHelperText className="text-[#f44336]">请输入风格名称</FormHelperText>}
                             </FormControl>
-                            {/* <div className="flex justify-center">
-                                <span className="mr-2">开启编辑</span>
-                                <Tooltip
-                                    title={
-                                        <div>
-                                            <div>开启编辑后，会从系统模版复制一份进行编辑，并且不再与系统模版同步配置</div>
-                                            <div>开启编辑后，如需继续使用系统模版，请删除后重新选择模版</div>
-                                        </div>
-                                    }
-                                >
-                                    <Switch
-                                        // 非系统不可编辑
-                                        disabled={!currentStyleRef?.current?.system}
-                                        checked={switchCheck}
-                                        onChange={(checked) => {
-                                            setSwitchCheck(checked);
-                                            setCurrentStyle((pre: any) => ({
-                                                ...pre,
-                                                system: !checked
-                                            }));
-                                        }}
-                                    />
-                                </Tooltip>
-                            </div> */}
                         </div>
 
                         <StyleTabs
                             schemaList={[]}
-                            imageStyleData={currentStyle?.templateList || []}
+                            imageStyleData={currentStyle?.templateList || [{ id: '', name: `图片 1`, model: '', key: 1, variableList: [] }]}
                             typeList={[]}
                             appData={{
                                 appUid,

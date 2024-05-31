@@ -302,7 +302,7 @@ const VariableInput = ({
                     <div className="flex flex-col flex-1 h-[310px]">
                         <span className="text-sm text-gray-500 mb-2">
                             <span className="mr-2">变量选择</span>
-                            <Tooltip title={'可选择上游步骤支持的变量，执行时会自动替换为具体的值'}>
+                            <Tooltip title={'可选择上游步骤支持的变量，执行时会自动替换为具体的值'} style={{ zIndex: 1002 }}>
                                 <ExclamationCircleOutlined rev={undefined} />
                             </Tooltip>
                         </span>

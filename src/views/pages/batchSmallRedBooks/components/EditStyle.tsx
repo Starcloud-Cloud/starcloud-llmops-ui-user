@@ -140,9 +140,11 @@ const EditStyle = ({
                             <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
                         </FormControl>
                     </div>
-                    <Button className="mt-[7px]" type="primary" onClick={handleCopy}>
-                        复制
-                    </Button>
+                    {!canEdit && (
+                        <Button className="mt-[7px]" type="primary" onClick={handleCopy}>
+                            复制
+                        </Button>
+                    )}
                 </div>
                 {imageStyleData?.code && (
                     <div>

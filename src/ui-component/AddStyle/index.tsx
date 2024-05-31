@@ -995,6 +995,18 @@ const AddStyle = React.forwardRef(
                         }}
                         footer={false}
                     >
+                        <div className="flex justify-end my-4">
+                            <Button
+                                className="w-[100px]"
+                                type="primary"
+                                onClick={() => {
+                                    setSystemVariable(_.cloneDeep(syszanVariable));
+                                    setSystemOPen(false);
+                                }}
+                            >
+                                保存
+                            </Button>
+                        </div>
                         <CreateTab
                             appData={{ materialType, appReqVO: details }}
                             imageStyleData={syszanVariable}

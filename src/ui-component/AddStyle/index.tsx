@@ -52,7 +52,6 @@ const AddStyle = React.forwardRef(
         }: any,
         ref: any
     ) => {
-        console.log(record, 'record');
         const [visible, setVisible] = useState(false);
 
         const [systemOPen, setSystemOPen] = useState(false);
@@ -1019,6 +1018,7 @@ const AddStyle = React.forwardRef(
                                 onClick={() => {
                                     setSystemVariable(_.cloneDeep(syszanVariable));
                                     setSystemOPen(false);
+                                    saveTemplate && saveTemplate();
                                 }}
                             >
                                 保存

@@ -1116,6 +1116,9 @@ const Lefts = ({
 
             if (!fieldShow) {
                 result = await planModify(data);
+                if (result) {
+                    getList();
+                }
             } else {
                 result = await planModifyConfig(data);
             }

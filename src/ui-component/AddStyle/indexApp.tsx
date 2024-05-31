@@ -198,6 +198,47 @@ const AddStyleApp = React.forwardRef(
                             const copyStyleData = [...styleData];
                             copyStyleData.splice(index, 1);
                             setStyleData(copyStyleData);
+
+                            // 走接口
+                            const copyOriginStyleData: any = [...originStyleData];
+                            copyOriginStyleData.splice(index, 1);
+
+                            const saveData: any = {};
+                            saveData.configuration = {
+                                appInformation: allData.configuration.appInformation,
+                                imageStyleList: copyOriginStyleData,
+                                materialList: allData.configuration.materialList
+                            };
+                            saveData.source = allData.source;
+                            saveData.totalCount = allData.totalCount;
+                            saveData.uid = allData.uid;
+
+                            planModifyConfig({ ...saveData, validate: false })
+                                .then((res: any) => {
+                                    setIsModalOpen(false);
+                                    setUpdIndex('');
+                                    setAddType(0);
+                                    setCurrentStyle(null);
+                                    getList();
+                                    setVisible(false);
+                                    setSelectImgs(null);
+                                    setChooseImageIndex('');
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '操作成功',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'success'
+                                            },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                            close: false
+                                        })
+                                    );
+                                })
+                                .catch((e: any) => {
+                                    return;
+                                });
                         }}
                     >
                         删除

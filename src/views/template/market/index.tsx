@@ -486,7 +486,7 @@ function TemplateMarket() {
                                     <Tab
                                         label={
                                             <div className="!text-[20px] !line-[25px] font-bold flex items-end gap-2">
-                                                <img height="20px" src={getImage(item.IconButton)} alt="" />
+                                                <img height="20px" src={getImage(item.icon)} alt="" />
                                                 <span>{item.name}</span>
                                             </div>
                                         }

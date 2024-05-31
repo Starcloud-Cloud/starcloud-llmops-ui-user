@@ -523,8 +523,13 @@ const Lefts = ({
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else if (appUpdate) {
             setTableLoading(true);
-            result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
-            newList = _.cloneDeep(result?.configuration?.appInformation);
+            if (searchParams.get('appUid')) {
+                result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
+                newList = _.cloneDeep(result?.configuration?.appInformation);
+            } else {
+                result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+                newList = _.cloneDeep(result?.configuration?.appInformation);
+            }
         } else if (detail) {
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             newList = _.cloneDeep(detail);
@@ -765,7 +770,7 @@ const Lefts = ({
         appRef.current = newData;
         setAppData(appRef.current);
         if (!detail) {
-            handleSaveClick(false);
+            handleSaveClick(false, false, true);
         } else {
             const arr = headerSaveAll(data);
             setDetail &&

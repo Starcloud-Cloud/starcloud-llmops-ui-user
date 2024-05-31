@@ -221,7 +221,7 @@ const Valida = ({
                     >
                         {variables?.map((el: any, i: number) => (
                             <Grid item md={12} xs={12} key={i + 'variables'}>
-                                {el.field !== 'prompt' && el.field !== 'n' && (
+                                {el.field !== 'prompt' && el.field !== 'n' && el.field !== 'SYSTEM_POSTER_STYLE_CONFIG' && (
                                     <FormExecute
                                         item={el}
                                         onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}

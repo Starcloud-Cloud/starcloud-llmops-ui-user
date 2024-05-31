@@ -43,6 +43,7 @@ const ThreeStep = ({
     pre,
     exeDetail,
     dataStatus,
+    errMessage,
     setSataStatus,
     setPre
 }: {
@@ -51,6 +52,7 @@ const ThreeStep = ({
     pre: number;
     exeDetail: boolean;
     dataStatus: boolean;
+    errMessage: string;
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
 }) => {
@@ -154,6 +156,11 @@ const ThreeStep = ({
             setAginLoading(false);
         }
     }, [dataStatus]);
+    useEffect(() => {
+        if (errMessage) {
+            clearInterval(timer.current);
+        }
+    }, [errMessage]);
     const props: UploadProps = {
         name: 'image',
         multiple: true,
@@ -471,15 +478,21 @@ const ThreeStep = ({
                     {aginLoading && (
                         <div className="z-[1000] absolute w-full h-full flex justify-center items-center bg-black/50">
                             <div className="flex flex-col gap-2 justify-center items-center bg-white w-[200px] h-[200px] rounded-lg">
-                                <Progress
-                                    type="circle"
-                                    percent={Math.floor((data?.progress?.currentStepIndex / data?.progress?.totalStepCount) * 100)}
-                                />
-                                <Popover content={'执行到第几步/总步数'}>
-                                    <div className="font-[500] cursor-pointer">
-                                        {data?.progress?.currentStepIndex || '-'}/{data?.progress?.totalStepCount || '-'}
-                                    </div>
-                                </Popover>
+                                {errMessage ? (
+                                    <div className="text-[#ff4d4f]">错误信息：{errMessage}</div>
+                                ) : (
+                                    <>
+                                        <Progress
+                                            type="circle"
+                                            percent={Math.floor((data?.progress?.currentStepIndex / data?.progress?.totalStepCount) * 100)}
+                                        />
+                                        <Popover content={'执行到第几步/总步数'}>
+                                            <div className="font-[500] cursor-pointer">
+                                                {data?.progress?.currentStepIndex || '-'}/{data?.progress?.totalStepCount || '-'}
+                                            </div>
+                                        </Popover>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}
@@ -510,15 +523,19 @@ const ThreeStep = ({
                         setFieldHead={setFieldHead}
                         fieldHead={fieldHead}
                         newSave={async (data: any) => {
-                            setSaveLoading(true);
-                            setSataStatus(false);
-                            await retryContent(data);
-                            setSaveLoading(false);
-                            setOpen(false);
-                            setAginLoading(true);
-                            timer.current = setInterval(() => {
-                                setPre(Math.random() + Math.random());
-                            }, 2000);
+                            try {
+                                setSaveLoading(true);
+                                setSataStatus(false);
+                                await retryContent(data);
+                                setSaveLoading(false);
+                                setOpen(false);
+                                setAginLoading(true);
+                                timer.current = setInterval(() => {
+                                    setPre(Math.random() + Math.random());
+                                }, 2000);
+                            } catch (err) {
+                                setSaveLoading(false);
+                            }
                         }}
                         setPlanUid={(uid: any) => {
                             console.log(uid);

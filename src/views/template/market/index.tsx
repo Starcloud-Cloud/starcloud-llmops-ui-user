@@ -486,7 +486,7 @@ function TemplateMarket() {
                                     <Tab
                                         label={
                                             <div className="!text-[20px] !line-[25px] font-bold flex items-end gap-2">
-                                                <img height="20px" src={getImage(item.IconButton)} alt="" />
+                                                <img height="20px" src={getImage(item.icon)} alt="" />
                                                 <span>{item.name}</span>
                                             </div>
                                         }
@@ -516,7 +516,12 @@ function TemplateMarket() {
                         (item?.code === 'HOT' ? (
                             <>
                                 <CustomTabPanel value={value} index={1}>
-                                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                                    <div
+                                        style={{
+                                            minHeight: '190px'
+                                        }}
+                                        className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                                    >
                                         {item.appList.map((el: any, index: number) => (
                                             <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
                                         ))}

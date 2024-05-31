@@ -28,6 +28,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
     const preRef = useRef(0);
     const [pre, setPre] = useState(0);
     const [dataStatus, setSataStatus] = useState(false);
+    const [errMessage, setErrMessage] = useState('');
     //是否是生成记录的详情
     const [exeDetail, setExeDetail] = useState(false);
     const [count, setCount] = useState(1);
@@ -57,11 +58,13 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
         if (pre) {
             getContentDetail(businessUid).then((res) => {
                 if (res) {
-                    if (res.status !== 'EXECUTING') {
+                    if (res.status !== 'EXECUTING' && res.status === 'SUCCESS') {
                         setSataStatus(true);
                         changeList && changeList(businessUid);
+                        setDetail(res);
+                    } else if (res.status !== 'EXECUTING' && res.status === 'SUCCESS') {
+                        setErrMessage(res.errorMessage);
                     }
-                    setDetail(res);
                 }
             });
         }
@@ -158,6 +161,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
                     show={show}
                     pre={preRef.current}
                     dataStatus={dataStatus}
+                    errMessage={errMessage}
                     exeDetail={exeDetail}
                     setSataStatus={setSataStatus}
                     setPre={(data) => {

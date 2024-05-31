@@ -521,7 +521,11 @@ const Lefts = ({
         if (data) {
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
-        } else if (detail && !appUpdate) {
+        } else if (appUpdate) {
+            setTableLoading(true);
+            result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+            newList = _.cloneDeep(result?.configuration?.appInformation);
+        } else if (detail) {
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             newList = _.cloneDeep(detail);
             newList?.workflowConfig?.steps?.forEach((item: any) => {
@@ -1138,7 +1142,7 @@ const Lefts = ({
             if (!fieldShow) {
                 result = await planModify(data);
                 if (result) {
-                    getList();
+                    getList(false, true);
                 }
             } else {
                 result = await planModifyConfig(data);

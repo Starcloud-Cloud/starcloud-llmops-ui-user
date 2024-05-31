@@ -145,8 +145,8 @@ const LeftModalAdd = ({
     }, [fieldHead]);
     return (
         <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
-            <div className="max-h-[60vh] overflow-y-auto">
-                <div className="flex gap-2 justify-between my-[20px]">
+            <div className="max-h-[60vh] overflow-y-auto mt-6">
+                <div className="flex gap-2 justify-between mb-[20px]">
                     <div className="flex gap-2">
                         <Button
                             type="primary"

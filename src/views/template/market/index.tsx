@@ -34,6 +34,7 @@ import dayjs from 'dayjs';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 import { appPage } from 'api/template';
 import jsCookie from 'js-cookie';
+import { ENUM_TENANT, getTenant } from 'utils/permission';
 interface MarketList {
     name: string;
     tags: string[];
@@ -353,7 +354,7 @@ function TemplateMarket() {
     const [newUserVipOpen, setNewUserVipOpen] = useState(false);
 
     useEffect(() => {
-        if (value === 2) {
+        if ((getTenant() === ENUM_TENANT.AI && value === 1) || (getTenant() !== ENUM_TENANT.AI && value === 2)) {
             favoriteList({}).then((res) => {
                 setCollectList(res);
             });
@@ -475,14 +476,16 @@ function TemplateMarket() {
                                     onChange={(event: React.SyntheticEvent, value: number) => setValue(value)}
                                     aria-label="basic tabs example"
                                 >
-                                    <Tab
-                                        label={
-                                            <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
-                                                <span>我的应用</span>
-                                            </div>
-                                        }
-                                        {...a11yProps(0)}
-                                    />
+                                    {getTenant() !== ENUM_TENANT.AI && (
+                                        <Tab
+                                            label={
+                                                <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
+                                                    <span>我的应用</span>
+                                                </div>
+                                            }
+                                            {...a11yProps(0)}
+                                        />
+                                    )}
                                     <Tab
                                         label={
                                             <div className="!text-[20px] !line-[25px] font-bold flex items-end gap-2">
@@ -490,7 +493,7 @@ function TemplateMarket() {
                                                 <span>{item.name}</span>
                                             </div>
                                         }
-                                        {...a11yProps(1)}
+                                        {...a11yProps(getTenant() === ENUM_TENANT.AI ? 0 : 1)}
                                     />
                                     <Tab
                                         label={
@@ -498,7 +501,7 @@ function TemplateMarket() {
                                                 <span>我的收藏</span>
                                             </div>
                                         }
-                                        {...a11yProps(2)}
+                                        {...a11yProps(getTenant() === ENUM_TENANT.AI ? 1 : 2)}
                                     />
                                     {getPermission(ENUM_PERMISSION.MARKET_VIDEO_MODAL) && (
                                         <div
@@ -515,7 +518,48 @@ function TemplateMarket() {
                     {item.appList.length > 0 &&
                         (item?.code === 'HOT' ? (
                             <>
-                                <CustomTabPanel value={value} index={1}>
+                                {getTenant() !== ENUM_TENANT.AI && (
+                                    <CustomTabPanel value={value} index={0}>
+                                        <div className="relative">
+                                            <div
+                                                className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                                                style={{
+                                                    height: '190px',
+                                                    overflowY: 'hidden'
+                                                }}
+                                            >
+                                                <div
+                                                    className="rounded-[12px] shadow-md border border-solid border-[transparent] hover:border-[#CECAD5] cursor-pointer h-[185px] bg-white p-4 flex gap-2 justify-center items-center flex-col"
+                                                    onClick={() => navigate('/my-app')}
+                                                >
+                                                    <PlusOutlined className="text-[30px]" rev={undefined} />
+                                                    <div className="text-black/60 text-[14px]">找不到合适的？ 创建新应用</div>
+                                                </div>
+                                                {myAppList.map((el: any, index: number) => (
+                                                    <MarketTemplate
+                                                        key={el?.uid}
+                                                        handleDetail={({ uid }: { uid: string }) => {
+                                                            navigate('/createApp?uid=' + uid);
+                                                        }}
+                                                        data={el}
+                                                    />
+                                                ))}
+                                            </div>
+                                            {myAppList.length > 0 && (
+                                                <div
+                                                    onClick={() => {
+                                                        navigate('/my-app');
+                                                    }}
+                                                    className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
+                                                >
+                                                    更多应用
+                                                    <RightOutlined rev={undefined} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </CustomTabPanel>
+                                )}
+                                <CustomTabPanel value={value} index={getTenant() === ENUM_TENANT.AI ? 0 : 1}>
                                     <div
                                         style={{
                                             minHeight: '190px'
@@ -527,46 +571,7 @@ function TemplateMarket() {
                                         ))}
                                     </div>
                                 </CustomTabPanel>
-                                <CustomTabPanel value={value} index={0}>
-                                    <div className="relative">
-                                        <div
-                                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                                            style={{
-                                                height: '190px',
-                                                overflowY: 'hidden'
-                                            }}
-                                        >
-                                            <div
-                                                className="rounded-[12px] shadow-md border border-solid border-[transparent] hover:border-[#CECAD5] cursor-pointer h-[185px] bg-white p-4 flex gap-2 justify-center items-center flex-col"
-                                                onClick={() => navigate('/my-app')}
-                                            >
-                                                <PlusOutlined className="text-[30px]" rev={undefined} />
-                                                <div className="text-black/60 text-[14px]">添加我的应用</div>
-                                            </div>
-                                            {myAppList.map((el: any, index: number) => (
-                                                <MarketTemplate
-                                                    key={el?.uid}
-                                                    handleDetail={({ uid }: { uid: string }) => {
-                                                        navigate('/createApp?uid=' + uid);
-                                                    }}
-                                                    data={el}
-                                                />
-                                            ))}
-                                        </div>
-                                        {myAppList.length > 0 && (
-                                            <div
-                                                onClick={() => {
-                                                    navigate('/my-app');
-                                                }}
-                                                className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
-                                            >
-                                                更多应用
-                                                <RightOutlined rev={undefined} />
-                                            </div>
-                                        )}
-                                    </div>
-                                </CustomTabPanel>
-                                <CustomTabPanel value={value} index={2}>
+                                <CustomTabPanel value={value} index={getTenant() === ENUM_TENANT.AI ? 1 : 2}>
                                     <div className="relative">
                                         <div
                                             style={{

@@ -1,7 +1,7 @@
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { RightOutlined } from '@ant-design/icons';
+import { PlusOutlined, RightOutlined } from '@ant-design/icons';
 import {
     Box,
     Typography,
@@ -32,6 +32,7 @@ import { NewUserVip } from '../../../ui-component/new-user-vip/index';
 import MarketTemplate from '../myTemplate/components/content/marketTemplate';
 import dayjs from 'dayjs';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+import { appPage } from 'api/template';
 import jsCookie from 'js-cookie';
 interface MarketList {
     name: string;
@@ -347,13 +348,23 @@ function TemplateMarket() {
     };
     const [value, setValue] = useState(0);
     const [collectList, setCollectList] = useState<any[]>([]);
+    const [myAppList, setmyAppList] = useState<any[]>([]);
     const [openMarketVideo, setOpenMarketVideo] = useState(false);
     const [newUserVipOpen, setNewUserVipOpen] = useState(false);
 
     useEffect(() => {
-        favoriteList({}).then((res) => {
-            setCollectList(res);
-        });
+        if (value === 2) {
+            favoriteList({}).then((res) => {
+                setCollectList(res);
+            });
+        } else if (value === 0) {
+            appPage({
+                pageNo: 1,
+                pageSize: 10
+            }).then((res) => {
+                setmyAppList(res.list);
+            });
+        }
     }, [value]);
     const scrollRef: any = useRef(null);
 
@@ -466,12 +477,20 @@ function TemplateMarket() {
                                 >
                                     <Tab
                                         label={
+                                            <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
+                                                <span>我的应用</span>
+                                            </div>
+                                        }
+                                        {...a11yProps(0)}
+                                    />
+                                    <Tab
+                                        label={
                                             <div className="!text-[20px] !line-[25px] font-bold flex items-end gap-2">
                                                 <img height="20px" src={getImage(item.IconButton)} alt="" />
                                                 <span>{item.name}</span>
                                             </div>
                                         }
-                                        {...a11yProps(0)}
+                                        {...a11yProps(1)}
                                     />
                                     <Tab
                                         label={
@@ -479,7 +498,7 @@ function TemplateMarket() {
                                                 <span>我的收藏</span>
                                             </div>
                                         }
-                                        {...a11yProps(1)}
+                                        {...a11yProps(2)}
                                     />
                                     {getPermission(ENUM_PERMISSION.MARKET_VIDEO_MODAL) && (
                                         <div
@@ -496,16 +515,61 @@ function TemplateMarket() {
                     {item.appList.length > 0 &&
                         (item?.code === 'HOT' ? (
                             <>
-                                <CustomTabPanel value={value} index={0}>
+                                <CustomTabPanel value={value} index={1}>
                                     <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
                                         {item.appList.map((el: any, index: number) => (
                                             <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
                                         ))}
                                     </div>
                                 </CustomTabPanel>
-                                <CustomTabPanel value={value} index={1}>
+                                <CustomTabPanel value={value} index={0}>
                                     <div className="relative">
-                                        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                                        <div
+                                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                                            style={{
+                                                height: '190px',
+                                                overflowY: 'hidden'
+                                            }}
+                                        >
+                                            <div
+                                                className="rounded-[12px] shadow-md border border-solid border-[transparent] hover:border-[#CECAD5] cursor-pointer h-[185px] bg-white p-4 flex gap-2 justify-center items-center flex-col"
+                                                onClick={() => navigate('/my-app')}
+                                            >
+                                                <PlusOutlined className="text-[30px]" rev={undefined} />
+                                                <div className="text-black/60 text-[14px]">添加我的应用</div>
+                                            </div>
+                                            {myAppList.map((el: any, index: number) => (
+                                                <MarketTemplate
+                                                    key={el?.uid}
+                                                    handleDetail={({ uid }: { uid: string }) => {
+                                                        navigate('/createApp?uid=' + uid);
+                                                    }}
+                                                    data={el}
+                                                />
+                                            ))}
+                                        </div>
+                                        {myAppList.length > 0 && (
+                                            <div
+                                                onClick={() => {
+                                                    navigate('/my-app');
+                                                }}
+                                                className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
+                                            >
+                                                更多应用
+                                                <RightOutlined rev={undefined} />
+                                            </div>
+                                        )}
+                                    </div>
+                                </CustomTabPanel>
+                                <CustomTabPanel value={value} index={2}>
+                                    <div className="relative">
+                                        <div
+                                            style={{
+                                                height: '190px',
+                                                overflowY: 'hidden'
+                                            }}
+                                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                                        >
                                             {collectList.map((el: any, index: number) => (
                                                 <MarketTemplate key={el?.uid} handleDetail={handleDetail} data={el} />
                                             ))}

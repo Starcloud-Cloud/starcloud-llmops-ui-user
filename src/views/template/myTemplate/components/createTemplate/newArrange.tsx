@@ -439,69 +439,29 @@ function Arrange({
                             {expanded[index] && <Divider />}
                             {expanded[index] && (
                                 <Box>
-                                    {item?.flowStep?.handler === 'PosterActionHandler' ? (
-                                        <div className="p-4">
-                                            {item?.flowStep?.variable?.variables?.map(
-                                                (el: any, i: number) =>
-                                                    el?.field === 'SYSTEM_POSTER_STYLE_CONFIG' && (
-                                                        <div>
-                                                            <CreateTab
-                                                                key={el?.field}
-                                                                appData={{ materialType, appReqVO: detail }}
-                                                                imageStyleData={el.value}
-                                                                setImageStyleData={(data) => {
-                                                                    basisChange({
-                                                                        e: { name: el.field, value: data },
-                                                                        index,
-                                                                        i,
-                                                                        values: true
-                                                                    });
-                                                                }}
-                                                                focuActive={focuActive}
-                                                                setFocuActive={setFocuActive}
-                                                                digui={() => {
-                                                                    const newData = el.value?.map((i: any) => i.name.split(' ')[1]);
-                                                                    if (!newData || newData?.every((i: any) => !i)) {
-                                                                        return 1;
-                                                                    }
-                                                                    return (
-                                                                        newData
-                                                                            ?.map((i: any) => Number(i))
-                                                                            ?.sort((a: any, b: any) => b - a)[0] *
-                                                                            1 +
-                                                                        1
-                                                                    );
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <Valida
-                                            key={item.field}
-                                            title={item.name}
-                                            variableStyle={variableStyle}
-                                            handler={item?.flowStep?.handler}
-                                            variable={item.variable?.variables}
-                                            variables={item.flowStep.variable?.variables}
-                                            responent={item.flowStep.response}
-                                            buttonLabel={item.buttonLabel}
-                                            basisChange={basisChange}
-                                            index={index}
-                                            allvalida={allvalida[index]}
-                                            fields={item.field}
-                                            setModal={(i) => {
-                                                setModal(i);
-                                            }}
-                                            setOpen={setOpen}
-                                            setTitle={setTitle}
-                                            editChange={editChange}
-                                            statusChange={statusChange}
-                                            editModal={editModal}
-                                            delModal={delModal}
-                                        />
-                                    )}
+                                    <Valida
+                                        key={item.field}
+                                        title={item.name}
+                                        variableStyle={variableStyle}
+                                        handler={item?.flowStep?.handler}
+                                        variable={item.variable?.variables}
+                                        variables={item.flowStep.variable?.variables}
+                                        responent={item.flowStep.response}
+                                        buttonLabel={item.buttonLabel}
+                                        basisChange={basisChange}
+                                        index={index}
+                                        allvalida={allvalida[index]}
+                                        fields={item.field}
+                                        setModal={(i) => {
+                                            setModal(i);
+                                        }}
+                                        setOpen={setOpen}
+                                        setTitle={setTitle}
+                                        editChange={editChange}
+                                        statusChange={statusChange}
+                                        editModal={editModal}
+                                        delModal={delModal}
+                                    />
                                 </Box>
                             )}
                         </SubCard>

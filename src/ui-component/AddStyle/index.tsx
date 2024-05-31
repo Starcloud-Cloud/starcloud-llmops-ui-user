@@ -995,37 +995,9 @@ const AddStyle = React.forwardRef(
                         }}
                         footer={false}
                     >
-                        <div className="flex justify-end my-4">
+                        <div className="relative mt-[30px]">
                             <Button
-                                className="w-[100px]"
-                                type="primary"
-                                onClick={() => {
-                                    setSystemVariable(_.cloneDeep(syszanVariable));
-                                    setSystemOPen(false);
-                                }}
-                            >
-                                保存
-                            </Button>
-                        </div>
-                        <CreateTab
-                            appData={{ materialType, appReqVO: details }}
-                            imageStyleData={syszanVariable}
-                            setImageStyleData={(data) => {
-                                setSyszanVariable(data);
-                            }}
-                            focuActive={focuActive}
-                            setFocuActive={setFocuActive}
-                            digui={() => {
-                                const newData = syszanVariable?.map((i: any) => i.name.split(' ')[1]);
-                                if (!newData || newData?.every((i: any) => !i)) {
-                                    return 1;
-                                }
-                                return newData?.map((i: any) => Number(i))?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
-                            }}
-                        />
-                        <div className="flex justify-center mt-4">
-                            <Button
-                                className="w-[100px]"
+                                className="w-[100px] absolute right-[10px]"
                                 type="primary"
                                 onClick={() => {
                                     setSystemVariable(_.cloneDeep(syszanVariable));
@@ -1035,6 +1007,23 @@ const AddStyle = React.forwardRef(
                             >
                                 保存
                             </Button>
+
+                            <CreateTab
+                                appData={{ materialType, appReqVO: details }}
+                                imageStyleData={syszanVariable}
+                                setImageStyleData={(data) => {
+                                    setSyszanVariable(data);
+                                }}
+                                focuActive={focuActive}
+                                setFocuActive={setFocuActive}
+                                digui={() => {
+                                    const newData = syszanVariable?.map((i: any) => i.name.split(' ')[1]);
+                                    if (!newData || newData?.every((i: any) => !i)) {
+                                        return 1;
+                                    }
+                                    return newData?.map((i: any) => Number(i))?.sort((a: any, b: any) => b - a)[0] * 1 + 1;
+                                }}
+                            />
                         </div>
                     </Modal>
                 )}

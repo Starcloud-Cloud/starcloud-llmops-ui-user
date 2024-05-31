@@ -515,12 +515,21 @@ const Lefts = ({
     const [generateList, setGenerateList] = useState<any[]>([]); //笔记生成
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
-    const getList = async (flag?: boolean) => {
+    const getList = async (flag?: boolean, appUpdate?: boolean) => {
         let result;
         let newList: any;
         if (data) {
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);
+        } else if (appUpdate) {
+            setTableLoading(true);
+            if (searchParams.get('appUid')) {
+                result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
+                newList = _.cloneDeep(result?.configuration?.appInformation);
+            } else {
+                result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+                newList = _.cloneDeep(result?.configuration?.appInformation);
+            }
         } else if (detail) {
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             newList = _.cloneDeep(detail);
@@ -761,7 +770,7 @@ const Lefts = ({
         appRef.current = newData;
         setAppData(appRef.current);
         if (!detail) {
-            handleSaveClick(false);
+            handleSaveClick(false, false, true);
         } else {
             const arr = headerSaveAll(data);
             setDetail &&
@@ -1138,7 +1147,7 @@ const Lefts = ({
             if (!fieldShow) {
                 result = await planModify(data);
                 if (result) {
-                    getList();
+                    getList(false, true);
                 }
             } else {
                 result = await planModifyConfig(data);
@@ -1960,10 +1969,7 @@ const Lefts = ({
                     setTitle={setTitle}
                     setEditOpen={setEditOpen}
                     changeTableValue={(data) => {
-                        tableRef.current = data?.map((item: any) => ({
-                            ...item,
-                            uuid: uuidv4()
-                        }));
+                        tableRef.current = data;
                         setTableData(tableRef.current);
                         setSelectedRowKeys([]);
                     }}

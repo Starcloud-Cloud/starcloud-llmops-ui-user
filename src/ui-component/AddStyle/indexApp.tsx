@@ -1203,7 +1203,7 @@ const AddStyleApp = React.forwardRef(
                                                         </Tooltip>
                                                         <Popconfirm
                                                             placement="top"
-                                                            title={`确认删除${item?.name}`}
+                                                            title={`确认删除[${item?.name}]`}
                                                             // description={description}
                                                             okText="是"
                                                             cancelText="否"

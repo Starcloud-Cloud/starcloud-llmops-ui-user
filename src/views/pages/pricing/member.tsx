@@ -552,7 +552,13 @@ const Price1 = () => {
                     .skus?.filter(
                         (item: any) => item.properties?.[0]?.remark === 'NEW_USER' || item.properties?.[0]?.remark === 'USER_INVITE'
                     );
-                setActiveProduct(list);
+
+                // 只有月份有新人用户专享
+                if (value === monthId) {
+                    setActiveProduct(list);
+                } else {
+                    setActiveProduct([]);
+                }
 
                 let newList: any[] = [];
                 res.list.forEach((item: any, index: number) => {

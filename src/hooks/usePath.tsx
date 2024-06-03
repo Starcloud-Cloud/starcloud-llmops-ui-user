@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { useMemo } from 'react';
 import { AppCustomRouteRecordRaw } from 'types/router';
-import useRouteStore from 'store/router';
+import useRouteStore, { routerName } from 'store/router';
 import Loadable from 'ui-component/Loadable';
 
 interface NavItemType {
@@ -10,9 +10,9 @@ interface NavItemType {
     element: any;
     children: any;
 }
+
 const usePath = () => {
     const route = useRouteStore((store) => store.routes);
-    console.log(route);
 
     const routes: any[] = useMemo(() => {
         const convertToNavItemType = (routeObj: AppCustomRouteRecordRaw): NavItemType => {
@@ -28,7 +28,7 @@ const usePath = () => {
             return routeList.map((routeObj) => convertToNavItemType(routeObj)); // setting isTopLevel as true for all items in routeList
         };
         if (routes) {
-            const targetRoute = routes.find((route) => route.name === 'mofaai');
+            const targetRoute = routes.find((route) => route.name === routerName);
             return targetRoute && targetRoute?.children && convertRouteList(targetRoute?.children);
         }
     }, [route]);

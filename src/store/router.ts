@@ -6,10 +6,36 @@ import { generateRoute } from 'utils/routerHelper';
 // import remainingroutes from 'router/routes';
 import { AppCustomRouteRecordRaw, RouteStore } from 'types/router';
 import localStorage from 'redux-persist/es/storage';
+import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const { wsCache } = useCache();
 // const allRoutes: MUIRoutes[] = remainingroutes;
+
+export const routerName = getPermission(ENUM_PERMISSION.MENU);
+
+function filterVisibleNodes(tree: any) {
+    const filteredTree: any = [];
+
+    function filterNodes(nodes: any) {
+        for (const node of nodes) {
+            if (node.visible !== false) {
+                const filteredChildren = filterNodes(node.children || []) as any;
+                if (filteredChildren?.length > 0 || !node.children) {
+                    const filteredNode = { ...node };
+                    if (filteredChildren?.length > 0) {
+                        filteredNode.children = filteredChildren;
+                    }
+                    filteredTree.push(filteredNode);
+                }
+            }
+        }
+    }
+
+    filterNodes(tree);
+    console.log(filteredTree, 'filteredTree');
+    return filteredTree;
+}
 
 const useRouteStore = create<RouteStore>((set) => ({
     routes: [],
@@ -37,8 +63,9 @@ const useRouteStore = create<RouteStore>((set) => ({
             res = resData?.menus;
             wsCache.set(CACHE_KEY.ROLE_ROUTERS, res);
         }
-        const targetRoute = res.find((route) => route.name === 'mofaai');
-        const routerMap = generateRoute(targetRoute?.children);
+        const targetRoute = res.find((route) => route.name === routerName);
+        // console.log(filterVisibleNodes(targetRoute?.children), 'filterVisibleNodes(targetRoute?.children)');
+        const routerMap = generateRoute(filterVisibleNodes(targetRoute?.children));
         // const routerMap = [];
         // ...use transformRoutes with your AppRouteRecordRaw routes array
         // const newRoutes = transformRoutes(routerMap);

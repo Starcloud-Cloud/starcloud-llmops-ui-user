@@ -1,7 +1,7 @@
 // project import
 
 import { NavItemType } from 'types';
-import useRouteStore from 'store/router';
+import useRouteStore, { routerName } from 'store/router';
 import { AppCustomRouteRecordRaw } from 'types/router';
 import { useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -36,9 +36,9 @@ export const RuoyiMenu = () => {
         if (routes) {
             let targetRoute;
             if (isMobile) {
-                targetRoute = routes?.find((route) => route.name === 'mofaai');
+                targetRoute = routes?.find((route) => route.name === routerName);
             } else {
-                targetRoute = routes?.find((route) => route.name === 'mofaai')?.children?.[routesIndex];
+                targetRoute = routes?.find((route) => route.name === routerName)?.children?.[routesIndex];
             }
             return targetRoute && targetRoute?.children && convertRouteList(targetRoute?.children);
         }

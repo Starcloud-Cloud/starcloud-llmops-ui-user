@@ -1,5 +1,5 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
-import { Input, Popover, Tree, Image, Row, Col, Menu, Switch, Button, Divider } from 'antd';
+import { Input, Popover, Tree, Image, Row, Col, Menu, Switch, Button, Divider, Spin } from 'antd';
 import type { TreeDataNode } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef, useMemo } from 'react';
@@ -152,7 +152,13 @@ const EditStyle = ({
                             <div className="w-[40%]">
                                 <div className="text-lg">图片模版示意图</div>
                                 <div className="relative w-[85%] mx-auto" ref={imgRef}>
-                                    <Image preview={false} src={currentTemp?.example + '?x-oss-process=image/quality,q_60'} />
+                                    {currentTemp?.example && (
+                                        <Image
+                                            preview={false}
+                                            src={currentTemp?.example + '?x-oss-process=image/quality,q_60'}
+                                            placeholder
+                                        />
+                                    )}
                                     {currentJson?.objects
                                         ?.filter((item: any) => item.type === 'image' || item.type.includes('text'))
                                         ?.map((item: any, index: number) => (
@@ -181,12 +187,16 @@ const EditStyle = ({
                             </div>
                             <div className="flex-1">
                                 <div>
-                                    <div className="text-lg">图片生成配置</div>
-                                    <div className="text-xs text-black/50">
-                                        {appData?.materialType === 'picture'
-                                            ? '用上传素材的图片随机绑定到图片模板上'
-                                            : '用上传素材的图片类型字段绑定到图片模板上的图片位置'}
-                                    </div>
+                                    {imageStyleData?.variableList?.filter((item: any) => item.type === 'IMAGE')?.length > 0 && (
+                                        <>
+                                            <div className="text-lg">图片生成配置</div>
+                                            <div className="text-xs text-black/50">
+                                                {appData?.materialType === 'picture'
+                                                    ? '用上传素材的图片随机绑定到图片模板上'
+                                                    : '用上传素材的图片类型字段绑定到图片模板上的图片位置'}
+                                            </div>
+                                        </>
+                                    )}
                                     <div className="flex flex-wrap">
                                         {appData?.materialType === 'picture' ? (
                                             <>

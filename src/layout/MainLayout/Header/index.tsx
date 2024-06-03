@@ -31,7 +31,7 @@ import { CACHE_KEY, useCache } from 'hooks/web/useCache';
 const { wsCache } = useCache();
 import './index.css';
 import React from 'react';
-import useRouteStore from 'store/router';
+import useRouteStore, { routerName } from 'store/router';
 import { isMobile } from 'react-device-detect';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
@@ -72,7 +72,10 @@ const Header = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const firstMenu = wsCache.get(CACHE_KEY.ROLE_ROUTERS)?.find((item: any) => item.name === 'mofaai')?.children;
+    const firstMenu = wsCache
+        .get(CACHE_KEY.ROLE_ROUTERS)
+        ?.find((item: any) => item.name === routerName)
+        ?.children.filter((item: any) => item.visible);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         const currentData = firstMenu[newValue];

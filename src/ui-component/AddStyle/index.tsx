@@ -194,60 +194,68 @@ const AddStyle = React.forwardRef(
             setSelectImgs(list);
         };
 
-        const items: any = [
-            {
-                key: '0',
-                label: (
-                    <span
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            const index: any = collapseIndexRef.current;
-                            const copyStyleData = [...styleData];
-                            const item = copyStyleData[index];
-                            setCurrentStyle(item);
-                            currentStyleRef.current = item;
-                            setIsModalOpen(true);
-                            setUpdIndex(index);
-                            setSwitchCheck(false);
-                        }}
-                    >
-                        查看
-                    </span>
-                )
-            },
-            {
-                key: '1',
-                label: (
-                    <span
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            const index: any = collapseIndexRef.current;
-                            const copyStyleData = [...styleData];
-                            copyStyleData.splice(index, 1);
-                            setStyleData(copyStyleData);
-                        }}
-                    >
-                        删除
-                    </span>
-                )
-            }
-            // {
-            //     key: '2',
-            //     label: (
-            //         <span
-            //             onClick={(e) => {
-            //                 e.stopPropagation();
-            //                 const index: any = collapseIndexRef.current;
-            //                 let copyStyleData = [...styleData];
-            //                 copyStyleData = [...copyStyleData, { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }];
-            //                 setStyleData(copyStyleData);
-            //             }}
-            //         >
-            //             复制
-            //         </span>
-            //     )
-            // }
-        ];
+        const items: any =
+            mode === 1
+                ? [
+                      {
+                          key: '0',
+                          label: (
+                              <span
+                                  onClick={(e) => {
+                                      e.stopPropagation();
+                                      const index: any = collapseIndexRef.current;
+                                      const copyStyleData = [...styleData];
+                                      const item = copyStyleData[index];
+                                      setCurrentStyle(item);
+                                      currentStyleRef.current = item;
+                                      setIsModalOpen(true);
+                                      setUpdIndex(index);
+                                      setSwitchCheck(false);
+                                  }}
+                              >
+                                  查看
+                              </span>
+                          )
+                      },
+                      {
+                          key: '1',
+                          label: (
+                              <span
+                                  onClick={(e) => {
+                                      e.stopPropagation();
+                                      const index: any = collapseIndexRef.current;
+                                      const copyStyleData = [...styleData];
+                                      copyStyleData.splice(index, 1);
+                                      setStyleData(copyStyleData);
+                                  }}
+                              >
+                                  删除
+                              </span>
+                          )
+                      }
+                  ]
+                : [
+                      {
+                          key: '0',
+                          label: (
+                              <span
+                                  onClick={(e) => {
+                                      e.stopPropagation();
+                                      const index: any = collapseIndexRef.current;
+                                      const copyStyleData = [...styleData];
+                                      const item = copyStyleData[index];
+                                      setCurrentStyle(item);
+                                      currentStyleRef.current = item;
+                                      setIsModalOpen(true);
+                                      setUpdIndex(index);
+                                      setSwitchCheck(false);
+                                  }}
+                              >
+                                  查看
+                              </span>
+                          )
+                      }
+                  ];
 
         // 重试
         const handleOK = () => {
@@ -415,6 +423,9 @@ const AddStyle = React.forwardRef(
                                                     <Spin />
                                                 </div>
                                             }
+                                            preview={{
+                                                src: item.example
+                                            }}
                                         />
                                     </div>
                                 ))}

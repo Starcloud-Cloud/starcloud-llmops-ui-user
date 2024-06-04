@@ -114,13 +114,15 @@ export const PicImagePick = ({
     };
 
     const tags = React.useMemo(() => {
-        return columns
-            ?.filter((item: any) => item?.type === 'string' || item.type === 'textBox')
-            ?.map((item: any) => ({
-                label: item?.title,
-                value: values[item?.dataIndex]
-            }))
-            .filter((item: any) => item.value);
+        return (
+            columns
+                ?.filter((item: any) => item?.type === 'string' || item.type === 'textBox')
+                ?.map((item: any) => ({
+                    label: item?.title,
+                    value: values[item?.dataIndex]
+                }))
+                .filter((item: any) => item.value) || []
+        );
     }, [values, columns]);
 
     const handleChange = (tag: string, checked: boolean) => {
@@ -146,24 +148,26 @@ export const PicImagePick = ({
                     setTotalHits(0);
                 }}
             />
-            <div className="flex mt-3">
-                <span className="w-[60px]">素材字段</span>
-                <div className="flex-1 overflow-auto">
-                    {tags?.map((item: any, index: number) => {
-                        const showValue = item.value.length > 20 ? item.value.slice(0, 20) + '...' : item.value;
-                        return (
-                            <Tag.CheckableTag
-                                key={index}
-                                checked={selectedTags.includes(item.value)}
-                                onChange={(checked) => handleChange(item.value, checked)}
-                            >
-                                <span className="font-bold">{item.label}：</span>
-                                {showValue}
-                            </Tag.CheckableTag>
-                        );
-                    })}
+            {tags?.length > 0 && (
+                <div className="flex mt-3">
+                    <span className="w-[60px]">素材字段</span>
+                    <div className="flex-1 overflow-auto">
+                        {tags?.map((item: any, index: number) => {
+                            const showValue = item.value.length > 20 ? item.value.slice(0, 20) + '...' : item.value;
+                            return (
+                                <Tag.CheckableTag
+                                    key={index}
+                                    checked={selectedTags.includes(item.value)}
+                                    onChange={(checked) => handleChange(item.value, checked)}
+                                >
+                                    <span className="font-bold">{item.label}：</span>
+                                    {showValue}
+                                </Tag.CheckableTag>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            )}
             <div className="mt-2">
                 <Space>
                     <span className="border-solid">筛选项</span>

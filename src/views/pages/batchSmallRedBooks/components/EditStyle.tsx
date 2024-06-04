@@ -151,7 +151,7 @@ const EditStyle = ({
                         <div className="flex">
                             <div className="w-[40%]">
                                 <div className="text-lg">图片模版示意图</div>
-                                <div className="relative w-[85%] mx-auto" ref={imgRef}>
+                                <div className="relative w-[85%] mx-auto overflow-hidden" ref={imgRef}>
                                     {currentTemp?.example && (
                                         <Image
                                             preview={false}
@@ -161,25 +161,28 @@ const EditStyle = ({
                                     )}
                                     {currentJson?.objects
                                         ?.filter((item: any) => item.type === 'image' || item.type.includes('text'))
-                                        ?.map((item: any, index: number) => (
-                                            <div
-                                                key={index}
-                                                onMouseEnter={() => setCurrentElementId(item.id)}
-                                                onMouseLeave={() => setCurrentElementId('')}
-                                                className={`${
-                                                    item.id === currentElementId
-                                                        ? 'outline outline-offset-2 outline-blue-500 w-full'
-                                                        : 'w-full'
-                                                }`}
-                                                style={{
-                                                    width: `${item.width * item.scaleX * scale}px`,
-                                                    height: `${item.height * item.scaleY * scale}px`,
-                                                    left: `${item.left * scale}px`,
-                                                    top: `${item.top * scale}px`,
-                                                    position: 'absolute'
-                                                }}
-                                            />
-                                        ))}
+                                        ?.map((item: any, index: number) => {
+                                            return (
+                                                <div
+                                                    key={`${item.id}-${index}`}
+                                                    onMouseEnter={() => setCurrentElementId(item.id)}
+                                                    onMouseLeave={() => setCurrentElementId('')}
+                                                    className={`${
+                                                        item.id === currentElementId
+                                                            ? 'outline outline-offset-2 outline-blue-500 w-full'
+                                                            : 'w-full'
+                                                    }`}
+                                                    style={{
+                                                        width: `${item.width * item.scaleX * scale}px`,
+                                                        height: `${item.height * item.scaleY * scale}px`,
+                                                        left: `${item.left * scale}px`,
+                                                        top: `${item.top * scale}px`,
+                                                        position: 'absolute',
+                                                        transform: `rotate(${item.angle}deg)`
+                                                    }}
+                                                />
+                                            );
+                                        })}
                                 </div>
                             </div>
                             <div>

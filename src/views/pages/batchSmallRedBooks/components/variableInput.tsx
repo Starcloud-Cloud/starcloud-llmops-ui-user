@@ -85,7 +85,7 @@ const VariableInput = ({
             if (property.type === 'object') {
                 const convertedProperty = getjsonschma(property, name);
                 arr.push(convertedProperty);
-            } else if (property.type === 'array') {
+            } else if (property.type === 'array' && property?.items?.type === 'object') {
                 arr.push({
                     key: key + 'index',
                     label: key + '[*]',

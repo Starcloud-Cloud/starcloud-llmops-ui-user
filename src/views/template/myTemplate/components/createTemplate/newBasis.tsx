@@ -210,23 +210,23 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                         </Select>
                         <span className=" block bg-[#fff] px-[5px] absolute top-[8px] left-2 text-[12px] text-[#697586]">图标*</span>
                     </div>
+                    <TextField
+                        sx={{ mt: 2 }}
+                        color="secondary"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        multiline
+                        minRows={6}
+                        label="示例"
+                        name="example"
+                        value={detail?.example}
+                        onChange={(e) => {
+                            setValues({ name: e.target.name, value: e.target.value });
+                        }}
+                        variant="outlined"
+                    />
                 </div>
             )}
-            <TextField
-                sx={{ mt: 2 }}
-                color="secondary"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                multiline
-                minRows={6}
-                label="示例"
-                name="example"
-                value={detail?.example}
-                onChange={(e) => {
-                    setValues({ name: e.target.name, value: e.target.value });
-                }}
-                variant="outlined"
-            />
         </div>
     );
 };

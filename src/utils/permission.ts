@@ -35,7 +35,8 @@ export const enum ENUM_PERMISSION {
     PHONE_CHECK = 'phone_check', // 手机校验
     MARKET_VIDEO_MODAL = 'market_video_modal',
     SPRING_SALE = 'spring_sale',
-    SHOW_RIGHTS = 'show_rights'
+    SHOW_RIGHTS = 'show_rights',
+    MENU = 'menu'
 }
 
 const list: IList = {
@@ -55,7 +56,8 @@ const list: IList = {
     [ENUM_PERMISSION.PHONE_CHECK]: true,
     [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: true,
     [ENUM_PERMISSION.SPRING_SALE]: true,
-    [ENUM_PERMISSION.SHOW_RIGHTS]: ['MAGIC_BEAN', 'MAGIC_IMAGE']
+    [ENUM_PERMISSION.SHOW_RIGHTS]: ['MAGIC_BEAN', 'MAGIC_IMAGE'],
+    [ENUM_PERMISSION.MENU]: 'mofaai'
 };
 
 const announceList: IList = {
@@ -75,7 +77,8 @@ const announceList: IList = {
     [ENUM_PERMISSION.PHONE_CHECK]: false,
     [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: false,
     [ENUM_PERMISSION.SPRING_SALE]: false,
-    [ENUM_PERMISSION.SHOW_RIGHTS]: ['MATRIX_BEAN']
+    [ENUM_PERMISSION.SHOW_RIGHTS]: ['MATRIX_BEAN'],
+    [ENUM_PERMISSION.MENU]: 'juzhen'
 };
 
 export const getPermission = (key: ENUM_PERMISSION) => {

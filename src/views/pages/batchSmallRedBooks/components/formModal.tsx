@@ -44,6 +44,7 @@ const FormModal = ({
     const [selectImg, setSelectImg] = useState<any>(null);
     const [imageDataIndex, setImageDataIndex] = useState<string>('');
     const [canUpload, setCanUpload] = useState(true);
+    const [values, setValues] = useState({});
 
     useEffect(() => {
         if (selectImg && imageDataIndex) {
@@ -170,10 +171,12 @@ const FormModal = ({
                                                     <Tooltip title="搜索">
                                                         <div
                                                             className="flex-1 flex justify-center !cursor-pointer"
-                                                            onClick={(e) => {
+                                                            onClick={async (e) => {
                                                                 setIsModalOpen(true);
                                                                 e.stopPropagation();
                                                                 setImageDataIndex(item.dataIndex);
+                                                                const result = await form.getFieldsValue();
+                                                                setValues(result);
                                                             }}
                                                         >
                                                             <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
@@ -192,7 +195,7 @@ const FormModal = ({
                                                 <Tooltip title="搜索">
                                                     <div
                                                         className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]"
-                                                        onClick={(e) => {
+                                                        onClick={async (e) => {
                                                             setIsModalOpen(true);
                                                             e.stopPropagation();
                                                             setImageDataIndex(item.dataIndex);
@@ -323,7 +326,15 @@ const FormModal = ({
                 }}
                 src={imageUrl}
             />
-            {isModalOpen && <PicImagePick isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} setSelectImg={setSelectImg} />}
+            {isModalOpen && (
+                <PicImagePick
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    setSelectImg={setSelectImg}
+                    columns={columns}
+                    values={values}
+                />
+            )}
         </Modal>
     );
 };

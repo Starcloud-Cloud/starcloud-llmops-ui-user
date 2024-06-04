@@ -121,6 +121,7 @@ const Lefts = ({
     const [selectImg, setSelectImg] = useState<any>(null);
     const [imageDataIndex, setImageDataIndex] = useState(0);
     const [filedName, setFiledName] = useState('');
+    const [values, setValues] = useState({});
 
     useEffect(() => {
         if (tableRef.current.length && selectImg?.largeImageURL) {
@@ -310,6 +311,7 @@ const Lefts = ({
                                                             e.stopPropagation();
                                                             setImageDataIndex(index);
                                                             setFiledName(item.fieldName);
+                                                            setValues(row);
                                                         }}
                                                     >
                                                         <SearchOutlined rev={undefined} className="text-white/60 hover:text-white" />
@@ -332,6 +334,7 @@ const Lefts = ({
                                                         e.stopPropagation();
                                                         setImageDataIndex(index);
                                                         setFiledName(item.fieldName);
+                                                        setValues(row);
                                                     }}
                                                 >
                                                     <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
@@ -2071,7 +2074,15 @@ const Lefts = ({
                 }}
                 src={previewUrl}
             />
-            {isModalOpen && <PicImagePick isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} setSelectImg={setSelectImg} />}
+            {isModalOpen && (
+                <PicImagePick
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    setSelectImg={setSelectImg}
+                    columns={columns}
+                    values={values}
+                />
+            )}
         </>
     );
 };

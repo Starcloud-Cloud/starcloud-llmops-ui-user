@@ -1,4 +1,4 @@
-import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button } from 'antd';
+import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag } from 'antd';
 import { imageSearch } from 'api/redBook/imageSearch';
 import axios from 'axios';
 import { debounce } from 'lodash-es';
@@ -12,11 +12,15 @@ const { Option } = Select;
 export const PicImagePick = ({
     isModalOpen,
     setIsModalOpen,
-    setSelectImg
+    setSelectImg,
+    columns,
+    values
 }: {
     isModalOpen: boolean;
     setIsModalOpen: (isModalOpen: boolean) => void;
     setSelectImg: (selectImg: any) => void;
+    columns?: any[];
+    values?: any;
 }) => {
     const [hits, setHits] = useState<any[]>([]);
     const [totalHits, setTotalHits] = useState(0);
@@ -25,6 +29,9 @@ export const PicImagePick = ({
     const [q, setQ] = useState('');
     const [size, setSize] = useState<any>({});
     const [query, setQuery] = useState<any>({});
+    const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
+    const [inputValue, setInputValue] = React.useState('');
+
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
     const currentPageRef = React.useRef(currentPage);
@@ -106,11 +113,32 @@ export const PicImagePick = ({
         setCheckItem(item);
     };
 
+    const tags = React.useMemo(() => {
+        return columns
+            ?.filter((item: any) => item?.type === 'string' || item.type === 'textBox')
+            ?.map((item: any) => ({
+                label: item?.title,
+                value: values[item?.dataIndex]
+            }))
+            .filter((item: any) => item.value);
+    }, [values, columns]);
+
+    const handleChange = (tag: string, checked: boolean) => {
+        const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter((t) => t !== tag);
+        setSelectedTags(nextSelectedTags);
+    };
+
+    useEffect(() => {
+        setInputValue(selectedTags.join(' '));
+    }, [selectedTags]);
+
     return (
         <Modal width={1000} title="图片选择" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <Search
                 placeholder="请输入搜索的图片"
                 enterButton
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
                 onSearch={(value) => {
                     setQ(value);
                     setCurrentPage(1);
@@ -118,6 +146,24 @@ export const PicImagePick = ({
                     setTotalHits(0);
                 }}
             />
+            <div className="flex mt-3">
+                <span className="w-[60px]">素材字段</span>
+                <div className="flex-1 overflow-auto">
+                    {tags?.map((item: any, index: number) => {
+                        const showValue = item.value.length > 20 ? item.value.slice(0, 20) + '...' : item.value;
+                        return (
+                            <Tag.CheckableTag
+                                key={index}
+                                checked={selectedTags.includes(item.value)}
+                                onChange={(checked) => handleChange(item.value, checked)}
+                            >
+                                <span className="font-bold">{item.label}：</span>
+                                {showValue}
+                            </Tag.CheckableTag>
+                        );
+                    })}
+                </div>
+            </div>
             <div className="mt-2">
                 <Space>
                     <span className="border-solid">筛选项</span>
@@ -241,6 +287,7 @@ export const PicImagePick = ({
                     </Select>
                 </Space>
             </div>
+
             <div className="mt-3 max-h-[560px] overflow-auto" ref={scrollRef}>
                 <Masonry columnsCount={4}>
                     {hits.map((item: any, index: number) => (

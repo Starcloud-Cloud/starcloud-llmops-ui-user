@@ -1525,9 +1525,11 @@ const Lefts = ({
         setGenerateList(generRef.current);
     };
     useEffect(() => {
-        stepList(detail?.type).then((res) => {
-            setStepList(res);
-        });
+        if (detail?.type) {
+            stepList(detail?.type).then((res) => {
+                setStepList(res);
+            });
+        }
     }, [detail?.type]);
     const [settingOpen, setSettingOpen] = useState(false);
     return (

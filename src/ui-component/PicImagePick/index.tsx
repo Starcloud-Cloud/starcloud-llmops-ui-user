@@ -142,10 +142,12 @@ export const PicImagePick = ({
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onSearch={(value) => {
-                    setQ(value);
-                    setCurrentPage(1);
-                    setHits([]);
-                    setTotalHits(0);
+                    if (value !== q) {
+                        setQ(value);
+                        setCurrentPage(1);
+                        setHits([]);
+                        setTotalHits(0);
+                    }
                 }}
             />
             {tags?.length > 0 && (

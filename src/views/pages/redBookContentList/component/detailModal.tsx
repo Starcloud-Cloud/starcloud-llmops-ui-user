@@ -58,7 +58,9 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
         if (pre) {
             getContentDetail(businessUid).then((res) => {
                 if (res) {
-                    if (res.status !== 'EXECUTING' && res.status === 'SUCCESS') {
+                    if (res.status === 'EXECUTING') {
+                        setDetail(res);
+                    } else if (res.status !== 'EXECUTING' && res.status === 'SUCCESS') {
                         setSataStatus(true);
                         changeList && changeList(businessUid);
                         setDetail(res);

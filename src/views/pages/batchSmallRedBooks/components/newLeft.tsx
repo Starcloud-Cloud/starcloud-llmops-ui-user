@@ -1033,6 +1033,13 @@ const Lefts = ({
         pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')].value = newList;
         generRef.current = newValue;
         setGenerateList(generRef.current);
+        const variable = appRef.current.configuration.appInformation.workflowConfig.steps;
+        const appOne = _.cloneDeep(variable[0]);
+        const applast = _.cloneDeep(variable[variable?.length - 1]);
+        const newappList = _.cloneDeep(appRef.current);
+        newappList.configuration.appInformation.workflowConfig.steps = [appOne, ...generRef.current, applast];
+        appRef.current = newappList;
+        setAppData(appRef.current);
         setEditOpens(false);
         forms.resetFields();
     };
@@ -1810,9 +1817,15 @@ const Lefts = ({
                                     <InfoCircleOutlined rev={undefined} />
                                     <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
                                 </div>
-                                <IconButton onClick={() => setSettingOpen(true)} size="small">
-                                    <SettingOutlined rev={undefined} />
-                                </IconButton>
+                                <Tooltip title="增加系统模版">
+                                    <Button
+                                        icon={<SettingOutlined rev={undefined} />}
+                                        shape="circle"
+                                        size="small"
+                                        type="primary"
+                                        onClick={() => setSettingOpen(true)}
+                                    />
+                                </Tooltip>
                             </div>
 
                             {generateList?.map((item: any, index: number) => (
@@ -1843,7 +1856,7 @@ const Lefts = ({
                                                         <div key={el.field}>
                                                             {el?.isShow && (
                                                                 <MarketForm
-                                                                    key={el.field}
+                                                                    key={el.value}
                                                                     item={el}
                                                                     materialType={''}
                                                                     details={appData?.configuration?.appInformation}
@@ -1906,6 +1919,19 @@ const Lefts = ({
                                                                         }
                                                                         generRef.current = newList;
                                                                         setGenerateList(generRef.current);
+                                                                        const variable =
+                                                                            appRef.current.configuration.appInformation.workflowConfig
+                                                                                .steps;
+                                                                        const appOne = _.cloneDeep(variable[0]);
+                                                                        const applast = _.cloneDeep(variable[variable?.length - 1]);
+                                                                        const newappList = _.cloneDeep(appRef.current);
+                                                                        newappList.configuration.appInformation.workflowConfig.steps = [
+                                                                            appOne,
+                                                                            ...generRef.current,
+                                                                            applast
+                                                                        ];
+                                                                        appRef.current = newappList;
+                                                                        setAppData(appRef.current);
                                                                     }}
                                                                 />
                                                             )}
@@ -1955,15 +1981,6 @@ const Lefts = ({
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
-                                <div className="flex items-center mb-2">
-                                    <Tooltip title="生成图片时会按照风格模板的顺序去使用">
-                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
-                                    </Tooltip>
-
-                                    <span className="text-sm ml-1 text-stone-600">
-                                        配置笔记图片生成的风格模版，支持不同风格模版组合生成
-                                    </span>
-                                </div>
                                 {detail ? (
                                     <AddStyle
                                         saveTemplate={saveTemplate}
@@ -2363,7 +2380,9 @@ const Lefts = ({
                                         </div>
                                         <div>
                                             {item?.flowStep?.handler !== 'MaterialActionHandler' &&
-                                                item?.flowStep?.handler !== 'PosterActionHandler' && (
+                                                item?.flowStep?.handler !== 'PosterActionHandler' &&
+                                                item?.flowStep?.handler !== 'AssembleActionHandler' &&
+                                                item?.flowStep?.handler !== 'VariableActionHandler' && (
                                                     <IconButton
                                                         onClick={(e) => {
                                                             setStepIndex(index);
@@ -2467,10 +2486,10 @@ const Lefts = ({
                                                             setEditOpen={setEditOpens}
                                                             setTitle={setTitles}
                                                             setStep={() => {
-                                                                stepRef.current = index;
+                                                                stepRef.current = index - 1;
                                                                 setStep(stepRef.current);
                                                             }}
-                                                            columns={stepMaterial[index]}
+                                                            columns={stepMaterial[index - 1]}
                                                             setMaterialType={() => {
                                                                 setMaterialTypes(
                                                                     item?.variable?.variables?.find((i: any) => i.field === 'MATERIAL_TYPE')
@@ -2478,22 +2497,23 @@ const Lefts = ({
                                                                 );
                                                             }}
                                                             onChange={(e: any) => {
+                                                                console.log(index);
                                                                 const newList = _.cloneDeep(generRef.current);
                                                                 const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
                                                                 const code = item?.flowStep?.handler;
-                                                                newList[index].variable.variables[i].value = e.value;
+                                                                newList[index - 1].variable.variables[i].value = e.value;
                                                                 if (
                                                                     type &&
                                                                     item.variable.variables?.find((item: any) => item.style === 'MATERIAL')
                                                                 ) {
-                                                                    newList[index].variable.variables[
+                                                                    newList[index - 1].variable.variables[
                                                                         item.variable.variables?.findIndex(
                                                                             (item: any) => item.style === 'MATERIAL'
                                                                         )
                                                                     ].value = [];
-                                                                    stepRef.current = index;
+                                                                    stepRef.current = index - 1;
                                                                     setStep(stepRef.current);
-                                                                    setTableDatas(type, index);
+                                                                    setTableDatas(type, index - 1);
                                                                 }
                                                                 if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
                                                                     const num = item.variable.variables?.findIndex(
@@ -2503,18 +2523,30 @@ const Lefts = ({
                                                                         (item: any) => item.style === 'MATERIAL'
                                                                     );
                                                                     if (e.value === 'RANDOM') {
-                                                                        newList[index].variable.variables[num].isShow = false;
-                                                                        newList[index].variable.variables[num1].isShow = true;
+                                                                        newList[index - 1].variable.variables[num].isShow = false;
+                                                                        newList[index - 1].variable.variables[num1].isShow = true;
                                                                     } else if (e.value === 'AI_PARODY') {
-                                                                        newList[index].variable.variables[num].isShow = true;
-                                                                        newList[index].variable.variables[num1].isShow = true;
+                                                                        newList[index - 1].variable.variables[num].isShow = true;
+                                                                        newList[index - 1].variable.variables[num1].isShow = true;
                                                                     } else {
-                                                                        newList[index].variable.variables[num1].isShow = false;
-                                                                        newList[index].variable.variables[num].isShow = true;
+                                                                        newList[index - 1].variable.variables[num1].isShow = false;
+                                                                        newList[index - 1].variable.variables[num].isShow = true;
                                                                     }
                                                                 }
                                                                 generRef.current = newList;
                                                                 setGenerateList(generRef.current);
+                                                                const variable =
+                                                                    appRef.current.configuration.appInformation.workflowConfig.steps;
+                                                                const appOne = _.cloneDeep(variable[0]);
+                                                                const applast = _.cloneDeep(variable[variable?.length - 1]);
+                                                                const newappList = _.cloneDeep(appRef.current);
+                                                                newappList.configuration.appInformation.workflowConfig.steps = [
+                                                                    appOne,
+                                                                    ...generRef.current,
+                                                                    applast
+                                                                ];
+                                                                appRef.current = newappList;
+                                                                setAppData(appRef.current);
                                                             }}
                                                         />
                                                     )}

@@ -30,7 +30,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
-import { PlusOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -644,13 +644,12 @@ const AddStyle = React.forwardRef(
 
         return (
             <div className="addStyle">
-                {mode === 1 && (
-                    <div className="pb-3 flex justify-between">
-                        <div>
-                            <Button size="small" type="primary" onClick={() => handleAdd()}>
-                                增加风格
-                            </Button>
-                        </div>
+                <div className="flex items-center mb-2">
+                    <Tooltip title="生成图片时会按照风格模板的顺序去使用">
+                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                    </Tooltip>
+                    <div className="w-full flex gap-2 justify-between">
+                        <span className="text-sm ml-1 text-stone-600">配置笔记图片生成的风格模版，支持不同风格模版组合生成</span>
                         <Tooltip title="增加系统模版">
                             <Button
                                 icon={<SettingOutlined rev={undefined} />}
@@ -664,6 +663,11 @@ const AddStyle = React.forwardRef(
                             />
                         </Tooltip>
                     </div>
+                </div>
+                {mode === 1 && (
+                    <Button mb-4 size="small" type="primary" onClick={() => handleAdd()}>
+                        增加风格
+                    </Button>
                 )}
                 <Collapse items={collapseList} defaultActiveKey={[0]} />
                 <Drawer

@@ -1,9 +1,11 @@
-import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag, Empty, Spin } from 'antd';
+import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag, Empty, Spin, Progress } from 'antd';
 import { imageSearch } from 'api/redBook/imageSearch';
 import axios from 'axios';
 import { debounce } from 'lodash-es';
 import React, { useCallback, useEffect, useState } from 'react';
 import Masonry from 'react-responsive-masonry';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 import { getAccessToken } from 'utils/auth';
 
 const { Search } = Input;
@@ -32,6 +34,11 @@ export const PicImagePick = ({
     const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
     const [inputValue, setInputValue] = React.useState('');
     const [loading, setLoading] = React.useState(false);
+    const [submitLoading, setSubmitLoading] = React.useState(false);
+    const [percent, setPercent] = React.useState({
+        label: '图片下载中',
+        value: 0
+    });
 
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
@@ -70,13 +77,43 @@ export const PicImagePick = ({
     }, [handleScroll]);
 
     const handleOk = async () => {
-        const response = await axios.get(checkItem.largeImageURL, { responseType: 'blob' });
-        const imageBlob = response.data;
+        setPercent({
+            label: '图片下载中',
+            value: 0
+        });
+        let imageBlob;
+        try {
+            setSubmitLoading(true);
+            const response = await axios.get(checkItem.largeImageURL, { responseType: 'blob' });
+            imageBlob = response.data;
+        } catch (error) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '图片获取失败',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+            setSubmitLoading(false);
+        }
+        setPercent({
+            label: '图片上传中',
+            value: 33
+        });
 
         // Step 2: 创建FormData对象
         const formData = new FormData();
         formData.append('image', imageBlob, 'image.jpg'); // 'file' 是服务器端接收图片的字段名，'downloaded-image.jpg' 是文件名
 
+        setPercent({
+            label: '图片上传到云端',
+            value: 66
+        });
         // Step 3: 上传到服务器
         const uploadResponse = await axios.post(
             `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
@@ -87,10 +124,17 @@ export const PicImagePick = ({
                 }
             }
         );
+
         const url = uploadResponse.data.data.url;
 
         setSelectImg({ ...checkItem, largeImageURL: url });
         handleCancel();
+        setTimeout(() => {
+            setPercent({
+                label: '图片插入成功',
+                value: 100
+            });
+        }, 1000);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -136,7 +180,6 @@ export const PicImagePick = ({
         setInputValue(selectedTags.join('+'));
     }, [selectedTags]);
 
-    console.log(loading, 'loading');
     return (
         <Modal width={1000} title="图片选择" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <Search
@@ -299,30 +342,49 @@ export const PicImagePick = ({
 
             <div className="mt-3 max-h-[560px] overflow-auto" ref={scrollRef}>
                 {hits.length ? (
-                    <div className="min-h-[300px]">
-                        <Masonry columnsCount={4}>
-                            {hits.map((item: any, index: number) => (
-                                <div className="mx-2 my-2 relative" key={index}>
-                                    <Checkbox
-                                        checked={item.id === checkItem?.id}
-                                        onChange={() => onChange(item)}
-                                        className="absolute right-0 z-10"
-                                    />
-                                    <Image
-                                        width={'100%'}
-                                        src={item.previewURL}
-                                        preview={{
-                                            src: item.largeImageURL
-                                        }}
-                                    />
-                                </div>
-                            ))}
-                        </Masonry>
-                    </div>
+                    <Spin spinning={loading}>
+                        <div className="min-h-[300px]">
+                            <Masonry columnsCount={4}>
+                                {hits.map((item: any, index: number) => (
+                                    <div className="mx-2 my-2 relative" key={index}>
+                                        <Checkbox
+                                            checked={item.id === checkItem?.id}
+                                            onChange={() => onChange(item)}
+                                            className="absolute right-0 z-10"
+                                        />
+                                        <Image
+                                            width={'100%'}
+                                            src={item.previewURL}
+                                            preview={{
+                                                src: item.largeImageURL
+                                            }}
+                                        />
+                                    </div>
+                                ))}
+                            </Masonry>
+                        </div>
+                    </Spin>
+                ) : loading ? (
+                    <Spin>
+                        <Empty />
+                    </Spin>
                 ) : (
                     <Empty />
                 )}
             </div>
+            <Modal
+                width={300}
+                title="保存中"
+                open={submitLoading}
+                onOk={() => setSubmitLoading(false)}
+                onCancel={() => setSubmitLoading(false)}
+                footer={null}
+            >
+                <div className="flex flex-col items-center justify-center">
+                    <Progress percent={percent.value} type="circle" />
+                    <span>{percent.label}</span>
+                </div>
+            </Modal>
         </Modal>
     );
 };

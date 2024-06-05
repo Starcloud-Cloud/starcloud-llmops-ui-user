@@ -286,12 +286,14 @@ const ThreeStep = ({
                                     <div className="h-full">
                                         {imageList.length > 0 && (
                                             <Swiper
-                                                onSwiper={(swiper) => setSwiperRef(swiper)}
+                                                onSwiper={(swiper) => {
+                                                    setSwiperRef(swiper);
+                                                }}
                                                 slidesPerView={1}
-                                                spaceBetween={30}
+                                                // spaceBetween={30}
                                                 centeredSlides={false}
                                                 loop
-                                                // pagination={{ clickable: true }}
+                                                pagination={{ clickable: true }}
                                                 modules={[Pagination]}
                                                 className="mySwiper h-full"
                                                 autoplay={{

@@ -295,8 +295,11 @@ const Lefts = ({
                                                 onClick={(e) => e.stopPropagation()}
                                                 width={82}
                                                 height={82}
+                                                preview={{
+                                                    src: row[item.fieldName]
+                                                }}
                                                 src={
-                                                    row[item.fieldName]
+                                                    row[item.fieldName] + '?x-oss-process=image/resize,w_300/quality,q_80'
                                                     // selectImg?.largeImageURL ||
                                                     // form.getFieldValue(item.dataIndex) + '?x-oss-process=image/resize,w_300/quality,q_80'
                                                 }

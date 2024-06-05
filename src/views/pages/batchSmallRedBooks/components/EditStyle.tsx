@@ -36,6 +36,7 @@ const EditStyle = ({
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [currentElementId, setCurrentElementId] = useState('');
     const [currentJson, setCurrentJson] = useState<any>({});
+    const [spinLoading, setSpinLoading] = useState(false);
 
     const imgRef: any = useRef(null);
     useEffect(() => {
@@ -63,12 +64,14 @@ const EditStyle = ({
         setOpen(false);
     };
     useEffect(() => {
+        setSpinLoading(true);
         getImageTemplateTypes().then((res) => {
             setImageTypeList(res);
             const list = res.map((element: any) => {
                 return element.list;
             });
             setTempList(list.flat());
+            setSpinLoading(false);
         });
     }, []);
     useEffect(() => {
@@ -120,7 +123,13 @@ const EditStyle = ({
         <div className="flex min-h-[250px]">
             <div className="flex-1">
                 {open && (
-                    <SelectTemplateModal open={open} imageTypeList={imageTypeList} handleClose={() => setOpen(false)} handleOk={handleOk} />
+                    <SelectTemplateModal
+                        open={open}
+                        imageTypeList={imageTypeList}
+                        handleClose={() => setOpen(false)}
+                        handleOk={handleOk}
+                        spinLoading={spinLoading}
+                    />
                 )}
                 <div className="pr-4 flex justify-between">
                     <div className="!w-[40%]">

@@ -1,4 +1,4 @@
-import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag } from 'antd';
+import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag, Empty, Spin } from 'antd';
 import { imageSearch } from 'api/redBook/imageSearch';
 import axios from 'axios';
 import { debounce } from 'lodash-es';
@@ -31,6 +31,7 @@ export const PicImagePick = ({
     const [query, setQuery] = useState<any>({});
     const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
     const [inputValue, setInputValue] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
 
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
@@ -99,9 +100,10 @@ export const PicImagePick = ({
         setTotalHits(0);
     };
     useEffect(() => {
-        console.log(hits, 'hits');
+        setLoading(true);
         imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query }).then(
             (res) => {
+                setLoading(false);
                 const { totalHits, hits: newData } = res;
                 setHits([...hits, ...newData]);
                 setTotalHits(totalHits);
@@ -131,9 +133,10 @@ export const PicImagePick = ({
     };
 
     useEffect(() => {
-        setInputValue(selectedTags.join(' '));
+        setInputValue(selectedTags.join('+'));
     }, [selectedTags]);
 
+    console.log(loading, 'loading');
     return (
         <Modal width={1000} title="图片选择" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <Search
@@ -295,24 +298,30 @@ export const PicImagePick = ({
             </div>
 
             <div className="mt-3 max-h-[560px] overflow-auto" ref={scrollRef}>
-                <Masonry columnsCount={4}>
-                    {hits.map((item: any, index: number) => (
-                        <div className="mx-2 my-2 relative" key={index}>
-                            <Checkbox
-                                checked={item.id === checkItem?.id}
-                                onChange={() => onChange(item)}
-                                className="absolute right-0 z-10"
-                            />
-                            <Image
-                                width={'100%'}
-                                src={item.previewURL}
-                                preview={{
-                                    src: item.largeImageURL
-                                }}
-                            />
-                        </div>
-                    ))}
-                </Masonry>
+                {hits.length ? (
+                    <div className="min-h-[300px]">
+                        <Masonry columnsCount={4}>
+                            {hits.map((item: any, index: number) => (
+                                <div className="mx-2 my-2 relative" key={index}>
+                                    <Checkbox
+                                        checked={item.id === checkItem?.id}
+                                        onChange={() => onChange(item)}
+                                        className="absolute right-0 z-10"
+                                    />
+                                    <Image
+                                        width={'100%'}
+                                        src={item.previewURL}
+                                        preview={{
+                                            src: item.largeImageURL
+                                        }}
+                                    />
+                                </div>
+                            ))}
+                        </Masonry>
+                    </div>
+                ) : (
+                    <Empty />
+                )}
             </div>
         </Modal>
     );

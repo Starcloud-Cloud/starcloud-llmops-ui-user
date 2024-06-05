@@ -67,6 +67,7 @@ const LeftModalAdd = ({
     setMaterialTypeStatus: (data: any) => void;
     variableData: any;
 }) => {
+    console.log(tableData, 'tableData-leadd');
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const handleDels = () => {
@@ -328,4 +329,5 @@ const memoLeftModal = (pre: any, next: any) => {
         JSON.stringify(pre.variableData) === JSON.stringify(next.variableData)
     );
 };
-export default memo(LeftModalAdd, memoLeftModal);
+// export default memo(LeftModalAdd, memoLeftModal);
+export default LeftModalAdd;

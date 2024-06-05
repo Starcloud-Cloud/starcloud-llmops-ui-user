@@ -73,6 +73,7 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import './newLeft.scss';
 import { SearchOutlined } from '@ant-design/icons';
 import { stepList } from 'api/template';
+import EditStepTitle from './editStepTitle';
 
 const Lefts = ({
     detailShow = true,
@@ -1579,6 +1580,9 @@ const Lefts = ({
         }
     }, [detail?.type]);
     const [settingOpen, setSettingOpen] = useState(false);
+    const [steptitOpen, setSteotitOpen] = useState(false);
+    const [stepTitData, setStepTitData] = useState<any>(null);
+    const [stepIndex, setStepIndex] = useState(-1);
     return (
         <>
             <div className="relative h-full">
@@ -2299,9 +2303,7 @@ const Lefts = ({
                             )}
                             <Accordion
                                 expanded={
-                                    item?.flowStep?.handler === 'MaterialActionHandler' ||
-                                    item?.flowStep?.handler === 'PosterActionHandler' ||
-                                    item?.flowStep?.handler === 'AssembleActionHandler'
+                                    item?.flowStep?.handler === 'MaterialActionHandler' || item?.flowStep?.handler === 'PosterActionHandler'
                                         ? false
                                         : undefined
                                 }
@@ -2309,8 +2311,7 @@ const Lefts = ({
                                 onChange={(e) => {
                                     if (
                                         item?.flowStep?.handler === 'MaterialActionHandler' ||
-                                        item?.flowStep?.handler === 'PosterActionHandler' ||
-                                        item?.flowStep?.handler === 'AssembleActionHandler'
+                                        item?.flowStep?.handler === 'PosterActionHandler'
                                     ) {
                                         dispatch(
                                             openSnackbar({
@@ -2347,8 +2348,7 @@ const Lefts = ({
                                         <div className="flex gap-2 items-center">
                                             <div className="w-[24px]">
                                                 {item?.flowStep?.handler !== 'MaterialActionHandler' &&
-                                                    item?.flowStep?.handler !== 'PosterActionHandler' &&
-                                                    item?.flowStep?.handler !== 'AssembleActionHandler' && (
+                                                    item?.flowStep?.handler !== 'PosterActionHandler' && (
                                                         <ExpandMore className="aaa -rotate-90" />
                                                     )}
                                             </div>
@@ -2362,9 +2362,23 @@ const Lefts = ({
                                             <div className="font-bold text-[16px]">{item.name}</div>
                                         </div>
                                         <div>
-                                            {/* <IconButton size="small">
-                                                <SettingOutlined rev={undefined} />
-                                            </IconButton> */}
+                                            {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                item?.flowStep?.handler !== 'PosterActionHandler' && (
+                                                    <IconButton
+                                                        onClick={(e) => {
+                                                            setStepIndex(index);
+                                                            setStepTitData({
+                                                                name: item?.name,
+                                                                description: item?.description
+                                                            });
+                                                            setSteotitOpen(true);
+                                                            e.stopPropagation();
+                                                        }}
+                                                        size="small"
+                                                    >
+                                                        <SettingOutlined rev={undefined} />
+                                                    </IconButton>
+                                                )}
                                             {item?.flowStep?.handler !== 'MaterialActionHandler' &&
                                                 item?.flowStep?.handler !== 'PosterActionHandler' &&
                                                 item?.flowStep?.handler !== 'AssembleActionHandler' && (
@@ -2375,7 +2389,11 @@ const Lefts = ({
                                                                 {
                                                                     key: '1',
                                                                     label: ' 向上',
-                                                                    disabled: index === 1,
+                                                                    disabled:
+                                                                        index === 1 ||
+                                                                        appData?.configuration?.appInformation?.workflowConfig?.steps[
+                                                                            index - 1
+                                                                        ]?.flowStep.handler === 'VariableActionHandler',
                                                                     icon: <VerticalAlignTopOutlined rev={undefined} />
                                                                 },
                                                                 {
@@ -2385,12 +2403,14 @@ const Lefts = ({
                                                                         appData?.configuration?.appInformation?.workflowConfig?.steps
                                                                             ?.length -
                                                                             3 ===
-                                                                        index,
+                                                                            index || item.flowStep.handler === 'VariableActionHandler',
+
                                                                     icon: <VerticalAlignBottomOutlined rev={undefined} />
                                                                 },
                                                                 {
                                                                     key: '3',
                                                                     label: ' 复制',
+                                                                    disabled: item.flowStep.handler === 'VariableActionHandler',
                                                                     icon: <CopyOutlined rev={undefined} />
                                                                 },
                                                                 {
@@ -2555,15 +2575,44 @@ const Lefts = ({
                                             content={
                                                 <div className="lg:w-[700px] md:w-[80%] flex gap-2 flex-wrap">
                                                     {stepLists
-                                                        ?.filter(
-                                                            (item) =>
-                                                                item.flowStep.handler !== 'MaterialActionHandler' &&
-                                                                item.flowStep.handler !== 'PosterActionHandler' &&
-                                                                item.flowStep.handler !== 'AssembleActionHandler'
-                                                        )
+                                                        ?.filter((item) => {
+                                                            if (index === 0) {
+                                                                return item.flowStep.handler === 'VariableActionHandler';
+                                                            } else {
+                                                                return (
+                                                                    item.flowStep.handler !== 'MaterialActionHandler' &&
+                                                                    item.flowStep.handler !== 'PosterActionHandler' &&
+                                                                    item.flowStep.handler !== 'AssembleActionHandler' &&
+                                                                    item.flowStep.handler !== 'VariableActionHandler'
+                                                                );
+                                                            }
+                                                        })
                                                         ?.map((el) => (
                                                             <div
-                                                                onClick={() => addStep(el, index)}
+                                                                onClick={() => {
+                                                                    if (
+                                                                        index === 0 &&
+                                                                        el.flowStep.handler === 'VariableActionHandler' &&
+                                                                        appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                                                                            (i: any) => i.flowStep.handler === 'VariableActionHandler'
+                                                                        )
+                                                                    ) {
+                                                                        dispatch(
+                                                                            openSnackbar({
+                                                                                open: true,
+                                                                                message: '全局变量已经存在',
+                                                                                variant: 'alert',
+                                                                                alert: {
+                                                                                    color: 'error'
+                                                                                },
+                                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                                close: false
+                                                                            })
+                                                                        );
+                                                                    } else {
+                                                                        addStep(el, index);
+                                                                    }
+                                                                }}
                                                                 className="!w-[calc(50%-0.25rem)] flex gap-2 items-center hover:shadow-md cursor-pointer p-2 rounded-md"
                                                             >
                                                                 <div className="border border-solid border-[rgba(76,76,102,.1)] rounded-lg p-2 ">
@@ -2596,6 +2645,30 @@ const Lefts = ({
                         </div>
                     ))}
                 </Modal>
+            )}
+            {steptitOpen && (
+                <EditStepTitle
+                    steptitOpen={steptitOpen}
+                    setSteotitOpen={setSteotitOpen}
+                    setData={(data: any) => {
+                        const newList = _.cloneDeep(generRef.current);
+                        const newLists = _.cloneDeep(appRef.current);
+                        newList[stepIndex - 1] = {
+                            ...newList[stepIndex - 1],
+                            ...data
+                        };
+                        newLists.configuration.appInformation.workflowConfig.steps[stepIndex] = {
+                            ...newLists.configuration?.appInformation?.workflowConfig?.steps[stepIndex],
+                            ...data
+                        };
+
+                        generRef.current = newList;
+                        appRef.current = newLists;
+                        setAppData(appRef.current);
+                        setGenerateList(generRef.current);
+                    }}
+                    stepTitData={stepTitData}
+                />
             )}
         </>
     );

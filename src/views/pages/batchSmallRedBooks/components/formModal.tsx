@@ -41,6 +41,7 @@ const FormModal = ({
     const [uploadLoading, setUploadLoading] = useState([]);
     const [linkLoading, setLinkLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [rowIndex, setRowIndex] = useState(-1);
     const [selectImg, setSelectImg] = useState<any>(null);
     const [imageDataIndex, setImageDataIndex] = useState<string>('');
     const [canUpload, setCanUpload] = useState(true);
@@ -139,7 +140,7 @@ const FormModal = ({
                                             }
                                         }}
                                     >
-                                        {selectImg?.largeImageURL || form.getFieldValue(item.dataIndex) ? (
+                                        {form.getFieldValue(item.dataIndex) ? (
                                             <div className="relative">
                                                 <Image
                                                     preview={{
@@ -150,9 +151,8 @@ const FormModal = ({
                                                     width={102}
                                                     height={102}
                                                     src={
-                                                        selectImg?.largeImageURL ||
                                                         form.getFieldValue(item.dataIndex) +
-                                                            '?x-oss-process=image/resize,w_300/quality,q_80'
+                                                        '?x-oss-process=image/resize,w_300/quality,q_80'
                                                     }
                                                 />
                                                 <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">

@@ -235,7 +235,8 @@ const EditStyle = ({
                                         ) : (
                                             imageStyleData?.variableList?.map(
                                                 (el: any, index: number) =>
-                                                    el.type === 'IMAGE' && (
+                                                    el.type === 'IMAGE' &&
+                                                    el.field && (
                                                         <div
                                                             className="w-[50%] p-3"
                                                             ref={wrapperRef}
@@ -317,7 +318,8 @@ const EditStyle = ({
                                         <div className="flex flex-wrap">
                                             {imageStyleData?.variableList?.map(
                                                 (el: any, index: number) =>
-                                                    el.type === 'TEXT' && (
+                                                    el.type === 'TEXT' &&
+                                                    el.field && (
                                                         <div
                                                             className="w-[50%] p-3"
                                                             ref={wrapperRef}

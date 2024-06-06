@@ -100,7 +100,7 @@ function FormExecute({
     const timer1: any = useRef(null);
     const props1: UploadProps = {
         showUploadList: false,
-        accept: '.zip',
+        accept: '.zip,.rar',
         beforeUpload: async (file, fileList) => {
             setUploadLoading(true);
             try {
@@ -270,32 +270,34 @@ function FormExecute({
                     fullWidth
                 />
             ) : item.style === 'SELECT' ? (
-                <TextField
-                    sx={mt}
-                    size="small"
-                    color="secondary"
-                    value={item.value}
-                    InputLabelProps={{ shrink: true }}
-                    select
-                    required
-                    id={item.field}
-                    name={item.field}
-                    label={item.label === 'Model' ? '推荐模型' : item.label}
-                    placeholder={item.defaultValue ? String(item.defaultValue) : ''}
-                    error={!item.value && value}
-                    helperText={!item.value && value ? `${item.label}必填` : item.description}
-                    onChange={(e) => {
-                        setValue(true);
-                        onChange(e.target);
-                    }}
-                    fullWidth
-                >
-                    {item.options.map((el: any) => (
-                        <MenuItem key={el.value} value={el.value}>
-                            {el.label}
-                        </MenuItem>
-                    ))}
-                </TextField>
+                item.field === 'MATERIAL_TYPE' ? null : (
+                    <TextField
+                        sx={mt}
+                        size="small"
+                        color="secondary"
+                        value={item.value}
+                        InputLabelProps={{ shrink: true }}
+                        select
+                        required
+                        id={item.field}
+                        name={item.field}
+                        label={item.label === 'Model' ? '推荐模型' : item.label}
+                        placeholder={item.defaultValue ? String(item.defaultValue) : ''}
+                        error={!item.value && value}
+                        helperText={!item.value && value ? `${item.label}必填` : item.description}
+                        onChange={(e) => {
+                            setValue(true);
+                            onChange(e.target);
+                        }}
+                        fullWidth
+                    >
+                        {item.options.map((el: any) => (
+                            <MenuItem key={el.value} value={el.value}>
+                                {el.label}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                )
             ) : item.style === 'RADIO' ? (
                 <div>
                     <Radio.Group

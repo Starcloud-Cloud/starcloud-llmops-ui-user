@@ -213,7 +213,7 @@ const VariableInput = ({
                             }
                         }}
                         icon={
-                            item.desc?.split('-')[1] && (
+                            item.desc?.split('-')[1] ? (
                                 <img
                                     className="w-[15px]"
                                     src={
@@ -227,6 +227,8 @@ const VariableInput = ({
                                     }
                                     alt=""
                                 />
+                            ) : (
+                                <img className="w-[15px]" src={string} alt="" />
                             )
                         }
                         key={item.key}

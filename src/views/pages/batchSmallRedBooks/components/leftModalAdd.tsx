@@ -67,7 +67,6 @@ const LeftModalAdd = ({
     setMaterialTypeStatus: (data: any) => void;
     variableData: any;
 }) => {
-    console.log(tableData, 'tableData-leadd');
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const handleDels = () => {
@@ -105,8 +104,6 @@ const LeftModalAdd = ({
                     <Button
                         type="link"
                         onClick={() => {
-                            console.log(row);
-
                             form.setFieldsValue(row);
                             setRowIndex(index);
                             setMaterialTitle('编辑');
@@ -264,7 +261,6 @@ const LeftModalAdd = ({
                 title={materialTitle}
                 onOk={async () => {
                     const result = await form.validateFields();
-                    console.log(result);
                     const newData = _.cloneDeep(materialTableData);
                     if (rowIndex === -1) {
                         newData.unshift(result);
@@ -273,8 +269,6 @@ const LeftModalAdd = ({
                     } else {
                         newData.splice(rowIndex, 1, { ...newData[rowIndex], ...result });
                         newData?.sort((a, b) => a.order - b.order);
-                        console.log(newData);
-
                         setMaterialTableData(newData);
                     }
                     form.resetFields();

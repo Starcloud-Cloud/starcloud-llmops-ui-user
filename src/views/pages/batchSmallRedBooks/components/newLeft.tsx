@@ -480,10 +480,12 @@ const Lefts = ({
     const formOk = (result: any) => {
         const newList = _.cloneDeep(tableRef.current) || [];
         if (title === '编辑') {
-            newList.splice((page - 1) * 10 + rowIndex, 1, {
+            console.log(result, page, rowIndex);
+
+            newList.splice((page - 1) * 20 + rowIndex, 1, {
                 ...result,
-                uuid: newList[(page - 1) * 10 + rowIndex]?.uuid,
-                group: newList[(page - 1) * 10 + rowIndex]?.group
+                uuid: newList[(page - 1) * 20 + rowIndex]?.uuid,
+                group: newList[(page - 1) * 20 + rowIndex]?.group
             });
             tableRef.current = newList;
             setTableData(tableRef.current);
@@ -1809,6 +1811,8 @@ const Lefts = ({
                                             <Table
                                                 className="!w-[684px]"
                                                 pagination={{
+                                                    defaultPageSize: 20,
+                                                    pageSizeOptions: [20, 50, 100, 300, 500],
                                                     onChange: (page) => {
                                                         setPage(page);
                                                     }
@@ -2275,32 +2279,34 @@ const Lefts = ({
             )}
             {settingOpen && (
                 <Modal width={'80%'} open={settingOpen} onCancel={() => setSettingOpen(false)} footer={false} title={'编辑步骤'}>
-                    <div className="flex justify-end my-4">
-                        <Button
-                            onClick={() => {
-                                const arr = headerSaveAll();
-                                setDetail &&
-                                    setDetail({
-                                        ...detail,
-                                        workflowConfig: {
-                                            steps: arr?.filter((item: any) => item)
-                                        }
-                                    });
-                            }}
-                            type="primary"
-                        >
-                            保存
-                        </Button>
-                    </div>
-                    {appData?.configuration?.appInformation?.workflowConfig?.steps?.map((item: any, index: number) => (
-                        <div key={index}>
-                            {index !== 0 && (
-                                //  &&
-                                //     appData?.configuration?.appInformation?.workflowConfig?.steps?.every(
-                                //         (i: any) => i.flowStep.handler !== 'MaterialActionHandler'
-                                // )
-                                <>
-                                    {/* <Popover
+                    <div className="flex justify-center">
+                        <div className="2xl:w-[1000px] xl:w-[820px] lg:w-[740px]  w-[100%]">
+                            <div className="flex justify-end my-4">
+                                <Button
+                                    onClick={() => {
+                                        const arr = headerSaveAll();
+                                        setDetail &&
+                                            setDetail({
+                                                ...detail,
+                                                workflowConfig: {
+                                                    steps: arr?.filter((item: any) => item)
+                                                }
+                                            });
+                                    }}
+                                    type="primary"
+                                >
+                                    保存
+                                </Button>
+                            </div>
+                            {appData?.configuration?.appInformation?.workflowConfig?.steps?.map((item: any, index: number) => (
+                                <div key={index}>
+                                    {index !== 0 && (
+                                        //  &&
+                                        //     appData?.configuration?.appInformation?.workflowConfig?.steps?.every(
+                                        //         (i: any) => i.flowStep.handler !== 'MaterialActionHandler'
+                                        // )
+                                        <>
+                                            {/* <Popover
                                             placement="bottom"
                                             trigger={'click'}
                                             content={
@@ -2337,367 +2343,382 @@ const Lefts = ({
                                                 <AddCircleSharp />
                                             </IconButton>
                                         </Popover> */}
-                                    <div className="flex justify-center my-4">
-                                        <South />
-                                    </div>
-                                </>
-                            )}
-                            <Accordion
-                                expanded={
-                                    item?.flowStep?.handler === 'MaterialActionHandler' || item?.flowStep?.handler === 'PosterActionHandler'
-                                        ? false
-                                        : undefined
-                                }
-                                key={item?.flowStep?.handler}
-                                onChange={(e) => {
-                                    if (
-                                        item?.flowStep?.handler === 'MaterialActionHandler' ||
-                                        item?.flowStep?.handler === 'PosterActionHandler'
-                                    ) {
-                                        dispatch(
-                                            openSnackbar({
-                                                open: true,
-                                                message: '该节点请在外部编辑',
-                                                variant: 'alert',
-                                                alert: {
-                                                    color: 'error'
-                                                },
-                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                close: false
-                                            })
-                                        );
-                                    }
-                                }}
-                                className="before:border-none !m-0 border border-solid border-black/20 rounded-lg"
-                            >
-                                <AccordionSummary
-                                    className="p-0 !min-h-0 !h-[70px] bg-black/10"
-                                    sx={{
-                                        '& .Mui-expanded': {
-                                            m: '0 !important'
-                                        },
-                                        '& .MuiAccordionSummary-content': {
-                                            m: '0 !important'
-                                        },
-                                        '& .Mui-expanded .aaa': {
-                                            transition: 'transform 0.4s',
-                                            transform: 'rotate(0deg)'
-                                        }
-                                    }}
-                                >
-                                    <div className="w-full flex justify-between items-center">
-                                        <div className="flex gap-2 items-center">
-                                            <div className="w-[24px]">
-                                                {item?.flowStep?.handler !== 'MaterialActionHandler' &&
-                                                    item?.flowStep?.handler !== 'PosterActionHandler' && (
-                                                        <ExpandMore className="aaa -rotate-90" />
-                                                    )}
+                                            <div className="flex justify-center my-4">
+                                                <South />
                                             </div>
-                                            <Image
-                                                preview={false}
-                                                style={{ width: '25px', height: '25px' }}
-                                                src={getImage(item.flowStep.icon)}
-                                                fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3PTWBSGcbGzM6GCKqlIBRV0dHRJFarQ0eUT8LH4BnRU0NHR0UEFVdIlFRV7TzRksomPY8uykTk/zewQfKw/9znv4yvJynLv4uLiV2dBoDiBf4qP3/ARuCRABEFAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghgg0Aj8i0JO4OzsrPv69Wv+hi2qPHr0qNvf39+iI97soRIh4f3z58/u7du3SXX7Xt7Z2enevHmzfQe+oSN2apSAPj09TSrb+XKI/f379+08+A0cNRE2ANkupk+ACNPvkSPcAAEibACyXUyfABGm3yNHuAECRNgAZLuYPgEirKlHu7u7XdyytGwHAd8jjNyng4OD7vnz51dbPT8/7z58+NB9+/bt6jU/TI+AGWHEnrx48eJ/EsSmHzx40L18+fLyzxF3ZVMjEyDCiEDjMYZZS5wiPXnyZFbJaxMhQIQRGzHvWR7XCyOCXsOmiDAi1HmPMMQjDpbpEiDCiL358eNHurW/5SnWdIBbXiDCiA38/Pnzrce2YyZ4//59F3ePLNMl4PbpiL2J0L979+7yDtHDhw8vtzzvdGnEXdvUigSIsCLAWavHp/+qM0BcXMd/q25n1vF57TYBp0a3mUzilePj4+7k5KSLb6gt6ydAhPUzXnoPR0dHl79WGTNCfBnn1uvSCJdegQhLI1vvCk+fPu2ePXt2tZOYEV6/fn31dz+shwAR1sP1cqvLntbEN9MxA9xcYjsxS1jWR4AIa2Ibzx0tc44fYX/16lV6NDFLXH+YL32jwiACRBiEbf5KcXoTIsQSpzXx4N28Ja4BQoK7rgXiydbHjx/P25TaQAJEGAguWy0+2Q8PD6/Ki4R8EVl+bzBOnZY95fq9rj9zAkTI2SxdidBHqG9+skdw43borCXO/ZcJdraPWdv22uIEiLA4q7nvvCug8WTqzQveOH26fodo7g6uFe/a17W3+nFBAkRYENRdb1vkkz1CH9cPsVy/jrhr27PqMYvENYNlHAIesRiBYwRy0V+8iXP8+/fvX11Mr7L7ECueb/r48eMqm7FuI2BGWDEG8cm+7G3NEOfmdcTQw4h9/55lhm7DekRYKQPZF2ArbXTAyu4kDYB2YxUzwg0gi/41ztHnfQG26HbGel/crVrm7tNY+/1btkOEAZ2M05r4FB7r9GbAIdxaZYrHdOsgJ/wCEQY0J74TmOKnbxxT9n3FgGGWWsVdowHtjt9Nnvf7yQM2aZU/TIAIAxrw6dOnAWtZZcoEnBpNuTuObWMEiLAx1HY0ZQJEmHJ3HNvGCBBhY6jtaMoEiJB0Z29vL6ls58vxPcO8/zfrdo5qvKO+d3Fx8Wu8zf1dW4p/cPzLly/dtv9Ts/EbcvGAHhHyfBIhZ6NSiIBTo0LNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiEC/wGgKKC4YMA4TAAAAABJRU5ErkJggg=="
-                                                alt="svg"
-                                            />
-                                            <div className="font-bold text-[16px]">{item.name}</div>
-                                        </div>
-                                        <div>
-                                            {item?.flowStep?.handler !== 'MaterialActionHandler' &&
-                                                item?.flowStep?.handler !== 'PosterActionHandler' &&
-                                                item?.flowStep?.handler !== 'AssembleActionHandler' &&
-                                                item?.flowStep?.handler !== 'VariableActionHandler' && (
-                                                    <Tooltip title="高级配置">
-                                                        <IconButton
-                                                            onClick={(e) => {
-                                                                setStepIndex(index);
-                                                                setStepTitData({
-                                                                    name: item?.name,
-                                                                    description: item?.description
-                                                                });
-                                                                setSteotitOpen(true);
-                                                                e.stopPropagation();
-                                                            }}
-                                                            size="small"
-                                                        >
-                                                            <SettingOutlined rev={undefined} />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                )}
-                                            {item?.flowStep?.handler !== 'MaterialActionHandler' &&
-                                                item?.flowStep?.handler !== 'PosterActionHandler' &&
-                                                item?.flowStep?.handler !== 'AssembleActionHandler' && (
-                                                    <Dropdown
-                                                        placement="bottom"
-                                                        menu={{
-                                                            items: [
-                                                                {
-                                                                    key: '1',
-                                                                    label: ' 向上',
-                                                                    disabled:
-                                                                        index === 1 ||
-                                                                        appData?.configuration?.appInformation?.workflowConfig?.steps[
-                                                                            index - 1
-                                                                        ]?.flowStep.handler === 'VariableActionHandler',
-                                                                    icon: <VerticalAlignTopOutlined rev={undefined} />
-                                                                },
-                                                                {
-                                                                    key: '2',
-                                                                    label: ' 向下',
-                                                                    disabled:
-                                                                        appData?.configuration?.appInformation?.workflowConfig?.steps
-                                                                            ?.length -
-                                                                            3 ===
-                                                                            index || item.flowStep.handler === 'VariableActionHandler',
-
-                                                                    icon: <VerticalAlignBottomOutlined rev={undefined} />
-                                                                },
-                                                                {
-                                                                    key: '3',
-                                                                    label: ' 复制',
-                                                                    disabled: item.flowStep.handler === 'VariableActionHandler',
-                                                                    icon: <CopyOutlined rev={undefined} />
-                                                                },
-                                                                {
-                                                                    key: '4',
-                                                                    label: '删除',
-                                                                    icon: <DeleteOutlined rev={undefined} />
-                                                                }
-                                                            ],
-                                                            onClick: (e: any) => {
-                                                                switch (e.key) {
-                                                                    case '1':
-                                                                        stepMove(index, -1);
-                                                                        break;
-                                                                    case '2':
-                                                                        stepMove(index, 1);
-                                                                        break;
-                                                                    case '3':
-                                                                        copyStep(item, index);
-                                                                        break;
-                                                                    case '4':
-                                                                        delStep(index);
-                                                                        break;
-                                                                }
-                                                                e.domEvent.stopPropagation();
-                                                            }
-                                                        }}
-                                                        trigger={['click']}
-                                                    >
-                                                        <IconButton size="small" onClick={(e) => e.stopPropagation()}>
-                                                            <MoreVert />
-                                                        </IconButton>
-                                                    </Dropdown>
-                                                )}
-                                        </div>
-                                    </div>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <div key={item.field}>
-                                        <div className="text-xs text-black/50 mb-4">{item?.description}</div>
-                                        {item?.flowStep?.handler !== 'VariableActionHandler' ? (
-                                            item?.variable?.variables?.map((el: any, i: number) => (
-                                                <div key={el.field}>
-                                                    {el?.isShow && (
-                                                        <MarketForm
-                                                            key={el.field}
-                                                            item={el}
-                                                            materialType={''}
-                                                            details={
-                                                                appData?.configuration?.appInformation ||
-                                                                appData?.executeParam?.appInformation
-                                                            }
-                                                            stepCode={item?.field}
-                                                            model={''}
-                                                            handlerCode={item?.flowStep?.handler}
-                                                            history={false}
-                                                            promptShow={true}
-                                                            setEditOpen={setEditOpens}
-                                                            setTitle={setTitles}
-                                                            setStep={() => {
-                                                                stepRef.current = index - 1;
-                                                                setStep(stepRef.current);
-                                                            }}
-                                                            columns={stepMaterial[index - 1]}
-                                                            setMaterialType={() => {
-                                                                setMaterialTypes(
-                                                                    item?.variable?.variables?.find((i: any) => i.field === 'MATERIAL_TYPE')
-                                                                        ?.value
-                                                                );
-                                                            }}
-                                                            onChange={(e: any) => {
-                                                                const newList = _.cloneDeep(generRef.current);
-                                                                const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
-                                                                const code = item?.flowStep?.handler;
-                                                                newList[index - 1].variable.variables[i].value = e.value;
-                                                                if (
-                                                                    type &&
-                                                                    item.variable.variables?.find((item: any) => item.style === 'MATERIAL')
-                                                                ) {
-                                                                    newList[index - 1].variable.variables[
-                                                                        item.variable.variables?.findIndex(
-                                                                            (item: any) => item.style === 'MATERIAL'
-                                                                        )
-                                                                    ].value = [];
-                                                                    stepRef.current = index - 1;
-                                                                    setStep(stepRef.current);
-                                                                    setTableDatas(type, index - 1);
-                                                                }
-                                                                if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
-                                                                    const num = item.variable.variables?.findIndex(
-                                                                        (item: any) => item.field === 'REQUIREMENT'
-                                                                    );
-                                                                    const num1 = item.variable.variables?.findIndex(
-                                                                        (item: any) => item.style === 'MATERIAL'
-                                                                    );
-                                                                    if (e.value === 'RANDOM') {
-                                                                        newList[index - 1].variable.variables[num].isShow = false;
-                                                                        newList[index - 1].variable.variables[num1].isShow = true;
-                                                                    } else if (e.value === 'AI_PARODY') {
-                                                                        newList[index - 1].variable.variables[num].isShow = true;
-                                                                        newList[index - 1].variable.variables[num1].isShow = true;
-                                                                    } else {
-                                                                        newList[index - 1].variable.variables[num1].isShow = false;
-                                                                        newList[index - 1].variable.variables[num].isShow = true;
-                                                                    }
-                                                                }
-                                                                generRef.current = newList;
-                                                                setGenerateList(generRef.current);
-                                                                setAppDataGen();
-                                                            }}
-                                                        />
-                                                    )}
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <Tabs defaultActiveKey="1">
-                                                <Tabs.TabPane tab="变量编辑" key="1">
-                                                    <Row gutter={10}>
-                                                        {item?.variable?.variables?.map((item: any, de: number) => (
-                                                            <Col key={item?.field} span={24}>
-                                                                <Forms
-                                                                    item={item}
-                                                                    index={de}
-                                                                    changeValue={(data: any) => {
-                                                                        const newList = _.cloneDeep(generRef.current);
-                                                                        newList[index - 1].variable.variables[de].value = data.value;
-                                                                        generRef.current = newList;
-                                                                        setGenerateList(generRef.current);
-                                                                    }}
-                                                                    flag={false}
-                                                                />
-                                                            </Col>
-                                                        ))}
-                                                    </Row>
-                                                </Tabs.TabPane>
-                                                <Tabs.TabPane tab="变量列表" key="2">
-                                                    <CreateVariable
-                                                        rows={item?.variable?.variables}
-                                                        setRows={(data: any[]) => {
-                                                            const newList = _.cloneDeep(generRef.current);
-                                                            newList[index - 1].variable.variables = data;
-                                                            generRef.current = newList;
-                                                            setGenerateList(generRef.current);
-                                                            setAppDataGen();
-                                                        }}
-                                                    />
-                                                </Tabs.TabPane>
-                                            </Tabs>
-                                        )}
-                                    </div>
-                                </AccordionDetails>
-                            </Accordion>
-                            {appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 1 !== index &&
-                                appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 2 !== index && (
-                                    <>
-                                        <div className="flex justify-center my-4">
-                                            <div className="h-[20px] w-[2px] bg-black/80"></div>
-                                        </div>
-                                        <Popover
-                                            open={stepOpen[index]}
-                                            placement="bottom"
-                                            trigger={'click'}
-                                            onOpenChange={(open: boolean) => {
-                                                const newList = _.cloneDeep(stepOpen);
-                                                newList[index] = open;
-                                                setStepOpen(newList);
+                                        </>
+                                    )}
+                                    <Accordion
+                                        expanded={
+                                            item?.flowStep?.handler === 'MaterialActionHandler' ||
+                                            item?.flowStep?.handler === 'PosterActionHandler'
+                                                ? false
+                                                : undefined
+                                        }
+                                        key={item?.flowStep?.handler}
+                                        onChange={(e) => {
+                                            if (
+                                                item?.flowStep?.handler === 'MaterialActionHandler' ||
+                                                item?.flowStep?.handler === 'PosterActionHandler'
+                                            ) {
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '该节点请在外部编辑',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'error'
+                                                        },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                        close: false
+                                                    })
+                                                );
+                                            }
+                                        }}
+                                        className="before:border-none !m-0 border border-solid border-black/20 rounded-lg"
+                                    >
+                                        <AccordionSummary
+                                            className="p-0 !min-h-0 !h-[70px] bg-black/10"
+                                            sx={{
+                                                '& .Mui-expanded': {
+                                                    m: '0 !important'
+                                                },
+                                                '& .MuiAccordionSummary-content': {
+                                                    m: '0 !important'
+                                                },
+                                                '& .Mui-expanded .aaa': {
+                                                    transition: 'transform 0.4s',
+                                                    transform: 'rotate(0deg)'
+                                                }
                                             }}
-                                            content={
-                                                <div className="lg:w-[700px] md:w-[80%] flex gap-2 flex-wrap">
-                                                    {stepLists
-                                                        ?.filter((item) => {
-                                                            if (index === 0) {
-                                                                return (
-                                                                    item.flowStep.handler !== 'MaterialActionHandler' &&
-                                                                    item.flowStep.handler !== 'PosterActionHandler' &&
-                                                                    item.flowStep.handler !== 'AssembleActionHandler'
-                                                                );
-                                                            } else {
-                                                                return (
-                                                                    item.flowStep.handler !== 'MaterialActionHandler' &&
-                                                                    item.flowStep.handler !== 'PosterActionHandler' &&
-                                                                    item.flowStep.handler !== 'AssembleActionHandler' &&
-                                                                    item.flowStep.handler !== 'VariableActionHandler'
-                                                                );
-                                                            }
-                                                        })
-                                                        ?.map((el) => (
-                                                            <div
-                                                                onClick={() => {
-                                                                    if (
-                                                                        index === 0 &&
-                                                                        el.flowStep.handler === 'VariableActionHandler' &&
-                                                                        appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
-                                                                            (i: any) => i.flowStep.handler === 'VariableActionHandler'
-                                                                        )
-                                                                    ) {
-                                                                        dispatch(
-                                                                            openSnackbar({
-                                                                                open: true,
-                                                                                message: '全局变量已经存在',
-                                                                                variant: 'alert',
-                                                                                alert: {
-                                                                                    color: 'error'
-                                                                                },
-                                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                                close: false
-                                                                            })
-                                                                        );
-                                                                    } else {
-                                                                        addStep(el, index);
+                                        >
+                                            <div className="w-full flex justify-between items-center">
+                                                <div className="flex gap-2 items-center">
+                                                    <div className="w-[24px]">
+                                                        {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                            item?.flowStep?.handler !== 'PosterActionHandler' && (
+                                                                <ExpandMore className="aaa -rotate-90" />
+                                                            )}
+                                                    </div>
+                                                    <Image
+                                                        preview={false}
+                                                        style={{ width: '25px', height: '25px' }}
+                                                        src={getImage(item.flowStep.icon)}
+                                                        fallback="data:image/png;base64,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"
+                                                        alt="svg"
+                                                    />
+                                                    <div className="font-bold text-[16px]">{item.name}</div>
+                                                </div>
+                                                <div>
+                                                    {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                        item?.flowStep?.handler !== 'PosterActionHandler' &&
+                                                        item?.flowStep?.handler !== 'AssembleActionHandler' &&
+                                                        item?.flowStep?.handler !== 'VariableActionHandler' && (
+                                                            <Tooltip title="高级配置">
+                                                                <IconButton
+                                                                    onClick={(e) => {
+                                                                        setStepIndex(index);
+                                                                        setStepTitData({
+                                                                            name: item?.name,
+                                                                            description: item?.description
+                                                                        });
+                                                                        setSteotitOpen(true);
+                                                                        e.stopPropagation();
+                                                                    }}
+                                                                    size="small"
+                                                                >
+                                                                    <SettingOutlined rev={undefined} />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        )}
+                                                    {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                        item?.flowStep?.handler !== 'PosterActionHandler' &&
+                                                        item?.flowStep?.handler !== 'AssembleActionHandler' && (
+                                                            <Dropdown
+                                                                placement="bottom"
+                                                                menu={{
+                                                                    items: [
+                                                                        {
+                                                                            key: '1',
+                                                                            label: ' 向上',
+                                                                            disabled:
+                                                                                index === 1 ||
+                                                                                appData?.configuration?.appInformation?.workflowConfig
+                                                                                    ?.steps[index - 1]?.flowStep.handler ===
+                                                                                    'VariableActionHandler',
+                                                                            icon: <VerticalAlignTopOutlined rev={undefined} />
+                                                                        },
+                                                                        {
+                                                                            key: '2',
+                                                                            label: ' 向下',
+                                                                            disabled:
+                                                                                appData?.configuration?.appInformation?.workflowConfig
+                                                                                    ?.steps?.length -
+                                                                                    3 ===
+                                                                                    index ||
+                                                                                item.flowStep.handler === 'VariableActionHandler',
+
+                                                                            icon: <VerticalAlignBottomOutlined rev={undefined} />
+                                                                        },
+                                                                        {
+                                                                            key: '3',
+                                                                            label: ' 复制',
+                                                                            disabled: item.flowStep.handler === 'VariableActionHandler',
+                                                                            icon: <CopyOutlined rev={undefined} />
+                                                                        },
+                                                                        {
+                                                                            key: '4',
+                                                                            label: '删除',
+                                                                            icon: <DeleteOutlined rev={undefined} />
+                                                                        }
+                                                                    ],
+                                                                    onClick: (e: any) => {
+                                                                        switch (e.key) {
+                                                                            case '1':
+                                                                                stepMove(index, -1);
+                                                                                break;
+                                                                            case '2':
+                                                                                stepMove(index, 1);
+                                                                                break;
+                                                                            case '3':
+                                                                                copyStep(item, index);
+                                                                                break;
+                                                                            case '4':
+                                                                                delStep(index);
+                                                                                break;
+                                                                        }
+                                                                        e.domEvent.stopPropagation();
                                                                     }
                                                                 }}
-                                                                className="!w-[calc(50%-0.25rem)] flex gap-2 items-center hover:shadow-md cursor-pointer p-2 rounded-md"
+                                                                trigger={['click']}
                                                             >
-                                                                <div className="border border-solid border-[rgba(76,76,102,.1)] rounded-lg p-2 ">
-                                                                    <Image
-                                                                        preview={false}
-                                                                        width={40}
-                                                                        height={40}
-                                                                        src={getImage(el?.flowStep?.icon)}
-                                                                        fallback="data:image/png;base64,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"
-                                                                        alt="svg"
-                                                                    />
-                                                                </div>
-                                                                <div className="flex justify-between gap-2 flex-col">
-                                                                    <div className="text-[16px] font-bold">{el?.name}</div>
-                                                                    <div className="text-xs text-black/50 line-clamp-3">
-                                                                        {el.description}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        ))}
+                                                                <IconButton size="small" onClick={(e) => e.stopPropagation()}>
+                                                                    <MoreVert />
+                                                                </IconButton>
+                                                            </Dropdown>
+                                                        )}
                                                 </div>
-                                            }
-                                        >
-                                            <div className="flex justify-center cursor-pointer">
-                                                <AddCircleSharp color="secondary" />
                                             </div>
-                                        </Popover>
-                                    </>
-                                )}
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            <div key={item.field}>
+                                                <div className="text-xs text-black/50 mb-4">{item?.description}</div>
+                                                {item?.flowStep?.handler !== 'VariableActionHandler' ? (
+                                                    item?.variable?.variables?.map((el: any, i: number) => (
+                                                        <div key={el.field}>
+                                                            {el?.isShow && (
+                                                                <MarketForm
+                                                                    key={el.field}
+                                                                    item={el}
+                                                                    materialType={''}
+                                                                    details={
+                                                                        appData?.configuration?.appInformation ||
+                                                                        appData?.executeParam?.appInformation
+                                                                    }
+                                                                    stepCode={item?.field}
+                                                                    model={''}
+                                                                    handlerCode={item?.flowStep?.handler}
+                                                                    history={false}
+                                                                    promptShow={true}
+                                                                    setEditOpen={setEditOpens}
+                                                                    setTitle={setTitles}
+                                                                    setStep={() => {
+                                                                        stepRef.current = index - 1;
+                                                                        setStep(stepRef.current);
+                                                                    }}
+                                                                    columns={stepMaterial[index - 1]}
+                                                                    setMaterialType={() => {
+                                                                        setMaterialTypes(
+                                                                            item?.variable?.variables?.find(
+                                                                                (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                            )?.value
+                                                                        );
+                                                                    }}
+                                                                    onChange={(e: any) => {
+                                                                        const newList = _.cloneDeep(generRef.current);
+                                                                        const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                                        const code = item?.flowStep?.handler;
+                                                                        newList[index - 1].variable.variables[i].value = e.value;
+                                                                        if (
+                                                                            type &&
+                                                                            item.variable.variables?.find(
+                                                                                (item: any) => item.style === 'MATERIAL'
+                                                                            )
+                                                                        ) {
+                                                                            newList[index - 1].variable.variables[
+                                                                                item.variable.variables?.findIndex(
+                                                                                    (item: any) => item.style === 'MATERIAL'
+                                                                                )
+                                                                            ].value = [];
+                                                                            stepRef.current = index - 1;
+                                                                            setStep(stepRef.current);
+                                                                            setTableDatas(type, index - 1);
+                                                                        }
+                                                                        if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
+                                                                            const num = item.variable.variables?.findIndex(
+                                                                                (item: any) => item.field === 'REQUIREMENT'
+                                                                            );
+                                                                            const num1 = item.variable.variables?.findIndex(
+                                                                                (item: any) => item.style === 'MATERIAL'
+                                                                            );
+                                                                            if (e.value === 'RANDOM') {
+                                                                                newList[index - 1].variable.variables[num].isShow = false;
+                                                                                newList[index - 1].variable.variables[num1].isShow = true;
+                                                                            } else if (e.value === 'AI_PARODY') {
+                                                                                newList[index - 1].variable.variables[num].isShow = true;
+                                                                                newList[index - 1].variable.variables[num1].isShow = true;
+                                                                            } else {
+                                                                                newList[index - 1].variable.variables[num1].isShow = false;
+                                                                                newList[index - 1].variable.variables[num].isShow = true;
+                                                                            }
+                                                                        }
+                                                                        generRef.current = newList;
+                                                                        setGenerateList(generRef.current);
+                                                                        setAppDataGen();
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <Tabs defaultActiveKey="1">
+                                                        <Tabs.TabPane tab="变量编辑" key="1">
+                                                            <Row gutter={10}>
+                                                                {item?.variable?.variables?.map((item: any, de: number) => (
+                                                                    <Col key={item?.field} span={24}>
+                                                                        <Forms
+                                                                            item={item}
+                                                                            index={de}
+                                                                            changeValue={(data: any) => {
+                                                                                const newList = _.cloneDeep(generRef.current);
+                                                                                newList[index - 1].variable.variables[de].value =
+                                                                                    data.value;
+                                                                                generRef.current = newList;
+                                                                                setGenerateList(generRef.current);
+                                                                            }}
+                                                                            flag={false}
+                                                                        />
+                                                                    </Col>
+                                                                ))}
+                                                            </Row>
+                                                        </Tabs.TabPane>
+                                                        <Tabs.TabPane tab="变量列表" key="2">
+                                                            <CreateVariable
+                                                                rows={item?.variable?.variables}
+                                                                setRows={(data: any[]) => {
+                                                                    const newList = _.cloneDeep(generRef.current);
+                                                                    newList[index - 1].variable.variables = data;
+                                                                    generRef.current = newList;
+                                                                    setGenerateList(generRef.current);
+                                                                    setAppDataGen();
+                                                                }}
+                                                            />
+                                                        </Tabs.TabPane>
+                                                    </Tabs>
+                                                )}
+                                            </div>
+                                        </AccordionDetails>
+                                    </Accordion>
+                                    {(index !== 0 ||
+                                        appData?.configuration?.appInformation?.workflowConfig?.steps[1]?.flowStep.handler !==
+                                            'VariableActionHandler') &&
+                                        appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 1 !== index &&
+                                        appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 2 !== index && (
+                                            <>
+                                                <div className="flex justify-center my-4">
+                                                    <div className="h-[20px] w-[2px] bg-black/80"></div>
+                                                </div>
+                                                <Popover
+                                                    open={stepOpen[index]}
+                                                    placement="bottom"
+                                                    trigger={'click'}
+                                                    onOpenChange={(open: boolean) => {
+                                                        const newList = _.cloneDeep(stepOpen);
+                                                        newList[index] = open;
+                                                        setStepOpen(newList);
+                                                    }}
+                                                    content={
+                                                        <div className="lg:w-[700px] md:w-[80%] flex gap-2 flex-wrap">
+                                                            {stepLists
+                                                                ?.filter((item) => {
+                                                                    if (index === 0) {
+                                                                        return (
+                                                                            item.flowStep.handler !== 'MaterialActionHandler' &&
+                                                                            item.flowStep.handler !== 'PosterActionHandler' &&
+                                                                            item.flowStep.handler !== 'AssembleActionHandler'
+                                                                        );
+                                                                    } else {
+                                                                        return (
+                                                                            item.flowStep.handler !== 'MaterialActionHandler' &&
+                                                                            item.flowStep.handler !== 'PosterActionHandler' &&
+                                                                            item.flowStep.handler !== 'AssembleActionHandler' &&
+                                                                            item.flowStep.handler !== 'VariableActionHandler'
+                                                                        );
+                                                                    }
+                                                                })
+                                                                ?.map((el) => (
+                                                                    <div
+                                                                        onClick={() => {
+                                                                            if (
+                                                                                index === 0 &&
+                                                                                el.flowStep.handler === 'VariableActionHandler' &&
+                                                                                appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                                                                                    (i: any) =>
+                                                                                        i.flowStep.handler === 'VariableActionHandler'
+                                                                                )
+                                                                            ) {
+                                                                                dispatch(
+                                                                                    openSnackbar({
+                                                                                        open: true,
+                                                                                        message: '全局变量已经存在',
+                                                                                        variant: 'alert',
+                                                                                        alert: {
+                                                                                            color: 'error'
+                                                                                        },
+                                                                                        anchorOrigin: {
+                                                                                            vertical: 'top',
+                                                                                            horizontal: 'center'
+                                                                                        },
+                                                                                        close: false
+                                                                                    })
+                                                                                );
+                                                                            } else {
+                                                                                addStep(el, index);
+                                                                            }
+                                                                        }}
+                                                                        className="!w-[calc(50%-0.25rem)] flex gap-2 items-center hover:shadow-md cursor-pointer p-2 rounded-md"
+                                                                    >
+                                                                        <div className="border border-solid border-[rgba(76,76,102,.1)] rounded-lg p-2 ">
+                                                                            <Image
+                                                                                preview={false}
+                                                                                width={40}
+                                                                                height={40}
+                                                                                src={getImage(el?.flowStep?.icon)}
+                                                                                fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3PTWBSGcbGzM6GCKqlIBRV0dHRJFarQ0eUT8LH4BnRU0NHR0UEFVdIlFRV7TzRksomPY8uykTk/zewQfKw/9znv4yvJynLv4uLiV2dBoDiBf4qP3/ARuCRABEFAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghgg0Aj8i0JO4OzsrPv69Wv+hi2qPHr0qNvf39+iI97soRIh4f3z58/u7du3SXX7Xt7Z2enevHmzfQe+oSN2apSAPj09TSrb+XKI/f379+08+A0cNRE2ANkupk+ACNPvkSPcAAEibACyXUyfABGm3yNHuAECRNgAZLuYPgEirKlHu7u7XdyytGwHAd8jjNyng4OD7vnz51dbPT8/7z58+NB9+/bt6jU/TI+AGWHEnrx48eJ/EsSmHzx40L18+fLyzxF3ZVMjEyDCiEDjMYZZS5wiPXnyZFbJaxMhQIQRGzHvWR7XCyOCXsOmiDAi1HmPMMQjDpbpEiDCiL358eNHurW/5SnWdIBbXiDCiA38/Pnzrce2YyZ4//59F3ePLNMl4PbpiL2J0L979+7yDtHDhw8vtzzvdGnEXdvUigSIsCLAWavHp/+qM0BcXMd/q25n1vF57TYBp0a3mUzilePj4+7k5KSLb6gt6ydAhPUzXnoPR0dHl79WGTNCfBnn1uvSCJdegQhLI1vvCk+fPu2ePXt2tZOYEV6/fn31dz+shwAR1sP1cqvLntbEN9MxA9xcYjsxS1jWR4AIa2Ibzx0tc44fYX/16lV6NDFLXH+YL32jwiACRBiEbf5KcXoTIsQSpzXx4N28Ja4BQoK7rgXiydbHjx/P25TaQAJEGAguWy0+2Q8PD6/Ki4R8EVl+bzBOnZY95fq9rj9zAkTI2SxdidBHqG9+skdw43borCXO/ZcJdraPWdv22uIEiLA4q7nvvCug8WTqzQveOH26fodo7g6uFe/a17W3+nFBAkRYENRdb1vkkz1CH9cPsVy/jrhr27PqMYvENYNlHAIesRiBYwRy0V+8iXP8+/fvX11Mr7L7ECueb/r48eMqm7FuI2BGWDEG8cm+7G3NEOfmdcTQw4h9/55lhm7DekRYKQPZF2ArbXTAyu4kDYB2YxUzwg0gi/41ztHnfQG26HbGel/crVrm7tNY+/1btkOEAZ2M05r4FB7r9GbAIdxaZYrHdOsgJ/wCEQY0J74TmOKnbxxT9n3FgGGWWsVdowHtjt9Nnvf7yQM2aZU/TIAIAxrw6dOnAWtZZcoEnBpNuTuObWMEiLAx1HY0ZQJEmHJ3HNvGCBBhY6jtaMoEiJB0Z29vL6ls58vxPcO8/zfrdo5qvKO+d3Fx8Wu8zf1dW4p/cPzLly/dtv9Ts/EbcvGAHhHyfBIhZ6NSiIBTo0LNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiECRCjUbEPNCRAhZ6NSiAARCjXbUHMCRMjZqBQiQIRCzTbUnAARcjYqhQgQoVCzDTUnQIScjUohAkQo1GxDzQkQIWejUogAEQo121BzAkTI2agUIkCEQs021JwAEXI2KoUIEKFQsw01J0CEnI1KIQJEKNRsQ80JECFno1KIABEKNdtQcwJEyNmoFCJAhELNNtScABFyNiqFCBChULMNNSdAhJyNSiEC/wGgKKC4YMA4TAAAAABJRU5ErkJggg=="
+                                                                                alt="svg"
+                                                                            />
+                                                                        </div>
+                                                                        <div className="flex justify-between gap-2 flex-col">
+                                                                            <div className="text-[16px] font-bold">{el?.name}</div>
+                                                                            <div className="text-xs text-black/50 line-clamp-3">
+                                                                                {el.description}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                        </div>
+                                                    }
+                                                >
+                                                    <div className="flex justify-center cursor-pointer">
+                                                        <AddCircleSharp color="secondary" />
+                                                    </div>
+                                                </Popover>
+                                            </>
+                                        )}
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    </div>
                 </Modal>
             )}
             {steptitOpen && (

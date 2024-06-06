@@ -145,14 +145,15 @@ export const PicImagePick = ({
     };
     useEffect(() => {
         setLoading(true);
-        imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query }).then(
-            (res) => {
-                setLoading(false);
+        imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query })
+            .then((res) => {
                 const { totalHits, hits: newData } = res;
                 setHits([...hits, ...newData]);
                 setTotalHits(totalHits);
-            }
-        );
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     }, [currentPage, q, query]);
 
     const onChange = (item: any) => {
@@ -188,7 +189,7 @@ export const PicImagePick = ({
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onSearch={(value) => {
-                    if (value !== q) {
+                    if (value !== q || !value) {
                         setQ(value);
                         setCurrentPage(1);
                         setHits([]);

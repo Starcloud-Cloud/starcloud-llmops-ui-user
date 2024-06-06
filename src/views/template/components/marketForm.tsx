@@ -100,7 +100,7 @@ function FormExecute({
     const timer1: any = useRef(null);
     const props1: UploadProps = {
         showUploadList: false,
-        accept: '.zip',
+        accept: '.zip,.rar',
         beforeUpload: async (file, fileList) => {
             setUploadLoading(true);
             try {

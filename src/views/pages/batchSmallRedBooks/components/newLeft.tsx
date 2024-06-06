@@ -191,7 +191,7 @@ const Lefts = ({
     };
     const props1: UploadProps = {
         showUploadList: false,
-        accept: '.zip',
+        accept: '.zip,.rar',
         beforeUpload: async (file, fileList) => {
             setUploadLoading(true);
             try {
@@ -1036,13 +1036,7 @@ const Lefts = ({
         pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')].value = newList;
         generRef.current = newValue;
         setGenerateList(generRef.current);
-        const variable = appRef.current.configuration.appInformation.workflowConfig.steps;
-        const appOne = _.cloneDeep(variable[0]);
-        const applast = _.cloneDeep(variable[variable?.length - 1]);
-        const newappList = _.cloneDeep(appRef.current);
-        newappList.configuration.appInformation.workflowConfig.steps = [appOne, ...generRef.current, applast];
-        appRef.current = newappList;
-        setAppData(appRef.current);
+        setAppDataGen();
         setEditOpens(false);
         forms.resetFields();
     };
@@ -1177,7 +1171,7 @@ const Lefts = ({
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '保存成功',
+                    message: '创作计划保存成功',
                     variant: 'alert',
                     alert: {
                         color: 'success'
@@ -1494,12 +1488,13 @@ const Lefts = ({
         const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         );
+        let name = addName(item.name);
         if (handle) {
-            newList.splice(index, 0, item);
-            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, item);
+            newList.splice(index, 0, { ...item, name });
+            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name });
         } else {
-            newList.splice(index + 1, 0, item);
-            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, item);
+            newList.splice(index + 1, 0, { ...item, name });
+            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name });
         }
         generRef.current = newList;
         appRef.current = newLists;
@@ -1508,6 +1503,26 @@ const Lefts = ({
         const newStep = _.cloneDeep(stepOpen);
         newStep[index] = open;
         setStepOpen(newStep);
+    };
+    const addName: any = (name: string) => {
+        const nameList = appRef.current.configuration?.appInformation?.workflowConfig?.steps?.map((item: any) => item.name);
+
+        if (nameList.includes(name)) {
+            const nameParts = name.match(/(.*?)(\d*)$/);
+            console.log(nameParts);
+            if (nameParts) {
+                // 如果有数字，则解析出数字并加1
+                let prefix = nameParts[1];
+                let numberPart = nameParts[2];
+                let incrementedNumber = numberPart ? parseInt(numberPart, 10) + 1 : 1;
+                return addName(`${prefix}${incrementedNumber > 0 ? incrementedNumber : ''}`);
+            } else {
+                // 如果没有数字，就默认从1开始
+                return addName(`${name}1`);
+            }
+        } else {
+            return name;
+        }
     };
     //删除步骤
     const delStep = (index: number) => {
@@ -1581,6 +1596,16 @@ const Lefts = ({
         appRef.current = newLists;
         setAppData(appRef.current);
         setGenerateList(generRef.current);
+    };
+    //改变给 sppData 赋值
+    const setAppDataGen = () => {
+        const variable = appRef.current.configuration.appInformation.workflowConfig.steps;
+        const appOne = _.cloneDeep(variable[0]);
+        const applast = _.cloneDeep(variable[variable?.length - 1]);
+        const newappList = _.cloneDeep(appRef.current);
+        newappList.configuration.appInformation.workflowConfig.steps = [appOne, ...generRef.current, applast];
+        appRef.current = newappList;
+        setAppData(appRef.current);
     };
     useEffect(() => {
         if (detail?.type) {
@@ -1698,9 +1723,9 @@ const Lefts = ({
                                         <InfoCircleOutlined rev={undefined} />
                                         <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
                                     </div>
-                                    <IconButton size="small">
+                                    {/* <IconButton size="small">
                                         <SettingOutlined rev={undefined} />
-                                    </IconButton>
+                                    </IconButton> */}
                                 </div>
                                 <div>
                                     {materialTypeStatus ? (
@@ -1820,15 +1845,17 @@ const Lefts = ({
                                     <InfoCircleOutlined rev={undefined} />
                                     <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
                                 </div>
-                                <Tooltip title="增加系统模版">
-                                    <Button
-                                        icon={<SettingOutlined rev={undefined} />}
-                                        shape="circle"
-                                        size="small"
-                                        type="primary"
-                                        onClick={() => setSettingOpen(true)}
-                                    />
-                                </Tooltip>
+                                {detail && (
+                                    <Tooltip title="流程配置">
+                                        <Button
+                                            icon={<SettingOutlined rev={undefined} />}
+                                            shape="circle"
+                                            size="small"
+                                            type="primary"
+                                            onClick={() => setSettingOpen(true)}
+                                        />
+                                    </Tooltip>
+                                )}
                             </div>
 
                             {generateList?.map((item: any, index: number) => (
@@ -1862,7 +1889,10 @@ const Lefts = ({
                                                                     key={el.value}
                                                                     item={el}
                                                                     materialType={''}
-                                                                    details={appData?.configuration?.appInformation}
+                                                                    details={
+                                                                        appData?.configuration?.appInformation ||
+                                                                        appData?.executeParam?.appInformation
+                                                                    }
                                                                     stepCode={item?.field}
                                                                     model={''}
                                                                     handlerCode={item?.flowStep?.handler}
@@ -1922,18 +1952,7 @@ const Lefts = ({
                                                                         }
                                                                         generRef.current = newList;
                                                                         setGenerateList(generRef.current);
-                                                                        const variable =
-                                                                            appRef.current.configuration.appInformation.workflowConfig
-                                                                                .steps;
-                                                                        const appOne = _.cloneDeep(variable[0]);
-                                                                        const applast = _.cloneDeep(variable[variable?.length - 1]);
-                                                                        const newappList = _.cloneDeep(appRef.current);
-                                                                        newappList.configuration.appInformation.workflowConfig.steps = [
-                                                                            appOne,
-                                                                            ...generRef.current,
-                                                                            applast
-                                                                        ];
-                                                                        appRef.current = newappList;
+                                                                        setAppDataGen();
                                                                         setAppData(appRef.current);
                                                                     }}
                                                                 />
@@ -1954,6 +1973,7 @@ const Lefts = ({
                                                                                 newList[index].variable.variables[de].value = data.value;
                                                                                 generRef.current = newList;
                                                                                 setGenerateList(generRef.current);
+                                                                                setAppDataGen();
                                                                             }}
                                                                             flag={false}
                                                                         />
@@ -1969,6 +1989,7 @@ const Lefts = ({
                                                                     newList[index].variable.variables = data;
                                                                     generRef.current = newList;
                                                                     setGenerateList(generRef.current);
+                                                                    setAppDataGen();
                                                                 }}
                                                             />
                                                         </Tabs.TabPane>
@@ -2316,7 +2337,7 @@ const Lefts = ({
                                                 <AddCircleSharp />
                                             </IconButton>
                                         </Popover> */}
-                                    <div className="flex justify-center">
+                                    <div className="flex justify-center my-4">
                                         <South />
                                     </div>
                                 </>
@@ -2386,20 +2407,22 @@ const Lefts = ({
                                                 item?.flowStep?.handler !== 'PosterActionHandler' &&
                                                 item?.flowStep?.handler !== 'AssembleActionHandler' &&
                                                 item?.flowStep?.handler !== 'VariableActionHandler' && (
-                                                    <IconButton
-                                                        onClick={(e) => {
-                                                            setStepIndex(index);
-                                                            setStepTitData({
-                                                                name: item?.name,
-                                                                description: item?.description
-                                                            });
-                                                            setSteotitOpen(true);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        <SettingOutlined rev={undefined} />
-                                                    </IconButton>
+                                                    <Tooltip title="高级配置">
+                                                        <IconButton
+                                                            onClick={(e) => {
+                                                                setStepIndex(index);
+                                                                setStepTitData({
+                                                                    name: item?.name,
+                                                                    description: item?.description
+                                                                });
+                                                                setSteotitOpen(true);
+                                                                e.stopPropagation();
+                                                            }}
+                                                            size="small"
+                                                        >
+                                                            <SettingOutlined rev={undefined} />
+                                                        </IconButton>
+                                                    </Tooltip>
                                                 )}
                                             {item?.flowStep?.handler !== 'MaterialActionHandler' &&
                                                 item?.flowStep?.handler !== 'PosterActionHandler' &&
@@ -2480,7 +2503,10 @@ const Lefts = ({
                                                             key={el.field}
                                                             item={el}
                                                             materialType={''}
-                                                            details={appData?.configuration?.appInformation}
+                                                            details={
+                                                                appData?.configuration?.appInformation ||
+                                                                appData?.executeParam?.appInformation
+                                                            }
                                                             stepCode={item?.field}
                                                             model={''}
                                                             handlerCode={item?.flowStep?.handler}
@@ -2500,7 +2526,6 @@ const Lefts = ({
                                                                 );
                                                             }}
                                                             onChange={(e: any) => {
-                                                                console.log(index);
                                                                 const newList = _.cloneDeep(generRef.current);
                                                                 const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
                                                                 const code = item?.flowStep?.handler;
@@ -2538,18 +2563,7 @@ const Lefts = ({
                                                                 }
                                                                 generRef.current = newList;
                                                                 setGenerateList(generRef.current);
-                                                                const variable =
-                                                                    appRef.current.configuration.appInformation.workflowConfig.steps;
-                                                                const appOne = _.cloneDeep(variable[0]);
-                                                                const applast = _.cloneDeep(variable[variable?.length - 1]);
-                                                                const newappList = _.cloneDeep(appRef.current);
-                                                                newappList.configuration.appInformation.workflowConfig.steps = [
-                                                                    appOne,
-                                                                    ...generRef.current,
-                                                                    applast
-                                                                ];
-                                                                appRef.current = newappList;
-                                                                setAppData(appRef.current);
+                                                                setAppDataGen();
                                                             }}
                                                         />
                                                     )}
@@ -2566,7 +2580,7 @@ const Lefts = ({
                                                                     index={de}
                                                                     changeValue={(data: any) => {
                                                                         const newList = _.cloneDeep(generRef.current);
-                                                                        newList[index].variable.variables[de].value = data.value;
+                                                                        newList[index - 1].variable.variables[de].value = data.value;
                                                                         generRef.current = newList;
                                                                         setGenerateList(generRef.current);
                                                                     }}
@@ -2581,9 +2595,10 @@ const Lefts = ({
                                                         rows={item?.variable?.variables}
                                                         setRows={(data: any[]) => {
                                                             const newList = _.cloneDeep(generRef.current);
-                                                            newList[index].variable.variables = data;
+                                                            newList[index - 1].variable.variables = data;
                                                             generRef.current = newList;
                                                             setGenerateList(generRef.current);
+                                                            setAppDataGen();
                                                         }}
                                                     />
                                                 </Tabs.TabPane>
@@ -2595,7 +2610,7 @@ const Lefts = ({
                             {appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 1 !== index &&
                                 appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 2 !== index && (
                                     <>
-                                        <div className="flex justify-center mt-4">
+                                        <div className="flex justify-center my-4">
                                             <div className="h-[20px] w-[2px] bg-black/80"></div>
                                         </div>
                                         <Popover
@@ -2612,7 +2627,11 @@ const Lefts = ({
                                                     {stepLists
                                                         ?.filter((item) => {
                                                             if (index === 0) {
-                                                                return item.flowStep.handler === 'VariableActionHandler';
+                                                                return (
+                                                                    item.flowStep.handler !== 'MaterialActionHandler' &&
+                                                                    item.flowStep.handler !== 'PosterActionHandler' &&
+                                                                    item.flowStep.handler !== 'AssembleActionHandler'
+                                                                );
                                                             } else {
                                                                 return (
                                                                     item.flowStep.handler !== 'MaterialActionHandler' &&
@@ -2671,9 +2690,9 @@ const Lefts = ({
                                                 </div>
                                             }
                                         >
-                                            <IconButton color="secondary" sx={{ display: 'block', margin: '0 auto', fontSize: 'unset' }}>
-                                                <AddCircleSharp />
-                                            </IconButton>
+                                            <div className="flex justify-center cursor-pointer">
+                                                <AddCircleSharp color="secondary" />
+                                            </div>
                                         </Popover>
                                     </>
                                 )}

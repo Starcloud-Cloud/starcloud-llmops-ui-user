@@ -633,8 +633,9 @@ function CreateDetail() {
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: '保存成功',
+                                message: '应用保存成功',
                                 variant: 'alert',
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 alert: {
                                     color: 'success'
                                 },

@@ -1,5 +1,6 @@
 import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag, Empty, Spin, Progress } from 'antd';
 import { imageSearch } from 'api/redBook/imageSearch';
+import { appModify } from 'api/template';
 import axios from 'axios';
 import { debounce } from 'lodash-es';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -7,17 +8,22 @@ import Masonry from 'react-responsive-masonry';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { getAccessToken } from 'utils/auth';
+import { planModifyConfig } from 'api/redBook/batchIndex';
 
 const { Search } = Input;
 const { Option } = Select;
 
 export const PicImagePick = ({
+    allData,
+    details,
     isModalOpen,
     setIsModalOpen,
     setSelectImg,
     columns,
     values
 }: {
+    allData?: any;
+    details?: any;
     isModalOpen: boolean;
     setIsModalOpen: (isModalOpen: boolean) => void;
     setSelectImg: (selectImg: any) => void;
@@ -39,6 +45,7 @@ export const PicImagePick = ({
         label: '图片下载中',
         value: 0
     });
+    const [currentDetails, setCurrentDetails] = React.useState<any>(null);
 
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
@@ -52,6 +59,34 @@ export const PicImagePick = ({
     useEffect(() => {
         currentPageRef.current = currentPage;
     }, [currentPage]);
+
+    // 回显
+    useEffect(() => {
+        if (details) {
+            details.workflowConfig.steps.forEach((item: any) => {
+                if (item.flowStep.handler === 'MaterialActionHandler') {
+                    const searchHabitsString = item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value || '{}';
+                    const searchHabitsStringJson = JSON.parse(searchHabitsString);
+                    setQuery(searchHabitsStringJson?.query || {});
+                    setSize(searchHabitsStringJson?.size || {});
+                }
+            });
+        }
+    }, [details]);
+
+    // 设置值
+    useEffect(() => {
+        if (details) {
+            details.workflowConfig.steps.forEach((item: any) => {
+                if (item.flowStep.handler === 'MaterialActionHandler') {
+                    item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });
+                }
+            });
+            setCurrentDetails(details);
+        }
+    }, [details, query, size]);
+
+    console.log(currentDetails);
 
     const handleScroll = useCallback(
         debounce(() => {
@@ -77,6 +112,20 @@ export const PicImagePick = ({
     }, [handleScroll]);
 
     const handleOk = async () => {
+        if (!checkItem.largeImageURL) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '请选择图片',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+        }
         setPercent({
             label: '图片下载中',
             value: 0
@@ -129,6 +178,31 @@ export const PicImagePick = ({
 
         setSelectImg({ ...checkItem, largeImageURL: url });
         handleCancel();
+
+        // 保存筛选项
+        currentDetails?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            const arr1 = item?.flowStep?.variable?.variables;
+            arr?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+            arr1?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+        });
+
+        appModify(currentDetails).then((res) => {
+            planModifyConfig({
+                ...allData,
+                configuration: { ...allData.configuration, appInformation: currentDetails },
+                validate: false
+            }).then((planRes) => {});
+        });
+
         setTimeout(() => {
             setPercent({
                 label: '图片插入成功',
@@ -223,6 +297,7 @@ export const PicImagePick = ({
                     <Select
                         style={{ width: '120px' }}
                         placeholder="图片类型"
+                        value={query?.image_type}
                         onChange={(value) => {
                             setCurrentPage(1);
                             setHits([]);
@@ -241,6 +316,7 @@ export const PicImagePick = ({
                     <Select
                         style={{ width: '120px' }}
                         placeholder="图像方向"
+                        value={query?.orientation}
                         onChange={(value) => {
                             setCurrentPage(1);
                             setHits([]);
@@ -263,6 +339,7 @@ export const PicImagePick = ({
                                 <div>
                                     <InputNumber
                                         placeholder="宽度(像素)"
+                                        value={size?.min_width}
                                         onChange={(value) => {
                                             setSize((pre: any) => ({
                                                 ...pre,
@@ -273,6 +350,7 @@ export const PicImagePick = ({
                                     x
                                     <InputNumber
                                         placeholder="长度(像素)"
+                                        value={size?.min_height}
                                         onChange={(value) => {
                                             setSize((pre: any) => ({
                                                 ...pre,
@@ -313,6 +391,7 @@ export const PicImagePick = ({
                         style={{ width: '300px' }}
                         placeholder="颜色"
                         mode="multiple"
+                        value={query?.colors ? query?.colors?.split(',') : []}
                         onChange={(value) => {
                             setCurrentPage(1);
                             setHits([]);

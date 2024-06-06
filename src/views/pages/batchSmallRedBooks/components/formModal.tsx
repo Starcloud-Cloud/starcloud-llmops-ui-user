@@ -18,6 +18,8 @@ export const propShow: UploadProps = {
     }
 };
 const FormModal = ({
+    details,
+    allData,
     title,
     editOpen,
     setEditOpen,
@@ -27,6 +29,8 @@ const FormModal = ({
     sourceList,
     materialType
 }: {
+    details?: any;
+    allData?: any;
     title: string;
     editOpen: boolean;
     setEditOpen: (data: boolean) => void;
@@ -328,6 +332,8 @@ const FormModal = ({
             />
             {isModalOpen && (
                 <PicImagePick
+                    allData={allData}
+                    details={details}
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
                     setSelectImg={setSelectImg}

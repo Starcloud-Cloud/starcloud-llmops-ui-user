@@ -657,7 +657,14 @@ const AddStyle = React.forwardRef(
                                 size="small"
                                 type="primary"
                                 onClick={() => {
-                                    setSyszanVariable(_.cloneDeep(systemVariable));
+                                    setSyszanVariable(
+                                        _.cloneDeep(
+                                            systemVariable?.map((item: any) => ({
+                                                ...item,
+                                                noExecuteIfEmpty: false
+                                            }))
+                                        )
+                                    );
                                     setSystemOPen(true);
                                 }}
                             />

@@ -1017,8 +1017,10 @@ const AddStyle = React.forwardRef(
                                 type="primary"
                                 onClick={() => {
                                     setSystemVariable(_.cloneDeep(syszanVariable));
+                                    setTimeout(() => {
+                                        saveTemplate && saveTemplate();
+                                    }, 0);
                                     setSystemOPen(false);
-                                    saveTemplate && saveTemplate();
                                 }}
                             >
                                 保存

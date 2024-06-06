@@ -1164,7 +1164,7 @@ function CreateDetail() {
                             <div className="w-full">
                                 {detail?.type === 'MEDIA_MATRIX' ? (
                                     <Spin spinning={viewLoading} tip="Loading">
-                                        <div className="h-[calc(100vh-359.5px)] bg-[rgb(244,246,248)] px-4 pb-4">
+                                        <div className="h-[calc(100vh-300px)] bg-[rgb(244,246,248)] px-4 pb-4">
                                             <CreatePlan
                                                 ref={createPlanRef}
                                                 planState={planState}

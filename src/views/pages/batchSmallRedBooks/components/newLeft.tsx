@@ -131,11 +131,16 @@ const Lefts = ({
     const [imageDataIndex, setImageDataIndex] = useState(0);
     const [filedName, setFiledName] = useState('');
     const [values, setValues] = useState({});
+    const tableRef = useRef<any[]>([]);
 
     useEffect(() => {
         if (tableRef.current.length && selectImg?.largeImageURL) {
             const data = tableRef.current;
-            data[imageDataIndex][filedName] = selectImg?.largeImageURL;
+            data.forEach((item) => {
+                if (item.uuid === imageDataIndex) {
+                    item[filedName] = selectImg?.largeImageURL;
+                }
+            });
             tableRef.current = data;
             setTableData([...data]);
         }
@@ -216,7 +221,6 @@ const Lefts = ({
     //批量上传素材
     const [zoomOpen, setZoomOpen] = useState(false); //下载弹框
     const [tableLoading, setTableLoading] = useState(false);
-    const tableRef = useRef<any[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);
     const [columns, setColumns] = useState<any[]>([]);
     //让列表插入数据
@@ -321,7 +325,7 @@ const Lefts = ({
                                                         onClick={(e) => {
                                                             setIsModalOpen(true);
                                                             e.stopPropagation();
-                                                            setImageDataIndex(index);
+                                                            setImageDataIndex(row.uuid);
                                                             setFiledName(item.fieldName);
                                                             setValues(row);
                                                         }}
@@ -344,7 +348,7 @@ const Lefts = ({
                                                     onClick={(e) => {
                                                         setIsModalOpen(true);
                                                         e.stopPropagation();
-                                                        setImageDataIndex(index);
+                                                        setImageDataIndex(row.uuid);
                                                         setFiledName(item.fieldName);
                                                         setValues(row);
                                                     }}
@@ -727,6 +731,7 @@ const Lefts = ({
                     ...item,
                     uuid: uuidv4()
                 }));
+                console.log(tableRef.current, 'tableRef.current');
                 setTableData(tableRef.current || []);
             }
         }
@@ -2233,6 +2238,8 @@ const Lefts = ({
             </Modal>
             {editOpen && (
                 <FormModal
+                    allData={appData}
+                    details={appData?.configuration?.appInformation}
                     title={title}
                     editOpen={editOpen}
                     setEditOpen={setEditOpen}
@@ -2244,6 +2251,8 @@ const Lefts = ({
             )}
             {editOpens && (
                 <FormModal
+                    allData={appData}
+                    details={appData?.configuration?.appInformation}
                     title={titles}
                     materialType={materialTypes}
                     editOpen={editOpens}
@@ -2270,6 +2279,8 @@ const Lefts = ({
             />
             {isModalOpen && (
                 <PicImagePick
+                    allData={appData}
+                    details={appData?.configuration?.appInformation}
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
                     setSelectImg={setSelectImg}

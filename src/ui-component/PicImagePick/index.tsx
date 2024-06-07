@@ -65,7 +65,7 @@ export const PicImagePick = ({
         if (details) {
             details.workflowConfig.steps.forEach((item: any) => {
                 if (item.flowStep.handler === 'MaterialActionHandler') {
-                    const searchHabitsString = item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value || '{}';
+                    const searchHabitsString = item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')?.value || '{}';
                     const searchHabitsStringJson = JSON.parse(searchHabitsString);
                     setQuery(searchHabitsStringJson?.query || {});
                     setSize(searchHabitsStringJson?.size || {});
@@ -79,7 +79,9 @@ export const PicImagePick = ({
         if (details) {
             details.workflowConfig.steps.forEach((item: any) => {
                 if (item.flowStep.handler === 'MaterialActionHandler') {
-                    item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });
+                    if (item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')) {
+                        item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });
+                    }
                 }
             });
             setCurrentDetails(details);

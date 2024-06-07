@@ -156,7 +156,7 @@ const FormModal = ({
                                                     height={102}
                                                     src={
                                                         form.getFieldValue(item.dataIndex) +
-                                                        '?x-oss-process=image/resize,w_300/quality,q_80'
+                                                        '?x-oss-process=image/resize,w_100/quality,q_80'
                                                     }
                                                 />
                                                 <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">

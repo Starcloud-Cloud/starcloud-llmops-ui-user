@@ -304,7 +304,7 @@ const Lefts = ({
                                                     src: row[item.fieldName]
                                                 }}
                                                 src={
-                                                    row[item.fieldName] + '?x-oss-process=image/resize,w_300/quality,q_80'
+                                                    row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'
                                                     // selectImg?.largeImageURL ||
                                                     // form.getFieldValue(item.dataIndex) + '?x-oss-process=image/resize,w_300/quality,q_80'
                                                 }
@@ -367,7 +367,7 @@ const Lefts = ({
                                         width={50}
                                         height={50}
                                         preview={false}
-                                        src={item + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                        src={item + '?x-oss-process=image/resize,w_100/quality,q_80'}
                                     />
                                 ))}
                             </div>
@@ -887,7 +887,7 @@ const Lefts = ({
                                     width={50}
                                     height={50}
                                     preview={false}
-                                    src={row[item.fieldName] + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                    src={row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'}
                                 />
                             ) : (
                                 <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
@@ -899,7 +899,7 @@ const Lefts = ({
                                         width={50}
                                         height={50}
                                         preview={false}
-                                        src={item + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                        src={item + '?x-oss-process=image/resize,w_100/quality,q_80'}
                                     />
                                 ))}
                             </div>
@@ -2170,7 +2170,7 @@ const Lefts = ({
                     className="min-w-[472px]"
                     preview={false}
                     alt="example"
-                    src={previewImage + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                    src={previewImage + '?x-oss-process=image/resize,w_100/quality,q_80'}
                 />
             </Modal>
             {zoomOpen && (

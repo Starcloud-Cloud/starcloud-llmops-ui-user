@@ -57,6 +57,7 @@ const AddStyle = React.forwardRef(
         const [systemOPen, setSystemOPen] = useState(false);
         const [systemVariable, setSystemVariable] = useState<any>([]); //系统变量
         const [syszanVariable, setSyszanVariable] = useState<any>([]);
+
         //新增文案与风格
         const [focuActive, setFocuActive] = useState<any[]>([]);
         const [styleData, setStyleData] = useState<any>([]);
@@ -661,7 +662,7 @@ const AddStyle = React.forwardRef(
                                         _.cloneDeep(
                                             systemVariable?.map((item: any) => ({
                                                 ...item,
-                                                noExecuteIfEmpty: false
+                                                noExecuteIfEmpty: item.noExecuteIfEmpty || false
                                             }))
                                         )
                                     );

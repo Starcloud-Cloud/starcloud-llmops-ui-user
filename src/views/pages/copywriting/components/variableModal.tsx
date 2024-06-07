@@ -170,7 +170,7 @@ const VariableModal = ({
                     onChange={handleChange}
                     InputLabelProps={{ shrink: true }}
                 />
-                <TextField
+                {/* <TextField
                     fullWidth
                     id="description"
                     name="description"
@@ -181,7 +181,7 @@ const VariableModal = ({
                     value={content.description}
                     onChange={handleChange}
                     InputLabelProps={{ shrink: true }}
-                />
+                /> */}
                 <FormControl color="secondary" size="small" fullWidth sx={{ mt: 2 }}>
                     <InputLabel>{t('myApp.type')}</InputLabel>
                     <Select onChange={handleChange} name="style" value={content.style} label={t('myApp.type')}>

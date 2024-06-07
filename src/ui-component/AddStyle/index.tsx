@@ -657,7 +657,14 @@ const AddStyle = React.forwardRef(
                                 size="small"
                                 type="primary"
                                 onClick={() => {
-                                    setSyszanVariable(_.cloneDeep(systemVariable));
+                                    setSyszanVariable(
+                                        _.cloneDeep(
+                                            systemVariable?.map((item: any) => ({
+                                                ...item,
+                                                noExecuteIfEmpty: false
+                                            }))
+                                        )
+                                    );
                                     setSystemOPen(true);
                                 }}
                             />
@@ -1017,8 +1024,10 @@ const AddStyle = React.forwardRef(
                                 type="primary"
                                 onClick={() => {
                                     setSystemVariable(_.cloneDeep(syszanVariable));
+                                    setTimeout(() => {
+                                        saveTemplate && saveTemplate();
+                                    }, 0);
                                     setSystemOPen(false);
-                                    saveTemplate && saveTemplate();
                                 }}
                             >
                                 保存

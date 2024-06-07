@@ -105,7 +105,7 @@ const VariableModal = ({
             return false;
         }
 
-        if (/^[A-Z0-9_\-]+$/.test(content.field)) {
+        if (/^[a-zA-Z0-9_\-]+$/.test(content.field)) {
             saveContent({
                 ...content,
                 style: content.style || 'INPUT',
@@ -134,10 +134,10 @@ const VariableModal = ({
                         handleChange(e), setFidldOpen(true);
                     }}
                     InputLabelProps={{ shrink: true }}
-                    error={(fieldOpen && !content.field) || (fieldOpen && !/^[A-Z0-9_\-]+$/.test(content.field))}
+                    error={(fieldOpen && !content.field) || (fieldOpen && !/^[a-zA-Z0-9_\-]+$/.test(content.field))}
                     helperText={
-                        (fieldOpen && !content.field) || (fieldOpen && !/^[A-Z0-9_\-]+$/.test(content.field))
-                            ? `${t('myApp.field')}必填并只能填写大写字母 数字 _ -`
+                        (fieldOpen && !content.field) || (fieldOpen && !/^[a-zA-Z0-9_\-]+$/.test(content.field))
+                            ? `${t('myApp.field')}必填并只能填写字母 数字 _ -`
                             : ''
                     }
                 />

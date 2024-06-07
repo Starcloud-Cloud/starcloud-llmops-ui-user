@@ -1625,6 +1625,9 @@ const Lefts = ({
     const [steptitOpen, setSteotitOpen] = useState(false);
     const [stepTitData, setStepTitData] = useState<any>(null);
     const [stepIndex, setStepIndex] = useState(-1);
+    //全局变量
+    const [advancedModal, setAdvancedModal] = useState(false);
+    const [allVariable, setAllVariable] = useState<any>(null);
     return (
         <>
             <div className="relative h-full">
@@ -1889,7 +1892,26 @@ const Lefts = ({
                                         </AccordionSummary>
                                         <AccordionDetails>
                                             <div key={item.field}>
-                                                <div className="text-xs text-black/50 mb-4">{item?.description}</div>
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <div className="text-xs text-black/50">{item?.description}</div>
+                                                    {item?.flowStep?.handler === 'VariableActionHandler' && (
+                                                        <div className="flex justify-end">
+                                                            <Tooltip title="高级配置">
+                                                                <IconButton
+                                                                    onClick={(e) => {
+                                                                        setAllVariable(item);
+                                                                        setStepIndex(index);
+                                                                        setAdvancedModal(true);
+                                                                    }}
+                                                                    size="small"
+                                                                >
+                                                                    <SettingOutlined rev={undefined} />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </div>
+                                                    )}
+                                                </div>
+
                                                 {item?.flowStep?.handler !== 'VariableActionHandler' ? (
                                                     item?.variable?.variables?.map((el: any, i: number) => (
                                                         <div key={el.field}>
@@ -1969,40 +1991,41 @@ const Lefts = ({
                                                         </div>
                                                     ))
                                                 ) : (
-                                                    <Tabs defaultActiveKey="1">
-                                                        <Tabs.TabPane tab="变量编辑" key="1">
-                                                            <Row gutter={10}>
-                                                                {item?.variable?.variables?.map((item: any, de: number) => (
-                                                                    <Col key={item?.field} span={24}>
-                                                                        <Forms
-                                                                            item={item}
-                                                                            index={de}
-                                                                            changeValue={(data: any) => {
-                                                                                const newList = _.cloneDeep(generRef.current);
-                                                                                newList[index].variable.variables[de].value = data.value;
-                                                                                generRef.current = newList;
-                                                                                setGenerateList(generRef.current);
-                                                                                setAppDataGen();
-                                                                            }}
-                                                                            flag={false}
-                                                                        />
-                                                                    </Col>
-                                                                ))}
-                                                            </Row>
-                                                        </Tabs.TabPane>
-                                                        <Tabs.TabPane tab="变量列表" key="2">
-                                                            <CreateVariable
-                                                                rows={item?.variable?.variables}
-                                                                setRows={(data: any[]) => {
-                                                                    const newList = _.cloneDeep(generRef.current);
-                                                                    newList[index].variable.variables = data;
-                                                                    generRef.current = newList;
-                                                                    setGenerateList(generRef.current);
-                                                                    setAppDataGen();
-                                                                }}
-                                                            />
-                                                        </Tabs.TabPane>
-                                                    </Tabs>
+                                                    <Row gutter={10}>
+                                                        {item?.variable?.variables?.map((item: any, de: number) => (
+                                                            <Col key={item?.field} span={24}>
+                                                                <Forms
+                                                                    item={item}
+                                                                    index={de}
+                                                                    changeValue={(data: any) => {
+                                                                        const newList = _.cloneDeep(generRef.current);
+                                                                        newList[index].variable.variables[de].value = data.value;
+                                                                        generRef.current = newList;
+                                                                        setGenerateList(generRef.current);
+                                                                        setAppDataGen();
+                                                                    }}
+                                                                    flag={false}
+                                                                />
+                                                            </Col>
+                                                        ))}
+                                                    </Row>
+                                                    // <Tabs defaultActiveKey="1">
+                                                    //     {/* <Tabs.TabPane tab="变量编辑" key="1"> */}
+
+                                                    //     {/* </Tabs.TabPane> */}
+                                                    //     {/* <Tabs.TabPane tab="变量列表" key="2">
+                                                    //         <CreateVariable
+                                                    //             rows={item?.variable?.variables}
+                                                    //             setRows={(data: any[]) => {
+                                                    //                 const newList = _.cloneDeep(generRef.current);
+                                                    //                 newList[index].variable.variables = data;
+                                                    //                 generRef.current = newList;
+                                                    //                 setGenerateList(generRef.current);
+                                                    //                 setAppDataGen();
+                                                    //             }}
+                                                    //         />
+                                                    //     </Tabs.TabPane> */}
+                                                    // {/* </Tabs> */}
                                                 )}
                                             </div>
                                         </AccordionDetails>
@@ -2289,26 +2312,34 @@ const Lefts = ({
                 />
             )}
             {settingOpen && (
-                <Modal width={'80%'} open={settingOpen} onCancel={() => setSettingOpen(false)} footer={false} title={'编辑步骤'}>
-                    <div className="flex justify-center">
+                <Modal width={'80%'} className="relative" open={settingOpen} onCancel={() => setSettingOpen(false)} footer={false}>
+                    <div className="w-full flex items-center justify-between pl-4 pr-14 absolute top-[15px] right-[0px]">
+                        <div className="text-[16px] font-[600]">编辑步骤</div>
+                        <Button
+                            onClick={() => {
+                                const arr = headerSaveAll();
+                                setDetail &&
+                                    setDetail({
+                                        ...detail,
+                                        workflowConfig: {
+                                            steps: arr?.filter((item: any) => item)
+                                        }
+                                    });
+                            }}
+                            type="primary"
+                        >
+                            保存
+                        </Button>
+                    </div>
+                    <div
+                        style={{
+                            backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
+                            backgroundSize: '10px 10px',
+                            backgroundRepeat: 'repeat'
+                        }}
+                        className="flex justify-center mt-6"
+                    >
                         <div className="2xl:w-[1000px] xl:w-[820px] lg:w-[740px]  w-[100%]">
-                            <div className="flex justify-end my-4">
-                                <Button
-                                    onClick={() => {
-                                        const arr = headerSaveAll();
-                                        setDetail &&
-                                            setDetail({
-                                                ...detail,
-                                                workflowConfig: {
-                                                    steps: arr?.filter((item: any) => item)
-                                                }
-                                            });
-                                    }}
-                                    type="primary"
-                                >
-                                    保存
-                                </Button>
-                            </div>
                             {appData?.configuration?.appInformation?.workflowConfig?.steps?.map((item: any, index: number) => (
                                 <div key={index}>
                                     {index !== 0 && (
@@ -2513,7 +2544,26 @@ const Lefts = ({
                                         </AccordionSummary>
                                         <AccordionDetails>
                                             <div key={item.field}>
-                                                <div className="text-xs text-black/50 mb-4">{item?.description}</div>
+                                                <div className="flex justify-between mb-4">
+                                                    <div className="text-xs text-black/50">{item?.description}</div>
+                                                    {item?.flowStep?.handler === 'VariableActionHandler' && (
+                                                        <div className="flex justify-end">
+                                                            <Tooltip title="高级配置">
+                                                                <IconButton
+                                                                    onClick={(e) => {
+                                                                        setAllVariable(item);
+                                                                        setStepIndex(index - 1);
+                                                                        setAdvancedModal(true);
+                                                                    }}
+                                                                    size="small"
+                                                                >
+                                                                    <SettingOutlined rev={undefined} />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </div>
+                                                    )}
+                                                </div>
+
                                                 {item?.flowStep?.handler !== 'VariableActionHandler' ? (
                                                     item?.variable?.variables?.map((el: any, i: number) => (
                                                         <div key={el.field}>
@@ -2592,40 +2642,41 @@ const Lefts = ({
                                                         </div>
                                                     ))
                                                 ) : (
-                                                    <Tabs defaultActiveKey="1">
-                                                        <Tabs.TabPane tab="变量编辑" key="1">
-                                                            <Row gutter={10}>
-                                                                {item?.variable?.variables?.map((item: any, de: number) => (
-                                                                    <Col key={item?.field} span={24}>
-                                                                        <Forms
-                                                                            item={item}
-                                                                            index={de}
-                                                                            changeValue={(data: any) => {
-                                                                                const newList = _.cloneDeep(generRef.current);
-                                                                                newList[index - 1].variable.variables[de].value =
-                                                                                    data.value;
-                                                                                generRef.current = newList;
-                                                                                setGenerateList(generRef.current);
-                                                                            }}
-                                                                            flag={false}
-                                                                        />
-                                                                    </Col>
-                                                                ))}
-                                                            </Row>
-                                                        </Tabs.TabPane>
-                                                        <Tabs.TabPane tab="变量列表" key="2">
-                                                            <CreateVariable
-                                                                rows={item?.variable?.variables}
-                                                                setRows={(data: any[]) => {
-                                                                    const newList = _.cloneDeep(generRef.current);
-                                                                    newList[index - 1].variable.variables = data;
-                                                                    generRef.current = newList;
-                                                                    setGenerateList(generRef.current);
-                                                                    setAppDataGen();
-                                                                }}
-                                                            />
-                                                        </Tabs.TabPane>
-                                                    </Tabs>
+                                                    // <Tabs defaultActiveKey="1">
+                                                    // <Tabs.TabPane tab="变量编辑" key="1">
+
+                                                    <Row gutter={10}>
+                                                        {item?.variable?.variables?.map((item: any, de: number) => (
+                                                            <Col key={item?.field} span={24}>
+                                                                <Forms
+                                                                    item={item}
+                                                                    index={de}
+                                                                    changeValue={(data: any) => {
+                                                                        const newList = _.cloneDeep(generRef.current);
+                                                                        newList[index - 1].variable.variables[de].value = data.value;
+                                                                        generRef.current = newList;
+                                                                        setGenerateList(generRef.current);
+                                                                    }}
+                                                                    flag={false}
+                                                                />
+                                                            </Col>
+                                                        ))}
+                                                    </Row>
+
+                                                    //     </Tabs.TabPane>
+                                                    //     <Tabs.TabPane tab="变量列表" key="2">
+                                                    //         <CreateVariable
+                                                    //             rows={item?.variable?.variables}
+                                                    //             setRows={(data: any[]) => {
+                                                    //                 const newList = _.cloneDeep(generRef.current);
+                                                    //                 newList[index - 1].variable.variables = data;
+                                                    //                 generRef.current = newList;
+                                                    //                 setGenerateList(generRef.current);
+                                                    //                 setAppDataGen();
+                                                    //             }}
+                                                    //         />
+                                                    //     </Tabs.TabPane>
+                                                    // </Tabs>
                                                 )}
                                             </div>
                                         </AccordionDetails>
@@ -2755,6 +2806,27 @@ const Lefts = ({
                     }}
                     stepTitData={stepTitData}
                 />
+            )}
+            {advancedModal && (
+                <Modal width={'60%'} title="高级设置" open={advancedModal} footer={false} onCancel={() => setAdvancedModal(false)}>
+                    <CreateVariable
+                        rows={allVariable?.variable?.variables}
+                        setRows={(data: any[]) => {
+                            const newTable = data?.map((item) => ({
+                                ...item,
+                                isShow: false
+                            }));
+                            const newData = _.cloneDeep(allVariable);
+                            newData.variable.variables = newTable;
+                            setAllVariable(newData);
+                            const newList = _.cloneDeep(generRef.current);
+                            newList[stepIndex].variable.variables = newTable;
+                            generRef.current = newList;
+                            setGenerateList(generRef.current);
+                            setAppDataGen();
+                        }}
+                    />
+                </Modal>
             )}
         </>
     );

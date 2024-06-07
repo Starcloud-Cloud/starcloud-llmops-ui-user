@@ -112,8 +112,17 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                         />
                                     )}
                                     <div className="flex gap-2 items-center">
-                                        {/* <div className="flex gap-2 items-center">
-                                            <span className="text-xs">是否设为系统</span>
+                                        <div className="flex gap-2 items-center">
+                                            <span className="text-xs">字段为空时默认不生成图片</span>
+                                            <Switch
+                                                checked={item?.noExecuteIfEmpty}
+                                                onChange={(data) => {
+                                                    const newData = _.cloneDeep(imageStyleData);
+                                                    newData[i].noExecuteIfEmpty = data;
+                                                    setImageStyleData(newData);
+                                                }}
+                                            />
+                                            {/* <span className="text-xs">是否设为系统</span>
                                             <Switch
                                                 checked={item?.system}
                                                 onChange={(data) => {
@@ -130,8 +139,9 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                                     newData[i].enable = data;
                                                     setImageStyleData(newData);
                                                 }}
-                                            />
-                                        </div> */}
+                                            /> */}
+                                        </div>
+
                                         <Dropdown
                                             placement="bottom"
                                             trigger={['click']}

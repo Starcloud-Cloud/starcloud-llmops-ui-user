@@ -14,6 +14,7 @@ const LeftModalAdd = ({
     colOpen,
     setColOpen,
     tableLoading,
+    detail,
     columns,
     tableData,
     MokeList,
@@ -43,6 +44,7 @@ const LeftModalAdd = ({
     colOpen: boolean;
     setColOpen: (data: boolean) => void;
     tableLoading: boolean;
+    detail?: any;
     columns: any[];
     MokeList: any[];
     materialFieldTypeList: any[];
@@ -162,6 +164,7 @@ const LeftModalAdd = ({
                     <div className="flex items-center gap-2">
                         <AiCreate
                             title="AI 素材生成"
+                            detail={detail}
                             setColOpen={setColOpen}
                             materialType={materialType}
                             columns={columns}
@@ -179,9 +182,11 @@ const LeftModalAdd = ({
                             setVariableData={setVariableData}
                             variableData={variableData}
                         />
-                        <Tooltip title="素材字段配置">
-                            <img onClick={() => setColOpen(true)} className="w-[28px] cursor-pointer" src={FieldImage} />
-                        </Tooltip>
+                        {detail && (
+                            <Tooltip title="素材字段配置">
+                                <img onClick={() => setColOpen(true)} className="w-[28px] cursor-pointer" src={FieldImage} />
+                            </Tooltip>
+                        )}
                     </div>
                 </div>
                 <Table

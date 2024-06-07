@@ -11,6 +11,7 @@ const { confirm } = Modal;
 
 const AiCreate = ({
     title,
+    detail,
     setColOpen,
     materialType,
     columns,
@@ -29,6 +30,7 @@ const AiCreate = ({
     variableData
 }: {
     title: string;
+    detail: any;
     setColOpen: (data: boolean) => void;
     materialType: any;
     columns: any[];
@@ -383,7 +385,7 @@ const AiCreate = ({
             <Button
                 size={title === 'AI 生成' ? 'small' : 'middle'}
                 onClick={() => {
-                    if (columns?.filter((item) => item.title !== '序号' && item.title !== '操作')?.length === 0) {
+                    if (detail && columns?.filter((item) => item.title !== '序号' && item.title !== '操作')?.length === 0) {
                         confirm({
                             title: '提示',
                             content: '还未配置素材字段',

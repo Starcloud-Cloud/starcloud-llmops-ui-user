@@ -46,6 +46,7 @@ export const PicImagePick = ({
         value: 0
     });
     const [currentDetails, setCurrentDetails] = React.useState<any>(null);
+    const [visibleSaveFilter, setVisibleSaveFilter] = React.useState(false);
 
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
@@ -66,6 +67,7 @@ export const PicImagePick = ({
             details.workflowConfig.steps.forEach((item: any) => {
                 if (item.flowStep.handler === 'MaterialActionHandler') {
                     const searchHabitsString = item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')?.value || '{}';
+                    setVisibleSaveFilter(searchHabitsString === '{}' ? false : true);
                     const searchHabitsStringJson = JSON.parse(searchHabitsString);
                     setQuery(searchHabitsStringJson?.query || {});
                     setSize(searchHabitsStringJson?.size || {});
@@ -114,7 +116,7 @@ export const PicImagePick = ({
     }, [handleScroll]);
 
     const handleOk = async () => {
-        if (!checkItem.largeImageURL) {
+        if (!checkItem?.largeImageURL) {
             dispatch(
                 openSnackbar({
                     open: true,
@@ -127,6 +129,7 @@ export const PicImagePick = ({
                     close: false
                 })
             );
+            return;
         }
         setPercent({
             label: '图片下载中',
@@ -181,30 +184,6 @@ export const PicImagePick = ({
         setSelectImg({ ...checkItem, largeImageURL: url });
         handleCancel();
 
-        // 保存筛选项
-        currentDetails?.workflowConfig?.steps?.forEach((item: any) => {
-            const arr = item?.variable?.variables;
-            const arr1 = item?.flowStep?.variable?.variables;
-            arr?.forEach((el: any) => {
-                if (el.value && typeof el.value === 'object') {
-                    el.value = JSON.stringify(el.value);
-                }
-            });
-            arr1?.forEach((el: any) => {
-                if (el.value && typeof el.value === 'object') {
-                    el.value = JSON.stringify(el.value);
-                }
-            });
-        });
-
-        appModify(currentDetails).then((res) => {
-            planModifyConfig({
-                ...allData,
-                configuration: { ...allData.configuration, appInformation: currentDetails },
-                validate: false
-            }).then((planRes) => {});
-        });
-
         setTimeout(() => {
             setPercent({
                 label: '图片插入成功',
@@ -220,16 +199,24 @@ export const PicImagePick = ({
         setTotalHits(0);
     };
     useEffect(() => {
-        setLoading(true);
-        imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query })
-            .then((res) => {
-                const { totalHits, hits: newData } = res;
-                setHits([...hits, ...newData]);
-                setTotalHits(totalHits);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        const fetchData = debounce(() => {
+            setLoading(true);
+            imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query })
+                .then((res) => {
+                    const { totalHits, hits: newData } = res;
+                    setHits([...hits, ...newData]);
+                    setTotalHits(totalHits);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }, 200); // 设置防抖时间为300毫秒
+
+        fetchData();
+
+        return () => {
+            fetchData.cancel(); // 取消防抖
+        };
     }, [currentPage, q, query]);
 
     const onChange = (item: any) => {
@@ -256,6 +243,45 @@ export const PicImagePick = ({
     useEffect(() => {
         setInputValue(selectedTags.join('+'));
     }, [selectedTags]);
+
+    const handleFilter = () => {
+        // 保存筛选项
+        currentDetails?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            const arr1 = item?.flowStep?.variable?.variables;
+            arr?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+            arr1?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+        });
+
+        appModify(currentDetails).then((res) => {
+            planModifyConfig({
+                ...allData,
+                configuration: { ...allData.configuration, appInformation: currentDetails },
+                validate: false
+            }).then((planRes) => {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '保存成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        close: false
+                    })
+                );
+            });
+        });
+    };
 
     return (
         <Modal width={1000} title="图片选择" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
@@ -419,6 +445,11 @@ export const PicImagePick = ({
                         <Option value={'black'}>黑色</Option>
                         <Option value={'brown'}>棕色</Option>
                     </Select>
+                    {visibleSaveFilter && (
+                        <Button type="primary" onClick={() => handleFilter()}>
+                            保存筛选项
+                        </Button>
+                    )}
                 </Space>
             </div>
 

@@ -1,6 +1,6 @@
 import { TextField, MenuItem, FormControl, Autocomplete, Chip } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
-import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image } from 'antd';
+import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Collapse } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { t } from 'i18next';
 import _ from 'lodash-es';
@@ -360,7 +360,14 @@ function FormExecute({
                                                 if (!newValue) {
                                                     newValue = [];
                                                 }
-                                                newValue.push(e.target.value);
+                                                const tag = e.target.value.split(/[\s,]+/).map((item: any) => {
+                                                    if (item[0] === '#') {
+                                                        return item.slice(1);
+                                                    } else {
+                                                        return item;
+                                                    }
+                                                });
+                                                newValue.push(...tag);
                                                 onChange({ name: item?.field, value: newValue });
                                             }
                                         }}
@@ -426,45 +433,64 @@ function FormExecute({
                 </div>
             ) : (
                 <div className="mt-4">
-                    <div className="flex justify-between mb-4">
-                        <div>
-                            {handlerCode === 'MaterialActionHandler' && (
-                                <Button
-                                    disabled={history}
-                                    size="small"
-                                    type="primary"
-                                    onClick={() => {
-                                        setUploadOpen(true);
-                                    }}
-                                >
-                                    批量导入
-                                </Button>
-                            )}
-                        </div>
-                        {handlerCode !== 'ImitateActionHandler' && (
-                            <Button
-                                disabled={history}
-                                size="small"
-                                type="primary"
-                                onClick={() => {
-                                    setStep();
-                                    setMaterialType();
-                                    setTitle('新增');
-                                    setEditOpen(true);
-                                }}
-                            >
-                                新增
-                            </Button>
-                        )}
-                    </div>
-                    <Table
-                        virtual
-                        rowKey={(_, index) => String(index)}
-                        loading={tableLoading}
-                        columns={handlerCode !== 'ImitateActionHandler' ? columns : columns?.filter((item: any) => item.title !== '操作')}
-                        dataSource={item.value}
-                        pagination={false}
+                    <Collapse
+                        items={[
+                            {
+                                key: '1',
+                                label: (
+                                    <div className="w-full flex justify-between">
+                                        <div>
+                                            {handlerCode === 'MaterialActionHandler' && (
+                                                <Button
+                                                    disabled={history}
+                                                    size="small"
+                                                    type="primary"
+                                                    onClick={(e) => {
+                                                        setUploadOpen(true);
+                                                        e.stopPropagation();
+                                                    }}
+                                                >
+                                                    批量导入
+                                                </Button>
+                                            )}
+                                        </div>
+                                        {handlerCode !== 'ImitateActionHandler' && (
+                                            <Button
+                                                disabled={history}
+                                                size="small"
+                                                type="primary"
+                                                onClick={(e) => {
+                                                    setStep();
+                                                    setMaterialType();
+                                                    setTitle('新增');
+                                                    setEditOpen(true);
+                                                    e.stopPropagation();
+                                                }}
+                                            >
+                                                新增
+                                            </Button>
+                                        )}
+                                    </div>
+                                ),
+                                children: (
+                                    <Table
+                                        virtual
+                                        rowKey={(_, index) => String(index)}
+                                        loading={tableLoading}
+                                        columns={
+                                            handlerCode !== 'ImitateActionHandler'
+                                                ? columns
+                                                : columns?.filter((item: any) => item.title !== '操作')
+                                        }
+                                        dataSource={item.value}
+                                        pagination={false}
+                                    />
+                                )
+                            }
+                        ]}
+                        defaultActiveKey={['1']}
                     />
+
                     {model && (model === 'RANDOM' || model === 'AI_PARODY') && (
                         <span className="text-xs text-[rgb(244,67,54)] mt-4">参考列表最少需要一个</span>
                     )}

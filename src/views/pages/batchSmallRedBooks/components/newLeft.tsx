@@ -1660,7 +1660,10 @@ const Lefts = ({
             <div className="relative h-full">
                 <Tooltip title={!leftWidth ? '展开' : '收缩'}>
                     <Button
-                        className={`absolute top-4 right-[-10px] z-[1000] rotate-${leftWidth ? 180 : 0} duration-700`}
+                        style={{
+                            transform: leftWidth ? 'rotate(180deg)' : 'rotate(0deg)'
+                        }}
+                        className={`absolute top-4 right-[-10px] z-[1000] duration-700`}
                         onClick={() => setWidth && setWidth()}
                         size="small"
                         shape="circle"

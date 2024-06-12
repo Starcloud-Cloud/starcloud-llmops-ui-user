@@ -539,7 +539,7 @@ function TemplateMarket() {
                                                     <MarketTemplate
                                                         key={el?.uid}
                                                         handleDetail={({ uid }: { uid: string }) => {
-                                                            navigate('/createApp?uid=' + uid);
+                                                            navigate('/createApp?uid=' + uid + '&source=market');
                                                         }}
                                                         data={el}
                                                     />

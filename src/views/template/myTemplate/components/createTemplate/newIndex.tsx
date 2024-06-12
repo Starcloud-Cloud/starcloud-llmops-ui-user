@@ -12,7 +12,7 @@ import {
     Typography
 } from '@mui/material';
 import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented, Spin } from 'antd';
-import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline } from '@mui/icons-material';
+import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline, KeyboardBackspace } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
 import { executeApp } from 'api/template/fetch';
@@ -37,6 +37,7 @@ import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 import { schemeMetadata } from 'api/redBook/copywriting';
 import CreatePlan from 'views/pages/batchSmallRedBooks';
 import useUserStore from 'store/user';
+import SubCard from 'ui-component/cards/SubCard';
 interface Items {
     label: string;
     value: string;
@@ -973,7 +974,38 @@ function CreateDetail() {
         setStepMaterial(stepMarRef.current);
     };
     const [viewLoading, setViewLoading] = useState(false);
-    return (
+    return searchParams.get('source') === 'market' ? (
+        detail ? (
+            <>
+                <SubCard
+                    contentSX={{
+                        p: '10px !important'
+                    }}
+                    sx={{ mb: '16px' }}
+                >
+                    <div>
+                        <IconButton onClick={() => navigate('/appMarket')} color="secondary">
+                            <KeyboardBackspace fontSize="small" />
+                        </IconButton>
+                        <span className="text-[#000c] font-[500]">应用市场</span>
+                    </div>
+                </SubCard>
+                <div className="h-[calc(100%-74px)] ">
+                    <CreatePlan
+                        ref={createPlanRef}
+                        planState={planState}
+                        detail={_.cloneDeep(detailRef.current)}
+                        setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
+                        isMyApp={true}
+                    />
+                </div>
+            </>
+        ) : (
+            <div className="w-full h-full flex justify-center items-center">
+                <Spin spinning={true} />
+            </div>
+        )
+    ) : (
         <Card sx={{ height: '100%', overflowY: 'auto' }}>
             <CardHeader
                 sx={{ padding: 2 }}
@@ -1070,7 +1102,7 @@ function CreateDetail() {
                 }
             ></CardHeader>
             <Divider />
-            <div className="p-4">
+            <div className="px-4">
                 <Tabs
                     activeKey={value}
                     onChange={(key: string) => {
@@ -1164,7 +1196,7 @@ function CreateDetail() {
                             <div className="w-full">
                                 {detail?.type === 'MEDIA_MATRIX' ? (
                                     <Spin spinning={viewLoading} tip="Loading">
-                                        <div className="h-[calc(100vh-300px)] bg-[rgb(244,246,248)] px-4 pb-4">
+                                        <div className="h-[calc(100vh-266px)] bg-[rgb(244,246,248)]">
                                             <CreatePlan
                                                 ref={createPlanRef}
                                                 planState={planState}

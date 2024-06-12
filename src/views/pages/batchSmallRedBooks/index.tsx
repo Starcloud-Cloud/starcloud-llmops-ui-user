@@ -294,6 +294,7 @@ const BatcSmallRedBooks = forwardRef(
         //批次号下的列表
         const batchDataListRef = useRef<any[]>([]);
         const [batchDataList, setBatchDataList] = useState<any[]>([]);
+        const [leftWidth, setLeftWidth] = useState('');
         return (
             <div
                 style={{
@@ -330,17 +331,30 @@ const BatcSmallRedBooks = forwardRef(
                     </SubCard>
                 )}
                 <div
-                    className="flex gap-[20px] mt-4"
+                    className="flex gap-[20px]"
                     style={{
-                        height: detail ? 'calc(100% - 20px)' : 'calc(100% - 74px)'
+                        height: detail ? '100%' : 'calc(100% - 58px)',
+                        marginTop: detail ? 0 : '16px'
                     }}
                 >
-                    <div className="2xl:w-[500px] xl:w-[410px] lg:w-[370px]  w-[370px] bg-white rounded-lg py-4 pl-2 pr-0">
+                    <div
+                        className={`duration-700 2xl:w-[${leftWidth ? leftWidth : '500px'}] xl:w-[${
+                            leftWidth ? leftWidth : '410px'
+                        }] lg:w-[${leftWidth ? leftWidth : '370px'}] w-[${leftWidth ? leftWidth : '370px'}] bg-white rounded-lg pl-2 pr-0`}
+                    >
                         <Left
                             pre={pre}
                             planState={planState}
                             detail={detail}
                             setGetData={setGetData}
+                            leftWidth={leftWidth}
+                            setWidth={() => {
+                                if (leftWidth) {
+                                    setLeftWidth('');
+                                } else {
+                                    setLeftWidth('50%');
+                                }
+                            }}
                             setFieldHead={setFieldHead}
                             setMoke={setMoke}
                             setImageMoke={setImageMoke}
@@ -396,7 +410,6 @@ const BatcSmallRedBooks = forwardRef(
                         />
                     </div>
                 </div>
-
                 {detailOpen && (
                     <DetailModal
                         open={detailOpen}

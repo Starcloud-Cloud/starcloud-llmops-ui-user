@@ -127,3 +127,7 @@ export const materialJudge = (params: any) => {
 export const createSameApp = (data: any) => {
     return request.post({ url: `/llm/creative/plan/createSameApp`, data });
 };
+//素材上传表格接口
+export const createMaterialList = (params: any) => {
+    return request.get({ url: `/llm/creative/material/list`, params });
+};

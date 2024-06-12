@@ -2061,7 +2061,8 @@ const Lefts = ({
                                 <AddStyle
                                     canAddCustomStyle={false}
                                     details={appData?.configuration?.appInformation}
-                                    hasAddStyle={true}
+                                    // hasAddStyle={true}
+                                    hasAddStyle={false}
                                     setImageVar={setImageVar}
                                     appUid={appData?.appUid}
                                     ref={imageRef}

@@ -338,9 +338,10 @@ const BatcSmallRedBooks = forwardRef(
                     }}
                 >
                     <div
-                        className={`duration-700 2xl:w-[${leftWidth ? leftWidth : '500px'}] xl:w-[${
-                            leftWidth ? leftWidth : '410px'
-                        }] lg:w-[${leftWidth ? leftWidth : '370px'}] w-[${leftWidth ? leftWidth : '370px'}] bg-white rounded-lg pl-2 pr-0`}
+                        style={{
+                            width: leftWidth ? leftWidth : ''
+                        }}
+                        className={`duration-700 2xl:w-[500px] xl:w-[410px] lg:w-[370px] w-[370px] bg-white rounded-lg pl-2 pr-0`}
                     >
                         <Left
                             pre={pre}

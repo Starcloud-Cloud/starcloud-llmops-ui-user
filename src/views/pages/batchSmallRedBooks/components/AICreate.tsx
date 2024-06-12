@@ -1,11 +1,11 @@
-import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover } from 'antd';
+import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover, List } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
 import { materialGenerate, customMaterialGenerate } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
-import { ExclamationCircleFilled } from '@ant-design/icons';
+import { ExclamationCircleFilled, ClockCircleOutlined } from '@ant-design/icons';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 const { confirm } = Modal;
 
@@ -380,6 +380,8 @@ const AiCreate = ({
             )
         }
     ];
+    const [sourceStatus, setSourceStatus] = useState(false);
+    const [dataSource, setdataSource] = useState([{}, {}]);
     return (
         <div>
             <Button
@@ -478,18 +480,50 @@ const AiCreate = ({
                                             <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
                                         </Popover>
                                     </div>
-                                    <TextArea
-                                        defaultValue={variableData.requirement}
-                                        status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}
-                                        onBlur={(e) => {
-                                            setrequirementStatusOpen(true);
-                                            setVariableData({
-                                                ...variableData,
-                                                requirement: e.target.value
-                                            });
-                                        }}
-                                        rows={10}
-                                    />
+                                    <div className="flex gap-2">
+                                        <TextArea
+                                            className="flex-1"
+                                            defaultValue={variableData.requirement}
+                                            status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}
+                                            onBlur={(e) => {
+                                                setrequirementStatusOpen(true);
+                                                setVariableData({
+                                                    ...variableData,
+                                                    requirement: e.target.value
+                                                });
+                                            }}
+                                            rows={10}
+                                        />
+                                        {sourceStatus && (
+                                            <List
+                                                className="flex-1"
+                                                itemLayout="horizontal"
+                                                dataSource={dataSource}
+                                                renderItem={(item, index) => (
+                                                    <List.Item>
+                                                        <List.Item.Meta
+                                                            title="1111"
+                                                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                                                        />
+                                                    </List.Item>
+                                                )}
+                                            />
+                                        )}
+                                        {!sourceStatus && (
+                                            <Button
+                                                onClick={() => setSourceStatus(true)}
+                                                className="group"
+                                                size="small"
+                                                icon={
+                                                    <ClockCircleOutlined
+                                                        className="text-[#673ab7] group-hover:text-[#d9d9d9]"
+                                                        rev={undefined}
+                                                    />
+                                                }
+                                                shape="circle"
+                                            />
+                                        )}
+                                    </div>
                                     {!variableData.requirement && requirementStatusOpen && (
                                         <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
                                     )}

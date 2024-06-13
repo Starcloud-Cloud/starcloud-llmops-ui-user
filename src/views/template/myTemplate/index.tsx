@@ -25,6 +25,7 @@ import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import './index.css';
 import { getRecommendApp, appCreate } from 'api/template/index';
+import { ENUM_TENANT, getTenant } from 'utils/permission';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -95,9 +96,9 @@ function MyTemplate() {
             if (newValue.name) {
                 nameMatch = item.name.toLowerCase().includes(newValue.name.toLowerCase());
             }
-            if (newValue.categories && newValue.categories.length > 0) {
-                if (item.categories) {
-                    topicMatch = item.categories.includes(newValue.categories);
+            if (newValue.categories) {
+                if (item.category) {
+                    topicMatch = item.category === newValue.categories;
                     // newValue.categories.some((topic) => item.categories.includes(topic));
                 } else {
                     topicMatch = false;
@@ -129,9 +130,11 @@ function MyTemplate() {
         //类别树
         categoryTree().then((res) => {
             const newData = _.cloneDeep(res);
-            newData.forEach((item: any) => {
-                item.disabled = true;
-            });
+            if (getTenant() === ENUM_TENANT.AI) {
+                newData.forEach((item: any) => {
+                    item.disabled = true;
+                });
+            }
             setCateTree(newData);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -56,6 +56,8 @@ const ThreeStep = ({
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
 }) => {
+    console.log(data);
+
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     const [tags, setTags] = React.useState<any>([]);
@@ -284,12 +286,14 @@ const ThreeStep = ({
                                     <div className="h-full">
                                         {imageList.length > 0 && (
                                             <Swiper
-                                                onSwiper={(swiper) => setSwiperRef(swiper)}
+                                                onSwiper={(swiper) => {
+                                                    setSwiperRef(swiper);
+                                                }}
                                                 slidesPerView={1}
-                                                spaceBetween={30}
+                                                // spaceBetween={30}
                                                 centeredSlides={false}
                                                 loop
-                                                // pagination={{ clickable: true }}
+                                                pagination={{ clickable: true }}
                                                 modules={[Pagination]}
                                                 className="mySwiper h-full"
                                                 autoplay={{
@@ -484,13 +488,15 @@ const ThreeStep = ({
                                     <>
                                         <Progress
                                             type="circle"
-                                            percent={Math.floor((data?.progress?.currentStepIndex / data?.progress?.totalStepCount) * 100)}
+                                            percent={Math.floor((data?.progress?.successStepCount / data?.progress?.totalStepCount) * 100)}
                                         />
-                                        <Popover content={'执行到第几步/总步数'}>
-                                            <div className="font-[500] cursor-pointer">
-                                                {data?.progress?.currentStepIndex || '-'}/{data?.progress?.totalStepCount || '-'}
-                                            </div>
-                                        </Popover>
+                                        {data?.progress && (
+                                            <Popover content={'执行到第几步/总步数'}>
+                                                <div className="font-[500] cursor-pointer">
+                                                    {data?.progress?.successStepCount || '-'}/{data?.progress?.totalStepCount || '-'}
+                                                </div>
+                                            </Popover>
+                                        )}
                                     </>
                                 )}
                             </div>

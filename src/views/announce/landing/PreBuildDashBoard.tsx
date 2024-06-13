@@ -231,14 +231,14 @@ const PreBuildDashBoard = () => {
                                 title="多平台内容AI一键批量创作"
                                 subTitle="多平台内容AI一键批量创作"
                                 description="支持多种平台和场景的文案AI生成，可精细化控制AI生成的内容。同时支持图片自动拼接，图片内容识别等最新多模态大模型能力。"
-                                image={theme.palette.mode === 'dark' ? createApp : createApp}
+                                image={theme.palette.mode === 'dark' ? push : push}
                                 link={''}
                             />
                             <Items
                                 title="多平台作品一键发布"
                                 subTitle="多平台作品一键发布"
                                 description="支持一键分发多个作品到多个主流媒体平台；减少重复性工作，提高内容发布效率与管理效率"
-                                image={theme.palette.mode === 'dark' ? push : push}
+                                image={theme.palette.mode === 'dark' ? createApp : createApp}
                                 link={''}
                             />
                             <Items

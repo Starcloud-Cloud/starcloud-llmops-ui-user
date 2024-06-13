@@ -32,7 +32,7 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
     const saveContent = (data: any) => {
         if (title === '增加变量') {
             if (rows) {
-                setRows([...rows, data]);
+                setRows([data, ...rows]);
                 setVariableOpen(false);
             } else {
                 setRows([data]);

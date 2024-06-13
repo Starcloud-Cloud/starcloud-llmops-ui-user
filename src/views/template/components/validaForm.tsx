@@ -4,15 +4,19 @@ import { Table, Button } from 'antd';
 import { t } from 'i18next';
 import _ from 'lodash-es';
 export const verifyJSON = (value: any) => {
-    const newValue = value?.replace(/'/g, '"');
-    let parsedJson;
-    try {
-        JSON.parse(newValue);
-        parsedJson = true;
-    } catch (error) {
-        parsedJson = false;
+    if (typeof value === 'object') {
+        return '';
+    } else {
+        const newValue = value?.replace(/'/g, '"');
+        let parsedJson;
+        try {
+            JSON.parse(newValue);
+            parsedJson = true;
+        } catch (error) {
+            parsedJson = false;
+        }
+        return parsedJson;
     }
-    return parsedJson;
 };
 export const changeJSONValue = (value: string) => {
     let parsedJson: any = value?.replace(/'/g, '"');
@@ -71,7 +75,7 @@ function FormExecute({ item, onChange, columns = [], setEditOpen, setTitle, setS
                     }}
                     fullWidth
                 />
-            ) : item.style === 'JSON' ? (
+            ) : item.style === 'JSON' && item.field !== 'CUSTOM_POSTER_STYLE_CONFIG' ? (
                 <TextField
                     sx={mt}
                     size="small"

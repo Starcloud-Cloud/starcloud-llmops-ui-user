@@ -127,3 +127,11 @@ export const materialJudge = (params: any) => {
 export const createSameApp = (data: any) => {
     return request.post({ url: `/llm/creative/plan/createSameApp`, data });
 };
+//素材上传表格接口
+export const createMaterialList = (params: any) => {
+    return request.get({ url: `/llm/creative/material/list`, params });
+};
+//历史详情
+export const createMaterialInfoPageByMarketUid = (data: any) => {
+    return request.post({ url: `/llm/creative/material/infoPageByMarketUid`, data });
+};

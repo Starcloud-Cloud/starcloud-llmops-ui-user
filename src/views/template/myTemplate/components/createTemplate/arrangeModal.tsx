@@ -57,7 +57,7 @@ const validationSchema = yup.object({
     field: yup
         .string()
         .required('variable is required')
-        .matches(/^[A-Z0-9_-]+$/, '只能输入大写字母、数字、_、-')
+        .matches(/^[a-zA-Z0-9_-]+$/, '只能输入字母、数字、_、-')
         .max(20, '最多输入20个字符'),
     label: yup.string().required('label is required')
 });

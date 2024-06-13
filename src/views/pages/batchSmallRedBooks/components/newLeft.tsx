@@ -466,6 +466,19 @@ const Lefts = ({
                         uuid: uuidv4()
                     }));
                     setTableData(tableRef.current);
+                    if (!detail) {
+                        handleSaveClick(false);
+                    } else {
+                        // 我的应用
+                        const arr = headerSaveAll();
+                        setDetail &&
+                            setDetail({
+                                ...detail,
+                                workflowConfig: {
+                                    steps: arr?.filter((item: any) => item)
+                                }
+                            });
+                    }
                 }
             });
         }, 2000);
@@ -1094,6 +1107,8 @@ const Lefts = ({
         }
     }, [pre]);
     useEffect(() => {
+        console.log(planState);
+
         if (planState && planState > 0) {
             handleSaveClick(exeState);
         } else if (planState && planState < 0) {

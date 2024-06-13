@@ -1,4 +1,4 @@
-import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover, List } from 'antd';
+import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover, List, Drawer } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
 import { materialGenerate, customMaterialGenerate, createMaterialInfoPageByMarketUid } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import { ExclamationCircleFilled, ClockCircleOutlined } from '@ant-design/icons';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import dayjs from 'dayjs';
 const { confirm } = Modal;
 
 const AiCreate = ({
@@ -380,14 +381,19 @@ const AiCreate = ({
             )
         }
     ];
-    const [sourceStatus, setSourceStatus] = useState(false);
-    const [dataSource, setdataSource] = useState([{}, {}]);
+
+    //历史数据
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [hisTotal, setHistoryTotal] = useState(0);
+    const [dataSource, setdataSource] = useState<any[]>([]);
     const [historyPage, setHistoryPage] = useState({
         pageNo: 1,
         pageSize: 10
     });
     const getHistoryData = async () => {
         const result = await createMaterialInfoPageByMarketUid(historyPage);
+        setdataSource(result.list);
+        setHistoryTotal(result.total);
         console.log(result);
     };
     return (
@@ -415,229 +421,160 @@ const AiCreate = ({
                 {title}
             </Button>
             <Modal title="素材AI生成" maskClosable={false} width={'60%'} open={open} footer={null} onCancel={() => setOpen(false)}>
-                <Tabs
-                    items={[
-                        {
-                            key: '1',
-                            label: '批量生成',
-                            children: (
-                                <div>
-                                    <div className="text-xs text-black/50">
-                                        告诉AI你想生成的素材描述，越详细越好。AI会自动生成多条素材内容。
-                                    </div>
-                                    <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
-                                    <Checkbox.Group
-                                        onChange={(e) => {
-                                            if (variableData.checkedFieldList.length > e.length) {
-                                                setVariableData({
-                                                    ...variableData,
-                                                    checkedFieldList: e
-                                                });
-                                            } else {
-                                                if (e.length > 6) {
-                                                    if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
+                <div className="relative">
+                    <Tabs
+                        items={[
+                            {
+                                key: '1',
+                                label: '批量生成',
+                                children: (
+                                    <div>
+                                        <div className="text-xs text-black/50">
+                                            告诉AI你想生成的素材描述，越详细越好。AI会自动生成多条素材内容。
+                                        </div>
+                                        <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
+                                        <Checkbox.Group
+                                            onChange={(e) => {
+                                                if (variableData.checkedFieldList.length > e.length) {
+                                                    setVariableData({
+                                                        ...variableData,
+                                                        checkedFieldList: e
+                                                    });
+                                                } else {
+                                                    if (e.length > 6) {
+                                                        if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
+                                                            setVariableData({
+                                                                ...variableData,
+                                                                checkedFieldList: e
+                                                            });
+                                                        } else {
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '最多只能选择6个字段',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'error'
+                                                                    },
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    close: false
+                                                                })
+                                                            );
+                                                        }
+                                                    } else {
                                                         setVariableData({
                                                             ...variableData,
                                                             checkedFieldList: e
                                                         });
-                                                    } else {
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '最多只能选择6个字段',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'error'
-                                                                },
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                close: false
-                                                            })
-                                                        );
                                                     }
-                                                } else {
-                                                    setVariableData({
-                                                        ...variableData,
-                                                        checkedFieldList: e
-                                                    });
                                                 }
-                                            }
-                                        }}
-                                        value={variableData.checkedFieldList}
-                                    >
-                                        {checkedList?.map((item) => (
-                                            <Checkbox disabled={item.required} value={item.dataIndex}>
-                                                {item.title}
-                                                {item.required ? '*' : ''}
-                                            </Checkbox>
-                                        ))}
-                                    </Checkbox.Group>
-                                    <div className="text-[16px] font-bold my-4 flex items-center">
-                                        <span>2.告诉 AI 如何生成这些字段内容</span>
-                                        <Popover
-                                            content={
-                                                <div className="max-w-[230px] sm:max-w-[600px]">
-                                                    <div>
-                                                        <Tabs size="small" defaultActiveKey="1" items={items} />
+                                            }}
+                                            value={variableData.checkedFieldList}
+                                        >
+                                            {checkedList?.map((item) => (
+                                                <Checkbox disabled={item.required} value={item.dataIndex}>
+                                                    {item.title}
+                                                    {item.required ? '*' : ''}
+                                                </Checkbox>
+                                            ))}
+                                        </Checkbox.Group>
+                                        <div className="text-[16px] font-bold mt-4 flex items-center">
+                                            <span>2.告诉 AI 如何生成这些字段内容</span>
+                                            <Popover
+                                                content={
+                                                    <div className="max-w-[230px] sm:max-w-[600px]">
+                                                        <div>
+                                                            <Tabs size="small" defaultActiveKey="1" items={items} />
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            }
-                                            placement="bottomLeft"
-                                            arrow={false}
-                                            trigger="hover"
-                                        >
-                                            <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
-                                        </Popover>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <TextArea
-                                            className="flex-1"
-                                            defaultValue={variableData.requirement}
-                                            status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}
-                                            onBlur={(e) => {
-                                                setrequirementStatusOpen(true);
-                                                setVariableData({
-                                                    ...variableData,
-                                                    requirement: e.target.value
-                                                });
-                                            }}
-                                            rows={10}
-                                        />
-                                        {/* {sourceStatus && (
-                                            <List
+                                                }
+                                                placement="bottomLeft"
+                                                arrow={false}
+                                                trigger="hover"
+                                            >
+                                                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
+                                            </Popover>
+                                        </div>
+                                        <div className="relative pt-8">
+                                            <TextArea
                                                 className="flex-1"
-                                                itemLayout="horizontal"
-                                                dataSource={dataSource}
-                                                renderItem={(item, index) => (
-                                                    <List.Item>
-                                                        <List.Item.Meta
-                                                            title="1111"
-                                                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-                                                        />
-                                                    </List.Item>
-                                                )}
-                                            />
-                                        )}
-                                        {!sourceStatus && (
-                                            <Button
-                                                onClick={async () => {
-                                                    getHistoryData();
-
-                                                    setSourceStatus(true);
-                                                }}
-                                                className="group"
-                                                size="small"
-                                                icon={
-                                                    <ClockCircleOutlined
-                                                        className="text-[#673ab7] group-hover:text-[#d9d9d9]"
-                                                        rev={undefined}
-                                                    />
-                                                }
-                                                shape="circle"
-                                            />
-                                        )} */}
-                                    </div>
-                                    {!variableData.requirement && requirementStatusOpen && (
-                                        <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
-                                    )}
-                                    <div className="text-[16px] font-bold my-4">3.如何生成素材</div>
-                                    <div className="flex gap-2 items-center text-xs mb-4">
-                                        <div>一组生成多少条</div>
-                                        <InputNumber
-                                            value={variableData.generateCount}
-                                            onChange={(value) => {
-                                                if (value) {
-                                                    setVariableData({
-                                                        ...variableData,
-                                                        generateCount: value
-                                                    });
-                                                }
-                                            }}
-                                            className="w-[200px]"
-                                            min={1}
-                                            max={12}
-                                        />
-                                    </div>
-                                    <div className="flex gap-2 items-center text-xs">
-                                        <div>共生成几组素材</div>
-                                        <InputNumber
-                                            value={variableData.groupNum}
-                                            onChange={(value) => {
-                                                if (value) {
-                                                    setVariableData({
-                                                        ...variableData,
-                                                        groupNum: value
-                                                    });
-                                                }
-                                            }}
-                                            className="w-[200px]"
-                                            min={1}
-                                            max={20}
-                                        />
-                                    </div>
-                                    <div className="flex justify-center gap-6 mt-6">
-                                        <Button
-                                            onClick={() => {
-                                                if (variableData.checkedFieldList?.length === 0) {
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: 'AI 补齐字段最少选一个',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'error'
-                                                            },
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            close: false
-                                                        })
-                                                    );
-                                                    return false;
-                                                }
-                                                if (!variableData.requirement) {
+                                                key={variableData.requirement}
+                                                defaultValue={variableData.requirement}
+                                                status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}
+                                                onBlur={(e) => {
                                                     setrequirementStatusOpen(true);
-                                                    return false;
-                                                }
-                                                setcustom && setcustom(JSON.stringify(variableData));
-                                            }}
-                                            type="primary"
-                                        >
-                                            保存配置
-                                        </Button>
-                                        <Button type="primary" onClick={aimaterialCreate}>
-                                            AI 生成素材
-                                        </Button>
-                                    </div>
-                                </div>
-                            )
-                        },
-                        {
-                            key: '0',
-                            label: '字段补齐',
-                            children: (
-                                <div>
-                                    <div className="text-xs text-black/50">
-                                        <p>先选择已选素材上想要补齐内容的字段，然后告诉AI你想生成的素材描述，越详细越好。</p>
-                                        <p>AI会自动生成已选素材的空缺字段的内容。</p>
-                                    </div>
-                                    <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
-                                    <Checkbox.Group
-                                        onChange={(e) => {
-                                            if (fieldCompletionData.checkedFieldList.length > e.length) {
-                                                setFieldCompletionData({
-                                                    ...fieldCompletionData,
-                                                    checkedFieldList: e
-                                                });
-                                            } else {
-                                                if (e.length > 6) {
-                                                    if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
-                                                        setFieldCompletionData({
-                                                            ...fieldCompletionData,
-                                                            checkedFieldList: e
+                                                    setVariableData({
+                                                        ...variableData,
+                                                        requirement: e.target.value
+                                                    });
+                                                }}
+                                                rows={10}
+                                            />
+                                            <div className=" absolute top-1 right-1 flex gap-1 items-end">
+                                                <div className="text-xs text-black/50">查看历史数据</div>
+                                                <Button
+                                                    className="group"
+                                                    onClick={async () => {
+                                                        getHistoryData();
+                                                        setHistoryOpen(true);
+                                                    }}
+                                                    size="small"
+                                                    icon={
+                                                        <ClockCircleOutlined
+                                                            className="text-[#673ab7] group-hover:text-[#d9d9d9]"
+                                                            rev={undefined}
+                                                        />
+                                                    }
+                                                    shape="circle"
+                                                />
+                                            </div>
+                                        </div>
+                                        {!variableData.requirement && requirementStatusOpen && (
+                                            <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
+                                        )}
+                                        <div className="text-[16px] font-bold my-4">3.如何生成素材</div>
+                                        <div className="flex gap-2 items-center text-xs mb-4">
+                                            <div>一组生成多少条</div>
+                                            <InputNumber
+                                                value={variableData.generateCount}
+                                                onChange={(value) => {
+                                                    if (value) {
+                                                        setVariableData({
+                                                            ...variableData,
+                                                            generateCount: value
                                                         });
-                                                    } else {
+                                                    }
+                                                }}
+                                                className="w-[200px]"
+                                                min={1}
+                                                max={12}
+                                            />
+                                        </div>
+                                        <div className="flex gap-2 items-center text-xs">
+                                            <div>共生成几组素材</div>
+                                            <InputNumber
+                                                value={variableData.groupNum}
+                                                onChange={(value) => {
+                                                    if (value) {
+                                                        setVariableData({
+                                                            ...variableData,
+                                                            groupNum: value
+                                                        });
+                                                    }
+                                                }}
+                                                className="w-[200px]"
+                                                min={1}
+                                                max={20}
+                                            />
+                                        </div>
+                                        <div className="flex justify-center gap-6 mt-6">
+                                            <Button
+                                                onClick={() => {
+                                                    if (variableData.checkedFieldList?.length === 0) {
                                                         dispatch(
                                                             openSnackbar({
                                                                 open: true,
-                                                                message: '最多只能选择6个字段',
+                                                                message: 'AI 补齐字段最少选一个',
                                                                 variant: 'alert',
                                                                 alert: {
                                                                     color: 'error'
@@ -646,102 +583,198 @@ const AiCreate = ({
                                                                 close: false
                                                             })
                                                         );
+                                                        return false;
                                                     }
-                                                } else {
+                                                    if (!variableData.requirement) {
+                                                        setrequirementStatusOpen(true);
+                                                        return false;
+                                                    }
+                                                    setcustom && setcustom(JSON.stringify(variableData));
+                                                }}
+                                                type="primary"
+                                            >
+                                                保存配置
+                                            </Button>
+                                            <Button type="primary" onClick={aimaterialCreate}>
+                                                AI 生成素材
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )
+                            },
+                            {
+                                key: '0',
+                                label: '字段补齐',
+                                children: (
+                                    <div>
+                                        <div className="text-xs text-black/50">
+                                            <p>先选择已选素材上想要补齐内容的字段，然后告诉AI你想生成的素材描述，越详细越好。</p>
+                                            <p>AI会自动生成已选素材的空缺字段的内容。</p>
+                                        </div>
+                                        <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
+                                        <Checkbox.Group
+                                            onChange={(e) => {
+                                                if (fieldCompletionData.checkedFieldList.length > e.length) {
                                                     setFieldCompletionData({
                                                         ...fieldCompletionData,
                                                         checkedFieldList: e
                                                     });
+                                                } else {
+                                                    if (e.length > 6) {
+                                                        if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
+                                                            setFieldCompletionData({
+                                                                ...fieldCompletionData,
+                                                                checkedFieldList: e
+                                                            });
+                                                        } else {
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '最多只能选择6个字段',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'error'
+                                                                    },
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    close: false
+                                                                })
+                                                            );
+                                                        }
+                                                    } else {
+                                                        setFieldCompletionData({
+                                                            ...fieldCompletionData,
+                                                            checkedFieldList: e
+                                                        });
+                                                    }
                                                 }
-                                            }
-                                        }}
-                                        value={fieldCompletionData.checkedFieldList}
-                                    >
-                                        {checkedList?.map((item) => (
-                                            <Checkbox value={item.dataIndex}>
-                                                {item.title}
-                                                {item.required ? '*' : ''}
-                                            </Checkbox>
-                                        ))}
-                                    </Checkbox.Group>
-                                    <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
-                                    <TextArea
-                                        defaultValue={fieldCompletionData.requirement}
-                                        status={!fieldCompletionData.requirement && requirementStatusOpen ? 'error' : ''}
-                                        onBlur={(e) => {
-                                            setFieldCompletionData({ ...fieldCompletionData, requirement: e.target.value });
-                                            setrequirementStatusOpen(true);
-                                        }}
-                                        rows={10}
+                                            }}
+                                            value={fieldCompletionData.checkedFieldList}
+                                        >
+                                            {checkedList?.map((item) => (
+                                                <Checkbox value={item.dataIndex}>
+                                                    {item.title}
+                                                    {item.required ? '*' : ''}
+                                                </Checkbox>
+                                            ))}
+                                        </Checkbox.Group>
+                                        <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
+                                        <TextArea
+                                            defaultValue={fieldCompletionData.requirement}
+                                            status={!fieldCompletionData.requirement && requirementStatusOpen ? 'error' : ''}
+                                            onBlur={(e) => {
+                                                setFieldCompletionData({ ...fieldCompletionData, requirement: e.target.value });
+                                                setrequirementStatusOpen(true);
+                                            }}
+                                            rows={10}
+                                        />
+                                        {!fieldCompletionData.requirement && requirementStatusOpen && (
+                                            <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
+                                        )}
+                                        <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
+                                        <Button className="mb-4" type="primary" size="small" onClick={() => setSelOpen(true)}>
+                                            选择素材
+                                        </Button>
+                                        <div className="flex justify-center gap-2">
+                                            <Button
+                                                className="h-[50px]"
+                                                disabled={selList?.length === 0}
+                                                onClick={() => editMaterial(1)}
+                                                type="primary"
+                                            >
+                                                <div className="flex flex-col items-center">
+                                                    处理选中的素材
+                                                    <div>({selList?.length})</div>
+                                                </div>
+                                            </Button>
+                                            <Button
+                                                className="h-[50px]"
+                                                disabled={tableData?.length === 0}
+                                                onClick={() => {
+                                                    editMaterial(2);
+                                                }}
+                                                type="primary"
+                                            >
+                                                <div className="flex flex-col items-center">
+                                                    处理全部素材
+                                                    <div>({tableData?.length})</div>
+                                                </div>
+                                            </Button>
+                                        </div>
+                                        <div className="flex justify-center gap-6 mt-6">
+                                            <Button
+                                                onClick={() => {
+                                                    if (!fieldCompletionData.requirement) {
+                                                        setrequirementStatusOpen(true);
+                                                        return false;
+                                                    }
+                                                    if (fieldCompletionData.checkedFieldList?.length === 0) {
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: 'AI 补齐字段最少选一个',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'error'
+                                                                },
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                close: false
+                                                            })
+                                                        );
+                                                        return false;
+                                                    }
+                                                    setField && setField(JSON.stringify(fieldCompletionData));
+                                                }}
+                                                type="primary"
+                                            >
+                                                保存配置
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )
+                            }
+                        ]}
+                        defaultActiveKey="1"
+                    ></Tabs>
+                    <Drawer
+                        title="历史数据"
+                        placement="right"
+                        closable={false}
+                        onClose={() => {
+                            setHistoryOpen(false);
+                        }}
+                        open={historyOpen}
+                        getContainer={false}
+                    >
+                        <List
+                            className="flex-1"
+                            itemLayout="horizontal"
+                            dataSource={dataSource}
+                            renderItem={(item, index) => (
+                                <List.Item>
+                                    <List.Item.Meta
+                                        title={
+                                            <div
+                                                onClick={() => {
+                                                    setVariableData({
+                                                        ...variableData,
+                                                        requirement: item.requestContent
+                                                    });
+                                                    setHistoryOpen(false);
+                                                }}
+                                                className="line-clamp-3 text-xs text-black/50 cursor-pointer"
+                                            >
+                                                <span className="text-black mr-2">
+                                                    {dayjs(item?.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                </span>
+                                                {item?.requestContent}
+                                            </div>
+                                        }
                                     />
-                                    {!fieldCompletionData.requirement && requirementStatusOpen && (
-                                        <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
-                                    )}
-                                    <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
-                                    <Button className="mb-4" type="primary" size="small" onClick={() => setSelOpen(true)}>
-                                        选择素材
-                                    </Button>
-                                    <div className="flex justify-center gap-2">
-                                        <Button
-                                            className="h-[50px]"
-                                            disabled={selList?.length === 0}
-                                            onClick={() => editMaterial(1)}
-                                            type="primary"
-                                        >
-                                            <div className="flex flex-col items-center">
-                                                处理选中的素材
-                                                <div>({selList?.length})</div>
-                                            </div>
-                                        </Button>
-                                        <Button
-                                            className="h-[50px]"
-                                            disabled={tableData?.length === 0}
-                                            onClick={() => {
-                                                editMaterial(2);
-                                            }}
-                                            type="primary"
-                                        >
-                                            <div className="flex flex-col items-center">
-                                                处理全部素材
-                                                <div>({tableData?.length})</div>
-                                            </div>
-                                        </Button>
-                                    </div>
-                                    <div className="flex justify-center gap-6 mt-6">
-                                        <Button
-                                            onClick={() => {
-                                                if (!fieldCompletionData.requirement) {
-                                                    setrequirementStatusOpen(true);
-                                                    return false;
-                                                }
-                                                if (fieldCompletionData.checkedFieldList?.length === 0) {
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: 'AI 补齐字段最少选一个',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'error'
-                                                            },
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            close: false
-                                                        })
-                                                    );
-                                                    return false;
-                                                }
-                                                setField && setField(JSON.stringify(fieldCompletionData));
-                                            }}
-                                            type="primary"
-                                        >
-                                            保存配置
-                                        </Button>
-                                    </div>
-                                </div>
-                            )
-                        }
-                    ]}
-                    defaultActiveKey="1"
-                ></Tabs>
+                                </List.Item>
+                            )}
+                        />
+                    </Drawer>
+                </div>
             </Modal>
             {/* 选择素材 */}
             <Modal

@@ -131,3 +131,7 @@ export const createSameApp = (data: any) => {
 export const createMaterialList = (params: any) => {
     return request.get({ url: `/llm/creative/material/list`, params });
 };
+//历史详情
+export const createMaterialInfoPageByMarketUid = (data: any) => {
+    return request.post({ url: `/llm/creative/material/infoPageByMarketUid`, data });
+};

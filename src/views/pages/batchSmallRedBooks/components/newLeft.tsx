@@ -1768,9 +1768,10 @@ const Lefts = ({
                             ? getTenant() === ENUM_TENANT.AI
                                 ? 'calc(100% - 118px)'
                                 : 'calc(100% - 68px)'
-                            : 'calc(100% - 14px)'
+                            : 'calc(100% - 14px)',
+                        scrollbarGutter: 'stable'
                     }}
-                    className=" overflow-y-auto mr-[-4px] pb-[72px]"
+                    className=" box-border overflow-y-auto pb-[72px] pr-1 mr-[-4px]"
                 >
                     <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
@@ -2842,7 +2843,8 @@ const Lefts = ({
                         const newLists = _.cloneDeep(appRef.current);
                         newList[stepIndex - 1] = {
                             ...newList[stepIndex - 1],
-                            ...data
+                            ...data,
+                            field: data.name
                         };
                         newLists.configuration.appInformation.workflowConfig.steps[stepIndex] = {
                             ...newLists.configuration?.appInformation?.workflowConfig?.steps[stepIndex],

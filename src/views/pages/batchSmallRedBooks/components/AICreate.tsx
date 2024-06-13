@@ -1,6 +1,6 @@
 import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover, List } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
-import { materialGenerate, customMaterialGenerate } from 'api/redBook/batchIndex';
+import { materialGenerate, customMaterialGenerate, createMaterialInfoPageByMarketUid } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { v4 as uuidv4 } from 'uuid';
@@ -382,6 +382,14 @@ const AiCreate = ({
     ];
     const [sourceStatus, setSourceStatus] = useState(false);
     const [dataSource, setdataSource] = useState([{}, {}]);
+    const [historyPage, setHistoryPage] = useState({
+        pageNo: 1,
+        pageSize: 10
+    });
+    const getHistoryData = async () => {
+        const result = await createMaterialInfoPageByMarketUid(historyPage);
+        console.log(result);
+    };
     return (
         <div>
             <Button
@@ -494,7 +502,7 @@ const AiCreate = ({
                                             }}
                                             rows={10}
                                         />
-                                        {sourceStatus && (
+                                        {/* {sourceStatus && (
                                             <List
                                                 className="flex-1"
                                                 itemLayout="horizontal"
@@ -511,7 +519,11 @@ const AiCreate = ({
                                         )}
                                         {!sourceStatus && (
                                             <Button
-                                                onClick={() => setSourceStatus(true)}
+                                                onClick={async () => {
+                                                    getHistoryData();
+
+                                                    setSourceStatus(true);
+                                                }}
                                                 className="group"
                                                 size="small"
                                                 icon={
@@ -522,7 +534,7 @@ const AiCreate = ({
                                                 }
                                                 shape="circle"
                                             />
-                                        )}
+                                        )} */}
                                     </div>
                                     {!variableData.requirement && requirementStatusOpen && (
                                         <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>

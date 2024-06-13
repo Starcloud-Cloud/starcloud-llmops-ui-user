@@ -671,6 +671,8 @@ function CreateDetail() {
         }
     };
     const saveDetails = (data: any, flag?: boolean) => {
+        console.log(flag);
+
         const newList = _.cloneDeep(data);
         detailRef.current = newList;
         setTimeout(() => {
@@ -974,6 +976,11 @@ function CreateDetail() {
         setStepMaterial(stepMarRef.current);
     };
     const [viewLoading, setViewLoading] = useState(false);
+    useEffect(() => {
+        if (searchParams.get('source') === 'market') {
+            setValue('4');
+        }
+    }, []);
     return searchParams.get('source') === 'market' ? (
         detail ? (
             <>

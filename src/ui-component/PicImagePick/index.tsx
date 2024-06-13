@@ -14,6 +14,7 @@ const { Search } = Input;
 const { Option } = Select;
 
 export const PicImagePick = ({
+    materialList,
     allData,
     details,
     isModalOpen,
@@ -22,6 +23,7 @@ export const PicImagePick = ({
     columns,
     values
 }: {
+    materialList?: any;
     allData?: any;
     details?: any;
     isModalOpen: boolean;
@@ -84,13 +86,14 @@ export const PicImagePick = ({
                     if (item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')) {
                         item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });
                     }
+                    if (item.variable.variables.find((i: any) => i.field === 'MATERIAL_LIST')) {
+                        item.variable.variables.find((i: any) => i.field === 'MATERIAL_LIST').value = JSON.stringify(materialList);
+                    }
                 }
             });
             setCurrentDetails(details);
         }
     }, [details, query, size]);
-
-    console.log(currentDetails);
 
     const handleScroll = useCallback(
         debounce(() => {
@@ -264,7 +267,7 @@ export const PicImagePick = ({
         appModify(currentDetails).then((res) => {
             planModifyConfig({
                 ...allData,
-                configuration: { ...allData.configuration, appInformation: currentDetails },
+                configuration: { ...allData.configuration, appInformation: currentDetails, materialList: materialList },
                 validate: false
             }).then((planRes) => {
                 dispatch(

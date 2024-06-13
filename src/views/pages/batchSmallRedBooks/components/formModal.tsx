@@ -18,6 +18,7 @@ export const propShow: UploadProps = {
     }
 };
 const FormModal = ({
+    materialList,
     details,
     allData,
     title,
@@ -29,6 +30,7 @@ const FormModal = ({
     sourceList,
     materialType
 }: {
+    materialList?: any;
     details?: any;
     allData?: any;
     title: string;
@@ -332,6 +334,7 @@ const FormModal = ({
             />
             {isModalOpen && (
                 <PicImagePick
+                    materialList={materialList}
                     allData={allData}
                     details={details}
                     isModalOpen={isModalOpen}

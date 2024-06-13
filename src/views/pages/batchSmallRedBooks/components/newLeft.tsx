@@ -76,6 +76,7 @@ import './newLeft.scss';
 import { SearchOutlined } from '@ant-design/icons';
 import { stepList } from 'api/template';
 import EditStepTitle from './editStepTitle';
+import React from 'react';
 
 const Lefts = ({
     detailShow = true,
@@ -1100,6 +1101,19 @@ const Lefts = ({
         }
     }, [planState]);
     const [exeState, setExeState] = useState(false);
+
+    const materialList = React.useMemo(() => {
+        return materialTypeStatus
+            ? fileList?.map((item) => ({
+                  pictureUrl: item?.response?.data?.url,
+                  type: 'picture'
+              }))
+            : tableData?.map((item) => ({
+                  ...item,
+                  type: materialType
+              }));
+    }, [materialTypeStatus, fileList, tableData]);
+
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
         const newList = _.cloneDeep(generRef.current);
@@ -2282,6 +2296,7 @@ const Lefts = ({
             </Modal>
             {editOpen && (
                 <FormModal
+                    materialList={materialList}
                     allData={appData}
                     details={appData?.configuration?.appInformation}
                     title={title}
@@ -2295,6 +2310,7 @@ const Lefts = ({
             )}
             {editOpens && (
                 <FormModal
+                    materialList={materialList}
                     allData={appData}
                     details={appData?.configuration?.appInformation}
                     title={titles}
@@ -2323,6 +2339,7 @@ const Lefts = ({
             />
             {isModalOpen && (
                 <PicImagePick
+                    materialList={materialList}
                     allData={appData}
                     details={appData?.configuration?.appInformation}
                     isModalOpen={isModalOpen}

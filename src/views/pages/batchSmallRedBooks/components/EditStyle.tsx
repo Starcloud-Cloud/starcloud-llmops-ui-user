@@ -119,6 +119,8 @@ const EditStyle = ({
         return imgRef?.current && currentJson ? imgRef?.current?.offsetWidth / currentJson?.clipPath?.width : 1;
     }, [currentJson, windowWidth, imgRef?.current]);
 
+    const isPageInputId = currentJson?.objects?.find((item: any) => item.isTextPage)?.id;
+
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -328,6 +330,7 @@ const EditStyle = ({
                                                             onMouseLeave={() => setCurrentElementId('')}
                                                         >
                                                             <VariableInput
+                                                                row={el.field === isPageInputId ? 4 : 1}
                                                                 disabled={canEdit}
                                                                 styles={
                                                                     currentElementId === el.field

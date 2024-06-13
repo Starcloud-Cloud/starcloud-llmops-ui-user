@@ -85,7 +85,7 @@ const VariableInput = ({
             if (property.type === 'object') {
                 const convertedProperty = getjsonschma(property, name);
                 arr.push(convertedProperty);
-            } else if (property.type === 'array') {
+            } else if (property.type === 'array' && property?.items?.type === 'object') {
                 arr.push({
                     key: key + 'index',
                     label: key + '[*]',
@@ -213,7 +213,7 @@ const VariableInput = ({
                             }
                         }}
                         icon={
-                            item.desc?.split('-')[1] && (
+                            item.desc?.split('-')[1] ? (
                                 <img
                                     className="w-[15px]"
                                     src={
@@ -227,13 +227,15 @@ const VariableInput = ({
                                     }
                                     alt=""
                                 />
+                            ) : (
+                                <img className="w-[15px]" src={string} alt="" />
                             )
                         }
                         key={item.key}
                     >
                         <div
                             onMouseEnter={() => {
-                                tipRef.current = item.desc?.split('-')[0];
+                                tipRef.current = item.title;
                                 setTipValue(tipRef.current);
                             }}
                             className="w-full flex justify-between items-center"
@@ -244,7 +246,7 @@ const VariableInput = ({
                                     <div>{item.label}</div>
                                 </div>
                             </div>
-                            <div className="text-xs text-black/50">{item.desc?.split('-')[0]}</div>
+                            <div className="text-xs text-black/50">{item.title}</div>
                         </div>
                     </Menu.Item>
                 );
@@ -258,10 +260,12 @@ const VariableInput = ({
                 ...JSON.parse(item.inJsonSchema),
                 properties: {
                     ...JSON.parse(item.inJsonSchema).properties,
-                    ...(item.code === '基础信息' ? {} : JSON.parse(item.outJsonSchema).properties)
+                    ...(item.code === '基础信息' || !item.outJsonSchema ? {} : JSON.parse(item.outJsonSchema).properties)
                 }
             };
         } catch (err) {
+            console.log(err);
+
             obj = {};
         }
         return obj;

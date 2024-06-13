@@ -18,16 +18,24 @@ import {
     Input,
     Badge,
     theme,
-    Tooltip
+    Tooltip,
+    Popover,
+    Dropdown
 } from 'antd';
+import { AccordionDetails, AccordionSummary, Accordion, IconButton } from '@mui/material';
+import { ExpandMore, AddCircleSharp, South, MoreVert } from '@mui/icons-material';
 import {
     PlusOutlined,
     SaveOutlined,
     ZoomInOutlined,
     InfoCircleOutlined,
-    EyeOutlined,
     CloudUploadOutlined,
-    SelectOutlined
+    DeleteOutlined,
+    CopyOutlined,
+    VerticalAlignBottomOutlined,
+    VerticalAlignTopOutlined,
+    SettingOutlined,
+    RightOutlined
 } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
@@ -44,7 +52,8 @@ import {
     metadata,
     planModifyConfig,
     materialJudge,
-    createSameApp
+    createSameApp,
+    createMaterialList
 } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
 import FormModal, { propShow } from './formModal';
@@ -65,6 +74,8 @@ import AiCreate from './AICreate';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import './newLeft.scss';
 import { SearchOutlined } from '@ant-design/icons';
+import { stepList } from 'api/template';
+import EditStepTitle from './editStepTitle';
 
 const Lefts = ({
     detailShow = true,
@@ -84,8 +95,10 @@ const Lefts = ({
     defaultVariableData,
     defaultField,
     fieldHead,
+    leftWidth,
     setDefaultVariableData,
-    setDefaultField
+    setDefaultField,
+    setWidth
 }: {
     detailShow?: boolean;
     planState?: number;
@@ -95,6 +108,7 @@ const Lefts = ({
     saveLoading?: boolean;
     defaultVariableData?: any;
     defaultField?: any;
+    leftWidth?: any;
     fieldHead?: any;
     setCollData?: (data: any) => void;
     setGetData?: (data: any) => void;
@@ -106,6 +120,7 @@ const Lefts = ({
     setPlanUid: (data: any) => void;
     setDefaultVariableData?: (data: any) => void;
     setDefaultField?: (data: any) => void;
+    setWidth?: () => void;
 }) => {
     const { token } = theme.useToken();
     const navigate = useNavigate();
@@ -121,11 +136,17 @@ const Lefts = ({
     const [selectImg, setSelectImg] = useState<any>(null);
     const [imageDataIndex, setImageDataIndex] = useState(0);
     const [filedName, setFiledName] = useState('');
+    const [values, setValues] = useState({});
+    const tableRef = useRef<any[]>([]);
 
     useEffect(() => {
         if (tableRef.current.length && selectImg?.largeImageURL) {
             const data = tableRef.current;
-            data[imageDataIndex][filedName] = selectImg?.largeImageURL;
+            data.forEach((item) => {
+                if (item.uuid === imageDataIndex) {
+                    item[filedName] = selectImg?.largeImageURL;
+                }
+            });
             tableRef.current = data;
             setTableData([...data]);
         }
@@ -181,7 +202,7 @@ const Lefts = ({
     };
     const props1: UploadProps = {
         showUploadList: false,
-        accept: '.zip',
+        accept: '.zip,.rar',
         beforeUpload: async (file, fileList) => {
             setUploadLoading(true);
             try {
@@ -206,7 +227,6 @@ const Lefts = ({
     //批量上传素材
     const [zoomOpen, setZoomOpen] = useState(false); //下载弹框
     const [tableLoading, setTableLoading] = useState(false);
-    const tableRef = useRef<any[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);
     const [columns, setColumns] = useState<any[]>([]);
     //让列表插入数据
@@ -286,8 +306,11 @@ const Lefts = ({
                                                 onClick={(e) => e.stopPropagation()}
                                                 width={82}
                                                 height={82}
+                                                preview={{
+                                                    src: row[item.fieldName]
+                                                }}
                                                 src={
-                                                    row[item.fieldName]
+                                                    row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'
                                                     // selectImg?.largeImageURL ||
                                                     // form.getFieldValue(item.dataIndex) + '?x-oss-process=image/resize,w_300/quality,q_80'
                                                 }
@@ -308,8 +331,9 @@ const Lefts = ({
                                                         onClick={(e) => {
                                                             setIsModalOpen(true);
                                                             e.stopPropagation();
-                                                            setImageDataIndex(index);
+                                                            setImageDataIndex(row.uuid);
                                                             setFiledName(item.fieldName);
+                                                            setValues(row);
                                                         }}
                                                     >
                                                         <SearchOutlined rev={undefined} className="text-white/60 hover:text-white" />
@@ -330,8 +354,9 @@ const Lefts = ({
                                                     onClick={(e) => {
                                                         setIsModalOpen(true);
                                                         e.stopPropagation();
-                                                        setImageDataIndex(index);
+                                                        setImageDataIndex(row.uuid);
                                                         setFiledName(item.fieldName);
+                                                        setValues(row);
                                                     }}
                                                 >
                                                     <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
@@ -348,7 +373,7 @@ const Lefts = ({
                                         width={50}
                                         height={50}
                                         preview={false}
-                                        src={item + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                        src={item + '?x-oss-process=image/resize,w_100/quality,q_80'}
                                     />
                                 ))}
                             </div>
@@ -465,10 +490,12 @@ const Lefts = ({
     const formOk = (result: any) => {
         const newList = _.cloneDeep(tableRef.current) || [];
         if (title === '编辑') {
-            newList.splice((page - 1) * 10 + rowIndex, 1, {
+            console.log(result, page, rowIndex);
+
+            newList.splice((page - 1) * 20 + rowIndex, 1, {
                 ...result,
-                uuid: newList[(page - 1) * 10 + rowIndex]?.uuid,
-                group: newList[(page - 1) * 10 + rowIndex]?.group
+                uuid: newList[(page - 1) * 20 + rowIndex]?.uuid,
+                group: newList[(page - 1) * 20 + rowIndex]?.group
             });
             tableRef.current = newList;
             setTableData(tableRef.current);
@@ -644,10 +671,17 @@ const Lefts = ({
                 ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value || [];
         const picList = result?.configuration?.materialList;
         setMaterialType(newMater);
+        let tableDataList;
+        if (!data) {
+            tableDataList = await createMaterialList({
+                uid: searchParams.get('appUid') ? searchParams.get('appUid') : detail ? detail?.uid : result.uid,
+                source: !searchParams.get('appUid') ? 'app' : 'market'
+            });
+        }
         if (judge) {
             if (!data) {
                 setFileList(
-                    result?.configuration?.materialList?.map((item: any) => ({
+                    tableDataList?.map((item: any) => ({
                         uid: uuidv4(),
                         thumbUrl: item?.pictureUrl,
                         response: {
@@ -655,7 +689,16 @@ const Lefts = ({
                                 url: item?.pictureUrl
                             }
                         }
-                    }))
+                    })) ||
+                        result?.configuration?.materialList?.map((item: any) => ({
+                            uid: uuidv4(),
+                            thumbUrl: item?.pictureUrl,
+                            response: {
+                                data: {
+                                    url: item?.pictureUrl
+                                }
+                            }
+                        }))
                 );
             } else {
                 const resul = newList?.workflowConfig?.steps
@@ -706,10 +749,16 @@ const Lefts = ({
                     });
                 setTableData(tableRef.current || []);
             } else {
-                tableRef.current = picList?.map((item: any) => ({
-                    ...item,
-                    uuid: uuidv4()
-                }));
+                tableRef.current =
+                    tableDataList?.map((item: any) => ({
+                        ...item,
+                        uuid: uuidv4()
+                    })) ||
+                    picList?.map((item: any) => ({
+                        ...item,
+                        uuid: uuidv4()
+                    }));
+                console.log(tableRef.current, 'tableRef.current');
                 setTableData(tableRef.current || []);
             }
         }
@@ -865,7 +914,7 @@ const Lefts = ({
                                     width={50}
                                     height={50}
                                     preview={false}
-                                    src={row[item.fieldName] + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                    src={row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'}
                                 />
                             ) : (
                                 <div className="w-[50px] h-[50px] rounded-md border border-solid border-black/10"></div>
@@ -877,7 +926,7 @@ const Lefts = ({
                                         width={50}
                                         height={50}
                                         preview={false}
-                                        src={item + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                                        src={item + '?x-oss-process=image/resize,w_100/quality,q_80'}
                                     />
                                 ))}
                             </div>
@@ -1021,6 +1070,7 @@ const Lefts = ({
         pubilcList[pubilcList?.findIndex((item: any) => item.style === 'MATERIAL')].value = newList;
         generRef.current = newValue;
         setGenerateList(generRef.current);
+        setAppDataGen();
         setEditOpens(false);
         forms.resetFields();
     };
@@ -1155,7 +1205,7 @@ const Lefts = ({
             dispatch(
                 openSnackbar({
                     open: true,
-                    message: '保存成功',
+                    message: '创作计划保存成功',
                     variant: 'alert',
                     alert: {
                         color: 'success'
@@ -1446,97 +1496,268 @@ const Lefts = ({
 
     //创作同款应用状态
     const [createAppStatus, setCreateAppStatus] = useState(false);
+
+    //增加步骤的
+    const [stepOpen, setStepOpen] = useState<any[]>([]);
+    const [stepLists, setStepList] = useState<any[]>([]);
+    const [collStep, setCollStep] = useState('');
+    const getImage = (data: string) => {
+        let image: string = '';
+        try {
+            image = require('../../../../assets/images/carryOut/' + data + '.svg');
+        } catch (errr) {
+            image = '';
+        }
+        return image;
+    };
+    const addupStep = (item: any, index: number) => {
+        const newLists = _.cloneDeep(appRef.current);
+        newLists.configuration?.appInformation?.workflowConfig?.steps.unshift(item);
+        appRef.current = newLists;
+        setAppData(appRef.current);
+    };
+    const addStep = (item: any, index: number) => {
+        const newList = _.cloneDeep(generRef.current);
+        const newLists = _.cloneDeep(appRef.current);
+        const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        );
+        let name = addName(item.name);
+        if (handle) {
+            newList.splice(index, 0, { ...item, name });
+            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name });
+        } else {
+            newList.splice(index + 1, 0, { ...item, name });
+            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name });
+        }
+        generRef.current = newList;
+        appRef.current = newLists;
+        setAppData(appRef.current);
+        setGenerateList(generRef.current);
+        const newStep = _.cloneDeep(stepOpen);
+        newStep[index] = open;
+        setStepOpen(newStep);
+    };
+    const addName: any = (name: string) => {
+        const nameList = appRef.current.configuration?.appInformation?.workflowConfig?.steps?.map((item: any) => item.name);
+
+        if (nameList.includes(name)) {
+            const nameParts = name.match(/(.*?)(\d*)$/);
+            console.log(nameParts);
+            if (nameParts) {
+                // 如果有数字，则解析出数字并加1
+                let prefix = nameParts[1];
+                let numberPart = nameParts[2];
+                let incrementedNumber = numberPart ? parseInt(numberPart, 10) + 1 : 1;
+                return addName(`${prefix}${incrementedNumber > 0 ? incrementedNumber : ''}`);
+            } else {
+                // 如果没有数字，就默认从1开始
+                return addName(`${name}1`);
+            }
+        } else {
+            return name;
+        }
+    };
+    //删除步骤
+    const delStep = (index: number) => {
+        const newList = _.cloneDeep(generRef.current);
+        const newLists = _.cloneDeep(appRef.current);
+        const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        );
+        if (handle) {
+            if (index === 0) {
+                setTableData([]);
+                setFileList([]);
+                newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index, 1);
+            } else {
+                newList.splice(index - 1, 1);
+                newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index, 1);
+            }
+        } else {
+            newList.splice(index, 1);
+            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index, 1);
+        }
+        generRef.current = newList;
+        appRef.current = newLists;
+        setAppData(appRef.current);
+        setGenerateList(generRef.current);
+    };
+    //复制步骤
+    const copyStep = (item: any, index: number) => {
+        const newList = _.cloneDeep(generRef.current);
+        const newLists = _.cloneDeep(appRef.current);
+        const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        );
+        if (handle) {
+            newList.splice(index, 0, { ...item, name: item.name + '_copy' });
+            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name: item.name + '_copy' });
+        } else {
+            newList.splice(index + 1, 0, { ...item, name: item.name + '_copy' });
+            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name: item.name + '_copy' });
+        }
+        generRef.current = newList;
+        appRef.current = newLists;
+        setAppData(appRef.current);
+        setGenerateList(generRef.current);
+    };
+    //移动步骤
+    const stepMove = (index: number, direction: number) => {
+        const newList = _.cloneDeep(generRef.current);
+        const newLists = _.cloneDeep(appRef.current);
+        const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
+            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
+        );
+        if (handle) {
+            const temp = _.cloneDeep(newList[index - 1]);
+            newList[index - 1] = newList[index - 1 + direction];
+            newList[index - 1 + direction] = temp;
+            console.log(newList);
+            const temps = _.cloneDeep(newLists.configuration?.appInformation?.workflowConfig?.steps[index]);
+            newLists.configuration.appInformation.workflowConfig.steps[index] =
+                newLists.configuration.appInformation.workflowConfig.steps[index + direction];
+            newLists.configuration.appInformation.workflowConfig.steps[index + direction] = temps;
+        } else {
+            const temp = _.cloneDeep(newList[index]);
+            newList[index] = newList[index + direction];
+            newList[index + direction] = temp;
+            const temps = _.cloneDeep(newLists.configuration?.appInformation?.workflowConfig?.steps[index]);
+            newLists.configuration.appInformation.workflowConfig.steps[index] = newList[index + direction];
+            newLists.configuration.appInformation.workflowConfig.steps[index + direction] = temps;
+        }
+        generRef.current = newList;
+        appRef.current = newLists;
+        setAppData(appRef.current);
+        setGenerateList(generRef.current);
+    };
+    //改变给 sppData 赋值
+    const setAppDataGen = () => {
+        const variable = appRef.current.configuration.appInformation.workflowConfig.steps;
+        const appOne = _.cloneDeep(variable[0]);
+        const applast = _.cloneDeep(variable[variable?.length - 1]);
+        const newappList = _.cloneDeep(appRef.current);
+        newappList.configuration.appInformation.workflowConfig.steps = [appOne, ...generRef.current, applast];
+        appRef.current = newappList;
+        setAppData(appRef.current);
+    };
+    useEffect(() => {
+        if (detail?.type) {
+            stepList(detail?.type).then((res) => {
+                setStepList(res);
+            });
+        }
+    }, [detail?.type]);
+    const [settingOpen, setSettingOpen] = useState(false);
+    const [steptitOpen, setSteotitOpen] = useState(false);
+    const [stepTitData, setStepTitData] = useState<any>(null);
+    const [stepIndex, setStepIndex] = useState(-1);
+    //全局变量
+    const [advancedModal, setAdvancedModal] = useState(false);
+    const [allVariable, setAllVariable] = useState<any>(null);
     return (
         <>
             <div className="relative h-full">
-                {detailShow && (
-                    <div className="flex gap-2 justify-between items-center mx-2 mb-4 mr-4">
+                <Tooltip title={!leftWidth ? '展开' : '收缩'}>
+                    <Button
+                        style={{
+                            transform: leftWidth ? 'rotate(180deg)' : 'rotate(0deg)'
+                        }}
+                        className={`absolute top-4 right-[-10px] z-[1000] duration-700`}
+                        onClick={() => setWidth && setWidth()}
+                        size="small"
+                        shape="circle"
+                    >
+                        <RightOutlined rev={undefined} />
+                    </Button>
+                </Tooltip>
+                {detailShow && !detail && (
+                    <div className="flex gap-2 justify-between items-center mx-2 mb-4 pt-4 mr-4">
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
-                        {!detail && (
-                            <div>
-                                {!detail && (
-                                    <Button
-                                        loading={createAppStatus}
-                                        onClick={async () => {
-                                            setCreateAppStatus(true);
-                                            const result = await createSameApp({
-                                                appMarketUid: searchParams.get('appUid'),
-                                                planUid: searchParams.get('uid')
-                                            });
-                                            navigate('/createApp?uid=' + result);
-                                            setCreateAppStatus(false);
-                                        }}
-                                        type="primary"
-                                        size="small"
-                                        className="mr-1"
-                                    >
-                                        创作同款应用
-                                    </Button>
-                                )}
-                                状态：{getStatus1(appData?.status)}
-                                <div className="inline-block whitespace-nowrap">
-                                    <Popconfirm
-                                        title="更新提示"
-                                        description={
-                                            <div className="ml-[-24px]">
-                                                <Tabs
-                                                    activeKey={updataTip}
-                                                    onChange={(e) => setUpdataTip(e)}
-                                                    items={[
-                                                        {
-                                                            key: '0',
-                                                            label: '更新应用',
-                                                            children: (
-                                                                <div className="w-[240px] mb-4">
-                                                                    <div>当前应用最新版本为：{version}</div>
-                                                                    <div>你使用的应用版本为：{appData?.version}</div>
-                                                                    <div>是否需要更新版本，获得最佳创作效果</div>
-                                                                </div>
-                                                            )
-                                                        },
-                                                        {
-                                                            key: '1',
-                                                            label: '初始化应用',
-                                                            children: (
-                                                                <div className="w-[240px] mb-4">
-                                                                    是否需要初始化为最新的应用配置。
-                                                                    <br />
-                                                                    <span className="text-[#ff4d4f]">注意:</span>
-                                                                    会覆盖所有已修改的应用配置，请自行备份相关内容
-                                                                </div>
-                                                            )
-                                                        }
-                                                    ]}
-                                                ></Tabs>
-                                            </div>
-                                        }
-                                        okButtonProps={{
-                                            disabled: (appData?.version ? appData?.version : 0) === version && updataTip === '0'
-                                        }}
-                                        onConfirm={() => upDateVersion(updataTip)}
-                                        okText="更新"
-                                        cancelText="取消"
-                                    >
-                                        <Badge count={(appData?.version ? appData?.version : 0) !== version ? 1 : 0} dot>
-                                            <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
-                                                版本号： <span className="font-blod">{appData?.version || 0}</span>
-                                            </span>
-                                        </Badge>
-                                    </Popconfirm>
-                                </div>
+                        <div>
+                            {!detail && (
+                                <Button
+                                    loading={createAppStatus}
+                                    onClick={async () => {
+                                        setCreateAppStatus(true);
+                                        const result = await createSameApp({
+                                            appMarketUid: searchParams.get('appUid'),
+                                            planUid: searchParams.get('uid')
+                                        });
+                                        navigate('/createApp?uid=' + result);
+                                        setCreateAppStatus(false);
+                                    }}
+                                    type="primary"
+                                    size="small"
+                                    className="mr-1"
+                                >
+                                    创作同款应用
+                                </Button>
+                            )}
+                            状态：{getStatus1(appData?.status)}
+                            <div className="inline-block whitespace-nowrap">
+                                <Popconfirm
+                                    title="更新提示"
+                                    description={
+                                        <div className="ml-[-24px]">
+                                            <Tabs
+                                                activeKey={updataTip}
+                                                onChange={(e) => setUpdataTip(e)}
+                                                items={[
+                                                    {
+                                                        key: '0',
+                                                        label: '更新应用',
+                                                        children: (
+                                                            <div className="w-[240px] mb-4">
+                                                                <div>当前应用最新版本为：{version}</div>
+                                                                <div>你使用的应用版本为：{appData?.version}</div>
+                                                                <div>是否需要更新版本，获得最佳创作效果</div>
+                                                            </div>
+                                                        )
+                                                    },
+                                                    {
+                                                        key: '1',
+                                                        label: '初始化应用',
+                                                        children: (
+                                                            <div className="w-[240px] mb-4">
+                                                                是否需要初始化为最新的应用配置。
+                                                                <br />
+                                                                <span className="text-[#ff4d4f]">注意:</span>
+                                                                会覆盖所有已修改的应用配置，请自行备份相关内容
+                                                            </div>
+                                                        )
+                                                    }
+                                                ]}
+                                            ></Tabs>
+                                        </div>
+                                    }
+                                    okButtonProps={{
+                                        disabled: (appData?.version ? appData?.version : 0) === version && updataTip === '0'
+                                    }}
+                                    onConfirm={() => upDateVersion(updataTip)}
+                                    okText="更新"
+                                    cancelText="取消"
+                                >
+                                    <Badge count={(appData?.version ? appData?.version : 0) !== version ? 1 : 0} dot>
+                                        <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                            版本号： <span className="font-blod">{appData?.version || 0}</span>
+                                        </span>
+                                    </Badge>
+                                </Popconfirm>
                             </div>
-                        )}
+                        </div>
                     </div>
                 )}
                 <div
                     style={{
                         height: detailShow
                             ? getTenant() === ENUM_TENANT.AI
-                                ? 'calc(100% - 100px)'
-                                : 'calc(100% - 50px)'
-                            : 'calc(100% - 14px)'
+                                ? 'calc(100% - 118px)'
+                                : 'calc(100% - 68px)'
+                            : 'calc(100% - 14px)',
+                        scrollbarGutter: 'stable'
                     }}
-                    className="overflow-y-auto pb-[72px] pr-2"
+                    className=" box-border overflow-y-auto pb-[72px] pr-1 mr-[-4px]"
                 >
                     <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
@@ -1546,9 +1767,14 @@ const Lefts = ({
                                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                             )) && (
                             <Tabs.TabPane key={'1'} tab="素材上传">
-                                <div className="flex items-center mb-2">
-                                    <InfoCircleOutlined rev={undefined} />
-                                    <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
+                                <div className="flex justify-between items-center mb-2">
+                                    <div>
+                                        <InfoCircleOutlined rev={undefined} />
+                                        <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
+                                    </div>
+                                    {/* <IconButton size="small">
+                                        <SettingOutlined rev={undefined} />
+                                    </IconButton> */}
                                 </div>
                                 <div>
                                     {materialTypeStatus ? (
@@ -1598,6 +1824,7 @@ const Lefts = ({
                                                     </Button>
                                                     <AiCreate
                                                         title="AI 生成"
+                                                        detail={detail}
                                                         materialType={materialType}
                                                         setColOpen={setColOpen}
                                                         columns={columns}
@@ -1630,8 +1857,9 @@ const Lefts = ({
                                                 </div>
                                             </div>
                                             <Table
-                                                className="!w-[684px]"
                                                 pagination={{
+                                                    defaultPageSize: 20,
+                                                    pageSizeOptions: [20, 50, 100, 300, 500],
                                                     onChange: (page) => {
                                                         setPage(page);
                                                     }
@@ -1663,155 +1891,172 @@ const Lefts = ({
                             }
                             tab="笔记生成"
                         >
-                            <div className="flex items-center mb-2">
-                                <InfoCircleOutlined rev={undefined} />
-                                <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
+                            <div className="flex justify-between items-center mb-2">
+                                <div>
+                                    <InfoCircleOutlined rev={undefined} />
+                                    <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
+                                </div>
+                                {detail && (
+                                    <Tooltip title="流程配置">
+                                        <Button
+                                            icon={<SettingOutlined rev={undefined} />}
+                                            shape="circle"
+                                            size="small"
+                                            type="primary"
+                                            onClick={() => setSettingOpen(true)}
+                                        />
+                                    </Tooltip>
+                                )}
                             </div>
-                            <Collapse
-                                defaultActiveKey={['0']}
-                                style={{ background: token.colorBgContainer, border: 'none' }}
-                                items={generateList?.map((item: any, index: number) => ({
-                                    key: index.toString(),
-                                    label: <span className="text-[16px]">{item.name}</span>,
-                                    children: (
-                                        <div key={item.field}>
-                                            <div className="text-xs text-black/50 mb-4">{item?.description}</div>
-                                            {item?.flowStep?.handler !== 'VariableActionHandler' ? (
-                                                item?.variable?.variables?.map((el: any, i: number) => (
-                                                    <div key={el.field}>
-                                                        {el?.isShow && (
-                                                            <MarketForm
-                                                                key={el.field}
-                                                                item={el}
-                                                                materialType={''}
-                                                                details={appData?.configuration?.appInformation}
-                                                                stepCode={item?.field}
-                                                                model={''}
-                                                                handlerCode={item?.flowStep?.handler}
-                                                                history={false}
-                                                                promptShow={true}
-                                                                setEditOpen={setEditOpens}
-                                                                setTitle={setTitles}
-                                                                setStep={() => {
-                                                                    stepRef.current = index;
-                                                                    setStep(stepRef.current);
-                                                                }}
-                                                                columns={stepMaterial[index]}
-                                                                setMaterialType={() => {
-                                                                    setMaterialTypes(
-                                                                        item?.variable?.variables?.find(
-                                                                            (i: any) => i.field === 'MATERIAL_TYPE'
-                                                                        )?.value
-                                                                    );
-                                                                }}
-                                                                onChange={(e: any) => {
-                                                                    const newList = _.cloneDeep(generRef.current);
-                                                                    const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
-                                                                    const code = item?.flowStep?.handler;
-                                                                    newList[index].variable.variables[i].value = e.value;
-                                                                    if (
-                                                                        type &&
-                                                                        item.variable.variables?.find(
-                                                                            (item: any) => item.style === 'MATERIAL'
-                                                                        )
-                                                                    ) {
-                                                                        newList[index].variable.variables[
-                                                                            item.variable.variables?.findIndex(
-                                                                                (item: any) => item.style === 'MATERIAL'
-                                                                            )
-                                                                        ].value = [];
+
+                            {generateList?.map((item: any, index: number) => (
+                                <div key={index}>
+                                    <Accordion defaultExpanded={index === 0} className="before:border-none !m-0">
+                                        <AccordionSummary
+                                            className="border-b border-solid border-black/20 p-0 !min-h-[0]"
+                                            sx={{
+                                                '& .Mui-expanded': {
+                                                    my: '12px !important'
+                                                },
+                                                '& .Mui-expanded .aaa': {
+                                                    transition: 'transform 0.4s',
+                                                    transform: 'rotate(0deg)'
+                                                }
+                                            }}
+                                        >
+                                            <div className="w-full flex items-center">
+                                                <ExpandMore className="aaa -rotate-90" />
+                                                {item.name}
+                                            </div>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            <div key={item.field}>
+                                                <div className="text-xs text-black/50">{item?.description}</div>
+                                                {item?.flowStep?.handler !== 'VariableActionHandler' ? (
+                                                    item?.variable?.variables?.map((el: any, i: number) => (
+                                                        <div key={el.field}>
+                                                            {el?.isShow && (
+                                                                <MarketForm
+                                                                    key={el.value}
+                                                                    item={el}
+                                                                    materialType={''}
+                                                                    details={
+                                                                        appData?.configuration?.appInformation ||
+                                                                        appData?.executeParam?.appInformation
+                                                                    }
+                                                                    stepCode={item?.field}
+                                                                    model={''}
+                                                                    handlerCode={item?.flowStep?.handler}
+                                                                    history={false}
+                                                                    promptShow={true}
+                                                                    setEditOpen={setEditOpens}
+                                                                    setTitle={setTitles}
+                                                                    setStep={() => {
                                                                         stepRef.current = index;
                                                                         setStep(stepRef.current);
-                                                                        setTableDatas(type, index);
-                                                                    }
-                                                                    if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
-                                                                        const num = item.variable.variables?.findIndex(
-                                                                            (item: any) => item.field === 'REQUIREMENT'
+                                                                    }}
+                                                                    columns={stepMaterial[index]}
+                                                                    setMaterialType={() => {
+                                                                        setMaterialTypes(
+                                                                            item?.variable?.variables?.find(
+                                                                                (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                            )?.value
                                                                         );
-                                                                        const num1 = item.variable.variables?.findIndex(
-                                                                            (item: any) => item.style === 'MATERIAL'
-                                                                        );
-                                                                        if (e.value === 'RANDOM') {
-                                                                            newList[index].variable.variables[num].isShow = false;
-                                                                            newList[index].variable.variables[num1].isShow = true;
-                                                                        } else if (e.value === 'AI_PARODY') {
-                                                                            newList[index].variable.variables[num].isShow = true;
-                                                                            newList[index].variable.variables[num1].isShow = true;
-                                                                        } else {
-                                                                            newList[index].variable.variables[num1].isShow = false;
-                                                                            newList[index].variable.variables[num].isShow = true;
+                                                                    }}
+                                                                    onChange={(e: any) => {
+                                                                        const newList = _.cloneDeep(generRef.current);
+                                                                        const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                                        const code = item?.flowStep?.handler;
+                                                                        newList[index].variable.variables[i].value = e.value;
+                                                                        if (
+                                                                            type &&
+                                                                            item.variable.variables?.find(
+                                                                                (item: any) => item.style === 'MATERIAL'
+                                                                            )
+                                                                        ) {
+                                                                            newList[index].variable.variables[
+                                                                                item.variable.variables?.findIndex(
+                                                                                    (item: any) => item.style === 'MATERIAL'
+                                                                                )
+                                                                            ].value = [];
+                                                                            stepRef.current = index;
+                                                                            setStep(stepRef.current);
+                                                                            setTableDatas(type, index);
                                                                         }
-                                                                    }
-                                                                    generRef.current = newList;
-                                                                    setGenerateList(generRef.current);
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <Tabs defaultActiveKey="1">
-                                                    <Tabs.TabPane tab="变量编辑" key="1">
-                                                        <Row gutter={10}>
-                                                            {item?.variable?.variables?.map((item: any, de: number) => (
-                                                                <Col key={item?.field} span={24}>
-                                                                    <Forms
-                                                                        item={item}
-                                                                        index={de}
-                                                                        changeValue={(data: any) => {
-                                                                            const newList = _.cloneDeep(generRef.current);
-                                                                            newList[index].variable.variables[de].value = data.value;
-                                                                            generRef.current = newList;
-                                                                            setGenerateList(generRef.current);
-                                                                        }}
-                                                                        flag={false}
-                                                                    />
-                                                                </Col>
-                                                            ))}
-                                                        </Row>
-                                                    </Tabs.TabPane>
-                                                    <Tabs.TabPane tab="变量列表" key="2">
-                                                        <CreateVariable
-                                                            rows={item?.variable?.variables}
-                                                            setRows={(data: any[]) => {
-                                                                const newList = _.cloneDeep(generRef.current);
-                                                                newList[index].variable.variables = data;
-                                                                generRef.current = newList;
-                                                                setGenerateList(generRef.current);
-                                                            }}
-                                                        />
-                                                    </Tabs.TabPane>
-                                                </Tabs>
-                                            )}
-                                        </div>
-                                    ),
-                                    style: {
-                                        marginBottom: 16,
-                                        background: token.colorFillAlter,
-                                        borderRadius: token.borderRadiusLG,
-                                        border: 'none'
-                                    }
-                                }))}
-                            >
-                                {/* {generateList?.map((item: any, index: number) => (
-                                        <Panel header="This is panel header 1" key="0">
+                                                                        if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
+                                                                            const num = item.variable.variables?.findIndex(
+                                                                                (item: any) => item.field === 'REQUIREMENT'
+                                                                            );
+                                                                            const num1 = item.variable.variables?.findIndex(
+                                                                                (item: any) => item.style === 'MATERIAL'
+                                                                            );
+                                                                            if (e.value === 'RANDOM') {
+                                                                                newList[index].variable.variables[num].isShow = false;
+                                                                                newList[index].variable.variables[num1].isShow = true;
+                                                                            } else if (e.value === 'AI_PARODY') {
+                                                                                newList[index].variable.variables[num].isShow = true;
+                                                                                newList[index].variable.variables[num1].isShow = true;
+                                                                            } else {
+                                                                                newList[index].variable.variables[num1].isShow = false;
+                                                                                newList[index].variable.variables[num].isShow = true;
+                                                                            }
+                                                                        }
+                                                                        generRef.current = newList;
+                                                                        setGenerateList(generRef.current);
+                                                                        setAppDataGen();
+                                                                        setAppData(appRef.current);
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <Row gutter={10}>
+                                                        {item?.variable?.variables?.map((item: any, de: number) => (
+                                                            <Col key={item?.value} span={24}>
+                                                                <Forms
+                                                                    item={item}
+                                                                    index={de}
+                                                                    changeValue={(data: any) => {
+                                                                        const newList = _.cloneDeep(generRef.current);
+                                                                        newList[index].variable.variables[de].value = data.value;
+                                                                        generRef.current = newList;
+                                                                        setGenerateList(generRef.current);
+                                                                        setAppDataGen();
+                                                                    }}
+                                                                    flag={false}
+                                                                />
+                                                            </Col>
+                                                        ))}
+                                                    </Row>
+                                                    // <Tabs defaultActiveKey="1">
+                                                    //     {/* <Tabs.TabPane tab="变量编辑" key="1"> */}
 
-</Panel>))} */}
-                            </Collapse>
+                                                    //     {/* </Tabs.TabPane> */}
+                                                    //     {/* <Tabs.TabPane tab="变量列表" key="2">
+                                                    //         <CreateVariable
+                                                    //             rows={item?.variable?.variables}
+                                                    //             setRows={(data: any[]) => {
+                                                    //                 const newList = _.cloneDeep(generRef.current);
+                                                    //                 newList[index].variable.variables = data;
+                                                    //                 generRef.current = newList;
+                                                    //                 setGenerateList(generRef.current);
+                                                    //                 setAppDataGen();
+                                                    //             }}
+                                                    //         />
+                                                    //     </Tabs.TabPane> */}
+                                                    // {/* </Tabs> */}
+                                                )}
+                                            </div>
+                                        </AccordionDetails>
+                                    </Accordion>
+                                </div>
+                            ))}
                         </Tabs.TabPane>
                         {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
-                                <div className="flex items-center mb-2">
-                                    <Tooltip title="生成图片时会按照风格模板的顺序去使用">
-                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
-                                    </Tooltip>
-
-                                    <span className="text-sm ml-1 text-stone-600">
-                                        配置笔记图片生成的风格模版，支持不同风格模版组合生成
-                                    </span>
-                                </div>
                                 {detail ? (
                                     <AddStyle
                                         saveTemplate={saveTemplate}
@@ -1854,7 +2099,8 @@ const Lefts = ({
                                 <AddStyle
                                     canAddCustomStyle={false}
                                     details={appData?.configuration?.appInformation}
-                                    hasAddStyle={true}
+                                    // hasAddStyle={true}
+                                    hasAddStyle={false}
                                     setImageVar={setImageVar}
                                     appUid={appData?.appUid}
                                     ref={imageRef}
@@ -1893,7 +2139,7 @@ const Lefts = ({
                         )}
                     </Tabs>
                 </div>
-                <div className="z-[1000] absolute bottom-[-2px] flex gap-2 bg-[#fff] pt-4 w-[calc(100%-8px)]">
+                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <>
                             <Button
@@ -1945,7 +2191,7 @@ const Lefts = ({
                     className="min-w-[472px]"
                     preview={false}
                     alt="example"
-                    src={previewImage + '?x-oss-process=image/resize,w_300/quality,q_80'}
+                    src={previewImage + '?x-oss-process=image/resize,w_100/quality,q_80'}
                 />
             </Modal>
             {zoomOpen && (
@@ -1964,6 +2210,7 @@ const Lefts = ({
                     setField={setField}
                     setFieldHeads={setFieldHeads}
                     materialType={materialType}
+                    detail={detail}
                     columns={columns}
                     tableData={tableData}
                     setTitle={setTitle}
@@ -2036,6 +2283,8 @@ const Lefts = ({
             </Modal>
             {editOpen && (
                 <FormModal
+                    allData={appData}
+                    details={appData?.configuration?.appInformation}
                     title={title}
                     editOpen={editOpen}
                     setEditOpen={setEditOpen}
@@ -2047,6 +2296,8 @@ const Lefts = ({
             )}
             {editOpens && (
                 <FormModal
+                    allData={appData}
+                    details={appData?.configuration?.appInformation}
                     title={titles}
                     materialType={materialTypes}
                     editOpen={editOpens}
@@ -2071,7 +2322,549 @@ const Lefts = ({
                 }}
                 src={previewUrl}
             />
-            {isModalOpen && <PicImagePick isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} setSelectImg={setSelectImg} />}
+            {isModalOpen && (
+                <PicImagePick
+                    allData={appData}
+                    details={appData?.configuration?.appInformation}
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    setSelectImg={setSelectImg}
+                    columns={columns}
+                    values={values}
+                />
+            )}
+            {settingOpen && (
+                <Modal width={'80%'} className="relative" open={settingOpen} onCancel={() => setSettingOpen(false)} footer={false}>
+                    <div style={{ scrollbarGutter: 'stable' }} className="h-[80vh] overflow-y-auto">
+                        <div className=" bg-white w-full flex items-center justify-between pl-4 pr-14 absolute top-[15px] right-[0px]">
+                            <div className="text-[16px] font-[600]">编辑步骤</div>
+                            <Button
+                                onClick={() => {
+                                    const arr = headerSaveAll();
+                                    setDetail &&
+                                        setDetail({
+                                            ...detail,
+                                            workflowConfig: {
+                                                steps: arr?.filter((item: any) => item)
+                                            }
+                                        });
+                                }}
+                                type="primary"
+                            >
+                                保存
+                            </Button>
+                        </div>
+                        <div
+                            style={{
+                                backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
+                                backgroundSize: '10px 10px',
+                                backgroundRepeat: 'repeat'
+                            }}
+                            className="flex justify-center mt-6"
+                        >
+                            <div className="2xl:w-[1000px] xl:w-[820px] lg:w-[740px]  w-[100%]">
+                                {appData?.configuration?.appInformation?.workflowConfig?.steps?.map((item: any, index: number) => (
+                                    <div key={index}>
+                                        {index !== 0 && (
+                                            //  &&
+                                            //     appData?.configuration?.appInformation?.workflowConfig?.steps?.every(
+                                            //         (i: any) => i.flowStep.handler !== 'MaterialActionHandler'
+                                            // )
+                                            <>
+                                                {/* <Popover
+                                            placement="bottom"
+                                            trigger={'click'}
+                                            content={
+                                                <div className="lg:w-[700px] md:w-[80%] flex gap-2 flex-wrap">
+                                                    {stepLists
+                                                        ?.filter((item) => item.flowStep.handler === 'MaterialActionHandler')
+                                                        ?.map((el) => (
+                                                            <div
+                                                                onClick={() => addupStep(el, index)}
+                                                                className="!w-[calc(50%-0.25rem)] flex gap-2 items-center hover:shadow-md cursor-pointer p-2 rounded-md"
+                                                            >
+                                                                <div className="border border-solid border-[rgba(76,76,102,.1)] rounded-lg p-2 ">
+                                                                    <Image
+                                                                        preview={false}
+                                                                        width={40}
+                                                                        height={40}
+                                                                        src={getImage(el?.flowStep?.icon)}
+                                                                        fallback="data:image/png;base64,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"
+                                                                        alt="svg"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex justify-between gap-2 flex-col">
+                                                                    <div className="text-[16px] font-bold">{el?.name}</div>
+                                                                    <div className="text-xs text-black/50 line-clamp-3">
+                                                                        {el.description}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                </div>
+                                            }
+                                        >
+                                            <IconButton color="secondary" sx={{ display: 'block', margin: '0 auto', fontSize: 'unset' }}>
+                                                <AddCircleSharp />
+                                            </IconButton>
+                                        </Popover> */}
+                                                <div className="flex justify-center my-4">
+                                                    <South />
+                                                </div>
+                                            </>
+                                        )}
+                                        <Accordion
+                                            expanded={
+                                                item?.flowStep?.handler === 'MaterialActionHandler' ||
+                                                item?.flowStep?.handler === 'PosterActionHandler'
+                                                    ? false
+                                                    : undefined
+                                            }
+                                            key={item?.flowStep?.handler}
+                                            onChange={(e) => {
+                                                if (
+                                                    item?.flowStep?.handler === 'MaterialActionHandler' ||
+                                                    item?.flowStep?.handler === 'PosterActionHandler'
+                                                ) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '该节点请在外部编辑',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                            close: false
+                                                        })
+                                                    );
+                                                }
+                                            }}
+                                            className="before:border-none !m-0 border border-solid border-black/20 rounded-lg"
+                                        >
+                                            <AccordionSummary
+                                                className="p-0 !min-h-0 !h-[70px] bg-black/10"
+                                                sx={{
+                                                    '& .Mui-expanded': {
+                                                        m: '0 !important'
+                                                    },
+                                                    '& .MuiAccordionSummary-content': {
+                                                        m: '0 !important'
+                                                    },
+                                                    '& .Mui-expanded .aaa': {
+                                                        transition: 'transform 0.4s',
+                                                        transform: 'rotate(0deg)'
+                                                    }
+                                                }}
+                                            >
+                                                <div className="w-full flex justify-between items-center">
+                                                    <div className="flex gap-2 items-center">
+                                                        <div className="w-[24px]">
+                                                            {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                                item?.flowStep?.handler !== 'PosterActionHandler' && (
+                                                                    <ExpandMore className="aaa -rotate-90" />
+                                                                )}
+                                                        </div>
+                                                        <Image
+                                                            preview={false}
+                                                            style={{ width: '25px', height: '25px' }}
+                                                            src={getImage(item.flowStep.icon)}
+                                                            fallback="data:image/png;base64,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"
+                                                            alt="svg"
+                                                        />
+                                                        <div className="font-bold text-[16px]">{item.name}</div>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        {item?.flowStep?.handler === 'VariableActionHandler' && (
+                                                            <div className="flex justify-end">
+                                                                <Tooltip title="高级配置">
+                                                                    <IconButton
+                                                                        onClick={(e) => {
+                                                                            setAllVariable(item);
+                                                                            setStepIndex(index - 1);
+                                                                            setAdvancedModal(true);
+                                                                        }}
+                                                                        size="small"
+                                                                    >
+                                                                        <SettingOutlined rev={undefined} />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </div>
+                                                        )}
+                                                        {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                            item?.flowStep?.handler !== 'PosterActionHandler' &&
+                                                            item?.flowStep?.handler !== 'AssembleActionHandler' &&
+                                                            item?.flowStep?.handler !== 'VariableActionHandler' && (
+                                                                <Tooltip title="高级配置">
+                                                                    <IconButton
+                                                                        onClick={(e) => {
+                                                                            setStepIndex(index);
+                                                                            setStepTitData({
+                                                                                name: item?.name,
+                                                                                description: item?.description
+                                                                            });
+                                                                            setSteotitOpen(true);
+                                                                            e.stopPropagation();
+                                                                        }}
+                                                                        size="small"
+                                                                    >
+                                                                        <SettingOutlined rev={undefined} />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            )}
+                                                        {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                            item?.flowStep?.handler !== 'PosterActionHandler' &&
+                                                            item?.flowStep?.handler !== 'AssembleActionHandler' && (
+                                                                <Dropdown
+                                                                    placement="bottom"
+                                                                    menu={{
+                                                                        items: [
+                                                                            {
+                                                                                key: '1',
+                                                                                label: ' 向上',
+                                                                                disabled:
+                                                                                    index === 1 ||
+                                                                                    appData?.configuration?.appInformation?.workflowConfig
+                                                                                        ?.steps[index - 1]?.flowStep.handler ===
+                                                                                        'VariableActionHandler',
+                                                                                icon: <VerticalAlignTopOutlined rev={undefined} />
+                                                                            },
+                                                                            {
+                                                                                key: '2',
+                                                                                label: ' 向下',
+                                                                                disabled:
+                                                                                    appData?.configuration?.appInformation?.workflowConfig
+                                                                                        ?.steps?.length -
+                                                                                        3 ===
+                                                                                        index ||
+                                                                                    item.flowStep.handler === 'VariableActionHandler',
+
+                                                                                icon: <VerticalAlignBottomOutlined rev={undefined} />
+                                                                            },
+                                                                            {
+                                                                                key: '3',
+                                                                                label: ' 复制',
+                                                                                disabled: item.flowStep.handler === 'VariableActionHandler',
+                                                                                icon: <CopyOutlined rev={undefined} />
+                                                                            },
+                                                                            {
+                                                                                key: '4',
+                                                                                label: '删除',
+                                                                                icon: <DeleteOutlined rev={undefined} />
+                                                                            }
+                                                                        ],
+                                                                        onClick: (e: any) => {
+                                                                            switch (e.key) {
+                                                                                case '1':
+                                                                                    stepMove(index, -1);
+                                                                                    break;
+                                                                                case '2':
+                                                                                    stepMove(index, 1);
+                                                                                    break;
+                                                                                case '3':
+                                                                                    copyStep(item, index);
+                                                                                    break;
+                                                                                case '4':
+                                                                                    delStep(index);
+                                                                                    break;
+                                                                            }
+                                                                            e.domEvent.stopPropagation();
+                                                                        }
+                                                                    }}
+                                                                    trigger={['click']}
+                                                                >
+                                                                    <IconButton size="small" onClick={(e) => e.stopPropagation()}>
+                                                                        <MoreVert />
+                                                                    </IconButton>
+                                                                </Dropdown>
+                                                            )}
+                                                    </div>
+                                                </div>
+                                            </AccordionSummary>
+                                            <AccordionDetails>
+                                                <div key={item.field}>
+                                                    <div className="text-xs text-black/50 mb-4">{item?.description}</div>
+
+                                                    {item?.flowStep?.handler !== 'VariableActionHandler' ? (
+                                                        item?.variable?.variables?.map((el: any, i: number) => (
+                                                            <div key={el.field}>
+                                                                {el?.isShow && (
+                                                                    <MarketForm
+                                                                        key={el.field}
+                                                                        item={el}
+                                                                        materialType={''}
+                                                                        details={
+                                                                            appData?.configuration?.appInformation ||
+                                                                            appData?.executeParam?.appInformation
+                                                                        }
+                                                                        stepCode={item?.field}
+                                                                        model={''}
+                                                                        handlerCode={item?.flowStep?.handler}
+                                                                        history={false}
+                                                                        promptShow={true}
+                                                                        setEditOpen={setEditOpens}
+                                                                        setTitle={setTitles}
+                                                                        setStep={() => {
+                                                                            stepRef.current = index - 1;
+                                                                            setStep(stepRef.current);
+                                                                        }}
+                                                                        columns={stepMaterial[index - 1]}
+                                                                        setMaterialType={() => {
+                                                                            setMaterialTypes(
+                                                                                item?.variable?.variables?.find(
+                                                                                    (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                                )?.value
+                                                                            );
+                                                                        }}
+                                                                        onChange={(e: any) => {
+                                                                            const newList = _.cloneDeep(generRef.current);
+                                                                            const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                                            const code = item?.flowStep?.handler;
+                                                                            newList[index - 1].variable.variables[i].value = e.value;
+                                                                            if (
+                                                                                type &&
+                                                                                item.variable.variables?.find(
+                                                                                    (item: any) => item.style === 'MATERIAL'
+                                                                                )
+                                                                            ) {
+                                                                                newList[index - 1].variable.variables[
+                                                                                    item.variable.variables?.findIndex(
+                                                                                        (item: any) => item.style === 'MATERIAL'
+                                                                                    )
+                                                                                ].value = [];
+                                                                                stepRef.current = index - 1;
+                                                                                setStep(stepRef.current);
+                                                                                setTableDatas(type, index - 1);
+                                                                            }
+                                                                            if (
+                                                                                code === 'CustomActionHandler' &&
+                                                                                e.name === 'GENERATE_MODE'
+                                                                            ) {
+                                                                                const num = item.variable.variables?.findIndex(
+                                                                                    (item: any) => item.field === 'REQUIREMENT'
+                                                                                );
+                                                                                const num1 = item.variable.variables?.findIndex(
+                                                                                    (item: any) => item.style === 'MATERIAL'
+                                                                                );
+                                                                                if (e.value === 'RANDOM') {
+                                                                                    newList[index - 1].variable.variables[num].isShow =
+                                                                                        false;
+                                                                                    newList[index - 1].variable.variables[num1].isShow =
+                                                                                        true;
+                                                                                } else if (e.value === 'AI_PARODY') {
+                                                                                    newList[index - 1].variable.variables[num].isShow =
+                                                                                        true;
+                                                                                    newList[index - 1].variable.variables[num1].isShow =
+                                                                                        true;
+                                                                                } else {
+                                                                                    newList[index - 1].variable.variables[num1].isShow =
+                                                                                        false;
+                                                                                    newList[index - 1].variable.variables[num].isShow =
+                                                                                        true;
+                                                                                }
+                                                                            }
+                                                                            generRef.current = newList;
+                                                                            setGenerateList(generRef.current);
+                                                                            setAppDataGen();
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        // <Tabs defaultActiveKey="1">
+                                                        // <Tabs.TabPane tab="变量编辑" key="1">
+
+                                                        <Row gutter={10}>
+                                                            {item?.variable?.variables?.map((item: any, de: number) => (
+                                                                <Col key={item?.field} span={24}>
+                                                                    <Forms
+                                                                        item={item}
+                                                                        index={de}
+                                                                        changeValue={(data: any) => {
+                                                                            const newList = _.cloneDeep(generRef.current);
+                                                                            newList[index - 1].variable.variables[de].value = data.value;
+                                                                            generRef.current = newList;
+                                                                            console.log(generRef.current);
+
+                                                                            setGenerateList(generRef.current);
+                                                                            setAppDataGen();
+                                                                        }}
+                                                                        flag={false}
+                                                                    />
+                                                                </Col>
+                                                            ))}
+                                                        </Row>
+
+                                                        //     </Tabs.TabPane>
+                                                        //     <Tabs.TabPane tab="变量列表" key="2">
+                                                        //         <CreateVariable
+                                                        //             rows={item?.variable?.variables}
+                                                        //             setRows={(data: any[]) => {
+                                                        //                 const newList = _.cloneDeep(generRef.current);
+                                                        //                 newList[index - 1].variable.variables = data;
+                                                        //                 generRef.current = newList;
+                                                        //                 setGenerateList(generRef.current);
+                                                        //                 setAppDataGen();
+                                                        //             }}
+                                                        //         />
+                                                        //     </Tabs.TabPane>
+                                                        // </Tabs>
+                                                    )}
+                                                </div>
+                                            </AccordionDetails>
+                                        </Accordion>
+                                        {(index !== 0 ||
+                                            appData?.configuration?.appInformation?.workflowConfig?.steps[1]?.flowStep.handler !==
+                                                'VariableActionHandler') &&
+                                            appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 1 !== index &&
+                                            appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 2 !== index && (
+                                                <>
+                                                    <div className="flex justify-center my-4">
+                                                        <div className="h-[20px] w-[2px] bg-black/80"></div>
+                                                    </div>
+                                                    <Popover
+                                                        open={stepOpen[index]}
+                                                        placement="bottom"
+                                                        trigger={'click'}
+                                                        onOpenChange={(open: boolean) => {
+                                                            const newList = _.cloneDeep(stepOpen);
+                                                            newList[index] = open;
+                                                            setStepOpen(newList);
+                                                        }}
+                                                        content={
+                                                            <div className="lg:w-[700px] md:w-[80%] flex gap-2 flex-wrap">
+                                                                {stepLists
+                                                                    ?.filter((item) => {
+                                                                        if (index === 0) {
+                                                                            return (
+                                                                                item.flowStep.handler !== 'MaterialActionHandler' &&
+                                                                                item.flowStep.handler !== 'PosterActionHandler' &&
+                                                                                item.flowStep.handler !== 'AssembleActionHandler'
+                                                                            );
+                                                                        } else {
+                                                                            return (
+                                                                                item.flowStep.handler !== 'MaterialActionHandler' &&
+                                                                                item.flowStep.handler !== 'PosterActionHandler' &&
+                                                                                item.flowStep.handler !== 'AssembleActionHandler' &&
+                                                                                item.flowStep.handler !== 'VariableActionHandler'
+                                                                            );
+                                                                        }
+                                                                    })
+                                                                    ?.map((el) => (
+                                                                        <div
+                                                                            onClick={() => {
+                                                                                if (
+                                                                                    index === 0 &&
+                                                                                    el.flowStep.handler === 'VariableActionHandler' &&
+                                                                                    appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                                                                                        (i: any) =>
+                                                                                            i.flowStep.handler === 'VariableActionHandler'
+                                                                                    )
+                                                                                ) {
+                                                                                    dispatch(
+                                                                                        openSnackbar({
+                                                                                            open: true,
+                                                                                            message: '全局变量已经存在',
+                                                                                            variant: 'alert',
+                                                                                            alert: {
+                                                                                                color: 'error'
+                                                                                            },
+                                                                                            anchorOrigin: {
+                                                                                                vertical: 'top',
+                                                                                                horizontal: 'center'
+                                                                                            },
+                                                                                            close: false
+                                                                                        })
+                                                                                    );
+                                                                                } else {
+                                                                                    addStep(el, index);
+                                                                                }
+                                                                            }}
+                                                                            className="!w-[calc(50%-0.25rem)] flex gap-2 items-center hover:shadow-md cursor-pointer p-2 rounded-md"
+                                                                        >
+                                                                            <div className="border border-solid border-[rgba(76,76,102,.1)] rounded-lg p-2 ">
+                                                                                <Image
+                                                                                    preview={false}
+                                                                                    width={40}
+                                                                                    height={40}
+                                                                                    src={getImage(el?.flowStep?.icon)}
+                                                                                    fallback="data:image/png;base64,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"
+                                                                                    alt="svg"
+                                                                                />
+                                                                            </div>
+                                                                            <div className="flex justify-between gap-2 flex-col">
+                                                                                <div className="text-[16px] font-bold">{el?.name}</div>
+                                                                                <div className="text-xs text-black/50 line-clamp-3">
+                                                                                    {el.description}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <div className="flex justify-center cursor-pointer">
+                                                            <AddCircleSharp color="secondary" />
+                                                        </div>
+                                                    </Popover>
+                                                </>
+                                            )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+            {steptitOpen && (
+                <EditStepTitle
+                    steptitOpen={steptitOpen}
+                    setSteotitOpen={setSteotitOpen}
+                    setData={(data: any) => {
+                        const newList = _.cloneDeep(generRef.current);
+                        const newLists = _.cloneDeep(appRef.current);
+                        newList[stepIndex - 1] = {
+                            ...newList[stepIndex - 1],
+                            ...data,
+                            field: data.name
+                        };
+                        newLists.configuration.appInformation.workflowConfig.steps[stepIndex] = {
+                            ...newLists.configuration?.appInformation?.workflowConfig?.steps[stepIndex],
+                            ...data
+                        };
+
+                        generRef.current = newList;
+                        appRef.current = newLists;
+                        setAppData(appRef.current);
+                        setGenerateList(generRef.current);
+                    }}
+                    stepTitData={stepTitData}
+                />
+            )}
+            {advancedModal && (
+                <Modal width={'60%'} title="高级设置" open={advancedModal} footer={false} onCancel={() => setAdvancedModal(false)}>
+                    <CreateVariable
+                        rows={allVariable?.variable?.variables}
+                        setRows={(data: any[]) => {
+                            console.log(data);
+
+                            const newTable = data?.map((item) => ({
+                                ...item,
+                                isShow: false
+                            }));
+                            const newData = _.cloneDeep(allVariable);
+                            newData.variable.variables = newTable;
+                            setAllVariable(newData);
+                            const newList = _.cloneDeep(generRef.current);
+                            newList[stepIndex].variable.variables = newTable;
+                            generRef.current = newList;
+                            setGenerateList(generRef.current);
+                            setAppDataGen();
+                        }}
+                    />
+                </Modal>
+            )}
         </>
     );
 };

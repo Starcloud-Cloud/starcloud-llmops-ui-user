@@ -1,22 +1,34 @@
-import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button } from 'antd';
+import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag, Empty, Spin, Progress } from 'antd';
 import { imageSearch } from 'api/redBook/imageSearch';
+import { appModify } from 'api/template';
 import axios from 'axios';
 import { debounce } from 'lodash-es';
 import React, { useCallback, useEffect, useState } from 'react';
 import Masonry from 'react-responsive-masonry';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 import { getAccessToken } from 'utils/auth';
+import { planModifyConfig } from 'api/redBook/batchIndex';
 
 const { Search } = Input;
 const { Option } = Select;
 
 export const PicImagePick = ({
+    allData,
+    details,
     isModalOpen,
     setIsModalOpen,
-    setSelectImg
+    setSelectImg,
+    columns,
+    values
 }: {
+    allData?: any;
+    details?: any;
     isModalOpen: boolean;
     setIsModalOpen: (isModalOpen: boolean) => void;
     setSelectImg: (selectImg: any) => void;
+    columns?: any[];
+    values?: any;
 }) => {
     const [hits, setHits] = useState<any[]>([]);
     const [totalHits, setTotalHits] = useState(0);
@@ -25,6 +37,17 @@ export const PicImagePick = ({
     const [q, setQ] = useState('');
     const [size, setSize] = useState<any>({});
     const [query, setQuery] = useState<any>({});
+    const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
+    const [inputValue, setInputValue] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
+    const [submitLoading, setSubmitLoading] = React.useState(false);
+    const [percent, setPercent] = React.useState({
+        label: '图片下载中',
+        value: 0
+    });
+    const [currentDetails, setCurrentDetails] = React.useState<any>(null);
+    const [visibleSaveFilter, setVisibleSaveFilter] = React.useState(false);
+
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
     const currentPageRef = React.useRef(currentPage);
@@ -37,6 +60,37 @@ export const PicImagePick = ({
     useEffect(() => {
         currentPageRef.current = currentPage;
     }, [currentPage]);
+
+    // 回显
+    useEffect(() => {
+        if (details) {
+            details.workflowConfig.steps.forEach((item: any) => {
+                if (item.flowStep.handler === 'MaterialActionHandler') {
+                    const searchHabitsString = item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')?.value || '{}';
+                    setVisibleSaveFilter(searchHabitsString === '{}' ? false : true);
+                    const searchHabitsStringJson = JSON.parse(searchHabitsString);
+                    setQuery(searchHabitsStringJson?.query || {});
+                    setSize(searchHabitsStringJson?.size || {});
+                }
+            });
+        }
+    }, [details]);
+
+    // 设置值
+    useEffect(() => {
+        if (details) {
+            details.workflowConfig.steps.forEach((item: any) => {
+                if (item.flowStep.handler === 'MaterialActionHandler') {
+                    if (item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')) {
+                        item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });
+                    }
+                }
+            });
+            setCurrentDetails(details);
+        }
+    }, [details, query, size]);
+
+    console.log(currentDetails);
 
     const handleScroll = useCallback(
         debounce(() => {
@@ -62,13 +116,58 @@ export const PicImagePick = ({
     }, [handleScroll]);
 
     const handleOk = async () => {
-        const response = await axios.get(checkItem.largeImageURL, { responseType: 'blob' });
-        const imageBlob = response.data;
+        if (!checkItem?.largeImageURL) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '请选择图片',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+            return;
+        }
+        setPercent({
+            label: '图片下载中',
+            value: 0
+        });
+        let imageBlob;
+        try {
+            setSubmitLoading(true);
+            const response = await axios.get(checkItem.largeImageURL, { responseType: 'blob' });
+            imageBlob = response.data;
+        } catch (error) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '图片获取失败',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+            setSubmitLoading(false);
+        }
+        setPercent({
+            label: '图片上传中',
+            value: 33
+        });
 
         // Step 2: 创建FormData对象
         const formData = new FormData();
         formData.append('image', imageBlob, 'image.jpg'); // 'file' 是服务器端接收图片的字段名，'downloaded-image.jpg' 是文件名
 
+        setPercent({
+            label: '图片上传到云端',
+            value: 66
+        });
         // Step 3: 上传到服务器
         const uploadResponse = await axios.post(
             `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
@@ -79,10 +178,18 @@ export const PicImagePick = ({
                 }
             }
         );
+
         const url = uploadResponse.data.data.url;
 
         setSelectImg({ ...checkItem, largeImageURL: url });
         handleCancel();
+
+        setTimeout(() => {
+            setPercent({
+                label: '图片插入成功',
+                value: 100
+            });
+        }, 1000);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -92,18 +199,88 @@ export const PicImagePick = ({
         setTotalHits(0);
     };
     useEffect(() => {
-        console.log(hits, 'hits');
-        imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query }).then(
-            (res) => {
-                const { totalHits, hits: newData } = res;
-                setHits([...hits, ...newData]);
-                setTotalHits(totalHits);
-            }
-        );
+        const fetchData = debounce(() => {
+            setLoading(true);
+            imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query })
+                .then((res) => {
+                    const { totalHits, hits: newData } = res;
+                    setHits([...hits, ...newData]);
+                    setTotalHits(totalHits);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }, 200); // 设置防抖时间为300毫秒
+
+        fetchData();
+
+        return () => {
+            fetchData.cancel(); // 取消防抖
+        };
     }, [currentPage, q, query]);
 
     const onChange = (item: any) => {
         setCheckItem(item);
+    };
+
+    const tags = React.useMemo(() => {
+        return (
+            columns
+                ?.filter((item: any) => item?.type === 'string' || item.type === 'textBox')
+                ?.map((item: any) => ({
+                    label: item?.title,
+                    value: values[item?.dataIndex]
+                }))
+                .filter((item: any) => item.value) || []
+        );
+    }, [values, columns]);
+
+    const handleChange = (tag: string, checked: boolean) => {
+        const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter((t) => t !== tag);
+        setSelectedTags(nextSelectedTags);
+    };
+
+    useEffect(() => {
+        setInputValue(selectedTags.join('+'));
+    }, [selectedTags]);
+
+    const handleFilter = () => {
+        // 保存筛选项
+        currentDetails?.workflowConfig?.steps?.forEach((item: any) => {
+            const arr = item?.variable?.variables;
+            const arr1 = item?.flowStep?.variable?.variables;
+            arr?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+            arr1?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+        });
+
+        appModify(currentDetails).then((res) => {
+            planModifyConfig({
+                ...allData,
+                configuration: { ...allData.configuration, appInformation: currentDetails },
+                validate: false
+            }).then((planRes) => {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '保存成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        close: false
+                    })
+                );
+            });
+        });
     };
 
     return (
@@ -111,19 +288,44 @@ export const PicImagePick = ({
             <Search
                 placeholder="请输入搜索的图片"
                 enterButton
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
                 onSearch={(value) => {
-                    setQ(value);
-                    setCurrentPage(1);
-                    setHits([]);
-                    setTotalHits(0);
+                    if (value !== q || !value) {
+                        setQ(value);
+                        setCurrentPage(1);
+                        setHits([]);
+                        setTotalHits(0);
+                    }
                 }}
             />
+            {tags?.length > 0 && (
+                <div className="flex mt-3">
+                    <span className="w-[60px]">素材字段</span>
+                    <div className="flex-1 overflow-auto">
+                        {tags?.map((item: any, index: number) => {
+                            const showValue = item.value.length > 20 ? item.value.slice(0, 20) + '...' : item.value;
+                            return (
+                                <Tag.CheckableTag
+                                    key={index}
+                                    checked={selectedTags.includes(item.value)}
+                                    onChange={(checked) => handleChange(item.value, checked)}
+                                >
+                                    <span className="font-bold">{item.label}：</span>
+                                    {showValue}
+                                </Tag.CheckableTag>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
             <div className="mt-2">
                 <Space>
                     <span className="border-solid">筛选项</span>
                     <Select
                         style={{ width: '120px' }}
                         placeholder="图片类型"
+                        value={query?.image_type}
                         onChange={(value) => {
                             setCurrentPage(1);
                             setHits([]);
@@ -142,6 +344,7 @@ export const PicImagePick = ({
                     <Select
                         style={{ width: '120px' }}
                         placeholder="图像方向"
+                        value={query?.orientation}
                         onChange={(value) => {
                             setCurrentPage(1);
                             setHits([]);
@@ -164,6 +367,7 @@ export const PicImagePick = ({
                                 <div>
                                     <InputNumber
                                         placeholder="宽度(像素)"
+                                        value={size?.min_width}
                                         onChange={(value) => {
                                             setSize((pre: any) => ({
                                                 ...pre,
@@ -174,6 +378,7 @@ export const PicImagePick = ({
                                     x
                                     <InputNumber
                                         placeholder="长度(像素)"
+                                        value={size?.min_height}
                                         onChange={(value) => {
                                             setSize((pre: any) => ({
                                                 ...pre,
@@ -214,6 +419,7 @@ export const PicImagePick = ({
                         style={{ width: '300px' }}
                         placeholder="颜色"
                         mode="multiple"
+                        value={query?.colors ? query?.colors?.split(',') : []}
                         onChange={(value) => {
                             setCurrentPage(1);
                             setHits([]);
@@ -239,28 +445,59 @@ export const PicImagePick = ({
                         <Option value={'black'}>黑色</Option>
                         <Option value={'brown'}>棕色</Option>
                     </Select>
+                    {visibleSaveFilter && (
+                        <Button type="primary" onClick={() => handleFilter()}>
+                            保存筛选项
+                        </Button>
+                    )}
                 </Space>
             </div>
+
             <div className="mt-3 max-h-[560px] overflow-auto" ref={scrollRef}>
-                <Masonry columnsCount={4}>
-                    {hits.map((item: any, index: number) => (
-                        <div className="mx-2 my-2 relative" key={index}>
-                            <Checkbox
-                                checked={item.id === checkItem?.id}
-                                onChange={() => onChange(item)}
-                                className="absolute right-0 z-10"
-                            />
-                            <Image
-                                width={'100%'}
-                                src={item.previewURL}
-                                preview={{
-                                    src: item.largeImageURL
-                                }}
-                            />
+                {hits.length ? (
+                    <Spin spinning={loading}>
+                        <div className="min-h-[300px]">
+                            <Masonry columnsCount={4}>
+                                {hits.map((item: any, index: number) => (
+                                    <div className="mx-2 my-2 relative" key={index}>
+                                        <Checkbox
+                                            checked={item.id === checkItem?.id}
+                                            onChange={() => onChange(item)}
+                                            className="absolute right-0 z-10"
+                                        />
+                                        <Image
+                                            width={'100%'}
+                                            src={item.previewURL}
+                                            preview={{
+                                                src: item.largeImageURL
+                                            }}
+                                        />
+                                    </div>
+                                ))}
+                            </Masonry>
                         </div>
-                    ))}
-                </Masonry>
+                    </Spin>
+                ) : loading ? (
+                    <Spin>
+                        <Empty />
+                    </Spin>
+                ) : (
+                    <Empty />
+                )}
             </div>
+            <Modal
+                width={300}
+                title="保存中"
+                open={submitLoading}
+                onOk={() => setSubmitLoading(false)}
+                onCancel={() => setSubmitLoading(false)}
+                footer={null}
+            >
+                <div className="flex flex-col items-center justify-center">
+                    <Progress percent={percent.value} type="circle" />
+                    <span>{percent.label}</span>
+                </div>
+            </Modal>
         </Modal>
     );
 };

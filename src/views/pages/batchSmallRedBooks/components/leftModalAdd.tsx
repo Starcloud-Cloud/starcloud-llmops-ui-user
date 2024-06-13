@@ -14,6 +14,7 @@ const LeftModalAdd = ({
     colOpen,
     setColOpen,
     tableLoading,
+    detail,
     columns,
     tableData,
     MokeList,
@@ -43,6 +44,7 @@ const LeftModalAdd = ({
     colOpen: boolean;
     setColOpen: (data: boolean) => void;
     tableLoading: boolean;
+    detail?: any;
     columns: any[];
     MokeList: any[];
     materialFieldTypeList: any[];
@@ -104,8 +106,6 @@ const LeftModalAdd = ({
                     <Button
                         type="link"
                         onClick={() => {
-                            console.log(row);
-
                             form.setFieldsValue(row);
                             setRowIndex(index);
                             setMaterialTitle('编辑');
@@ -164,6 +164,7 @@ const LeftModalAdd = ({
                     <div className="flex items-center gap-2">
                         <AiCreate
                             title="AI 素材生成"
+                            detail={detail}
                             setColOpen={setColOpen}
                             materialType={materialType}
                             columns={columns}
@@ -181,9 +182,11 @@ const LeftModalAdd = ({
                             setVariableData={setVariableData}
                             variableData={variableData}
                         />
-                        <Tooltip title="素材字段配置">
-                            <img onClick={() => setColOpen(true)} className="w-[28px] cursor-pointer" src={FieldImage} />
-                        </Tooltip>
+                        {detail && (
+                            <Tooltip title="素材字段配置">
+                                <img onClick={() => setColOpen(true)} className="w-[28px] cursor-pointer" src={FieldImage} />
+                            </Tooltip>
+                        )}
                     </div>
                 </div>
                 <Table
@@ -263,7 +266,6 @@ const LeftModalAdd = ({
                 title={materialTitle}
                 onOk={async () => {
                     const result = await form.validateFields();
-                    console.log(result);
                     const newData = _.cloneDeep(materialTableData);
                     if (rowIndex === -1) {
                         newData.unshift(result);
@@ -272,8 +274,6 @@ const LeftModalAdd = ({
                     } else {
                         newData.splice(rowIndex, 1, { ...newData[rowIndex], ...result });
                         newData?.sort((a, b) => a.order - b.order);
-                        console.log(newData);
-
                         setMaterialTableData(newData);
                     }
                     form.resetFields();
@@ -328,4 +328,5 @@ const memoLeftModal = (pre: any, next: any) => {
         JSON.stringify(pre.variableData) === JSON.stringify(next.variableData)
     );
 };
-export default memo(LeftModalAdd, memoLeftModal);
+// export default memo(LeftModalAdd, memoLeftModal);
+export default LeftModalAdd;

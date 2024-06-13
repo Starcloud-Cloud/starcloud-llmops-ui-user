@@ -524,6 +524,7 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
         JSON.stringify(prevProps?.open) === JSON.stringify(nextProps?.open) &&
         JSON.stringify(prevProps?.columns) === JSON.stringify(nextProps?.columns) &&
         JSON.stringify(prevProps?.model) === JSON.stringify(nextProps?.model) &&
+        JSON.stringify(prevProps?.details) === JSON.stringify(nextProps?.details) &&
         JSON.stringify(prevProps?.stepCode) === JSON.stringify(nextProps?.stepCode)
     );
 };

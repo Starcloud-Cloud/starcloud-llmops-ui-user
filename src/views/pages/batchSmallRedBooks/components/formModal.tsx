@@ -56,8 +56,9 @@ const FormModal = ({
     useEffect(() => {
         if (selectImg && imageDataIndex) {
             form.setFieldValue(imageDataIndex, selectImg?.largeImageURL);
+            setImageDataIndex('');
         }
-    }, [selectImg, imageDataIndex]);
+    }, [selectImg]);
 
     const [seleVal, setSeleVal] = useState('');
     useEffect(() => {

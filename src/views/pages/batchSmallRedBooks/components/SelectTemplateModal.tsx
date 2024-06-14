@@ -87,7 +87,7 @@ export const SelectTemplateModal = ({
                                             className={`h-auto max-w-full rounded-lg cursor-pointer ${
                                                 v.code === current && 'outline outline-offset-2 outline-1 outline-blue-500'
                                             }`}
-                                            src={v.example + '?x-oss-process=image/quality,q_60'}
+                                            src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
                                             key={i}
                                             onClick={() => setCurrent(v.code)}
                                         />

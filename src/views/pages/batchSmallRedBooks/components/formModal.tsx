@@ -57,7 +57,7 @@ const FormModal = ({
         if (selectImg && imageDataIndex) {
             form.setFieldValue(imageDataIndex, selectImg?.largeImageURL);
         }
-    }, [selectImg]);
+    }, [selectImg, imageDataIndex]);
 
     const [seleVal, setSeleVal] = useState('');
     useEffect(() => {
@@ -88,6 +88,8 @@ const FormModal = ({
     const [open, setOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const [fileList, setFileList] = useState<any[]>([]);
+
+    console.log(columns, 'columns');
 
     return (
         <Modal

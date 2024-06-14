@@ -8,6 +8,7 @@ import image from 'assets/images/icons/image.svg';
 import string from 'assets/images/icons/string.svg';
 import textBox from 'assets/images/icons/textBox.svg';
 import number from 'assets/images/icons/nu.svg';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const { SubMenu } = Menu;
 const { TextArea } = Input;
 const VariableInput = ({
@@ -27,7 +28,8 @@ const VariableInput = ({
     model,
     details,
     stepCode = '图片生成',
-    disabled = false
+    disabled = false,
+    isPageText
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
@@ -46,6 +48,7 @@ const VariableInput = ({
     details: any;
     stepCode?: string;
     disabled?: boolean;
+    isPageText?: boolean;
 }) => {
     const inputList: any = useRef([]);
     const tipRef = useRef<any>('');
@@ -324,47 +327,53 @@ const VariableInput = ({
                 </div>
             }
         >
-            <div className="flex items-stretch relative">
-                <TextArea
-                    disabled={disabled}
-                    style={styles}
-                    rows={row || 1}
-                    status={!newValues && status ? 'error' : ''}
-                    value={newValues}
-                    ref={(ref) => (inputList.current[index] = ref)}
-                    onChange={(e) => {
-                        setNewValue(e.target.value);
-                        e.stopPropagation();
-                    }}
-                    onBlur={(e) => {
-                        setValue(e.target.value);
-                        e.stopPropagation();
-                    }}
-                    className="rounded-r-[0px]"
-                    allowClear
-                />
-                <div
-                    onClick={(e) => {
-                        setOpen(true);
-                        e.stopPropagation();
-                    }}
-                    className="w-[50px] flex justify-center items-center border border-solid border-[#d9d9d9] ml-[-4px] bg-[#f8fafc] rounded-r-[6px] cursor-pointer"
-                    style={{ borderLeft: 'none' }}
-                >
-                    参
-                </div>
-                <span className="text-black block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc] z-[1]">
-                    {title}
-                </span>
-                {model === 'AI_CUSTOM' && (
-                    <ExePrompt
-                        type="prompt_template_user"
-                        changePrompt={(data: any) => {
-                            setData(data, true);
+            <div>
+                <div className="flex items-stretch relative">
+                    <TextArea
+                        disabled={disabled}
+                        style={styles}
+                        rows={row || 1}
+                        status={!newValues && status ? 'error' : ''}
+                        value={newValues}
+                        ref={(ref) => (inputList.current[index] = ref)}
+                        onChange={(e) => {
+                            setNewValue(e.target.value);
+                            e.stopPropagation();
                         }}
-                        flag={true}
+                        onBlur={(e) => {
+                            setValue(e.target.value);
+                            e.stopPropagation();
+                        }}
+                        className="rounded-r-[0px]"
+                        allowClear
                     />
-                )}
+                    <div
+                        onClick={(e) => {
+                            setOpen(true);
+                            e.stopPropagation();
+                        }}
+                        className="w-[50px] flex justify-center items-center border border-solid border-[#d9d9d9] ml-[-4px] bg-[#f8fafc] rounded-r-[6px] cursor-pointer"
+                        style={{ borderLeft: 'none' }}
+                    >
+                        参
+                    </div>
+                    <span className="text-black block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc] z-[1]">
+                        {title}
+                    </span>
+                    {model === 'AI_CUSTOM' && (
+                        <ExePrompt
+                            type="prompt_template_user"
+                            changePrompt={(data: any) => {
+                                setData(data, true);
+                            }}
+                            flag={true}
+                        />
+                    )}
+                </div>
+                <div className="flex items-center text-[12px]">
+                    <ErrorOutlineIcon sx={{ marginLeft: '5px', cursor: 'pointer', fontSize: '12px' }} />
+                    <span>自动分页字段，可根据实际内容自动分页生成图片（最多18页）</span>
+                </div>
             </div>
         </Popover>
     );

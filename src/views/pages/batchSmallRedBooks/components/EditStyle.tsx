@@ -19,6 +19,7 @@ const EditStyle = ({
     setData,
     setCopyData,
     appData = {},
+    selModal,
     canEdit = false
 }: {
     schemaList?: any[];
@@ -27,6 +28,7 @@ const EditStyle = ({
     setData: (data: any) => void;
     setCopyData: (data: any) => void;
     appData?: any;
+    selModal?: string;
     canEdit?: boolean;
 }) => {
     const [open, setOpen] = React.useState(false);
@@ -123,7 +125,11 @@ const EditStyle = ({
     const [pre, setPre] = useState(0);
 
     const isPageInputId = currentJson?.objects?.find((item: any) => item.isTextPage)?.id;
-
+    useEffect(() => {
+        if (selModal && selModal === imageStyleData.uuid) {
+            setOpen(true);
+        }
+    }, [selModal]);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">

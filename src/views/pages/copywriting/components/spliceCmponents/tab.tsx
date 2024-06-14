@@ -43,7 +43,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                     key: '1',
                     name: '首图',
                     model: '',
-                    titleGenerateMode: 'DEFAULT',
+                    isMultimodalTitle: false,
                     uuid: uuidv4()?.split('-')?.join(''),
                     variableList: []
                 }

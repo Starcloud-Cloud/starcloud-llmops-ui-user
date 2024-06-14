@@ -662,6 +662,8 @@ const AddStyle = React.forwardRef(
                                 size="small"
                                 type="primary"
                                 onClick={() => {
+                                    console.log(systemVariable);
+
                                     setSyszanVariable(
                                         _.cloneDeep(
                                             systemVariable?.map((item: any) => ({

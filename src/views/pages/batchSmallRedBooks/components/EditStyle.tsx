@@ -58,8 +58,10 @@ const EditStyle = ({
         newData.code = temp.code;
         newData.variableList = temp.variableList?.map((item: any) => ({
             ...item,
+            value: '',
             uuid: uuidv4()?.split('-')?.join('')
         }));
+        setPre(pre + 1);
         setData(newData);
         setOpen(false);
     };
@@ -118,7 +120,7 @@ const EditStyle = ({
     const scale = useMemo(() => {
         return imgRef?.current && currentJson ? imgRef?.current?.offsetWidth / currentJson?.clipPath?.width : 1;
     }, [currentJson, windowWidth, imgRef?.current]);
-
+    const [pre, setPre] = useState(0);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -266,6 +268,7 @@ const EditStyle = ({
                                                                 index={index}
                                                                 title={el?.label}
                                                                 value={el.value}
+                                                                pre={pre}
                                                                 setValue={(value) => {
                                                                     const newData = _.cloneDeep(imageStyleData);
                                                                     newData.variableList[index].value = value;
@@ -285,36 +288,39 @@ const EditStyle = ({
                                         <div className="text-lg">图片文字配置</div>
                                         <div className="text-xs text-black/50">可绑定数据或输入内容到图片模版上具体文字位置上</div>
                                         <div className="flex items-center gap-4 min-h-[32px] ml-3">
-                                            <span>图片标题生成</span>
+                                            <span>AI 图片分析生产标题</span>
                                             <Switch
                                                 disabled={canEdit}
-                                                checked={imageStyleData?.titleGenerateMode === 'AI' ? true : false}
+                                                checked={imageStyleData?.isMultimodalTitle}
                                                 onChange={(e) => {
                                                     const newData = _.cloneDeep(imageStyleData);
-                                                    if (e) {
-                                                        newData.titleGenerateMode = 'AI';
-                                                    } else {
-                                                        newData.titleGenerateMode = 'DEFAULT';
-                                                    }
+                                                    newData.isMultimodalTitle = e;
                                                     setData(newData);
                                                 }}
                                             />
-                                            <span className="text-[#673ab7]">
-                                                {imageStyleData?.titleGenerateMode === 'AI' ? 'AI 生成' : '默认'}
-                                            </span>
-                                            {imageStyleData?.titleGenerateMode === 'AI' && (
+                                        </div>
+                                        {imageStyleData?.isMultimodalTitle && (
+                                            <>
                                                 <Input
-                                                    className="w-[400px]"
-                                                    value={imageStyleData?.titleGenerateRequirement}
+                                                    className="w-[400px] ml-3"
+                                                    value={imageStyleData?.multimodalTitleRequirement}
                                                     onChange={(e) => {
                                                         const newData = _.cloneDeep(imageStyleData);
-                                                        newData.titleGenerateRequirement = e.target.value;
+                                                        newData.multimodalTitleRequirement = e.target.value;
                                                         setData(newData);
                                                     }}
                                                     placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
                                                 />
-                                            )}
-                                        </div>
+                                                <div className="ml-3 text-xs text-black/50 my-2">
+                                                    <span className="text-[#673ab7] font-bold">Tips：</span>
+                                                    可使用下面的变量替换到图片文字字段中
+                                                </div>
+                                                <div className="ml-3 flex gap-2 text-xs mb-4">
+                                                    <div>{`{{AI分析.图片标题}}`}</div>
+                                                    <div>{`{{AI分析.图片副标题}}`}</div>
+                                                </div>
+                                            </>
+                                        )}
                                         <div className="flex flex-wrap">
                                             {imageStyleData?.variableList?.map(
                                                 (el: any, index: number) =>
@@ -349,6 +355,7 @@ const EditStyle = ({
                                                                 index={index}
                                                                 title={el?.label}
                                                                 value={el.value}
+                                                                pre={pre}
                                                                 setValue={(value) => {
                                                                     const newData = _.cloneDeep(imageStyleData);
                                                                     newData.variableList[index].value = value;

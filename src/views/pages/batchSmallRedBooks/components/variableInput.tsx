@@ -21,6 +21,7 @@ const VariableInput = ({
     status = false,
     title,
     value,
+    pre,
     setValue,
     styles = {},
     model,
@@ -40,6 +41,7 @@ const VariableInput = ({
     status?: boolean;
     setValue: (data: any) => void;
     styles?: any;
+    pre?: number;
     model?: string;
     details: any;
     stepCode?: string;
@@ -293,7 +295,7 @@ const VariableInput = ({
     const [newValues, setNewValue] = useState('');
     useEffect(() => {
         setNewValue(value);
-    }, []);
+    }, [pre]);
     return (
         <Popover
             trigger="click"

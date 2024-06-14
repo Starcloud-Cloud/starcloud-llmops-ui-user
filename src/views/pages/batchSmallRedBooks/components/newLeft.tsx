@@ -454,6 +454,7 @@ const Lefts = ({
     const [percent, setPercent] = useState(0);
     //获取导出结果
     const timer: any = useRef(null);
+
     const getImportResult = () => {
         clearInterval(timer.current);
         timer.current = setInterval(() => {
@@ -556,6 +557,26 @@ const Lefts = ({
     const [generateList, setGenerateList] = useState<any[]>([]); //笔记生成
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
+    const verifyList = () => {
+        if (tableData?.length === 0 && fileList?.length === 0) {
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '素材上传最少有一个',
+                    variant: 'alert',
+                    alert: {
+                        color: 'error'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+            return;
+        }
+        if (imageRef.current?.record?.variable?.variable?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')) {
+        }
+        console.log(imageRef.current);
+    };
     const getList = async (flag?: boolean, appUpdate?: boolean) => {
         let result;
         let newList: any;
@@ -1107,8 +1128,6 @@ const Lefts = ({
         }
     }, [pre]);
     useEffect(() => {
-        console.log(planState);
-
         if (planState && planState > 0) {
             handleSaveClick(exeState);
         } else if (planState && planState < 0) {
@@ -1131,6 +1150,8 @@ const Lefts = ({
 
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
+        // verifyList();
+        // return;
         const newList = _.cloneDeep(generRef.current);
         newList?.forEach((item: any) => {
             item?.variable?.variables?.forEach((el: any) => {

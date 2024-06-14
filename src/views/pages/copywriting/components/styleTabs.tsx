@@ -56,7 +56,7 @@ const StyleTabs = ({
             key: digui().toString(),
             mode: 'SEQUENCE',
             uuid: uuidv4()?.split('-')?.join(''),
-            titleGenerateMode: data?.titleGenerateMode || 'DEFAULT',
+            isMultimodalTitle: false,
             example: data?.example || '',
             variableList:
                 data?.variableList?.map((item: any) => ({

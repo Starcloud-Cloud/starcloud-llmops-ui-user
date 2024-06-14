@@ -331,6 +331,7 @@ const EditStyle = ({
                                                         >
                                                             <VariableInput
                                                                 row={el.field === isPageInputId ? 4 : 1}
+                                                                isPageText={el.field === isPageInputId}
                                                                 disabled={canEdit}
                                                                 styles={
                                                                     currentElementId === el.field

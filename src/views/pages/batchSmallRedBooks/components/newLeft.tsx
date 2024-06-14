@@ -557,6 +557,7 @@ const Lefts = ({
     const [generateList, setGenerateList] = useState<any[]>([]); //笔记生成
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
+    const [selectImgLoading, setSelectImgLoading] = useState(false);
     const verifyList = () => {
         if (tableData?.length === 0 && fileList?.length === 0) {
             dispatch(
@@ -577,6 +578,8 @@ const Lefts = ({
         }
         console.log(imageRef.current);
     };
+    // 选择照片loading
+
     const getList = async (flag?: boolean, appUpdate?: boolean) => {
         let result;
         let newList: any;
@@ -586,14 +589,20 @@ const Lefts = ({
             newList = _.cloneDeep(result?.executeParam?.appInformation);
         } else if (appUpdate) {
             if (searchParams.get('appUid')) {
+                setSelectImgLoading(true);
                 result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
+                setSelectImgLoading(false);
                 newList = _.cloneDeep(result?.configuration?.appInformation);
             } else {
+                setSelectImgLoading(true);
                 result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+                setSelectImgLoading(false);
                 newList = _.cloneDeep(result?.configuration?.appInformation);
             }
         } else if (detail) {
+            setSelectImgLoading(true);
             result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+            setSelectImgLoading(false);
             newList = _.cloneDeep(detail);
             newList?.workflowConfig?.steps?.forEach((item: any) => {
                 const arr = item?.variable?.variables;
@@ -610,7 +619,9 @@ const Lefts = ({
                 });
             });
         } else {
+            setSelectImgLoading(true);
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
+            setSelectImgLoading(false);
             const res = await marketDeatail({ uid: searchParams.get('appUid') });
             setVersion(res?.version || 0);
             newList = _.cloneDeep(result?.configuration?.appInformation);
@@ -1113,11 +1124,13 @@ const Lefts = ({
     const [totalCount, setTotalCount] = useState<number>(1);
     useEffect(() => {
         const getStatus = async () => {
+            setSelectImgLoading(true);
             const result = await getPlan({
                 appUid: searchParams.get('appUid') || searchParams.get('uid'),
                 uid: searchParams.get('appUid') ? searchParams.get('uid') : undefined,
                 source: searchParams.get('appUid') ? 'MARKET' : detail ? 'APP' : 'MARKET'
             });
+            setSelectImgLoading(false);
             const newData = _.cloneDeep(appRef.current);
             newData.status = result?.status;
             appRef.current = newData;
@@ -2121,6 +2134,7 @@ const Lefts = ({
                                     />
                                 ) : (
                                     <AddStyleApp
+                                        selectImgLoading={selectImgLoading}
                                         allData={appData}
                                         details={appData?.configuration?.appInformation}
                                         hasAddStyle={detail || !detailShow ? false : true}

@@ -191,7 +191,10 @@ const FormModal = ({
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative">
+                                            <div
+                                                className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
+                                                onMouseEnter={() => setCanUpload(true)}
+                                            >
                                                 {uploadLoading[index] ? (
                                                     <LoadingOutlined rev={undefined} />
                                                 ) : (

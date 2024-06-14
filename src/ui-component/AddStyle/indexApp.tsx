@@ -39,7 +39,10 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 
 const AddStyleApp = React.forwardRef(
-    ({ record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any, ref: any) => {
+    (
+        { selectImgLoading, record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any,
+        ref: any
+    ) => {
         const [visible, setVisible] = useState(false);
         const [styleData, setStyleData] = useState<any>([]); //列表展示结果
         const [selectImgs, setSelectImgs] = useState<any>([]);
@@ -1034,6 +1037,7 @@ const AddStyleApp = React.forwardRef(
                             )}
                         </div> */}
                     </div>
+                    {/* <Spin spinning={selectImgLoading}> */}
                     <div className="h-[calc(100% - 60px)]">
                         <div className="bg-white p-3">
                             <span className="text-stone-700 font-semibold">系统风格</span>
@@ -1230,6 +1234,7 @@ const AddStyleApp = React.forwardRef(
                             </div>
                         )}
                     </div>
+                    {/* </Spin> */}
                 </Drawer>
                 {isModalOpen && (
                     <Modal

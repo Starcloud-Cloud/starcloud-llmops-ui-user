@@ -24,6 +24,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
             newData = [];
         }
         const styleuid = uuidv4()?.split('-')?.join('');
+        const fristuid = uuidv4()?.split('-')?.join('');
         newData.push({
             name: `风格 ${digui()}`,
             index: digui(),
@@ -44,7 +45,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                     name: '首图',
                     model: '',
                     isMultimodalTitle: false,
-                    uuid: uuidv4()?.split('-')?.join(''),
+                    uuid: fristuid,
                     variableList: []
                 }
             ],
@@ -52,15 +53,19 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
         });
         setImageStyleData(newData);
         setCheckStyle(styleuid);
+        if (!data) {
+            setSelModal(fristuid);
+        }
     };
     const [checkStyle, setCheckStyle] = useState('');
+    const [selModal, setSelModal] = useState('');
     useEffect(() => {
         setCheckStyle(imageStyleData[0]?.uuid);
     }, []);
     return (
         <div className="min-h-[800px] ">
             <div className="flex items-end mb-[20px]">
-                <Button onClick={handleAdd} type="primary" icon={<PlusOutlined rev={undefined} />}>
+                <Button onClick={() => handleAdd()} type="primary" icon={<PlusOutlined rev={undefined} />}>
                     增加风格
                 </Button>
                 <div
@@ -189,6 +194,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                         imageStyleData={item?.templateList}
                                         typeList={[]}
                                         appData={appData}
+                                        selModal={selModal}
                                         setDetailData={(data: any) => {
                                             const newData = _.cloneDeep(imageStyleData);
                                             newData[i].templateList = data;

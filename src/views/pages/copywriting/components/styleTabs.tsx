@@ -11,6 +11,7 @@ const StyleTabs = ({
     imageStyleData,
     setDetailData,
     appData,
+    selModal,
     canEdit = false
 }: {
     schemaList?: any[];
@@ -18,6 +19,7 @@ const StyleTabs = ({
     imageStyleData: any[];
     setDetailData: (data: any) => void;
     appData: any;
+    selModal?: string;
     canEdit?: boolean;
 }) => {
     const [activeKey, setActiveKey] = useState('0');
@@ -119,6 +121,7 @@ const StyleTabs = ({
                                 schemaList={schemaList}
                                 imageStyleData={item}
                                 canEdit={canEdit}
+                                selModal={selModal}
                                 setData={(data: any) => {
                                     const newData = _.cloneDeep(imageStyleData);
                                     newData[i] = data;

@@ -568,7 +568,7 @@ function CreateDetail() {
                 }
             });
         });
-        if (value === '4') {
+        if (createPlanRef.current) {
             let arr = _.cloneDeep(newList?.workflowConfig?.steps);
             const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
             if (a) {
@@ -623,7 +623,7 @@ function CreateDetail() {
                 appModify(newList).then((res) => {
                     setViewLoading(false);
                     if (res.data) {
-                        if (value === '4' && !flag) {
+                        if (createPlanRef.current && !flag) {
                             if (fieldShow) {
                                 planState < 0 ? setPlanState(planState - 1) : setPlanState(-1);
                             } else {

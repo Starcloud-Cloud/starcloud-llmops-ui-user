@@ -471,6 +471,7 @@ const Lefts = ({
                         handleSaveClick(false);
                     } else {
                         // 我的应用
+                        setExeState(false);
                         const arr = headerSaveAll();
                         setDetail &&
                             setDetail({
@@ -841,6 +842,7 @@ const Lefts = ({
         appRef.current = newData;
         setAppData(appRef.current);
         if (detail) {
+            setExeState(false);
             const arr = headerSaveAll();
             setDetail &&
                 setDetail({
@@ -867,6 +869,7 @@ const Lefts = ({
         if (!detail) {
             handleSaveClick(false, false, true);
         } else {
+            setExeState(false);
             const arr = headerSaveAll(data);
             setDetail &&
                 setDetail(
@@ -892,6 +895,7 @@ const Lefts = ({
         appRef.current = newData1;
         setAppData(appRef.current);
         if (detail) {
+            setExeState(false);
             const arr = headerSaveAll();
             setDetail &&
                 setDetail({
@@ -1532,6 +1536,7 @@ const Lefts = ({
 
     // 我的应用保存
     const saveTemplate = () => {
+        setExeState(false);
         const arr = headerSaveAll();
         setDetail &&
             setDetail({
@@ -2214,6 +2219,7 @@ const Lefts = ({
                                         handleSaveClick(false);
                                     } else {
                                         // 我的应用
+                                        setExeState(false);
                                         const arr = headerSaveAll();
                                         setDetail &&
                                             setDetail({
@@ -2407,6 +2413,7 @@ const Lefts = ({
                             <div className="text-[16px] font-[600]">编辑步骤</div>
                             <Button
                                 onClick={() => {
+                                    setExeState(false);
                                     const arr = headerSaveAll();
                                     setDetail &&
                                         setDetail({
@@ -2648,138 +2655,150 @@ const Lefts = ({
                                                     </div>
                                                 </div>
                                             </AccordionSummary>
-                                            <AccordionDetails>
-                                                <div key={item.field}>
-                                                    <div className="text-xs text-black/50 mb-4">{item?.description}</div>
+                                            {index !== 0 &&
+                                                index !== appData?.configuration?.appInformation?.workflowConfig?.steps?.length - 1 && (
+                                                    <AccordionDetails>
+                                                        <div key={item.field}>
+                                                            <div className="text-xs text-black/50 mb-4">{item?.description}</div>
 
-                                                    {item?.flowStep?.handler !== 'VariableActionHandler' ? (
-                                                        item?.variable?.variables?.map((el: any, i: number) => (
-                                                            <div key={el.field}>
-                                                                {el?.isShow && (
-                                                                    <MarketForm
-                                                                        key={el.field}
-                                                                        item={el}
-                                                                        materialType={''}
-                                                                        details={
-                                                                            appData?.configuration?.appInformation ||
-                                                                            appData?.executeParam?.appInformation
-                                                                        }
-                                                                        stepCode={item?.field}
-                                                                        model={''}
-                                                                        handlerCode={item?.flowStep?.handler}
-                                                                        history={false}
-                                                                        promptShow={true}
-                                                                        setEditOpen={setEditOpens}
-                                                                        setTitle={setTitles}
-                                                                        setStep={() => {
-                                                                            stepRef.current = index - 1;
-                                                                            setStep(stepRef.current);
-                                                                        }}
-                                                                        columns={stepMaterial[index - 1]}
-                                                                        setMaterialType={() => {
-                                                                            setMaterialTypes(
-                                                                                item?.variable?.variables?.find(
-                                                                                    (i: any) => i.field === 'MATERIAL_TYPE'
-                                                                                )?.value
-                                                                            );
-                                                                        }}
-                                                                        onChange={(e: any) => {
-                                                                            const newList = _.cloneDeep(generRef.current);
-                                                                            const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
-                                                                            const code = item?.flowStep?.handler;
-                                                                            newList[index - 1].variable.variables[i].value = e.value;
-                                                                            if (
-                                                                                type &&
-                                                                                item.variable.variables?.find(
-                                                                                    (item: any) => item.style === 'MATERIAL'
-                                                                                )
-                                                                            ) {
-                                                                                newList[index - 1].variable.variables[
-                                                                                    item.variable.variables?.findIndex(
-                                                                                        (item: any) => item.style === 'MATERIAL'
-                                                                                    )
-                                                                                ].value = [];
-                                                                                stepRef.current = index - 1;
-                                                                                setStep(stepRef.current);
-                                                                                setTableDatas(type, index - 1);
-                                                                            }
-                                                                            if (
-                                                                                code === 'CustomActionHandler' &&
-                                                                                e.name === 'GENERATE_MODE'
-                                                                            ) {
-                                                                                const num = item.variable.variables?.findIndex(
-                                                                                    (item: any) => item.field === 'REQUIREMENT'
-                                                                                );
-                                                                                const num1 = item.variable.variables?.findIndex(
-                                                                                    (item: any) => item.style === 'MATERIAL'
-                                                                                );
-                                                                                if (e.value === 'RANDOM') {
-                                                                                    newList[index - 1].variable.variables[num].isShow =
-                                                                                        false;
-                                                                                    newList[index - 1].variable.variables[num1].isShow =
-                                                                                        true;
-                                                                                } else if (e.value === 'AI_PARODY') {
-                                                                                    newList[index - 1].variable.variables[num].isShow =
-                                                                                        true;
-                                                                                    newList[index - 1].variable.variables[num1].isShow =
-                                                                                        true;
-                                                                                } else {
-                                                                                    newList[index - 1].variable.variables[num1].isShow =
-                                                                                        false;
-                                                                                    newList[index - 1].variable.variables[num].isShow =
-                                                                                        true;
+                                                            {item?.flowStep?.handler !== 'VariableActionHandler' ? (
+                                                                item?.variable?.variables?.map((el: any, i: number) => (
+                                                                    <div key={el.field}>
+                                                                        {el?.isShow && (
+                                                                            <MarketForm
+                                                                                key={el.field}
+                                                                                item={el}
+                                                                                materialType={''}
+                                                                                details={
+                                                                                    appData?.configuration?.appInformation ||
+                                                                                    appData?.executeParam?.appInformation
                                                                                 }
-                                                                            }
-                                                                            generRef.current = newList;
-                                                                            setGenerateList(generRef.current);
-                                                                            setAppDataGen();
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        // <Tabs defaultActiveKey="1">
-                                                        // <Tabs.TabPane tab="变量编辑" key="1">
+                                                                                stepCode={item?.field}
+                                                                                model={''}
+                                                                                handlerCode={item?.flowStep?.handler}
+                                                                                history={false}
+                                                                                promptShow={true}
+                                                                                setEditOpen={setEditOpens}
+                                                                                setTitle={setTitles}
+                                                                                setStep={() => {
+                                                                                    stepRef.current = index - 1;
+                                                                                    setStep(stepRef.current);
+                                                                                }}
+                                                                                columns={stepMaterial[index - 1]}
+                                                                                setMaterialType={() => {
+                                                                                    setMaterialTypes(
+                                                                                        item?.variable?.variables?.find(
+                                                                                            (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                                        )?.value
+                                                                                    );
+                                                                                }}
+                                                                                onChange={(e: any) => {
+                                                                                    const newList = _.cloneDeep(generRef.current);
+                                                                                    const type =
+                                                                                        e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                                                    const code = item?.flowStep?.handler;
+                                                                                    newList[index - 1].variable.variables[i].value =
+                                                                                        e.value;
+                                                                                    if (
+                                                                                        type &&
+                                                                                        item.variable.variables?.find(
+                                                                                            (item: any) => item.style === 'MATERIAL'
+                                                                                        )
+                                                                                    ) {
+                                                                                        newList[index - 1].variable.variables[
+                                                                                            item.variable.variables?.findIndex(
+                                                                                                (item: any) => item.style === 'MATERIAL'
+                                                                                            )
+                                                                                        ].value = [];
+                                                                                        stepRef.current = index - 1;
+                                                                                        setStep(stepRef.current);
+                                                                                        setTableDatas(type, index - 1);
+                                                                                    }
+                                                                                    if (
+                                                                                        code === 'CustomActionHandler' &&
+                                                                                        e.name === 'GENERATE_MODE'
+                                                                                    ) {
+                                                                                        const num = item.variable.variables?.findIndex(
+                                                                                            (item: any) => item.field === 'REQUIREMENT'
+                                                                                        );
+                                                                                        const num1 = item.variable.variables?.findIndex(
+                                                                                            (item: any) => item.style === 'MATERIAL'
+                                                                                        );
+                                                                                        if (e.value === 'RANDOM') {
+                                                                                            newList[index - 1].variable.variables[
+                                                                                                num
+                                                                                            ].isShow = false;
+                                                                                            newList[index - 1].variable.variables[
+                                                                                                num1
+                                                                                            ].isShow = true;
+                                                                                        } else if (e.value === 'AI_PARODY') {
+                                                                                            newList[index - 1].variable.variables[
+                                                                                                num
+                                                                                            ].isShow = true;
+                                                                                            newList[index - 1].variable.variables[
+                                                                                                num1
+                                                                                            ].isShow = true;
+                                                                                        } else {
+                                                                                            newList[index - 1].variable.variables[
+                                                                                                num1
+                                                                                            ].isShow = false;
+                                                                                            newList[index - 1].variable.variables[
+                                                                                                num
+                                                                                            ].isShow = true;
+                                                                                        }
+                                                                                    }
+                                                                                    generRef.current = newList;
+                                                                                    setGenerateList(generRef.current);
+                                                                                    setAppDataGen();
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                // <Tabs defaultActiveKey="1">
+                                                                // <Tabs.TabPane tab="变量编辑" key="1">
 
-                                                        <Row gutter={10}>
-                                                            {item?.variable?.variables?.map((item: any, de: number) => (
-                                                                <Col key={item?.field} span={24}>
-                                                                    <Forms
-                                                                        item={item}
-                                                                        index={de}
-                                                                        changeValue={(data: any) => {
-                                                                            const newList = _.cloneDeep(generRef.current);
-                                                                            newList[index - 1].variable.variables[de].value = data.value;
-                                                                            generRef.current = newList;
-                                                                            console.log(generRef.current);
+                                                                <Row gutter={10}>
+                                                                    {item?.variable?.variables?.map((item: any, de: number) => (
+                                                                        <Col key={item?.field} span={24}>
+                                                                            <Forms
+                                                                                item={item}
+                                                                                index={de}
+                                                                                changeValue={(data: any) => {
+                                                                                    const newList = _.cloneDeep(generRef.current);
+                                                                                    newList[index - 1].variable.variables[de].value =
+                                                                                        data.value;
+                                                                                    generRef.current = newList;
+                                                                                    console.log(generRef.current);
 
-                                                                            setGenerateList(generRef.current);
-                                                                            setAppDataGen();
-                                                                        }}
-                                                                        flag={false}
-                                                                    />
-                                                                </Col>
-                                                            ))}
-                                                        </Row>
+                                                                                    setGenerateList(generRef.current);
+                                                                                    setAppDataGen();
+                                                                                }}
+                                                                                flag={false}
+                                                                            />
+                                                                        </Col>
+                                                                    ))}
+                                                                </Row>
 
-                                                        //     </Tabs.TabPane>
-                                                        //     <Tabs.TabPane tab="变量列表" key="2">
-                                                        //         <CreateVariable
-                                                        //             rows={item?.variable?.variables}
-                                                        //             setRows={(data: any[]) => {
-                                                        //                 const newList = _.cloneDeep(generRef.current);
-                                                        //                 newList[index - 1].variable.variables = data;
-                                                        //                 generRef.current = newList;
-                                                        //                 setGenerateList(generRef.current);
-                                                        //                 setAppDataGen();
-                                                        //             }}
-                                                        //         />
-                                                        //     </Tabs.TabPane>
-                                                        // </Tabs>
-                                                    )}
-                                                </div>
-                                            </AccordionDetails>
+                                                                //     </Tabs.TabPane>
+                                                                //     <Tabs.TabPane tab="变量列表" key="2">
+                                                                //         <CreateVariable
+                                                                //             rows={item?.variable?.variables}
+                                                                //             setRows={(data: any[]) => {
+                                                                //                 const newList = _.cloneDeep(generRef.current);
+                                                                //                 newList[index - 1].variable.variables = data;
+                                                                //                 generRef.current = newList;
+                                                                //                 setGenerateList(generRef.current);
+                                                                //                 setAppDataGen();
+                                                                //             }}
+                                                                //         />
+                                                                //     </Tabs.TabPane>
+                                                                // </Tabs>
+                                                            )}
+                                                        </div>
+                                                    </AccordionDetails>
+                                                )}
                                         </Accordion>
                                         {(index !== 0 ||
                                             appData?.configuration?.appInformation?.workflowConfig?.steps[1]?.flowStep.handler !==

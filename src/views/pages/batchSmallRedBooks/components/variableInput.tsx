@@ -370,10 +370,12 @@ const VariableInput = ({
                         />
                     )}
                 </div>
-                <div className="flex items-center text-[12px]">
-                    <ErrorOutlineIcon sx={{ marginLeft: '5px', cursor: 'pointer', fontSize: '12px' }} />
-                    <span>自动分页字段，可根据实际内容自动分页生成图片（最多18页）</span>
-                </div>
+                {isPageText && (
+                    <div className="flex items-center text-[12px]">
+                        <ErrorOutlineIcon sx={{ marginLeft: '5px', cursor: 'pointer', fontSize: '12px' }} />
+                        <span>自动分页字段，可根据实际内容自动分页生成图片（最多18页）</span>
+                    </div>
+                )}
             </div>
         </Popover>
     );

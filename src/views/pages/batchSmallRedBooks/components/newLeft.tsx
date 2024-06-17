@@ -2127,6 +2127,7 @@ const Lefts = ({
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 {detail ? (
                                     <AddStyle
+                                        selectImgLoading={selectImgLoading}
                                         saveTemplate={saveTemplate}
                                         details={appData?.configuration?.appInformation}
                                         hasAddStyle={detail || !detailShow ? false : true}

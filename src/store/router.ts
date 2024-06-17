@@ -19,15 +19,13 @@ function filterVisibleNodes(tree: any) {
 
     function filterNodes(nodes: any) {
         for (const node of nodes) {
-            if (node.visible !== false) {
-                const filteredChildren = filterNodes(node.children || []) as any;
-                if (filteredChildren?.length > 0 || !node.children) {
-                    const filteredNode = { ...node };
-                    if (filteredChildren?.length > 0) {
-                        filteredNode.children = filteredChildren;
-                    }
-                    filteredTree.push(filteredNode);
+            const filteredChildren = filterNodes(node.children || []) as any;
+            if (filteredChildren?.length > 0 || !node.children) {
+                const filteredNode = { ...node };
+                if (filteredChildren?.length > 0) {
+                    filteredNode.children = filteredChildren;
                 }
+                filteredTree.push(filteredNode);
             }
         }
     }

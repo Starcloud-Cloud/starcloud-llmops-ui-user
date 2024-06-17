@@ -8,14 +8,21 @@ import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
 
 import Left from './components/newLeft';
-const CreatePlan = ({ isMyApp, detail }: { isMyApp?: boolean; detail: any }) => {
+const CreatePlan = ({
+    isMyApp,
+    detail,
+    setDetail
+}: {
+    isMyApp?: boolean;
+    detail: any;
+    setDetail: (data: any, fieldShow?: boolean) => void;
+}) => {
     const navigate = useNavigate();
     const [appDescription, setAppDescription] = useState('');
     const [leftWidth, setLeftWidth] = useState('');
     return (
         <CreatePlanProvider>
-            <div>11111</div>
-            {/* <div
+            <div
                 style={{
                     height: jsCookie.get('isClient') ? '100vh' : '100%'
                 }}
@@ -62,11 +69,10 @@ const CreatePlan = ({ isMyApp, detail }: { isMyApp?: boolean; detail: any }) => 
                         }}
                         className={`duration-700 2xl:w-[500px] xl:w-[410px] lg:w-[370px] w-[370px] bg-white rounded-lg pl-2 pr-0`}
                     >
-                        <Left
-                            pre={pre}
-                            planState={planState}
+                        {/* <Left
+                            pre={1}
+                            planState={false}
                             detail={detail}
-                            setGetData={setGetData}
                             leftWidth={leftWidth}
                             setWidth={() => {
                                 if (leftWidth) {
@@ -75,21 +81,10 @@ const CreatePlan = ({ isMyApp, detail }: { isMyApp?: boolean; detail: any }) => 
                                     setLeftWidth('50%');
                                 }
                             }}
-                            setFieldHead={setFieldHead}
-                            setMoke={setMoke}
-                            setImageMoke={setImageMoke}
-                            setCollData={setCollData}
-                            newSave={newSave}
                             setDetail={setDetail}
-                            setPlanUid={setPlanUid}
-                            defaultVariableData={defaultVariableData}
-                            defaultField={defaultField}
-                            fieldHead={fieldHead}
-                            setDefaultVariableData={setDefaultVariableData}
-                            setDefaultField={setDefaultField}
-                        />
+                        /> */}
                     </div>
-                    <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
+                    {/* <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
                         <Right
                             rightPage={rightPage}
                             batchTotal={batchTotal}
@@ -129,7 +124,6 @@ const CreatePlan = ({ isMyApp, detail }: { isMyApp?: boolean; detail: any }) => 
                             }}
                         />
                     </div>
-                </div>
                 {detailOpen && (
                     <DetailModal
                         open={detailOpen}
@@ -137,8 +131,9 @@ const CreatePlan = ({ isMyApp, detail }: { isMyApp?: boolean; detail: any }) => 
                         handleClose={() => setDetailOpen(false)}
                         businessUid={businessUid}
                     />
-                )}
-            </div> */}
+                )} */}
+                </div>
+            </div>
         </CreatePlanProvider>
     );
 };

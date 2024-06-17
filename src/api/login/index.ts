@@ -47,6 +47,10 @@ export const loginOut = () => {
 export const getInfo = () => {
     return request.get({ url: '/system/auth/get-permission-info' });
 };
+// 团队获取用户权限信息 | Get user permission information
+export const getInfos = () => {
+    return request.get({ url: '/llm/auth/get-permission-info' });
+};
 
 // 路由 | Routes
 export const getAsyncRoutes = () => {

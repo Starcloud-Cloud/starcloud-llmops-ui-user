@@ -2933,8 +2933,6 @@ const Lefts = ({
                     <CreateVariable
                         rows={allVariable?.variable?.variables}
                         setRows={(data: any[]) => {
-                            console.log(data);
-
                             const newTable = data?.map((item) => ({
                                 ...item,
                                 isShow: false
@@ -2947,6 +2945,7 @@ const Lefts = ({
                             generRef.current = newList;
                             setGenerateList(generRef.current);
                             setAppDataGen();
+                            setAdvancedModal(false);
                         }}
                     />
                 </Modal>

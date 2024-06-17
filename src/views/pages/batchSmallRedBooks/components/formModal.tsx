@@ -95,6 +95,7 @@ const FormModal = ({
     return (
         <Modal
             zIndex={1000}
+            width={'60%'}
             title={title}
             open={editOpen}
             onCancel={() => {
@@ -109,7 +110,7 @@ const FormModal = ({
                 formOk(result);
             }}
         >
-            <Form form={form} labelCol={{ span: 6 }}>
+            <Form form={form} labelCol={{ span: 7 }}>
                 {columns?.map(
                     (item, index) =>
                         item.title !== '操作' &&

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 // import { cloneDeep } from 'lodash-es';
-import { getInfo } from 'api/login';
+import { getInfos } from 'api/login';
 import { CACHE_KEY, useCache } from 'hooks/web/useCache';
 import { generateRoute } from 'utils/routerHelper';
 // import remainingroutes from 'router/routes';
@@ -59,7 +59,7 @@ const useRouteStore = create<RouteStore>((set) => ({
         if (wsCache.get(CACHE_KEY.ROLE_ROUTERS)) {
             res = wsCache.get(CACHE_KEY.ROLE_ROUTERS);
         } else {
-            const resData = await getInfo();
+            const resData = await getInfos();
             res = resData?.menus;
             wsCache.set(CACHE_KEY.ROLE_ROUTERS, res);
         }

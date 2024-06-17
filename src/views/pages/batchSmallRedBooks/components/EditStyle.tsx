@@ -175,7 +175,7 @@ const EditStyle = ({
                                     {currentTemp?.example && (
                                         <Image
                                             preview={false}
-                                            src={currentTemp?.example + '?x-oss-process=image/quality,q_60'}
+                                            src={currentTemp?.example + '?x-oss-process=image/resize,w_280/quality,q_80'}
                                             placeholder
                                         />
                                     )}

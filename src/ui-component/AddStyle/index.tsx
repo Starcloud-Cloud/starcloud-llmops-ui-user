@@ -84,26 +84,30 @@ const AddStyle = React.forwardRef(
         const templateRef: any = useRef(null);
 
         const submitData = React.useMemo(() => {
-            const copyRecord = _.cloneDeep(record);
-            copyRecord?.variable?.variables?.forEach((item: any) => {
-                // addType
-                if (addType === 1) {
-                } else {
-                    // 风格产生===2 -> POSTER_STYLE
-                    if (mode === 1) {
-                        if (item.field === 'POSTER_STYLE_CONFIG') {
-                            item.value = styleData;
-                        }
+            if (record) {
+                const copyRecord = _.cloneDeep(record);
+                copyRecord?.variable?.variables?.forEach((item: any) => {
+                    // addType
+                    if (addType === 1) {
                     } else {
-                        if (item.field === 'POSTER_STYLE') {
-                            item.value = JSON.stringify(styleData?.[0] || {});
+                        // 风格产生===2 -> POSTER_STYLE
+                        if (mode === 1) {
+                            if (item.field === 'POSTER_STYLE_CONFIG') {
+                                item.value = styleData;
+                            }
+                        } else {
+                            if (item.field === 'POSTER_STYLE') {
+                                item.value = JSON.stringify(styleData?.[0] || {});
+                            }
                         }
                     }
-                }
-            });
-            copyRecord.flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG').value =
-                JSON.stringify(systemVariable);
-            return copyRecord;
+                });
+                copyRecord.flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG').value =
+                    JSON.stringify(systemVariable);
+                return copyRecord;
+            } else {
+                return {};
+            }
         }, [styleData, record, systemVariable]);
 
         // useEffect(() => {

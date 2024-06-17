@@ -70,24 +70,28 @@ const AddStyleApp = React.forwardRef(
         const templateRef: any = useRef(null);
 
         const submitData = React.useMemo(() => {
-            const copyRecord = _.cloneDeep(record);
-            copyRecord.variable.variables.forEach((item: any) => {
-                // addType
-                if (addType === 1) {
-                } else {
-                    // 风格产生===2 -> POSTER_STYLE
-                    if (mode === 1) {
-                        if (item.field === 'POSTER_STYLE_CONFIG') {
-                            item.value = styleData;
-                        }
+            if (record) {
+                const copyRecord = _.cloneDeep(record);
+                copyRecord.variable.variables.forEach((item: any) => {
+                    // addType
+                    if (addType === 1) {
                     } else {
-                        if (item.field === 'POSTER_STYLE') {
-                            item.value = JSON.stringify(styleData?.[0] || {});
+                        // 风格产生===2 -> POSTER_STYLE
+                        if (mode === 1) {
+                            if (item.field === 'POSTER_STYLE_CONFIG') {
+                                item.value = styleData;
+                            }
+                        } else {
+                            if (item.field === 'POSTER_STYLE') {
+                                item.value = JSON.stringify(styleData?.[0] || {});
+                            }
                         }
                     }
-                }
-            });
-            return copyRecord;
+                });
+                return copyRecord;
+            } else {
+                return {};
+            }
         }, [styleData, record]);
 
         // useEffect(() => {

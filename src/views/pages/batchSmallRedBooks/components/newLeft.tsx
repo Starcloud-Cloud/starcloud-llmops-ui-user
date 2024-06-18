@@ -20,7 +20,8 @@ import {
     theme,
     Tooltip,
     Popover,
-    Dropdown
+    Dropdown,
+    Switch
 } from 'antd';
 import { AccordionDetails, AccordionSummary, Accordion, IconButton } from '@mui/material';
 import { ExpandMore, AddCircleSharp, South, MoreVert } from '@mui/icons-material';
@@ -39,7 +40,7 @@ import {
 } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
     materialTemplate,
     materialImport,
@@ -176,6 +177,17 @@ const Lefts = ({
     //上传素材
     const [materialType, setMaterialType] = useState('');
     const [materialTypeStatus, setMaterialTypeStatus] = useState(false); //获取状态 true图片 false 表格
+    const materialStatus = useMemo(() => {
+        return (
+            appData?.configuration?.appInformation?.workflowConfig?.steps
+                ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
+                ?.variable?.variables?.find((el: any) => el.field === 'BUSINESS_TYPE')?.value || 'default'
+        );
+    }, [
+        appData?.configuration?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
+            ?.variable?.variables?.find((el: any) => el.field === 'BUSINESS_TYPE')?.value
+    ]);
     //上传图片
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
@@ -723,8 +735,7 @@ const Lefts = ({
         let tableDataList;
         if (!data) {
             tableDataList = await createMaterialList({
-                uid: searchParams.get('appUid') ? searchParams.get('appUid') : detail ? detail?.uid : result.uid,
-                source: !searchParams.get('appUid') ? 'app' : 'market'
+                uid: result.uid
             });
         }
         if (judge) {
@@ -1156,7 +1167,7 @@ const Lefts = ({
     const [exeState, setExeState] = useState(false);
 
     const materialList = React.useMemo(() => {
-        return materialTypeStatus
+        return materialStatus === 'picture'
             ? fileList?.map((item) => ({
                   pictureUrl: item?.response?.data?.url,
                   type: 'picture'
@@ -1165,7 +1176,7 @@ const Lefts = ({
                   ...item,
                   type: materialType
               }));
-    }, [materialTypeStatus, fileList, tableData]);
+    }, [materialStatus, fileList, tableData]);
 
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
@@ -1191,19 +1202,20 @@ const Lefts = ({
             );
             upData?.variable?.variables?.forEach((item: any) => {
                 if (item?.style === 'MATERIAL') {
-                    item.value = materialTypeStatus
-                        ? JSON.stringify(
-                              fileList?.map((item) => ({
-                                  pictureUrl: item?.response?.data?.url,
-                                  type: 'picture'
-                              }))
-                          )
-                        : JSON.stringify(
-                              tableData?.map((item) => ({
-                                  ...item,
-                                  type: materialType
-                              }))
-                          );
+                    item.value =
+                        materialStatus === 'picture'
+                            ? JSON.stringify(
+                                  fileList?.map((item) => ({
+                                      pictureUrl: item?.response?.data?.url,
+                                      type: 'picture'
+                                  }))
+                              )
+                            : JSON.stringify(
+                                  tableData?.map((item) => ({
+                                      ...item,
+                                      type: materialType
+                                  }))
+                              );
                 }
             });
             data.executeParam.appInformation.workflowConfig.steps = [
@@ -1233,15 +1245,16 @@ const Lefts = ({
                               index: index + 1
                           }))
                         : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
-                    materialList: materialTypeStatus
-                        ? fileList?.map((item) => ({
-                              pictureUrl: item?.response?.data?.url,
-                              type: 'picture'
-                          }))
-                        : tableData?.map((item) => ({
-                              ...item,
-                              type: materialType
-                          })),
+                    materialList:
+                        materialStatus === 'picture'
+                            ? fileList?.map((item) => ({
+                                  pictureUrl: item?.response?.data?.url,
+                                  type: 'picture'
+                              }))
+                            : tableData?.map((item) => ({
+                                  ...item,
+                                  type: materialType
+                              })),
                     appInformation: {
                         ...appRef.current.configuration.appInformation,
                         workflowConfig: {
@@ -1271,6 +1284,11 @@ const Lefts = ({
             } else {
                 result = await planModifyConfig(data);
             }
+            const judge = await materialJudge({
+                uid: searchParams.get('uid'),
+                planSource: searchParams.get('appUid') ? 'market' : 'app'
+            });
+            setMaterialTypeStatus(judge);
             dispatch(
                 openSnackbar({
                     open: true,
@@ -1356,7 +1374,7 @@ const Lefts = ({
         }
     }, [generateList]);
     useEffect(() => {
-        if (materialTypeStatus) {
+        if (materialStatus === 'picture') {
             setMoke &&
                 setMoke(
                     fileList?.map((item) => ({
@@ -1508,13 +1526,14 @@ const Lefts = ({
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         );
         if (a) {
-            a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = materialTypeStatus
-                ? fileList?.map((item: any) => ({
-                      pictureUrl: item?.response?.data?.url
-                  }))
-                : tableData?.map((item: any) => ({
-                      ...item
-                  }));
+            a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
+                materialStatus === 'picture'
+                    ? fileList?.map((item: any) => ({
+                          pictureUrl: item?.response?.data?.url
+                      }))
+                    : tableData?.map((item: any) => ({
+                          ...item
+                      }));
             a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value =
                 data ||
                 appRef.current.configuration?.appInformation?.workflowConfig?.steps
@@ -1858,7 +1877,7 @@ const Lefts = ({
                                     </IconButton> */}
                                 </div>
                                 <div>
-                                    {materialTypeStatus ? (
+                                    {materialStatus === 'picture' ? (
                                         <>
                                             <div className="text-[12px] font-[500] flex items-center justify-between">
                                                 <div>图片总量：{fileList?.length}</div>
@@ -2666,6 +2685,60 @@ const Lefts = ({
                                                                     </IconButton>
                                                                 </Dropdown>
                                                             )}
+                                                        {item?.flowStep?.handler === 'MaterialActionHandler' && materialTypeStatus && (
+                                                            <div className="flex gap-2 items-center mr-4">
+                                                                <div>
+                                                                    <span>拼图生成模式</span>
+                                                                    <Tooltip title="方便批量上传图片，图片会随机放在 图片风格模版中进行生成">
+                                                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                                                    </Tooltip>
+                                                                </div>
+                                                                <Switch
+                                                                    checked={materialStatus === 'default' ? false : true}
+                                                                    onChange={(e, event) => {
+                                                                        if (materialStatus === 'default') {
+                                                                            setFileList(
+                                                                                tableRef.current?.map((item) => ({
+                                                                                    uid: uuidv4(),
+                                                                                    thumbUrl: item[columns[1]?.dataIndex],
+                                                                                    response: {
+                                                                                        data: {
+                                                                                            url: item[columns[1]?.dataIndex]
+                                                                                        }
+                                                                                    }
+                                                                                }))
+                                                                            );
+                                                                        } else {
+                                                                            tableRef.current = fileList?.map((item) => ({
+                                                                                [columns[1].dataIndex]: item?.response?.data?.url
+                                                                            }));
+                                                                            setTableData(tableRef.current);
+                                                                        }
+                                                                        appRef.current.configuration.appInformation.workflowConfig.steps
+                                                                            .find(
+                                                                                (item: any) =>
+                                                                                    item.flowStep.handler === 'MaterialActionHandler'
+                                                                            )
+                                                                            .variable.variables.find(
+                                                                                (el: any) => el.field === 'BUSINESS_TYPE'
+                                                                            ).value = materialStatus === 'default' ? 'picture' : 'default';
+                                                                        setAppData(appRef.current);
+                                                                        generRef.current =
+                                                                            appRef.current?.configuration?.appInformation?.workflowConfig?.steps?.filter(
+                                                                                (item: any) => {
+                                                                                    return (
+                                                                                        item?.flowStep?.handler !==
+                                                                                            'MaterialActionHandler' &&
+                                                                                        item?.flowStep?.handler !== 'PosterActionHandler'
+                                                                                    );
+                                                                                }
+                                                                            );
+                                                                        setGenerateList(generRef.current);
+                                                                        event.stopPropagation();
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </AccordionSummary>

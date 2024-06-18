@@ -250,12 +250,6 @@ const LeftModalAdd = ({
                             } catch (err) {
                                 console.log(err);
                             }
-                            const judge = await materialJudge({
-                                uid: searchParams.get('uid'),
-                                planSource: searchParams.get('appUid') ? 'market' : 'app'
-                            });
-
-                            setMaterialTypeStatus(judge);
                         }}
                     >
                         保存

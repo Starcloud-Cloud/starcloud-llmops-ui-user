@@ -127,10 +127,14 @@ const AddStyle = React.forwardRef(
 
         useEffect(() => {
             const newList = _.cloneDeep(submitData);
-            newList.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value = JSON.parse(
-                newList.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value
-            );
-            setImageVar && setImageVar(newList);
+            if (newList?.variable?.variables) {
+                newList.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value = JSON.parse(
+                    newList.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value
+                );
+                setImageVar && setImageVar(newList);
+            } else {
+                setImageVar([]);
+            }
         }, [submitData]);
 
         useEffect(() => {

@@ -19,10 +19,11 @@ const BatcSmallRedBooks = forwardRef(
     (
         {
             planState,
+            changePre,
             detail,
             isMyApp,
             setDetail
-        }: { planState: number; detail?: any; isMyApp?: boolean; setDetail: (data: any, fieldShow?: boolean) => void },
+        }: { planState: number; changePre?: number; detail?: any; isMyApp?: boolean; setDetail: (data: any, fieldShow?: boolean) => void },
         ref
     ) => {
         useImperativeHandle(ref, () => ({
@@ -345,6 +346,7 @@ const BatcSmallRedBooks = forwardRef(
                     >
                         <Left
                             pre={pre}
+                            changePre={changePre}
                             planState={planState}
                             detail={detail}
                             setGetData={setGetData}

@@ -174,8 +174,9 @@ const EditStyle = ({
                                 <div className="relative w-[85%] mx-auto overflow-hidden" ref={imgRef}>
                                     {currentTemp?.example && (
                                         <Image
+                                            width={'100%'}
                                             preview={false}
-                                            src={currentTemp?.example + '?x-oss-process=image/resize,w_280/quality,q_80'}
+                                            src={currentTemp?.example + '?x-oss-process=image/resize,w_380/quality,q_80'}
                                             placeholder
                                         />
                                     )}

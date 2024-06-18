@@ -49,6 +49,7 @@ export const PicImagePick = ({
     });
     const [currentDetails, setCurrentDetails] = React.useState<any>(null);
     const [visibleSaveFilter, setVisibleSaveFilter] = React.useState(false);
+    const [canSearch, setCanSearch] = React.useState(false);
 
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
@@ -101,7 +102,8 @@ export const PicImagePick = ({
             if (element) {
                 if (element.scrollTop + element.clientHeight >= element.scrollHeight - 20) {
                     const nextPage = currentPageRef.current + 1;
-                    if (nextPage <= Math.ceil(totalHitsRef.current / 20)) {
+                    if (nextPage <= Math.ceil(totalHitsRef.current / 40)) {
+                        setCanSearch(true);
                         setCurrentPage(nextPage);
                     }
                 }
@@ -203,24 +205,28 @@ export const PicImagePick = ({
     };
     useEffect(() => {
         const fetchData = debounce(() => {
-            setLoading(true);
-            imageSearch(q ? { q, page: currentPage, per_page: 20, lang: 'zh', ...query } : { page: currentPage, per_page: 20, ...query })
-                .then((res) => {
-                    const { totalHits, hits: newData } = res;
-                    setHits([...hits, ...newData]);
-                    setTotalHits(totalHits);
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
+            if (canSearch) {
+                setLoading(true);
+                imageSearch(
+                    q ? { q, page: currentPage, per_page: 40, lang: 'zh', ...query } : { page: currentPage, per_page: 40, ...query }
+                )
+                    .then((res) => {
+                        const { totalHits, hits: newData } = res;
+                        setHits([...hits, ...newData]);
+                        setTotalHits(totalHits);
+                    })
+                    .finally(() => {
+                        setLoading(false);
+                        setCanSearch(false);
+                    });
+            }
         }, 200); // 设置防抖时间为300毫秒
 
         fetchData();
-
         return () => {
             fetchData.cancel(); // 取消防抖
         };
-    }, [currentPage, q, query]);
+    }, [currentPage, q, query, canSearch]);
 
     const onChange = (item: any) => {
         setCheckItem(item);
@@ -300,6 +306,7 @@ export const PicImagePick = ({
                         setHits([]);
                         setTotalHits(0);
                     }
+                    setCanSearch(true);
                 }}
             />
             {tags?.length > 0 && (

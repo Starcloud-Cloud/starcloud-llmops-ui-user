@@ -99,19 +99,17 @@ const VariableModal = ({
         }
     }, []);
     const handleSave = () => {
-        if (!content.field || !content.label) {
+        if (!content.label) {
             setFidldOpen(true);
             setLabelOpen(true);
             return false;
         }
-
-        if (/^[a-zA-Z0-9_\-]+$/.test(content.field)) {
-            saveContent({
-                ...content,
-                style: content.style || 'INPUT',
-                options: content.style === 'SELECT' ? options : []
-            });
-        }
+        saveContent({
+            ...content,
+            field: itemData?.field,
+            style: content.style || 'INPUT',
+            options: content.style === 'SELECT' ? options : []
+        });
     };
     return (
         <Dialog onClose={() => setOpen(false)} aria-labelledby="customized-dialog-title" open={open}>
@@ -121,26 +119,6 @@ const VariableModal = ({
                 </Typography>
             </BootstrapDialogTitle>
             <DialogContent dividers>
-                <TextField
-                    fullWidth
-                    id="field"
-                    name="field"
-                    required
-                    label={t('myApp.field')}
-                    color="secondary"
-                    size="small"
-                    value={content.field}
-                    onChange={(e) => {
-                        handleChange(e), setFidldOpen(true);
-                    }}
-                    InputLabelProps={{ shrink: true }}
-                    error={(fieldOpen && !content.field) || (fieldOpen && !/^[a-zA-Z0-9_\-]+$/.test(content.field))}
-                    helperText={
-                        (fieldOpen && !content.field) || (fieldOpen && !/^[a-zA-Z0-9_\-]+$/.test(content.field))
-                            ? `${t('myApp.field')}必填并只能填写字母 数字 _ -`
-                            : ''
-                    }
-                />
                 <TextField
                     fullWidth
                     id="label"

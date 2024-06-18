@@ -1,9 +1,8 @@
-import { Tooltip, Popconfirm } from 'antd';
+import { Tooltip, Popconfirm, Button } from 'antd';
 import {
     Box,
     Chip,
     Typography,
-    Button as Buttons,
     Divider,
     TableContainer,
     Table as Tables,
@@ -14,11 +13,12 @@ import {
     IconButton
 } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
-import { Error, Add, Delete, Settings } from '@mui/icons-material';
+import { Error, Delete, Settings } from '@mui/icons-material';
 import { t } from 'hooks/web/useI18n';
 import { useState, memo, useEffect } from 'react';
 import _ from 'lodash-es';
 import VariableModal from '../variableModal';
+import { appFieldCode } from 'api/redBook/batchIndex';
 interface Variable {
     rows: any[];
     setRows: (data: any[]) => void;
@@ -29,22 +29,39 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
     const [variableOpen, setVariableOpen] = useState(false);
     const [varIndex, setVarIndex] = useState(-1);
     const [itemData, setItemData] = useState<any>({});
+    const [tableData, setTableData] = useState<any[]>([]);
     const saveContent = (data: any) => {
         if (title === '增加变量') {
-            if (rows) {
-                setRows([data, ...rows]);
+            if (tableData) {
+                setTableData([data, ...tableData]);
                 setVariableOpen(false);
             } else {
-                setRows([data]);
+                setTableData([data]);
                 setVariableOpen(false);
             }
         } else {
-            const newList = _.cloneDeep(rows);
+            const newList = _.cloneDeep(tableData);
             newList[varIndex] = data;
-            setRows(newList);
+            setTableData(newList);
             setVariableOpen(false);
         }
     };
+    const [saveLoading, setSaveLoading] = useState(false);
+    const handleSave = async () => {
+        setSaveLoading(true);
+        try {
+            const result = await appFieldCode({
+                variables: tableData
+            });
+            setSaveLoading(false);
+            setRows(result);
+        } catch (err) {
+            setSaveLoading(false);
+        }
+    };
+    useEffect(() => {
+        setTableData(rows);
+    }, []);
     useEffect(() => {
         if (!variableOpen) {
             setItemData({});
@@ -60,35 +77,35 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                             <Error sx={{ cursor: 'pointer' }} fontSize="small" />
                         </Tooltip>
                     </Typography>
-                    <Buttons
-                        size="small"
-                        color="secondary"
-                        onClick={() => {
-                            setTitle('增加变量');
-                            setVariableOpen(true);
-                        }}
-                        variant="outlined"
-                        startIcon={<Add />}
-                    >
-                        {t('myApp.add')}
-                    </Buttons>
+                    <div className="flex gap-2">
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                setTitle('增加变量');
+                                setVariableOpen(true);
+                            }}
+                        >
+                            {t('myApp.add')}
+                        </Button>
+                        <Button loading={saveLoading} type="primary" onClick={handleSave}>
+                            保存
+                        </Button>
+                    </div>
                 </Box>
                 <Divider style={{ margin: '10px 0' }} />
                 <TableContainer>
                     <Tables size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>{t('myApp.field')}</TableCell>
                                 <TableCell>{t('myApp.name')}</TableCell>
                                 <TableCell>{t('myApp.type')}</TableCell>
                                 <TableCell>{t('myApp.operation')}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows?.length > 0 &&
-                                rows?.map((row: any, i: number) => (
-                                    <TableRow hover key={row.field}>
-                                        <TableCell>{row.field}</TableCell>
+                            {tableData?.length > 0 &&
+                                tableData?.map((row: any, i: number) => (
+                                    <TableRow hover key={i}>
                                         <TableCell>{row.label}</TableCell>
                                         <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
                                         <TableCell sx={{ width: 120 }}>
@@ -107,9 +124,9 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                                                 title={t('myApp.del')}
                                                 description={t('myApp.delDesc')}
                                                 onConfirm={() => {
-                                                    const newList = _.cloneDeep(rows);
+                                                    const newList = _.cloneDeep(tableData);
                                                     newList?.splice(i, 1);
-                                                    setRows(newList);
+                                                    setTableData(newList);
                                                 }}
                                                 onCancel={() => {}}
                                                 okText={t('myApp.confirm')}

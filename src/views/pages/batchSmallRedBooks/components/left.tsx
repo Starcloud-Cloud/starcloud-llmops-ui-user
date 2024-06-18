@@ -82,7 +82,6 @@ const Lefts = ({
     detailShow = true,
     planState,
     pre,
-    changePre,
     detail,
     data,
     saveLoading,
@@ -105,7 +104,6 @@ const Lefts = ({
     detailShow?: boolean;
     planState?: number;
     pre?: number;
-    changePre?: number;
     detail?: any;
     data?: any;
     saveLoading?: boolean;
@@ -1718,17 +1716,6 @@ const Lefts = ({
             });
         }
     }, [detail?.type]);
-    useEffect(() => {
-        if (changePre && appRef.current) {
-            appRef.current.configuration.appInformation = detail;
-            setAppData(appRef.current);
-            generRef.current = appRef.current?.configuration?.appInformation?.workflowConfig?.steps?.filter((item: any) => {
-                return item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler';
-            });
-            setGenerateList(generRef.current);
-        }
-    }, [changePre]);
-
     const [settingOpen, setSettingOpen] = useState(false);
     const [steptitOpen, setSteotitOpen] = useState(false);
     const [stepTitData, setStepTitData] = useState<any>(null);

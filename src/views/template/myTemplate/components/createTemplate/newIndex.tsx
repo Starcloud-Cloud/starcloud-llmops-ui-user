@@ -359,16 +359,6 @@ function CreateDetail() {
                 }
                 arr.find((el: any) => el.style === 'MATERIAL').value = list;
             }
-            if (arr?.find((el: any) => el.field === 'MATERIAL_DEFINE')?.value) {
-                let list: any;
-
-                try {
-                    list = JSON.parse(arr?.find((el: any) => el.field === 'MATERIAL_DEFINE')?.value);
-                } catch (err) {
-                    list = arr?.find((el: any) => el.style === 'MATERIAL')?.value;
-                }
-                arr.find((el: any) => el.field === 'MATERIAL_DEFINE').value = list;
-            }
             if (arr?.find((el: any) => el.style === 'CHECKBOX')) {
                 let list: any;
 
@@ -981,6 +971,7 @@ function CreateDetail() {
             setValue('4');
         }
     }, []);
+    const [changePre, setChangePre] = useState(0);
     return searchParams.get('source') === 'market' ? (
         detail ? (
             <>
@@ -1142,11 +1133,11 @@ function CreateDetail() {
                                     arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
                                 ];
                                 newData.workflowConfig.steps = arr?.filter((item: any) => item);
-                                console.log(newData);
                                 detailRef.current = newData;
                                 setDetail(detailRef?.current);
                                 setValue(key);
                             } else if (key === '4') {
+                                setChangePre(changePre + 1);
                                 setValue(key);
                             } else {
                                 setValue(key);
@@ -1206,6 +1197,7 @@ function CreateDetail() {
                                         <div className="h-[calc(100vh-266px)] bg-[rgb(244,246,248)]">
                                             <CreatePlan
                                                 ref={createPlanRef}
+                                                changePre={changePre}
                                                 planState={planState}
                                                 detail={_.cloneDeep(detailRef.current)}
                                                 setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}

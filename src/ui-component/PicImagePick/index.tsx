@@ -279,7 +279,7 @@ export const PicImagePick = ({
                 dispatch(
                     openSnackbar({
                         open: true,
-                        message: '保存成功',
+                        message: '创作计划保存成功',
                         variant: 'alert',
                         alert: {
                             color: 'success'

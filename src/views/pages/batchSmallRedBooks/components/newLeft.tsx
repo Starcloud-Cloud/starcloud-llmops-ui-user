@@ -2441,7 +2441,15 @@ const Lefts = ({
             )}
             {settingOpen && (
                 <Modal width={'80%'} className="relative" open={settingOpen} onCancel={() => setSettingOpen(false)} footer={false}>
-                    <div style={{ scrollbarGutter: 'stable' }} className="h-[80vh] overflow-y-auto">
+                    <div
+                        style={{
+                            backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
+                            backgroundSize: '10px 10px',
+                            backgroundRepeat: 'repeat',
+                            scrollbarGutter: 'stable'
+                        }}
+                        className="h-[80vh] overflow-y-auto"
+                    >
                         <div className=" bg-white w-full flex items-center justify-between pl-4 pr-14 absolute top-[15px] right-[0px]">
                             <div className="text-[16px] font-[600]">编辑步骤</div>
                             <Button
@@ -2461,14 +2469,7 @@ const Lefts = ({
                                 保存
                             </Button>
                         </div>
-                        <div
-                            style={{
-                                backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
-                                backgroundSize: '10px 10px',
-                                backgroundRepeat: 'repeat'
-                            }}
-                            className="flex justify-center mt-6"
-                        >
+                        <div className="flex justify-center mt-6">
                             <div className="2xl:w-[1000px] xl:w-[820px] lg:w-[740px]  w-[100%]">
                                 {appData?.configuration?.appInformation?.workflowConfig?.steps?.map((item: any, index: number) => (
                                     <div key={index}>
@@ -2590,6 +2591,7 @@ const Lefts = ({
                                                                             setAllVariable(item);
                                                                             setStepIndex(index - 1);
                                                                             setAdvancedModal(true);
+                                                                            e.stopPropagation();
                                                                         }}
                                                                         size="small"
                                                                     >
@@ -2685,16 +2687,20 @@ const Lefts = ({
                                                                     </IconButton>
                                                                 </Dropdown>
                                                             )}
-                                                        {item?.flowStep?.handler === 'MaterialActionHandler' && materialTypeStatus && (
+                                                        {item?.flowStep?.handler === 'MaterialActionHandler' && (
                                                             <div className="flex gap-2 items-center mr-4">
                                                                 <div>
                                                                     <span>拼图生成模式</span>
-                                                                    <Tooltip title="方便批量上传图片，图片会随机放在 图片风格模版中进行生成">
+                                                                    <Tooltip
+                                                                        title="方便批量上传图片，图片会随机放在 图片风格模版中进行生成
+(当素材只有一个图片类型的字段的时候可开启此功能)"
+                                                                    >
                                                                         <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
                                                                     </Tooltip>
                                                                 </div>
                                                                 <Switch
                                                                     checked={materialStatus === 'default' ? false : true}
+                                                                    disabled={!materialTypeStatus}
                                                                     onChange={(e, event) => {
                                                                         if (materialStatus === 'default') {
                                                                             setFileList(

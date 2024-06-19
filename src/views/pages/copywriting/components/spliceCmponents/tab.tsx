@@ -16,8 +16,20 @@ interface Tabs {
     setFocuActive: (data: any) => void;
     digui: () => number;
     appData: any;
+    materialStatus?: string;
 }
-const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui, appData }: Tabs) => {
+const CreateTab = ({
+    materialStatus,
+    schemaList,
+    mode,
+    setModel,
+    imageStyleData,
+    setImageStyleData,
+    focuActive,
+    setFocuActive,
+    digui,
+    appData
+}: Tabs) => {
     const handleAdd = (data?: any) => {
         let newData = _.cloneDeep(imageStyleData);
         if (!newData) {
@@ -191,6 +203,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                     </div>
                                     <StyleTabs
                                         schemaList={schemaList}
+                                        materialStatus={materialStatus}
                                         imageStyleData={item?.templateList}
                                         typeList={[]}
                                         appData={appData}

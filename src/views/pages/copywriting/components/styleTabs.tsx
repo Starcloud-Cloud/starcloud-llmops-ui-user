@@ -12,6 +12,7 @@ const StyleTabs = ({
     setDetailData,
     appData,
     selModal,
+    materialStatus,
     canEdit = false
 }: {
     schemaList?: any[];
@@ -20,6 +21,7 @@ const StyleTabs = ({
     setDetailData: (data: any) => void;
     appData: any;
     selModal?: string;
+    materialStatus?: string;
     canEdit?: boolean;
 }) => {
     const [activeKey, setActiveKey] = useState('0');
@@ -118,6 +120,7 @@ const StyleTabs = ({
                         children: (
                             <EditStyle
                                 appData={appData}
+                                materialStatus={materialStatus}
                                 schemaList={schemaList}
                                 imageStyleData={item}
                                 canEdit={canEdit}

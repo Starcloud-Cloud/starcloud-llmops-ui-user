@@ -2169,6 +2169,7 @@ const Lefts = ({
                                         record={imageMater}
                                         getList={() => getList(true)}
                                         materialType={materialType}
+                                        materialStatus={materialStatus}
                                     />
                                 ) : (
                                     <AddStyleApp

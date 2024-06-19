@@ -1,16 +1,16 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
-import { Input, Popover, Tree, Image, Row, Col, Menu, Switch, Button, Divider, Spin } from 'antd';
-import type { TreeDataNode } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { Input, Image, Menu, Switch, Button, Divider, Tooltip } from 'antd';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import _ from 'lodash-es';
 import { SelectTemplateModal } from './SelectTemplateModal';
 import React from 'react';
 import { getImageTemplateTypes } from 'api/template';
 import VariableInput from './variableInput';
-import { BorderColor } from '@mui/icons-material';
 import { getImageTemplateJSON } from '../../../../api/template/index';
 import { v4 as uuidv4 } from 'uuid';
+import copy from 'clipboard-copy';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const { SubMenu } = Menu;
 const EditStyle = ({
     schemaList,
@@ -130,6 +130,21 @@ const EditStyle = ({
             setOpen(true);
         }
     }, [selModal]);
+    const textCopy = (data: string) => {
+        copy(data);
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '复制成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                close: false
+            })
+        );
+    };
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -328,8 +343,18 @@ const EditStyle = ({
                                                     可使用下面的变量替换到图片文字字段中
                                                 </div>
                                                 <div className="ml-3 flex gap-2 text-xs mb-4">
-                                                    <div>{`{{AI分析.图片标题}}`}</div>
-                                                    <div>{`{{AI分析.图片副标题}}`}</div>
+                                                    <Tooltip title="点击复制">
+                                                        <div
+                                                            onClick={() => textCopy(`{{AI分析.图片标题}}`)}
+                                                            className="cursor-pointer"
+                                                        >{`{{AI分析.图片标题}}`}</div>
+                                                    </Tooltip>
+                                                    <Tooltip title="点击复制">
+                                                        <div
+                                                            onClick={() => textCopy(`{{AI分析.图片副标题}}`)}
+                                                            className="cursor-pointer"
+                                                        >{`{{AI分析.图片副标题}}`}</div>
+                                                    </Tooltip>
                                                 </div>
                                             </>
                                         )}

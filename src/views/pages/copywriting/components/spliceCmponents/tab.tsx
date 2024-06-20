@@ -42,8 +42,8 @@ const CreateTab = ({
             index: digui(),
             system: data?.system || true,
             enable: data?.enable || true,
+            isCopy: data?.isCopy || true,
             uuid: styleuid,
-
             templateList: data?.templateList?.map((item: any) => ({
                 ...item,
                 uuid: uuidv4()?.split('-')?.join(''),
@@ -58,6 +58,7 @@ const CreateTab = ({
                     model: '',
                     isMultimodalTitle: false,
                     uuid: fristuid,
+                    isCopy: false,
                     variableList: []
                 }
             ],
@@ -177,6 +178,15 @@ const CreateTab = ({
                                                             handleAdd(item);
                                                         } else if (e.key === '2') {
                                                             const newData = _.cloneDeep(imageStyleData);
+                                                            let lastIndex = '';
+                                                            imageStyleData.forEach((item: any) => {
+                                                                if (item?.uuid === newData[i]?.uuid) {
+                                                                    lastIndex = newData[i - 1]?.uuid;
+                                                                }
+                                                            });
+                                                            console.log(imageStyleData, lastIndex || imageStyleData[0]?.uuid);
+
+                                                            setCheckStyle(lastIndex || imageStyleData[i + 1]?.uuid);
                                                             newData.splice(i, 1);
                                                             setImageStyleData(newData);
                                                         }
@@ -208,6 +218,7 @@ const CreateTab = ({
                                         typeList={[]}
                                         appData={appData}
                                         selModal={selModal}
+                                        setSelModal={setSelModal}
                                         setDetailData={(data: any) => {
                                             const newData = _.cloneDeep(imageStyleData);
                                             newData[i].templateList = data;

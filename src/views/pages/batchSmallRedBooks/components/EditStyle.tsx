@@ -177,11 +177,22 @@ const EditStyle = ({
                             <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
                         </FormControl>
                     </div>
-                    {!canEdit && (
-                        <Button className="mt-[7px]" type="primary" onClick={handleCopy}>
-                            复制
-                        </Button>
-                    )}
+                    <div className="flex items-center gap-2 mt-[7px]">
+                        <div className="text-xs inline-block">是否复制图片</div>
+                        <Switch
+                            checked={imageStyleData?.isCopy}
+                            onChange={(e) => {
+                                const newData = _.cloneDeep(imageStyleData);
+                                newData.isCopy = e;
+                                setData(newData);
+                            }}
+                        />
+                        {!canEdit && (
+                            <Button type="primary" onClick={handleCopy}>
+                                复制
+                            </Button>
+                        )}
+                    </div>
                 </div>
                 {imageStyleData?.code && (
                     <div>

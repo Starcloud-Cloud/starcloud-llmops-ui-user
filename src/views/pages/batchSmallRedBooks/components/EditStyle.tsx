@@ -20,6 +20,7 @@ const EditStyle = ({
     setCopyData,
     appData = {},
     selModal,
+    materialStatus,
     canEdit = false
 }: {
     schemaList?: any[];
@@ -29,6 +30,7 @@ const EditStyle = ({
     setCopyData: (data: any) => void;
     appData?: any;
     selModal?: string;
+    materialStatus?: string;
     canEdit?: boolean;
 }) => {
     const [open, setOpen] = React.useState(false);
@@ -227,88 +229,90 @@ const EditStyle = ({
                                 <Divider type="vertical" style={{ height: '100%' }} />
                             </div>
                             <div className="flex-1">
-                                <div>
-                                    {imageStyleData?.variableList?.filter((item: any) => item.type === 'IMAGE')?.length > 0 && (
-                                        <>
-                                            <div className="text-lg">图片生成配置</div>
-                                            <div className="text-xs text-black/50">
-                                                {appData?.materialType === 'picture'
-                                                    ? '用上传素材的图片随机绑定到图片模板上'
-                                                    : '用上传素材的图片类型字段绑定到图片模板上的图片位置'}
-                                            </div>
-                                        </>
-                                    )}
-                                    <div className="flex flex-wrap">
-                                        {appData?.materialType === 'picture' ? (
+                                {materialStatus === 'default' && (
+                                    <div>
+                                        {imageStyleData?.variableList?.filter((item: any) => item.type === 'IMAGE')?.length > 0 && (
                                             <>
-                                                <div className="flex items-center gap-4 min-h-[32px]">
-                                                    <span>图片生成模式</span>
-                                                    <Switch
-                                                        disabled={canEdit}
-                                                        checked={imageStyleData?.mode === 'RANDOM' ? true : false}
-                                                        onChange={(e) => {
-                                                            const newData = _.cloneDeep(imageStyleData);
-                                                            if (e) {
-                                                                newData.mode = 'RANDOM';
-                                                            } else {
-                                                                newData.mode = 'SEQUENCE';
-                                                            }
-                                                            setData(newData);
-                                                        }}
-                                                    />
-                                                    <span className="text-[#673ab7]">
-                                                        {imageStyleData?.mode === 'RANDOM' ? '随机生成' : '顺序生成'}
-                                                    </span>
+                                                <div className="text-lg">图片生成配置</div>
+                                                <div className="text-xs text-black/50">
+                                                    {appData?.materialType === 'picture'
+                                                        ? '用上传素材的图片随机绑定到图片模板上'
+                                                        : '用上传素材的图片类型字段绑定到图片模板上的图片位置'}
                                                 </div>
                                             </>
-                                        ) : (
-                                            imageStyleData?.variableList?.map(
-                                                (el: any, index: number) =>
-                                                    el.type === 'IMAGE' &&
-                                                    el.field && (
-                                                        <div
-                                                            className="w-[50%] p-3"
-                                                            ref={wrapperRef}
-                                                            onClick={() => setCurrentElementId(el.field)}
-                                                            onMouseEnter={() => setCurrentElementId(el.field)}
-                                                            onMouseLeave={() => setCurrentElementId('')}
-                                                        >
-                                                            <VariableInput
-                                                                disabled={canEdit}
-                                                                styles={
-                                                                    currentElementId === el.field
-                                                                        ? {
-                                                                              border: '2px solid #673ab7'
-                                                                          }
-                                                                        : {}
-                                                                }
-                                                                open={perOpen[index]}
-                                                                setOpen={(flag) => {
-                                                                    const newData = _.cloneDeep(perOpen);
-                                                                    newData[index] = flag;
-                                                                    setPerOpen(newData);
-                                                                }}
-                                                                code="PosterActionHandler"
-                                                                popoverWidth={popoverWidth}
-                                                                handleMenu={handleMenu}
-                                                                details={appData.appReqVO}
-                                                                index={index}
-                                                                title={el?.label}
-                                                                value={el.value}
-                                                                pre={pre}
-                                                                setValue={(value) => {
-                                                                    const newData = _.cloneDeep(imageStyleData);
-                                                                    newData.variableList[index].value = value;
-                                                                    newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
-                                                                    setData(newData);
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )
-                                            )
                                         )}
+                                        <div className="flex flex-wrap">
+                                            {appData?.materialType === 'picture' ? (
+                                                <>
+                                                    <div className="flex items-center gap-4 min-h-[32px]">
+                                                        <span>图片生成模式</span>
+                                                        <Switch
+                                                            disabled={canEdit}
+                                                            checked={imageStyleData?.mode === 'RANDOM' ? true : false}
+                                                            onChange={(e) => {
+                                                                const newData = _.cloneDeep(imageStyleData);
+                                                                if (e) {
+                                                                    newData.mode = 'RANDOM';
+                                                                } else {
+                                                                    newData.mode = 'SEQUENCE';
+                                                                }
+                                                                setData(newData);
+                                                            }}
+                                                        />
+                                                        <span className="text-[#673ab7]">
+                                                            {imageStyleData?.mode === 'RANDOM' ? '随机生成' : '顺序生成'}
+                                                        </span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                imageStyleData?.variableList?.map(
+                                                    (el: any, index: number) =>
+                                                        el.type === 'IMAGE' &&
+                                                        el.field && (
+                                                            <div
+                                                                className="w-[50%] p-3"
+                                                                ref={wrapperRef}
+                                                                onClick={() => setCurrentElementId(el.field)}
+                                                                onMouseEnter={() => setCurrentElementId(el.field)}
+                                                                onMouseLeave={() => setCurrentElementId('')}
+                                                            >
+                                                                <VariableInput
+                                                                    disabled={canEdit}
+                                                                    styles={
+                                                                        currentElementId === el.field
+                                                                            ? {
+                                                                                  border: '2px solid #673ab7'
+                                                                              }
+                                                                            : {}
+                                                                    }
+                                                                    open={perOpen[index]}
+                                                                    setOpen={(flag) => {
+                                                                        const newData = _.cloneDeep(perOpen);
+                                                                        newData[index] = flag;
+                                                                        setPerOpen(newData);
+                                                                    }}
+                                                                    code="PosterActionHandler"
+                                                                    popoverWidth={popoverWidth}
+                                                                    handleMenu={handleMenu}
+                                                                    details={appData.appReqVO}
+                                                                    index={index}
+                                                                    title={el?.label}
+                                                                    value={el.value}
+                                                                    pre={pre}
+                                                                    setValue={(value) => {
+                                                                        const newData = _.cloneDeep(imageStyleData);
+                                                                        newData.variableList[index].value = value;
+                                                                        newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
+                                                                        setData(newData);
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )
+                                                )
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {imageStyleData?.variableList?.filter((item: any) => item?.type === 'TEXT')?.length > 0 && (
                                     <div className="mt-2">

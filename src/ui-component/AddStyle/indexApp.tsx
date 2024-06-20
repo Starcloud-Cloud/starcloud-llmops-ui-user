@@ -128,7 +128,6 @@ const AddStyleApp = React.forwardRef(
         }, [record]);
 
         React.useEffect(() => {
-            console.log(mode, 'mode');
             if (record) {
                 let list: any = [];
                 if (mode === 2) {
@@ -279,12 +278,14 @@ const AddStyleApp = React.forwardRef(
                             const index: any = collapseIndexRef.current;
                             const copyStyleData = [...styleData];
                             const item = copyStyleData[index];
+                            console.log('🚀 ~ item:', item);
                             setCurrentStyle(item);
                             currentStyleRef.current = item;
                             setIsModalOpen(true);
                             setUpdIndex(index);
 
-                            setUpdDrawIndex(index);
+                            // 设置uuid
+                            setUpdDrawIndex(item.uuid);
                             setAddType(4);
                         }}
                     >
@@ -889,25 +890,22 @@ const AddStyleApp = React.forwardRef(
                         return;
                     });
             } else if (addType === 4) {
-                // 修改风格
+                // 修改uuid的不需要改变
                 const copyRecord = _.cloneDeep(record);
                 const copyDetails = _.cloneDeep(details);
+                const valueString =
+                    copyRecord.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG')?.value || '[]';
 
-                console.log(copyRecord, 'copyRecord');
-                console.log(copyDetails, 'copyDetails');
+                const valueJson = JSON.parse(valueString);
+                const index = valueJson.findIndex((item: any) => item.uuid === updDrawIndex);
 
-                const valueJson = copyRecord.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || '[]';
-                console.log('🚀 ~ handleModalOk ~ valueString:', valueJson);
-
-                // const valueJson = JSON.parse(valueString);
-                // console.log('🚀 ~ handleModalOk ~ valueJson:', valueJson);
-                valueJson[updDrawIndex] = {
-                    ...valueJson[updDrawIndex],
+                valueJson[index] = {
+                    ...valueJson[index],
                     ...currentStyle
                 };
 
                 copyRecord.variable.variables.forEach((item: any) => {
-                    if (item.field === 'POSTER_STYLE_CONFIG') {
+                    if (item.field === 'CUSTOM_POSTER_STYLE_CONFIG') {
                         item.value = valueJson;
                     }
                 });

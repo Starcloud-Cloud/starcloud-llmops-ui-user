@@ -269,87 +269,110 @@ const AddStyleApp = React.forwardRef(
                     </span>
                 )
             }
+            // {
+            //     key: '3',
+            //     label: (
+            //         <span
+            //             onClick={(e) => {
+            //                 e.stopPropagation();
+            //                 const index: any = collapseIndexRef.current;
+            //                 const copyStyleData = [...styleData];
+            //                 const item = copyStyleData[index];
+            //                 setCurrentStyle(item);
+            //                 currentStyleRef.current = item;
+            //                 setIsModalOpen(true);
+            //                 setUpdIndex(index);
+
+            //                 setUpdDrawIndex(index);
+            //                 setAddType(3);
+            //             }}
+            //         >
+            //             编辑
+            //         </span>
+            //     )
+            // }
         ];
 
-        // const items: any =
-        //     mode === 1
-        //         ? [
-        //               {
-        //                   key: '0',
-        //                   label: (
-        //                       <span
-        //                           onClick={(e) => {
-        //                               e.stopPropagation();
-        //                               const index: any = collapseIndexRef.current;
-        //                               const copyStyleData = [...styleData];
-        //                               const item = copyStyleData[index];
-        //                               setCurrentStyle(item);
-        //                               currentStyleRef.current = item;
-        //                               setIsModalOpen(true);
-        //                               setUpdIndex(index);
-        //                           }}
-        //                       >
-        //                           编辑
-        //                       </span>
-        //                   )
-        //               },
-        //               {
-        //                   key: '1',
-        //                   label: (
-        //                       <span
-        //                           onClick={(e) => {
-        //                               e.stopPropagation();
-        //                               const index: any = collapseIndexRef.current;
-        //                               const copyStyleData = [...styleData];
-        //                               copyStyleData.splice(index, 1);
-        //                               setStyleData(copyStyleData);
-        //                           }}
-        //                       >
-        //                           删除
-        //                       </span>
-        //                   )
-        //               },
-        //               {
-        //                   key: '2',
-        //                   label: (
-        //                       <span
-        //                           onClick={(e) => {
-        //                               e.stopPropagation();
-        //                               const index: any = collapseIndexRef.current;
-        //                               let copyStyleData = [...styleData];
-        //                               copyStyleData = [
-        //                                   ...copyStyleData,
-        //                                   { ...copyStyleData[index], name: `${copyStyleData[index].name}_复制` }
-        //                               ];
-        //                               setStyleData(copyStyleData);
-        //                           }}
-        //                       >
-        //                           复制
-        //                       </span>
-        //                   )
-        //               }
-        //           ]
-        //         : [
-        //               {
-        //                   key: '0',
-        //                   label: (
-        //                       <span
-        //                           onClick={(e) => {
-        //                               e.stopPropagation();
-        //                               const index: any = collapseIndexRef.current;
-        //                               const copyStyleData = [...styleData];
-        //                               const item = copyStyleData[index];
-        //                               setCurrentStyle(item);
-        //                               currentStyleRef.current = item;
-        //                               setIsModalOpen(true);
-        //                               setUpdIndex(index);
-        //                           }}
-        //                       >
-        //                           编辑
-        //                       </span>
-        //                   )
-        //               }
-        //           ];
+        const itemsSys = [
+            {
+                key: '0',
+                label: (
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const index: any = collapseIndexRef.current;
+                            const copyStyleData = [...styleData];
+                            const item = copyStyleData[index];
+                            setCurrentStyle(item);
+                            currentStyleRef.current = item;
+                            setIsModalOpen(true);
+                            setUpdIndex(index);
+                            setSwitchCheck(false);
+                        }}
+                    >
+                        查看
+                    </span>
+                )
+            },
+            {
+                key: '1',
+                label: (
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const index: any = collapseIndexRef.current;
+                            const copyStyleData = [...styleData];
+                            copyStyleData.splice(index, 1);
+                            setStyleData(copyStyleData);
+
+                            // 走接口
+                            const copyOriginStyleData: any = [...originStyleData];
+                            copyOriginStyleData.splice(index, 1);
+
+                            const saveData: any = {};
+                            saveData.configuration = {
+                                appInformation: allData.configuration.appInformation,
+                                imageStyleList: copyOriginStyleData,
+                                materialList: allData.configuration.materialList
+                            };
+                            saveData.source = allData.source;
+                            saveData.totalCount = allData.totalCount;
+                            saveData.uid = allData.uid;
+
+                            planModifyConfig({ ...saveData, validate: false })
+                                .then((res: any) => {
+                                    setIsModalOpen(false);
+                                    setUpdIndex('');
+                                    setAddType(0);
+                                    setCurrentStyle(null);
+                                    getList();
+                                    setVisible(false);
+                                    setSelectImgs([]);
+                                    setChooseImageIndex([]);
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '创作计划保存成功',
+                                            variant: 'alert',
+                                            alert: {
+                                                color: 'success'
+                                            },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                            close: false
+                                        })
+                                    );
+                                })
+                                .catch((e: any) => {
+                                    return;
+                                });
+                        }}
+                    >
+                        删除
+                    </span>
+                )
+            }
+        ];
+
         const handleOkV2 = () => {
             if (type === 0) {
                 // 新增
@@ -448,7 +471,7 @@ const AddStyleApp = React.forwardRef(
                         <div className="flex justify-center">
                             <span>共{item?.templateList?.length || 0}张图片</span>
                             <Dropdown
-                                menu={{ items }}
+                                menu={item.system ? { items: itemsSys } : { items }}
                                 placement="bottom"
                                 arrow
                                 onOpenChange={() => {
@@ -839,30 +862,31 @@ const AddStyleApp = React.forwardRef(
                 saveData.source = allData.source;
                 saveData.totalCount = allData.totalCount;
                 saveData.uid = allData.uid;
+                console.log('🚀 ~ handleModalOk ~ saveData:', saveData);
 
-                planModifyConfig({ ...saveData, validate: false })
-                    .then((res: any) => {
-                        setIsModalOpen(false);
-                        setUpdIndex('');
-                        setAddType(0);
-                        setCurrentStyle(null);
-                        getList();
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: '创作计划保存成功',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                close: false
-                            })
-                        );
-                    })
-                    .catch((e: any) => {
-                        return;
-                    });
+                // planModifyConfig({ ...saveData, validate: false })
+                //     .then((res: any) => {
+                //         setIsModalOpen(false);
+                //         setUpdIndex('');
+                //         setAddType(0);
+                //         setCurrentStyle(null);
+                //         getList();
+                //         dispatch(
+                //             openSnackbar({
+                //                 open: true,
+                //                 message: '创作计划保存成功',
+                //                 variant: 'alert',
+                //                 alert: {
+                //                     color: 'success'
+                //                 },
+                //                 anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                //                 close: false
+                //             })
+                //         );
+                //     })
+                //     .catch((e: any) => {
+                //         return;
+                //     });
             } else {
                 const copyStyleData = _.cloneDeep(styleData);
                 // 非系统的uuid需要变

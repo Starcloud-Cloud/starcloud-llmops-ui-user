@@ -2354,6 +2354,7 @@ const Lefts = ({
             </Modal>
             {editOpen && (
                 <FormModal
+                    getList={() => getList(true)}
                     materialList={materialList}
                     allData={appData}
                     details={appData?.configuration?.appInformation}
@@ -2368,6 +2369,7 @@ const Lefts = ({
             )}
             {editOpens && (
                 <FormModal
+                    getList={() => getList(true)}
                     materialList={materialList}
                     allData={appData}
                     details={appData?.configuration?.appInformation}
@@ -2397,6 +2399,7 @@ const Lefts = ({
             />
             {isModalOpen && (
                 <PicImagePick
+                    getList={() => getList(true)}
                     materialList={materialList}
                     allData={appData}
                     details={appData?.configuration?.appInformation}

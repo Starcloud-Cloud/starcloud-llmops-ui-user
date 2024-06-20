@@ -268,29 +268,29 @@ const AddStyleApp = React.forwardRef(
                         删除
                     </span>
                 )
-            }
-            // {
-            //     key: '3',
-            //     label: (
-            //         <span
-            //             onClick={(e) => {
-            //                 e.stopPropagation();
-            //                 const index: any = collapseIndexRef.current;
-            //                 const copyStyleData = [...styleData];
-            //                 const item = copyStyleData[index];
-            //                 setCurrentStyle(item);
-            //                 currentStyleRef.current = item;
-            //                 setIsModalOpen(true);
-            //                 setUpdIndex(index);
+            },
+            {
+                key: '3',
+                label: (
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const index: any = collapseIndexRef.current;
+                            const copyStyleData = [...styleData];
+                            const item = copyStyleData[index];
+                            setCurrentStyle(item);
+                            currentStyleRef.current = item;
+                            setIsModalOpen(true);
+                            setUpdIndex(index);
 
-            //                 setUpdDrawIndex(index);
-            //                 setAddType(3);
-            //             }}
-            //         >
-            //             编辑
-            //         </span>
-            //     )
-            // }
+                            setUpdDrawIndex(index);
+                            setAddType(3);
+                        }}
+                    >
+                        编辑
+                    </span>
+                )
+            }
         ];
 
         const itemsSys = [
@@ -864,29 +864,29 @@ const AddStyleApp = React.forwardRef(
                 saveData.uid = allData.uid;
                 console.log('🚀 ~ handleModalOk ~ saveData:', saveData);
 
-                // planModifyConfig({ ...saveData, validate: false })
-                //     .then((res: any) => {
-                //         setIsModalOpen(false);
-                //         setUpdIndex('');
-                //         setAddType(0);
-                //         setCurrentStyle(null);
-                //         getList();
-                //         dispatch(
-                //             openSnackbar({
-                //                 open: true,
-                //                 message: '创作计划保存成功',
-                //                 variant: 'alert',
-                //                 alert: {
-                //                     color: 'success'
-                //                 },
-                //                 anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                //                 close: false
-                //             })
-                //         );
-                //     })
-                //     .catch((e: any) => {
-                //         return;
-                //     });
+                planModifyConfig({ ...saveData, validate: false })
+                    .then((res: any) => {
+                        setIsModalOpen(false);
+                        setUpdIndex('');
+                        setAddType(0);
+                        setCurrentStyle(null);
+                        getList();
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '创作计划保存成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
+                    })
+                    .catch((e: any) => {
+                        return;
+                    });
             } else {
                 const copyStyleData = _.cloneDeep(styleData);
                 // 非系统的uuid需要变

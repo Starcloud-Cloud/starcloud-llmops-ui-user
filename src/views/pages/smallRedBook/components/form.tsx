@@ -118,7 +118,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     ))}
                 </TextField>
             ) : item.style === 'IMAGE' ? (
-                <Upload {...props}>
+                <Upload {...props} className="mt-4">
                     {item.value ? <img className="mt-4" src={item.value} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
                 </Upload>
             ) : null}

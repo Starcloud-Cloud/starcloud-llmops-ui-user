@@ -2473,7 +2473,8 @@ const Lefts = ({
                         setStepIndex(index);
                         setStepTitData({
                             name: item?.name,
-                            description: item?.description
+                            description: item?.description,
+                            flowStep: item?.flowStep
                         });
                         setSteotitOpen(true);
                     }}
@@ -2566,16 +2567,21 @@ const Lefts = ({
                     setData={(data: any) => {
                         const newList = _.cloneDeep(generRef.current);
                         const newLists = _.cloneDeep(appRef.current);
+                        const { name, description, variables } = data;
                         newList[stepIndex - 1] = {
                             ...newList[stepIndex - 1],
-                            ...data,
-                            field: data.name
+                            name,
+                            description,
+                            field: name
                         };
+                        newList[stepIndex - 1].flowStep.variable.variables = variables;
                         newLists.configuration.appInformation.workflowConfig.steps[stepIndex] = {
                             ...newLists.configuration?.appInformation?.workflowConfig?.steps[stepIndex],
-                            ...data
+                            name,
+                            description,
+                            field: name
                         };
-
+                        newLists.configuration.appInformation.workflowConfig.steps[stepIndex].flowStep.variable.variables = variables;
                         generRef.current = newList;
                         appRef.current = newLists;
                         setAppData(appRef.current);

@@ -128,6 +128,7 @@ const AddStyleApp = React.forwardRef(
         }, [record]);
 
         React.useEffect(() => {
+            console.log(mode, 'mode');
             if (record) {
                 let list: any = [];
                 if (mode === 2) {
@@ -284,7 +285,7 @@ const AddStyleApp = React.forwardRef(
                             setUpdIndex(index);
 
                             setUpdDrawIndex(index);
-                            setAddType(3);
+                            setAddType(4);
                         }}
                     >
                         编辑
@@ -863,6 +864,85 @@ const AddStyleApp = React.forwardRef(
                 saveData.totalCount = allData.totalCount;
                 saveData.uid = allData.uid;
                 console.log('🚀 ~ handleModalOk ~ saveData:', saveData);
+
+                planModifyConfig({ ...saveData, validate: false })
+                    .then((res: any) => {
+                        setIsModalOpen(false);
+                        setUpdIndex('');
+                        setAddType(0);
+                        setCurrentStyle(null);
+                        getList();
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '创作计划保存成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
+                    })
+                    .catch((e: any) => {
+                        return;
+                    });
+            } else if (addType === 4) {
+                // 修改风格
+                const copyRecord = _.cloneDeep(record);
+                const copyDetails = _.cloneDeep(details);
+
+                console.log(copyRecord, 'copyRecord');
+                console.log(copyDetails, 'copyDetails');
+
+                const valueJson = copyRecord.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || '[]';
+                console.log('🚀 ~ handleModalOk ~ valueString:', valueJson);
+
+                // const valueJson = JSON.parse(valueString);
+                // console.log('🚀 ~ handleModalOk ~ valueJson:', valueJson);
+                valueJson[updDrawIndex] = {
+                    ...valueJson[updDrawIndex],
+                    ...currentStyle
+                };
+
+                copyRecord.variable.variables.forEach((item: any) => {
+                    if (item.field === 'POSTER_STYLE_CONFIG') {
+                        item.value = valueJson;
+                    }
+                });
+
+                copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                    if (item.flowStep.handler === 'PosterActionHandler') {
+                        // 将该步骤的属性值更改为 copyRecord 的值
+                        Object.assign(item, copyRecord);
+                    }
+                });
+
+                copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+                    const arr = item?.variable?.variables;
+                    const arr1 = item?.flowStep?.variable?.variables;
+                    arr?.forEach((el: any) => {
+                        if (el.value && typeof el.value === 'object') {
+                            el.value = JSON.stringify(el.value);
+                        }
+                    });
+                    arr1?.forEach((el: any) => {
+                        if (el.value && typeof el.value === 'object') {
+                            el.value = JSON.stringify(el.value);
+                        }
+                    });
+                });
+
+                const saveData: any = {};
+                saveData.configuration = {
+                    appInformation: copyDetails,
+                    imageStyleList: allData.configuration.imageStyleList,
+                    materialList: allData.configuration.materialList
+                };
+                saveData.source = allData.source;
+                saveData.totalCount = allData.totalCount;
+                saveData.uid = allData.uid;
 
                 planModifyConfig({ ...saveData, validate: false })
                     .then((res: any) => {

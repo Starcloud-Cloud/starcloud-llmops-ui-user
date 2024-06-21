@@ -372,7 +372,7 @@ function CreateDetail() {
                 <Tabs value={value} variant="scrollable" onChange={handleChange}>
                     <Tab component={Link} label={'形象设计'} {...a11yProps(0)} />
                     <Tab component={Link} label={'规则设定'} {...a11yProps(1)} />
-                    <Tab component={Link} label={'知识库'} {...a11yProps(3)} />
+                    {/* <Tab component={Link} label={'知识库'} {...a11yProps(3)} /> */}
                     <Tab component={Link} label={'技能'} {...a11yProps(4)} />
                     {width < 1280 && <Tab component={Link} label={'调试'} {...a11yProps(5)} />}
                     <Tab

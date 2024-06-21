@@ -814,6 +814,7 @@
     "field": "变量KEY",
     "name": "变量名称",
     "value": "变量默认值",
+    "image": "图片",
     "isShow": "是否显示",
     "operation": "操作",
     "type": "类型",

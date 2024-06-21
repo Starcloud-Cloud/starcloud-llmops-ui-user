@@ -87,9 +87,6 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                         >
                             {t('myApp.add')}
                         </Button>
-                        <Button loading={saveLoading} type="primary" onClick={handleSave}>
-                            保存
-                        </Button>
                     </div>
                 </Box>
                 <Divider style={{ margin: '10px 0' }} />
@@ -142,6 +139,11 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                         </TableBody>
                     </Tables>
                 </TableContainer>
+                <div className="flex justify-center mt-4">
+                    <Button loading={saveLoading} type="primary" onClick={handleSave}>
+                        保存
+                    </Button>
+                </div>
             </MainCard>
             {variableOpen && (
                 <VariableModal title={title} open={variableOpen} setOpen={setVariableOpen} itemData={itemData} saveContent={saveContent} />

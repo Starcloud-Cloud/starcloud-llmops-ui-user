@@ -433,64 +433,47 @@ function FormExecute({
                 </div>
             ) : (
                 <div className="mt-4">
-                    <Collapse
-                        items={[
-                            {
-                                key: '1',
-                                label: (
-                                    <div className="w-full flex justify-between">
-                                        <div>
-                                            {handlerCode === 'MaterialActionHandler' && (
-                                                <Button
-                                                    disabled={history}
-                                                    size="small"
-                                                    type="primary"
-                                                    onClick={(e) => {
-                                                        setUploadOpen(true);
-                                                        e.stopPropagation();
-                                                    }}
-                                                >
-                                                    批量导入
-                                                </Button>
-                                            )}
-                                        </div>
-                                        {handlerCode !== 'ImitateActionHandler' && (
-                                            <Button
-                                                disabled={history}
-                                                size="small"
-                                                type="primary"
-                                                onClick={(e) => {
-                                                    setStep();
-                                                    setMaterialType();
-                                                    setTitle('新增');
-                                                    setEditOpen(true);
-                                                    e.stopPropagation();
-                                                }}
-                                            >
-                                                新增
-                                            </Button>
-                                        )}
-                                    </div>
-                                ),
-                                children: (
-                                    <Table
-                                        virtual
-                                        rowKey={(_, index) => String(index)}
-                                        loading={tableLoading}
-                                        columns={
-                                            handlerCode !== 'ImitateActionHandler'
-                                                ? columns
-                                                : columns?.filter((item: any) => item.title !== '操作')
-                                        }
-                                        dataSource={item.value}
-                                        pagination={false}
-                                    />
-                                )
-                            }
-                        ]}
-                        defaultActiveKey={['1']}
+                    <div className="w-full flex justify-between">
+                        <div>
+                            {handlerCode === 'MaterialActionHandler' && (
+                                <Button
+                                    disabled={history}
+                                    size="small"
+                                    type="primary"
+                                    onClick={(e) => {
+                                        setUploadOpen(true);
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    批量导入
+                                </Button>
+                            )}
+                        </div>
+                        {handlerCode !== 'ImitateActionHandler' && (
+                            <Button
+                                disabled={history}
+                                size="small"
+                                type="primary"
+                                onClick={(e) => {
+                                    setStep();
+                                    setMaterialType();
+                                    setTitle('新增');
+                                    setEditOpen(true);
+                                    e.stopPropagation();
+                                }}
+                            >
+                                新增
+                            </Button>
+                        )}
+                    </div>
+                    <Table
+                        virtual
+                        rowKey={(_, index) => String(index)}
+                        loading={tableLoading}
+                        columns={handlerCode !== 'ImitateActionHandler' ? columns : columns?.filter((item: any) => item.title !== '操作')}
+                        dataSource={item.value}
+                        pagination={false}
                     />
-
                     {model && (model === 'RANDOM' || model === 'AI_PARODY') && (
                         <span className="text-xs text-[rgb(244,67,54)] mt-4">参考列表最少需要一个</span>
                     )}

@@ -60,7 +60,8 @@ const VariableModal = ({
     const typeList = [
         { label: t('myApp.input'), value: 'INPUT' },
         { label: t('myApp.textarea'), value: 'TEXTAREA' },
-        { label: t('myApp.select'), value: 'SELECT' }
+        { label: t('myApp.select'), value: 'SELECT' },
+        { label: '图片', value: 'IMAGE' }
     ];
     const [options, setOptions] = useState<any[]>([]);
     //必填

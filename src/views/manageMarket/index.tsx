@@ -1,7 +1,7 @@
 import {
     Box,
     Pagination,
-    Button,
+    Button as Buttons,
     Typography,
     Tooltip,
     Grid,
@@ -22,7 +22,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { pageAdmin, setAudit } from 'api/template';
 import formatDate from 'hooks/useDate';
-import { Popconfirm } from 'antd';
+import { Popconfirm, Button } from 'antd';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { t } from 'hooks/web/useI18n';
@@ -151,7 +151,7 @@ function Form() {
                     </FormControl>
                 </Grid>
                 <Grid item xs={3}>
-                    <Button variant="outlined" onClick={query}>
+                    <Button type="primary" onClick={query}>
                         搜索
                     </Button>
                 </Grid>
@@ -241,9 +241,9 @@ function Form() {
                                         okText="Yes"
                                         cancelText="No"
                                     >
-                                        <Button disabled={row.audit === 2 || row.audit === 3} size="small" color="secondary">
+                                        <Buttons disabled={row.audit === 2 || row.audit === 3} size="small" color="secondary">
                                             通过
-                                        </Button>
+                                        </Buttons>
                                     </Popconfirm>
                                     <Popconfirm
                                         placement="top"
@@ -254,9 +254,9 @@ function Form() {
                                         okText="Yes"
                                         cancelText="No"
                                     >
-                                        <Button disabled={row.audit === 2 || row.audit === 3} size="small">
+                                        <Buttons disabled={row.audit === 2 || row.audit === 3} size="small">
                                             拒绝
-                                        </Button>
+                                        </Buttons>
                                     </Popconfirm>
                                 </TableCell>
                             </TableRow>

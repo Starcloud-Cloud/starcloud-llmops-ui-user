@@ -84,6 +84,7 @@ const Lefts = ({
     detailShow = true,
     planState,
     pre,
+    isMyApp,
     changePre,
     detail,
     data,
@@ -106,6 +107,7 @@ const Lefts = ({
 }: {
     detailShow?: boolean;
     planState?: number;
+    isMyApp?: boolean;
     pre?: number;
     changePre?: number;
     detail?: any;
@@ -1772,6 +1774,9 @@ const Lefts = ({
                         <RightOutlined rev={undefined} />
                     </Button>
                 </Tooltip>
+                {isMyApp && (
+                    <div className="text-[22px] whitespace-nowrap mx-2 mb-4 pt-4 mr-4">{appData?.configuration?.appInformation?.name}</div>
+                )}
                 {detailShow && !detail && (
                     <div className="flex gap-2 justify-between items-center mx-2 mb-4 pt-4 mr-4">
                         <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
@@ -2458,6 +2463,7 @@ const Lefts = ({
                                     steps: arr?.filter((item: any) => item)
                                 }
                             });
+                        setSettingOpen(false);
                     }}
                     appData={appData}
                     stepMove={stepMove}

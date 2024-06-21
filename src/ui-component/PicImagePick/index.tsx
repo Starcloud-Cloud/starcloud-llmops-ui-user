@@ -85,7 +85,7 @@ export const PicImagePick = ({
 
     const currentDetails = React.useMemo(() => {
         const copyDetails = _.cloneDeep(details);
-        copyDetails.workflowConfig.steps.forEach((item: any) => {
+        copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
             if (item.flowStep.handler === 'MaterialActionHandler') {
                 if (item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')) {
                     item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });

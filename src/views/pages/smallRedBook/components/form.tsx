@@ -1,8 +1,9 @@
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Upload } from 'antd';
+import { PlusOutlined, SearchOutlined, CloudUploadOutlined } from '@ant-design/icons';
+import { PicImagePick } from 'ui-component/PicImagePick';
+import { Upload, Tooltip, Image } from 'antd';
 import type { UploadProps } from 'antd';
 import { getAccessToken } from 'utils/auth';
 const Form = ({ item, index, changeValue, flag }: { item: any; index: number; changeValue: any; flag?: boolean }) => {
@@ -11,12 +12,8 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
     };
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const uploadButton = (
-        <button style={{ border: 0, background: 'none', marginTop: 16 }} type="button">
-            {loading ? <LoadingOutlined rev={undefined} /> : <PlusOutlined rev={undefined} />}
-            <div style={{ marginTop: 8 }}>Upload</div>
-        </button>
-    );
+    const [canUpload, setCanUpload] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const props: UploadProps = {
         name: 'image',
         multiple: true,
@@ -118,10 +115,80 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                     ))}
                 </TextField>
             ) : item.style === 'IMAGE' ? (
-                <Upload {...props} className="mt-4">
-                    {item.value ? <img className="mt-4" src={item.value} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-                </Upload>
+                <>
+                    <Upload {...props} disabled={!canUpload} className="mt-4">
+                        {item.value ? (
+                            <div className="relative">
+                                <Image
+                                    onMouseEnter={() => setCanUpload(false)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    width={82}
+                                    height={82}
+                                    preview={{
+                                        src: item.value
+                                    }}
+                                    src={item.value + '?x-oss-process=image/resize,w_100/quality,q_80'}
+                                />
+                                <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.4)]">
+                                    <Tooltip title="上传">
+                                        <div
+                                            className="flex-1 flex justify-center"
+                                            onMouseEnter={() => setCanUpload(true)}
+                                            onMouseLeave={() => setCanUpload(false)}
+                                        >
+                                            <CloudUploadOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                        </div>
+                                    </Tooltip>
+                                    <Tooltip title="搜索">
+                                        <div
+                                            className="flex-1 flex justify-center !cursor-pointer"
+                                            onClick={(e) => {
+                                                setIsModalOpen(true);
+                                                e.stopPropagation();
+                                            }}
+                                        >
+                                            <SearchOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                        </div>
+                                    </Tooltip>
+                                </div>
+                            </div>
+                        ) : (
+                            <div
+                                className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
+                                onMouseEnter={() => setCanUpload(true)}
+                            >
+                                <PlusOutlined rev={undefined} />
+                                <div style={{ marginTop: 8 }}>Upload</div>
+                                <Tooltip title="搜索">
+                                    <div
+                                        className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]"
+                                        onClick={(e) => {
+                                            setIsModalOpen(true);
+                                            e.stopPropagation();
+                                        }}
+                                    >
+                                        <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                    </div>
+                                </Tooltip>
+                            </div>
+                        )}
+                    </Upload>
+
+                    {/* <Upload {...props} className="mt-4">
+                    {item.value ? <img src={item.value} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+                </Upload> */}
+                </>
             ) : null}
+            {isModalOpen && (
+                <PicImagePick
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    setSelectImg={(value) => {
+                        console.log(value);
+                        changeValue({ index, value: value?.largeImageURL });
+                    }}
+                />
+            )}
         </div>
     );
 };

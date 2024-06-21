@@ -88,11 +88,11 @@ const LeftModalAdd = ({
             render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label,
             align: 'center'
         },
-        {
-            title: '是否为分组',
-            render: (_, row) => <Tag color="processing">{row?.isGroupField ? '是' : '否'}</Tag>,
-            align: 'center'
-        },
+        // {
+        //     title: '是否为分组',
+        //     render: (_, row) => <Tag color="processing">{row?.isGroupField ? '是' : '否'}</Tag>,
+        //     align: 'center'
+        // },
         {
             title: '是否必填',
             render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : ''),
@@ -302,9 +302,9 @@ const LeftModalAdd = ({
                     <Form.Item initialValue={0} label="字段排序" name="order" rules={[{ required: true, message: '请输入字段排序' }]}>
                         <InputNumber className="w-full" min={0} />
                     </Form.Item>
-                    <Form.Item initialValue={false} label="是否为分组字段" name="isGroupField" valuePropName="checked">
+                    {/* <Form.Item initialValue={false} label="是否为分组字段" name="isGroupField" valuePropName="checked">
                         <Switch />
-                    </Form.Item>
+                    </Form.Item> */}
                     <Form.Item initialValue={false} label="是否必填" name="required" valuePropName="checked">
                         <Switch />
                     </Form.Item>

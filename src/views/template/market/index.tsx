@@ -354,18 +354,15 @@ function TemplateMarket() {
     const [newUserVipOpen, setNewUserVipOpen] = useState(false);
 
     useEffect(() => {
-        if ((getTenant() === ENUM_TENANT.AI && value === 1) || (getTenant() !== ENUM_TENANT.AI && value === 2)) {
-            favoriteList({}).then((res) => {
-                setCollectList(res);
-            });
-        } else if (value === 0) {
-            appPage({
-                pageNo: 1,
-                pageSize: 10
-            }).then((res) => {
-                setmyAppList(res.list);
-            });
-        }
+        favoriteList({}).then((res) => {
+            setCollectList(res);
+        });
+        appPage({
+            pageNo: 1,
+            pageSize: 10
+        }).then((res) => {
+            setmyAppList(res.list);
+        });
     }, [value]);
     const scrollRef: any = useRef(null);
 
@@ -441,6 +438,139 @@ function TemplateMarket() {
                     </Box>
                 ))}
             </ScrollMenu>
+            {queryParams.category === 'ALL' && (
+                <Tabs
+                    textColor="secondary"
+                    indicatorColor="secondary"
+                    sx={{ color: 'red', '& .MuiTabs-flexContainer': { borderColor: 'transparent' } }}
+                    value={value}
+                    onChange={(event: React.SyntheticEvent, value: number) => setValue(value)}
+                    aria-label="basic tabs example"
+                >
+                    {getTenant() !== ENUM_TENANT.AI && (
+                        <Tab
+                            label={
+                                <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
+                                    <span>我的应用</span>
+                                </div>
+                            }
+                            {...a11yProps(0)}
+                        />
+                    )}
+                    {newList?.some((item) => item?.code === 'HOT') && (
+                        <Tab
+                            label={
+                                <div className="!text-[20px] !line-[25px] font-bold flex items-end gap-2">
+                                    <img height="20px" src={getImage(newList?.find((item) => item?.code === 'HOT').icon)} alt="" />
+                                    <span>{newList?.find((item) => item?.code === 'HOT').name}</span>
+                                </div>
+                            }
+                            {...a11yProps(1)}
+                        />
+                    )}
+                    <Tab
+                        label={
+                            <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
+                                <span>我的收藏</span>
+                            </div>
+                        }
+                        {...a11yProps(2)}
+                    />
+                    {getPermission(ENUM_PERMISSION.MARKET_VIDEO_MODAL) && (
+                        <div
+                            className="cursor-pointer text-[#6839b7] ml-1 flex justify-center items-center"
+                            onClick={() => setOpenMarketVideo(true)}
+                        >
+                            应用市场使用视频
+                        </div>
+                    )}
+                </Tabs>
+            )}
+            <>
+                {getTenant() !== ENUM_TENANT.AI && (
+                    <CustomTabPanel value={value} index={0}>
+                        <div className="relative">
+                            <div
+                                className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                                style={{
+                                    height: '190px',
+                                    overflowY: 'hidden'
+                                }}
+                            >
+                                <div
+                                    className="rounded-[12px] shadow-md border border-solid border-[transparent] hover:border-[#CECAD5] cursor-pointer h-[185px] bg-white p-4 flex gap-2 justify-center items-center flex-col"
+                                    onClick={() => navigate('/my-app')}
+                                >
+                                    <PlusOutlined className="text-[30px]" rev={undefined} />
+                                    <div className="text-black/60 text-[14px]">找不到合适的？ 创建新应用</div>
+                                </div>
+                                {myAppList.map((el: any, index: number) => (
+                                    <MarketTemplate
+                                        key={el?.uid}
+                                        handleDetail={({ uid }: { uid: string }) => {
+                                            navigate('/createApp?uid=' + uid + '&source=market');
+                                        }}
+                                        data={el}
+                                    />
+                                ))}
+                            </div>
+                            {myAppList.length > 0 && (
+                                <div
+                                    onClick={() => {
+                                        navigate('/my-app');
+                                    }}
+                                    className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
+                                >
+                                    更多应用
+                                    <RightOutlined rev={undefined} />
+                                </div>
+                            )}
+                        </div>
+                    </CustomTabPanel>
+                )}
+                {newList?.some((item) => item?.code === 'HOT') && (
+                    <CustomTabPanel value={value} index={1}>
+                        <div
+                            style={{
+                                minHeight: '190px'
+                            }}
+                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                        >
+                            {newList
+                                ?.find((item) => item.code === 'HOT')
+                                ?.appList.map((el: any, index: number) => (
+                                    <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
+                                ))}
+                        </div>
+                    </CustomTabPanel>
+                )}
+                <CustomTabPanel value={value} index={2}>
+                    <div className="relative">
+                        <div
+                            style={{
+                                height: '190px',
+                                overflowY: 'hidden'
+                            }}
+                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                        >
+                            {collectList.map((el: any, index: number) => (
+                                <MarketTemplate key={el?.uid} handleDetail={handleDetail} data={el} />
+                            ))}
+                        </div>
+                        {collectList.length > 0 && (
+                            <div
+                                onClick={() => {
+                                    navigate('/collect');
+                                }}
+                                className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
+                            >
+                                更多收藏
+                                <RightOutlined rev={undefined} />
+                            </div>
+                        )}
+                    </div>
+                </CustomTabPanel>
+            </>
             {newList?.map((item, index) => (
                 <div key={index}>
                     {item.appList?.length > 0 && (
@@ -467,152 +597,23 @@ function TemplateMarket() {
                                     )}
                                 </div>
                             )}
-                            {queryParams.category === 'ALL' && item?.code === 'HOT' && (
-                                <Tabs
-                                    textColor="secondary"
-                                    indicatorColor="secondary"
-                                    sx={{ color: 'red', '& .MuiTabs-flexContainer': { borderColor: 'transparent' } }}
-                                    value={value}
-                                    onChange={(event: React.SyntheticEvent, value: number) => setValue(value)}
-                                    aria-label="basic tabs example"
-                                >
-                                    {getTenant() !== ENUM_TENANT.AI && (
-                                        <Tab
-                                            label={
-                                                <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
-                                                    <span>我的应用</span>
-                                                </div>
-                                            }
-                                            {...a11yProps(0)}
-                                        />
-                                    )}
-                                    <Tab
-                                        label={
-                                            <div className="!text-[20px] !line-[25px] font-bold flex items-end gap-2">
-                                                <img height="20px" src={getImage(item.icon)} alt="" />
-                                                <span>{item.name}</span>
-                                            </div>
-                                        }
-                                        {...a11yProps(getTenant() === ENUM_TENANT.AI ? 0 : 1)}
-                                    />
-                                    <Tab
-                                        label={
-                                            <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
-                                                <span>我的收藏</span>
-                                            </div>
-                                        }
-                                        {...a11yProps(getTenant() === ENUM_TENANT.AI ? 1 : 2)}
-                                    />
-                                    {getPermission(ENUM_PERMISSION.MARKET_VIDEO_MODAL) && (
-                                        <div
-                                            className="cursor-pointer text-[#6839b7] ml-1 flex justify-center items-center"
-                                            onClick={() => setOpenMarketVideo(true)}
-                                        >
-                                            应用市场使用视频
-                                        </div>
-                                    )}
-                                </Tabs>
-                            )}
                         </>
                     )}
-                    {item.appList.length > 0 &&
-                        (item?.code === 'HOT' ? (
-                            <>
-                                {getTenant() !== ENUM_TENANT.AI && (
-                                    <CustomTabPanel value={value} index={0}>
-                                        <div className="relative">
-                                            <div
-                                                className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                                                style={{
-                                                    height: '190px',
-                                                    overflowY: 'hidden'
-                                                }}
-                                            >
-                                                <div
-                                                    className="rounded-[12px] shadow-md border border-solid border-[transparent] hover:border-[#CECAD5] cursor-pointer h-[185px] bg-white p-4 flex gap-2 justify-center items-center flex-col"
-                                                    onClick={() => navigate('/my-app')}
-                                                >
-                                                    <PlusOutlined className="text-[30px]" rev={undefined} />
-                                                    <div className="text-black/60 text-[14px]">找不到合适的？ 创建新应用</div>
-                                                </div>
-                                                {myAppList.map((el: any, index: number) => (
-                                                    <MarketTemplate
-                                                        key={el?.uid}
-                                                        handleDetail={({ uid }: { uid: string }) => {
-                                                            navigate('/createApp?uid=' + uid + '&source=market');
-                                                        }}
-                                                        data={el}
-                                                    />
-                                                ))}
-                                            </div>
-                                            {myAppList.length > 0 && (
-                                                <div
-                                                    onClick={() => {
-                                                        navigate('/my-app');
-                                                    }}
-                                                    className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
-                                                >
-                                                    更多应用
-                                                    <RightOutlined rev={undefined} />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </CustomTabPanel>
-                                )}
-                                <CustomTabPanel value={value} index={getTenant() === ENUM_TENANT.AI ? 0 : 1}>
-                                    <div
-                                        style={{
-                                            minHeight: '190px'
-                                        }}
-                                        className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                                    >
-                                        {item.appList.map((el: any, index: number) => (
-                                            <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
-                                        ))}
-                                    </div>
-                                </CustomTabPanel>
-                                <CustomTabPanel value={value} index={getTenant() === ENUM_TENANT.AI ? 1 : 2}>
-                                    <div className="relative">
-                                        <div
-                                            style={{
-                                                height: '190px',
-                                                overflowY: 'hidden'
-                                            }}
-                                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                                        >
-                                            {collectList.map((el: any, index: number) => (
-                                                <MarketTemplate key={el?.uid} handleDetail={handleDetail} data={el} />
-                                            ))}
-                                        </div>
-                                        {collectList.length > 0 && (
-                                            <div
-                                                onClick={() => {
-                                                    navigate('/collect');
-                                                }}
-                                                className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
-                                            >
-                                                更多收藏
-                                                <RightOutlined rev={undefined} />
-                                            </div>
-                                        )}
-                                    </div>
-                                </CustomTabPanel>
-                            </>
-                        ) : (
-                            <div
-                                className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                                style={{
-                                    height: queryParams.category === 'ALL' ? '190px' : 'auto',
-                                    overflowX: 'visible',
-                                    overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible',
-                                    paddingBottom: queryParams.category === 'ALL' ? '0px' : '10px'
-                                }}
-                            >
-                                {item.appList.map((el: any, index: number) => (
-                                    <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
-                                ))}
-                            </div>
-                        ))}
+                    {item.appList.length > 0 && item?.code !== 'HOT' && (
+                        <div
+                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                            style={{
+                                height: queryParams.category === 'ALL' ? '190px' : 'auto',
+                                overflowX: 'visible',
+                                overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible',
+                                paddingBottom: queryParams.category === 'ALL' ? '0px' : '10px'
+                            }}
+                        >
+                            {item.appList.map((el: any, index: number) => (
+                                <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             ))}
             <MarketVideoModel

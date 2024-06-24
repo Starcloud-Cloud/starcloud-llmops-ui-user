@@ -178,7 +178,7 @@ const EditStyle = ({
                         </FormControl>
                     </div>
                     <div className="flex items-center gap-2 mt-[7px]">
-                        {/* <div className="text-xs inline-block">是否复制图片</div>
+                        <div className="text-xs inline-block">是否复制图片</div>
                         <Switch
                             checked={imageStyleData?.isCopy}
                             onChange={(e) => {
@@ -186,7 +186,7 @@ const EditStyle = ({
                                 newData.isCopy = e;
                                 setData(newData);
                             }}
-                        /> */}
+                        />
                         {!canEdit && (
                             <Button type="primary" onClick={handleCopy}>
                                 复制

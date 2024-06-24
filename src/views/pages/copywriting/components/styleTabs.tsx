@@ -12,6 +12,8 @@ const StyleTabs = ({
     setDetailData,
     appData,
     selModal,
+    setSelModal,
+    materialStatus,
     canEdit = false
 }: {
     schemaList?: any[];
@@ -20,6 +22,8 @@ const StyleTabs = ({
     setDetailData: (data: any) => void;
     appData: any;
     selModal?: string;
+    setSelModal?: any;
+    materialStatus?: string;
     canEdit?: boolean;
 }) => {
     const [activeKey, setActiveKey] = useState('0');
@@ -52,12 +56,13 @@ const StyleTabs = ({
     };
     const add = (data?: any) => {
         const newPanes = _.cloneDeep(imageStyleData);
+        const uuid = uuidv4()?.split('-')?.join('');
         newPanes.push({
             code: data?.code || '',
             name: `图片 ${digui()}`,
             key: digui().toString(),
             mode: 'SEQUENCE',
-            uuid: uuidv4()?.split('-')?.join(''),
+            uuid,
             isMultimodalTitle: false,
             example: data?.example || '',
             variableList:
@@ -66,6 +71,9 @@ const StyleTabs = ({
                     uuid: uuidv4()?.split('-')?.join('')
                 })) || []
         });
+        if (!data) {
+            setSelModal && setSelModal(uuid);
+        }
         setDetailData(newPanes);
         setActiveKey((newPanes.length - 1).toString());
     };
@@ -118,6 +126,7 @@ const StyleTabs = ({
                         children: (
                             <EditStyle
                                 appData={appData}
+                                materialStatus={materialStatus}
                                 schemaList={schemaList}
                                 imageStyleData={item}
                                 canEdit={canEdit}

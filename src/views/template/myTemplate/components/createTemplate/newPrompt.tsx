@@ -1,7 +1,7 @@
 import { Box, Typography, Switch, Tooltip, Chip, FormControlLabel } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Input } from 'antd';
-import { useRef, useState, useEffect, memo } from 'react';
+import { useRef, useState, useEffect, memo, useMemo } from 'react';
 import { t } from 'hooks/web/useI18n';
 import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
@@ -47,6 +47,13 @@ const NewPrompt = ({
     useEffect(() => {
         setPrompt(variables?.find((item: any) => item.field === 'prompt')?.value);
     }, [variables?.find((item: any) => item.field === 'prompt')?.value]);
+    // const promptmessage = useMemo(()=>{
+    //     console.log(11111111);
+    //     variable?.map(item=>{
+    //         prompt.
+    //     })
+
+    // },[prompt])
     return (
         <div>
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -83,6 +90,7 @@ const NewPrompt = ({
                     onChange={(e) => setPrompts(e)}
                     onBlur={(e) => basisChange({ e: e.target, index, i, flag: false, values: true })}
                 />
+                {/* <div className="border border-solid border-black w-[400px] h-[300px] rounded-lg p-4" contentEditable={true}></div> */}
                 <ExePrompt
                     type="prompt_template"
                     changePrompt={(data) => {

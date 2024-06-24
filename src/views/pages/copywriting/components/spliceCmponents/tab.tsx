@@ -16,8 +16,20 @@ interface Tabs {
     setFocuActive: (data: any) => void;
     digui: () => number;
     appData: any;
+    materialStatus?: string;
 }
-const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleData, focuActive, setFocuActive, digui, appData }: Tabs) => {
+const CreateTab = ({
+    materialStatus,
+    schemaList,
+    mode,
+    setModel,
+    imageStyleData,
+    setImageStyleData,
+    focuActive,
+    setFocuActive,
+    digui,
+    appData
+}: Tabs) => {
     const handleAdd = (data?: any) => {
         let newData = _.cloneDeep(imageStyleData);
         if (!newData) {
@@ -30,8 +42,8 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
             index: digui(),
             system: data?.system || true,
             enable: data?.enable || true,
+            isCopy: data?.isCopy || true,
             uuid: styleuid,
-
             templateList: data?.templateList?.map((item: any) => ({
                 ...item,
                 uuid: uuidv4()?.split('-')?.join(''),
@@ -46,6 +58,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                     model: '',
                     isMultimodalTitle: false,
                     uuid: fristuid,
+                    isCopy: false,
                     variableList: []
                 }
             ],
@@ -126,8 +139,8 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                             />
                                         )}
                                         <div className="flex gap-2 items-center">
-                                            <div className="flex gap-2 items-center">
-                                                <span className="text-xs">字段为空时默认不生成图片</span>
+                                            {/* <div className="flex gap-2 items-center"> */}
+                                            {/* <span className="text-xs">字段为空时默认不生成图片</span>
                                                 <Switch
                                                     checked={item?.noExecuteIfEmpty}
                                                     onChange={(data) => {
@@ -135,8 +148,8 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                                         newData[i].noExecuteIfEmpty = data;
                                                         setImageStyleData(newData);
                                                     }}
-                                                />
-                                                {/* <span className="text-xs">是否设为系统</span>
+                                                /> */}
+                                            {/* <span className="text-xs">是否设为系统</span>
                                             <Switch
                                                 checked={item?.system}
                                                 onChange={(data) => {
@@ -154,7 +167,7 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                                     setImageStyleData(newData);
                                                 }}
                                             /> */}
-                                            </div>
+                                            {/* </div> */}
 
                                             <Dropdown
                                                 placement="bottom"
@@ -165,6 +178,15 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                                             handleAdd(item);
                                                         } else if (e.key === '2') {
                                                             const newData = _.cloneDeep(imageStyleData);
+                                                            let lastIndex = '';
+                                                            imageStyleData.forEach((item: any) => {
+                                                                if (item?.uuid === newData[i]?.uuid) {
+                                                                    lastIndex = newData[i - 1]?.uuid;
+                                                                }
+                                                            });
+                                                            console.log(imageStyleData, lastIndex || imageStyleData[0]?.uuid);
+
+                                                            setCheckStyle(lastIndex || imageStyleData[i + 1]?.uuid);
                                                             newData.splice(i, 1);
                                                             setImageStyleData(newData);
                                                         }
@@ -191,10 +213,12 @@ const CreateTab = ({ schemaList, mode, setModel, imageStyleData, setImageStyleDa
                                     </div>
                                     <StyleTabs
                                         schemaList={schemaList}
+                                        materialStatus={materialStatus}
                                         imageStyleData={item?.templateList}
                                         typeList={[]}
                                         appData={appData}
                                         selModal={selModal}
+                                        setSelModal={setSelModal}
                                         setDetailData={(data: any) => {
                                             const newData = _.cloneDeep(imageStyleData);
                                             newData[i].templateList = data;

@@ -6,6 +6,7 @@ import Loadable from 'ui-component/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import jsCookie from 'js-cookie';
 import MinimalLayout from 'layout/MinimalLayout';
+import MaterialLibrary from 'views/materialLibrary/index';
 
 // template routing
 const Market = Loadable(lazy(() => import('views/template/market')));
@@ -221,6 +222,10 @@ const MainRoutes = {
         {
             path: '/announce',
             element: <Announce />
+        },
+        {
+            path: '/material',
+            element: <MaterialLibrary />
         }
     ]
 };

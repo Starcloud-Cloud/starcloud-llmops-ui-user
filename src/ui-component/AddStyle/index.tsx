@@ -49,7 +49,8 @@ const AddStyle = React.forwardRef(
             setImageVar,
             allData,
             canAddCustomStyle = true,
-            saveTemplate
+            saveTemplate,
+            materialStatus
         }: any,
         ref: any
     ) => {
@@ -343,7 +344,7 @@ const AddStyle = React.forwardRef(
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: '操作成功',
+                                message: '创作计划保存成功',
                                 variant: 'alert',
                                 alert: {
                                     color: 'success'
@@ -385,7 +386,7 @@ const AddStyle = React.forwardRef(
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: '操作成功',
+                                message: '创作计划保存成功',
                                 variant: 'alert',
                                 alert: {
                                     color: 'success'
@@ -557,7 +558,7 @@ const AddStyle = React.forwardRef(
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: '操作成功',
+                                message: '创作计划保存成功',
                                 variant: 'alert',
                                 alert: {
                                     color: 'success'
@@ -644,7 +645,7 @@ const AddStyle = React.forwardRef(
                 dispatch(
                     openSnackbar({
                         open: true,
-                        message: '操作成功',
+                        message: '创作计划保存成功',
                         variant: 'alert',
                         alert: {
                             color: 'success'
@@ -671,8 +672,6 @@ const AddStyle = React.forwardRef(
                                 size="small"
                                 type="primary"
                                 onClick={() => {
-                                    console.log(systemVariable);
-
                                     setSyszanVariable(
                                         _.cloneDeep(
                                             systemVariable?.map((item: any) => ({
@@ -1050,6 +1049,7 @@ const AddStyle = React.forwardRef(
                             </Button>
 
                             <CreateTab
+                                materialStatus={materialStatus}
                                 appData={{ materialType, appReqVO: details }}
                                 imageStyleData={syszanVariable}
                                 setImageStyleData={(data) => {

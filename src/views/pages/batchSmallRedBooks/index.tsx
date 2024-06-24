@@ -346,6 +346,7 @@ const BatcSmallRedBooks = forwardRef(
                     >
                         <Left
                             pre={pre}
+                            isMyApp={isMyApp}
                             changePre={changePre}
                             planState={planState}
                             detail={detail}

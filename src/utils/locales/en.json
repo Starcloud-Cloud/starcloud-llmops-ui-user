@@ -757,6 +757,7 @@
     "field": "Variable Key",
     "name": "Name",
     "value": "defaultValue",
+    "image": "Image",
     "isShow": "Show or not",
     "operation": "Operation",
     "type": "Type",

@@ -61,12 +61,12 @@ export const SelectTemplateModal = ({
             <MainCard
                 style={{
                     position: 'absolute',
-                    width: '1000px',
+                    width: '80%',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)'
                 }}
-                title="选择风格"
+                title="选择图片模版"
                 content={false}
                 secondary={
                     <IconButton onClick={handleClose} size="large" aria-label="close modal">

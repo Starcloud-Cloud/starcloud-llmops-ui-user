@@ -9,11 +9,13 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { getAccessToken } from 'utils/auth';
 import { planModifyConfig } from 'api/redBook/batchIndex';
+import _ from 'lodash';
 
 const { Search } = Input;
 const { Option } = Select;
 
 export const PicImagePick = ({
+    getList,
     materialList,
     allData,
     details,
@@ -23,6 +25,7 @@ export const PicImagePick = ({
     columns,
     values
 }: {
+    getList?: any;
     materialList?: any;
     allData?: any;
     details?: any;
@@ -47,7 +50,7 @@ export const PicImagePick = ({
         label: '图片下载中',
         value: 0
     });
-    const [currentDetails, setCurrentDetails] = React.useState<any>(null);
+    // const [currentDetails, setCurrentDetails] = React.useState<any>(null);
     const [visibleSaveFilter, setVisibleSaveFilter] = React.useState(false);
     const [canSearch, setCanSearch] = React.useState(false);
 
@@ -66,6 +69,7 @@ export const PicImagePick = ({
 
     // 回显
     useEffect(() => {
+        console.log(111);
         if (details) {
             details.workflowConfig.steps.forEach((item: any) => {
                 if (item.flowStep.handler === 'MaterialActionHandler') {
@@ -77,24 +81,22 @@ export const PicImagePick = ({
                 }
             });
         }
-    }, [details]);
+    }, [JSON.stringify(details)]);
 
-    // 设置值
-    useEffect(() => {
-        if (details) {
-            details.workflowConfig.steps.forEach((item: any) => {
-                if (item.flowStep.handler === 'MaterialActionHandler') {
-                    if (item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')) {
-                        item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });
-                    }
-                    if (item.variable.variables.find((i: any) => i.field === 'MATERIAL_LIST')) {
-                        item.variable.variables.find((i: any) => i.field === 'MATERIAL_LIST').value = JSON.stringify(materialList);
-                    }
+    const currentDetails = React.useMemo(() => {
+        const copyDetails = _.cloneDeep(details);
+        copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
+            if (item.flowStep.handler === 'MaterialActionHandler') {
+                if (item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')) {
+                    item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });
                 }
-            });
-            setCurrentDetails(details);
-        }
-    }, [details, query, size]);
+                if (item.variable.variables.find((i: any) => i.field === 'MATERIAL_LIST')) {
+                    item.variable.variables.find((i: any) => i.field === 'MATERIAL_LIST').value = JSON.stringify(materialList);
+                }
+            }
+        });
+        return copyDetails;
+    }, [JSON.stringify(details), JSON.stringify(query), JSON.stringify(size)]);
 
     const handleScroll = useCallback(
         debounce(() => {
@@ -270,16 +272,41 @@ export const PicImagePick = ({
             });
         });
 
-        appModify(currentDetails).then((res) => {
+        // 我的里面两个都调用, 应用市场只调用计划
+        // 我的应用
+        if (details?.source) {
+            appModify(currentDetails).then((res) => {
+                planModifyConfig({
+                    ...allData,
+                    configuration: { ...allData.configuration, appInformation: currentDetails, materialList: materialList },
+                    validate: false
+                }).then((planRes) => {
+                    getList && getList();
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: '创作计划保存成功',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            close: false
+                        })
+                    );
+                });
+            });
+        } else {
             planModifyConfig({
                 ...allData,
                 configuration: { ...allData.configuration, appInformation: currentDetails, materialList: materialList },
                 validate: false
             }).then((planRes) => {
+                getList && getList();
                 dispatch(
                     openSnackbar({
                         open: true,
-                        message: '保存成功',
+                        message: '创作计划保存成功',
                         variant: 'alert',
                         alert: {
                             color: 'success'
@@ -289,7 +316,7 @@ export const PicImagePick = ({
                     })
                 );
             });
-        });
+        }
     };
 
     return (

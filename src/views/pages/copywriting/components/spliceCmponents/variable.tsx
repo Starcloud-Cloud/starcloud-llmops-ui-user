@@ -1,19 +1,7 @@
-import { Tooltip, Popconfirm, Button } from 'antd';
-import {
-    Box,
-    Chip,
-    Typography,
-    Divider,
-    TableContainer,
-    Table as Tables,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    IconButton
-} from '@mui/material';
-import MainCard from 'ui-component/cards/MainCard';
-import { Error, Delete, Settings } from '@mui/icons-material';
+import { Tooltip, Popconfirm, Button, Space, Table } from 'antd';
+import { Delete, Settings } from '@mui/icons-material';
+import type { TableProps } from 'antd';
+import { InfoCircleOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
 import { t } from 'hooks/web/useI18n';
 import { useState, memo, useEffect } from 'react';
 import _ from 'lodash-es';
@@ -25,6 +13,60 @@ interface Variable {
 }
 
 const CreateVariable = ({ rows, setRows }: Variable) => {
+    const columns: TableProps<any>['columns'] = [
+        {
+            title: '变量名称',
+            dataIndex: 'label',
+            align: 'center'
+        },
+        {
+            title: '类型',
+            align: 'center',
+            render: (_, row) => <span>{t('myApp.' + row.style?.toLowerCase())}</span>
+        },
+        {
+            title: '操作',
+            width: 100,
+            align: 'center',
+            render: (_, row, i) => (
+                <Space>
+                    <Button
+                        onClick={() => {
+                            setVarIndex(i);
+                            setItemData(row);
+                            setTitle('编辑变量');
+                            setVariableOpen(true);
+                        }}
+                        size="small"
+                        shape="circle"
+                        icon={<SettingOutlined rev={undefined} />}
+                        type="primary"
+                    />
+                    <Popconfirm
+                        title="删除变量"
+                        description="是否确认删除这条数据"
+                        onConfirm={() => {
+                            const newList = _.cloneDeep(tableData);
+                            newList?.splice(i, 1);
+                            setTableData(newList);
+                        }}
+                        onCancel={() => {}}
+                        okText="确认"
+                        cancelText="取消"
+                    >
+                        <Button
+                            size="small"
+                            shape="circle"
+                            icon={<DeleteOutlined rev={undefined} />}
+                            disabled={row.group === 'SYSTEM'}
+                            danger
+                            type="primary"
+                        />
+                    </Popconfirm>
+                </Space>
+            )
+        }
+    ];
     const [title, setTitle] = useState('');
     const [variableOpen, setVariableOpen] = useState(false);
     const [varIndex, setVarIndex] = useState(-1);
@@ -69,82 +111,29 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
     }, [variableOpen]);
     return (
         <>
-            <MainCard sx={{ borderRadius: 0 }} contentSX={{ p: 0 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Box mr={1}>{t('myApp.table')}</Box>
-                        <Tooltip placement="top" title={t('market.varableDesc')}>
-                            <Error sx={{ cursor: 'pointer' }} fontSize="small" />
-                        </Tooltip>
-                    </Typography>
-                    <div className="flex gap-2">
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                setTitle('增加变量');
-                                setVariableOpen(true);
-                            }}
-                        >
-                            {t('myApp.add')}
-                        </Button>
-                    </div>
-                </Box>
-                <Divider style={{ margin: '10px 0' }} />
-                <TableContainer>
-                    <Tables size="small">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>{t('myApp.name')}</TableCell>
-                                <TableCell>{t('myApp.type')}</TableCell>
-                                <TableCell>{t('myApp.operation')}</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {tableData?.length > 0 &&
-                                tableData?.map((row: any, i: number) => (
-                                    <TableRow hover key={i}>
-                                        <TableCell>{row.label}</TableCell>
-                                        <TableCell>{t('myApp.' + row.style?.toLowerCase())}</TableCell>
-                                        <TableCell sx={{ width: 120 }}>
-                                            <IconButton
-                                                onClick={() => {
-                                                    setVarIndex(i);
-                                                    setItemData(row);
-                                                    setTitle('编辑变量');
-                                                    setVariableOpen(true);
-                                                }}
-                                                color="primary"
-                                            >
-                                                <Settings />
-                                            </IconButton>
-                                            <Popconfirm
-                                                title={t('myApp.del')}
-                                                description={t('myApp.delDesc')}
-                                                onConfirm={() => {
-                                                    const newList = _.cloneDeep(tableData);
-                                                    newList?.splice(i, 1);
-                                                    setTableData(newList);
-                                                }}
-                                                onCancel={() => {}}
-                                                okText={t('myApp.confirm')}
-                                                cancelText={t('myApp.cancel')}
-                                            >
-                                                <IconButton disabled={row?.group === 'ADVANCED'} color="error">
-                                                    <Delete />
-                                                </IconButton>
-                                            </Popconfirm>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                        </TableBody>
-                    </Tables>
-                </TableContainer>
-                <div className="flex justify-center mt-4">
-                    <Button loading={saveLoading} type="primary" onClick={handleSave}>
-                        保存
+            <div className="w-full flex justify-end mb-4">
+                <div className="flex gap-2">
+                    <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量	'}>
+                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                    </Tooltip>
+                    <Button
+                        size="small"
+                        type="primary"
+                        onClick={() => {
+                            setTitle('增加变量');
+                            setVariableOpen(true);
+                        }}
+                    >
+                        新增
                     </Button>
                 </div>
-            </MainCard>
+            </div>
+            <Table columns={columns} dataSource={tableData} pagination={false} />
+            <div className="flex justify-center mt-4">
+                <Button loading={saveLoading} type="primary" onClick={handleSave}>
+                    保存
+                </Button>
+            </div>
             {variableOpen && (
                 <VariableModal title={title} open={variableOpen} setOpen={setVariableOpen} itemData={itemData} saveContent={saveContent} />
             )}

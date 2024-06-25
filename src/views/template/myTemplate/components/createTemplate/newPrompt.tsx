@@ -18,7 +18,7 @@ const NewPrompt = ({
 }: {
     el: any;
     handler?: string;
-    dictList: any[];
+    dictList?: any[];
     variable: any[];
     fields: any;
     index: number;

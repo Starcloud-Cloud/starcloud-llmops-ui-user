@@ -1104,6 +1104,9 @@ function CreateDetail() {
                 <Tabs
                     activeKey={value}
                     onChange={(key: string) => {
+                        if (!detailRef.current) {
+                            return;
+                        }
                         if (detailRef?.current?.type === 'MEDIA_MATRIX') {
                             if (value === '4') {
                                 const newData = _.cloneDeep(detailRef.current);
@@ -1170,7 +1173,14 @@ function CreateDetail() {
                     </Tabs.TabPane>
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
-                            <div className="flex justify-center">
+                            <div
+                                className="flex justify-center"
+                                style={{
+                                    backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
+                                    backgroundSize: '10px 10px',
+                                    backgroundRepeat: 'repeat'
+                                }}
+                            >
                                 <div className={`xl:w-[80%] lg:w-full`}>
                                     <Arrange
                                         detail={detail}

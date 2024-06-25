@@ -113,7 +113,7 @@ const StyleTabs = ({
                 onChange={onChange}
                 activeKey={activeKey}
                 onEdit={onEdit}
-                items={imageStyleData.map((item: any, i: number) => {
+                items={imageStyleData?.map((item: any, i: number) => {
                     return {
                         label: (
                             <div>

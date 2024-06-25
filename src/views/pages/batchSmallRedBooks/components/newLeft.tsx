@@ -2002,7 +2002,7 @@ const Lefts = ({
                                     <InfoCircleOutlined rev={undefined} />
                                     <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
                                 </div>
-                                {detail && (
+                                {/* {detail && (
                                     <Tooltip title="流程配置">
                                         <Button
                                             icon={<SettingOutlined rev={undefined} />}
@@ -2012,7 +2012,7 @@ const Lefts = ({
                                             onClick={() => setSettingOpen(true)}
                                         />
                                     </Tooltip>
-                                )}
+                                )} */}
                             </div>
 
                             {generateList?.map((item: any, index: number) => (

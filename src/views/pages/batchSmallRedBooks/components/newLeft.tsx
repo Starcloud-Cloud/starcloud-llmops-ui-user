@@ -103,7 +103,8 @@ const Lefts = ({
     leftWidth,
     setDefaultVariableData,
     setDefaultField,
-    setWidth
+    setWidth,
+    getAppList
 }: {
     detailShow?: boolean;
     planState?: number;
@@ -128,6 +129,7 @@ const Lefts = ({
     setDefaultVariableData?: (data: any) => void;
     setDefaultField?: (data: any) => void;
     setWidth?: () => void;
+    getAppList?: () => void;
 }) => {
     const { token } = theme.useToken();
     const navigate = useNavigate();
@@ -2438,7 +2440,10 @@ const Lefts = ({
             />
             {isModalOpen && (
                 <PicImagePick
-                    getList={() => getList(true)}
+                    getList={() => {
+                        // getList(true);
+                        getAppList && getAppList();
+                    }}
                     materialList={materialList}
                     allData={appData}
                     details={appData?.configuration?.appInformation}

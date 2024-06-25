@@ -20,10 +20,18 @@ const BatcSmallRedBooks = forwardRef(
         {
             planState,
             changePre,
+            getAppList,
             detail,
             isMyApp,
             setDetail
-        }: { planState: number; changePre?: number; detail?: any; isMyApp?: boolean; setDetail: (data: any, fieldShow?: boolean) => void },
+        }: {
+            planState: number;
+            changePre?: number;
+            getAppList: () => void;
+            detail?: any;
+            isMyApp?: boolean;
+            setDetail: (data: any, fieldShow?: boolean) => void;
+        },
         ref
     ) => {
         useImperativeHandle(ref, () => ({
@@ -359,6 +367,7 @@ const BatcSmallRedBooks = forwardRef(
                                     setLeftWidth('50%');
                                 }
                             }}
+                            getAppList={getAppList}
                             setFieldHead={setFieldHead}
                             setMoke={setMoke}
                             setImageMoke={setImageMoke}

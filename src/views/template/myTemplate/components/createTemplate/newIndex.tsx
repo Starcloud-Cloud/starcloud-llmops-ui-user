@@ -992,6 +992,7 @@ function CreateDetail() {
                     <CreatePlan
                         ref={createPlanRef}
                         planState={planState}
+                        getAppList={getList}
                         detail={_.cloneDeep(detailRef.current)}
                         setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
                         isMyApp={true}
@@ -1207,6 +1208,7 @@ function CreateDetail() {
                                         <div className="h-[calc(100vh-266px)] bg-[rgb(244,246,248)]">
                                             <CreatePlan
                                                 ref={createPlanRef}
+                                                getAppList={getList}
                                                 changePre={changePre}
                                                 planState={planState}
                                                 detail={_.cloneDeep(detailRef.current)}

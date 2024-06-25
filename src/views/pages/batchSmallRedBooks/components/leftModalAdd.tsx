@@ -88,11 +88,11 @@ const LeftModalAdd = ({
             render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label,
             align: 'center'
         },
-        // {
-        //     title: '是否为分组',
-        //     render: (_, row) => <Tag color="processing">{row?.isGroupField ? '是' : '否'}</Tag>,
-        //     align: 'center'
-        // },
+        {
+            title: '是否为分组',
+            render: (_, row) => <Tag color="processing">{row?.isGroupField ? '是' : '否'}</Tag>,
+            align: 'center'
+        },
         {
             title: '是否必填',
             render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : ''),

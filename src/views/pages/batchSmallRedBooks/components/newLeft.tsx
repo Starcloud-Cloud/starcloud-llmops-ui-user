@@ -1752,7 +1752,14 @@ const Lefts = ({
             setGenerateList(generRef.current);
         }
     }, [changePre]);
-
+    const [imgPre, setImgPre] = useState(0);
+    useEffect(() => {
+        console.log(11111);
+        if (imgPre === 1) {
+            getList(true);
+            setImgPre(0);
+        }
+    }, [detail]);
     const [settingOpen, setSettingOpen] = useState(false);
     const [steptitOpen, setSteotitOpen] = useState(false);
     const [stepTitData, setStepTitData] = useState<any>(null);
@@ -1760,6 +1767,8 @@ const Lefts = ({
     //全局变量
     const [advancedModal, setAdvancedModal] = useState(false);
     const [allVariable, setAllVariable] = useState<any>(null);
+    console.log(appData);
+
     return (
         <>
             <div className="relative h-full">
@@ -2441,8 +2450,12 @@ const Lefts = ({
             {isModalOpen && (
                 <PicImagePick
                     getList={() => {
-                        getList(true);
-                        getAppList && getAppList();
+                        if (detail) {
+                            setImgPre(1);
+                            getAppList && getAppList();
+                        } else {
+                            getList(true);
+                        }
                     }}
                     materialList={materialList}
                     allData={appData}

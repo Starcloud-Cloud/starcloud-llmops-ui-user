@@ -2441,7 +2441,7 @@ const Lefts = ({
             {isModalOpen && (
                 <PicImagePick
                     getList={() => {
-                        // getList(true);
+                        getList(true);
                         getAppList && getAppList();
                     }}
                     materialList={materialList}

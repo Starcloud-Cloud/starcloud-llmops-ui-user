@@ -69,15 +69,18 @@ export const PicImagePick = ({
 
     // 回显
     useEffect(() => {
-        console.log(111);
         if (details) {
             details.workflowConfig.steps.forEach((item: any) => {
                 if (item.flowStep.handler === 'MaterialActionHandler') {
-                    const searchHabitsString = item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')?.value || '{}';
-                    setVisibleSaveFilter(searchHabitsString === '{}' ? false : true);
-                    const searchHabitsStringJson = JSON.parse(searchHabitsString);
-                    setQuery(searchHabitsStringJson?.query || {});
-                    setSize(searchHabitsStringJson?.size || {});
+                    const searchHabits = item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS');
+                    if (searchHabits) {
+                        setVisibleSaveFilter(true);
+                        const searchHabitsStringJson = JSON.parse(
+                            searchHabits.value === 'null' || !searchHabits.value ? '{}' : searchHabits.value
+                        );
+                        setQuery(searchHabitsStringJson?.query || {});
+                        setSize(searchHabitsStringJson?.size || {});
+                    }
                 }
             });
         }

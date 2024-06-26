@@ -665,7 +665,7 @@ const AddStyle = React.forwardRef(
                     </Tooltip>
                     <div className="w-full flex gap-2 justify-between">
                         <span className="text-sm ml-1 text-stone-600">配置笔记图片生成的风格模版，支持不同风格模版组合生成</span>
-                        {/* <Tooltip title="风格模版配置">
+                        <Tooltip title="风格模版配置">
                             <Button
                                 icon={<SettingOutlined rev={undefined} />}
                                 shape="circle"
@@ -683,7 +683,7 @@ const AddStyle = React.forwardRef(
                                     setSystemOPen(true);
                                 }}
                             />
-                        </Tooltip> */}
+                        </Tooltip>
                     </div>
                 </div>
                 {mode === 1 && (

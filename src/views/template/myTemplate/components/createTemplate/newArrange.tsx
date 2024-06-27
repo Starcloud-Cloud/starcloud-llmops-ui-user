@@ -110,13 +110,13 @@ function Arrange({
         });
     }, [detail?.type]);
     const getImage = (data: string) => {
-        let image: string = '';
+        let image: any = '';
         try {
             image = require('../../../../../assets/images/carryOut/' + data + '.svg');
         } catch (err) {
             image = require('../../../../../assets/images/carryOut/open-ai.svg');
         }
-        return image;
+        return image?.default || image;
     };
     const upHandler = useMemo(() => {
         return (
@@ -172,12 +172,7 @@ function Arrange({
                                     <div className="w-[24px]">
                                         <ExpandMore className="aaa -rotate-90" />
                                     </div>
-                                    <Image
-                                        preview={false}
-                                        style={{ width: '25px', height: '25px' }}
-                                        src={getImage(item.flowStep.icon)}
-                                        alt="svg"
-                                    />
+                                    <Image preview={false} style={{ width: '25px', height: '25px' }} src={getImage(item.flowStep.icon)} />
                                     <div className="w-full flex flex-col justify-center">
                                         {editStatus[index] ? (
                                             <TextField
@@ -441,7 +436,6 @@ function Arrange({
                                                                 width={40}
                                                                 height={40}
                                                                 src={getImage(el?.flowStep?.icon)}
-                                                                alt="svg"
                                                             />
                                                         </div>
                                                         <div className="flex justify-between gap-2 flex-col">

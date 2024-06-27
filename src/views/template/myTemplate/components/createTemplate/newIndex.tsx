@@ -668,7 +668,11 @@ function CreateDetail() {
     //风格模板配置
     const [imageStylePre, setImageStylePre] = useState(0);
     const saveImageStyle = () => {
-        setImageStylePre(imageStylePre + 1);
+        if (createPlanRef.current) {
+            setImageStylePre(imageStylePre + 1);
+        } else {
+            saveDetail();
+        }
     };
     const saveDetails = (data: any, flag?: boolean) => {
         const newList = _.cloneDeep(data);

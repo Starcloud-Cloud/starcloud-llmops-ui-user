@@ -84,6 +84,7 @@ const Lefts = ({
     detailShow = true,
     planState,
     pre,
+    imageStylePre,
     isMyApp,
     changePre,
     detail,
@@ -110,6 +111,7 @@ const Lefts = ({
     planState?: number;
     isMyApp?: boolean;
     pre?: number;
+    imageStylePre?: number;
     changePre?: number;
     detail?: any;
     data?: any;
@@ -600,7 +602,7 @@ const Lefts = ({
     };
     // 选择照片loading
 
-    const getList = async (flag?: boolean, appUpdate?: boolean) => {
+    const getList = async (flag?: boolean, appUpdate?: boolean, isimgStyle?: boolean) => {
         let result;
         let newList: any;
         setTableLoading(true);
@@ -621,7 +623,7 @@ const Lefts = ({
             }
         } else if (detail) {
             setSelectImgLoading(true);
-            result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+            result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             setSelectImgLoading(false);
             newList = _.cloneDeep(detail);
             newList?.workflowConfig?.steps?.forEach((item: any) => {
@@ -845,12 +847,12 @@ const Lefts = ({
                 result?.configuration?.imageStyleList ||
                 newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
         }
-        console.log(newList);
-
-        console.log(newImage);
-
+        imageRef.current = newImage;
         setImagMater(newImage);
         setTableLoading(false);
+        if (isimgStyle) {
+            saveTemplate();
+        }
     };
     const setcustom = (data: any) => {
         const newData = _.cloneDeep(appRef.current);
@@ -1560,6 +1562,8 @@ const Lefts = ({
                 (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
             );
         }
+        console.log(b);
+
         arr = [arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'), ..._.cloneDeep(generRef.current), b];
         return arr;
     };
@@ -1568,6 +1572,8 @@ const Lefts = ({
     const saveTemplate = () => {
         setExeState(false);
         const arr = headerSaveAll();
+        console.log(arr);
+
         setDetail &&
             setDetail({
                 ...detail,
@@ -1770,6 +1776,11 @@ const Lefts = ({
     //全局变量
     const [advancedModal, setAdvancedModal] = useState(false);
     const [allVariable, setAllVariable] = useState<any>(null);
+    useEffect(() => {
+        if (imageStylePre) {
+            getList(true, false, true);
+        }
+    }, [imageStylePre]);
     return (
         <>
             <div className="relative h-full">
@@ -1812,7 +1823,7 @@ const Lefts = ({
                                     创作同款应用
                                 </Button>
                             )}
-                            状态：{getStatus1(appData?.status)}
+                            执行状态：{getStatus1(appData?.status)}
                             <div className="inline-block whitespace-nowrap">
                                 <Popconfirm
                                     title="更新提示"

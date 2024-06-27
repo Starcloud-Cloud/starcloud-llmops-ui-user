@@ -19,6 +19,7 @@ const BatcSmallRedBooks = forwardRef(
     (
         {
             planState,
+            imageStylePre,
             changePre,
             getAppList,
             detail,
@@ -27,6 +28,7 @@ const BatcSmallRedBooks = forwardRef(
             setDetail
         }: {
             planState: number;
+            imageStylePre?: number;
             changePre?: number;
             getAppList: () => void;
             detail?: any;
@@ -356,6 +358,7 @@ const BatcSmallRedBooks = forwardRef(
                     >
                         <Left
                             pre={pre}
+                            imageStylePre={imageStylePre}
                             isMyApp={isMyApp}
                             changePre={changePre}
                             planState={planState}

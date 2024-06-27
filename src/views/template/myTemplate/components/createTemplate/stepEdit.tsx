@@ -24,7 +24,8 @@ const StepEdit = ({
     basisChange, //改变 prompt
     resReadOnly, //响应类型是否禁用
     resType, //响应类型
-    resJsonSchema //响应数据
+    resJsonSchema, //响应数据
+    saveImageStyle //保存图片风格
 }: {
     detail: any;
     variableStyle: any[];
@@ -40,6 +41,7 @@ const StepEdit = ({
     resReadOnly: boolean;
     resType: string;
     resJsonSchema: string;
+    saveImageStyle: () => void;
 }) => {
     const permissions = useUserStore((state) => state.permissions);
     const { TextArea } = Input;
@@ -180,6 +182,17 @@ const StepEdit = ({
                 {handler === 'PosterActionHandler' && (
                     <Tabs.TabPane tab="系统风格模版配置" key="1">
                         <div className="relative">
+                            <Button
+                                className="w-[100px] absolute right-[10px]"
+                                type="primary"
+                                onClick={() => {
+                                    setTimeout(() => {
+                                        saveImageStyle();
+                                    }, 0);
+                                }}
+                            >
+                                保存
+                            </Button>
                             <CreateTab
                                 materialStatus={upHandler}
                                 appData={{ materialType: upHandler, appReqVO: detail }}

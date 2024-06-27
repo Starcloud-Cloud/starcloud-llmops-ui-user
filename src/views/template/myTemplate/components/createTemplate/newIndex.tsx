@@ -469,12 +469,12 @@ function CreateDetail() {
     //增加 删除 改变变量
     const changeConfigs = (data: any) => {
         detailRef.current = _.cloneDeep({
-            ...detail,
+            ...detailRef.current,
             workflowConfig: data
         });
         setDetail(
             _.cloneDeep({
-                ...detail,
+                ...detailRef.current,
                 workflowConfig: data
             })
         );
@@ -543,7 +543,7 @@ function CreateDetail() {
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
-    const saveDetail = (flag?: boolean, fieldShow?: boolean) => {
+    const saveDetail = (flag?: boolean, fieldShow?: boolean, isimgStyle?: boolean) => {
         const newList = _.cloneDeep(detailRef.current);
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {
@@ -611,6 +611,8 @@ function CreateDetail() {
             ];
             newList.workflowConfig.steps = arr?.filter((item: any) => item);
         }
+        console.log(JSON.parse(newList.workflowConfig?.steps[3].flowStep.variable.variables[4].value));
+
         if (newList.name && newList.category) {
             if (searchParams.get('uid')) {
                 appModify(newList).then((res) => {
@@ -663,10 +665,14 @@ function CreateDetail() {
             setValue('0');
         }
     };
+    //风格模板配置
+    const [imageStylePre, setImageStylePre] = useState(0);
+    const saveImageStyle = () => {
+        setImageStylePre(imageStylePre + 1);
+    };
     const saveDetails = (data: any, flag?: boolean) => {
-        console.log(flag);
-
         const newList = _.cloneDeep(data);
+        console.log(newList);
         detailRef.current = newList;
         setTimeout(() => {
             if (flag) {
@@ -674,7 +680,7 @@ function CreateDetail() {
             } else {
                 saveDetail();
             }
-        }, 100);
+        }, 500);
 
         // setDetail(detailRef.current);
     };
@@ -1009,7 +1015,7 @@ function CreateDetail() {
             </div>
         )
     ) : (
-        <Card sx={{ height: '100%', overflowY: 'auto' }}>
+        <Card sx={{ height: '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={
@@ -1105,9 +1111,10 @@ function CreateDetail() {
                 }
             ></CardHeader>
             <Divider />
-            <div className="px-4">
+            <div className="w-full px-4 absolute top-[24px]">
                 <Tabs
                     activeKey={value}
+                    centered={true}
                     onChange={(key: string) => {
                         if (!detailRef.current) {
                             return;
@@ -1205,6 +1212,7 @@ function CreateDetail() {
                                         tableCopy={tableCopy}
                                         tableDataDel={tableDataDel}
                                         tableDataMove={tableDataMove}
+                                        saveImageStyle={saveImageStyle}
                                     />
                                 </div>
                             </div>
@@ -1218,6 +1226,7 @@ function CreateDetail() {
                                         <div className="h-[calc(100vh-266px)] bg-[rgb(244,246,248)]">
                                             <CreatePlan
                                                 ref={createPlanRef}
+                                                imageStylePre={imageStylePre}
                                                 getAppList={getList}
                                                 changePre={changePre}
                                                 planState={planState}
@@ -1230,9 +1239,6 @@ function CreateDetail() {
                                     </Spin>
                                 ) : (
                                     <div>
-                                        <Typography variant="h5" fontSize="1rem" mb={1}>
-                                            {t('market.debug')}
-                                        </Typography>
                                         <Card elevation={2} sx={{ p: 2 }}>
                                             <Header
                                                 permissions={permissions}

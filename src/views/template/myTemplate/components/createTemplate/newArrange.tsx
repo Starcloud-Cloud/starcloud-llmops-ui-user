@@ -20,7 +20,8 @@ function Arrange({
     getTableData,
     tableCopy,
     tableDataDel,
-    tableDataMove
+    tableDataMove,
+    saveImageStyle
 }: any) {
     //增加节点
     const [expanded, setExpanded] = useState<any[]>([]);
@@ -113,7 +114,7 @@ function Arrange({
         try {
             image = require('../../../../../assets/images/carryOut/' + data + '.svg');
         } catch (errr) {
-            image = '';
+            image = require('../../../../../assets/images/carryOut/open-ai.svg');
         }
         return image;
     };
@@ -362,6 +363,7 @@ function Arrange({
                                 resReadOnly={item?.flowStep?.response?.readOnly}
                                 resType={item?.flowStep?.response?.type}
                                 resJsonSchema={item?.flowStep?.response?.output?.jsonSchema}
+                                saveImageStyle={saveImageStyle}
                             />
                         </AccordionDetails>
                     </Accordion>
@@ -446,7 +448,9 @@ function Arrange({
                                                         </div>
                                                         <div className="flex justify-between gap-2 flex-col">
                                                             <div className="text-[16px] font-bold">{el?.name}</div>
-                                                            <div className="text-xs text-black/50 line-clamp-3">{el.description}</div>
+                                                            <div className="h-[48px] text-xs text-black/50 line-clamp-3">
+                                                                {el.description}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 ))}

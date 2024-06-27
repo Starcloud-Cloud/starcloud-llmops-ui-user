@@ -177,7 +177,7 @@ const StepEdit = ({
                         </div>
                     </Tabs.TabPane>
                 )}
-                {handler === 'PosterActionHandler' && permissions.includes('app:step:image:system:style:config') && (
+                {handler === 'PosterActionHandler' && (
                     <Tabs.TabPane tab="系统风格模版配置" key="1">
                         <div className="relative">
                             <CreateTab

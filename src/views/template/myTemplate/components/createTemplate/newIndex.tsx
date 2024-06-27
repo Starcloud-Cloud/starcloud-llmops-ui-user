@@ -999,6 +999,7 @@ function CreateDetail() {
                         detail={_.cloneDeep(detailRef.current)}
                         setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
                         isMyApp={true}
+                        isblack={false}
                     />
                 </div>
             </>
@@ -1222,7 +1223,8 @@ function CreateDetail() {
                                                 planState={planState}
                                                 detail={_.cloneDeep(detailRef.current)}
                                                 setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
-                                                isMyApp={true}
+                                                isMyApp={false}
+                                                isblack={false}
                                             />
                                         </div>
                                     </Spin>

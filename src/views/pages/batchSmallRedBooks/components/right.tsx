@@ -122,7 +122,6 @@ const Right = ({
                                                                 e.stopPropagation();
                                                             }}
                                                             className="cursor-pointer"
-                                                            rev={undefined}
                                                         />
                                                     </div>
                                                 }

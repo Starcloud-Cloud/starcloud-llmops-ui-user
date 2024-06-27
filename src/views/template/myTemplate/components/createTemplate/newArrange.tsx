@@ -281,7 +281,7 @@ function Arrange({
                                                             item?.flowStep.handler === 'VariableActionHandler' ||
                                                             config?.steps[index - 1]?.flowStep.handler === 'MaterialActionHandler' ||
                                                             config?.steps[index - 1]?.flowStep.handler === 'VariableActionHandler',
-                                                        icon: <VerticalAlignTopOutlined rev={undefined} />
+                                                        icon: <VerticalAlignTopOutlined />
                                                     },
                                                     {
                                                         key: '2',
@@ -291,18 +291,18 @@ function Arrange({
                                                             config?.steps[index + 1]?.flowStep.handler === 'AssembleActionHandler' ||
                                                             item.flowStep.handler === 'VariableActionHandler',
 
-                                                        icon: <VerticalAlignBottomOutlined rev={undefined} />
+                                                        icon: <VerticalAlignBottomOutlined />
                                                     },
                                                     {
                                                         key: '3',
                                                         label: ' 复制',
                                                         disabled: item.flowStep.handler === 'VariableActionHandler',
-                                                        icon: <CopyOutlined rev={undefined} />
+                                                        icon: <CopyOutlined />
                                                     },
                                                     {
                                                         key: '4',
                                                         label: '删除',
-                                                        icon: <DeleteOutlined rev={undefined} />
+                                                        icon: <DeleteOutlined />
                                                     }
                                                 ],
                                                 onClick: (e: any) => {

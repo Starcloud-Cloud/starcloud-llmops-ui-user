@@ -23,7 +23,7 @@ const SmallRedBook = () => {
             showRemoveIcon: false,
             previewIcon: (
                 <Tooltip placement="top" title={'添加到风格里边'}>
-                    <SubnodeOutlined className="!text-[#fff] text-5xl " rev={undefined} />
+                    <SubnodeOutlined className="!text-[#fff] text-5xl " />
                 </Tooltip>
             )
         },
@@ -210,7 +210,7 @@ const SmallRedBook = () => {
                         <div className="text-[18px] font-[600] mb-[20px]">2. 上传图片</div>
                         <Upload {...props}>
                             <div>
-                                <PlusOutlined className="text-4xl " rev={undefined} />
+                                <PlusOutlined className="text-4xl " />
                                 <div style={{ marginTop: 8 }}>Upload</div>
                             </div>
                         </Upload>

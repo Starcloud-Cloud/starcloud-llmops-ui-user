@@ -174,10 +174,7 @@ const FormModal = ({
                                                             onMouseEnter={() => setCanUpload(true)}
                                                             onMouseLeave={() => setCanUpload(false)}
                                                         >
-                                                            <CloudUploadOutlined
-                                                                rev={undefined}
-                                                                className="text-white/80 hover:text-white !cursor-pointer"
-                                                            />
+                                                            <CloudUploadOutlined className="text-white/80 hover:text-white !cursor-pointer" />
                                                         </div>
                                                     </Tooltip>
                                                     <Tooltip title="搜索">
@@ -191,7 +188,7 @@ const FormModal = ({
                                                                 setValues(result);
                                                             }}
                                                         >
-                                                            <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                                            <SearchOutlined className="text-white/80 hover:text-white" />
                                                         </div>
                                                     </Tooltip>
                                                 </div>
@@ -201,11 +198,7 @@ const FormModal = ({
                                                 className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
                                                 onMouseEnter={() => setCanUpload(true)}
                                             >
-                                                {uploadLoading[index] ? (
-                                                    <LoadingOutlined rev={undefined} />
-                                                ) : (
-                                                    <PlusOutlined rev={undefined} />
-                                                )}
+                                                {uploadLoading[index] ? <LoadingOutlined /> : <PlusOutlined />}
                                                 <div style={{ marginTop: 8 }}>Upload</div>
                                                 <Tooltip title="搜索">
                                                     <div
@@ -216,7 +209,7 @@ const FormModal = ({
                                                             setImageDataIndex(item.dataIndex);
                                                         }}
                                                     >
-                                                        <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                                        <SearchOutlined className="text-white/80 hover:text-white" />
                                                     </div>
                                                 </Tooltip>
                                             </div>
@@ -253,7 +246,7 @@ const FormModal = ({
                                         }}
                                     >
                                         <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                            {uploadLoading[index] ? <LoadingOutlined rev={undefined} /> : <PlusOutlined rev={undefined} />}
+                                            {uploadLoading[index] ? <LoadingOutlined /> : <PlusOutlined />}
                                             <div style={{ marginTop: 8 }}>Upload</div>
                                         </div>
                                     </Upload>

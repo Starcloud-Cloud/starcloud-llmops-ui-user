@@ -259,7 +259,7 @@ const ThreeStep = ({
                             (editType ? (
                                 <Upload {...props}>
                                     <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                        <PlusOutlined rev={undefined} />
+                                        <PlusOutlined />
                                         <div style={{ marginTop: 8 }}>上传</div>
                                     </div>
                                 </Upload>

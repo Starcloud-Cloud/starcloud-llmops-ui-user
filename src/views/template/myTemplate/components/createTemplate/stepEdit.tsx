@@ -83,7 +83,7 @@ const StepEdit = ({
                         }}
                         size="small"
                         shape="circle"
-                        icon={<SettingOutlined rev={undefined} />}
+                        icon={<SettingOutlined />}
                         type="primary"
                     />
 
@@ -91,7 +91,7 @@ const StepEdit = ({
                         <Button
                             size="small"
                             shape="circle"
-                            icon={<DeleteOutlined rev={undefined} />}
+                            icon={<DeleteOutlined />}
                             disabled={row.group === 'SYSTEM'}
                             danger
                             type="primary"
@@ -112,7 +112,7 @@ const StepEdit = ({
                             <Button
                                 size="small"
                                 shape="circle"
-                                icon={<DeleteOutlined rev={undefined} />}
+                                icon={<DeleteOutlined />}
                                 disabled={row.group === 'SYSTEM'}
                                 danger
                                 type="primary"
@@ -162,7 +162,7 @@ const StepEdit = ({
                             <div className="flex gap-1">
                                 拼图生成模式
                                 <Tooltip title="方便批量上传图片，图片会随机放在 图片风格模版中进行生成(当素材只有一个图片类型的字段的时候可开启此功能)">
-                                    <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                    <InfoCircleOutlined className="cursor-pointer" />
                                 </Tooltip>
                             </div>
                             <Switch
@@ -222,7 +222,7 @@ const StepEdit = ({
                             <div className="flex justify-end items-center mb-4">
                                 <div className="flex gap-2">
                                     <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
-                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                        <InfoCircleOutlined className="cursor-pointer" />
                                     </Tooltip>
                                     <Button
                                         size="small"

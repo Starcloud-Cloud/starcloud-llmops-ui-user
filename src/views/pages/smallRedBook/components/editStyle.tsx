@@ -60,7 +60,7 @@ const EditStyle = ({
                                                             detailImage(label, index);
                                                         }}
                                                         className="cursor-pointer hover:text-[red]"
-                                                        rev={undefined}
+                                                        
                                                     />
                                                 </div>
                                             </div>
@@ -93,7 +93,6 @@ const EditStyle = ({
                                         detailImage(label, index);
                                     }}
                                     className="cursor-pointer hover:text-[red] text-4xl"
-                                    rev={undefined}
                                 />
                             </div>
                         </div>

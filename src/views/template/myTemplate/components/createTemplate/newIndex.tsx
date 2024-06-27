@@ -225,6 +225,8 @@ function CreateDetail() {
                         break;
                     }
                     let str = textDecoder.decode(value);
+                    console.log(str);
+
                     const lines = str.split('\n');
                     lines.forEach((message, i: number) => {
                         if (i === 0 && joins) {
@@ -241,6 +243,7 @@ function CreateDetail() {
                         if (message?.startsWith('data:')) {
                             bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                         }
+                        console.log(bufferObj);
                         if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
                             changeArr(loadingsRef.current, setLoadings, index, false);
                             if (!conversationUid && index === 0 && isAllExecute) {

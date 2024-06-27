@@ -20,14 +20,7 @@ const RowContext = createContext<any>({});
 const DragHandle: React.FC = () => {
     const { setActivatorNodeRef, listeners } = useContext(RowContext);
     return (
-        <Button
-            type="text"
-            size="small"
-            icon={<HolderOutlined rev={undefined} />}
-            style={{ cursor: 'move' }}
-            ref={setActivatorNodeRef}
-            {...listeners}
-        />
+        <Button type="text" size="small" icon={<HolderOutlined />} style={{ cursor: 'move' }} ref={setActivatorNodeRef} {...listeners} />
     );
 };
 const Row: React.FC<any> = (props) => {
@@ -387,7 +380,7 @@ const LeftModalAdd = ({
                             setRowIndex(-1);
                             setFormOpen(true);
                         }}
-                        icon={<PlusOutlined rev={undefined} />}
+                        icon={<PlusOutlined />}
                         type="primary"
                     >
                         新增({materialTableData?.length || 0}/30)

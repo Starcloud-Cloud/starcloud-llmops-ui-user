@@ -309,7 +309,7 @@ const Cards = ({ flag = false }) => {
                             open={open}
                             onOpenChange={(newOpen: boolean) => setOpen(newOpen)}
                         >
-                            <SwapOutlined className="cursor-pointer" rev={undefined} />
+                            <SwapOutlined className="cursor-pointer" />
                         </Popover>
                     </div>
                 )}

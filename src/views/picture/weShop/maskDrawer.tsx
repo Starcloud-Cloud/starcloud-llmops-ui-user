@@ -88,11 +88,11 @@ const MaskDrawer = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean)
                                 <div>
                                     {loading ? (
                                         <p className="ant-upload-drag-icon">
-                                            <LoadingOutlined rev={undefined} />
+                                            <LoadingOutlined />
                                         </p>
                                     ) : (
                                         <p className="ant-upload-drag-icon">
-                                            <PlusOutlined rev={undefined} />
+                                            <PlusOutlined />
                                         </p>
                                     )}
                                     <p className="ant-upload-text">点击上传或直接将图片文件拖入区域</p>
@@ -112,11 +112,11 @@ const MaskDrawer = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean)
                                 <div>
                                     {loading ? (
                                         <p className="ant-upload-drag-icon">
-                                            <LoadingOutlined rev={undefined} />
+                                            <LoadingOutlined />
                                         </p>
                                     ) : (
                                         <p className="ant-upload-drag-icon">
-                                            <PlusOutlined rev={undefined} />
+                                            <PlusOutlined />
                                         </p>
                                     )}
                                     <p className="ant-upload-text">点击上传或直接将图片文件拖入区域</p>

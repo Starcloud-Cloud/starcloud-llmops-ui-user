@@ -663,13 +663,13 @@ const AddStyle = React.forwardRef(
             <div className="addStyle">
                 <div className="flex items-center mb-2">
                     <Tooltip title="生成图片时会按照风格模板的顺序去使用">
-                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                        <InfoCircleOutlined className="cursor-pointer" />
                     </Tooltip>
                     <div className="w-full flex gap-2 justify-between">
                         <span className="text-sm ml-1 text-stone-600">配置笔记图片生成的风格模版，支持不同风格模版组合生成</span>
                         <Tooltip title="风格模版配置">
                             <Button
-                                icon={<SettingOutlined rev={undefined} />}
+                                icon={<SettingOutlined />}
                                 shape="circle"
                                 size="small"
                                 type="primary"
@@ -855,7 +855,6 @@ const AddStyle = React.forwardRef(
                                                 >
                                                     <div className="flex flex-col justify-center items-center w-full h-[200px]">
                                                         <PlusOutlined
-                                                            rev={undefined}
                                                             style={{
                                                                 fontSize: '24px'
                                                             }}
@@ -892,7 +891,7 @@ const AddStyle = React.forwardRef(
                                                         onConfirm={() => handleDel(index)}
                                                     >
                                                         <DeleteOutlined
-                                                            rev={undefined}
+                                                            
                                                             className="absolute z-50 py-[3px] left-[2px] text-red-600"
                                                         />
                                                     </Popconfirm> */}

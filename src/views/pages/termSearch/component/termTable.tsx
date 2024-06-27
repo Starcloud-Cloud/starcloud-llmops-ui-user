@@ -148,7 +148,7 @@ const TermTable = ({
                     <div className="cursor-default relative min-w-[90px]">
                         <span className="text-[#673ab7] text-sm">
                             流量占比
-                            <ArrowDownOutlined className="" rev={undefined} />
+                            <ArrowDownOutlined className="" />
                         </span>
                     </div>
                 </Tooltip>

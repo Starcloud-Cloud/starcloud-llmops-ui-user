@@ -1232,7 +1232,6 @@ const AddStyleApp = React.forwardRef(
                                             >
                                                 <div className="flex flex-col justify-center items-center w-full h-[200px]">
                                                     <PlusOutlined
-                                                        rev={undefined}
                                                         style={{
                                                             fontSize: '24px'
                                                         }}

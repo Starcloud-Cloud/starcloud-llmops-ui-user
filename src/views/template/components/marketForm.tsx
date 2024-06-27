@@ -190,7 +190,8 @@ function FormExecute({
     };
     return (
         <>
-            {item.style === 'TEXTAREA' || (handlerCode === 'AssembleActionHandler' && item.field === 'TITLE') ? (
+            {(handlerCode !== 'OpenAIChatActionHandler' && item.style === 'TEXTAREA') ||
+            (handlerCode === 'AssembleActionHandler' && item.field === 'TITLE') ? (
                 <div ref={widthRef} className="w-full relative mt-4">
                     <VariableInput
                         open={open}
@@ -221,6 +222,31 @@ function FormExecute({
                         <p className="text-[#f44336] mt-[4px] text-xs">{item.label}必填</p>
                     )}
                 </div>
+            ) : item.style === 'TEXTAREA' ? (
+                <TextField
+                    color="secondary"
+                    size="small"
+                    sx={mt}
+                    label={item.label}
+                    defaultValue={item.value}
+                    id={item.field}
+                    required
+                    name={item.field}
+                    multiline
+                    minRows={3}
+                    maxRows={3}
+                    InputLabelProps={{ shrink: true }}
+                    placeholder={item.defaultValue ? String(item.defaultValue) : ''}
+                    error={!item.value && value}
+                    helperText={!item.value && value ? `${item.label}必填` : item.description}
+                    onChange={(e) => {
+                        setValue(true);
+                    }}
+                    onBlur={(e) => {
+                        onChange(e.target);
+                    }}
+                    fullWidth
+                />
             ) : item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}

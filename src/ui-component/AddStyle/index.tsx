@@ -54,6 +54,8 @@ const AddStyle = React.forwardRef(
         }: any,
         ref: any
     ) => {
+        console.log(record);
+
         const [visible, setVisible] = useState(false);
 
         const [systemOPen, setSystemOPen] = useState(false);

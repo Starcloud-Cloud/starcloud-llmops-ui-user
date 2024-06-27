@@ -845,6 +845,10 @@ const Lefts = ({
                 result?.configuration?.imageStyleList ||
                 newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
         }
+        console.log(newList);
+
+        console.log(newImage);
+
         setImagMater(newImage);
         setTableLoading(false);
     };
@@ -1754,7 +1758,6 @@ const Lefts = ({
     }, [changePre]);
     const [imgPre, setImgPre] = useState(0);
     useEffect(() => {
-        console.log(11111);
         if (imgPre === 1) {
             getList(true);
             setImgPre(0);
@@ -1767,8 +1770,6 @@ const Lefts = ({
     //全局变量
     const [advancedModal, setAdvancedModal] = useState(false);
     const [allVariable, setAllVariable] = useState<any>(null);
-    console.log(appData);
-
     return (
         <>
             <div className="relative h-full">

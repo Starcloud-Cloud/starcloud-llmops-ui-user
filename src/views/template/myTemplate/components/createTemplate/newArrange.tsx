@@ -1,7 +1,7 @@
-import { Box, Typography, TextField, IconButton, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Box, TextField, IconButton, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Image, Dropdown, Popover, Switch, Spin } from 'antd';
-import { VerticalAlignTopOutlined, VerticalAlignBottomOutlined, CopyOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { BorderColor, AddCircleSharp, South, ExpandMore, MoreVert, Error, Add } from '@mui/icons-material';
+import { VerticalAlignTopOutlined, VerticalAlignBottomOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
+import { BorderColor, AddCircleSharp, South, ExpandMore, MoreVert } from '@mui/icons-material';
 import { t } from 'hooks/web/useI18n';
 import { stepList } from 'api/template';
 import { dispatch } from 'store';
@@ -140,9 +140,6 @@ function Arrange({
     }
     return (
         <Box>
-            <Typography variant="h5" fontSize="1rem" mb={1}>
-                {t('myApp.flow')}
-            </Typography>
             {config?.steps?.map((item: any, index: number) => (
                 <div key={item?.field}>
                     {index !== 0 && (
@@ -247,19 +244,24 @@ function Arrange({
                                         ) : (
                                             <div className="flex items-center">
                                                 <div className="max-w-[500px] text-xs text-black/50 line-clamp-1">{item.description}</div>
-                                                <Tooltip placement="top" title={'编辑步骤描述'}>
-                                                    <IconButton
-                                                        onClick={(e) => {
-                                                            const newList = _.cloneDeep(descStatus);
-                                                            newList[index] = true;
-                                                            setDescStatus(newList);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        <BorderColor fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
+                                                {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                    item?.flowStep?.handler !== 'VariableActionHandler' &&
+                                                    item?.flowStep?.handler !== 'AssembleActionHandler' &&
+                                                    item?.flowStep?.handler !== 'PosterActionHandler' && (
+                                                        <Tooltip placement="top" title={'编辑步骤描述'}>
+                                                            <IconButton
+                                                                onClick={(e) => {
+                                                                    const newList = _.cloneDeep(descStatus);
+                                                                    newList[index] = true;
+                                                                    setDescStatus(newList);
+                                                                    e.stopPropagation();
+                                                                }}
+                                                                size="small"
+                                                            >
+                                                                <BorderColor fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    )}
                                             </div>
                                         )}
                                     </div>
@@ -275,7 +277,9 @@ function Arrange({
                                                         key: '1',
                                                         label: ' 向上',
                                                         disabled:
-                                                            index === 1 ||
+                                                            index === 0 ||
+                                                            item?.flowStep.handler === 'VariableActionHandler' ||
+                                                            config?.steps[index - 1]?.flowStep.handler === 'MaterialActionHandler' ||
                                                             config?.steps[index - 1]?.flowStep.handler === 'VariableActionHandler',
                                                         icon: <VerticalAlignTopOutlined rev={undefined} />
                                                     },
@@ -283,7 +287,8 @@ function Arrange({
                                                         key: '2',
                                                         label: ' 向下',
                                                         disabled:
-                                                            config?.steps?.length - 3 === index ||
+                                                            config?.steps?.length - 1 === index ||
+                                                            config?.steps[index + 1]?.flowStep.handler === 'AssembleActionHandler' ||
                                                             item.flowStep.handler === 'VariableActionHandler',
 
                                                         icon: <VerticalAlignBottomOutlined rev={undefined} />
@@ -360,9 +365,11 @@ function Arrange({
                             />
                         </AccordionDetails>
                     </Accordion>
-                    {(index !== 0 || config?.steps[1]?.flowStep.handler !== 'VariableActionHandler') &&
-                        config?.steps?.length - 1 !== index &&
-                        config?.steps?.length - 2 !== index && (
+                    {(item?.flowStep.handler === 'OpenAIChatActionHandler' ||
+                        index !== 0 ||
+                        config?.steps[1]?.flowStep.handler !== 'VariableActionHandler') &&
+                        item?.flowStep.handler !== 'AssembleActionHandler' &&
+                        item?.flowStep.handler !== 'PosterActionHandler' && (
                             <>
                                 <div className="flex justify-center my-4">
                                     <div className="h-[20px] w-[2px] bg-black/80"></div>

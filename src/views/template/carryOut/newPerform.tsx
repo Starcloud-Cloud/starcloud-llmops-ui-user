@@ -218,7 +218,8 @@ function Perform({
                                     </Box>
                                     {item.variable?.variables?.map(
                                         (el: any, i: number) =>
-                                            el.isShow && (
+                                            el.isShow &&
+                                            el?.style && (
                                                 <MarketForm
                                                     details={details}
                                                     item={el}

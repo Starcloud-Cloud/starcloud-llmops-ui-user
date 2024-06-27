@@ -11,7 +11,7 @@ import {
     MenuItem,
     Typography
 } from '@mui/material';
-import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented, Spin } from 'antd';
+import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Spin, Alert } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline, KeyboardBackspace } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -1174,6 +1174,12 @@ function CreateDetail() {
                     </Tabs.TabPane>
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
+                            <Alert
+                                className="mb-4"
+                                message="修改流程后，可直接在 ”运行应用“ 处进行测试，验证流程是否符合需求"
+                                type="warning"
+                                closable
+                            />
                             <div
                                 className="flex justify-center"
                                 style={{

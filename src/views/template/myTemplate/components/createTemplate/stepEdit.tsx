@@ -9,6 +9,7 @@ import CreateVariable from 'views/pages/copywriting/components/spliceCmponents/v
 import NewPrompt from './newPrompt';
 import { useState, useMemo } from 'react';
 import _ from 'lodash-es';
+import useUserStore from 'store/user';
 const StepEdit = ({
     detail,
     variableStyle, //变量类型
@@ -40,6 +41,7 @@ const StepEdit = ({
     resType: string;
     resJsonSchema: string;
 }) => {
+    const permissions = useUserStore((state) => state.permissions);
     const { TextArea } = Input;
     const columns: TableProps<any>['columns'] = [
         {
@@ -146,7 +148,7 @@ const StepEdit = ({
     const materialTypeStatus = useMemo(() => {
         if (handler === 'MaterialActionHandler') {
             const newList = variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value;
-            return JSON.parse(newList)?.length === 1 ? true : false;
+            return JSON.parse(newList)?.length === 1 && JSON.parse(newList)[0]?.type === 'image' ? true : false;
         } else {
             return false;
         }
@@ -175,7 +177,7 @@ const StepEdit = ({
                         </div>
                     </Tabs.TabPane>
                 )}
-                {handler === 'PosterActionHandler' && (
+                {handler === 'PosterActionHandler' && permissions.includes('app:step:image:system:style:config') && (
                     <Tabs.TabPane tab="系统风格模版配置" key="1">
                         <div className="relative">
                             <CreateTab
@@ -216,39 +218,26 @@ const StepEdit = ({
                 )}
                 {handler !== 'VariableActionHandler' && (
                     <Tabs.TabPane tab="变量" key="3">
-                        {handler !== 'MaterialActionHandler' &&
-                            handler !== 'AssembleActionHandler' &&
-                            handler !== 'PosterActionHandler' && (
-                                <div className="flex justify-end items-center mb-4">
-                                    <div className="flex gap-2">
-                                        <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
-                                            <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
-                                        </Tooltip>
-                                        <Button
-                                            size="small"
-                                            type="primary"
-                                            onClick={() => {
-                                                setOpen(true);
-                                                setTitle('新增');
-                                            }}
-                                        >
-                                            新增
-                                        </Button>
-                                    </div>
+                        {handler === 'OpenAIChatActionHandler' && (
+                            <div className="flex justify-end items-center mb-4">
+                                <div className="flex gap-2">
+                                    <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
+                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                    </Tooltip>
+                                    <Button
+                                        size="small"
+                                        type="primary"
+                                        onClick={() => {
+                                            setOpen(true);
+                                            setTitle('新增');
+                                        }}
+                                    >
+                                        新增
+                                    </Button>
                                 </div>
-                            )}
-                        <Table
-                            rowKey={(record: any) => record.field}
-                            columns={
-                                handler !== 'MaterialActionHandler' &&
-                                handler !== 'AssembleActionHandler' &&
-                                handler !== 'PosterActionHandler'
-                                    ? columns
-                                    : columns?.splice(0, columns?.length - 2)
-                            }
-                            dataSource={variable}
-                            pagination={false}
-                        />
+                            </div>
+                        )}
+                        <Table rowKey={(record: any) => record.field} columns={columns} dataSource={variable} pagination={false} />
                     </Tabs.TabPane>
                 )}
                 {handler !== 'MaterialActionHandler' && handler !== 'VariableActionHandler' && handler !== 'AssembleActionHandler' && (

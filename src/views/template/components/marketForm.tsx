@@ -1,6 +1,6 @@
 import { TextField, MenuItem, FormControl, Autocomplete, Chip } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
-import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Collapse } from 'antd';
+import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Select } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { t } from 'i18next';
 import _ from 'lodash-es';
@@ -26,7 +26,9 @@ function FormExecute({
     setTitle,
     setStep,
     setMaterialType,
-    history
+    history,
+    materialValue,
+    materialList
 }: any) {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -188,6 +190,8 @@ function FormExecute({
         }
         onChange({ name: item?.field, value: values });
     };
+    console.log(materialValue, materialList);
+
     return (
         <>
             {(handlerCode !== 'OpenAIChatActionHandler' && item.style === 'TEXTAREA') ||
@@ -459,8 +463,17 @@ function FormExecute({
                 </div>
             ) : (
                 <div className="mt-4">
-                    <div className="w-full flex justify-between">
-                        <div>
+                    <div className="w-full flex justify-between items-center mb-2">
+                        <Select
+                            placeholder="选择素材类型"
+                            onChange={(e) => {
+                                setMaterialType(e);
+                            }}
+                            className="w-[200px]"
+                            value={materialValue}
+                            options={materialList}
+                        />
+                        {/* <div>
                             {handlerCode === 'MaterialActionHandler' && (
                                 <Button
                                     disabled={history}
@@ -474,7 +487,7 @@ function FormExecute({
                                     批量导入
                                 </Button>
                             )}
-                        </div>
+                        </div> */}
                         {handlerCode !== 'ImitateActionHandler' && (
                             <Button
                                 disabled={history}
@@ -534,7 +547,8 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
         JSON.stringify(prevProps?.columns) === JSON.stringify(nextProps?.columns) &&
         JSON.stringify(prevProps?.model) === JSON.stringify(nextProps?.model) &&
         JSON.stringify(prevProps?.details) === JSON.stringify(nextProps?.details) &&
-        JSON.stringify(prevProps?.stepCode) === JSON.stringify(nextProps?.stepCode)
+        JSON.stringify(prevProps?.stepCode) === JSON.stringify(nextProps?.stepCode) &&
+        JSON.stringify(prevProps?.materialValue) === JSON.stringify(nextProps?.materialValue)
     );
 };
 export default memo(FormExecute, arePropsEqual);

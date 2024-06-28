@@ -2073,6 +2073,16 @@ const Lefts = ({
                                                                         appData?.configuration?.appInformation ||
                                                                         appData?.executeParam?.appInformation
                                                                     }
+                                                                    materialList={
+                                                                        item?.variable?.variables?.find(
+                                                                            (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                        )?.options || []
+                                                                    }
+                                                                    materialValue={
+                                                                        item?.variable?.variables?.find(
+                                                                            (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                        )?.value
+                                                                    }
                                                                     stepCode={item?.field}
                                                                     model={''}
                                                                     handlerCode={item?.flowStep?.handler}
@@ -2085,12 +2095,30 @@ const Lefts = ({
                                                                         setStep(stepRef.current);
                                                                     }}
                                                                     columns={stepMaterial[index]}
-                                                                    setMaterialType={() => {
-                                                                        setMaterialTypes(
-                                                                            item?.variable?.variables?.find(
-                                                                                (i: any) => i.field === 'MATERIAL_TYPE'
-                                                                            )?.value
-                                                                        );
+                                                                    setMaterialType={(e: any) => {
+                                                                        if (e) {
+                                                                            setMaterialTypes(e);
+                                                                            const newList = _.cloneDeep(generRef.current);
+                                                                            newList[index].variable.variables.find(
+                                                                                (dt: any) => dt.field === 'MATERIAL_TYPE'
+                                                                            ).value = e;
+                                                                            generRef.current = newList;
+                                                                            setGenerateList(generRef.current);
+                                                                            newList[index].variable.variables[
+                                                                                item.variable.variables?.findIndex(
+                                                                                    (item: any) => item.style === 'MATERIAL'
+                                                                                )
+                                                                            ].value = [];
+                                                                            stepRef.current = index;
+                                                                            setStep(stepRef.current);
+                                                                            setTableDatas(e, index);
+                                                                        } else {
+                                                                            setMaterialTypes(
+                                                                                item?.variable?.variables?.find(
+                                                                                    (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                                )?.value
+                                                                            );
+                                                                        }
                                                                     }}
                                                                     onChange={(e: any) => {
                                                                         const newList = _.cloneDeep(generRef.current);

@@ -253,42 +253,48 @@ const StepEdit = ({
                         <Table rowKey={(record: any) => record.field} columns={columns} dataSource={variable} pagination={false} />
                     </Tabs.TabPane>
                 )}
-                {handler !== 'MaterialActionHandler' && handler !== 'VariableActionHandler' && handler !== 'AssembleActionHandler' && (
-                    <Tabs.TabPane tab="提示词" key="4">
-                        {variables?.map(
-                            (item, i) =>
-                                item?.field === 'prompt' && (
-                                    <NewPrompt
-                                        key={item.field}
-                                        el={item}
-                                        handler={handler}
-                                        variable={variable}
-                                        fields={fields}
-                                        index={index}
-                                        i={i}
-                                        variables={variables}
-                                        basisChange={basisChange}
-                                    />
-                                )
-                        )}
-                    </Tabs.TabPane>
-                )}
-                {handler !== 'MaterialActionHandler' && handler !== 'VariableActionHandler' && handler !== 'AssembleActionHandler' && (
-                    <Tabs.TabPane tab="大模型" key="5">
-                        {variables?.map(
-                            (item, i) =>
-                                item.field !== 'prompt' &&
-                                item.field !== 'n' &&
-                                item.field !== 'SYSTEM_POSTER_STYLE_CONFIG' && (
-                                    <FormExecute
-                                        key={item?.field}
-                                        item={item}
-                                        onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
-                                    />
-                                )
-                        )}
-                    </Tabs.TabPane>
-                )}
+                {handler !== 'MaterialActionHandler' &&
+                    handler !== 'VariableActionHandler' &&
+                    handler !== 'AssembleActionHandler' &&
+                    handler !== 'XhsParseActionHandler' && (
+                        <Tabs.TabPane tab="提示词" key="4">
+                            {variables?.map(
+                                (item, i) =>
+                                    item?.field === 'prompt' && (
+                                        <NewPrompt
+                                            key={item.field}
+                                            el={item}
+                                            handler={handler}
+                                            variable={variable}
+                                            fields={fields}
+                                            index={index}
+                                            i={i}
+                                            variables={variables}
+                                            basisChange={basisChange}
+                                        />
+                                    )
+                            )}
+                        </Tabs.TabPane>
+                    )}
+                {handler !== 'MaterialActionHandler' &&
+                    handler !== 'VariableActionHandler' &&
+                    handler !== 'AssembleActionHandler' &&
+                    handler !== 'XhsParseActionHandler' && (
+                        <Tabs.TabPane tab="大模型" key="5">
+                            {variables?.map(
+                                (item, i) =>
+                                    item.field !== 'prompt' &&
+                                    item.field !== 'n' &&
+                                    item.field !== 'SYSTEM_POSTER_STYLE_CONFIG' && (
+                                        <FormExecute
+                                            key={item?.field}
+                                            item={item}
+                                            onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
+                                        />
+                                    )
+                            )}
+                        </Tabs.TabPane>
+                    )}
                 {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && (
                     <Tabs.TabPane tab="返回结果" key="6">
                         <FormControl fullWidth>

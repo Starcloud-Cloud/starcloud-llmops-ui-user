@@ -611,8 +611,6 @@ function CreateDetail() {
             ];
             newList.workflowConfig.steps = arr?.filter((item: any) => item);
         }
-        console.log(JSON.parse(newList.workflowConfig?.steps[3].flowStep.variable.variables[4].value));
-
         if (newList.name && newList.category) {
             if (searchParams.get('uid')) {
                 appModify(newList).then((res) => {

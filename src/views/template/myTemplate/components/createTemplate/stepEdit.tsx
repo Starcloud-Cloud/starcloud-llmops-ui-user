@@ -229,7 +229,7 @@ const StepEdit = ({
                         />
                     </Tabs.TabPane>
                 )}
-                {handler !== 'VariableActionHandler' && (
+                {handler !== 'VariableActionHandler' && handler !== 'PosterActionHandler' && (
                     <Tabs.TabPane tab="变量" key="3">
                         {handler === 'OpenAIChatActionHandler' && (
                             <div className="flex justify-end items-center mb-4">
@@ -289,7 +289,7 @@ const StepEdit = ({
                         )}
                     </Tabs.TabPane>
                 )}
-                {handler !== 'VariableActionHandler' && (
+                {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && (
                     <Tabs.TabPane tab="返回结果" key="6">
                         <FormControl fullWidth>
                             <InputLabel color="secondary" id="responent">

@@ -346,8 +346,7 @@ const BatcSmallRedBooks = forwardRef(
                 <div
                     className="flex gap-[20px]"
                     style={{
-                        height: detail ? '100%' : 'calc(100% - 58px)',
-                        marginTop: detail ? 0 : '16px'
+                        height: detail ? '100%' : 'calc(100% - 58px)'
                     }}
                 >
                     <div

@@ -1024,6 +1024,7 @@ function CreateDetail() {
                 sx={{ padding: 2 }}
                 avatar={
                     <Buttons
+                        sx={{ zIndex: 10 }}
                         variant="contained"
                         startIcon={<ArrowBack />}
                         color="secondary"
@@ -1042,6 +1043,7 @@ function CreateDetail() {
                                 aria-controls={delOpen ? 'long-menu' : undefined}
                                 aria-expanded={delOpen ? 'true' : undefined}
                                 aria-haspopup="true"
+                                sx={{ zIndex: 10 }}
                                 onClick={(e) => {
                                     setDelAnchorEl(e.currentTarget);
                                 }}
@@ -1108,14 +1110,14 @@ function CreateDetail() {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                        <Buttons variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
+                        <Buttons sx={{ zIndex: 10 }} variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
                             {t('myApp.save')}
                         </Buttons>
                     </>
                 }
             ></CardHeader>
             <Divider />
-            <div className="w-full px-4 absolute top-[24px]">
+            <div className="w-full absolute top-[24px]">
                 <Tabs
                     activeKey={value}
                     centered={true}
@@ -1189,35 +1191,37 @@ function CreateDetail() {
                     </Tabs.TabPane>
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
-                            <Alert
-                                className="mb-4"
-                                message="修改流程后，可直接在 ”运行应用“ 处进行测试，验证流程是否符合需求"
-                                type="warning"
-                                closable
-                            />
                             <div
-                                className="flex justify-center"
+                                className="h-full"
                                 style={{
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
                                     backgroundRepeat: 'repeat'
                                 }}
                             >
-                                <div className={`xl:w-[80%] lg:w-full`}>
-                                    <Arrange
-                                        detail={detail}
-                                        config={detail?.workflowConfig}
-                                        variableStyle={appModels?.variableStyle}
-                                        editChange={editChange}
-                                        basisChange={basisChange}
-                                        statusChange={statusChange}
-                                        changeConfigs={changeConfigs}
-                                        getTableData={getTableData}
-                                        tableCopy={tableCopy}
-                                        tableDataDel={tableDataDel}
-                                        tableDataMove={tableDataMove}
-                                        saveImageStyle={saveImageStyle}
-                                    />
+                                <Alert
+                                    className="mb-4 mx-4"
+                                    message="修改流程后，可直接在 ”运行应用“ 处进行测试，验证流程是否符合需求"
+                                    type="warning"
+                                    closable
+                                />
+                                <div className="flex justify-center">
+                                    <div className={`xl:w-[80%] lg:w-full`}>
+                                        <Arrange
+                                            detail={detail}
+                                            config={detail?.workflowConfig}
+                                            variableStyle={appModels?.variableStyle}
+                                            editChange={editChange}
+                                            basisChange={basisChange}
+                                            statusChange={statusChange}
+                                            changeConfigs={changeConfigs}
+                                            getTableData={getTableData}
+                                            tableCopy={tableCopy}
+                                            tableDataDel={tableDataDel}
+                                            tableDataMove={tableDataMove}
+                                            saveImageStyle={saveImageStyle}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </Tabs.TabPane>
@@ -1286,17 +1290,21 @@ function CreateDetail() {
                     )}
                     {detailRef.current?.uid && searchParams.get('uid') && permissions.includes('app:analyze') && (
                         <Tabs.TabPane tab="应用分析" key="2">
-                            <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
+                            <div className="px-4">
+                                <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
+                            </div>
                         </Tabs.TabPane>
                     )}
                     {searchParams.get('uid') && permissions.includes('app:publish') && (
                         <Tabs.TabPane tab="应用发布" key="3">
-                            <Upload
-                                appUid={searchParams.get('uid') as string}
-                                saveState={saveState}
-                                saveDetail={saveDetail}
-                                getStatus={getStatus}
-                            />
+                            <div className="px-4">
+                                <Upload
+                                    appUid={searchParams.get('uid') as string}
+                                    saveState={saveState}
+                                    saveDetail={saveDetail}
+                                    getStatus={getStatus}
+                                />
+                            </div>
                         </Tabs.TabPane>
                     )}
                 </Tabs>

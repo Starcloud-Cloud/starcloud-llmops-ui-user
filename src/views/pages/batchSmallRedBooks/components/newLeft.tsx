@@ -1912,7 +1912,6 @@ const Lefts = ({
                                     </IconButton> */}
                                 </div>
                                 <div>
-                                    {materialStatus}
                                     {materialStatus === 'picture' ? (
                                         <>
                                             <div className="text-[12px] font-[500] flex items-center justify-between">

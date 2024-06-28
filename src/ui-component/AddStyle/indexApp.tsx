@@ -40,7 +40,19 @@ import { openSnackbar } from 'store/slices/snackbar';
 
 const AddStyleApp = React.forwardRef(
     (
-        { selectImgLoading, record, details, appUid, mode = 1, materialType, getList, hasAddStyle = true, setImageVar, allData }: any,
+        {
+            selectImgLoading,
+            record,
+            materialStatus,
+            details,
+            appUid,
+            mode = 1,
+            materialType,
+            getList,
+            hasAddStyle = true,
+            setImageVar,
+            allData
+        }: any,
         ref: any
     ) => {
         const [visible, setVisible] = useState(false);
@@ -1390,6 +1402,7 @@ const AddStyleApp = React.forwardRef(
                                 appReqVO: details,
                                 materialType
                             }}
+                            materialStatus={materialStatus}
                             canEdit={!switchCheck}
                             setDetailData={(data: any) => {
                                 const copyCurrentStyle = { ...currentStyle };

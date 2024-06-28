@@ -1007,6 +1007,7 @@ const AddStyle = React.forwardRef(
                             schemaList={[]}
                             imageStyleData={currentStyle?.templateList || []}
                             typeList={[]}
+                            materialStatus={materialStatus}
                             appData={{
                                 appUid,
                                 appReqVO: details,

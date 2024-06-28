@@ -190,8 +190,6 @@ function FormExecute({
         }
         onChange({ name: item?.field, value: values });
     };
-    console.log(materialValue, materialList);
-
     return (
         <>
             {(handlerCode !== 'OpenAIChatActionHandler' && item.style === 'TEXTAREA') ||
@@ -464,15 +462,20 @@ function FormExecute({
             ) : (
                 <div className="mt-4">
                     <div className="w-full flex justify-between items-center mb-2">
-                        <Select
-                            placeholder="选择素材类型"
-                            onChange={(e) => {
-                                setMaterialType(e);
-                            }}
-                            className="w-[200px]"
-                            value={materialValue}
-                            options={materialList}
-                        />
+                        <div className="relative">
+                            <Select
+                                placeholder="选择素材类型"
+                                onChange={(e) => {
+                                    setMaterialType(e);
+                                }}
+                                className="w-[150px] h-[25px]"
+                                value={materialValue}
+                                options={materialList}
+                            />
+                            <span className="z-[100] block bg-[#fff] px-[5px] absolute top-[-9px] left-2 text-[10px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                素材类型
+                            </span>
+                        </div>
                         {/* <div>
                             {handlerCode === 'MaterialActionHandler' && (
                                 <Button

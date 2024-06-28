@@ -1912,6 +1912,7 @@ const Lefts = ({
                                     </IconButton> */}
                                 </div>
                                 <div>
+                                    {materialStatus}
                                     {materialStatus === 'picture' ? (
                                         <>
                                             <div className="text-[12px] font-[500] flex items-center justify-between">
@@ -2223,6 +2224,7 @@ const Lefts = ({
                                 {detail ? (
                                     <AddStyle
                                         selectImgLoading={selectImgLoading}
+                                        materialStatus={materialStatus}
                                         saveTemplate={saveTemplate}
                                         details={appData?.configuration?.appInformation}
                                         hasAddStyle={detail || !detailShow ? false : true}
@@ -2232,12 +2234,12 @@ const Lefts = ({
                                         record={imageMater}
                                         getList={() => getList(true)}
                                         materialType={materialType}
-                                        materialStatus={materialStatus}
                                     />
                                 ) : (
                                     <AddStyleApp
                                         selectImgLoading={selectImgLoading}
                                         allData={appData}
+                                        materialStatus={materialStatus}
                                         details={appData?.configuration?.appInformation}
                                         hasAddStyle={detail || !detailShow ? false : true}
                                         setImageVar={setImageVar}
@@ -2265,6 +2267,7 @@ const Lefts = ({
                                 <AddStyle
                                     canAddCustomStyle={false}
                                     details={appData?.configuration?.appInformation}
+                                    materialStatus={materialStatus}
                                     // hasAddStyle={true}
                                     hasAddStyle={false}
                                     setImageVar={setImageVar}

@@ -1190,7 +1190,7 @@ function CreateDetail() {
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
-                                className="h-full"
+                                className="h-[calc(100vh-190px)] mt-[-16px] overflow-hidden"
                                 style={{
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
@@ -1198,13 +1198,13 @@ function CreateDetail() {
                                 }}
                             >
                                 <Alert
-                                    className="mb-4 mx-4"
+                                    className="my-4 mx-4"
                                     message="修改流程后，可直接在 ”运行应用“ 处进行测试，验证流程是否符合需求"
                                     type="warning"
                                     closable
                                 />
                                 <div className="flex justify-center">
-                                    <div className={`xl:w-[80%] lg:w-full`}>
+                                    <div className={`xl:w-[80%] lg:w-full pb-4`}>
                                         <Arrange
                                             detail={detail}
                                             config={detail?.workflowConfig}
@@ -1229,7 +1229,7 @@ function CreateDetail() {
                             <div className="w-full">
                                 {detail?.type === 'MEDIA_MATRIX' ? (
                                     <Spin spinning={viewLoading} tip="Loading">
-                                        <div className="h-[calc(100vh-266px)] bg-[rgb(244,246,248)]">
+                                        <div className="h-[calc(100vh-220px)] bg-[rgb(244,246,248)]">
                                             <CreatePlan
                                                 ref={createPlanRef}
                                                 imageStylePre={imageStylePre}

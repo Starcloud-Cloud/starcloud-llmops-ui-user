@@ -238,7 +238,8 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.mode) === JSON.stringify(nextProps?.mode) &&
         JSON.stringify(prevProps?.imageStyleData) === JSON.stringify(nextProps?.imageStyleData) &&
-        JSON.stringify(prevProps?.focuActive) === JSON.stringify(nextProps?.focuActive)
+        JSON.stringify(prevProps?.focuActive) === JSON.stringify(nextProps?.focuActive) &&
+        JSON.stringify(prevProps?.materialStatus) === JSON.stringify(nextProps?.materialStatus)
     );
 };
 export default memo(CreateTab, arePropsEqual);

@@ -2308,7 +2308,12 @@ const Lefts = ({
                         )}
                     </Tabs>
                 </div>
-                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">
+                <div
+                    style={{
+                        marginBottom: '16px'
+                    }}
+                    className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]"
+                >
                     {detailShow && (
                         <>
                             <Button

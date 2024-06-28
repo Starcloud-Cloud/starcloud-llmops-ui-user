@@ -1190,13 +1190,14 @@ function CreateDetail() {
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
-                                className="h-[calc(100vh-190px)] mt-[-16px] overflow-hidden"
+                                className="h-[calc(100vh-190px)] mt-[-16px]"
                                 style={{
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
                                     backgroundRepeat: 'repeat'
                                 }}
                             >
+                                <div className="h-[16px]"></div>
                                 <Alert
                                     className="my-4 mx-4"
                                     message="修改流程后，可直接在 ”运行应用“ 处进行测试，验证流程是否符合需求"

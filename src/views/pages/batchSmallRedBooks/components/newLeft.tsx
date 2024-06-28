@@ -847,7 +847,6 @@ const Lefts = ({
                 result?.configuration?.imageStyleList ||
                 newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
         }
-        imageRef.current = newImage;
         setImagMater(newImage);
         setTableLoading(false);
         if (isimgStyle) {
@@ -1244,6 +1243,13 @@ const Lefts = ({
             if (typeof styleData === 'string') {
                 styleData = JSON.parse(styleData);
             }
+            console.log(imageRef.current);
+            console.log(
+                appRef.current.configuration.appInformation.workflowConfig.steps?.find(
+                    (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                )
+            );
+
             const data = {
                 uid: appRef.current?.uid,
                 totalCount,

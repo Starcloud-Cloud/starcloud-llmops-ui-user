@@ -19,10 +19,9 @@ import {
     Badge,
     theme,
     Tooltip,
-    Popover,
-    Dropdown,
-    Switch
+    Radio
 } from 'antd';
+import type { RadioChangeEvent } from 'antd';
 import { AccordionDetails, AccordionSummary, Accordion, IconButton } from '@mui/material';
 import { ExpandMore, AddCircleSharp, South, MoreVert } from '@mui/icons-material';
 import {
@@ -483,10 +482,19 @@ const Lefts = ({
                 if (result?.complete) {
                     setTableLoading(false);
                     clearInterval(timer.current);
-                    tableRef.current = result?.materialList?.map((item: any) => ({
-                        ...item,
-                        uuid: uuidv4()
-                    }));
+                    tableRef.current =
+                        radioType === 2
+                            ? result?.materialList?.map((item: any) => ({
+                                  ...item,
+                                  uuid: uuidv4()
+                              }))
+                            : [
+                                  ...result?.materialList?.map((item: any) => ({
+                                      ...item,
+                                      uuid: uuidv4()
+                                  })),
+                                  ...tableRef.current
+                              ];
                     setTableData(tableRef.current);
                     if (!detail) {
                         handleSaveClick(false);
@@ -1787,6 +1795,8 @@ const Lefts = ({
             getList(true, false, true);
         }
     }, [imageStylePre]);
+    //批量上传选择
+    const [radioType, setRadioType] = useState(1);
     return (
         <>
             <div className="relative h-full">
@@ -2410,12 +2420,18 @@ const Lefts = ({
             )}
             <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
                 <p>
-                    支持以 XLS 文件形式批量导入页面元素，导入文件将自动刷新列表页。
+                    支持以 XLS 文件形式批量导入数据，导入文件将自动刷新素材列表。
                     <span className="text-[#673ab7] cursor-pointer" onClick={handleDownLoad}>
                         下载导入 XLS 模板
                     </span>
                 </p>
-                <div className="flex justify-center mt-[20px]">
+                <div className="my-4 flex justify-center">
+                    <Radio.Group onChange={(e) => setRadioType(e.target.value)} value={radioType}>
+                        <Radio value={1}>累加数据</Radio>
+                        <Radio value={2}>覆盖已有数据</Radio>
+                    </Radio.Group>
+                </div>
+                <div className="flex justify-center">
                     <div className="flex flex-col items-center">
                         <Upload {...props1}>
                             <Button type="primary">上传 ZIP</Button>

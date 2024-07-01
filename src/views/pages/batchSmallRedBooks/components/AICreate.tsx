@@ -8,6 +8,7 @@ import _ from 'lodash-es';
 import { ExclamationCircleFilled, ClockCircleOutlined } from '@ant-design/icons';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import dayjs from 'dayjs';
+import './aiCreate.css';
 const { confirm } = Modal;
 
 const AiCreate = ({
@@ -89,21 +90,33 @@ const AiCreate = ({
     const [errorCount, setErrorCount] = useState(0);
     const errorMessageRef = useRef<any[]>([]);
     const [errorMessage, setErrorMessage] = useState<any[]>([]);
+    const retryNumRef = useRef(0);
+    const [retryNum, setRetryNum] = useState(0);
+    const retryListRef = useRef<any[]>([]);
+    const [retryList, setRetryList] = useState<any[]>([]);
     const materialPre = useMemo(() => {
         return ((successCountRef.current / totalCountRef.current) * 100) | 0;
     }, [successCount, totalCount]);
     const aref = useRef(false);
-    const handleMaterial = async (num: number) => {
-        materialzanListRef.current = [];
-        setMaterialzanList(materialzanListRef.current);
-        uuidListsRef.current = [];
-        setUuidLists(uuidListsRef.current);
+    const handleMaterial = async (num: number, retry?: boolean) => {
+        if (!retry) {
+            materialzanListRef.current = [];
+            setMaterialzanList(materialzanListRef.current);
+            uuidListsRef.current = [];
+            setUuidLists(uuidListsRef.current);
+        }
         aref.current = false;
         setMaterialExecutionOpen(true);
         //记录原有数据下标
         const indexList: any[] = [];
         let theStaging = _.cloneDeep(tableData);
-        if (num === 1) {
+        if (retry) {
+            tableData?.map((item, index) => {
+                if (retryListRef.current?.find((el) => el.uuid === item.uuid)) {
+                    indexList.push(index);
+                }
+            });
+        } else if (num === 1) {
             tableData?.map((item, index) => {
                 if (selList?.find((el) => el.uuid === item.uuid)) {
                     indexList.push(index);
@@ -114,12 +127,17 @@ const AiCreate = ({
                 indexList.push(index);
             });
         }
-        totalCountRef.current = num === 1 ? selList.length : tableData.length;
-        setTotalCount(totalCountRef.current);
+        if (!retry) {
+            totalCountRef.current = num === 1 ? selList.length : tableData.length;
+            setTotalCount(totalCountRef.current);
+        }
         let index = 0;
-        const chunks = chunkArray(num === 1 ? selList : tableData, 3);
+        const chunks = chunkArray(retry ? retryListRef.current : num === 1 ? selList : tableData, 3);
+        retryListRef.current = [];
+        setRetryList(retryListRef.current);
         while (index < chunks.length && !aref.current) {
             const resArr: any[] = [];
+            const newResArr: any[] = [];
             const uuidList: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             // try {
@@ -135,21 +153,31 @@ const AiCreate = ({
                             ...fieldCompletionData
                         });
                         if (!aref.current) {
-                            if (res?.length === group?.length) {
-                                resArr[index + i] = res;
-                            } else if (res?.length !== group?.length && res.length === 1) {
-                                resArr[index + i] = [...res, {}, {}];
-                            } else if (res?.length !== group?.length && res.length === 2) {
-                                resArr[index + i] = [...res, {}];
-                            } else {
-                                resArr[index + i] = res;
-                            }
+                            newResArr.push(
+                                ...group.map((dt, t) => ({
+                                    ...dt,
+                                    ...(res[t] ? res[t] : {})
+                                }))
+                            );
+                            // if (res?.length === group?.length) {
+                            //     resArr[index + i] = res;
+                            // } else if (res?.length !== group?.length && res.length === 1) {
+                            //     resArr[index + i] = [...res, {}, {}];
+                            // } else if (res?.length !== group?.length && res.length === 2) {
+                            //     resArr[index + i] = [...res, {}];
+                            // } else {
+                            //     resArr[index + i] = res;
+                            // }
                             executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
                             setExecutionCount(executionCountRef.current);
                             setSuccessCount(successCountRef.current);
                         }
                     } catch (error: any) {
+                        const newRetry = _.cloneDeep(retryListRef.current);
+                        newRetry.push(...group);
+                        retryListRef.current = newRetry;
+                        setRetryList(retryListRef.current);
                         group?.map((item) => {
                             if (!resArr[index + i]) {
                                 resArr[index + i] = [{}];
@@ -173,30 +201,34 @@ const AiCreate = ({
                 })
             );
             if (!aref.current) {
-                let newList = _.cloneDeep(theStaging);
                 const newArr = _.cloneDeep(materialzanListRef.current);
                 console.log(newArr, currentBatch, resArr);
-                for (let i = 0; i < currentBatch.flat().length; i++) {
-                    const obj: any = {};
-                    resArr.flat()[i] &&
-                        Object.keys(resArr.flat()[i]).map((item) => {
-                            obj[item] = resArr.flat()[i][item];
-                        });
-                    newArr.push(obj);
-                    uuidList.push(newList[indexList[i + index * 3]]?.uuid);
-                    newList[indexList[i + index * 3]] = {
-                        ...newList[indexList[i + index * 3]],
-                        ...obj
-                    };
-                }
-                materialzanListRef.current = newArr;
+                // for (let i = 0; i < currentBatch.flat().length; i++) {
+                //     const obj: any = {};
+                //     resArr.flat()[i] &&
+                //         Object.keys(resArr.flat()[i]).map((item) => {
+                //             obj[item] = resArr.flat()[i][item];
+                //         });
+                //     newArr.push(obj);
+                //     uuidList.push(newList[indexList[i + index * 3]]?.uuid);
+                //     newList[indexList[i + index * 3]] = {
+                //         ...newList[indexList[i + index * 3]],
+                //         ...obj
+                //     };
+                // }
+                const updatedMaterialzanList = [...materialzanListRef.current, ...newResArr];
+                materialzanListRef.current = updatedMaterialzanList;
                 setMaterialzanList(materialzanListRef.current);
-                const newL = _.cloneDeep(uuidListsRef.current);
-                newL?.push(...uuidList);
-                uuidListsRef.current = newL;
+                uuidListsRef.current = materialzanListRef.current?.map((item) => item.uuid);
                 setUuidLists(uuidListsRef.current);
-                theStaging = _.cloneDeep(newList);
-                materialFieldexeDataRef.current = theStaging;
+                materialFieldexeDataRef.current = theStaging?.map((item) => {
+                    const arrinclude = materialzanListRef.current.find((el) => el.uuid === item.uuid);
+                    if (arrinclude) {
+                        return arrinclude;
+                    } else {
+                        return item;
+                    }
+                });
                 index += 3;
             }
         }
@@ -209,17 +241,29 @@ const AiCreate = ({
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
 
     //素材预览
-    const getTextStream = async () => {
-        materialzanListRef.current = [];
-        setMaterialzanList(materialzanListRef.current);
-        uuidListsRef.current = [];
-        setUuidLists(uuidListsRef.current);
+    const getTextStream = async (retry?: boolean) => {
+        if (!retry) {
+            materialzanListRef.current = [];
+            setMaterialzanList(materialzanListRef.current);
+            uuidListsRef.current = [];
+            setUuidLists(uuidListsRef.current);
+        }
         aref.current = false;
         setMaterialExecutionOpen(true);
-        const i = Array.from({ length: variableData.generateCount * variableData.groupNum }, (_, index) => index);
-        totalCountRef.current = i?.length;
-        setTotalCount(totalCountRef.current);
-        const chunks = chunkArray(i, variableData.generateCount);
+        let chunks;
+        if (!retry) {
+            const i = Array.from({ length: variableData.generateCount * variableData.groupNum }, (_, index) => index);
+            totalCountRef.current = i?.length;
+            setTotalCount(totalCountRef.current);
+            chunks = chunkArray(i, variableData.generateCount);
+        } else {
+            chunks = chunkArray(
+                Array.from({ length: retryNumRef.current }, (_, index) => index),
+                variableData.generateCount
+            );
+        }
+        retryNumRef.current = 0;
+        setRetryNum(retryNumRef.current);
         let index = 0;
         // let theStaging = _.cloneDeep(tableData);
         while (index < chunks?.length && !aref.current) {
@@ -248,6 +292,10 @@ const AiCreate = ({
                         console.log(error);
                         const newList = _.cloneDeep(errorMessageRef.current);
                         newList.push(error.msg);
+                        let newretryNum = _.cloneDeep(retryNumRef.current);
+                        newretryNum += 1;
+                        retryNumRef.current = newretryNum;
+                        setRetryNum(retryNumRef.current);
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
@@ -293,7 +341,7 @@ const AiCreate = ({
     }, [materialExecutionOpen]);
 
     //AI 素材生成
-    const aimaterialCreate = () => {
+    const aimaterialCreate = (retry?: boolean) => {
         setSelectValue('batch');
         if (variableData.checkedFieldList?.length === 0) {
             dispatch(
@@ -314,10 +362,10 @@ const AiCreate = ({
             setrequirementStatusOpen(true);
             return false;
         }
-        getTextStream();
+        getTextStream(retry);
     };
     //处理素材
-    const editMaterial = (num: number) => {
+    const editMaterial = (num: number, retry?: boolean) => {
         setSelectValue('field');
         if (!fieldCompletionData.requirement) {
             setrequirementStatusOpen(true);
@@ -339,7 +387,7 @@ const AiCreate = ({
             return false;
         }
         batchNum.current = num;
-        handleMaterial(num);
+        handleMaterial(num, retry);
     };
     //新增插入表格
     const [selectValue, setSelectValue] = useState('');
@@ -590,7 +638,7 @@ const AiCreate = ({
                                             >
                                                 保存配置
                                             </Button>
-                                            <Button type="primary" onClick={aimaterialCreate}>
+                                            <Button type="primary" onClick={() => aimaterialCreate()}>
                                                 AI 生成素材
                                             </Button>
                                         </div>
@@ -814,115 +862,142 @@ const AiCreate = ({
                 </div>
             </Modal>
             {/* 素材执行 loading */}
-            {materialExecutionOpen && (
-                <Modal width={'80%'} open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>
-                    <div className="flex justify-center ">
-                        <Progress percent={materialPre} type="circle" />
+            {/* {materialExecutionOpen && ( */}
+            <Modal width={'80%'} open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>
+                <div className="flex justify-center ">
+                    <Progress percent={materialPre} type="circle" />
+                </div>
+                {executionCount !== 0 && (
+                    <div className="flex justify-center">
+                        <div className="font-bold mt-4 loader"></div>
                     </div>
-                    {executionCount !== 0 && <div className="font-bold text-center mt-4">AI 处理中，请勿刷新页面···</div>}
-                    <div className="my-4">
-                        {errorMessage?.length > 0 &&
-                            errorMessage?.map((item, i) => (
-                                <div className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
-                                    <span className="font-bold">错误信息 {i + 1}：</span>
-                                    {item}
-                                </div>
-                            ))}
+                )}
+                <div className="my-4">
+                    {errorMessage?.length > 0 &&
+                        errorMessage?.map((item, i) => (
+                            <div className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
+                                <span className="font-bold">错误信息 {i + 1}：</span>
+                                {item}
+                            </div>
+                        ))}
+                </div>
+                {totalCount === successCount + errorCount && successCount !== 0 && (
+                    <div className="my-4 text-xs flex justify-center">
+                        <span className="font-bold">已经生成完成，点击确认导入素材</span>
                     </div>
-                    {totalCount === successCount + errorCount && successCount !== 0 && (
-                        <div className="my-4 text-xs flex justify-center">
-                            <span className="font-bold">已经生成完成，点击确认导入素材</span>
-                        </div>
-                    )}
-                    <div className="flex gap-2 justify-center my-4 text-xs">
-                        <div>
-                            <Tag>全部：{totalCount}</Tag>
-                        </div>
-                        <div>
-                            <Tag color="processing">待执行：{totalCount - successCount - errorCount - executionCount}</Tag>
-                        </div>
-                        <div>
-                            <Tag color="processing">执行中：{executionCount}</Tag>
-                        </div>
-                        <div>
-                            <Tag color="success">执行完成：{successCount}</Tag>
-                        </div>
-                        <div>
-                            <Tag color="error">执行失败：{errorCount}</Tag>
-                        </div>
+                )}
+                <div className="flex gap-2 justify-center my-4 text-xs">
+                    <div>
+                        <Tag>全部：{totalCount}</Tag>
                     </div>
-                    <Table
-                        columns={[
-                            { title: '序号', width: 60, render: (_, row, index) => <span>{index + 1}</span> },
-                            ...(selectValue === 'field'
-                                ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
-                                : columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex)))
-                        ]}
-                        dataSource={materialzanList}
-                    />
-                    <div className="flex justify-center gap-2 mt-4">
-                        {executionCount === 0 && (
-                            <>
+                    <div>
+                        <Tag color="processing">待执行：{totalCount - successCount - errorCount - executionCount}</Tag>
+                    </div>
+                    <div>
+                        <Tag color="processing">执行中：{executionCount}</Tag>
+                    </div>
+                    <div>
+                        <Tag color="success">执行完成：{successCount}</Tag>
+                    </div>
+                    <div>
+                        <Tag color="error">执行失败：{errorCount}</Tag>
+                    </div>
+                </div>
+                <Table
+                    columns={[
+                        { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
+                        ...(selectValue === 'field'
+                            ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
+                            : columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex)))
+                    ]}
+                    dataSource={materialzanList}
+                />
+                <div className="flex justify-center gap-2 mt-4">
+                    {executionCount === 0 && (
+                        <>
+                            <Button
+                                className="w-[100px]"
+                                size="small"
+                                onClick={() => {
+                                    errorCountRef.current = 0;
+                                    successCountRef.current = 0;
+                                    executionCountRef.current = 0;
+                                    errorMessageRef.current = [];
+                                    setErrorCount(errorCountRef.current);
+                                    setSuccessCount(successCountRef.current);
+                                    setExecutionCount(executionCountRef.current);
+                                    setErrorMessage(errorMessageRef.current);
+                                    if (selectValue === 'batch') {
+                                        aimaterialCreate();
+                                    } else {
+                                        editMaterial(batchNum.current);
+                                    }
+                                }}
+                            >
+                                重新执行
+                            </Button>
+                            {errorMessage?.length > 0 && (
                                 <Button
                                     className="w-[100px]"
                                     size="small"
                                     onClick={() => {
                                         errorCountRef.current = 0;
-                                        successCountRef.current = 0;
                                         executionCountRef.current = 0;
+                                        errorMessageRef.current = [];
                                         setErrorCount(errorCountRef.current);
-                                        setSuccessCount(successCountRef.current);
                                         setExecutionCount(executionCountRef.current);
+                                        setErrorMessage(errorMessageRef.current);
                                         if (selectValue === 'batch') {
-                                            aimaterialCreate();
+                                            aimaterialCreate(true);
                                         } else {
-                                            editMaterial(batchNum.current);
+                                            editMaterial(batchNum.current, true);
                                         }
                                     }}
                                 >
-                                    重试
+                                    失败重试
                                 </Button>
-                                <Button
-                                    onClick={() => {
-                                        if (selectValue === 'batch') {
-                                            console.log(materialzanListRef.current);
-                                            console.log(uuidListsRef.current);
-                                            downTableData(materialzanListRef.current, 1);
-                                            setMaterialExecutionOpen(false);
-                                            setOpen(false);
-                                            setSelectedRowKeys(uuidListsRef.current);
-                                        } else {
-                                            setSelList([]);
-                                            downTableData(materialFieldexeDataRef.current, 2);
-                                            setMaterialExecutionOpen(false);
-                                            setOpen(false);
-                                            setSelectedRowKeys(uuidLists);
-                                        }
-                                    }}
-                                    className="w-[100px]"
-                                    size="small"
-                                    type="primary"
-                                >
-                                    确认
-                                </Button>
-                            </>
-                        )}
-                        {executionCount > 0 && (
+                            )}
                             <Button
+                                onClick={() => {
+                                    if (selectValue === 'batch') {
+                                        downTableData(materialzanListRef.current, 1);
+                                        setMaterialExecutionOpen(false);
+                                        setOpen(false);
+                                        setSelectedRowKeys(uuidListsRef.current);
+                                    } else {
+                                        setSelList([]);
+                                        console.log(materialFieldexeDataRef.current);
+
+                                        downTableData(materialFieldexeDataRef.current, 2);
+                                        setMaterialExecutionOpen(false);
+                                        setOpen(false);
+                                        setSelectedRowKeys(uuidLists);
+                                    }
+                                }}
+                                className="w-[100px]"
                                 size="small"
                                 type="primary"
-                                onClick={() => {
-                                    executionCountRef.current = 0;
-                                    setExecutionCount(executionCountRef.current);
-                                    aref.current = true;
-                                }}
                             >
-                                取消执行
+                                确认
                             </Button>
-                        )}
-                    </div>
-                </Modal>
-            )}
+                        </>
+                    )}
+                    {executionCount > 0 && (
+                        <Button
+                            size="small"
+                            type="primary"
+                            onClick={() => {
+                                executionCountRef.current = 0;
+                                setExecutionCount(executionCountRef.current);
+                                aref.current = true;
+                            }}
+                        >
+                            取消执行
+                        </Button>
+                    )}
+                </div>
+            </Modal>
+            {/* )} */}
         </div>
     );
 };

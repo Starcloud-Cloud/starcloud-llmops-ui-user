@@ -231,7 +231,7 @@ const ThreeStep = ({
                             style={{
                                 position: 'absolute',
                                 right: '12px',
-                                top: '-48px'
+                                top: '-42px'
                             }}
                         >
                             {/* {jsCookie.get('isClient')&&
@@ -388,8 +388,8 @@ const ThreeStep = ({
                                         <div>{title}</div>
                                     </div>
                                 )}
-                                <Divider />
-                                <div>
+                                <Divider style={{ margin: '2px 0' }} />
+                                <div className="mt-2">
                                     {!exeDetail && (
                                         <Space>
                                             <Button

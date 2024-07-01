@@ -77,6 +77,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
             width={'80%'}
             open={open}
             onCancel={handleClose}
+            wrapClassName="wrap-three-step"
             title={
                 <div className="flex">
                     <span>详情</span>

@@ -420,7 +420,7 @@ const AddStyle = React.forwardRef(
                                     collapseIndexRef.current = index;
                                 }}
                             >
-                                <MoreVertIcon className="cursor-pointer" />
+                                <MoreVertIcon className="cursor-pointer" onClick={(e) => e.stopPropagation()} />
                             </Dropdown>
                         </div>
                     </div>

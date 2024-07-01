@@ -2,3 +2,8 @@
     transform: none !important; 
 } 
    
+.wrap-three-step {
+    .ant-modal-header {
+        margin-bottom: 0 !important;
+    }
+}

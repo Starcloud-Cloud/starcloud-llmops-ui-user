@@ -1,13 +1,47 @@
 import { Modal, Button, Table, Popconfirm, Form, Input, Select, Switch, InputNumber, Tag, Tooltip } from 'antd';
 import type { TableProps } from 'antd';
-import { useEffect, useState, memo } from 'react';
+import type { ProColumns } from '@ant-design/pro-components';
+import { EditableProTable, ProFormRadio } from '@ant-design/pro-components';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { DndContext } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { useEffect, useState, useMemo, createContext, useContext } from 'react';
 import AiCreate from './AICreate';
 import _ from 'lodash-es';
-import { PlusOutlined } from '@ant-design/icons';
-import { materialJudge } from 'api/redBook/batchIndex';
+import { PlusOutlined, HolderOutlined } from '@ant-design/icons';
 import { materialFieldCode } from 'api/redBook/batchIndex';
 import { useLocation } from 'react-router-dom';
 import FieldImage from 'assets/images/icons/field.svg';
+import { v4 as uuidv4 } from 'uuid';
+const RowContext = createContext<any>({});
+const DragHandle: React.FC = () => {
+    const { setActivatorNodeRef, listeners } = useContext(RowContext);
+    return (
+        <Button type="text" size="small" icon={<HolderOutlined />} style={{ cursor: 'move' }} ref={setActivatorNodeRef} {...listeners} />
+    );
+};
+const Row: React.FC<any> = (props) => {
+    const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+        id: props['data-row-key']
+    });
+
+    const style: React.CSSProperties = {
+        ...props.style,
+        transform: CSS.Translate.toString(transform),
+        transition,
+        ...(isDragging ? { position: 'relative', zIndex: 9999 } : {})
+    };
+
+    const contextValue = useMemo<any>(() => ({ setActivatorNodeRef, listeners }), [setActivatorNodeRef, listeners]);
+    return (
+        <RowContext.Provider value={contextValue}>
+            <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+        </RowContext.Provider>
+    );
+};
 const LeftModalAdd = ({
     zoomOpen,
     setZoomOpen,
@@ -138,14 +172,127 @@ const LeftModalAdd = ({
             align: 'center'
         }
     ];
+    // const materialColumns: ProColumns<any>[] = [
+    //     {
+    //         title: '排序',
+    //         readonly: true,
+    //         editable: (text, record, index) => {
+    //             return false;
+    //         },
+    //         align: 'center',
+    //         width: 80,
+    //         render: () => <DragHandle />
+    //     },
+    //     {
+    //         title: '字段名称',
+    //         align: 'center',
+    //         dataIndex: 'desc',
+    //         formItemProps: {
+    //             rules: [
+    //                 {
+    //                     required: true,
+    //                     message: '请输入字段名称'
+    //                 },
+    //                 {
+    //                     max: 16,
+    //                     message: '字段名称不能超过 20 个字'
+    //                 }
+    //             ]
+    //         }
+    //     },
+    //     {
+    //         title: '字段类型',
+    //         dataIndex: 'type',
+    //         align: 'center',
+    //         valueType: 'select',
+    //         fieldProps: {
+    //             options: materialFieldTypeList
+    //         },
+    //         formItemProps: {
+    //             rules: [
+    //                 {
+    //                     required: true,
+    //                     message: '请选择字段类型'
+    //                 }
+    //             ]
+    //         },
+    //         render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label
+    //     },
+    //     {
+    //         title: '是否为分组字段',
+    //         dataIndex: 'isGroupField',
+    //         align: 'center',
+    //         valueType: 'switch',
+    //         render: (_, row) => (row?.isGroupField ? <Tag color="processing">是</Tag> : <Tag color="processing">否</Tag>)
+    //     },
+    //     {
+    //         title: '是否必填',
+    //         dataIndex: 'required',
+    //         align: 'center',
+    //         valueType: 'switch',
+    //         render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : '')
+    //     },
+    //     {
+    //         title: '操作',
+    //         align: 'center',
+    //         valueType: 'option',
+    //         width: 200,
+    //         render: (text, record, index, action) => (
+    //             <div className="w-full flex justify-center gap-2">
+    //                 <Button
+    //                     type="link"
+    //                     onClick={() => {
+    //                         console.log(record.uuid);
+
+    //                         action?.startEditable?.(record.uuid);
+    //                     }}
+    //                 >
+    //                     编辑
+    //                 </Button>
+    //                 <Popconfirm
+    //                     title="提示"
+    //                     description="请再次确认是否要删除"
+    //                     onConfirm={() => {
+    //                         const newData = materialTableData?.filter((item, i) => i !== index);
+    //                         setMaterialTableData(newData);
+    //                     }}
+    //                     okText="Yes"
+    //                     cancelText="No"
+    //                 >
+    //                     <Button type="link" danger>
+    //                         删除
+    //                     </Button>
+    //                 </Popconfirm>
+    //             </div>
+    //         )
+    //     }
+    // ];
     const [materialTableData, setMaterialTableData] = useState<any[]>([]);
     const [rowIndex, setRowIndex] = useState(-1);
     const [formOpen, setFormOpen] = useState(false);
     const [materialTitle, setMaterialTitle] = useState('');
     const [form] = Form.useForm();
+    //多行编辑
+    const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
+
+    const onDragEnd = ({ active, over }: DragEndEvent) => {
+        if (active.id !== over?.id) {
+            const newList = (prevState: any) => {
+                const activeIndex = prevState.findIndex((record: any) => record.uuid === active?.id);
+                const overIndex = prevState.findIndex((record: any) => record.uuid === over?.id);
+                return arrayMove(prevState, activeIndex, overIndex);
+            };
+            setMaterialTableData(newList(materialTableData));
+        }
+    };
     useEffect(() => {
         if (fieldHead) {
             setMaterialTableData(fieldHead);
+            // setMaterialTableData(
+            //     fieldHead?.map((item: any) => {
+            //         return { ...item, uuid: item.uuid || uuidv4() };
+            //     })
+            // );
         }
     }, [fieldHead]);
     return (
@@ -233,13 +380,46 @@ const LeftModalAdd = ({
                             setRowIndex(-1);
                             setFormOpen(true);
                         }}
-                        icon={<PlusOutlined rev={undefined} />}
+                        icon={<PlusOutlined />}
                         type="primary"
                     >
                         新增({materialTableData?.length || 0}/30)
                     </Button>
                 </div>
                 <Table pagination={false} columns={materialColumns} dataSource={materialTableData} />
+                {/* <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+                    <SortableContext items={materialTableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
+                        <EditableProTable<any>
+                            rowKey="uuid"
+                            components={{ body: { row: Row } }}
+                            toolBarRender={false}
+                            columns={materialColumns}
+                            value={materialTableData}
+                            recordCreatorProps={{
+                                record: () => ({
+                                    uuid: uuidv4(),
+                                    isGroupField: false,
+                                    required: false
+                                })
+                            }}
+                            editable={{
+                                type: 'multiple',
+                                editableKeys,
+                                onSave: async (rowKey, data, row) => {
+                                    const newList = materialTableData?.map((item) => {
+                                        if (item.uuid === rowKey) {
+                                            return data;
+                                        } else {
+                                            return item;
+                                        }
+                                    });
+                                    setMaterialTableData(newList);
+                                },
+                                onChange: setEditableRowKeys
+                            }}
+                        />
+                    </SortableContext>
+                </DndContext> */}
                 <div className="flex justify-center mt-4">
                     <Button
                         type="primary"
@@ -247,6 +427,10 @@ const LeftModalAdd = ({
                         onClick={async () => {
                             const result = await materialFieldCode({
                                 fieldConfigDTOList: materialTableData
+                                // fieldConfigDTOList: materialTableData?.map((item, index) => ({
+                                //     ...item,
+                                //     order: index
+                                // }))
                             });
                             setMaterialTableData(result);
                             try {

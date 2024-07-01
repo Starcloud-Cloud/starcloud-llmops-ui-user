@@ -170,7 +170,7 @@ const SettingModal = ({
                                                                 }}
                                                                 size="small"
                                                             >
-                                                                <SettingOutlined rev={undefined} />
+                                                                <SettingOutlined />
                                                             </IconButton>
                                                         </Tooltip>
                                                     </div>
@@ -187,7 +187,7 @@ const SettingModal = ({
                                                                 }}
                                                                 size="small"
                                                             >
-                                                                <SettingOutlined rev={undefined} />
+                                                                <SettingOutlined />
                                                             </IconButton>
                                                         </Tooltip>
                                                     )}
@@ -206,7 +206,7 @@ const SettingModal = ({
                                                                             appData?.configuration?.appInformation?.workflowConfig?.steps[
                                                                                 index - 1
                                                                             ]?.flowStep.handler === 'VariableActionHandler',
-                                                                        icon: <VerticalAlignTopOutlined rev={undefined} />
+                                                                        icon: <VerticalAlignTopOutlined />
                                                                     },
                                                                     {
                                                                         key: '2',
@@ -217,18 +217,18 @@ const SettingModal = ({
                                                                                 3 ===
                                                                                 index || item.flowStep.handler === 'VariableActionHandler',
 
-                                                                        icon: <VerticalAlignBottomOutlined rev={undefined} />
+                                                                        icon: <VerticalAlignBottomOutlined />
                                                                     },
                                                                     {
                                                                         key: '3',
                                                                         label: ' 复制',
                                                                         disabled: item.flowStep.handler === 'VariableActionHandler',
-                                                                        icon: <CopyOutlined rev={undefined} />
+                                                                        icon: <CopyOutlined />
                                                                     },
                                                                     {
                                                                         key: '4',
                                                                         label: '删除',
-                                                                        icon: <DeleteOutlined rev={undefined} />
+                                                                        icon: <DeleteOutlined />
                                                                     }
                                                                 ],
                                                                 onClick: (e: any) => {
@@ -264,7 +264,7 @@ const SettingModal = ({
                                                                 title="方便批量上传图片，图片会随机放在 图片风格模版中进行生成
 (当素材只有一个图片类型的字段的时候可开启此功能)"
                                                             >
-                                                                <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                                                <InfoCircleOutlined className="cursor-pointer" />
                                                             </Tooltip>
                                                         </div>
                                                         <Switch

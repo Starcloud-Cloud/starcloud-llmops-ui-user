@@ -136,7 +136,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                                             onMouseEnter={() => setCanUpload(true)}
                                             onMouseLeave={() => setCanUpload(false)}
                                         >
-                                            <CloudUploadOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                            <CloudUploadOutlined className="text-white/60 hover:text-white" />
                                         </div>
                                     </Tooltip>
                                     <Tooltip title="搜索">
@@ -147,7 +147,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                                                 e.stopPropagation();
                                             }}
                                         >
-                                            <SearchOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                            <SearchOutlined className="text-white/60 hover:text-white" />
                                         </div>
                                     </Tooltip>
                                 </div>
@@ -157,7 +157,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                                 className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
                                 onMouseEnter={() => setCanUpload(true)}
                             >
-                                <PlusOutlined rev={undefined} />
+                                <PlusOutlined />
                                 <div style={{ marginTop: 8 }}>Upload</div>
                                 <Tooltip title="搜索">
                                     <div
@@ -167,7 +167,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                                             e.stopPropagation();
                                         }}
                                     >
-                                        <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                        <SearchOutlined className="text-white/80 hover:text-white" />
                                     </div>
                                 </Tooltip>
                             </div>

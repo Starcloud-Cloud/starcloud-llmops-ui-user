@@ -547,28 +547,28 @@ const AddModal = () => {
                 appData?.steps?.findIndex((item: any) => item?.code === 'VariableActionHandler') !== -1
             ) {
                 setStepItem([
-                    { icon: <HomeOutlined rev={undefined} />, title: '模版说明' },
-                    { icon: <ContainerOutlined rev={undefined} />, title: '基础信息' },
-                    { icon: <SettingOutlined rev={undefined} />, title: '笔记生成' },
-                    { icon: <FileImageOutlined rev={undefined} />, title: '图片生成' },
-                    { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
+                    { icon: <HomeOutlined />, title: '模版说明' },
+                    { icon: <ContainerOutlined />, title: '基础信息' },
+                    { icon: <SettingOutlined />, title: '笔记生成' },
+                    { icon: <FileImageOutlined />, title: '图片生成' },
+                    { icon: <UserOutlined />, title: '生成测试' }
                 ]);
             } else if (
                 appData?.steps?.findIndex((item: any) => item?.code === 'PosterActionHandler') !== -1 &&
                 appData?.steps?.findIndex((item: any) => item?.code === 'VariableActionHandler') === -1
             ) {
                 setStepItem([
-                    { icon: <HomeOutlined rev={undefined} />, title: '模版说明' },
-                    { icon: <SettingOutlined rev={undefined} />, title: '笔记生成' },
-                    { icon: <FileImageOutlined rev={undefined} />, title: '图片生成' },
-                    { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
+                    { icon: <HomeOutlined />, title: '模版说明' },
+                    { icon: <SettingOutlined />, title: '笔记生成' },
+                    { icon: <FileImageOutlined />, title: '图片生成' },
+                    { icon: <UserOutlined />, title: '生成测试' }
                 ]);
             } else {
                 setStepItem([
-                    { icon: <HomeOutlined rev={undefined} />, title: '模版说明' },
-                    { icon: <ContainerOutlined rev={undefined} />, title: '基础信息' },
-                    { icon: <SettingOutlined rev={undefined} />, title: '笔记生成' },
-                    { icon: <UserOutlined rev={undefined} />, title: '生成测试' }
+                    { icon: <HomeOutlined />, title: '模版说明' },
+                    { icon: <ContainerOutlined />, title: '基础信息' },
+                    { icon: <SettingOutlined />, title: '笔记生成' },
+                    { icon: <UserOutlined />, title: '生成测试' }
                 ]);
             }
         }
@@ -1128,7 +1128,7 @@ const AddModal = () => {
                                 <div>
                                     <Upload {...testProps}>
                                         <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                            <PlusOutlined rev={undefined} />
+                                            <PlusOutlined />
                                             <div style={{ marginTop: 8 }}>Upload</div>
                                         </div>
                                     </Upload>

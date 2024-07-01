@@ -661,13 +661,13 @@ const AddStyle = React.forwardRef(
             <div className="addStyle">
                 <div className="flex items-center mb-2">
                     <Tooltip title="生成图片时会按照风格模板的顺序去使用">
-                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                        <InfoCircleOutlined className="cursor-pointer" />
                     </Tooltip>
                     <div className="w-full flex gap-2 justify-between">
                         <span className="text-sm ml-1 text-stone-600">配置笔记图片生成的风格模版，支持不同风格模版组合生成</span>
-                        <Tooltip title="风格模版配置">
+                        {/* <Tooltip title="风格模版配置">
                             <Button
-                                icon={<SettingOutlined rev={undefined} />}
+                                icon={<SettingOutlined />}
                                 shape="circle"
                                 size="small"
                                 type="primary"
@@ -683,11 +683,11 @@ const AddStyle = React.forwardRef(
                                     setSystemOPen(true);
                                 }}
                             />
-                        </Tooltip>
+                        </Tooltip> */}
                     </div>
                 </div>
                 {mode === 1 && (
-                    <Button mb-4 size="small" type="primary" onClick={() => handleAdd()}>
+                    <Button className="mb-4" size="small" type="primary" onClick={() => handleAdd()}>
                         增加风格
                     </Button>
                 )}
@@ -882,6 +882,36 @@ const AddStyle = React.forwardRef(
                                                         }}
                                                     />
                                                     {/* <Popconfirm
+                                                    <div className="flex flex-col justify-center items-center w-full h-[200px]">
+                                                        <PlusOutlined
+                                                            style={{
+                                                                fontSize: '24px'
+                                                            }}
+                                                        />
+                                                        <span className="mt-3">创建自定义风格</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {customList?.map((item, index) => {
+                                                return (
+                                                    <div
+                                                        className={`flex overflow-x-auto cursor-pointer w-full ${
+                                                            hoverIndex === item.uuid || chooseImageIndex.includes(item.uuid)
+                                                                ? 'outline outline-offset-2 outline-1 outline-[#673ab7]'
+                                                                : 'outline outline-offset-2 outline-1 outline-[#ccc]'
+                                                        } rounded-sm relative`}
+                                                        onMouseEnter={() => setHoverIndex(item.uuid)}
+                                                        onMouseLeave={() => setHoverIndex('')}
+                                                    >
+                                                        <Checkbox
+                                                            checked={chooseImageIndex.includes(item.uuid)}
+                                                            className="absolute z-50 right-[2px]"
+                                                            onChange={(e) => {
+                                                                const value = e.target.checked;
+                                                                handleChoose(item.uuid);
+                                                            }}
+                                                        />
+                                                        {/* <Popconfirm
                                                         placement="top"
                                                         title={'确认删除'}
                                                         // description={description}
@@ -890,7 +920,7 @@ const AddStyle = React.forwardRef(
                                                         onConfirm={() => handleDel(index)}
                                                     >
                                                         <DeleteOutlined
-                                                            rev={undefined}
+                                                            
                                                             className="absolute z-50 py-[3px] left-[2px] text-red-600"
                                                         />
                                                     </Popconfirm> */}
@@ -1008,6 +1038,7 @@ const AddStyle = React.forwardRef(
                             schemaList={[]}
                             imageStyleData={currentStyle?.templateList || []}
                             typeList={[]}
+                            materialStatus={materialStatus}
                             appData={{
                                 appUid,
                                 appReqVO: details,

@@ -227,10 +227,7 @@ const ResultFilter = ({
                             onClick={() => setFilterOpen(!filterOpen)}
                         >
                             {filterOpen ? '隐藏过滤条件' : '展示过滤条件'}
-                            <DownOutlined
-                                style={{ transition: 'transform .3s', transform: !filterOpen ? 'rotate(-180deg)' : '' }}
-                                rev={undefined}
-                            />
+                            <DownOutlined style={{ transition: 'transform .3s', transform: !filterOpen ? 'rotate(-180deg)' : '' }} />
                         </span>
                     </div>
                 </Col>
@@ -258,7 +255,7 @@ const ResultFilter = ({
                                         placement="top"
                                         title={<div className="max-w-[500px] text-[#fff]">{item.desc}</div>}
                                     >
-                                        <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
+                                        <QuestionCircleOutlined className="cursor-pointer" />
                                     </Popover>
                                 </div>
                                 {item.type !== 'checkbox' ? (
@@ -347,7 +344,7 @@ const ResultFilter = ({
                                 filterTable(searchWord);
                             }}
                             type="primary"
-                            icon={<FilterOutlined rev={undefined} />}
+                            icon={<FilterOutlined />}
                         >
                             开始筛选
                         </Button>
@@ -357,7 +354,7 @@ const ResultFilter = ({
                                 filterTable({});
                             }}
                             className="ml-[60px]"
-                            icon={<SyncOutlined rev={undefined} />}
+                            icon={<SyncOutlined />}
                         >
                             重置条件
                         </Button>

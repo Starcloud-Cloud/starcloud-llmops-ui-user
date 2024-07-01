@@ -214,7 +214,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                 <Dragger className="w-[240px] h-[240px]" {...imageprops}>
                     <div>
                         <p className="ant-upload-drag-icon">
-                            <PlusOutlined rev={undefined} />
+                            <PlusOutlined />
                         </p>
                         <p className="ant-upload-text">点击上传或直接将图片拖入区域</p>
                         <p className="ant-upload-hint">仅支持 .jpg/.png/.webp 格式</p>
@@ -237,7 +237,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                                     setDetailOpen(true);
                                                 }}
                                             >
-                                                <EyeOutlined className="text-[20px]" rev={undefined} />
+                                                <EyeOutlined className="text-[20px]" />
                                                 预览
                                                 <div
                                                     onClick={(e) => {
@@ -299,7 +299,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                         <CardContent sx={{ p: 2, display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                             <Dragger className="w-[160px] h-[160px]" {...imageprops}>
                                 <div className="border-[#673ab7] text-[#673ab7] rounded-lg flex flex-col justify-center items-center cursor-pointer">
-                                    <PlusOutlined className="text-[20px] mb-[8px]" rev={undefined} />
+                                    <PlusOutlined className="text-[20px] mb-[8px]" />
                                     <p>继续上传</p>
                                     <div className="text-sm leading-4 flex items-center !text-[12px] text-[#697586]">
                                         上传图片大小不能超过1024x1024
@@ -326,7 +326,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
                                                                 }}
                                                                 className="block cursor-pointer hover:text-[red]"
                                                             >
-                                                                <DeleteOutlined className="text-[20px]" rev={undefined} />
+                                                                <DeleteOutlined className="text-[20px]" />
                                                             </span>
                                                             {subTitle === '图片无损放大' && (
                                                                 <span className="mt-[10px] block">

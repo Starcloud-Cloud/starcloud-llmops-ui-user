@@ -405,7 +405,7 @@ const AiCreate = ({
                         confirm({
                             title: '提示',
                             content: '还未配置素材字段',
-                            icon: <ExclamationCircleFilled rev={undefined} />,
+                            icon: <ExclamationCircleFilled />,
                             okText: '去配置',
                             cancelText: '再想想',
                             onOk() {
@@ -519,12 +519,7 @@ const AiCreate = ({
                                                         setHistoryOpen(true);
                                                     }}
                                                     size="small"
-                                                    icon={
-                                                        <ClockCircleOutlined
-                                                            className="text-[#673ab7] group-hover:text-[#d9d9d9]"
-                                                            rev={undefined}
-                                                        />
-                                                    }
+                                                    icon={<ClockCircleOutlined className="text-[#673ab7] group-hover:text-[#d9d9d9]" />}
                                                     shape="circle"
                                                 />
                                             </div>

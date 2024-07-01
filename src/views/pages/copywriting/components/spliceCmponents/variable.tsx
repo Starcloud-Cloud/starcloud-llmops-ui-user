@@ -39,7 +39,7 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                         }}
                         size="small"
                         shape="circle"
-                        icon={<SettingOutlined rev={undefined} />}
+                        icon={<SettingOutlined />}
                         type="primary"
                     />
                     <Popconfirm
@@ -57,7 +57,7 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
                         <Button
                             size="small"
                             shape="circle"
-                            icon={<DeleteOutlined rev={undefined} />}
+                            icon={<DeleteOutlined />}
                             disabled={row.group === 'SYSTEM'}
                             danger
                             type="primary"
@@ -114,7 +114,7 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
             <div className="w-full flex justify-end mb-4">
                 <div className="flex gap-2">
                     <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量	'}>
-                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                        <InfoCircleOutlined className="cursor-pointer" />
                     </Tooltip>
                     <Button
                         size="small"

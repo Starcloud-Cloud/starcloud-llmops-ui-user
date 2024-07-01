@@ -19,17 +19,21 @@ const BatcSmallRedBooks = forwardRef(
     (
         {
             planState,
+            imageStylePre,
             changePre,
             getAppList,
             detail,
             isMyApp,
+            isblack,
             setDetail
         }: {
             planState: number;
+            imageStylePre?: number;
             changePre?: number;
             getAppList: () => void;
             detail?: any;
             isMyApp?: boolean;
+            isblack?: boolean;
             setDetail: (data: any, fieldShow?: boolean) => void;
         },
         ref
@@ -311,7 +315,7 @@ const BatcSmallRedBooks = forwardRef(
                 }}
                 className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto"
             >
-                {!isMyApp && (
+                {!detail && (
                     <SubCard
                         contentSX={{
                             display: 'flex',
@@ -354,6 +358,7 @@ const BatcSmallRedBooks = forwardRef(
                     >
                         <Left
                             pre={pre}
+                            imageStylePre={imageStylePre}
                             isMyApp={isMyApp}
                             changePre={changePre}
                             planState={planState}

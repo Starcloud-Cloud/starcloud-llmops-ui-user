@@ -442,7 +442,7 @@ function TemplateMarket() {
                                         className="rounded-[12px] shadow-md border border-solid border-[transparent] hover:border-[#CECAD5] cursor-pointer h-[185px] bg-white p-4 flex gap-2 justify-center items-center flex-col"
                                         onClick={() => navigate('/my-app')}
                                     >
-                                        <PlusOutlined className="text-[30px]" rev={undefined} />
+                                        <PlusOutlined className="text-[30px]" />
                                         <div className="text-black/60 text-[14px]">找不到合适的？ 创建新应用</div>
                                     </div>
                                     {myAppList.map((el: any, index: number) => (
@@ -463,7 +463,7 @@ function TemplateMarket() {
                                         className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
                                     >
                                         更多应用
-                                        <RightOutlined rev={undefined} />
+                                        <RightOutlined />
                                     </div>
                                 )}
                             </div>
@@ -514,7 +514,7 @@ function TemplateMarket() {
                                     className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
                                 >
                                     更多收藏
-                                    <RightOutlined rev={undefined} />
+                                    <RightOutlined />
                                 </div>
                             )}
                         </div>
@@ -550,7 +550,7 @@ function TemplateMarket() {
                                             className="text-[#673ab7] cursor-pointer"
                                         >
                                             更多应用
-                                            <RightOutlined rev={undefined} />
+                                            <RightOutlined />
                                         </div>
                                     )}
                                 </div>

@@ -1,7 +1,7 @@
-import { Box, Typography, TextField, IconButton, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Box, TextField, IconButton, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Image, Dropdown, Popover, Switch, Spin } from 'antd';
-import { VerticalAlignTopOutlined, VerticalAlignBottomOutlined, CopyOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { BorderColor, AddCircleSharp, South, ExpandMore, MoreVert, Error, Add } from '@mui/icons-material';
+import { VerticalAlignTopOutlined, VerticalAlignBottomOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
+import { BorderColor, AddCircleSharp, South, ExpandMore, MoreVert } from '@mui/icons-material';
 import { t } from 'hooks/web/useI18n';
 import { stepList } from 'api/template';
 import { dispatch } from 'store';
@@ -20,7 +20,8 @@ function Arrange({
     getTableData,
     tableCopy,
     tableDataDel,
-    tableDataMove
+    tableDataMove,
+    saveImageStyle
 }: any) {
     //增加节点
     const [expanded, setExpanded] = useState<any[]>([]);
@@ -109,13 +110,13 @@ function Arrange({
         });
     }, [detail?.type]);
     const getImage = (data: string) => {
-        let image: string = '';
+        let image: any = '';
         try {
             image = require('../../../../../assets/images/carryOut/' + data + '.svg');
-        } catch (errr) {
-            image = '';
+        } catch (err) {
+            image = require('../../../../../assets/images/carryOut/open-ai.svg');
         }
-        return image;
+        return image?.default || image;
     };
     const upHandler = useMemo(() => {
         return (
@@ -140,9 +141,6 @@ function Arrange({
     }
     return (
         <Box>
-            <Typography variant="h5" fontSize="1rem" mb={1}>
-                {t('myApp.flow')}
-            </Typography>
             {config?.steps?.map((item: any, index: number) => (
                 <div key={item?.field}>
                     {index !== 0 && (
@@ -174,13 +172,7 @@ function Arrange({
                                     <div className="w-[24px]">
                                         <ExpandMore className="aaa -rotate-90" />
                                     </div>
-                                    <Image
-                                        preview={false}
-                                        style={{ width: '25px', height: '25px' }}
-                                        src={getImage(item.flowStep.icon)}
-                                        fallback="data:image/png;base64,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"
-                                        alt="svg"
-                                    />
+                                    <Image preview={false} style={{ width: '25px', height: '25px' }} src={getImage(item.flowStep.icon)} />
                                     <div className="w-full flex flex-col justify-center">
                                         {editStatus[index] ? (
                                             <TextField
@@ -247,19 +239,24 @@ function Arrange({
                                         ) : (
                                             <div className="flex items-center">
                                                 <div className="max-w-[500px] text-xs text-black/50 line-clamp-1">{item.description}</div>
-                                                <Tooltip placement="top" title={'编辑步骤描述'}>
-                                                    <IconButton
-                                                        onClick={(e) => {
-                                                            const newList = _.cloneDeep(descStatus);
-                                                            newList[index] = true;
-                                                            setDescStatus(newList);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        <BorderColor fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
+                                                {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                    item?.flowStep?.handler !== 'VariableActionHandler' &&
+                                                    item?.flowStep?.handler !== 'AssembleActionHandler' &&
+                                                    item?.flowStep?.handler !== 'PosterActionHandler' && (
+                                                        <Tooltip placement="top" title={'编辑步骤描述'}>
+                                                            <IconButton
+                                                                onClick={(e) => {
+                                                                    const newList = _.cloneDeep(descStatus);
+                                                                    newList[index] = true;
+                                                                    setDescStatus(newList);
+                                                                    e.stopPropagation();
+                                                                }}
+                                                                size="small"
+                                                            >
+                                                                <BorderColor fontSize="small" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    )}
                                             </div>
                                         )}
                                     </div>
@@ -275,29 +272,32 @@ function Arrange({
                                                         key: '1',
                                                         label: ' 向上',
                                                         disabled:
-                                                            index === 1 ||
+                                                            index === 0 ||
+                                                            item?.flowStep.handler === 'VariableActionHandler' ||
+                                                            config?.steps[index - 1]?.flowStep.handler === 'MaterialActionHandler' ||
                                                             config?.steps[index - 1]?.flowStep.handler === 'VariableActionHandler',
-                                                        icon: <VerticalAlignTopOutlined rev={undefined} />
+                                                        icon: <VerticalAlignTopOutlined />
                                                     },
                                                     {
                                                         key: '2',
                                                         label: ' 向下',
                                                         disabled:
-                                                            config?.steps?.length - 3 === index ||
+                                                            config?.steps?.length - 1 === index ||
+                                                            config?.steps[index + 1]?.flowStep.handler === 'AssembleActionHandler' ||
                                                             item.flowStep.handler === 'VariableActionHandler',
 
-                                                        icon: <VerticalAlignBottomOutlined rev={undefined} />
+                                                        icon: <VerticalAlignBottomOutlined />
                                                     },
                                                     {
                                                         key: '3',
                                                         label: ' 复制',
                                                         disabled: item.flowStep.handler === 'VariableActionHandler',
-                                                        icon: <CopyOutlined rev={undefined} />
+                                                        icon: <CopyOutlined />
                                                     },
                                                     {
                                                         key: '4',
                                                         label: '删除',
-                                                        icon: <DeleteOutlined rev={undefined} />
+                                                        icon: <DeleteOutlined />
                                                     }
                                                 ],
                                                 onClick: (e: any) => {
@@ -357,12 +357,15 @@ function Arrange({
                                 resReadOnly={item?.flowStep?.response?.readOnly}
                                 resType={item?.flowStep?.response?.type}
                                 resJsonSchema={item?.flowStep?.response?.output?.jsonSchema}
+                                saveImageStyle={saveImageStyle}
                             />
                         </AccordionDetails>
                     </Accordion>
-                    {(index !== 0 || config?.steps[1]?.flowStep.handler !== 'VariableActionHandler') &&
-                        config?.steps?.length - 1 !== index &&
-                        config?.steps?.length - 2 !== index && (
+                    {(item?.flowStep.handler === 'OpenAIChatActionHandler' ||
+                        index !== 0 ||
+                        config?.steps[1]?.flowStep.handler !== 'VariableActionHandler') &&
+                        item?.flowStep.handler !== 'AssembleActionHandler' &&
+                        item?.flowStep.handler !== 'PosterActionHandler' && (
                             <>
                                 <div className="flex justify-center my-4">
                                     <div className="h-[20px] w-[2px] bg-black/80"></div>
@@ -433,13 +436,13 @@ function Arrange({
                                                                 width={40}
                                                                 height={40}
                                                                 src={getImage(el?.flowStep?.icon)}
-                                                                fallback="data:image/png;base64,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"
-                                                                alt="svg"
                                                             />
                                                         </div>
                                                         <div className="flex justify-between gap-2 flex-col">
                                                             <div className="text-[16px] font-bold">{el?.name}</div>
-                                                            <div className="text-xs text-black/50 line-clamp-3">{el.description}</div>
+                                                            <div className="h-[48px] text-xs text-black/50 line-clamp-3">
+                                                                {el.description}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 ))}

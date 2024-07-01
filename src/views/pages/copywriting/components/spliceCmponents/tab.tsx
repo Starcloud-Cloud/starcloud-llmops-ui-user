@@ -78,7 +78,7 @@ const CreateTab = ({
     return (
         <div className="min-h-[800px] ">
             <div className="flex items-end mb-[20px]">
-                <Button onClick={() => handleAdd()} type="primary" icon={<PlusOutlined rev={undefined} />}>
+                <Button onClick={() => handleAdd()} type="primary" icon={<PlusOutlined />}>
                     增加风格
                 </Button>
                 <div
@@ -101,7 +101,7 @@ const CreateTab = ({
                                 <div>
                                     {item.name}
                                     {item?.templateList?.some((item: any) => !item.code) && (
-                                        <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />
+                                        <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" />
                                     )}
                                 </div>
                             ),
@@ -195,11 +195,11 @@ const CreateTab = ({
                                                         {
                                                             key: '1',
                                                             label: '复制',
-                                                            icon: <CopyOutlined rev={undefined} />
+                                                            icon: <CopyOutlined />
                                                         },
                                                         {
                                                             key: '2',
-                                                            icon: <DeleteOutlined rev={undefined} />,
+                                                            icon: <DeleteOutlined />,
                                                             label: '删除'
                                                         }
                                                     ]
@@ -238,7 +238,8 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.mode) === JSON.stringify(nextProps?.mode) &&
         JSON.stringify(prevProps?.imageStyleData) === JSON.stringify(nextProps?.imageStyleData) &&
-        JSON.stringify(prevProps?.focuActive) === JSON.stringify(nextProps?.focuActive)
+        JSON.stringify(prevProps?.focuActive) === JSON.stringify(nextProps?.focuActive) &&
+        JSON.stringify(prevProps?.materialStatus) === JSON.stringify(nextProps?.materialStatus)
     );
 };
 export default memo(CreateTab, arePropsEqual);

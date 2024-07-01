@@ -118,7 +118,7 @@ const StyleTabs = ({
                         label: (
                             <div>
                                 {item.name}
-                                {!item.code && <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" rev={undefined} />}
+                                {!item.code && <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" />}
                             </div>
                         ),
                         key: i.toString(),

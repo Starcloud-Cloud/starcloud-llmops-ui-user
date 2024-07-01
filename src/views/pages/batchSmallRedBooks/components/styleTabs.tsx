@@ -89,7 +89,7 @@ const StyleTabs = ({
                         label: (
                             <div className="flex items-center">
                                 <span style={{ display: !item.id ? 'block' : 'none' }} className=" text-[#ff4d4f] text-[16px]">
-                                    <CloseCircleOutlined rev={undefined} />
+                                    <CloseCircleOutlined />
                                 </span>
                                 {item.name}
                             </div>

@@ -1,6 +1,6 @@
 import { TextField, MenuItem, FormControl, Autocomplete, Chip } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
-import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Collapse } from 'antd';
+import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Select } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { t } from 'i18next';
 import _ from 'lodash-es';
@@ -26,7 +26,9 @@ function FormExecute({
     setTitle,
     setStep,
     setMaterialType,
-    history
+    history,
+    materialValue,
+    materialList
 }: any) {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -190,7 +192,8 @@ function FormExecute({
     };
     return (
         <>
-            {item.style === 'TEXTAREA' || (handlerCode === 'AssembleActionHandler' && item.field === 'TITLE') ? (
+            {(handlerCode !== 'OpenAIChatActionHandler' && item.style === 'TEXTAREA') ||
+            (handlerCode === 'AssembleActionHandler' && item.field === 'TITLE') ? (
                 <div ref={widthRef} className="w-full relative mt-4">
                     <VariableInput
                         open={open}
@@ -221,6 +224,31 @@ function FormExecute({
                         <p className="text-[#f44336] mt-[4px] text-xs">{item.label}必填</p>
                     )}
                 </div>
+            ) : item.style === 'TEXTAREA' ? (
+                <TextField
+                    color="secondary"
+                    size="small"
+                    sx={mt}
+                    label={item.label}
+                    defaultValue={item.value}
+                    id={item.field}
+                    required
+                    name={item.field}
+                    multiline
+                    minRows={3}
+                    maxRows={3}
+                    InputLabelProps={{ shrink: true }}
+                    placeholder={item.defaultValue ? String(item.defaultValue) : ''}
+                    error={!item.value && value}
+                    helperText={!item.value && value ? `${item.label}必填` : item.description}
+                    onChange={(e) => {
+                        setValue(true);
+                    }}
+                    onBlur={(e) => {
+                        onChange(e.target);
+                    }}
+                    fullWidth
+                />
             ) : item.style === 'INPUT' ? (
                 <TextField
                     sx={mt}
@@ -424,7 +452,7 @@ function FormExecute({
                         <div>
                             <Upload {...props}>
                                 <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                    <PlusOutlined rev={undefined} />
+                                    <PlusOutlined />
                                     <div style={{ marginTop: 8 }}>Upload</div>
                                 </div>
                             </Upload>
@@ -433,8 +461,22 @@ function FormExecute({
                 </div>
             ) : (
                 <div className="mt-4">
-                    <div className="w-full flex justify-between">
-                        <div>
+                    <div className="w-full flex justify-between items-center mb-2">
+                        <div className="relative">
+                            <Select
+                                placeholder="选择素材类型"
+                                onChange={(e) => {
+                                    setMaterialType(e);
+                                }}
+                                className="w-[150px] h-[25px]"
+                                value={materialValue}
+                                options={materialList}
+                            />
+                            <span className="z-[100] block bg-[#fff] px-[5px] absolute top-[-9px] left-2 text-[10px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
+                                素材类型
+                            </span>
+                        </div>
+                        {/* <div>
                             {handlerCode === 'MaterialActionHandler' && (
                                 <Button
                                     disabled={history}
@@ -448,7 +490,7 @@ function FormExecute({
                                     批量导入
                                 </Button>
                             )}
-                        </div>
+                        </div> */}
                         {handlerCode !== 'ImitateActionHandler' && (
                             <Button
                                 disabled={history}
@@ -508,7 +550,8 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
         JSON.stringify(prevProps?.columns) === JSON.stringify(nextProps?.columns) &&
         JSON.stringify(prevProps?.model) === JSON.stringify(nextProps?.model) &&
         JSON.stringify(prevProps?.details) === JSON.stringify(nextProps?.details) &&
-        JSON.stringify(prevProps?.stepCode) === JSON.stringify(nextProps?.stepCode)
+        JSON.stringify(prevProps?.stepCode) === JSON.stringify(nextProps?.stepCode) &&
+        JSON.stringify(prevProps?.materialValue) === JSON.stringify(nextProps?.materialValue)
     );
 };
 export default memo(FormExecute, arePropsEqual);

@@ -211,8 +211,7 @@ const ResultFilter = ({
                     className="text-[#673ab7] rounded border border-solid border-[#673ab7] text-[13px] font-[500] px-[6px] py-[10px] cursor-pointer ml-[30px] leading-3"
                     onClick={() => setFilteOpen(!filteOpen)}
                 >
-                    隐藏过滤条件{' '}
-                    <DownOutlined style={{ transition: 'transform .3s', transform: !filteOpen ? 'rotate(-180deg)' : '' }} rev={undefined} />
+                    隐藏过滤条件 <DownOutlined style={{ transition: 'transform .3s', transform: !filteOpen ? 'rotate(-180deg)' : '' }} />
                 </span>
             </div>
             {filteOpen && (
@@ -229,7 +228,7 @@ const ResultFilter = ({
                                         placement="top"
                                         title={<div className="max-w-[500px] text-[#fff]">{item.desc}</div>}
                                     >
-                                        <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
+                                        <QuestionCircleOutlined className="cursor-pointer" />
                                     </Popover>
                                 </div>
                                 <div className="flex items-center mb-[30px]">
@@ -306,7 +305,7 @@ const ResultFilter = ({
                                         placement="top"
                                         title={<div className="max-w-[500px] text-[#fff]">{item.desc}</div>}
                                     >
-                                        <QuestionCircleOutlined className="cursor-pointer" rev={undefined} />
+                                        <QuestionCircleOutlined className="cursor-pointer" />
                                     </Popover>
                                 </div>
                                 <div className="flex mb-[30px]">
@@ -344,7 +343,7 @@ const ResultFilter = ({
                                 filterTable(searchWord);
                             }}
                             type="primary"
-                            icon={<FilterOutlined rev={undefined} />}
+                            icon={<FilterOutlined />}
                         >
                             开始筛选(剩余{restCount}次)
                         </Button>
@@ -354,7 +353,7 @@ const ResultFilter = ({
                                 filterTable({});
                             }}
                             className="ml-[60px]"
-                            icon={<SyncOutlined rev={undefined} />}
+                            icon={<SyncOutlined />}
                         >
                             重置条件
                         </Button>

@@ -65,8 +65,8 @@ const LintellgentMatting = () => {
                             style={{ left: dragDistance + '%' }}
                         >
                             <div className="w-[29px] h-[29px] flex rounded-full bg-[#fff] border border-solid border-[#673ab7]">
-                                <LeftOutlined rev={undefined} />
-                                <RightOutlined rev={undefined} />
+                                <LeftOutlined />
+                                <RightOutlined />
                             </div>
                         </div>
                     </div>
@@ -133,8 +133,8 @@ const LintellgentMatting = () => {
                             style={{ left: dragDistances + '%' }}
                         >
                             <div className="w-[29px] h-[29px] flex rounded-full bg-[#fff] border border-solid border-[#673ab7]">
-                                <LeftOutlined rev={undefined} />
-                                <RightOutlined rev={undefined} />
+                                <LeftOutlined />
+                                <RightOutlined />
                             </div>
                         </div>
                     </div>

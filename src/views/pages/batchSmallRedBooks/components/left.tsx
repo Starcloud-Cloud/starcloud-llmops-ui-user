@@ -323,7 +323,7 @@ const Lefts = ({
                                                         onMouseEnter={() => setCanUpload(true)}
                                                         onMouseLeave={() => setCanUpload(false)}
                                                     >
-                                                        <CloudUploadOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                                        <CloudUploadOutlined className="text-white/60 hover:text-white" />
                                                     </div>
                                                 </Tooltip>
                                                 <Tooltip title="搜索">
@@ -337,7 +337,7 @@ const Lefts = ({
                                                             setValues(row);
                                                         }}
                                                     >
-                                                        <SearchOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                                        <SearchOutlined className="text-white/60 hover:text-white" />
                                                     </div>
                                                 </Tooltip>
                                             </div>
@@ -347,7 +347,7 @@ const Lefts = ({
                                             className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
                                             onMouseEnter={() => setCanUpload(true)}
                                         >
-                                            <PlusOutlined rev={undefined} />
+                                            <PlusOutlined />
                                             <div style={{ marginTop: 8 }}>Upload</div>
                                             <Tooltip title="搜索">
                                                 <div
@@ -360,7 +360,7 @@ const Lefts = ({
                                                         setValues(row);
                                                     }}
                                                 >
-                                                    <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                                    <SearchOutlined className="text-white/80 hover:text-white" />
                                                 </div>
                                             </Tooltip>
                                         </div>
@@ -1736,7 +1736,7 @@ const Lefts = ({
                         size="small"
                         shape="circle"
                     >
-                        <RightOutlined rev={undefined} />
+                        <RightOutlined />
                     </Button>
                 </Tooltip>
                 {detailShow && !detail && (
@@ -1837,11 +1837,11 @@ const Lefts = ({
                             <Tabs.TabPane key={'1'} tab="素材上传">
                                 <div className="flex justify-between items-center mb-2">
                                     <div>
-                                        <InfoCircleOutlined rev={undefined} />
+                                        <InfoCircleOutlined />
                                         <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
                                     </div>
                                     {/* <IconButton size="small">
-                                        <SettingOutlined rev={undefined} />
+                                        <SettingOutlined  />
                                     </IconButton> */}
                                 </div>
                                 <div>
@@ -1866,7 +1866,7 @@ const Lefts = ({
                                                 <div>
                                                     <Upload {...props}>
                                                         <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                                            <PlusOutlined rev={undefined} />
+                                                            <PlusOutlined />
                                                             <div style={{ marginTop: 8 }}>Upload</div>
                                                         </div>
                                                     </Upload>
@@ -1920,7 +1920,7 @@ const Lefts = ({
                                                         onClick={() => setZoomOpen(true)}
                                                         type="primary"
                                                         shape="circle"
-                                                        icon={<ZoomInOutlined rev={undefined} />}
+                                                        icon={<ZoomInOutlined />}
                                                     ></Button>
                                                 </div>
                                             </div>
@@ -1961,13 +1961,13 @@ const Lefts = ({
                         >
                             <div className="flex justify-between items-center mb-2">
                                 <div>
-                                    <InfoCircleOutlined rev={undefined} />
+                                    <InfoCircleOutlined />
                                     <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
                                 </div>
                                 {detail && (
                                     <Tooltip title="流程配置">
                                         <Button
-                                            icon={<SettingOutlined rev={undefined} />}
+                                            icon={<SettingOutlined />}
                                             shape="circle"
                                             size="small"
                                             type="primary"
@@ -2160,7 +2160,7 @@ const Lefts = ({
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <div className="flex items-center mb-2">
                                     <Tooltip title="生成图片时会按照风格模板的顺序去使用">
-                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                        <InfoCircleOutlined className="cursor-pointer" />
                                     </Tooltip>
                                     <span className="text-sm ml-1 text-stone-600">
                                         配置笔记图片生成的风格模版，支持不同风格模版组合生成
@@ -2214,7 +2214,7 @@ const Lefts = ({
                         <>
                             <Button
                                 className="w-full"
-                                icon={<SaveOutlined rev={undefined} />}
+                                icon={<SaveOutlined />}
                                 onClick={() => {
                                     if (!detail) {
                                         handleSaveClick(false);
@@ -2564,7 +2564,7 @@ const Lefts = ({
                                                                         }}
                                                                         size="small"
                                                                     >
-                                                                        <SettingOutlined rev={undefined} />
+                                                                        <SettingOutlined />
                                                                     </IconButton>
                                                                 </Tooltip>
                                                             </div>
@@ -2586,7 +2586,7 @@ const Lefts = ({
                                                                         }}
                                                                         size="small"
                                                                     >
-                                                                        <SettingOutlined rev={undefined} />
+                                                                        <SettingOutlined />
                                                                     </IconButton>
                                                                 </Tooltip>
                                                             )}
@@ -2605,7 +2605,7 @@ const Lefts = ({
                                                                                     appData?.configuration?.appInformation?.workflowConfig
                                                                                         ?.steps[index - 1]?.flowStep.handler ===
                                                                                         'VariableActionHandler',
-                                                                                icon: <VerticalAlignTopOutlined rev={undefined} />
+                                                                                icon: <VerticalAlignTopOutlined />
                                                                             },
                                                                             {
                                                                                 key: '2',
@@ -2617,18 +2617,18 @@ const Lefts = ({
                                                                                         index ||
                                                                                     item.flowStep.handler === 'VariableActionHandler',
 
-                                                                                icon: <VerticalAlignBottomOutlined rev={undefined} />
+                                                                                icon: <VerticalAlignBottomOutlined />
                                                                             },
                                                                             {
                                                                                 key: '3',
                                                                                 label: ' 复制',
                                                                                 disabled: item.flowStep.handler === 'VariableActionHandler',
-                                                                                icon: <CopyOutlined rev={undefined} />
+                                                                                icon: <CopyOutlined />
                                                                             },
                                                                             {
                                                                                 key: '4',
                                                                                 label: '删除',
-                                                                                icon: <DeleteOutlined rev={undefined} />
+                                                                                icon: <DeleteOutlined />
                                                                             }
                                                                         ],
                                                                         onClick: (e: any) => {

@@ -269,7 +269,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                         <div>
                             <Upload {...props}>
                                 <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                    <PlusOutlined rev={undefined} />
+                                    <PlusOutlined />
                                     <div style={{ marginTop: 8 }}>Upload</div>
                                 </div>
                             </Upload>
@@ -421,7 +421,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                         }}
                         className="mb-[20px]"
                         type="primary"
-                        icon={<PlusOutlined rev={undefined} />}
+                        icon={<PlusOutlined />}
                     >
                         新增
                     </Button>

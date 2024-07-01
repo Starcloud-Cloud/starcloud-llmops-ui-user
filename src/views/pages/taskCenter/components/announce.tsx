@@ -695,7 +695,7 @@ const Announce = ({
                             <Button
                                 type="primary"
                                 disabled={!searchParams.get('notificationUid')}
-                                icon={<SearchOutlined rev={undefined} />}
+                                icon={<SearchOutlined />}
                                 onClick={() => {
                                     getList();
                                 }}
@@ -706,13 +706,7 @@ const Announce = ({
                     </Row>
                 </div>
                 <div className="flex items-end gap-2">
-                    <Button
-                        disabled={uids?.length === 0}
-                        onClick={() => setDelsOpen(true)}
-                        danger
-                        icon={<DeleteOutlined rev={undefined} />}
-                        type="primary"
-                    >
+                    <Button disabled={uids?.length === 0} onClick={() => setDelsOpen(true)} danger icon={<DeleteOutlined />} type="primary">
                         批量删除
                     </Button>
                     <Tooltip
@@ -748,7 +742,7 @@ const Announce = ({
                             }
                         }}
                         type="primary"
-                        icon={<ExportOutlined rev={undefined} />}
+                        icon={<ExportOutlined />}
                     >
                         导出
                     </Button>
@@ -765,7 +759,7 @@ const Announce = ({
                             }
                         }}
                         type="primary"
-                        icon={<ImportOutlined  rev={undefined} />}
+                        icon={<ImportOutlined   />}
                     >
                         导入
                     </Button> */}

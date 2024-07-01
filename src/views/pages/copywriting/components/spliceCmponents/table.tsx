@@ -145,7 +145,7 @@ const CreateTable = ({ code, materialType, tableData, sourceList, setTableData, 
                     }}
                     className="mb-[20px]"
                     type="primary"
-                    icon={<PlusOutlined rev={undefined} />}
+                    icon={<PlusOutlined />}
                 >
                     新增
                 </Button>

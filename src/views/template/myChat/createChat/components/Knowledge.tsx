@@ -1567,7 +1567,7 @@ export const Knowledge = ({ datasetId }: { datasetId: string }) => {
                                 //                                 ) : (
                                 //                                     <LoadingOutlined
                                 //                                         style={{ fontSize: '14px', color: '#673ab7' }}
-                                //                                         rev={undefined}
+                                //
                                 //                                     />
                                 //                                 )}
                                 //                                 <Typography ml={0.5} variant="caption">

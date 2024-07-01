@@ -9,6 +9,7 @@ import CreateVariable from 'views/pages/copywriting/components/spliceCmponents/v
 import NewPrompt from './newPrompt';
 import { useState, useMemo } from 'react';
 import _ from 'lodash-es';
+import useUserStore from 'store/user';
 const StepEdit = ({
     detail,
     variableStyle, //变量类型
@@ -23,7 +24,8 @@ const StepEdit = ({
     basisChange, //改变 prompt
     resReadOnly, //响应类型是否禁用
     resType, //响应类型
-    resJsonSchema //响应数据
+    resJsonSchema, //响应数据
+    saveImageStyle //保存图片风格
 }: {
     detail: any;
     variableStyle: any[];
@@ -39,7 +41,9 @@ const StepEdit = ({
     resReadOnly: boolean;
     resType: string;
     resJsonSchema: string;
+    saveImageStyle: () => void;
 }) => {
+    const permissions = useUserStore((state) => state.permissions);
     const { TextArea } = Input;
     const columns: TableProps<any>['columns'] = [
         {
@@ -81,7 +85,7 @@ const StepEdit = ({
                         }}
                         size="small"
                         shape="circle"
-                        icon={<SettingOutlined rev={undefined} />}
+                        icon={<SettingOutlined />}
                         type="primary"
                     />
 
@@ -89,7 +93,7 @@ const StepEdit = ({
                         <Button
                             size="small"
                             shape="circle"
-                            icon={<DeleteOutlined rev={undefined} />}
+                            icon={<DeleteOutlined />}
                             disabled={row.group === 'SYSTEM'}
                             danger
                             type="primary"
@@ -110,7 +114,7 @@ const StepEdit = ({
                             <Button
                                 size="small"
                                 shape="circle"
-                                icon={<DeleteOutlined rev={undefined} />}
+                                icon={<DeleteOutlined />}
                                 disabled={row.group === 'SYSTEM'}
                                 danger
                                 type="primary"
@@ -146,7 +150,7 @@ const StepEdit = ({
     const materialTypeStatus = useMemo(() => {
         if (handler === 'MaterialActionHandler') {
             const newList = variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value;
-            return JSON.parse(newList)?.length === 1 ? true : false;
+            return JSON.parse(newList)?.length === 1 && JSON.parse(newList)[0]?.type === 'image' ? true : false;
         } else {
             return false;
         }
@@ -160,7 +164,7 @@ const StepEdit = ({
                             <div className="flex gap-1">
                                 拼图生成模式
                                 <Tooltip title="方便批量上传图片，图片会随机放在 图片风格模版中进行生成(当素材只有一个图片类型的字段的时候可开启此功能)">
-                                    <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                    <InfoCircleOutlined className="cursor-pointer" />
                                 </Tooltip>
                             </div>
                             <Switch
@@ -178,6 +182,17 @@ const StepEdit = ({
                 {handler === 'PosterActionHandler' && (
                     <Tabs.TabPane tab="系统风格模版配置" key="1">
                         <div className="relative">
+                            <Button
+                                className="w-[100px] absolute right-[10px]"
+                                type="primary"
+                                onClick={() => {
+                                    setTimeout(() => {
+                                        saveImageStyle();
+                                    }, 0);
+                                }}
+                            >
+                                保存
+                            </Button>
                             <CreateTab
                                 materialStatus={upHandler}
                                 appData={{ materialType: upHandler, appReqVO: detail }}
@@ -214,80 +229,73 @@ const StepEdit = ({
                         />
                     </Tabs.TabPane>
                 )}
-                {handler !== 'VariableActionHandler' && (
+                {handler !== 'VariableActionHandler' && handler !== 'PosterActionHandler' && (
                     <Tabs.TabPane tab="变量" key="3">
-                        {handler !== 'MaterialActionHandler' &&
-                            handler !== 'AssembleActionHandler' &&
-                            handler !== 'PosterActionHandler' && (
-                                <div className="flex justify-end items-center mb-4">
-                                    <div className="flex gap-2">
-                                        <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
-                                            <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
-                                        </Tooltip>
-                                        <Button
-                                            size="small"
-                                            type="primary"
-                                            onClick={() => {
-                                                setOpen(true);
-                                                setTitle('新增');
-                                            }}
-                                        >
-                                            新增
-                                        </Button>
-                                    </div>
+                        {handler === 'OpenAIChatActionHandler' && (
+                            <div className="flex justify-end items-center mb-4">
+                                <div className="flex gap-2">
+                                    <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
+                                        <InfoCircleOutlined className="cursor-pointer" />
+                                    </Tooltip>
+                                    <Button
+                                        size="small"
+                                        type="primary"
+                                        onClick={() => {
+                                            setOpen(true);
+                                            setTitle('新增');
+                                        }}
+                                    >
+                                        新增
+                                    </Button>
                                 </div>
+                            </div>
+                        )}
+                        <Table rowKey={(record: any) => record.field} columns={columns} dataSource={variable} pagination={false} />
+                    </Tabs.TabPane>
+                )}
+                {handler !== 'MaterialActionHandler' &&
+                    handler !== 'VariableActionHandler' &&
+                    handler !== 'AssembleActionHandler' &&
+                    handler !== 'XhsParseActionHandler' && (
+                        <Tabs.TabPane tab="提示词" key="4">
+                            {variables?.map(
+                                (item, i) =>
+                                    item?.field === 'prompt' && (
+                                        <NewPrompt
+                                            key={item.field}
+                                            el={item}
+                                            handler={handler}
+                                            variable={variable}
+                                            fields={fields}
+                                            index={index}
+                                            i={i}
+                                            variables={variables}
+                                            basisChange={basisChange}
+                                        />
+                                    )
                             )}
-                        <Table
-                            rowKey={(record: any) => record.field}
-                            columns={
-                                handler !== 'MaterialActionHandler' &&
-                                handler !== 'AssembleActionHandler' &&
-                                handler !== 'PosterActionHandler'
-                                    ? columns
-                                    : columns?.splice(0, columns?.length - 2)
-                            }
-                            dataSource={variable}
-                            pagination={false}
-                        />
-                    </Tabs.TabPane>
-                )}
-                {handler !== 'MaterialActionHandler' && handler !== 'VariableActionHandler' && handler !== 'AssembleActionHandler' && (
-                    <Tabs.TabPane tab="提示词" key="4">
-                        {variables?.map(
-                            (item, i) =>
-                                item?.field === 'prompt' && (
-                                    <NewPrompt
-                                        key={item.field}
-                                        el={item}
-                                        handler={handler}
-                                        variable={variable}
-                                        fields={fields}
-                                        index={index}
-                                        i={i}
-                                        variables={variables}
-                                        basisChange={basisChange}
-                                    />
-                                )
-                        )}
-                    </Tabs.TabPane>
-                )}
-                {handler !== 'MaterialActionHandler' && handler !== 'VariableActionHandler' && handler !== 'AssembleActionHandler' && (
-                    <Tabs.TabPane tab="大模型" key="5">
-                        {variables?.map(
-                            (item, i) =>
-                                item.field !== 'prompt' &&
-                                item.field !== 'n' &&
-                                item.field !== 'SYSTEM_POSTER_STYLE_CONFIG' && (
-                                    <FormExecute
-                                        key={item?.field}
-                                        item={item}
-                                        onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
-                                    />
-                                )
-                        )}
-                    </Tabs.TabPane>
-                )}
-                {handler !== 'VariableActionHandler' && (
+                        </Tabs.TabPane>
+                    )}
+                {handler !== 'MaterialActionHandler' &&
+                    handler !== 'VariableActionHandler' &&
+                    handler !== 'AssembleActionHandler' &&
+                    handler !== 'XhsParseActionHandler' && (
+                        <Tabs.TabPane tab="大模型" key="5">
+                            {variables?.map(
+                                (item, i) =>
+                                    item.field !== 'prompt' &&
+                                    item.field !== 'n' &&
+                                    item.field !== 'SYSTEM_POSTER_STYLE_CONFIG' && (
+                                        <FormExecute
+                                            key={item?.field}
+                                            item={item}
+                                            onChange={(e: any) => basisChange({ e, index, i, flag: false, values: true })}
+                                        />
+                                    )
+                            )}
+                        </Tabs.TabPane>
+                    )}
+                {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && (
                     <Tabs.TabPane tab="返回结果" key="6">
                         <FormControl fullWidth>
                             <InputLabel color="secondary" id="responent">

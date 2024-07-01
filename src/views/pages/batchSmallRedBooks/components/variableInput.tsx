@@ -88,8 +88,18 @@ const VariableInput = ({
         for (const key in json.properties) {
             const property = json.properties[key];
             if (property.type === 'object') {
-                const convertedProperty = getjsonschma(property, name);
-                arr.push(convertedProperty);
+                if (property?.properties) {
+                    arr.push({
+                        key: jsonType ? name + `.list('${key}')` : name + '.' + key,
+                        label: key,
+                        title: property?.title,
+                        desc: property?.description,
+                        children: getjsonschma(property, name)
+                    });
+                } else {
+                    const convertedProperty = getjsonschma(property, name);
+                    arr.push(convertedProperty);
+                }
             } else if (property.type === 'array' && property?.items?.type === 'object') {
                 arr.push({
                     key: key + 'index',
@@ -291,6 +301,8 @@ const VariableInput = ({
                             : []
                     }))
                     ?.filter((item: any) => item?.children?.length > 0);
+                console.log(newList);
+
                 setSchemaList(newList);
             });
         }
@@ -312,7 +324,7 @@ const VariableInput = ({
                         <span className="text-sm text-gray-500 mb-2">
                             <span className="mr-2">变量选择</span>
                             <Tooltip title={'可选择上游步骤支持的变量，执行时会自动替换为具体的值'} style={{ zIndex: 1002 }}>
-                                <ExclamationCircleOutlined rev={undefined} />
+                                <ExclamationCircleOutlined />
                             </Tooltip>
                         </span>
                         <Menu inlineIndent={12} className="flex-1 h-[300px] overflow-y-auto" defaultSelectedKeys={[]} mode="inline">

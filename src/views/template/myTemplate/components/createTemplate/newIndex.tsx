@@ -11,7 +11,7 @@ import {
     MenuItem,
     Typography
 } from '@mui/material';
-import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Segmented, Spin } from 'antd';
+import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Spin, Alert } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline, KeyboardBackspace } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -225,6 +225,8 @@ function CreateDetail() {
                         break;
                     }
                     let str = textDecoder.decode(value);
+                    console.log(str);
+
                     const lines = str.split('\n');
                     lines.forEach((message, i: number) => {
                         if (i === 0 && joins) {
@@ -241,6 +243,7 @@ function CreateDetail() {
                         if (message?.startsWith('data:')) {
                             bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                         }
+                        console.log(bufferObj);
                         if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
                             changeArr(loadingsRef.current, setLoadings, index, false);
                             if (!conversationUid && index === 0 && isAllExecute) {
@@ -466,12 +469,12 @@ function CreateDetail() {
     //增加 删除 改变变量
     const changeConfigs = (data: any) => {
         detailRef.current = _.cloneDeep({
-            ...detail,
+            ...detailRef.current,
             workflowConfig: data
         });
         setDetail(
             _.cloneDeep({
-                ...detail,
+                ...detailRef.current,
                 workflowConfig: data
             })
         );
@@ -540,7 +543,7 @@ function CreateDetail() {
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
-    const saveDetail = (flag?: boolean, fieldShow?: boolean) => {
+    const saveDetail = (flag?: boolean, fieldShow?: boolean, isimgStyle?: boolean) => {
         const newList = _.cloneDeep(detailRef.current);
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {
@@ -660,10 +663,18 @@ function CreateDetail() {
             setValue('0');
         }
     };
+    //风格模板配置
+    const [imageStylePre, setImageStylePre] = useState(0);
+    const saveImageStyle = () => {
+        if (createPlanRef.current) {
+            setImageStylePre(imageStylePre + 1);
+        } else {
+            saveDetail();
+        }
+    };
     const saveDetails = (data: any, flag?: boolean) => {
-        console.log(flag);
-
         const newList = _.cloneDeep(data);
+        console.log(newList);
         detailRef.current = newList;
         setTimeout(() => {
             if (flag) {
@@ -671,7 +682,7 @@ function CreateDetail() {
             } else {
                 saveDetail();
             }
-        }, 100);
+        }, 500);
 
         // setDetail(detailRef.current);
     };
@@ -996,6 +1007,7 @@ function CreateDetail() {
                         detail={_.cloneDeep(detailRef.current)}
                         setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
                         isMyApp={true}
+                        isblack={false}
                     />
                 </div>
             </>
@@ -1005,11 +1017,12 @@ function CreateDetail() {
             </div>
         )
     ) : (
-        <Card sx={{ height: '100%', overflowY: 'auto' }}>
+        <Card sx={{ height: '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={
                     <Buttons
+                        sx={{ zIndex: 10 }}
                         variant="contained"
                         startIcon={<ArrowBack />}
                         color="secondary"
@@ -1028,6 +1041,7 @@ function CreateDetail() {
                                 aria-controls={delOpen ? 'long-menu' : undefined}
                                 aria-expanded={delOpen ? 'true' : undefined}
                                 aria-haspopup="true"
+                                sx={{ zIndex: 10 }}
                                 onClick={(e) => {
                                     setDelAnchorEl(e.currentTarget);
                                 }}
@@ -1094,16 +1108,17 @@ function CreateDetail() {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                        <Buttons variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
+                        <Buttons sx={{ zIndex: 10 }} variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
                             {t('myApp.save')}
                         </Buttons>
                     </>
                 }
             ></CardHeader>
             <Divider />
-            <div className="px-4">
+            <div className="w-full absolute top-[24px]">
                 <Tabs
                     activeKey={value}
+                    centered={true}
                     onChange={(key: string) => {
                         if (!detailRef.current) {
                             return;
@@ -1175,27 +1190,37 @@ function CreateDetail() {
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
-                                className="flex justify-center"
+                                className="h-[calc(100vh-190px)] mt-[-16px]"
                                 style={{
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
                                     backgroundRepeat: 'repeat'
                                 }}
                             >
-                                <div className={`xl:w-[80%] lg:w-full`}>
-                                    <Arrange
-                                        detail={detail}
-                                        config={detail?.workflowConfig}
-                                        variableStyle={appModels?.variableStyle}
-                                        editChange={editChange}
-                                        basisChange={basisChange}
-                                        statusChange={statusChange}
-                                        changeConfigs={changeConfigs}
-                                        getTableData={getTableData}
-                                        tableCopy={tableCopy}
-                                        tableDataDel={tableDataDel}
-                                        tableDataMove={tableDataMove}
-                                    />
+                                <div className="h-[16px]"></div>
+                                <Alert
+                                    className="my-4 mx-4"
+                                    message="修改流程后，可直接在 ”运行应用“ 处进行测试，验证流程是否符合需求"
+                                    type="warning"
+                                    closable
+                                />
+                                <div className="flex justify-center">
+                                    <div className={`xl:w-[80%] lg:w-full pb-4`}>
+                                        <Arrange
+                                            detail={detail}
+                                            config={detail?.workflowConfig}
+                                            variableStyle={appModels?.variableStyle}
+                                            editChange={editChange}
+                                            basisChange={basisChange}
+                                            statusChange={statusChange}
+                                            changeConfigs={changeConfigs}
+                                            getTableData={getTableData}
+                                            tableCopy={tableCopy}
+                                            tableDataDel={tableDataDel}
+                                            tableDataMove={tableDataMove}
+                                            saveImageStyle={saveImageStyle}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </Tabs.TabPane>
@@ -1205,23 +1230,22 @@ function CreateDetail() {
                             <div className="w-full">
                                 {detail?.type === 'MEDIA_MATRIX' ? (
                                     <Spin spinning={viewLoading} tip="Loading">
-                                        <div className="h-[calc(100vh-266px)] bg-[rgb(244,246,248)]">
+                                        <div className="h-[calc(100vh-220px)] bg-[rgb(244,246,248)]">
                                             <CreatePlan
                                                 ref={createPlanRef}
+                                                imageStylePre={imageStylePre}
                                                 getAppList={getList}
                                                 changePre={changePre}
                                                 planState={planState}
                                                 detail={_.cloneDeep(detailRef.current)}
                                                 setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
-                                                isMyApp={true}
+                                                isMyApp={false}
+                                                isblack={false}
                                             />
                                         </div>
                                     </Spin>
                                 ) : (
                                     <div>
-                                        <Typography variant="h5" fontSize="1rem" mb={1}>
-                                            {t('market.debug')}
-                                        </Typography>
                                         <Card elevation={2} sx={{ p: 2 }}>
                                             <Header
                                                 permissions={permissions}
@@ -1265,17 +1289,21 @@ function CreateDetail() {
                     )}
                     {detailRef.current?.uid && searchParams.get('uid') && permissions.includes('app:analyze') && (
                         <Tabs.TabPane tab="应用分析" key="2">
-                            <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
+                            <div className="px-4">
+                                <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
+                            </div>
                         </Tabs.TabPane>
                     )}
                     {searchParams.get('uid') && permissions.includes('app:publish') && (
                         <Tabs.TabPane tab="应用发布" key="3">
-                            <Upload
-                                appUid={searchParams.get('uid') as string}
-                                saveState={saveState}
-                                saveDetail={saveDetail}
-                                getStatus={getStatus}
-                            />
+                            <div className="px-4">
+                                <Upload
+                                    appUid={searchParams.get('uid') as string}
+                                    saveState={saveState}
+                                    saveDetail={saveDetail}
+                                    getStatus={getStatus}
+                                />
+                            </div>
                         </Tabs.TabPane>
                     )}
                 </Tabs>

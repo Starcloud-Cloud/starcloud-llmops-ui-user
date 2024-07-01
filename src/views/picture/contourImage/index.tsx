@@ -345,7 +345,7 @@ const ContourImage = () => {
                                                 setDetailOpen(true);
                                             }}
                                         >
-                                            <EyeOutlined className="text-[20px]" rev={undefined} />
+                                            <EyeOutlined className="text-[20px]" />
                                             预览
                                             <div
                                                 onClick={(e) => {

@@ -561,7 +561,7 @@ const Content = () => {
         if (someList) {
             Modal.confirm({
                 title: '温馨提示',
-                icon: <ExclamationCircleFilled rev={undefined} />,
+                icon: <ExclamationCircleFilled />,
                 content: '获取Listing后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
                 onOk: () => {
                     typeSearchList(value);
@@ -774,7 +774,7 @@ const Content = () => {
         if (list[index].value) {
             Modal.confirm({
                 title: '温馨提示',
-                icon: <ExclamationCircleFilled rev={undefined} />,
+                icon: <ExclamationCircleFilled />,
                 content:
                     item.type === ListingBuilderEnum.SEARCH_WORD
                         ? '智能推荐后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续'
@@ -797,7 +797,7 @@ const Content = () => {
         if (hasValue) {
             Modal.confirm({
                 title: '温馨提示',
-                icon: <ExclamationCircleFilled rev={undefined} />,
+                icon: <ExclamationCircleFilled />,
                 content: 'AI生成后，您当前编辑的内容会被覆盖，但不影响导入的关键词库，是否继续',
                 onOk: () => {
                     doAiWrite(list[0], 0, true);

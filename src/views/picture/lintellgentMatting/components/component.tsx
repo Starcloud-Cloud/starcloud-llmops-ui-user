@@ -175,7 +175,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                 <Dragger className="w-[240px] h-[240px]" {...imageprops}>
                     <div>
                         <p className="ant-upload-drag-icon">
-                            <PlusOutlined rev={undefined} />
+                            <PlusOutlined />
                         </p>
                         <p className="ant-upload-text">点击上传或直接将图片拖入区域</p>
                         <p className="ant-upload-hint">仅支持 .jpg/.png/.webp 格式</p>
@@ -198,7 +198,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                                                     setDetailOpen(true);
                                                 }}
                                             >
-                                                <EyeOutlined className="text-[20px]" rev={undefined} />
+                                                <EyeOutlined className="text-[20px]" />
                                                 预览
                                                 <div
                                                     onClick={(e) => {
@@ -259,7 +259,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                     <CardContent sx={{ p: 2, display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         <Dragger className="w-[160px] h-[160px]" {...imageprops}>
                             <div className="border-[#673ab7] text-[#673ab7] rounded-lg flex flex-col justify-center items-center cursor-pointer">
-                                <PlusOutlined className="text-[20px] mb-[8px]" rev={undefined} />
+                                <PlusOutlined className="text-[20px] mb-[8px]" />
                                 <p>继续上传</p>
                             </div>
                         </Dragger>
@@ -283,7 +283,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
                                                             }}
                                                             className="cursor-pointer hover:text-[red]"
                                                         >
-                                                            <DeleteOutlined className="text-[20px]" rev={undefined} />
+                                                            <DeleteOutlined className="text-[20px]" />
                                                         </span>
                                                     </div>
                                                 )
@@ -375,7 +375,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
         //                     <Dragger className="w-[240px] h-[240px]" {...props}>
         //                         <div>
         //                             <p className="ant-upload-drag-icon">
-        //                                 <PlusOutlined rev={undefined} />
+        //                                 <PlusOutlined  />
         //                             </p>
         //                             <p className="ant-upload-text">点击上传或直接将图片拖入区域</p>
         //                             <p className="ant-upload-hint">仅支持 .jpg/.png/.webp 格式</p>
@@ -405,7 +405,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
         //                     <Dragger className="w-[300px] h-[180px]" {...props}>
         //                         <div>
         //                             <p className="ant-upload-drag-icon">
-        //                                 <PlusOutlined rev={undefined} />
+        //                                 <PlusOutlined  />
         //                             </p>
         //                             <p className="ant-upload-text">点击上传或直接将图片拖入区域</p>
         //                             <p className="ant-upload-hint">仅支持 .jpg/.png/.webp 格式</p>

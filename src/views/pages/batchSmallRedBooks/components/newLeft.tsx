@@ -84,6 +84,7 @@ const Lefts = ({
     detailShow = true,
     planState,
     pre,
+    imageStylePre,
     isMyApp,
     changePre,
     detail,
@@ -110,6 +111,7 @@ const Lefts = ({
     planState?: number;
     isMyApp?: boolean;
     pre?: number;
+    imageStylePre?: number;
     changePre?: number;
     detail?: any;
     data?: any;
@@ -342,7 +344,7 @@ const Lefts = ({
                                                         onMouseEnter={() => setCanUpload(true)}
                                                         onMouseLeave={() => setCanUpload(false)}
                                                     >
-                                                        <CloudUploadOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                                        <CloudUploadOutlined className="text-white/60 hover:text-white" />
                                                     </div>
                                                 </Tooltip>
                                                 <Tooltip title="搜索">
@@ -356,7 +358,7 @@ const Lefts = ({
                                                             setValues(row);
                                                         }}
                                                     >
-                                                        <SearchOutlined rev={undefined} className="text-white/60 hover:text-white" />
+                                                        <SearchOutlined className="text-white/60 hover:text-white" />
                                                     </div>
                                                 </Tooltip>
                                             </div>
@@ -366,7 +368,7 @@ const Lefts = ({
                                             className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
                                             onMouseEnter={() => setCanUpload(true)}
                                         >
-                                            <PlusOutlined rev={undefined} />
+                                            <PlusOutlined />
                                             <div style={{ marginTop: 8 }}>Upload</div>
                                             <Tooltip title="搜索">
                                                 <div
@@ -379,7 +381,7 @@ const Lefts = ({
                                                         setValues(row);
                                                     }}
                                                 >
-                                                    <SearchOutlined rev={undefined} className="text-white/80 hover:text-white" />
+                                                    <SearchOutlined className="text-white/80 hover:text-white" />
                                                 </div>
                                             </Tooltip>
                                         </div>
@@ -600,7 +602,7 @@ const Lefts = ({
     };
     // 选择照片loading
 
-    const getList = async (flag?: boolean, appUpdate?: boolean) => {
+    const getList = async (flag?: boolean, appUpdate?: boolean, isimgStyle?: boolean) => {
         let result;
         let newList: any;
         setTableLoading(true);
@@ -621,7 +623,7 @@ const Lefts = ({
             }
         } else if (detail) {
             setSelectImgLoading(true);
-            result = result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+            result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
             setSelectImgLoading(false);
             newList = _.cloneDeep(detail);
             newList?.workflowConfig?.steps?.forEach((item: any) => {
@@ -847,6 +849,9 @@ const Lefts = ({
         }
         setImagMater(newImage);
         setTableLoading(false);
+        if (isimgStyle) {
+            saveTemplate();
+        }
     };
     const setcustom = (data: any) => {
         const newData = _.cloneDeep(appRef.current);
@@ -1238,6 +1243,13 @@ const Lefts = ({
             if (typeof styleData === 'string') {
                 styleData = JSON.parse(styleData);
             }
+            console.log(imageRef.current);
+            console.log(
+                appRef.current.configuration.appInformation.workflowConfig.steps?.find(
+                    (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                )
+            );
+
             const data = {
                 uid: appRef.current?.uid,
                 totalCount,
@@ -1556,6 +1568,8 @@ const Lefts = ({
                 (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
             );
         }
+        console.log(b);
+
         arr = [arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'), ..._.cloneDeep(generRef.current), b];
         return arr;
     };
@@ -1564,6 +1578,8 @@ const Lefts = ({
     const saveTemplate = () => {
         setExeState(false);
         const arr = headerSaveAll();
+        console.log(arr);
+
         setDetail &&
             setDetail({
                 ...detail,
@@ -1754,7 +1770,6 @@ const Lefts = ({
     }, [changePre]);
     const [imgPre, setImgPre] = useState(0);
     useEffect(() => {
-        console.log(11111);
         if (imgPre === 1) {
             getList(true);
             setImgPre(0);
@@ -1767,8 +1782,11 @@ const Lefts = ({
     //全局变量
     const [advancedModal, setAdvancedModal] = useState(false);
     const [allVariable, setAllVariable] = useState<any>(null);
-    console.log(appData);
-
+    useEffect(() => {
+        if (imageStylePre) {
+            getList(true, false, true);
+        }
+    }, [imageStylePre]);
     return (
         <>
             <div className="relative h-full">
@@ -1782,7 +1800,7 @@ const Lefts = ({
                         size="small"
                         shape="circle"
                     >
-                        <RightOutlined rev={undefined} />
+                        <RightOutlined />
                     </Button>
                 </Tooltip>
                 {isMyApp && (
@@ -1811,7 +1829,7 @@ const Lefts = ({
                                     创作同款应用
                                 </Button>
                             )}
-                            状态：{getStatus1(appData?.status)}
+                            执行状态：{getStatus1(appData?.status)}
                             <div className="inline-block whitespace-nowrap">
                                 <Popconfirm
                                     title="更新提示"
@@ -1886,11 +1904,11 @@ const Lefts = ({
                             <Tabs.TabPane key={'1'} tab="素材上传">
                                 <div className="flex justify-between items-center mb-2">
                                     <div>
-                                        <InfoCircleOutlined rev={undefined} />
+                                        <InfoCircleOutlined />
                                         <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
                                     </div>
                                     {/* <IconButton size="small">
-                                        <SettingOutlined rev={undefined} />
+                                        <SettingOutlined  />
                                     </IconButton> */}
                                 </div>
                                 <div>
@@ -1915,7 +1933,7 @@ const Lefts = ({
                                                 <div>
                                                     <Upload {...props}>
                                                         <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                                            <PlusOutlined rev={undefined} />
+                                                            <PlusOutlined />
                                                             <div style={{ marginTop: 8 }}>Upload</div>
                                                         </div>
                                                     </Upload>
@@ -1969,7 +1987,7 @@ const Lefts = ({
                                                         onClick={() => setZoomOpen(true)}
                                                         type="primary"
                                                         shape="circle"
-                                                        icon={<ZoomInOutlined rev={undefined} />}
+                                                        icon={<ZoomInOutlined />}
                                                     ></Button>
                                                 </div>
                                             </div>
@@ -2010,13 +2028,13 @@ const Lefts = ({
                         >
                             <div className="flex justify-between items-center mb-2">
                                 <div>
-                                    <InfoCircleOutlined rev={undefined} />
+                                    <InfoCircleOutlined />
                                     <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
                                 </div>
                                 {/* {detail && (
                                     <Tooltip title="流程配置">
                                         <Button
-                                            icon={<SettingOutlined rev={undefined} />}
+                                            icon={<SettingOutlined  />}
                                             shape="circle"
                                             size="small"
                                             type="primary"
@@ -2061,6 +2079,16 @@ const Lefts = ({
                                                                         appData?.configuration?.appInformation ||
                                                                         appData?.executeParam?.appInformation
                                                                     }
+                                                                    materialList={
+                                                                        item?.variable?.variables?.find(
+                                                                            (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                        )?.options || []
+                                                                    }
+                                                                    materialValue={
+                                                                        item?.variable?.variables?.find(
+                                                                            (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                        )?.value
+                                                                    }
                                                                     stepCode={item?.field}
                                                                     model={''}
                                                                     handlerCode={item?.flowStep?.handler}
@@ -2073,12 +2101,30 @@ const Lefts = ({
                                                                         setStep(stepRef.current);
                                                                     }}
                                                                     columns={stepMaterial[index]}
-                                                                    setMaterialType={() => {
-                                                                        setMaterialTypes(
-                                                                            item?.variable?.variables?.find(
-                                                                                (i: any) => i.field === 'MATERIAL_TYPE'
-                                                                            )?.value
-                                                                        );
+                                                                    setMaterialType={(e: any) => {
+                                                                        if (e) {
+                                                                            setMaterialTypes(e);
+                                                                            const newList = _.cloneDeep(generRef.current);
+                                                                            newList[index].variable.variables.find(
+                                                                                (dt: any) => dt.field === 'MATERIAL_TYPE'
+                                                                            ).value = e;
+                                                                            generRef.current = newList;
+                                                                            setGenerateList(generRef.current);
+                                                                            newList[index].variable.variables[
+                                                                                item.variable.variables?.findIndex(
+                                                                                    (item: any) => item.style === 'MATERIAL'
+                                                                                )
+                                                                            ].value = [];
+                                                                            stepRef.current = index;
+                                                                            setStep(stepRef.current);
+                                                                            setTableDatas(e, index);
+                                                                        } else {
+                                                                            setMaterialTypes(
+                                                                                item?.variable?.variables?.find(
+                                                                                    (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                                )?.value
+                                                                            );
+                                                                        }
                                                                     }}
                                                                     onChange={(e: any) => {
                                                                         const newList = _.cloneDeep(generRef.current);
@@ -2177,6 +2223,7 @@ const Lefts = ({
                                 {detail ? (
                                     <AddStyle
                                         selectImgLoading={selectImgLoading}
+                                        materialStatus={materialStatus}
                                         saveTemplate={saveTemplate}
                                         details={appData?.configuration?.appInformation}
                                         hasAddStyle={detail || !detailShow ? false : true}
@@ -2186,12 +2233,12 @@ const Lefts = ({
                                         record={imageMater}
                                         getList={() => getList(true)}
                                         materialType={materialType}
-                                        materialStatus={materialStatus}
                                     />
                                 ) : (
                                     <AddStyleApp
                                         selectImgLoading={selectImgLoading}
                                         allData={appData}
+                                        materialStatus={materialStatus}
                                         details={appData?.configuration?.appInformation}
                                         hasAddStyle={detail || !detailShow ? false : true}
                                         setImageVar={setImageVar}
@@ -2210,7 +2257,7 @@ const Lefts = ({
                             <Tabs.TabPane key={'3'} tab="图片生成">
                                 <div className="flex items-center mb-2">
                                     <Tooltip title="生成图片时会按照风格模板的顺序去使用">
-                                        <InfoCircleOutlined className="cursor-pointer" rev={undefined} />
+                                        <InfoCircleOutlined className="cursor-pointer" />
                                     </Tooltip>
                                     <span className="text-sm ml-1 text-stone-600">
                                         配置笔记图片生成的风格模版，支持不同风格模版组合生成
@@ -2219,6 +2266,7 @@ const Lefts = ({
                                 <AddStyle
                                     canAddCustomStyle={false}
                                     details={appData?.configuration?.appInformation}
+                                    materialStatus={materialStatus}
                                     // hasAddStyle={true}
                                     hasAddStyle={false}
                                     setImageVar={setImageVar}
@@ -2259,12 +2307,17 @@ const Lefts = ({
                         )}
                     </Tabs>
                 </div>
-                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">
+                <div
+                    style={{
+                        marginBottom: '16px'
+                    }}
+                    className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]"
+                >
                     {detailShow && (
                         <>
                             <Button
                                 className="w-full"
-                                icon={<SaveOutlined rev={undefined} />}
+                                icon={<SaveOutlined />}
                                 onClick={() => {
                                     if (!detail) {
                                         handleSaveClick(false);

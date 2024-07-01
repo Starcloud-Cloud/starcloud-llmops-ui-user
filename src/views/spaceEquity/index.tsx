@@ -131,7 +131,7 @@ const SpaceEquity = () => {
     const [active, setActive] = useState<string | null>(null);
     const uploadButton = (
         <button style={{ border: 0, background: 'none' }} type="button">
-            <PlusOutlined rev={undefined} />
+            <PlusOutlined />
         </button>
     );
     const props: UploadProps = {
@@ -510,7 +510,6 @@ const SpaceEquity = () => {
                                         setavatarOpen(true);
                                     }}
                                     className="cursor-pointer"
-                                    rev={undefined}
                                 />
                             )}
                         </div>
@@ -697,7 +696,7 @@ const SpaceEquity = () => {
                                 <span className="font-bold">
                                     添加成员链接
                                     <Popover placement="top" content={<span>对方打开链接，点击‘确认’并登录，即可加入该空间</span>}>
-                                        <QuestionCircleOutlined className="cursor-pointer ml-[5px] mr-[10px]" rev={undefined} />
+                                        <QuestionCircleOutlined className="cursor-pointer ml-[5px] mr-[10px]" />
                                     </Popover>
                                 </span>
                                 {window.location.protocol + '//' + window.location.host + '/invite?invite=' + user?.inviteCode}

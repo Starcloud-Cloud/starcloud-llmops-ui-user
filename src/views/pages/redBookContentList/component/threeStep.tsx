@@ -95,7 +95,8 @@ const ThreeStep = ({
             if (res) {
                 setTags(res?.executeResult?.copyWriting?.tagList);
                 setText(res?.executeResult?.copyWriting?.content);
-                setTitle(res?.executeResult?.copyWriting?.title);
+                const newTitle = res?.executeResult?.copyWriting?.title.replace(/\n/g, ' ');
+                setTitle(newTitle);
                 setClaim(res?.claim);
                 const imgs = res?.executeResult?.imageList?.map((item: any) => ({
                     uid: item.index,
@@ -130,7 +131,8 @@ const ThreeStep = ({
         if (data) {
             setTags(data?.executeResult?.copyWriting?.tagList);
             setText(data?.executeResult?.copyWriting?.content);
-            setTitle(data?.executeResult?.copyWriting?.title);
+            const newTitle = data?.executeResult?.copyWriting?.title.replace(/\n/g, ' ') || '';
+            setTitle(newTitle);
             setClaim(data?.claim);
             // setImages(data?.pictureContent || []);
             const imgs = data?.executeResult?.imageList?.map((item: any) => ({

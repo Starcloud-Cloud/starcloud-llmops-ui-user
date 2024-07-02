@@ -11,7 +11,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useEffect, useState, useMemo, createContext, useContext } from 'react';
 import AiCreate from './AICreate';
 import _ from 'lodash-es';
-import { PlusOutlined, HolderOutlined } from '@ant-design/icons';
+import { PlusOutlined, CloudDownloadOutlined, HolderOutlined } from '@ant-design/icons';
 import { materialFieldCode } from 'api/redBook/batchIndex';
 import { useLocation } from 'react-router-dom';
 import FieldImage from 'assets/images/icons/field.svg';
@@ -49,8 +49,11 @@ const LeftModalAdd = ({
     setColOpen,
     tableLoading,
     detail,
+    editableKey,
+    setEditableRowKey,
     columns,
     tableData,
+    setTableData,
     MokeList,
     materialFieldTypeList,
     setTitle,
@@ -78,12 +81,15 @@ const LeftModalAdd = ({
     colOpen: boolean;
     setColOpen: (data: boolean) => void;
     tableLoading: boolean;
+    editableKey: any[];
+    setEditableRowKey: (data: any) => void;
     detail?: any;
     columns: any[];
     MokeList: any[];
     materialFieldTypeList: any[];
     materialType: any;
     tableData: any[];
+    setTableData: (data: any[]) => void;
     setTitle: (data: string) => void;
     setEditOpen: (data: boolean) => void;
     changeTableValue: (data: any) => void;
@@ -111,140 +117,44 @@ const LeftModalAdd = ({
         });
         changeTableValue(newData);
     };
-    const materialColumns: TableProps<any>['columns'] = [
-        {
-            title: '字段名称',
-            dataIndex: 'desc',
-            align: 'center'
-        },
-        {
-            title: '字段类型',
-            render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label,
-            align: 'center'
-        },
-        {
-            title: '是否为分组',
-            render: (_, row) => <Tag color="processing">{row?.isGroupField ? '是' : '否'}</Tag>,
-            align: 'center'
-        },
-        {
-            title: '是否必填',
-            render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : ''),
-            align: 'center'
-        },
-        {
-            title: '排序',
-            dataIndex: 'order',
-            align: 'center'
-        },
-        {
-            title: '操作',
-            width: 120,
-            render: (_, row, index) => (
-                <div className="flex gap-2">
-                    <Button
-                        type="link"
-                        onClick={() => {
-                            form.setFieldsValue(row);
-                            setRowIndex(index);
-                            setMaterialTitle('编辑');
-                            setFormOpen(true);
-                        }}
-                    >
-                        编辑
-                    </Button>
-                    <Popconfirm
-                        title="提示"
-                        description="请再次确认是否要删除"
-                        onConfirm={() => {
-                            const newData = materialTableData?.filter((item, i) => i !== index);
-                            setMaterialTableData(newData);
-                        }}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button type="link" danger>
-                            删除
-                        </Button>
-                    </Popconfirm>
-                </div>
-            ),
-            align: 'center'
-        }
-    ];
-    // const materialColumns: ProColumns<any>[] = [
-    //     {
-    //         title: '排序',
-    //         readonly: true,
-    //         editable: (text, record, index) => {
-    //             return false;
-    //         },
-    //         align: 'center',
-    //         width: 80,
-    //         render: () => <DragHandle />
-    //     },
+    // const materialColumns: TableProps<any>['columns'] = [
     //     {
     //         title: '字段名称',
-    //         align: 'center',
     //         dataIndex: 'desc',
-    //         formItemProps: {
-    //             rules: [
-    //                 {
-    //                     required: true,
-    //                     message: '请输入字段名称'
-    //                 },
-    //                 {
-    //                     max: 16,
-    //                     message: '字段名称不能超过 20 个字'
-    //                 }
-    //             ]
-    //         }
+    //         align: 'center'
     //     },
     //     {
     //         title: '字段类型',
-    //         dataIndex: 'type',
-    //         align: 'center',
-    //         valueType: 'select',
-    //         fieldProps: {
-    //             options: materialFieldTypeList
-    //         },
-    //         formItemProps: {
-    //             rules: [
-    //                 {
-    //                     required: true,
-    //                     message: '请选择字段类型'
-    //                 }
-    //             ]
-    //         },
-    //         render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label
+    //         render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label,
+    //         align: 'center'
     //     },
     //     {
-    //         title: '是否为分组字段',
-    //         dataIndex: 'isGroupField',
-    //         align: 'center',
-    //         valueType: 'switch',
-    //         render: (_, row) => (row?.isGroupField ? <Tag color="processing">是</Tag> : <Tag color="processing">否</Tag>)
+    //         title: '是否为分组',
+    //         render: (_, row) => <Tag color="processing">{row?.isGroupField ? '是' : '否'}</Tag>,
+    //         align: 'center'
     //     },
     //     {
     //         title: '是否必填',
-    //         dataIndex: 'required',
-    //         align: 'center',
-    //         valueType: 'switch',
-    //         render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : '')
+    //         render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : ''),
+    //         align: 'center'
+    //     },
+    //     {
+    //         title: '排序',
+    //         dataIndex: 'order',
+    //         align: 'center'
     //     },
     //     {
     //         title: '操作',
-    //         align: 'center',
-    //         valueType: 'option',
-    //         width: 200,
-    //         render: (text, record, index, action) => (
-    //             <div className="w-full flex justify-center gap-2">
+    //         width: 120,
+    //         render: (_, row, index) => (
+    //             <div className="flex gap-2">
     //                 <Button
     //                     type="link"
     //                     onClick={() => {
-    //                         console.log(record.uuid);
-
-    //                         action?.startEditable?.(record.uuid);
+    //                         form.setFieldsValue(row);
+    //                         setRowIndex(index);
+    //                         setMaterialTitle('编辑');
+    //                         setFormOpen(true);
     //                     }}
     //                 >
     //                     编辑
@@ -264,9 +174,105 @@ const LeftModalAdd = ({
     //                     </Button>
     //                 </Popconfirm>
     //             </div>
-    //         )
+    //         ),
+    //         align: 'center'
     //     }
     // ];
+    const materialColumns: ProColumns<any>[] = [
+        {
+            title: '排序',
+            readonly: true,
+            editable: (text, record, index) => {
+                return false;
+            },
+            align: 'center',
+            width: 80,
+            render: () => <DragHandle />
+        },
+        {
+            title: '字段名称',
+            align: 'center',
+            dataIndex: 'desc',
+            formItemProps: {
+                rules: [
+                    {
+                        required: true,
+                        message: '请输入字段名称'
+                    },
+                    {
+                        max: 16,
+                        message: '字段名称不能超过 20 个字'
+                    }
+                ]
+            }
+        },
+        {
+            title: '字段类型',
+            dataIndex: 'type',
+            align: 'center',
+            valueType: 'select',
+            fieldProps: {
+                options: materialFieldTypeList
+            },
+            formItemProps: {
+                rules: [
+                    {
+                        required: true,
+                        message: '请选择字段类型'
+                    }
+                ]
+            },
+            render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label
+        },
+        {
+            title: '是否为分组字段',
+            dataIndex: 'isGroupField',
+            align: 'center',
+            valueType: 'switch',
+            render: (_, row) => (row?.isGroupField ? <Tag color="processing">是</Tag> : <Tag color="processing">否</Tag>)
+        },
+        {
+            title: '是否必填',
+            dataIndex: 'required',
+            align: 'center',
+            valueType: 'switch',
+            render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : '')
+        },
+        {
+            title: '操作',
+            align: 'center',
+            valueType: 'option',
+            width: 200,
+            render: (text, record, index, action) => (
+                <div className="w-full flex justify-center gap-2">
+                    <Button
+                        type="link"
+                        onClick={() => {
+                            console.log(record.uuid);
+
+                            action?.startEditable?.(record.uuid);
+                        }}
+                    >
+                        编辑
+                    </Button>
+                    <Popconfirm
+                        title="提示"
+                        description="请再次确认是否要删除"
+                        onConfirm={() => {
+                            const newData = materialTableData?.filter((item, i) => i !== index);
+                            setMaterialTableData(newData);
+                        }}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button type="link" danger>
+                            删除
+                        </Button>
+                    </Popconfirm>
+                </div>
+            )
+        }
+    ];
     const [materialTableData, setMaterialTableData] = useState<any[]>([]);
     const [rowIndex, setRowIndex] = useState(-1);
     const [formOpen, setFormOpen] = useState(false);
@@ -287,12 +293,12 @@ const LeftModalAdd = ({
     };
     useEffect(() => {
         if (fieldHead) {
-            setMaterialTableData(fieldHead);
-            // setMaterialTableData(
-            //     fieldHead?.map((item: any) => {
-            //         return { ...item, uuid: item.uuid || uuidv4() };
-            //     })
-            // );
+            // setMaterialTableData(fieldHead);
+            setMaterialTableData(
+                fieldHead?.map((item: any) => {
+                    return { ...item, uuid: item.uuid || uuidv4() };
+                })
+            );
         }
     }, [fieldHead]);
     return (
@@ -341,7 +347,57 @@ const LeftModalAdd = ({
                         )}
                     </div>
                 </div>
-                <Table
+                <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+                    <SortableContext items={tableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
+                        <EditableProTable<any>
+                            rowKey="uuid"
+                            tableAlertRender={false}
+                            rowSelection={{
+                                type: 'checkbox',
+                                fixed: true,
+                                columnWidth: 50,
+                                selectedRowKeys: selectedRowKeys,
+                                onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+                                    setSelectedRowKeys(selectedRowKeys);
+                                }
+                            }}
+                            components={{ body: { row: Row } }}
+                            toolBarRender={false}
+                            columns={columns}
+                            value={tableData}
+                            pagination={{
+                                pageSize: 20,
+                                pageSizeOptions: [20, 50, 100, 300, 500],
+                                onChange: (page) => setPage(page)
+                            }}
+                            recordCreatorProps={{
+                                position: 'top',
+                                record: () => ({
+                                    uuid: uuidv4()
+                                })
+                            }}
+                            editable={{
+                                type: 'multiple',
+                                editableKeys: editableKey,
+                                onSave: async (rowKey, data, row) => {
+                                    const newList = tableData?.map((item) => {
+                                        if (item.uuid === rowKey) {
+                                            return data;
+                                        } else {
+                                            return item;
+                                        }
+                                    });
+                                    setTableData(newList);
+                                },
+                                onChange: setEditableRowKey
+                            }}
+                            onChange={(data: any) => {
+                                setTableData(data);
+                            }}
+                        />
+                    </SortableContext>
+                </DndContext>
+                {/* <Table
                     rowKey={(record, index) => {
                         return record.uuid;
                     }}
@@ -367,14 +423,24 @@ const LeftModalAdd = ({
                     }}
                     columns={columns}
                     dataSource={tableData}
-                />
+                /> */}
             </div>
             <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
-                <div className="flex justify-end">
-                    <Button
+                <div className="flex justify-end mb-4">
+                    {/* <Button
+                        disabled={materialTableData?.length >= 30}
+                        size="small"
+                        onClick={() => {
+                            console.log(1111);
+                        }}
+                        icon={<CloudDownloadOutlined />}
+                        type="primary"
+                    >
+                        导入素材字段
+                    </Button> */}
+                    {/* <Button
                         disabled={materialTableData?.length === 30}
                         size="small"
-                        className="mb-4"
                         onClick={() => {
                             setMaterialTitle('新增');
                             setRowIndex(-1);
@@ -384,15 +450,16 @@ const LeftModalAdd = ({
                         type="primary"
                     >
                         新增({materialTableData?.length || 0}/30)
-                    </Button>
+                    </Button> */}
                 </div>
-                <Table pagination={false} columns={materialColumns} dataSource={materialTableData} />
-                {/* <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+                {/* <Table pagination={false} columns={materialColumns} dataSource={materialTableData} /> */}
+                <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
                     <SortableContext items={materialTableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
                         <EditableProTable<any>
                             rowKey="uuid"
                             components={{ body: { row: Row } }}
                             toolBarRender={false}
+                            maxLength={30}
                             columns={materialColumns}
                             value={materialTableData}
                             recordCreatorProps={{
@@ -419,18 +486,18 @@ const LeftModalAdd = ({
                             }}
                         />
                     </SortableContext>
-                </DndContext> */}
+                </DndContext>
                 <div className="flex justify-center mt-4">
                     <Button
                         type="primary"
                         disabled={materialTableData?.length === 0}
                         onClick={async () => {
                             const result = await materialFieldCode({
-                                fieldConfigDTOList: materialTableData
-                                // fieldConfigDTOList: materialTableData?.map((item, index) => ({
-                                //     ...item,
-                                //     order: index
-                                // }))
+                                // fieldConfigDTOList: materialTableData
+                                fieldConfigDTOList: materialTableData?.map((item, index) => ({
+                                    ...item,
+                                    order: index
+                                }))
                             });
                             setMaterialTableData(result);
                             try {
@@ -502,6 +569,7 @@ const memoLeftModal = (pre: any, next: any) => {
         JSON.stringify(pre.zoomOpen) === JSON.stringify(next.zoomOpen) &&
         JSON.stringify(pre.colOpen) === JSON.stringify(next.colOpen) &&
         JSON.stringify(pre.tableLoading) === JSON.stringify(next.tableLoading) &&
+        JSON.stringify(pre.editableKey) === JSON.stringify(next.editableKey) &&
         JSON.stringify(pre.columns) === JSON.stringify(next.columns) &&
         JSON.stringify(pre.MokeList) === JSON.stringify(next.MokeList) &&
         JSON.stringify(pre.materialFieldTypeList) === JSON.stringify(next.materialFieldTypeList) &&

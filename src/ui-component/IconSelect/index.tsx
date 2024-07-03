@@ -38,7 +38,7 @@ const TwoToneIcon = (props: any) => (
         )}
     />
 );
-const MoreIcon = (props: any) => (
+export const MoreIcon = (props: any) => (
     <Icon
         {...props}
         component={() => (
@@ -52,9 +52,10 @@ const MoreIcon = (props: any) => (
         )}
     />
 );
-const allIcons: {
+export const allIcons: {
     [key: string]: any;
 } = AntdIcons;
+
 const IconSelect: React.FC<IconSelectProps> = ({ value, onChange }) => {
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [iconTheme, setIconTheme] = useState<'Outlined' | 'Filled' | 'TwoTone'>('Outlined');

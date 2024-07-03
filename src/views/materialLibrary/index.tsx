@@ -1,6 +1,7 @@
 import { Select, Input, Row, Col, Tabs, Table, Space, Button } from 'antd';
 import type { TabsProps, TableProps } from 'antd';
 import { useState } from 'react';
+import PlugMarket from './components/plugMarket';
 const MaterialLibrary = () => {
     const { Option } = Select;
     const columns: TableProps<any>['columns'] = [
@@ -51,8 +52,10 @@ const MaterialLibrary = () => {
         },
         { label: '系统素材库', key: '2', children: <div>222</div> }
     ];
+    const [open, setOpen] = useState(false);
     return (
         <div className="bg-white h-full p-4">
+            <Button onClick={() => setOpen(true)}>aaaaa</Button>
             <Row gutter={[16, 16]}>
                 <Col xxl={4} lg={6} md={8} xs={12} sm={24}>
                     <Input placeholder="搜索" />
@@ -64,6 +67,7 @@ const MaterialLibrary = () => {
                 </Col>
             </Row>
             <Tabs items={TabsItems}></Tabs>
+            <PlugMarket open={open} setOpen={setOpen} />
         </div>
     );
 };

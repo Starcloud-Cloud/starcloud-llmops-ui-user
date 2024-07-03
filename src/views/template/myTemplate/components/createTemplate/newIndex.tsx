@@ -983,6 +983,8 @@ function CreateDetail() {
         }
     }, []);
     const [changePre, setChangePre] = useState(0);
+    console.log(1);
+
     return searchParams.get('source') === 'market' ? (
         detail ? (
             <>

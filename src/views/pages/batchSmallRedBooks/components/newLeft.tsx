@@ -3,41 +3,25 @@ import {
     Upload,
     UploadProps,
     Button,
-    Table,
     Modal,
     Image,
     Popconfirm,
     Form,
     Progress,
     Tabs,
-    Collapse,
     InputNumber,
     Tag,
     Row,
     Col,
     Input,
     Badge,
-    theme,
     Tooltip,
     Radio
 } from 'antd';
-import { EditableProTable, ProFormRadio } from '@ant-design/pro-components';
-import type { RadioChangeEvent } from 'antd';
-import { AccordionDetails, AccordionSummary, Accordion, IconButton } from '@mui/material';
-import { ExpandMore, AddCircleSharp, South, MoreVert } from '@mui/icons-material';
-import {
-    PlusOutlined,
-    SaveOutlined,
-    ZoomInOutlined,
-    InfoCircleOutlined,
-    CloudUploadOutlined,
-    DeleteOutlined,
-    CopyOutlined,
-    VerticalAlignBottomOutlined,
-    VerticalAlignTopOutlined,
-    SettingOutlined,
-    RightOutlined
-} from '@ant-design/icons';
+import { EditableProTable } from '@ant-design/pro-components';
+import { AccordionDetails, AccordionSummary, Accordion } from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
+import { PlusOutlined, SaveOutlined, ZoomInOutlined, InfoCircleOutlined, CloudUploadOutlined, RightOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -59,7 +43,6 @@ import {
 import { marketDeatail } from 'api/template/index';
 import FormModal, { propShow } from './formModal';
 import MarketForm from '../../../template/components/marketForm';
-import CreateVariable from '../../copywriting/components/spliceCmponents/variable';
 import LeftModalAdd from './leftModalAdd';
 import AddStyleApp from 'ui-component/AddStyle/indexApp';
 import AddStyle from 'ui-component/AddStyle/index';
@@ -75,9 +58,6 @@ import AiCreate from './AICreate';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import './newLeft.scss';
 import { SearchOutlined } from '@ant-design/icons';
-import { stepList } from 'api/template';
-import EditStepTitle from './editStepTitle';
-import SettingModal from './settingModal';
 import React from 'react';
 
 const Lefts = ({
@@ -133,7 +113,6 @@ const Lefts = ({
     setWidth?: () => void;
     getAppList?: () => void;
 }) => {
-    const { token } = theme.useToken();
     const navigate = useNavigate();
     const { allDetail: all_detail }: any = useAllDetail();
     const { TextArea } = Input;
@@ -152,7 +131,7 @@ const Lefts = ({
 
     useEffect(() => {
         if (tableRef.current.length && selectImg?.largeImageURL) {
-            const data = tableRef.current;
+            const data = _.cloneDeep(tableRef.current);
             data.forEach((item) => {
                 if (item.uuid === imageDataIndex) {
                     item[filedName] = selectImg?.largeImageURL;
@@ -199,7 +178,6 @@ const Lefts = ({
     const [open, setOpen] = useState(false);
     const [previewImage, setpreviewImage] = useState('');
     const [fileList, setFileList] = useState<any[]>([]);
-    const [previewUrl, setPreviewUrl] = useState('');
     const [previewOpen, setPreviewOpen] = useState(false);
     const props: UploadProps = {
         name: 'image',
@@ -280,7 +258,6 @@ const Lefts = ({
     const [canUpload, setCanUpload] = useState(true);
 
     const getTableHeader = (list: any[]) => {
-        // const result = await materialTemplate(materialType);
         setMokeList(list);
         const newList = list?.map((item: any) => {
             return {
@@ -306,7 +283,7 @@ const Lefts = ({
                                     disabled={!canUpload}
                                     onChange={(info) => {
                                         if (info.file.status === 'done') {
-                                            const data = tableRef.current;
+                                            const data = JSON.parse(JSON.stringify(tableRef.current));
                                             data[index][item.fieldName] = info?.file?.response?.data?.url;
                                             tableRef.current = data;
                                             setTableData([...data]);
@@ -461,7 +438,6 @@ const Lefts = ({
             }
         ]);
         setTableLoading(false);
-        setTablePre(1);
     };
     //下载模板
     const handleDownLoad = async () => {
@@ -568,12 +544,6 @@ const Lefts = ({
             clearInterval(timer.current);
         };
     }, [parseUid]);
-    //获取素材上传表格
-    // useEffect(() => {
-    //     if (materialType) {
-    //         getTableHeader();
-    //     }
-    // }, [materialType]);
     //模拟上传进度
     const timer1: any = useRef(null);
     useEffect(() => {
@@ -596,27 +566,6 @@ const Lefts = ({
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
     const [selectImgLoading, setSelectImgLoading] = useState(false);
-    const verifyList = () => {
-        if (tableData?.length === 0 && fileList?.length === 0) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '素材上传最少有一个',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    close: false
-                })
-            );
-            return;
-        }
-        if (imageRef.current?.record?.variable?.variable?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')) {
-        }
-        console.log(imageRef.current);
-    };
-    // 选择照片loading
 
     const getList = async (flag?: boolean, appUpdate?: boolean, isimgStyle?: boolean) => {
         let result;
@@ -869,6 +818,7 @@ const Lefts = ({
             saveTemplate();
         }
     };
+    const getOtherList = () => {};
     const setcustom = (data: any) => {
         const newData = _.cloneDeep(appRef.current);
         const step = newData.configuration.appInformation.workflowConfig.steps.find(
@@ -950,6 +900,7 @@ const Lefts = ({
     //页面进入给 Tabs 分配值
     useEffect(() => {
         getList();
+        getOtherList();
     }, []);
     //笔记生成的表头
     const stepRef = useRef(0);
@@ -1375,32 +1326,6 @@ const Lefts = ({
             setBookValue('');
         }
     }, [bookOpen]);
-    //监听素材上传发生变化
-    const [tablePre, setTablePre] = useState(0);
-
-    const getTag = (type: string) => {
-        return tableData
-            ?.map((item: any) => item[type])
-            ?.flat(1)
-            ?.filter((item: string) => item);
-    };
-    useEffect(() => {
-        if (tablePre && materialType === 'note') {
-            const imageList = getTag('images')?.map((item) => ({
-                type: 'note',
-                pictureUrl: item
-            }));
-            const TagList = getTag('tags');
-            const newList = _.cloneDeep(generRef.current);
-            let conList = newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables;
-            conList.find((item: any) => item.style === 'MATERIAL').value = tableData;
-            conList.find((item: any) => item.field === 'REFERS_IMAGE').value = imageList;
-            conList.find((item: any) => item.field === 'REFERS_TAG').value = TagList;
-            newList.find((item: any) => item.flowStep.handler === 'ImitateActionHandler').variable.variables = conList;
-            generRef.current = newList;
-            setGenerateList(generRef.current);
-        }
-    }, [JSON.stringify(tableData)]);
     useEffect(() => {
         if (generateList?.length > 0) {
             setGetData && setGetData(generateList);
@@ -1622,48 +1547,6 @@ const Lefts = ({
 
     //创作同款应用状态
     const [createAppStatus, setCreateAppStatus] = useState(false);
-
-    //增加步骤的
-    const [stepOpen, setStepOpen] = useState<any[]>([]);
-    const [stepLists, setStepList] = useState<any[]>([]);
-    const [collStep, setCollStep] = useState('');
-    const getImage = (data: string) => {
-        let image: string = '';
-        try {
-            image = require('../../../../assets/images/carryOut/' + data + '.svg');
-        } catch (errr) {
-            image = '';
-        }
-        return image;
-    };
-    const addupStep = (item: any, index: number) => {
-        const newLists = _.cloneDeep(appRef.current);
-        newLists.configuration?.appInformation?.workflowConfig?.steps.unshift(item);
-        appRef.current = newLists;
-        setAppData(appRef.current);
-    };
-    const addStep = (item: any, index: number) => {
-        const newList = _.cloneDeep(generRef.current);
-        const newLists = _.cloneDeep(appRef.current);
-        const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
-            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
-        );
-        let name = addName(item.name);
-        if (handle) {
-            newList.splice(index, 0, { ...item, name });
-            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name });
-        } else {
-            newList.splice(index + 1, 0, { ...item, name });
-            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name });
-        }
-        generRef.current = newList;
-        appRef.current = newLists;
-        setAppData(appRef.current);
-        setGenerateList(generRef.current);
-        const newStep = _.cloneDeep(stepOpen);
-        newStep[index] = open;
-        setStepOpen(newStep);
-    };
     const addName: any = (name: string) => {
         const nameList = appRef.current.configuration?.appInformation?.workflowConfig?.steps?.map((item: any) => item.name);
 
@@ -1684,79 +1567,6 @@ const Lefts = ({
             return name;
         }
     };
-    //删除步骤
-    const delStep = (index: number) => {
-        const newList = _.cloneDeep(generRef.current);
-        const newLists = _.cloneDeep(appRef.current);
-        const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
-            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
-        );
-        if (handle) {
-            if (index === 0) {
-                setTableData([]);
-                setFileList([]);
-                newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index, 1);
-            } else {
-                newList.splice(index - 1, 1);
-                newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index, 1);
-            }
-        } else {
-            newList.splice(index, 1);
-            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index, 1);
-        }
-        generRef.current = newList;
-        appRef.current = newLists;
-        setAppData(appRef.current);
-        setGenerateList(generRef.current);
-    };
-    //复制步骤
-    const copyStep = (item: any, index: number) => {
-        const newList = _.cloneDeep(generRef.current);
-        const newLists = _.cloneDeep(appRef.current);
-        const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
-            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
-        );
-        if (handle) {
-            newList.splice(index, 0, { ...item, name: item.name + '_copy' });
-            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name: item.name + '_copy' });
-        } else {
-            newList.splice(index + 1, 0, { ...item, name: item.name + '_copy' });
-            newLists.configuration?.appInformation?.workflowConfig?.steps.splice(index + 1, 0, { ...item, name: item.name + '_copy' });
-        }
-        generRef.current = newList;
-        appRef.current = newLists;
-        setAppData(appRef.current);
-        setGenerateList(generRef.current);
-    };
-    //移动步骤
-    const stepMove = (index: number, direction: number) => {
-        const newList = _.cloneDeep(generRef.current);
-        const newLists = _.cloneDeep(appRef.current);
-        const handle = newLists.configuration?.appInformation?.workflowConfig?.steps?.find(
-            (item: any) => item.flowStep.handler === 'MaterialActionHandler'
-        );
-        if (handle) {
-            const temp = _.cloneDeep(newList[index - 1]);
-            newList[index - 1] = newList[index - 1 + direction];
-            newList[index - 1 + direction] = temp;
-            console.log(newList);
-            const temps = _.cloneDeep(newLists.configuration?.appInformation?.workflowConfig?.steps[index]);
-            newLists.configuration.appInformation.workflowConfig.steps[index] =
-                newLists.configuration.appInformation.workflowConfig.steps[index + direction];
-            newLists.configuration.appInformation.workflowConfig.steps[index + direction] = temps;
-        } else {
-            const temp = _.cloneDeep(newList[index]);
-            newList[index] = newList[index + direction];
-            newList[index + direction] = temp;
-            const temps = _.cloneDeep(newLists.configuration?.appInformation?.workflowConfig?.steps[index]);
-            newLists.configuration.appInformation.workflowConfig.steps[index] = newList[index + direction];
-            newLists.configuration.appInformation.workflowConfig.steps[index + direction] = temps;
-        }
-        generRef.current = newList;
-        appRef.current = newLists;
-        setAppData(appRef.current);
-        setGenerateList(generRef.current);
-    };
     //改变给 sppData 赋值
     const setAppDataGen = () => {
         const variable = appRef.current.configuration.appInformation.workflowConfig.steps;
@@ -1767,13 +1577,6 @@ const Lefts = ({
         appRef.current = newappList;
         setAppData(appRef.current);
     };
-    useEffect(() => {
-        if (detail?.type) {
-            stepList(detail?.type).then((res) => {
-                setStepList(res);
-            });
-        }
-    }, [detail?.type]);
     useEffect(() => {
         if (changePre && appRef.current) {
             appRef.current.configuration.appInformation = detail;
@@ -1791,13 +1594,6 @@ const Lefts = ({
             setImgPre(0);
         }
     }, [detail]);
-    const [settingOpen, setSettingOpen] = useState(false);
-    const [steptitOpen, setSteotitOpen] = useState(false);
-    const [stepTitData, setStepTitData] = useState<any>(null);
-    const [stepIndex, setStepIndex] = useState(-1);
-    //全局变量
-    const [advancedModal, setAdvancedModal] = useState(false);
-    const [allVariable, setAllVariable] = useState<any>(null);
     useEffect(() => {
         if (imageStylePre) {
             getList(true, false, true);
@@ -1807,6 +1603,8 @@ const Lefts = ({
     const [radioType, setRadioType] = useState(1);
     //多行编辑
     const [editableKey, setEditableRowKey] = useState<React.Key[]>([]);
+    console.log(3333);
+
     return (
         <>
             <div className="relative h-full">
@@ -1927,9 +1725,6 @@ const Lefts = ({
                                         <InfoCircleOutlined />
                                         <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
                                     </div>
-                                    {/* <IconButton size="small">
-                                        <SettingOutlined  />
-                                    </IconButton> */}
                                 </div>
                                 <div>
                                     {materialStatus === 'picture' ? (
@@ -2419,10 +2214,8 @@ const Lefts = ({
                     src={previewImage + '?x-oss-process=image/resize,w_100/quality,q_80'}
                 />
             </Modal>
-            {zoomOpen && (
+            <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
-                    zoomOpen={zoomOpen}
-                    setZoomOpen={setZoomOpen}
                     colOpen={colOpen}
                     setColOpen={setColOpen}
                     tableLoading={tableLoading}
@@ -2436,8 +2229,6 @@ const Lefts = ({
                     setFieldHeads={setFieldHeads}
                     materialType={materialType}
                     detail={detail}
-                    editableKey={editableKey}
-                    setEditableRowKey={setEditableRowKey}
                     columns={columns}
                     tableData={tableData}
                     setTableData={(data) => {
@@ -2462,9 +2253,9 @@ const Lefts = ({
                     fieldCompletionData={fieldCompletionData}
                     setVariableData={setVariableData}
                     variableData={variableData}
-                    setMaterialTypeStatus={setMaterialTypeStatus}
+                    // setMaterialTypeStatus={setMaterialTypeStatus}
                 />
-            )}
+            </Modal>
             <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
                 <p>
                     支持以 XLS 文件形式批量导入数据，导入文件将自动刷新素材列表。
@@ -2552,17 +2343,6 @@ const Lefts = ({
             {botOpen && (
                 <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`权益不足，去升级`} from={''} />
             )}
-            <Image
-                className="hidden"
-                width={400}
-                preview={{
-                    visible: previewOpen,
-                    onVisibleChange: (visible) => {
-                        setPreviewOpen(visible);
-                    }
-                }}
-                src={previewUrl}
-            />
             {isModalOpen && (
                 <PicImagePick
                     getList={() => {
@@ -2582,175 +2362,6 @@ const Lefts = ({
                     columns={columns}
                     values={values}
                 />
-            )}
-            {settingOpen && (
-                <SettingModal
-                    settingOpen={settingOpen}
-                    setSettingOpen={setSettingOpen}
-                    saveStep={() => {
-                        setExeState(false);
-                        const arr = headerSaveAll();
-                        setDetail &&
-                            setDetail({
-                                ...detail,
-                                workflowConfig: {
-                                    steps: arr?.filter((item: any) => item)
-                                }
-                            });
-                        setSettingOpen(false);
-                    }}
-                    appData={appData}
-                    stepMove={stepMove}
-                    stepOpen={stepOpen}
-                    setStepOpen={setStepOpen}
-                    materialStatus={materialStatus}
-                    advanced={(item, index) => {
-                        setAllVariable(item);
-                        setStepIndex(index - 1);
-                        setAdvancedModal(true);
-                    }}
-                    advanceds={(item, index) => {
-                        setStepIndex(index);
-                        setStepTitData({
-                            name: item?.name,
-                            description: item?.description,
-                            flowStep: item?.flowStep
-                        });
-                        setSteotitOpen(true);
-                    }}
-                    addStep={addStep}
-                    copyStep={copyStep}
-                    delStep={delStep}
-                    setEditOpens={setEditOpens}
-                    setTitles={setTitles}
-                    stepMaterial={stepMaterial}
-                    setMaterialTypes={setMaterialTypes}
-                    materialTypeStatus={materialTypeStatus}
-                    setStep={(index) => {
-                        stepRef.current = index - 1;
-                        setStep(stepRef.current);
-                    }}
-                    changeSwitch={() => {
-                        if (materialStatus === 'default') {
-                            setFileList(
-                                tableRef.current?.map((item) => ({
-                                    uid: uuidv4(),
-                                    thumbUrl: item[columns[1]?.dataIndex],
-                                    response: {
-                                        data: {
-                                            url: item[columns[1]?.dataIndex]
-                                        }
-                                    }
-                                }))
-                            );
-                        } else {
-                            tableRef.current = fileList?.map((item) => ({
-                                [columns[1].dataIndex]: item?.response?.data?.url
-                            }));
-                            setTableData(tableRef.current);
-                        }
-                        appRef.current.configuration.appInformation.workflowConfig.steps
-                            .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
-                            .variable.variables.find((el: any) => el.field === 'BUSINESS_TYPE').value =
-                            materialStatus === 'default' ? 'picture' : 'default';
-                        setAppData(appRef.current);
-                        generRef.current = appRef.current?.configuration?.appInformation?.workflowConfig?.steps?.filter((item: any) => {
-                            return item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler';
-                        });
-                        setGenerateList(generRef.current);
-                    }}
-                    changeForm={(e: any, item: any, index: number, i: number) => {
-                        const newList = _.cloneDeep(generRef.current);
-                        const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
-                        const code = item?.flowStep?.handler;
-                        newList[index - 1].variable.variables[i].value = e.value;
-                        if (type && item.variable.variables?.find((item: any) => item.style === 'MATERIAL')) {
-                            newList[index - 1].variable.variables[
-                                item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL')
-                            ].value = [];
-                            stepRef.current = index - 1;
-                            setStep(stepRef.current);
-                            setTableDatas(type, index - 1);
-                        }
-                        if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
-                            const num = item.variable.variables?.findIndex((item: any) => item.field === 'REQUIREMENT');
-                            const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
-                            if (e.value === 'RANDOM') {
-                                newList[index - 1].variable.variables[num].isShow = false;
-                                newList[index - 1].variable.variables[num1].isShow = true;
-                            } else if (e.value === 'AI_PARODY') {
-                                newList[index - 1].variable.variables[num].isShow = true;
-                                newList[index - 1].variable.variables[num1].isShow = true;
-                            } else {
-                                newList[index - 1].variable.variables[num1].isShow = false;
-                                newList[index - 1].variable.variables[num].isShow = true;
-                            }
-                        }
-                        generRef.current = newList;
-                        setGenerateList(generRef.current);
-                        setAppDataGen();
-                    }}
-                    stepLists={stepLists}
-                    changeForms={(data, index, de) => {
-                        const newList = _.cloneDeep(generRef.current);
-                        newList[index - 1].variable.variables[de].value = data.value;
-                        generRef.current = newList;
-                        setGenerateList(generRef.current);
-                        setAppDataGen();
-                    }}
-                />
-            )}
-            {steptitOpen && (
-                <EditStepTitle
-                    steptitOpen={steptitOpen}
-                    setSteotitOpen={setSteotitOpen}
-                    setData={(data: any) => {
-                        const newList = _.cloneDeep(generRef.current);
-                        const newLists = _.cloneDeep(appRef.current);
-                        const { name, description, variables } = data;
-                        newList[stepIndex - 1] = {
-                            ...newList[stepIndex - 1],
-                            name,
-                            description,
-                            field: name
-                        };
-                        newList[stepIndex - 1].flowStep.variable.variables = variables;
-                        newLists.configuration.appInformation.workflowConfig.steps[stepIndex] = {
-                            ...newLists.configuration?.appInformation?.workflowConfig?.steps[stepIndex],
-                            name,
-                            description,
-                            field: name
-                        };
-                        newLists.configuration.appInformation.workflowConfig.steps[stepIndex].flowStep.variable.variables = variables;
-                        generRef.current = newList;
-                        appRef.current = newLists;
-                        setAppData(appRef.current);
-                        setGenerateList(generRef.current);
-                    }}
-                    stepTitData={stepTitData}
-                />
-            )}
-            {advancedModal && (
-                <Modal width={'60%'} title="高级设置" open={advancedModal} footer={false} onCancel={() => setAdvancedModal(false)}>
-                    <CreateVariable
-                        rows={allVariable?.variable?.variables}
-                        setRows={(data: any[]) => {
-                            const newTable = data?.map((item) => ({
-                                ...item,
-                                isShow: false
-                            }));
-                            const newData = _.cloneDeep(allVariable);
-                            newData.variable.variables = newTable;
-                            setAllVariable(newData);
-                            const newList = _.cloneDeep(generRef.current);
-                            newList[stepIndex].variable.variables = newTable;
-                            generRef.current = newList;
-                            setGenerateList(generRef.current);
-                            setAppDataGen();
-                            setAdvancedModal(false);
-                        }}
-                    />
-                </Modal>
             )}
         </>
     );

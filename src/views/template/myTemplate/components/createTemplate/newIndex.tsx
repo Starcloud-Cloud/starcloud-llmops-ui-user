@@ -983,6 +983,8 @@ function CreateDetail() {
         }
     }, []);
     const [changePre, setChangePre] = useState(0);
+    console.log(1);
+
     return searchParams.get('source') === 'market' ? (
         detail ? (
             <>
@@ -1000,15 +1002,60 @@ function CreateDetail() {
                     </div>
                 </SubCard>
                 <div className="h-[calc(100%-74px)] ">
-                    <CreatePlan
-                        ref={createPlanRef}
-                        planState={planState}
-                        getAppList={getList}
-                        detail={_.cloneDeep(detailRef.current)}
-                        setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
-                        isMyApp={true}
-                        isblack={false}
-                    />
+                    {detail?.type === 'MEDIA_MATRIX' ? (
+                        <Spin spinning={viewLoading} tip="Loading">
+                            <div className="h-[calc(100vh-220px)] bg-[rgb(244,246,248)]">
+                                <CreatePlan
+                                    ref={createPlanRef}
+                                    imageStylePre={imageStylePre}
+                                    getAppList={getList}
+                                    changePre={changePre}
+                                    planState={planState}
+                                    detail={_.cloneDeep(detailRef.current)}
+                                    setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
+                                    isMyApp={false}
+                                    isblack={false}
+                                />
+                            </div>
+                        </Spin>
+                    ) : (
+                        <Card elevation={2} sx={{ p: 2 }}>
+                            <Header
+                                permissions={permissions}
+                                detail={detail}
+                                aiModel={aiModel}
+                                setOpenUpgradeModel={setOpenUpgradeModel}
+                                setAiModel={setAiModel}
+                                appModels={appModels}
+                            />
+                            <Perform
+                                columns={stepMaterial}
+                                setEditOpen={setEditOpen}
+                                setStep={(data: any) => {
+                                    stepRef.current = data;
+                                    setStep(stepRef.current);
+                                }}
+                                getList={getList}
+                                setMaterialType={setMaterialType}
+                                setTitle={setTitle}
+                                isShows={isShows}
+                                details={_.cloneDeep(detailRef.current)}
+                                config={_.cloneDeep(detailRef.current?.workflowConfig)}
+                                changeConfigs={changeConfigs}
+                                changeSon={changeData}
+                                changeanswer={changeanswer}
+                                loadings={loadings}
+                                isDisables={isDisables}
+                                variableChange={exeChange}
+                                promptChange={promptChange}
+                                isallExecute={(flag: boolean) => {
+                                    isAllExecute = flag;
+                                }}
+                                addStyle={addStyle}
+                                source="myApp"
+                            />
+                        </Card>
+                    )}
                 </div>
             </>
         ) : (
@@ -1199,7 +1246,7 @@ function CreateDetail() {
                             >
                                 <div className="h-[16px]"></div>
                                 <Alert
-                                    className="my-4 mx-4"
+                                    className="mb-4 mx-4"
                                     message="修改流程后，可直接在 ”运行应用“ 处进行测试，验证流程是否符合需求"
                                     type="warning"
                                     closable

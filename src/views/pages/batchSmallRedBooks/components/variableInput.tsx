@@ -94,7 +94,7 @@ const VariableInput = ({
                         label: key,
                         title: property?.title,
                         desc: property?.description,
-                        children: getjsonschma(property, name)
+                        children: getjsonschma(property, name + '.' + key)
                     });
                 } else {
                     const convertedProperty = getjsonschma(property, name);

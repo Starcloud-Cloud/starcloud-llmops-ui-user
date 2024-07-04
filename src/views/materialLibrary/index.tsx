@@ -1,19 +1,32 @@
-import { Select, Input, Row, Col, Tabs, Space, Button, Modal, Form, Switch, Avatar, message, Popconfirm } from 'antd';
-import type { TabsProps } from 'antd';
+import { Select, Input, Row, Col, Tabs, Space, Button, Modal, Form, message, Popconfirm, Dropdown } from 'antd';
+import type { MenuProps, TabsProps } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import IconSelect, { MoreIcon, allIcons } from 'ui-component/IconSelect';
-import Icon, { ApiOutlined, AppstoreOutlined, UploadOutlined } from '@ant-design/icons';
+import IconSelect, { allIcons } from 'ui-component/IconSelect';
+import Icon, {
+    ApiOutlined,
+    AppstoreOutlined,
+    ExclamationCircleFilled,
+    MoreOutlined,
+    PlusOutlined,
+    UploadOutlined
+} from '@ant-design/icons';
 import { ActionType, CheckCard, ProColumns, ProTable } from '@ant-design/pro-components';
 import { addMaterial, delMaterial, getMaterialPage, updateMaterial } from 'api/material';
 import dayjs from 'dayjs';
 import { dictData } from 'api/template';
 const { Option } = Select;
+const { Search } = Input;
+const { confirm } = Modal;
 
 const MaterialLibrary = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectIcon, setSelectIcon] = useState('');
     const [typeList, setTypeList] = useState<any[]>([]);
     const [record, setRecord] = useState<any>(null);
+    const [query, setQuery] = useState<{
+        name: string;
+    } | null>(null);
+
     const actionRef = useRef<ActionType>();
 
     const IconRenderer = ({ value }: { value: string }) => {
@@ -30,6 +43,44 @@ const MaterialLibrary = () => {
     const handleTypeLabel = (value: string) => {
         return typeList.find((v) => v.value === value.toString())?.label || '未知';
     };
+
+    const showConfirm = () => {
+        confirm({
+            title: '确认',
+            icon: <ExclamationCircleFilled />,
+            content: '确认删除该条记录?',
+            onOk: async () => {
+                const data = await delMaterial({ id: record?.id });
+                if (data) {
+                    message.success('删除成功');
+                    actionRef.current?.reload();
+                }
+            },
+            onCancel() {
+                console.log('Cancel');
+            }
+        });
+    };
+
+    const items: any = [
+        {
+            key: '1',
+            label: '编辑',
+            onClick: () => {
+                setRecord(record);
+                form.setFieldsValue(record);
+                setIsModalOpen(true);
+            }
+        },
+        {
+            key: '2',
+            label: '删除',
+            danger: true,
+            onClick: async () => {
+                await showConfirm();
+            }
+        }
+    ];
 
     const columns: ProColumns<any>[] = [
         {
@@ -69,37 +120,11 @@ const MaterialLibrary = () => {
             title: '操作',
             width: 100,
             search: false,
-            align: 'center',
+            align: 'right',
             render: (_, row) => (
-                <Space>
-                    <Button
-                        type="link"
-                        onClick={() => {
-                            setRecord(row);
-                            form.setFieldsValue(row);
-                            setIsModalOpen(true);
-                        }}
-                    >
-                        编辑
-                    </Button>
-                    <Popconfirm
-                        title="确认"
-                        description="删除该记录?"
-                        onConfirm={async () => {
-                            const data = await delMaterial({ id: row?.id });
-                            if (data) {
-                                message.success('删除成功');
-                                actionRef.current?.reload();
-                            }
-                        }}
-                        okText="是"
-                        cancelText="否"
-                    >
-                        <Button danger type="link">
-                            删除
-                        </Button>
-                    </Popconfirm>
-                </Space>
+                <Dropdown menu={{ items }} onOpenChange={() => setRecord(row)}>
+                    <MoreOutlined className="cursor-pointer p-1" />
+                </Dropdown>
             )
         }
     ];
@@ -113,8 +138,10 @@ const MaterialLibrary = () => {
                     <ProTable
                         actionRef={actionRef}
                         columns={columns}
+                        search={false}
                         request={async (params) => {
                             params.pageNo = params.current;
+                            params.name = query?.name;
                             const data = await getMaterialPage(params);
                             return {
                                 data: data.list,
@@ -122,17 +149,38 @@ const MaterialLibrary = () => {
                                 total: data.total
                             };
                         }}
-                        bordered
-                        toolBarRender={() => [
+                        // bordered
+                        options={false}
+                        headerTitle={
                             <Button
-                                type={'default'}
+                                type={'primary'}
+                                icon={<PlusOutlined />}
                                 onClick={() => {
                                     setRecord(null);
                                     setIsModalOpen(true);
                                 }}
                             >
-                                新增
+                                创建知识库
                             </Button>
+                        }
+                        toolBarRender={() => [
+                            <Search
+                                placeholder="搜索"
+                                style={{ width: 200 }}
+                                allowClear
+                                onSearch={(value) => {
+                                    setQuery({ name: value });
+                                    actionRef.current?.reload();
+                                }}
+                            />
+                            // <Select placeholder="请选择分类" value={''} style={{ width: 100 }}>
+                            //     <Option value={''}>全部</Option>
+                            //     {typeList.map((item, index) => (
+                            //         <Option key={index} value={item.value}>
+                            //             {item.label}
+                            //         </Option>
+                            //     ))}
+                            // </Select>
                         ]}
                     />
                 </div>
@@ -140,10 +188,6 @@ const MaterialLibrary = () => {
         },
         { label: '系统素材库', key: '2', children: <div>222</div> }
     ];
-
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
 
     const handleOk = async () => {
         const values = await form.validateFields();

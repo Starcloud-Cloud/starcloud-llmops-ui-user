@@ -67,8 +67,6 @@ const LeftModalAdd = ({
     // setMaterialTypeStatus: (data: any) => void;
     variableData: any;
 }) => {
-    console.log(9999);
-
     const handleDels = () => {
         const newData = tableData?.filter((item) => {
             return !selectedRowKeys?.find((el: any) => el === item.uuid);

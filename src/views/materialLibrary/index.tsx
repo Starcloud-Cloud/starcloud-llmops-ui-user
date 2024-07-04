@@ -1,4 +1,4 @@
-import { Select, Input, Row, Col, Tabs, Space, Button, Modal, Form, message, Popconfirm, Dropdown } from 'antd';
+import { Select, Input, Row, Col, Tabs, Space, Button, Modal, Form, message, Popconfirm, Dropdown, Avatar, Switch } from 'antd';
 import type { MenuProps, TabsProps } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import IconSelect, { allIcons } from 'ui-component/IconSelect';
@@ -14,6 +14,7 @@ import { ActionType, CheckCard, ProColumns, ProTable } from '@ant-design/pro-com
 import { addMaterial, delMaterial, getMaterialPage, updateMaterial } from 'api/material';
 import dayjs from 'dayjs';
 import { dictData } from 'api/template';
+import { useNavigate } from 'react-router-dom';
 const { Option } = Select;
 const { Search } = Input;
 const { confirm } = Modal;
@@ -27,6 +28,7 @@ const MaterialLibrary = () => {
         name: string;
     } | null>(null);
 
+    const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
 
     const IconRenderer = ({ value }: { value: string }) => {
@@ -90,35 +92,59 @@ const MaterialLibrary = () => {
             renderText: (_, record) => {
                 return (
                     <div className="flex items-center">
-                        <IconRenderer value={record.iconUrl} />
+                        <Avatar shape="square" icon={<IconRenderer value={record.iconUrl} />} size={48} />
                         <span className="ml-2">{record.name}</span>
                     </div>
                 );
             }
         },
         {
+            title: '描述',
+            dataIndex: 'description',
+            search: false,
+            ellipsis: true
+        },
+        {
             title: '类型',
-            align: 'center',
             dataIndex: 'formatType',
             search: false,
+            width: 100,
+            align: 'center',
             renderText: (text) => handleTypeLabel(text)
         },
         {
-            title: '数量',
-            align: 'center',
+            title: '数据量',
             dataIndex: 'fileCount',
-            search: false
+            search: false,
+            width: 80,
+            align: 'center'
         },
         {
             title: '创建时间',
             align: 'center',
             dataIndex: 'createTime',
             search: false,
-            renderText: (text) => text && dayjs(text).format('YYYY-MM-DD')
+            width: 150,
+            renderText: (text) => text && dayjs(text).format('YYYY-MM-DD HH:mm')
+        },
+        {
+            title: '创作者',
+            align: 'center',
+            dataIndex: 'createName',
+            width: 120,
+            search: false
+        },
+        {
+            title: '启用',
+            align: 'center',
+            dataIndex: 'status',
+            search: false,
+            width: 80,
+            renderText: (text, record) => <Switch value={!!text} onChange={(value) => handleStatus({ ...record, status: value ? 1 : 0 })} />
         },
         {
             title: '操作',
-            width: 100,
+            width: 50,
             search: false,
             align: 'right',
             render: (_, row) => (
@@ -149,7 +175,13 @@ const MaterialLibrary = () => {
                                 total: data.total
                             };
                         }}
-                        // bordered
+                        onRow={(record) => {
+                            return {
+                                onClick: () => {
+                                    navigate(`/material/detail?id=${record.id}`);
+                                }
+                            };
+                        }}
                         options={false}
                         headerTitle={
                             <Button
@@ -189,10 +221,19 @@ const MaterialLibrary = () => {
         { label: '系统素材库', key: '2', children: <div>222</div> }
     ];
 
+    const handleStatus = async (record: any) => {
+        const data = await updateMaterial(record);
+        if (data) {
+            message.success('修改成功!');
+            setIsModalOpen(false);
+            actionRef.current?.reload();
+        }
+    };
+
     const handleOk = async () => {
         const values = await form.validateFields();
         const data = record ? await updateMaterial({ ...values, id: record.id }) : await addMaterial({ ...values, status: 1 });
-        if (data?.id) {
+        if (data) {
             message.success('添加成功!');
             setIsModalOpen(false);
             actionRef.current?.reload();

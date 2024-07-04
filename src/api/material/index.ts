@@ -35,3 +35,27 @@ export const updateMaterial = (data: any) => {
 export const delMaterial = (data: any) => {
     return request.delete({ url: '/llm/material-library/delete', params: data });
 };
+
+//  ###
+
+/**
+ * 获取素材表头
+ * @param data
+ * @returns
+ */
+export const getMaterialLibraryTitleList = (data: any) => {
+    return request.get({ url: '/llm/material-library/get', params: data });
+};
+
+/**
+ * 获取素材table
+ * @param data
+ * @returns
+ */
+export const getMaterialLibraryDataPage = (data: any) => {
+    return request.get({ url: '/llm/material-library-slice/page', params: data });
+};
+
+export const getMaterialLibraryDataList = (data: any) => {
+    return request.get({ url: '/llm/material-library-slice/list', params: data });
+};

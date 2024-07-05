@@ -37,7 +37,6 @@ const Row: React.FC<any> = (props) => {
     );
 };
 const HeaderField = ({
-    colOpen,
     setColOpen,
     onDragEnd,
     materialFieldTypeList,
@@ -45,7 +44,6 @@ const HeaderField = ({
     setMaterialTableData,
     setFieldHeads
 }: {
-    colOpen: boolean;
     setColOpen: (data: boolean) => void;
     onDragEnd: (data: any) => void;
     materialFieldTypeList: any[];
@@ -150,7 +148,7 @@ const HeaderField = ({
         }
     ];
     return (
-        <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
+        <>
             <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
                 <SortableContext items={materialTableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
                     <EditableProTable<any>
@@ -208,12 +206,11 @@ const HeaderField = ({
                     保存
                 </Button>
             </div>
-        </Modal>
+        </>
     );
 };
 const memoHeaderField = (oldValue: any, newValue: any) => {
     return (
-        _.isEqual(oldValue.colOpen, newValue.colOpen) &&
         _.isEqual(oldValue.materialFieldTypeList, newValue.materialFieldTypeList) &&
         _.isEqual(oldValue.materialTableData, newValue.materialTableData)
     );

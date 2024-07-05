@@ -139,3 +139,8 @@ export const createMaterialList = (params: any) => {
 export const createMaterialInfoPageByMarketUid = (data: any) => {
     return request.post({ url: `/llm/creative/material/infoPageByMarketUid`, data });
 };
+
+//历史详情
+export const pluginsXhsOcr = (data: any) => {
+    return request.post({ url: `/llm/creative/plugins/xhsOcr`, data });
+};

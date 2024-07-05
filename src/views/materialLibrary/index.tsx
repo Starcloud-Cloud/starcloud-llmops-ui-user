@@ -19,6 +19,11 @@ const { Option } = Select;
 const { Search } = Input;
 const { confirm } = Modal;
 
+export const IconRenderer = ({ value }: { value: string }) => {
+    let SelectedIcon = value.includes('http') ? AppstoreOutlined : allIcons['AppstoreAddOutlined'];
+    return <SelectedIcon />;
+};
+
 const MaterialLibrary = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectIcon, setSelectIcon] = useState('');
@@ -30,11 +35,6 @@ const MaterialLibrary = () => {
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
-
-    const IconRenderer = ({ value }: { value: string }) => {
-        let SelectedIcon = value.includes('http') ? AppstoreOutlined : allIcons['AppstoreAddOutlined'];
-        return <SelectedIcon />;
-    };
 
     useEffect(() => {
         dictData('', 'material_format_type').then((res) => {

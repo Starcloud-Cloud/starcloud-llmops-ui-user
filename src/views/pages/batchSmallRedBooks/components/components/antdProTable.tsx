@@ -1,15 +1,61 @@
 import { EditableProTable } from '@ant-design/pro-components';
-import { useState, memo, useMemo } from 'react';
+import { useState, memo, useMemo, useEffect } from 'react';
 import _ from 'lodash-es';
+import { Resizable } from 'react-resizable';
+import './index.css';
+
+const ResizeableTitle = (props: any) => {
+    const { onResize, width, ...restProps } = props;
+
+    if (!width) {
+        return <th {...restProps} />;
+    }
+
+    return (
+        <Resizable width={width} height={0} onResize={onResize} draggableOpts={{ enableUserSelectHack: false }}>
+            <th {...restProps} />
+        </Resizable>
+    );
+};
+
 const TablePro = ({ tableData, selectedRowKeys, setSelectedRowKeys, columns, setPage, setTableData }: any) => {
     const [editableKey, setEditableRowKey] = useState<React.Key[]>([]);
-    const column: any[] = useMemo(() => {
-        return columns;
-    }, [columns]);
+    const [column, setColumn] = useState<any[]>(columns);
+
+    // const column: any[] = useMemo(() => {
+    //     return columns;
+    // }, [columns]);
+
+    const components = {
+        header: {
+            cell: ResizeableTitle
+        }
+    };
+
+    const handleResize =
+        (index: number) =>
+        (e: any, { size }: any) => {
+            const nextColumns = [...column];
+            nextColumns[index] = {
+                ...nextColumns[index],
+                width: size.width
+            };
+            setColumn(nextColumns);
+        };
+
+    const resultColumns = column.map((col: any, index: any) => ({
+        ...col,
+        onHeaderCell: (column: any) => ({
+            width: column.width,
+            onResize: handleResize(index)
+        })
+    }));
+
     return (
         <EditableProTable<any>
             rowKey="uuid"
             tableAlertRender={false}
+            components={components}
             rowSelection={{
                 type: 'checkbox',
                 fixed: true,
@@ -20,7 +66,7 @@ const TablePro = ({ tableData, selectedRowKeys, setSelectedRowKeys, columns, set
                 }
             }}
             toolBarRender={false}
-            columns={column}
+            columns={resultColumns}
             value={tableData}
             pagination={{
                 pageSize: 20,

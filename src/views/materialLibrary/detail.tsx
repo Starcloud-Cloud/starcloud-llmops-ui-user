@@ -15,11 +15,13 @@ import { useLocation } from 'react-router-dom';
 import TablePro from 'views/pages/batchSmallRedBooks/components/components/antdProTable';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { v4 as uuidv4 } from 'uuid';
+import { IconRenderer } from './index';
 const { Search } = Input;
 
 const MaterialLibraryDetail = () => {
     const [columns, setColumns] = useState<any>([]);
     const [tableData, setTableData] = useState<any>([]);
+    const [detail, setDetail] = useState<any>(null);
     const [selectedRowKeys, setSelectRowKeys] = useState<any>([]);
     const [page, setPage] = useState(1);
     const [typeList, setTypeList] = useState<any[]>([]);
@@ -39,6 +41,7 @@ const MaterialLibraryDetail = () => {
 
     useEffect(() => {
         getMaterialLibraryTitleList({ id }).then((data) => {
+            setDetail(data);
             const list = data.tableMeta.map((item: any) => ({
                 desc: item.columnName,
                 fieldName: item.columnCode
@@ -242,7 +245,18 @@ const MaterialLibraryDetail = () => {
         });
     }, []);
 
-    const items: any = [];
+    const items: any = [
+        {
+            key: '1',
+            label: '编辑素材字段',
+            onClick: () => {}
+        },
+        {
+            key: '2',
+            label: '导入素材字段',
+            onClick: async () => {}
+        }
+    ];
 
     const handleDel = (index: number) => {
         const newList = JSON.parse(JSON.stringify(tableRef.current));
@@ -254,12 +268,10 @@ const MaterialLibraryDetail = () => {
         <>
             <div className="flex justify-between items-center">
                 <div className="flex items-center mb-2">
-                    <div>
-                        <Avatar shape="square" icon={<AntDesignOutlined />} size={48} />
-                    </div>
+                    <div>{detail?.iconUrl && <Avatar shape="square" icon={<IconRenderer value={detail?.iconUrl} />} size={48} />}</div>
                     <div className="flex flex-col ml-2">
                         <div className="cursor-pointer flex items-center">
-                            <span className="text-[20px] font-semibold">测试</span>
+                            <span className="text-[20px] font-semibold">{detail?.name}</span>
                             <EditOutlined className="ml-1" />
                         </div>
                         <div className="mt-2">
@@ -274,15 +286,15 @@ const MaterialLibraryDetail = () => {
                 </div>
                 <div>
                     <Space>
-                        <Search
+                        {/* <Search
                             placeholder="搜索"
                             style={{ width: 200 }}
                             allowClear
                             onSearch={(value) => {
-                                // setQuery({ name: value });
-                                // actionRef.current?.reload();
+                                 setQuery({ name: value });
+                                 actionRef.current?.reload();
                             }}
-                        />
+                        /> */}
                         <Dropdown menu={{ items }}>
                             <Button>
                                 <Space>

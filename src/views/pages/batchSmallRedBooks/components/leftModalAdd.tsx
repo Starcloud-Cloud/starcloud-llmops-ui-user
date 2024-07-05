@@ -1,13 +1,15 @@
 import { Modal, Button, Tooltip } from 'antd';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo, useMemo } from 'react';
+import { LeftOutlined } from '@ant-design/icons';
 import AiCreate from './AICreate';
 import _ from 'lodash-es';
 import FieldImage from 'assets/images/icons/field.svg';
 import { v4 as uuidv4 } from 'uuid';
 import TablePro from './components/antdProTable';
 import HeaderField from './components/headerField';
+import PlugMarket from 'views/materialLibrary/components/plugMarket';
 const LeftModalAdd = ({
     colOpen,
     setColOpen,
@@ -150,6 +152,10 @@ const LeftModalAdd = ({
             setMaterialTableData(newList(materialTableData));
         }
     };
+
+    const [plugOpen, setPlugOpen] = useState(false);
+    const [plugTitle, setPlugTitle] = useState('插件市场');
+    const [plugValue, setPlugValue] = useState<null | string>(null);
     useEffect(() => {
         if (fieldHead) {
             // setMaterialTableData(fieldHead);
@@ -160,7 +166,12 @@ const LeftModalAdd = ({
             );
         }
     }, [fieldHead]);
-
+    useEffect(() => {
+        if (!plugOpen) {
+            setPlugValue(null);
+            setPlugTitle('插件市场');
+        }
+    }, [plugOpen]);
     return (
         <div>
             <div className="max-h-[60vh] overflow-y-auto mt-6">
@@ -180,26 +191,9 @@ const LeftModalAdd = ({
                         </Button>
                     </div>
                     <div className="flex items-center gap-2">
-                        <AiCreate
-                            title="AI 素材生成"
-                            detail={detail}
-                            setColOpen={setColOpen}
-                            materialType={materialType}
-                            columns={columns}
-                            MokeList={MokeList}
-                            tableData={tableData}
-                            defaultVariableData={defaultVariableData}
-                            defaultField={defaultField}
-                            setPage={setPage}
-                            setcustom={setcustom}
-                            setField={setField}
-                            setSelectedRowKeys={setSelectedRowKeys}
-                            downTableData={downTableData}
-                            setFieldCompletionData={setFieldCompletionData}
-                            fieldCompletionData={fieldCompletionData}
-                            setVariableData={setVariableData}
-                            variableData={variableData}
-                        />
+                        <Button type="primary" onClick={() => setPlugOpen(true)}>
+                            AI 素材生成
+                        </Button>
                         {detail && (
                             <Tooltip title="素材字段配置">
                                 <img onClick={() => setColOpen(true)} className="w-[28px] cursor-pointer" src={FieldImage} />
@@ -216,15 +210,46 @@ const LeftModalAdd = ({
                     setTableData={setTableData}
                 />
             </div>
-            <HeaderField
-                colOpen={colOpen}
-                setColOpen={setColOpen}
-                onDragEnd={onDragEnd}
-                materialFieldTypeList={materialFieldTypeList}
-                materialTableData={materialTableData}
-                setMaterialTableData={setMaterialTableData}
-                setFieldHeads={setFieldHeads}
-            />
+            {/* AI素材生成 */}
+            <Modal width={800} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>
+                <div className="font-bold text-xl mb-8 flex items-center gap-2">
+                    {plugValue && <Button onClick={() => setPlugValue(null)} size="small" shape="circle" icon={<LeftOutlined />} />}
+                    {plugTitle}
+                </div>
+                {!plugValue ? (
+                    <PlugMarket onOk={setPlugValue} />
+                ) : (
+                    <AiCreate
+                        plugValue={plugValue}
+                        setPlugOpen={setPlugOpen}
+                        materialType={materialType}
+                        columns={columns}
+                        MokeList={MokeList}
+                        tableData={tableData}
+                        setPage={setPage}
+                        setcustom={setcustom}
+                        setField={setField}
+                        setSelectedRowKeys={setSelectedRowKeys}
+                        downTableData={downTableData}
+                        setFieldCompletionData={setFieldCompletionData}
+                        fieldCompletionData={fieldCompletionData}
+                        setVariableData={setVariableData}
+                        variableData={variableData}
+                    />
+                )}
+            </Modal>
+            {/* 字段配置 */}
+            <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
+                <HeaderField
+                    setColOpen={setColOpen}
+                    onDragEnd={onDragEnd}
+                    materialFieldTypeList={materialFieldTypeList}
+                    materialTableData={materialTableData}
+                    setMaterialTableData={setMaterialTableData}
+                    setFieldHeads={setFieldHeads}
+                />
+            </Modal>
+
             {/* <Modal
                 title={materialTitle}
                 onOk={async () => {

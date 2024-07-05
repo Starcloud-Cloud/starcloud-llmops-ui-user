@@ -298,9 +298,10 @@ const Lefts = ({
                                                 width={82}
                                                 height={82}
                                                 preview={{
-                                                    src: row[item.fieldName]
+                                                    src: row[item.fieldName]?.url || row[item.fieldName]
                                                 }}
                                                 src={
+                                                    row[item.fieldName]?.url ||
                                                     row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'
                                                     // selectImg?.largeImageURL ||
                                                     // form.getFieldValue(item.dataIndex) + '?x-oss-process=image/resize,w_300/quality,q_80'
@@ -1604,7 +1605,6 @@ const Lefts = ({
     //多行编辑
     const [editableKey, setEditableRowKey] = useState<React.Key[]>([]);
     console.log(3333);
-
     return (
         <>
             <div className="relative h-full">
@@ -1772,16 +1772,11 @@ const Lefts = ({
                                                     >
                                                         批量导入
                                                     </Button>
-                                                    <AiCreate
-                                                        title="AI 生成"
-                                                        detail={detail}
+                                                    {/* <AiCreate
                                                         materialType={materialType}
-                                                        setColOpen={setColOpen}
                                                         columns={columns}
                                                         MokeList={MokeList}
                                                         tableData={tableData}
-                                                        defaultVariableData={defaultVariableData}
-                                                        defaultField={defaultField}
                                                         setPage={setPage}
                                                         setcustom={setcustom}
                                                         setField={setField}
@@ -1794,7 +1789,7 @@ const Lefts = ({
                                                         fieldCompletionData={fieldCompletionData}
                                                         setVariableData={setVariableData}
                                                         variableData={variableData}
-                                                    />
+                                                    /> */}
                                                 </div>
                                                 <div className="flex gap-2 items-end">
                                                     <div className="text-xs text-black/50">点击放大编辑</div>

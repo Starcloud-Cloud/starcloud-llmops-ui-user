@@ -1839,7 +1839,7 @@ const Lefts = ({
                                     创作同款应用
                                 </Button>
                             )}
-                            执行状态：{getStatus1(appData?.status)}
+                            状态：{getStatus1(appData?.status)}
                             <div className="inline-block whitespace-nowrap">
                                 <Popconfirm
                                     title="更新提示"

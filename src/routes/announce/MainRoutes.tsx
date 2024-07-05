@@ -6,7 +6,6 @@ import Loadable from 'ui-component/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import jsCookie from 'js-cookie';
 import MinimalLayout from 'layout/MinimalLayout';
-import MaterialLibrary from 'views/materialLibrary/index';
 
 // template routing
 const Market = Loadable(lazy(() => import('views/template/market')));
@@ -70,6 +69,9 @@ const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookConten
 const Thesaurus = Loadable(lazy(() => import('views/pages/thesaurus')));
 // 个人设置
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
+
+const MaterialLibrary = Loadable(lazy(() => import('views/materialLibrary/index')));
+const MaterialLibraryDetail = Loadable(lazy(() => import('views/materialLibrary/detail')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -226,6 +228,10 @@ const MainRoutes = {
         {
             path: '/material',
             element: <MaterialLibrary />
+        },
+        {
+            path: '/material/detail',
+            element: <MaterialLibraryDetail />
         }
     ]
 };

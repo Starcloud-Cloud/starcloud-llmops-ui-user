@@ -34,6 +34,7 @@ const RedBookAnalysis = ({
         <div>
             <div className="text-[16px] font-bold mb-4">1.输入需要抓取的小红书链接，最大支持 20 个</div>
             <TextArea
+                placeholder=" 使用逗号或回车来分割"
                 defaultValue={redBookData.requirement}
                 status={!redBookData.requirement && requirementStatusOpen ? 'error' : ''}
                 onBlur={(e) => {
@@ -45,7 +46,7 @@ const RedBookAnalysis = ({
             {!redBookData.requirement && requirementStatusOpen && <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>}
 
             <div className="text-[16px] font-bold my-4">2.绑定小红书字段</div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
                 <Checkbox.Group
                     onChange={(data) =>
                         setRedBookData({
@@ -55,7 +56,7 @@ const RedBookAnalysis = ({
                     }
                 >
                     {redList?.map((item) => (
-                        <div key={item.value} className="flex flex-col items-center mb-2">
+                        <div key={item.value} className="mb-4">
                             <Checkbox value={item.value}>{item.label}</Checkbox>
                             <div className="flex items-center">
                                 <span className="text-xs">绑定字段：</span>
@@ -82,7 +83,7 @@ const RedBookAnalysis = ({
                 </Checkbox.Group>
             </div>
             <div className="flex justify-center gap-6 mt-6">
-                <Button
+                {/* <Button
                     onClick={() => {
                         if (!redBookData.requirement) {
                             setrequirementStatusOpen(true);
@@ -92,7 +93,7 @@ const RedBookAnalysis = ({
                     type="primary"
                 >
                     保存配置
-                </Button>
+                </Button> */}
                 <Button
                     onClick={() => {
                         if (!redBookData.requirement) {

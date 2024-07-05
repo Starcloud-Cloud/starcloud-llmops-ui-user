@@ -25,7 +25,7 @@ const AiCreate = ({
     variableData,
     setPlugOpen
 }: {
-    plugValue: string;
+    plugValue: string | null;
     materialType: any;
     columns: any[];
     MokeList: any[];
@@ -345,7 +345,14 @@ const AiCreate = ({
         }
         aref.current = false;
         setMaterialExecutionOpen(true);
-        let requirementData = redBookData.requirement.split(',');
+        console.log(redBookData.requirement);
+
+        let requirementData = redBookData.requirement
+            .replace(/\s+/g, '')
+            ?.split(/[,\n\r，]+/)
+            .filter(Boolean);
+        console.log(requirementData);
+
         let chunks;
         if (!retry) {
             totalCountRef.current = requirementData?.length;

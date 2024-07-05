@@ -3,6 +3,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 import { useState } from 'react';
 import { pluginsXhsOcr } from 'api/redBook/batchIndex';
+import { isEqual, sortBy } from 'lodash-es';
 const RedBookAnalysis = ({
     columns,
     redBookData,
@@ -30,6 +31,7 @@ const RedBookAnalysis = ({
         { label: ' 图片 9', value: 'image9' },
         { label: ' 图片 10', value: 'image10' }
     ];
+
     return (
         <div>
             <div className="text-[16px] font-bold mb-4">1.输入需要抓取的小红书链接，最大支持 20 个</div>
@@ -62,6 +64,9 @@ const RedBookAnalysis = ({
                                 <span className="text-xs">绑定字段：</span>
                                 <Select
                                     value={redBookData.bindFieldData[item.value]}
+                                    status={
+                                        redBookData.fieldList.includes(item.value) && !redBookData.bindFieldData[item.value] ? 'error' : ''
+                                    }
                                     onChange={(e) =>
                                         setRedBookData({
                                             ...redBookData,
@@ -78,6 +83,11 @@ const RedBookAnalysis = ({
                                     ))}
                                 </Select>
                             </div>
+                            {redBookData.fieldList.includes(item.value) && !redBookData.bindFieldData[item.value] ? (
+                                <span className="text-xs text-[#ff4d4f] ml-[4px] h-[22px]">该字段为必填项</span>
+                            ) : (
+                                <div className="h-[22px]"> </div>
+                            )}
                         </div>
                     ))}
                 </Checkbox.Group>
@@ -98,6 +108,13 @@ const RedBookAnalysis = ({
                     onClick={() => {
                         if (!redBookData.requirement) {
                             setrequirementStatusOpen(true);
+                            return false;
+                        }
+
+                        let fieldList = redBookData.fieldList;
+                        const bindFieldData = Object.keys(redBookData.bindFieldData);
+                        const areArraysEqual = isEqual(sortBy(fieldList), sortBy(bindFieldData));
+                        if (!areArraysEqual) {
                             return false;
                         }
                         xhsAnalysis();

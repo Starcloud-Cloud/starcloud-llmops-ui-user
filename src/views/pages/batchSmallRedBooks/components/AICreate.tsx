@@ -347,10 +347,7 @@ const AiCreate = ({
         setMaterialExecutionOpen(true);
         console.log(redBookData.requirement);
 
-        let requirementData = redBookData.requirement
-            .replace(/\s+/g, '')
-            ?.split(/[,\n\r，]+/)
-            .filter(Boolean);
+        let requirementData = redBookData.requirement?.split(/[,\n\r，]+/).filter(Boolean);
         console.log(requirementData);
 
         let chunks;

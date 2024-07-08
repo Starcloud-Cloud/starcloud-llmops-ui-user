@@ -278,7 +278,7 @@ function Deatail() {
             if (result?.workflowConfig?.steps?.length === 1) {
                 aimodeRef.current =
                     result?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
-                    'gpt-3.5-turbo-1106';
+                    'gpt-3.5-turbo';
                 setAiModels(aimodeRef.current);
             }
             const newData = _.cloneDeep(result);

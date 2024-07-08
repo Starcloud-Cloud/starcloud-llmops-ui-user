@@ -1,8 +1,10 @@
 import { EditableProTable } from '@ant-design/pro-components';
-import { useState, memo, useMemo, useEffect } from 'react';
+import { useState, memo, useEffect, useCallback } from 'react';
 import _ from 'lodash-es';
 import { Resizable } from 'react-resizable';
 import './index.css';
+import React from 'react';
+import { GetRowKey } from 'antd/lib/table/interface';
 
 const ResizeableTitle = (props: any) => {
     const { onResize, width, ...restProps } = props;
@@ -18,19 +20,54 @@ const ResizeableTitle = (props: any) => {
     );
 };
 
-const TablePro = ({ tableData, selectedRowKeys, setSelectedRowKeys, columns, setPage, setTableData }: any) => {
-    const [editableKey, setEditableRowKey] = useState<React.Key[]>([]);
-    const [column, setColumn] = useState<any[]>(columns);
+const TablePro = ({
+    tableData,
+    selectedRowKeys,
+    setSelectedRowKeys,
+    columns,
+    setPage,
+    setTableData,
+    actionRef,
+    onUpdateColumn,
+    handleEditColumn
+}: any) => {
+    const [column, setColumn] = useState<any[]>([]);
+    const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
+    const [dataIndex, setDataIndex] = useState<any[]>([]);
 
-    // const column: any[] = useMemo(() => {
-    //     return columns;
-    // }, [columns]);
+    useEffect(() => {
+        setColumn(columns);
+    }, [columns]);
 
     const components = {
         header: {
             cell: ResizeableTitle
         }
     };
+
+    const rowKey = 'uuid';
+
+    // ============================ RowKey ============================
+    const getRowKey = React.useMemo<GetRowKey<any>>(() => {
+        if (typeof rowKey === 'function') {
+            return rowKey;
+        }
+        return (record: any, index?: number) => {
+            if (index === -1) {
+                return (record as any)?.[rowKey as string];
+            }
+            // 如果 props 中有name 的话，用index 来做行号，这样方便转化为 index
+
+            return (record as any)?.[rowKey as string] ?? index?.toString();
+        };
+    }, [rowKey]);
+
+    const handleUpdateColumn = async (index: any, size: any) => {
+        onUpdateColumn && (await onUpdateColumn(index, size));
+    };
+
+    // 使用 useCallback 确保防抖动函数不会在每次渲染时重新创建
+    const debouncedHandleUpdateColumn = useCallback(_.debounce(handleUpdateColumn, 500), []);
 
     const handleResize =
         (index: number) =>
@@ -41,6 +78,7 @@ const TablePro = ({ tableData, selectedRowKeys, setSelectedRowKeys, columns, set
                 width: size.width
             };
             setColumn(nextColumns);
+            debouncedHandleUpdateColumn(index, size);
         };
 
     const resultColumns = column.map((col: any, index: any) => ({
@@ -53,7 +91,7 @@ const TablePro = ({ tableData, selectedRowKeys, setSelectedRowKeys, columns, set
 
     return (
         <EditableProTable<any>
-            rowKey="uuid"
+            rowKey={rowKey}
             tableAlertRender={false}
             components={components}
             rowSelection={{
@@ -65,8 +103,26 @@ const TablePro = ({ tableData, selectedRowKeys, setSelectedRowKeys, columns, set
                     setSelectedRowKeys(selectedRowKeys);
                 }
             }}
+            actionRef={actionRef}
             toolBarRender={false}
-            columns={resultColumns}
+            columns={resultColumns.map((item) => ({
+                ...item,
+                editable: dataIndex.flat(1).join('.') === [item.dataIndex || item.key].flat(1).join('.') ? undefined : false,
+                onCell: (record: any, rowIndex: any) => ({
+                    onClick: () => {
+                        setEditableRowKeys([getRowKey(record, rowIndex)]);
+                        if (item.dataIndex === 'index' || item.dataIndex === 'operation') {
+                            setDataIndex([]);
+                            setEditableRowKeys([]);
+                            return;
+                        }
+                        setDataIndex([item.dataIndex || (item.key as string)]);
+                    },
+                    onBlur: () => {
+                        setEditableRowKeys([]);
+                    }
+                })
+            }))}
             value={tableData}
             pagination={{
                 pageSize: 20,
@@ -75,19 +131,11 @@ const TablePro = ({ tableData, selectedRowKeys, setSelectedRowKeys, columns, set
             }}
             recordCreatorProps={false}
             editable={{
-                type: 'multiple',
-                editableKeys: editableKey,
-                onSave: async (rowKey, data, row) => {
-                    const newList = tableData?.map((item: any) => {
-                        if (item.uuid === rowKey) {
-                            return data;
-                        } else {
-                            return item;
-                        }
-                    });
-                    setTableData(newList);
-                },
-                onChange: setEditableRowKey
+                editableKeys: editableKeys,
+                onValuesChange: (record, recordList) => {
+                    setTableData(recordList);
+                    handleEditColumn(dataIndex, record);
+                }
             }}
         />
     );

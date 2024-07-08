@@ -7,8 +7,14 @@ import {
     SearchOutlined,
     SettingOutlined
 } from '@ant-design/icons';
-import { Button, Space, Input, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip } from 'antd';
-import { getMaterialLibraryDataList, getMaterialLibraryTitleList } from 'api/material';
+import { Button, Space, Input, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message } from 'antd';
+import {
+    delMaterialLibrarySlice,
+    getMaterialLibraryDataList,
+    getMaterialLibraryTitleList,
+    updateMaterialLibrarySlice,
+    updateMaterialLibraryTitle
+} from 'api/material';
 import { dictData } from 'api/template';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -16,6 +22,7 @@ import TablePro from 'views/pages/batchSmallRedBooks/components/components/antdP
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { v4 as uuidv4 } from 'uuid';
 import { IconRenderer } from './index';
+import { ActionType } from '@ant-design/pro-components';
 const { Search } = Input;
 
 const MaterialLibraryDetail = () => {
@@ -26,12 +33,15 @@ const MaterialLibraryDetail = () => {
     const [page, setPage] = useState(1);
     const [typeList, setTypeList] = useState<any[]>([]);
     const [canUpload, setCanUpload] = useState(true);
+    const [forceUpdate, setForceUpdate] = useState(0);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const id = searchParams.get('id');
 
     const tableRef = useRef<any[]>([]);
+    const actionRef = useRef<ActionType>();
+    const tableMetaRef = useRef<any[]>([]);
 
     useEffect(() => {
         dictData('', 'material_format_type').then((res) => {
@@ -42,9 +52,12 @@ const MaterialLibraryDetail = () => {
     useEffect(() => {
         getMaterialLibraryTitleList({ id }).then((data) => {
             setDetail(data);
+            tableMetaRef.current = data.tableMeta;
             const list = data.tableMeta.map((item: any) => ({
                 desc: item.columnName,
-                fieldName: item.columnCode
+                fieldName: item.columnCode,
+                type: item.columnType,
+                required: item.isRequired
             }));
 
             const newList = list?.map((item: any) => {
@@ -57,7 +70,8 @@ const MaterialLibraryDetail = () => {
                     editable: () => {
                         return item.type === 'image' ? false : true;
                     },
-                    valueType: item.type === 'textBox' ? 'textarea' : 'text',
+                    valueType: 'textarea',
+                    fieldProps: { autoSize: true, maxRows: 5 },
                     render: (_: any, row: any, index: number) => (
                         <div className="flex justify-center items-center gap-2">
                             {item.type === 'image' ? (
@@ -182,10 +196,11 @@ const MaterialLibraryDetail = () => {
                     type: item.type
                 };
             });
-            setColumns([
+            const columnData = [
                 {
                     title: '序号',
                     align: 'center',
+                    dataIndex: 'index',
                     editable: () => {
                         return false;
                     },
@@ -197,17 +212,12 @@ const MaterialLibraryDetail = () => {
                 {
                     title: '操作',
                     align: 'center',
-                    valueType: 'option',
+                    dataIndex: 'operation',
                     width: 200,
                     fixed: 'right',
-                    render: (text: any, record: any, index: number, action: any) => (
+                    render: (text: any, record: any, index: number) => (
                         <div className="flex items-center justify-center h-[102px]">
-                            <Button
-                                type="link"
-                                onClick={() => {
-                                    action?.startEditable?.(record.uuid);
-                                }}
-                            >
+                            <Button type="link" onClick={() => {}}>
                                 编辑
                             </Button>
                             <Popconfirm
@@ -224,26 +234,32 @@ const MaterialLibraryDetail = () => {
                         </div>
                     )
                 }
-            ]);
+            ];
+
+            setColumns(columnData);
         });
     }, []);
 
     useEffect(() => {
         getMaterialLibraryDataList({ libraryId: id }).then((data) => {
             let newList: any = [];
-            data.map((item: any) => item.content).map((v: any) => {
+            data.map((item: any) => {
                 let obj: any = {
-                    uuid: uuidv4()
+                    uuid: uuidv4(),
+                    id: item.id
                 };
-                v.forEach((item: any) => {
-                    obj[item['columnCode']] = item['value'];
+                item.content.forEach((item1: any) => {
+                    if (obj?.[item1?.['columnCode']]) {
+                        obj[item1['columnCode']] = item1?.['value'];
+                    }
                 });
                 newList.push(obj);
             });
+
             setTableData(newList);
             tableRef.current = newList;
         });
-    }, []);
+    }, [forceUpdate]);
 
     const items: any = [
         {
@@ -258,12 +274,65 @@ const MaterialLibraryDetail = () => {
         }
     ];
 
-    const handleDel = (index: number) => {
+    const handleDel = async (index: number) => {
         const newList = JSON.parse(JSON.stringify(tableRef.current));
-        newList.splice(index, 1);
-        tableRef.current = newList;
-        setTableData(tableRef.current);
+        // newList.splice(index, 1);
+        // tableRef.current = newList;
+        // setTableData(tableRef.current);
+
+        const id = newList[index].id;
+        const data = await delMaterialLibrarySlice({ id });
+        if (data) {
+            setForceUpdate(forceUpdate + 1);
+            message.success('删除成功');
+        }
     };
+
+    const handleUpdateColumn = async (index: number, size: any) => {
+        const list = tableMetaRef.current[index];
+        console.log('🚀 ~ handleUpdateColumn ~ list:', list);
+
+        await updateMaterialLibraryTitle({
+            columnType: list.columnType,
+            columnWidth: size.width,
+            libraryId: Number(id),
+            id: list.id,
+            isRequired: list.isRequired,
+            sequence: list.sequence,
+            columnName: list.columnName,
+            description: list.description
+        });
+    };
+
+    const handleEditColumn = async (dataIndex: number, record: any) => {
+        const tableMetaList = tableMetaRef.current;
+        console.log('🚀 ~ handleEditColumn ~ tableMetaList:', tableMetaList);
+        console.log('🚀 ~ handleEditColumn ~ record:', record);
+        const recordKeys = Object.keys(record);
+        const content = tableMetaList.map((item) => {
+            if (recordKeys.includes(item.columnCode)) {
+                return {
+                    columnId: item.id,
+                    columnName: item.columnName,
+                    columnCode: item.columnCode,
+                    value: record[item.columnCode]
+                };
+            }
+        });
+
+        const data = {
+            libraryId: detail.id,
+            id: record.id,
+            content: content,
+            url: detail.iconUrl,
+            status: detail.status
+        };
+        const result = await updateMaterialLibrarySlice(data);
+        if (result) {
+            message.success('更新成功');
+        }
+    };
+
     return (
         <>
             <div className="flex justify-between items-center">
@@ -303,12 +372,29 @@ const MaterialLibraryDetail = () => {
                                 </Space>
                             </Button>
                         </Dropdown>
-                        <Button type="primary">添加内容</Button>
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                actionRef.current?.addEditRecord?.(
+                                    {
+                                        uuid: uuidv4()
+                                    },
+                                    {
+                                        position: 'top'
+                                    }
+                                );
+                            }}
+                        >
+                            添加内容
+                        </Button>
                     </Space>
                 </div>
             </div>
             <div>
                 <TablePro
+                    handleEditColumn={handleEditColumn}
+                    onUpdateColumn={handleUpdateColumn}
+                    actionRef={actionRef}
                     tableData={tableData}
                     selectedRowKeys={selectedRowKeys}
                     setSelectedRowKeys={setSelectRowKeys}

@@ -5,6 +5,7 @@ import { Resizable } from 'react-resizable';
 import './index.css';
 import React from 'react';
 import { GetRowKey } from 'antd/lib/table/interface';
+import { EditType } from 'views/materialLibrary/detail';
 
 const ResizeableTitle = (props: any) => {
     const { onResize, width, ...restProps } = props;
@@ -45,7 +46,7 @@ const TablePro = ({
         }
     };
 
-    const rowKey = 'uuid';
+    const rowKey = 'id';
 
     // ============================ RowKey ============================
     const getRowKey = React.useMemo<GetRowKey<any>>(() => {
@@ -91,6 +92,7 @@ const TablePro = ({
 
     return (
         <EditableProTable<any>
+            className="edit-table"
             rowKey={rowKey}
             tableAlertRender={false}
             components={components}
@@ -110,15 +112,21 @@ const TablePro = ({
                 editable: dataIndex.flat(1).join('.') === [item.dataIndex || item.key].flat(1).join('.') ? undefined : false,
                 onCell: (record: any, rowIndex: any) => ({
                     onClick: () => {
-                        setEditableRowKeys([getRowKey(record, rowIndex)]);
-                        if (item.dataIndex === 'index' || item.dataIndex === 'operation') {
+                        if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
                             setDataIndex([]);
                             setEditableRowKeys([]);
                             return;
                         }
+                        setEditableRowKeys([getRowKey(record, rowIndex)]);
                         setDataIndex([item.dataIndex || (item.key as string)]);
                     },
-                    onBlur: () => {
+                    onBlur: (e: any) => {
+                        if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
+                            setDataIndex([]);
+                            setEditableRowKeys([]);
+                            return;
+                        }
+                        handleEditColumn(record);
                         setEditableRowKeys([]);
                     }
                 })
@@ -134,12 +142,12 @@ const TablePro = ({
                 editableKeys: editableKeys,
                 onValuesChange: (record, recordList) => {
                     setTableData(recordList);
-                    handleEditColumn(dataIndex, record);
                 }
             }}
         />
     );
 };
+
 const memoTablePro = (oldValue: any, newValue: any) => {
     return (
         _.isEqual(oldValue.tableData, newValue.tableData) &&

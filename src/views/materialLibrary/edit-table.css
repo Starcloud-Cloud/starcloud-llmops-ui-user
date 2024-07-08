@@ -1,0 +1,12 @@
+.material-detail-table  textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.ant-table-cel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

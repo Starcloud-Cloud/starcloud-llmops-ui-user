@@ -96,3 +96,12 @@ export const updateMaterialLibrarySlice = (data: any) => {
 export const delMaterialLibrarySlice = (data: any) => {
     return request.delete({ url: '/llm/material-library-slice/delete', params: data });
 };
+
+/**
+ * 批量删除
+ * @param data
+ * @returns
+ */
+export const delBatchMaterialLibrarySlice = (data: any) => {
+    return request.post({ url: '/llm/material-library-slice/delete-batch', data });
+};

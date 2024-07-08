@@ -1,14 +1,8 @@
+import { CloudUploadOutlined, DownOutlined, PlusOutlined, SearchOutlined, SettingOutlined } from '@ant-design/icons';
+import { Button, Space, Input, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message, Form } from 'antd';
 import {
-    AntDesignOutlined,
-    CloudUploadOutlined,
-    DownOutlined,
-    EditOutlined,
-    PlusOutlined,
-    SearchOutlined,
-    SettingOutlined
-} from '@ant-design/icons';
-import { Button, Space, Input, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message } from 'antd';
-import {
+    createMaterialLibrarySlice,
+    delBatchMaterialLibrarySlice,
     delMaterialLibrarySlice,
     getMaterialLibraryDataList,
     getMaterialLibraryTitleList,
@@ -16,14 +10,25 @@ import {
     updateMaterialLibraryTitle
 } from 'api/material';
 import { dictData } from 'api/template';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import TablePro from 'views/pages/batchSmallRedBooks/components/components/antdProTable';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { v4 as uuidv4 } from 'uuid';
 import { IconRenderer } from './index';
-import { ActionType } from '@ant-design/pro-components';
-const { Search } = Input;
+import { ActionType, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import FormModal from './components/formModal';
+import './edit-table.css';
+import { PicImagePick } from 'ui-component/PicImagePick';
+
+export enum EditType {
+    String = 0,
+    Int = 1,
+    Time = 2,
+    Num = 3,
+    Boolean = 4,
+    Image = 5
+}
 
 const MaterialLibraryDetail = () => {
     const [columns, setColumns] = useState<any>([]);
@@ -34,6 +39,21 @@ const MaterialLibraryDetail = () => {
     const [typeList, setTypeList] = useState<any[]>([]);
     const [canUpload, setCanUpload] = useState(true);
     const [forceUpdate, setForceUpdate] = useState(0);
+    const [editOpen, setEditOpen] = useState(false);
+    const [title, setTitle] = useState('');
+    const [currentRecord, setCurrentRecord] = useState<any>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [filedName, setFiledName] = useState<string>('');
+    const [selectImg, setSelectImg] = useState<any>(null);
+
+    useEffect(() => {
+        if (tableRef.current.length && selectImg?.largeImageURL) {
+            const result: any = currentRecord;
+            result[filedName] = selectImg?.largeImageURL;
+
+            handleEditColumn(result);
+        }
+    }, [selectImg]);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -42,6 +62,8 @@ const MaterialLibraryDetail = () => {
     const tableRef = useRef<any[]>([]);
     const actionRef = useRef<ActionType>();
     const tableMetaRef = useRef<any[]>([]);
+
+    const [form] = Form.useForm();
 
     useEffect(() => {
         dictData('', 'material_format_type').then((res) => {
@@ -53,7 +75,12 @@ const MaterialLibraryDetail = () => {
         getMaterialLibraryTitleList({ id }).then((data) => {
             setDetail(data);
             tableMetaRef.current = data.tableMeta;
-            const list = data.tableMeta.map((item: any) => ({
+        });
+    }, []);
+
+    useEffect(() => {
+        if (detail) {
+            const list = detail?.tableMeta?.map((item: any) => ({
                 desc: item.columnName,
                 fieldName: item.columnCode,
                 type: item.columnType,
@@ -65,16 +92,17 @@ const MaterialLibraryDetail = () => {
                     title: item.desc,
                     align: 'center',
                     className: 'align-middle',
-                    width: item.type === 'textBox' ? 400 : 200,
+                    width: item.type === EditType.Image ? 200 : 400,
                     dataIndex: item.fieldName,
                     editable: () => {
-                        return item.type === 'image' ? false : true;
+                        return !(item.type === EditType.Image);
                     },
+                    editType: item.type,
                     valueType: 'textarea',
-                    fieldProps: { autoSize: true, maxRows: 5 },
+                    fieldProps: { autoSize: { minRows: 1, maxRows: 5 } },
                     render: (_: any, row: any, index: number) => (
                         <div className="flex justify-center items-center gap-2">
-                            {item.type === 'image' ? (
+                            {item.type === EditType.Image ? (
                                 <div className="relative">
                                     <Upload
                                         className="table_upload"
@@ -89,6 +117,7 @@ const MaterialLibraryDetail = () => {
                                                 data[index][item.fieldName] = info?.file?.response?.data?.url;
                                                 tableRef.current = data;
                                                 setTableData([...data]);
+                                                handleEditColumn({ ...row, [item.fieldName]: info?.file?.response?.data?.url });
                                             }
                                         }}
                                     >
@@ -122,10 +151,11 @@ const MaterialLibraryDetail = () => {
                                                         <div
                                                             className="flex-1 flex justify-center !cursor-pointer"
                                                             onClick={(e) => {
-                                                                // setIsModalOpen(true);
+                                                                setIsModalOpen(true);
                                                                 e.stopPropagation();
+                                                                setCurrentRecord(row);
+                                                                setFiledName(item.fieldName);
                                                                 // setImageDataIndex(row.uuid);
-                                                                // setFiledName(item.fieldName);
                                                                 // setValues(row);
                                                             }}
                                                         >
@@ -145,10 +175,11 @@ const MaterialLibraryDetail = () => {
                                                     <div
                                                         className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]"
                                                         onClick={(e) => {
-                                                            // setIsModalOpen(true);
+                                                            setIsModalOpen(true);
                                                             e.stopPropagation();
+                                                            setCurrentRecord(row);
+                                                            setFiledName(item.fieldName);
                                                             // setImageDataIndex(row.uuid);
-                                                            // setFiledName(item.fieldName);
                                                             // setValues(row);
                                                         }}
                                                     >
@@ -159,29 +190,8 @@ const MaterialLibraryDetail = () => {
                                         )}
                                     </Upload>
                                 </div>
-                            ) : item.type === 'listImage' ? (
-                                <div className="flex gap-1 flex-wrap">
-                                    {row[item.fieldName]?.map((item: any) => (
-                                        <Image
-                                            width={50}
-                                            height={50}
-                                            preview={false}
-                                            src={item + '?x-oss-process=image/resize,w_100/quality,q_80'}
-                                        />
-                                    ))}
-                                </div>
-                            ) : item.type === 'listStr' ? (
-                                <div className="flex gap-1 flex-wrap">
-                                    {row[item.fieldName]?.map((item: any) => (
-                                        <Tag color="processing">{item}</Tag>
-                                    ))}
-                                </div>
                             ) : (
-                                <div className="break-all line-clamp-4">
-                                    {item.fieldName === 'source'
-                                        ? typeList?.find((i) => i.value === row[item.fieldName])?.label
-                                        : row[item.fieldName]}
-                                </div>
+                                <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
                             )}
                         </div>
                     ),
@@ -200,6 +210,7 @@ const MaterialLibraryDetail = () => {
                 {
                     title: '序号',
                     align: 'center',
+                    className: 'align-middle',
                     dataIndex: 'index',
                     editable: () => {
                         return false;
@@ -213,17 +224,26 @@ const MaterialLibraryDetail = () => {
                     title: '操作',
                     align: 'center',
                     dataIndex: 'operation',
+                    className: 'align-middle',
                     width: 200,
                     fixed: 'right',
                     render: (text: any, record: any, index: number) => (
-                        <div className="flex items-center justify-center h-[102px]">
-                            <Button type="link" onClick={() => {}}>
+                        <div className="flex items-center justify-center">
+                            <Button
+                                type="link"
+                                onClick={async () => {
+                                    await form.setFieldsValue(record);
+                                    setCurrentRecord(record);
+                                    setTitle('编辑');
+                                    setEditOpen(true);
+                                }}
+                            >
                                 编辑
                             </Button>
                             <Popconfirm
                                 title="提示"
                                 description="请再次确认是否要删除"
-                                onConfirm={() => handleDel(index)}
+                                onConfirm={() => handleDel(record.id)}
                                 okText="Yes"
                                 cancelText="No"
                             >
@@ -237,19 +257,19 @@ const MaterialLibraryDetail = () => {
             ];
 
             setColumns(columnData);
-        });
-    }, []);
+        }
+    }, [canUpload, detail]);
 
     useEffect(() => {
         getMaterialLibraryDataList({ libraryId: id }).then((data) => {
             let newList: any = [];
             data.map((item: any) => {
                 let obj: any = {
-                    uuid: uuidv4(),
+                    // uuid: uuidv4(),
                     id: item.id
                 };
                 item.content.forEach((item1: any) => {
-                    if (obj?.[item1?.['columnCode']]) {
+                    if (item1?.['columnCode']) {
                         obj[item1['columnCode']] = item1?.['value'];
                     }
                 });
@@ -274,14 +294,16 @@ const MaterialLibraryDetail = () => {
         }
     ];
 
-    const handleDel = async (index: number) => {
-        const newList = JSON.parse(JSON.stringify(tableRef.current));
-        // newList.splice(index, 1);
-        // tableRef.current = newList;
-        // setTableData(tableRef.current);
-
-        const id = newList[index].id;
+    const handleDel = async (id: number) => {
         const data = await delMaterialLibrarySlice({ id });
+        if (data) {
+            setForceUpdate(forceUpdate + 1);
+            message.success('删除成功');
+        }
+    };
+
+    const handleBatchDel = async () => {
+        const data = await delBatchMaterialLibrarySlice(selectedRowKeys);
         if (data) {
             setForceUpdate(forceUpdate + 1);
             message.success('删除成功');
@@ -290,7 +312,6 @@ const MaterialLibraryDetail = () => {
 
     const handleUpdateColumn = async (index: number, size: any) => {
         const list = tableMetaRef.current[index];
-        console.log('🚀 ~ handleUpdateColumn ~ list:', list);
 
         await updateMaterialLibraryTitle({
             columnType: list.columnType,
@@ -304,10 +325,8 @@ const MaterialLibraryDetail = () => {
         });
     };
 
-    const handleEditColumn = async (dataIndex: number, record: any) => {
+    const handleEditColumn = async (record: any, type = 1) => {
         const tableMetaList = tableMetaRef.current;
-        console.log('🚀 ~ handleEditColumn ~ tableMetaList:', tableMetaList);
-        console.log('🚀 ~ handleEditColumn ~ record:', record);
         const recordKeys = Object.keys(record);
         const content = tableMetaList.map((item) => {
             if (recordKeys.includes(item.columnCode)) {
@@ -327,9 +346,33 @@ const MaterialLibraryDetail = () => {
             url: detail.iconUrl,
             status: detail.status
         };
-        const result = await updateMaterialLibrarySlice(data);
+        let result;
+        if (type === 1) {
+            result = await updateMaterialLibrarySlice(data);
+        } else {
+            result = await createMaterialLibrarySlice(data);
+        }
         if (result) {
-            message.success('更新成功');
+            if (type === 1) {
+                message.success('更新成功');
+                setForceUpdate(forceUpdate + 1);
+            } else {
+                message.success('新增成功');
+                setForceUpdate(forceUpdate + 1);
+            }
+        }
+    };
+
+    const formOk = async () => {
+        const values = await form.validateFields();
+        if (currentRecord) {
+            await handleEditColumn({ ...values, id: currentRecord.id }, 1);
+            setEditOpen(false);
+            setCurrentRecord(null);
+        } else {
+            await handleEditColumn({ ...values }, 2);
+            setEditOpen(false);
+            setCurrentRecord(null);
         }
     };
 
@@ -341,29 +384,24 @@ const MaterialLibraryDetail = () => {
                     <div className="flex flex-col ml-2">
                         <div className="cursor-pointer flex items-center">
                             <span className="text-[20px] font-semibold">{detail?.name}</span>
-                            <EditOutlined className="ml-1" />
                         </div>
-                        <div className="mt-2">
+                        {/* <div className="mt-2">
                             <Space>
                                 <Tag bordered={false}>123</Tag>
                                 <Tag bordered={false}>123</Tag>
                                 <Tag bordered={false}>123</Tag>
                                 <Tag bordered={false}>123</Tag>
                             </Space>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div>
                     <Space>
-                        {/* <Search
-                            placeholder="搜索"
-                            style={{ width: 200 }}
-                            allowClear
-                            onSearch={(value) => {
-                                 setQuery({ name: value });
-                                 actionRef.current?.reload();
-                            }}
-                        /> */}
+                        {selectedRowKeys.length > 0 && (
+                            <Popconfirm title="确认删除?" onConfirm={handleBatchDel}>
+                                <Button danger>批量删除</Button>
+                            </Popconfirm>
+                        )}
                         <Dropdown menu={{ items }}>
                             <Button>
                                 <Space>
@@ -375,14 +413,8 @@ const MaterialLibraryDetail = () => {
                         <Button
                             type="primary"
                             onClick={() => {
-                                actionRef.current?.addEditRecord?.(
-                                    {
-                                        uuid: uuidv4()
-                                    },
-                                    {
-                                        position: 'top'
-                                    }
-                                );
+                                setEditOpen(true);
+                                setTitle('添加内容');
                             }}
                         >
                             添加内容
@@ -390,19 +422,42 @@ const MaterialLibraryDetail = () => {
                     </Space>
                 </div>
             </div>
-            <div>
-                <TablePro
-                    handleEditColumn={handleEditColumn}
-                    onUpdateColumn={handleUpdateColumn}
-                    actionRef={actionRef}
-                    tableData={tableData}
-                    selectedRowKeys={selectedRowKeys}
-                    setSelectedRowKeys={setSelectRowKeys}
-                    columns={columns}
-                    setPage={setPage}
-                    setTableData={setTableData}
-                />
+            <div className="material-detail-table">
+                {columns.length > 0 && tableData.length > 0 && (
+                    <TablePro
+                        handleEditColumn={handleEditColumn}
+                        onUpdateColumn={handleUpdateColumn}
+                        actionRef={actionRef}
+                        tableData={tableData}
+                        selectedRowKeys={selectedRowKeys}
+                        setSelectedRowKeys={setSelectRowKeys}
+                        columns={columns}
+                        setPage={setPage}
+                        setTableData={setTableData}
+                    />
+                )}
             </div>
+            <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
+            {isModalOpen && (
+                <PicImagePick
+                    getList={() => {
+                        // if (detail) {
+                        //     setImgPre(1);
+                        //     getAppList && getAppList();
+                        // } else {
+                        //     getList(true);
+                        // }
+                    }}
+                    materialList={[]}
+                    allData={null}
+                    details={null}
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    setSelectImg={setSelectImg}
+                    columns={columns}
+                    values={null}
+                />
+            )}
         </>
     );
 };

@@ -272,7 +272,9 @@ const Lefts = ({
                 valueType: item.type === 'textBox' ? 'textarea' : 'text',
                 render: (_: any, row: any, index: number) => (
                     <div className="flex justify-center items-center gap-2">
-                        {item.type === 'image' ? (
+                        {item.type === 'string' || item.type === 'textBox' ? (
+                            <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
+                        ) : item.type === 'image' ? (
                             <div className="relative">
                                 <Upload
                                     className="table_upload"
@@ -1913,7 +1915,6 @@ const Lefts = ({
                                                         <div key={el.field}>
                                                             {el?.isShow && (
                                                                 <MarketForm
-                                                                    key={el.value}
                                                                     item={el}
                                                                     materialType={''}
                                                                     details={

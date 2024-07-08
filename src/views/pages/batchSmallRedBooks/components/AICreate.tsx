@@ -375,8 +375,7 @@ const AiCreate = ({
                             const selectData = _.cloneDeep(redBookData.bindFieldData);
                             const obj: any = {};
                             newCheckbox.forEach((dt) => {
-                                console.log(dt, selectData[dt], res, dt);
-                                obj[selectData[dt]] = res[dt];
+                                obj[selectData[dt]] = res[dt]?.url || res[dt];
                             });
                             obj.uuid = uuidv4();
                             console.log(obj);
@@ -446,18 +445,7 @@ const AiCreate = ({
     }, [redBookData?.fieldList, redBookData]);
     return (
         <div>
-            {plugValue === 'extraction' ? (
-                // 素材生成
-                <div className="relative">
-                    <AICreates
-                        variableData={variableData}
-                        setVariableData={setVariableData}
-                        checkedList={checkedList}
-                        setcustom={setcustom}
-                        aimaterialCreate={aimaterialCreate}
-                    />
-                </div>
-            ) : plugValue === 'imageOcr' ? (
+            {plugValue === 'imageOcr' ? (
                 //OCR 提取
                 <ImgOcr
                     imgCheckedList={imgCheckedList}
@@ -470,7 +458,7 @@ const AiCreate = ({
             ) : plugValue === 'xhsOcr' ? (
                 //小红书分析
                 <RedBookAnalysis columns={allColumns} redBookData={redBookData} setRedBookData={setRedBookData} xhsAnalysis={xhsAnalysis} />
-            ) : (
+            ) : plugValue === 'generate_material_one' ? (
                 // 素材字段补齐
                 <FieldCompletion
                     fieldCompletionData={fieldCompletionData}
@@ -482,7 +470,18 @@ const AiCreate = ({
                     editMaterial={editMaterial}
                     setField={setField}
                 />
-            )}
+            ) : plugValue === 'generate_material_batch' ? (
+                // 素材生成
+                <div className="relative">
+                    <AICreates
+                        variableData={variableData}
+                        setVariableData={setVariableData}
+                        checkedList={checkedList}
+                        setcustom={setcustom}
+                        aimaterialCreate={aimaterialCreate}
+                    />
+                </div>
+            ) : null}
             {/* 选择素材 */}
             <Modal
                 className="relative"

@@ -172,6 +172,8 @@ const LeftModalAdd = ({
             setPlugTitle('插件市场');
         }
     }, [plugOpen]);
+    console.log(columns);
+
     return (
         <div>
             <div className="max-h-[60vh] overflow-y-auto mt-6">
@@ -303,6 +305,8 @@ const LeftModalAdd = ({
     );
 };
 const memoLeftModal = (pre: any, next: any) => {
+    console.log(_.isEqual(pre.columns, next.columns));
+
     return (
         _.isEqual(pre.colOpen, next.colOpen) &&
         _.isEqual(pre.editableKey, next.editableKey) &&

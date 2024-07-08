@@ -20,11 +20,11 @@ const ResizeableTitle = (props: any) => {
 
 const TablePro = ({ tableData, selectedRowKeys, setSelectedRowKeys, columns, setPage, setTableData }: any) => {
     const [editableKey, setEditableRowKey] = useState<React.Key[]>([]);
-    const [column, setColumn] = useState<any[]>(columns);
+    const [column, setColumn] = useState<any[]>([]);
 
-    // const column: any[] = useMemo(() => {
-    //     return columns;
-    // }, [columns]);
+    useEffect(() => {
+        setColumn(columns);
+    }, [columns]);
 
     const components = {
         header: {

@@ -117,7 +117,7 @@ const Header = ({
                                 setAiModel(value);
                             }}
                         >
-                            {appModels?.aiModel?.map((item: any) => (
+                            {appModels?.llmModelType?.map((item: any) => (
                                 <Option key={item.value} value={item.value}>
                                     {item.label}
                                 </Option>

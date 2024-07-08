@@ -2,16 +2,19 @@ import { Row, Col } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { dictData } from 'api/template';
-const PlugMarket = ({ onOk }: { onOk: (data: any) => void }) => {
+const PlugMarket = ({ onOk }: { onOk: (title: string, value: string) => void }) => {
     const [handleList, setHandleList] = useState<any[]>([]);
     const [generateList, setGenerateList] = useState<any[]>([]);
     const getList = async () => {
         const result = await dictData('', 'material_library_plugins');
+        console.log(result);
+
         const handle: any[] = [];
         const generate: any[] = [];
         result?.list?.map((item: any) => {
             const value = JSON.parse(item.value);
-            if (value.type === 'handle') {
+            console.log(value);
+            if (value.type === 'generate') {
                 handle.push(value);
             } else {
                 generate.push(value);
@@ -35,11 +38,14 @@ const PlugMarket = ({ onOk }: { onOk: (data: any) => void }) => {
     return (
         <>
             <div className="font-bold text-base mb-4">素材获取</div>
-            <CheckCard.Group value={'undefined'} onChange={onOk} style={{ width: '100%' }}>
+            <CheckCard.Group value={'undefined'} style={{ width: '100%' }}>
                 <Row gutter={[16, 16]}>
                     {handleList?.map((item) => (
                         <Col key={item.pluginsCode} span={8}>
                             <CheckCard
+                                onChange={() => {
+                                    onOk(item.name, item.pluginsCode);
+                                }}
                                 className="w-[100%]"
                                 title={item.name}
                                 value={item.pluginsCode}
@@ -55,6 +61,9 @@ const PlugMarket = ({ onOk }: { onOk: (data: any) => void }) => {
                         <Col key={item.pluginsCode} span={8}>
                             <CheckCard
                                 className="w-[100%]"
+                                onChange={() => {
+                                    onOk(item.name, item.pluginsCode);
+                                }}
                                 title={item.name}
                                 value={item.pluginsCode}
                                 avatar={<img className="w-[16px] h-[16px] align-middle" src={getImage(item.icon)} />}

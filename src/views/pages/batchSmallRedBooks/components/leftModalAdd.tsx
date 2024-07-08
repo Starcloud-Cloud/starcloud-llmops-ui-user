@@ -219,7 +219,14 @@ const LeftModalAdd = ({
                     {plugTitle}
                 </div>
                 {!plugValue ? (
-                    <PlugMarket onOk={setPlugValue} />
+                    <PlugMarket
+                        onOk={(title: string, value: string) => {
+                            console.log(value);
+
+                            setPlugTitle(title);
+                            setPlugValue(value);
+                        }}
+                    />
                 ) : (
                     <AiCreate
                         plugValue={plugValue}

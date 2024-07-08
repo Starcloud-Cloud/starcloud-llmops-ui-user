@@ -8,6 +8,7 @@ import AICreates from './components/AICreate';
 import FieldCompletion from './components/fieldCompletion';
 import RedBookAnalysis from './components/redBookAnalysis';
 import ImgOcr from './components/imgOcr';
+import TextExtraction from './components/textExtraction';
 const AiCreate = ({
     plugValue,
     materialType,
@@ -445,7 +446,10 @@ const AiCreate = ({
     }, [redBookData?.fieldList, redBookData]);
     return (
         <div>
-            {plugValue === 'imageOcr' ? (
+            {plugValue === 'extraction' ? (
+                //文本智能提取
+                <TextExtraction />
+            ) : plugValue === 'imageOcr' ? (
                 //OCR 提取
                 <ImgOcr
                     imgCheckedList={imgCheckedList}

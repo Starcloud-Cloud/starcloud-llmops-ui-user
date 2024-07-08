@@ -117,7 +117,7 @@ const Header = ({
                                 setAiModel(value);
                             }}
                         >
-                            {appModels?.aiModel?.map((item: any) => (
+                            {appModels?.llmModelType?.map((item: any) => (
                                 <Option key={item.value} value={item.value}>
                                     {item.label}
                                 </Option>
@@ -405,7 +405,7 @@ function CreateDetail() {
         if (newValue?.workflowConfig?.steps?.length === 1) {
             setAiModel(
                 newValue?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
-                    'gpt-3.5-turbo-1106'
+                    'gpt-3.5-turbo'
             );
         }
         detailRef.current = _.cloneDeep(newValue);

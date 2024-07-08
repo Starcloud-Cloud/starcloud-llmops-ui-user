@@ -8,6 +8,7 @@ import AICreates from './components/AICreate';
 import FieldCompletion from './components/fieldCompletion';
 import RedBookAnalysis from './components/redBookAnalysis';
 import ImgOcr from './components/imgOcr';
+import TextExtraction from './components/textExtraction';
 const AiCreate = ({
     plugValue,
     materialType,
@@ -375,8 +376,7 @@ const AiCreate = ({
                             const selectData = _.cloneDeep(redBookData.bindFieldData);
                             const obj: any = {};
                             newCheckbox.forEach((dt) => {
-                                console.log(dt, selectData[dt], res, dt);
-                                obj[selectData[dt]] = res[dt];
+                                obj[selectData[dt]] = res[dt]?.url || res[dt];
                             });
                             obj.uuid = uuidv4();
                             console.log(obj);
@@ -447,16 +447,8 @@ const AiCreate = ({
     return (
         <div>
             {plugValue === 'extraction' ? (
-                // 素材生成
-                <div className="relative">
-                    <AICreates
-                        variableData={variableData}
-                        setVariableData={setVariableData}
-                        checkedList={checkedList}
-                        setcustom={setcustom}
-                        aimaterialCreate={aimaterialCreate}
-                    />
-                </div>
+                //文本智能提取
+                <TextExtraction />
             ) : plugValue === 'imageOcr' ? (
                 //OCR 提取
                 <ImgOcr
@@ -470,7 +462,7 @@ const AiCreate = ({
             ) : plugValue === 'xhsOcr' ? (
                 //小红书分析
                 <RedBookAnalysis columns={allColumns} redBookData={redBookData} setRedBookData={setRedBookData} xhsAnalysis={xhsAnalysis} />
-            ) : (
+            ) : plugValue === 'generate_material_one' ? (
                 // 素材字段补齐
                 <FieldCompletion
                     fieldCompletionData={fieldCompletionData}
@@ -482,7 +474,18 @@ const AiCreate = ({
                     editMaterial={editMaterial}
                     setField={setField}
                 />
-            )}
+            ) : plugValue === 'generate_material_batch' ? (
+                // 素材生成
+                <div className="relative">
+                    <AICreates
+                        variableData={variableData}
+                        setVariableData={setVariableData}
+                        checkedList={checkedList}
+                        setcustom={setcustom}
+                        aimaterialCreate={aimaterialCreate}
+                    />
+                </div>
+            ) : null}
             {/* 选择素材 */}
             <Modal
                 className="relative"

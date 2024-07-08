@@ -279,7 +279,7 @@ function CreateDetail() {
         if (newValue?.workflowConfig?.steps?.length === 1) {
             setAiModel(
                 newValue?.workflowConfig?.steps[0].flowStep?.variable?.variables?.find((item: any) => item?.field === 'model')?.value ||
-                    'gpt-3.5-turbo-1106'
+                    'gpt-3.5-turbo'
             );
         }
         getStepMater();

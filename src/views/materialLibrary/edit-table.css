@@ -5,8 +5,18 @@
     z-index: 1;
 }
 
-.ant-table-cel {
+.material-detail-table .ant-table-cel {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.material-detail-table .ant-table-selection-column {
+    vertical-align: middle;
+}
+
+.material-detail-table .ant-upload-select {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
 }

@@ -1,5 +1,5 @@
-import { EditableProTable } from '@ant-design/pro-components';
-import { useState, memo, useEffect, useCallback } from 'react';
+import { EditableProTable, ProForm, ProFormInstance } from '@ant-design/pro-components';
+import { useState, memo, useEffect, useCallback, useRef } from 'react';
 import _ from 'lodash-es';
 import { Resizable } from 'react-resizable';
 import './index.css';
@@ -84,10 +84,12 @@ const TablePro = ({
 
     const resultColumns = column.map((col: any, index: any) => ({
         ...col,
-        onHeaderCell: (column: any) => ({
-            width: column.width,
-            onResize: handleResize(index)
-        })
+        onHeaderCell: (column: any) => {
+            return {
+                width: column.width,
+                onResize: handleResize(index)
+            };
+        }
     }));
 
     return (
@@ -105,7 +107,7 @@ const TablePro = ({
                     setSelectedRowKeys(selectedRowKeys);
                 }
             }}
-            actionRef={actionRef}
+            editableFormRef={actionRef}
             toolBarRender={false}
             columns={resultColumns.map((item) => ({
                 ...item,
@@ -120,7 +122,11 @@ const TablePro = ({
                         setEditableRowKeys([getRowKey(record, rowIndex)]);
                         setDataIndex([item.dataIndex || (item.key as string)]);
                     },
-                    onBlur: (e: any) => {
+                    onBlur: async (e: any) => {
+                        if (item.required && !e.target.value) {
+                            // 必填项
+                            return;
+                        }
                         if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
                             setDataIndex([]);
                             setEditableRowKeys([]);

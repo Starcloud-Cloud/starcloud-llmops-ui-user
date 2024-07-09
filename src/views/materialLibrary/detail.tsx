@@ -1,5 +1,5 @@
 import { CloudUploadOutlined, DownOutlined, PlusOutlined, SearchOutlined, SettingOutlined } from '@ant-design/icons';
-import { Button, Space, Input, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message, Form } from 'antd';
+import { Button, Space, Input, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message, Form, Modal } from 'antd';
 import {
     createMaterialLibrarySlice,
     delBatchMaterialLibrarySlice,
@@ -16,7 +16,7 @@ import TablePro from 'views/pages/batchSmallRedBooks/components/components/antdP
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { v4 as uuidv4 } from 'uuid';
 import { IconRenderer } from './index';
-import { ActionType, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { ActionType, ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import FormModal from './components/formModal';
 import './edit-table.css';
 import { PicImagePick } from 'ui-component/PicImagePick';
@@ -45,6 +45,7 @@ const MaterialLibraryDetail = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filedName, setFiledName] = useState<string>('');
     const [selectImg, setSelectImg] = useState<any>(null);
+    const [previewOpen, setPreviewOpen] = useState(false);
 
     useEffect(() => {
         if (tableRef.current.length && selectImg?.largeImageURL) {
@@ -84,7 +85,8 @@ const MaterialLibraryDetail = () => {
                 desc: item.columnName,
                 fieldName: item.columnCode,
                 type: item.columnType,
-                required: item.isRequired
+                required: item.isRequired,
+                width: item.columnWidth
             }));
 
             const newList = list?.map((item: any) => {
@@ -92,7 +94,8 @@ const MaterialLibraryDetail = () => {
                     title: item.desc,
                     align: 'center',
                     className: 'align-middle',
-                    width: item.type === EditType.Image ? 200 : 400,
+                    required: !!item.required,
+                    width: item.width || 400,
                     dataIndex: item.fieldName,
                     editable: () => {
                         return !(item.type === EditType.Image);
@@ -129,7 +132,25 @@ const MaterialLibraryDetail = () => {
                                                     width={82}
                                                     height={82}
                                                     preview={{
-                                                        src: row[item.fieldName]
+                                                        destroyOnClose: true,
+                                                        toolbarRender: () => null,
+                                                        imageRender: () => {
+                                                            return (
+                                                                <ModalForm
+                                                                    layout="horizontal"
+                                                                    width={800}
+                                                                    title="预览"
+                                                                    open={true}
+                                                                    modalProps={{ closable: false }}
+                                                                >
+                                                                    <div className="flex justify-center mb-3">
+                                                                        <Image width={500} src={row[item.fieldName]} preview={false} />
+                                                                    </div>
+                                                                    <ProFormText name="tags" label="标签" />
+                                                                    <ProFormTextArea name="description" label="描述" />
+                                                                </ModalForm>
+                                                            );
+                                                        }
                                                     }}
                                                     src={
                                                         row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'
@@ -198,7 +219,7 @@ const MaterialLibraryDetail = () => {
                     formItemProps: {
                         rules: [
                             {
-                                required: item.required,
+                                required: !!item.required,
                                 message: item.desc + '是必填项'
                             }
                         ]
@@ -311,7 +332,7 @@ const MaterialLibraryDetail = () => {
     };
 
     const handleUpdateColumn = async (index: number, size: any) => {
-        const list = tableMetaRef.current[index];
+        const list = tableMetaRef.current[index - 1];
 
         await updateMaterialLibraryTitle({
             columnType: list.columnType,

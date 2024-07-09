@@ -215,7 +215,7 @@ const FormModal = ({
                                         )}
                                     </Upload>
                                 ) : (
-                                    <TextArea rows={8} />
+                                    <TextArea autoSize={{ minRows: 3, maxRows: 8 }} />
                                 )}
                             </Form.Item>
                         ) : (

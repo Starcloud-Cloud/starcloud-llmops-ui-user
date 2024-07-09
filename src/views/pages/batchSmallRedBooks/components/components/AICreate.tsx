@@ -110,7 +110,7 @@ const AiCreate = ({
                 value={variableData.checkedFieldList}
             >
                 {checkedList?.map((item) => (
-                    <Checkbox disabled={item.required} value={item.dataIndex}>
+                    <Checkbox key={item.title} disabled={item.required} value={item.dataIndex}>
                         {item.title}
                         {item.required ? '*' : ''}
                     </Checkbox>

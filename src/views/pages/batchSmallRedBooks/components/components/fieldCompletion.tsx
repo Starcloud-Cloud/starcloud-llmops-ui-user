@@ -92,7 +92,7 @@ const FieldCompletion = ({
                 value={fieldCompletionData.checkedFieldList}
             >
                 {checkedList?.map((item) => (
-                    <Checkbox value={item.dataIndex}>
+                    <Checkbox key={item.dataIndex} value={item.dataIndex}>
                         {item.title}
                         {item.required ? '*' : ''}
                     </Checkbox>

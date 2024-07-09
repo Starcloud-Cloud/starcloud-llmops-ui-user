@@ -152,6 +152,8 @@ const BatcSmallRedBooks = forwardRef(
                 pageNo,
                 batchUid: batch || batchUid
             }).then((res) => {
+                console.log(res);
+
                 const result = res?.list?.every((item: any) => {
                     return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
                 });

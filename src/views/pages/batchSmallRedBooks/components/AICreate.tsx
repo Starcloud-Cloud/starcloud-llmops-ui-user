@@ -1,6 +1,6 @@
 import { Modal, Button, Table, Progress, Tag } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
-import { materialGenerate, customMaterialGenerate, pluginsXhsOcr } from 'api/redBook/batchIndex';
+import { materialGenerate, customMaterialGenerate, pluginsXhsOcr, extraction } from 'api/redBook/batchIndex';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import './aiCreate.css';
@@ -417,6 +417,136 @@ const AiCreate = ({
         executionCountRef.current = 0;
         setExecutionCount(executionCountRef.current);
     };
+    //文本智能提取
+    const handleTextData = async (num: number, retry?: boolean) => {
+        setSelectValue('text');
+        if (!retry) {
+            materialzanListRef.current = [];
+            setMaterialzanList(materialzanListRef.current);
+            uuidListsRef.current = [];
+            setUuidLists(uuidListsRef.current);
+        }
+        const newList = _.cloneDeep(requirementList);
+        const define: any = {};
+        newList?.map((item: any) => {
+            define[item.title] = item.value;
+        });
+        aref.current = false;
+        setMaterialExecutionOpen(true);
+        //记录原有数据下标
+        const indexList: any[] = [];
+        let theStaging = _.cloneDeep(tableData);
+        if (retry) {
+            tableData?.map((item, index) => {
+                if (retryListRef.current?.find((el) => el.uuid === item.uuid)) {
+                    indexList.push(index);
+                }
+            });
+        } else if (num === 1) {
+            tableData?.map((item, index) => {
+                if (selList?.find((el) => el.uuid === item.uuid)) {
+                    indexList.push(index);
+                }
+            });
+        } else {
+            tableData?.map((item, index) => {
+                indexList.push(index);
+            });
+        }
+        if (!retry) {
+            totalCountRef.current = num === 1 ? selList.length : tableData.length;
+            setTotalCount(totalCountRef.current);
+        }
+        let index = 0;
+        const chunks = chunkArray(retry ? retryListRef.current : num === 1 ? selList : tableData, 1);
+        retryListRef.current = [];
+        while (index < chunks.length && !aref.current) {
+            const resArr: any[] = [];
+            const newResArr: any[] = [];
+            const currentBatch = chunks.slice(index, index + 3);
+            executionCountRef.current = currentBatch?.flat()?.length;
+            setExecutionCount(executionCountRef.current);
+            console.log(currentBatch);
+
+            await Promise.all(
+                currentBatch.map(async (group, i) => {
+                    console.log(group);
+
+                    try {
+                        const res = await extraction({
+                            define,
+                            parseText: group[0][textData.checkedFieldList]
+                        });
+
+                        if (!aref.current) {
+                            const newCheckbox: any[] = _.cloneDeep(textData.fieldList);
+                            const selectData = _.cloneDeep(textData.bindFieldData);
+                            const obj: any = {};
+                            newCheckbox.forEach((dt) => {
+                                obj[selectData[dt]] = res[dt]?.url || res[dt];
+                            });
+                            console.log(obj);
+
+                            newResArr.push(
+                                ...group.map((dt, t) => ({
+                                    ...dt,
+                                    ...obj
+                                }))
+                            );
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            successCountRef.current += group?.length;
+                            setExecutionCount(executionCountRef.current);
+                            setSuccessCount(successCountRef.current);
+                        }
+                    } catch (error: any) {
+                        const newRetry = _.cloneDeep(retryListRef.current);
+                        newRetry.push(...group);
+                        retryListRef.current = newRetry;
+                        group?.map((item) => {
+                            if (!resArr[index + i]) {
+                                resArr[index + i] = [{}];
+                            } else {
+                                resArr[index + i].push({});
+                            }
+                        });
+                        console.log(error);
+                        const newList = _.cloneDeep(errorMessageRef.current);
+                        newList.push(error.msg);
+                        errorMessageRef.current = newList;
+                        setErrorMessage(errorMessageRef.current);
+                        executionCountRef.current -= group?.length;
+                        setExecutionCount(executionCountRef.current);
+                        errorCountRef.current += group?.length;
+                        if (errorCountRef.current >= 9) {
+                            aref.current = true;
+                        }
+                        setErrorCount(errorCountRef.current);
+                    }
+                })
+            );
+            if (!aref.current) {
+                const newArr = _.cloneDeep(materialzanListRef.current);
+                const updatedMaterialzanList = [...materialzanListRef.current, ...newResArr];
+                console.log(updatedMaterialzanList);
+
+                materialzanListRef.current = updatedMaterialzanList;
+                setMaterialzanList(materialzanListRef.current);
+                uuidListsRef.current = materialzanListRef.current?.map((item) => item.uuid);
+                setUuidLists(uuidListsRef.current);
+                materialFieldexeDataRef.current = theStaging?.map((item) => {
+                    const arrinclude = materialzanListRef.current.find((el) => el.uuid === item.uuid);
+                    if (arrinclude) {
+                        return arrinclude;
+                    } else {
+                        return item;
+                    }
+                });
+                index += 3;
+            }
+        }
+        executionCountRef.current = 0;
+        setExecutionCount(executionCountRef.current);
+    };
 
     //新增插入表格
     const [selectValue, setSelectValue] = useState('');
@@ -424,13 +554,16 @@ const AiCreate = ({
     const materialFieldexeDataRef = useRef<any>(null);
     const materialzanListRef = useRef<any[]>([]);
     const [materialzanList, setMaterialzanList] = useState<any[]>([]);
-
     //小红书数据
     const [redBookData, setRedBookData] = useState<any>({
         requirement: '',
         fieldList: [],
         bindFieldData: {}
     });
+    const xhsCloumns = useMemo(() => {
+        const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
+        return columns?.filter((item) => arr?.includes(item.dataIndex));
+    }, [redBookData?.fieldList, redBookData.bindFieldData]);
     // OCR 提取数据
     const [ocrData, setOcrData] = useState({
         requirement: '',
@@ -439,16 +572,35 @@ const AiCreate = ({
         titleField: 1,
         contentField: 1
     });
-
-    const xhsCloumns = useMemo(() => {
-        const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
+    //文本智能提取数据
+    const [requirementList, setRequirementList] = useState<any[]>([]);
+    const [textData, setTextData] = useState<any>({
+        checkedFieldList: '',
+        fieldList: [],
+        bindFieldData: {}
+    });
+    useEffect(() => {
+        console.log(textData, requirementList);
+    }, [textData, requirementList]);
+    const textCloumns = useMemo(() => {
+        const arr = textData?.fieldList?.map((item: any) => textData?.bindFieldData[item])?.filter((item: any) => item);
         return columns?.filter((item) => arr?.includes(item.dataIndex));
-    }, [redBookData?.fieldList, redBookData]);
+    }, [textData?.fieldList, textData?.bindFieldData]);
     return (
         <div>
             {plugValue === 'extraction' ? (
                 //文本智能提取
-                <TextExtraction />
+                <TextExtraction
+                    requirementList={requirementList}
+                    textData={textData}
+                    setRequirementList={setRequirementList}
+                    setTextData={setTextData}
+                    checkedList={checkedList}
+                    selListLength={selList?.length || 0}
+                    tableDataLength={tableData?.length || 0}
+                    setSelOpen={setSelOpen}
+                    handleTextData={handleTextData}
+                />
             ) : plugValue === 'imageOcr' ? (
                 //OCR 提取
                 <ImgOcr
@@ -542,7 +694,7 @@ const AiCreate = ({
                 <div className="my-4">
                     {errorMessage?.length > 0 &&
                         errorMessage?.map((item, i) => (
-                            <div className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
+                            <div key={item} className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
                                 <span className="font-bold">错误信息 {i + 1}：</span>
                                 {item}
                             </div>
@@ -579,6 +731,8 @@ const AiCreate = ({
                             ? columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex))
                             : selectValue === 'xhs'
                             ? xhsCloumns
+                            : selectValue === 'text'
+                            ? textCloumns
                             : [])
                     ]}
                     dataSource={materialzanList}
@@ -646,6 +800,12 @@ const AiCreate = ({
                                         setMaterialExecutionOpen(false);
                                         setPlugOpen(false);
                                         setSelectedRowKeys(uuidListsRef.current);
+                                    } else if (selectValue === 'text') {
+                                        setSelList([]);
+                                        downTableData(materialFieldexeDataRef.current, 2);
+                                        setMaterialExecutionOpen(false);
+                                        setPlugOpen(false);
+                                        setSelectedRowKeys(uuidLists);
                                     }
                                 }}
                                 className="w-[100px]"

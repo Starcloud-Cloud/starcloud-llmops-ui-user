@@ -143,6 +143,8 @@ const LeftModalAdd = ({
     // const [form] = Form.useForm();
 
     const onDragEnd = ({ active, over }: DragEndEvent) => {
+        console.log(1111);
+
         if (active.id !== over?.id) {
             const newList = (prevState: any) => {
                 const activeIndex = prevState.findIndex((record: any) => record.uuid === active?.id);
@@ -248,7 +250,7 @@ const LeftModalAdd = ({
                 )}
             </Modal>
             {/* 字段配置 */}
-            <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
+            <Modal className="relative" width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
                 <HeaderField
                     setColOpen={setColOpen}
                     onDragEnd={onDragEnd}

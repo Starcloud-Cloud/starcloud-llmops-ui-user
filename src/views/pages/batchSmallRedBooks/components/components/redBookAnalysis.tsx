@@ -79,7 +79,9 @@ const RedBookAnalysis = ({
                                     className="w-[100px]"
                                 >
                                     {columns?.map((item) => (
-                                        <Option value={item.dataIndex}>{item.title}</Option>
+                                        <Option key={item.dataIndex} value={item.dataIndex}>
+                                            {item.title}
+                                        </Option>
                                     ))}
                                 </Select>
                             </div>

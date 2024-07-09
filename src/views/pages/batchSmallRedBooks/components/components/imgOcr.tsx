@@ -47,7 +47,9 @@ const ImgOcr = ({
                 value={ocrData.checkedFieldList}
             >
                 {imgCheckedList?.map((item) => (
-                    <Checkbox value={item.dataIndex}>{item.title}</Checkbox>
+                    <Checkbox key={item.dataIndex} value={item.dataIndex}>
+                        {item.title}
+                    </Checkbox>
                 ))}
             </Checkbox.Group>
             <div className="text-[16px] font-bold my-4">2.如何处理素材</div>

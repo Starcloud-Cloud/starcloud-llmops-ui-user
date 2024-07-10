@@ -92,65 +92,70 @@ const TablePro = ({
         }
     }));
 
+    const dataColumns = resultColumns.map((item) => ({
+        ...item,
+        editable: dataIndex.flat(1).join('.') === [item.dataIndex || item.key].flat(1).join('.') ? undefined : false,
+        onCell: (record: any, rowIndex: any) => ({
+            onClick: () => {
+                if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
+                    setDataIndex([]);
+                    setEditableRowKeys([]);
+                    return;
+                }
+                setEditableRowKeys([getRowKey(record, rowIndex)]);
+                setDataIndex([item.dataIndex || (item.key as string)]);
+            },
+            onBlur: async (e: any) => {
+                if (item.required && !e.target.value) {
+                    // 必填项
+                    return;
+                }
+                if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
+                    setDataIndex([]);
+                    setEditableRowKeys([]);
+                    return;
+                }
+                handleEditColumn(record);
+                setEditableRowKeys([]);
+            }
+        })
+    }));
+
     return (
-        <EditableProTable<any>
-            className="edit-table"
-            rowKey={rowKey}
-            tableAlertRender={false}
-            components={components}
-            rowSelection={{
-                type: 'checkbox',
-                fixed: true,
-                columnWidth: 50,
-                selectedRowKeys: selectedRowKeys,
-                onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-                    setSelectedRowKeys(selectedRowKeys);
-                }
-            }}
-            editableFormRef={actionRef}
-            toolBarRender={false}
-            columns={resultColumns.map((item) => ({
-                ...item,
-                editable: dataIndex.flat(1).join('.') === [item.dataIndex || item.key].flat(1).join('.') ? undefined : false,
-                onCell: (record: any, rowIndex: any) => ({
-                    onClick: () => {
-                        if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
-                            setDataIndex([]);
-                            setEditableRowKeys([]);
-                            return;
-                        }
-                        setEditableRowKeys([getRowKey(record, rowIndex)]);
-                        setDataIndex([item.dataIndex || (item.key as string)]);
-                    },
-                    onBlur: async (e: any) => {
-                        if (item.required && !e.target.value) {
-                            // 必填项
-                            return;
-                        }
-                        if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
-                            setDataIndex([]);
-                            setEditableRowKeys([]);
-                            return;
-                        }
-                        handleEditColumn(record);
-                        setEditableRowKeys([]);
+        dataColumns.length &&
+        tableData.length && (
+            <EditableProTable<any>
+                className="edit-table"
+                rowKey={rowKey}
+                tableAlertRender={false}
+                components={components}
+                rowSelection={{
+                    type: 'checkbox',
+                    fixed: true,
+                    columnWidth: 50,
+                    selectedRowKeys: selectedRowKeys,
+                    onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+                        setSelectedRowKeys(selectedRowKeys);
                     }
-                })
-            }))}
-            value={tableData}
-            pagination={{
-                pageSize: 20,
-                pageSizeOptions: [20, 50, 100, 300, 500],
-                onChange: (page) => setPage(page)
-            }}
-            recordCreatorProps={false}
-            editable={{
-                editableKeys: editableKeys,
-                onValuesChange: (record, recordList) => {
-                    setTableData(recordList);
-                }
-            }}
-        />
+                }}
+                editableFormRef={actionRef}
+                toolBarRender={false}
+                columns={dataColumns}
+                value={tableData}
+                pagination={{
+                    pageSize: 20,
+                    pageSizeOptions: [20, 50, 100, 300, 500],
+                    onChange: (page) => setPage(page)
+                }}
+                recordCreatorProps={false}
+                editable={{
+                    editableKeys: editableKeys,
+                    onValuesChange: (record, recordList) => {
+                        setTableData(recordList);
+                    }
+                }}
+            />
+        )
     );
 };
 

@@ -1,4 +1,4 @@
-import { CloudUploadOutlined, DownOutlined, PlusOutlined, SearchOutlined, SettingOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, DownOutlined, EyeOutlined, PlusOutlined, SearchOutlined, SettingOutlined } from '@ant-design/icons';
 import { Button, Space, Input, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message, Form, Modal } from 'antd';
 import {
     createMaterialLibrarySlice,
@@ -14,9 +14,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import TablePro from 'views/pages/batchSmallRedBooks/components/components/antdProTable';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
-import { v4 as uuidv4 } from 'uuid';
 import { IconRenderer } from './index';
-import { ActionType, ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { ActionType, ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import FormModal from './components/formModal';
 import './edit-table.css';
 import { PicImagePick } from 'ui-component/PicImagePick';
@@ -47,6 +46,7 @@ const MaterialLibraryDetail = () => {
     const [filedName, setFiledName] = useState<string>('');
     const [selectImg, setSelectImg] = useState<any>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
+    const [tableDataOriginal, setTableDataOriginal] = useState<any>([]);
 
     useEffect(() => {
         if (tableRef.current.length && selectImg?.largeImageURL) {
@@ -66,6 +66,7 @@ const MaterialLibraryDetail = () => {
     const tableMetaRef = useRef<any[]>([]);
 
     const [form] = Form.useForm();
+    const [imageForm] = Form.useForm();
 
     useEffect(() => {
         dictData('', 'material_format_type').then((res) => {
@@ -104,119 +105,113 @@ const MaterialLibraryDetail = () => {
                     editType: item.type,
                     valueType: 'textarea',
                     fieldProps: { autoSize: { minRows: 1, maxRows: 5 } },
-                    render: (_: any, row: any, index: number) => (
-                        <div className="flex justify-center items-center gap-2">
-                            {item.type === EditType.Image ? (
-                                <div className="relative">
-                                    <Upload
-                                        className="table_upload"
-                                        {...propShow}
-                                        showUploadList={false}
-                                        listType="picture-card"
-                                        maxCount={1}
-                                        disabled={!canUpload}
-                                        onChange={(info) => {
-                                            if (info.file.status === 'done') {
-                                                const data = JSON.parse(JSON.stringify(tableRef.current));
-                                                data[index][item.fieldName] = info?.file?.response?.data?.url;
-                                                tableRef.current = data;
-                                                setTableData([...data]);
-                                                handleEditColumn({ ...row, [item.fieldName]: info?.file?.response?.data?.url });
-                                            }
-                                        }}
-                                    >
-                                        {row[item.fieldName] ? (
-                                            <div className="relative">
-                                                <Image
-                                                    onMouseEnter={() => setCanUpload(false)}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    width={82}
-                                                    height={82}
-                                                    preview={{
-                                                        destroyOnClose: true,
-                                                        toolbarRender: () => null,
-                                                        imageRender: () => {
-                                                            return (
-                                                                <ModalForm
-                                                                    layout="horizontal"
-                                                                    width={800}
-                                                                    title="预览"
-                                                                    open={true}
-                                                                    modalProps={{ closable: false }}
-                                                                >
-                                                                    <div className="flex justify-center mb-3">
-                                                                        <Image width={500} src={row[item.fieldName]} preview={false} />
-                                                                    </div>
-                                                                    <ProFormText name="tags" label="标签" />
-                                                                    <ProFormTextArea name="description" label="描述" />
-                                                                </ModalForm>
-                                                            );
-                                                        }
-                                                    }}
-                                                    src={
-                                                        row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'
-                                                        // selectImg?.largeImageURL ||
-                                                        // form.getFieldValue(item.dataIndex) + '?x-oss-process=image/resize,w_300/quality,q_80'
-                                                    }
-                                                />
-                                                <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.4)]">
-                                                    <Tooltip title="上传">
+                    render: (text: any, row: any, index: number) => {
+                        return (
+                            <div className="flex justify-center items-center gap-2">
+                                {item.type === EditType.Image ? (
+                                    <div className="relative">
+                                        <Upload
+                                            className="table_upload"
+                                            {...propShow}
+                                            showUploadList={false}
+                                            listType="picture-card"
+                                            maxCount={1}
+                                            disabled={!canUpload}
+                                            onChange={(info) => {
+                                                if (info.file.status === 'done') {
+                                                    const data = JSON.parse(JSON.stringify(tableRef.current));
+                                                    data[index][item.fieldName] = info?.file?.response?.data?.url;
+                                                    tableRef.current = data;
+                                                    setTableData([...data]);
+                                                    handleEditColumn({ ...row, [item.fieldName]: info?.file?.response?.data?.url });
+                                                }
+                                            }}
+                                        >
+                                            {row[item.fieldName] ? (
+                                                <div className="relative">
+                                                    <div className="relative">
+                                                        <Image
+                                                            onMouseEnter={() => setCanUpload(false)}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            width={82}
+                                                            height={82}
+                                                            preview={false}
+                                                            src={row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'}
+                                                        />
                                                         <div
-                                                            className="flex-1 flex justify-center"
-                                                            onMouseEnter={() => setCanUpload(true)}
-                                                            onMouseLeave={() => setCanUpload(false)}
+                                                            className="absolute z-[10] cursor-pointer inset-0 bg-[rgba(0, 0, 0, 0.5)] flex justify-center items-center text-white opacity-0 hover:opacity-100"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setPreviewOpen(true);
+                                                                setCurrentRecord(row);
+                                                                setFiledName(item.fieldName);
+                                                            }}
                                                         >
-                                                            <CloudUploadOutlined className="text-white/60 hover:text-white" />
+                                                            <div>
+                                                                <EyeOutlined />
+                                                                预览
+                                                            </div>
                                                         </div>
-                                                    </Tooltip>
+                                                    </div>
+                                                    <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.4)]">
+                                                        <Tooltip title="上传">
+                                                            <div
+                                                                className="flex-1 flex justify-center"
+                                                                onMouseEnter={() => setCanUpload(true)}
+                                                                onMouseLeave={() => setCanUpload(false)}
+                                                            >
+                                                                <CloudUploadOutlined className="text-white/60 hover:text-white" />
+                                                            </div>
+                                                        </Tooltip>
+                                                        <Tooltip title="搜索">
+                                                            <div
+                                                                className="flex-1 flex justify-center !cursor-pointer"
+                                                                onClick={(e) => {
+                                                                    setIsModalOpen(true);
+                                                                    e.stopPropagation();
+                                                                    setCurrentRecord(row);
+                                                                    setFiledName(item.fieldName);
+                                                                    // setImageData(row.uuid);
+                                                                    // setValues(row);
+                                                                }}
+                                                            >
+                                                                <SearchOutlined className="text-white/60 hover:text-white" />
+                                                            </div>
+                                                        </Tooltip>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
+                                                    onMouseEnter={() => setCanUpload(true)}
+                                                >
+                                                    <PlusOutlined />
+                                                    <div style={{ marginTop: 8 }}>Upload</div>
                                                     <Tooltip title="搜索">
                                                         <div
-                                                            className="flex-1 flex justify-center !cursor-pointer"
+                                                            className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]"
                                                             onClick={(e) => {
                                                                 setIsModalOpen(true);
                                                                 e.stopPropagation();
                                                                 setCurrentRecord(row);
                                                                 setFiledName(item.fieldName);
-                                                                // setImageDataIndex(row.uuid);
+                                                                // setImageData(row.uuid);
                                                                 // setValues(row);
                                                             }}
                                                         >
-                                                            <SearchOutlined className="text-white/60 hover:text-white" />
+                                                            <SearchOutlined className="text-white/80 hover:text-white" />
                                                         </div>
                                                     </Tooltip>
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            <div
-                                                className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
-                                                onMouseEnter={() => setCanUpload(true)}
-                                            >
-                                                <PlusOutlined />
-                                                <div style={{ marginTop: 8 }}>Upload</div>
-                                                <Tooltip title="搜索">
-                                                    <div
-                                                        className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]"
-                                                        onClick={(e) => {
-                                                            setIsModalOpen(true);
-                                                            e.stopPropagation();
-                                                            setCurrentRecord(row);
-                                                            setFiledName(item.fieldName);
-                                                            // setImageDataIndex(row.uuid);
-                                                            // setValues(row);
-                                                        }}
-                                                    >
-                                                        <SearchOutlined className="text-white/80 hover:text-white" />
-                                                    </div>
-                                                </Tooltip>
-                                            </div>
-                                        )}
-                                    </Upload>
-                                </div>
-                            ) : (
-                                <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
-                            )}
-                        </div>
-                    ),
+                                            )}
+                                        </Upload>
+                                    </div>
+                                ) : (
+                                    <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
+                                )}
+                            </div>
+                        );
+                    },
                     formItemProps: {
                         rules: [
                             {
@@ -280,24 +275,29 @@ const MaterialLibraryDetail = () => {
 
             setColumns(columnData);
         }
-    }, [canUpload, detail]);
+    }, [canUpload, detail, tableDataOriginal]);
 
     useEffect(() => {
         getMaterialLibraryDataList({ libraryId: id }).then((data) => {
+            setTableDataOriginal(data);
             let newList: any = [];
             data.map((item: any) => {
                 let obj: any = {
-                    // uuid: uuidv4(),
                     id: item.id
                 };
                 item.content.forEach((item1: any) => {
                     if (item1?.['columnCode']) {
                         obj[item1['columnCode']] = item1?.['value'];
+                        if (item1.description) {
+                            obj[item1['columnCode'] + '_description'] = item1?.['description'];
+                        }
+                        if (item1.tags) {
+                            obj[item1['columnCode'] + '_tags'] = item1?.['tags'];
+                        }
                     }
                 });
                 newList.push(obj);
             });
-
             setTableData(newList);
             tableRef.current = newList;
         });
@@ -352,12 +352,23 @@ const MaterialLibraryDetail = () => {
         const recordKeys = Object.keys(record);
         const content = tableMetaList.map((item) => {
             if (recordKeys.includes(item.columnCode)) {
-                return {
-                    columnId: item.id,
-                    columnName: item.columnName,
-                    columnCode: item.columnCode,
-                    value: record[item.columnCode]
-                };
+                if (item.columnType === EditType.Image) {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: record[item.columnCode],
+                        description: record.description || record[item.columnCode + '_description'],
+                        tags: record.tags || record[item.columnCode + '_tags']
+                    };
+                } else {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: record[item.columnCode]
+                    };
+                }
             }
         });
 
@@ -400,6 +411,7 @@ const MaterialLibraryDetail = () => {
 
     //字段配置
     const [colOpen, setColOpen] = useState(false);
+    // console.log(previewImageDataRef.current, 'previewImageDataRef.current');
 
     return (
         <>
@@ -484,6 +496,36 @@ const MaterialLibraryDetail = () => {
                 />
             )}
             {colOpen && <HeaderField colOpen={colOpen} setColOpen={setColOpen} />}
+
+            {previewOpen && (
+                <ModalForm
+                    onInit={async () => {
+                        const tags = currentRecord[filedName + '_tags'];
+                        const description = currentRecord[filedName + '_description'];
+                        await imageForm.setFieldsValue({ tags, description });
+                    }}
+                    layout="horizontal"
+                    form={imageForm}
+                    width={800}
+                    title="预览"
+                    open={previewOpen}
+                    onOpenChange={setPreviewOpen}
+                    onFinish={async () => {
+                        const value = await imageForm.getFieldsValue();
+                        const result = await handleEditColumn({
+                            ...currentRecord,
+                            ...value
+                        });
+                        setPreviewOpen(false);
+                    }}
+                >
+                    <div className="flex justify-center mb-3">
+                        <Image width={500} src={currentRecord[filedName]} preview={false} />
+                    </div>
+                    <ProFormSelect mode="tags" name="tags" label="标签" />
+                    <ProFormTextArea name="description" label="描述" />
+                </ModalForm>
+            )}
         </>
     );
 };

@@ -138,7 +138,7 @@ const MaterialLibraryDetail = () => {
                                                             src={row[item.fieldName] + '?x-oss-process=image/resize,w_100/quality,q_80'}
                                                         />
                                                         <div
-                                                            className="absolute z-[10] cursor-pointer inset-0 bg-[rgba(0, 0, 0, 0.5)] flex justify-center items-center text-white opacity-0 hover:opacity-100"
+                                                            className="absolute z-[1] cursor-pointer inset-0 bg-[rgba(0, 0, 0, 0.5)] flex justify-center items-center text-white opacity-0 hover:opacity-100"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 setPreviewOpen(true);
@@ -357,8 +357,8 @@ const MaterialLibraryDetail = () => {
                         columnName: item.columnName,
                         columnCode: item.columnCode,
                         value: record[item.columnCode],
-                        description: record.description || record[item.columnCode + '_description'],
-                        tags: record.tags || record[item.columnCode + '_tags']
+                        description: record[item.columnCode + '_description'],
+                        tags: record[item.columnCode + '_tags']
                     };
                 } else {
                     return {
@@ -408,8 +408,6 @@ const MaterialLibraryDetail = () => {
         }
     };
 
-    // console.log(previewImageDataRef.current, 'previewImageDataRef.current');
-
     return (
         <>
             <div className="flex justify-between items-center">
@@ -419,14 +417,6 @@ const MaterialLibraryDetail = () => {
                         <div className="cursor-pointer flex items-center">
                             <span className="text-[20px] font-semibold">{detail?.name}</span>
                         </div>
-                        {/* <div className="mt-2">
-                            <Space>
-                                <Tag bordered={false}>123</Tag>
-                                <Tag bordered={false}>123</Tag>
-                                <Tag bordered={false}>123</Tag>
-                                <Tag bordered={false}>123</Tag>
-                            </Space>
-                        </div> */}
                     </div>
                 </div>
                 <div>
@@ -518,8 +508,8 @@ const MaterialLibraryDetail = () => {
                     <div className="flex justify-center mb-3">
                         <Image width={500} src={currentRecord[filedName]} preview={false} />
                     </div>
-                    <ProFormSelect mode="tags" name="tags" label="标签" />
-                    <ProFormTextArea name="description" label="描述" />
+                    <ProFormSelect mode="tags" name={filedName + 'tags'} label="标签" />
+                    <ProFormTextArea name={filedName + 'description'} label="描述" />
                 </ModalForm>
             )}
         </>

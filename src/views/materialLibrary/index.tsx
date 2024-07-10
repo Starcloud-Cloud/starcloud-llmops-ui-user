@@ -140,7 +140,15 @@ const MaterialLibrary = () => {
             dataIndex: 'status',
             search: false,
             width: 80,
-            renderText: (text, record) => <Switch value={!!text} onChange={(value) => handleStatus({ ...record, status: value ? 1 : 0 })} />
+            renderText: (text, record) => (
+                <Switch
+                    value={!!text}
+                    onChange={(value, e) => {
+                        e.stopPropagation();
+                        handleStatus({ ...record, status: value ? 1 : 0 });
+                    }}
+                />
+            )
         },
         {
             title: '操作',
@@ -148,8 +156,18 @@ const MaterialLibrary = () => {
             search: false,
             align: 'right',
             render: (_, row) => (
-                <Dropdown menu={{ items }} onOpenChange={() => setRecord(row)}>
-                    <MoreOutlined className="cursor-pointer p-1" />
+                <Dropdown
+                    menu={{ items }}
+                    onOpenChange={() => {
+                        setRecord(row);
+                    }}
+                >
+                    <MoreOutlined
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+                        className="cursor-pointer p-1"
+                    />
                 </Dropdown>
             )
         }

@@ -20,6 +20,7 @@ import { ActionType, ModalForm, ProFormText, ProFormTextArea } from '@ant-design
 import FormModal from './components/formModal';
 import './edit-table.css';
 import { PicImagePick } from 'ui-component/PicImagePick';
+import HeaderField from '../pages/batchSmallRedBooks/components/components/headerField';
 
 export enum EditType {
     String = 0,
@@ -306,7 +307,7 @@ const MaterialLibraryDetail = () => {
         {
             key: '1',
             label: '编辑素材字段',
-            onClick: () => {}
+            onClick: () => setColOpen(true)
         },
         {
             key: '2',
@@ -397,6 +398,9 @@ const MaterialLibraryDetail = () => {
         }
     };
 
+    //字段配置
+    const [colOpen, setColOpen] = useState(false);
+
     return (
         <>
             <div className="flex justify-between items-center">
@@ -479,6 +483,7 @@ const MaterialLibraryDetail = () => {
                     values={null}
                 />
             )}
+            {colOpen && <HeaderField colOpen={colOpen} setColOpen={setColOpen} />}
         </>
     );
 };

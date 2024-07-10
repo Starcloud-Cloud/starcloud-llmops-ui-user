@@ -248,7 +248,7 @@ const LeftModalAdd = ({
                 )}
             </Modal>
             {/* 字段配置 */}
-            <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
+            {/* <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
                 <HeaderField
                     setColOpen={setColOpen}
                     onDragEnd={onDragEnd}
@@ -257,7 +257,7 @@ const LeftModalAdd = ({
                     setMaterialTableData={setMaterialTableData}
                     setFieldHeads={setFieldHeads}
                 />
-            </Modal>
+            </Modal> */}
 
             {/* <Modal
                 title={materialTitle}

@@ -1,5 +1,5 @@
-import { EditableProTable, ProForm, ProFormInstance } from '@ant-design/pro-components';
-import { useState, memo, useEffect, useCallback, useRef } from 'react';
+import { EditableProTable } from '@ant-design/pro-components';
+import { useState, memo, useEffect, useCallback } from 'react';
 import _ from 'lodash-es';
 import { Resizable } from 'react-resizable';
 import './index.css';
@@ -22,6 +22,9 @@ const ResizeableTitle = (props: any) => {
 };
 
 const TablePro = ({
+    tableLoading = false,
+    isSelection = false,
+    isPagination = false,
     tableData,
     selectedRowKeys,
     setSelectedRowKeys,
@@ -98,15 +101,20 @@ const TablePro = ({
             rowKey={rowKey}
             tableAlertRender={false}
             components={components}
-            rowSelection={{
-                type: 'checkbox',
-                fixed: true,
-                columnWidth: 50,
-                selectedRowKeys: selectedRowKeys,
-                onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-                    setSelectedRowKeys(selectedRowKeys);
-                }
-            }}
+            loading={tableLoading}
+            rowSelection={
+                isSelection
+                    ? false
+                    : {
+                          type: 'checkbox',
+                          fixed: true,
+                          columnWidth: 50,
+                          selectedRowKeys: selectedRowKeys,
+                          onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+                              setSelectedRowKeys(selectedRowKeys);
+                          }
+                      }
+            }
             editableFormRef={actionRef}
             toolBarRender={false}
             columns={resultColumns.map((item) => ({
@@ -138,11 +146,15 @@ const TablePro = ({
                 })
             }))}
             value={tableData}
-            pagination={{
-                pageSize: 20,
-                pageSizeOptions: [20, 50, 100, 300, 500],
-                onChange: (page) => setPage(page)
-            }}
+            pagination={
+                isPagination
+                    ? false
+                    : {
+                          pageSize: 20,
+                          pageSizeOptions: [20, 50, 100, 300, 500],
+                          onChange: (page) => setPage(page)
+                      }
+            }
             recordCreatorProps={false}
             editable={{
                 editableKeys: editableKeys,

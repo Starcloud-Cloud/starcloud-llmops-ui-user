@@ -121,42 +121,39 @@ const TablePro = ({
         })
     }));
 
-    return (
-        dataColumns.length &&
-        tableData.length && (
-            <EditableProTable<any>
-                className="edit-table"
-                rowKey={rowKey}
-                tableAlertRender={false}
-                components={components}
-                rowSelection={{
-                    type: 'checkbox',
-                    fixed: true,
-                    columnWidth: 50,
-                    selectedRowKeys: selectedRowKeys,
-                    onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-                        setSelectedRowKeys(selectedRowKeys);
-                    }
-                }}
-                editableFormRef={actionRef}
-                toolBarRender={false}
-                columns={dataColumns}
-                value={tableData}
-                pagination={{
-                    pageSize: 20,
-                    pageSizeOptions: [20, 50, 100, 300, 500],
-                    onChange: (page) => setPage(page)
-                }}
-                recordCreatorProps={false}
-                editable={{
-                    editableKeys: editableKeys,
-                    onValuesChange: (record, recordList) => {
-                        setTableData(recordList);
-                    }
-                }}
-            />
-        )
-    );
+    return dataColumns.length > 0 ? (
+        <EditableProTable<any>
+            className="edit-table"
+            rowKey={rowKey}
+            tableAlertRender={false}
+            components={components}
+            rowSelection={{
+                type: 'checkbox',
+                fixed: true,
+                columnWidth: 50,
+                selectedRowKeys: selectedRowKeys,
+                onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+                    setSelectedRowKeys(selectedRowKeys);
+                }
+            }}
+            editableFormRef={actionRef}
+            toolBarRender={false}
+            columns={dataColumns}
+            value={tableData}
+            pagination={{
+                pageSize: 20,
+                pageSizeOptions: [20, 50, 100, 300, 500],
+                onChange: (page) => setPage(page)
+            }}
+            recordCreatorProps={false}
+            editable={{
+                editableKeys: editableKeys,
+                onValuesChange: (record, recordList) => {
+                    setTableData(recordList);
+                }
+            }}
+        />
+    ) : null;
 };
 
 const memoTablePro = (oldValue: any, newValue: any) => {

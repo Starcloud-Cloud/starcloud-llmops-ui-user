@@ -15,6 +15,7 @@ import { addMaterial, delMaterial, getMaterialPage, updateMaterial } from 'api/m
 import dayjs from 'dayjs';
 import { dictData } from 'api/template';
 import { useNavigate } from 'react-router-dom';
+import HeaderField from '../pages/batchSmallRedBooks/components/components/headerField';
 const { Option } = Select;
 const { Search } = Input;
 const { confirm } = Modal;

@@ -1,72 +1,38 @@
-import { Modal, Button, Popconfirm, Tag } from 'antd';
-import type { ProColumns } from '@ant-design/pro-components';
-import { EditableProTable } from '@ant-design/pro-components';
-import { DndContext } from '@dnd-kit/core';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useState, useMemo, createContext, useContext, memo } from 'react';
+import { Modal, Form, Button, Popconfirm, Tag, Input, InputNumber, Switch, Select } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { ActionType } from '@ant-design/pro-components';
+import { useState, useRef, useEffect } from 'react';
 import _ from 'lodash-es';
-import { HolderOutlined } from '@ant-design/icons';
-import { materialFieldCode } from 'api/redBook/batchIndex';
-import { v4 as uuidv4 } from 'uuid';
-const RowContext = createContext<any>({});
-const DragHandle: React.FC = () => {
-    const { setActivatorNodeRef, listeners } = useContext(RowContext);
-    return (
-        <Button type="text" size="small" icon={<HolderOutlined />} style={{ cursor: 'move' }} ref={setActivatorNodeRef} {...listeners} />
-    );
-};
-const Row: React.FC<any> = (props) => {
-    const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
-        id: props['data-row-key']
-    });
+import TablePro from './antdProTable';
+import { getColumn, createColumn, updateColumn, delColumn } from 'api/material/field';
 
-    const style: React.CSSProperties = {
-        ...props.style,
-        transform: CSS.Translate.toString(transform),
-        transition,
-        ...(isDragging ? { position: 'relative', zIndex: 9999 } : {})
-    };
-
-    const contextValue = useMemo<any>(() => ({ setActivatorNodeRef, listeners }), [setActivatorNodeRef, listeners]);
-    return (
-        <RowContext.Provider value={contextValue}>
-            <tr {...props} ref={setNodeRef} style={style} {...attributes} />
-        </RowContext.Provider>
-    );
-};
 const HeaderField = ({
-    setColOpen,
-    onDragEnd,
-    materialFieldTypeList,
-    materialTableData,
-    setMaterialTableData,
-    setFieldHeads
+    libraryId = '77',
+    colOpen,
+    setColOpen
 }: {
+    libraryId?: string;
+    colOpen: boolean;
     setColOpen: (data: boolean) => void;
-    onDragEnd: (data: any) => void;
-    materialFieldTypeList: any[];
-    materialTableData: any[];
-    setMaterialTableData: (data: any) => void;
-    setFieldHeads?: (data: any) => void;
 }) => {
-    const [editableKeys, setEditableRowKeys] = useState<any[]>([]);
-    const materialColumns: ProColumns<any>[] = [
-        {
-            title: '排序',
-            readonly: true,
-            editable: (text, record, index) => {
-                return false;
-            },
-            align: 'center',
-            width: 80,
-            render: () => <DragHandle />
-        },
+    const [form] = Form.useForm();
+    const [open, setOpen] = useState(false);
+    const actionRef = useRef<ActionType>();
+    const materialFieldTypeList = [
+        { label: '字符串输入框', value: 0 },
+        { label: '整数', value: 1 },
+        { label: '时间', value: 2 },
+        { label: '数字', value: 3 },
+        { label: '布尔值', value: 4 },
+        { label: '图片', value: 5 }
+    ];
+    const materialColumns: any = [
         {
             title: '字段名称',
             align: 'center',
-            dataIndex: 'desc',
+            width: 400,
+            required: true,
+            dataIndex: 'columnName',
             formItemProps: {
                 rules: [
                     {
@@ -82,7 +48,9 @@ const HeaderField = ({
         },
         {
             title: '字段类型',
-            dataIndex: 'type',
+            width: 200,
+            required: true,
+            dataIndex: 'columnType',
             align: 'center',
             valueType: 'select',
             fieldProps: {
@@ -96,45 +64,48 @@ const HeaderField = ({
                     }
                 ]
             },
-            render: (_, row) => materialFieldTypeList?.find((item) => item.value === row.type)?.label
+            render: (_: any, row: any) => materialFieldTypeList?.find((item) => item.value === row.type)?.label
         },
         {
+            width: 200,
             title: '是否为分组字段',
-            dataIndex: 'isGroupField',
+            dataIndex: 'isGroupColumn',
             align: 'center',
             valueType: 'switch',
-            render: (_, row) => (row?.isGroupField ? <Tag color="processing">是</Tag> : <Tag color="processing">否</Tag>)
+            render: (_: any, row: any) => (row?.isGroupColumn ? <Tag color="processing">是</Tag> : <Tag color="processing">否</Tag>)
         },
         {
+            width: 200,
             title: '是否必填',
-            dataIndex: 'required',
+            dataIndex: 'isRequired',
             align: 'center',
             valueType: 'switch',
-            render: (_, row) => (row?.required ? <Tag color="processing">必填</Tag> : '')
+            render: (_: any, row: any) => (row?.isRequired ? <Tag color="processing">必填</Tag> : '')
         },
         {
             title: '操作',
             align: 'center',
-            valueType: 'option',
-            width: 200,
-            render: (text, record, index, action) => (
+            dataIndex: 'operation',
+            width: 60,
+            render: (text: any, row: any, index: any) => (
                 <div className="w-full flex justify-center gap-2">
-                    <Button
+                    {/* <Button
                         type="link"
                         onClick={() => {
-                            console.log(record.uuid);
-
-                            action?.startEditable?.(record.uuid);
+                            form.setFieldsValue(row);
+                            setRowIndex(index);
+                            setTitle('编辑字段配置');
+                            setOpen(true);
                         }}
                     >
                         编辑
-                    </Button>
+                    </Button> */}
                     <Popconfirm
                         title="提示"
                         description="请再次确认是否要删除"
-                        onConfirm={() => {
-                            const newData = materialTableData?.filter((item, i) => i !== index);
-                            setMaterialTableData(newData);
+                        onConfirm={async () => {
+                            await delColumn({ id: row.id });
+                            getList();
                         }}
                         okText="Yes"
                         cancelText="No"
@@ -147,72 +118,86 @@ const HeaderField = ({
             )
         }
     ];
+    const [tableData, setTableData] = useState<any[]>([]);
+    //编辑
+    const handleEditColumn = async (record: any, type = 1) => {
+        await updateColumn(record);
+        getList();
+    };
+    const [tableLoading, setTableLoading] = useState(false);
+    const getList = async () => {
+        setTableLoading(true);
+        const result = await getColumn({ libraryId });
+        setTableLoading(false);
+        setTableData(result);
+    };
+    useEffect(() => {
+        getList();
+    }, []);
     return (
-        <>
-            <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
-                <SortableContext items={materialTableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
-                    <EditableProTable<any>
-                        rowKey="uuid"
-                        components={{ body: { row: Row } }}
-                        toolBarRender={false}
-                        maxLength={30}
-                        columns={materialColumns}
-                        value={materialTableData}
-                        recordCreatorProps={{
-                            record: () => ({
-                                uuid: uuidv4(),
-                                isGroupField: false,
-                                required: false
-                            })
-                        }}
-                        editable={{
-                            type: 'multiple',
-                            editableKeys,
-                            onSave: async (rowKey, data, row) => {
-                                const newList = materialTableData?.map((item) => {
-                                    if (item.uuid === rowKey) {
-                                        return data;
-                                    } else {
-                                        return item;
-                                    }
-                                });
-                                setMaterialTableData(newList);
-                            },
-                            onChange: setEditableRowKeys
-                        }}
-                    />
-                </SortableContext>
-            </DndContext>
-            <div className="flex justify-center mt-4">
-                <Button
-                    type="primary"
-                    disabled={materialTableData?.length === 0}
-                    onClick={async () => {
-                        const result = await materialFieldCode({
-                            fieldConfigDTOList: materialTableData?.map((item, index) => ({
-                                ...item,
-                                order: index
-                            }))
-                        });
-                        setMaterialTableData(result);
-                        try {
-                            setFieldHeads && setFieldHeads(JSON.stringify(result));
-                            setColOpen(false);
-                        } catch (err) {
-                            console.log(err);
-                        }
-                    }}
-                >
-                    保存
-                </Button>
-            </div>
-        </>
+        <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
+            <TablePro
+                isSelection={true}
+                isPagination={true}
+                tableLoading={tableLoading}
+                handleEditColumn={handleEditColumn}
+                actionRef={actionRef}
+                tableData={tableData}
+                columns={materialColumns}
+                setTableData={setTableData}
+            />
+            <Button
+                onClick={() => {
+                    setOpen(true);
+                }}
+                disabled={tableData.length >= 30}
+                className="mt-4"
+                type="primary"
+                icon={<PlusOutlined />}
+            >
+                新增（{tableData.length}/30）
+            </Button>
+            <Modal
+                title={'新增字段配置'}
+                onOk={async () => {
+                    const result = await form.validateFields();
+                    await createColumn({ ...result, libraryId });
+                    getList();
+                    setOpen(false);
+                    form.resetFields();
+                }}
+                open={open}
+                onCancel={() => {
+                    form.resetFields();
+                    setOpen(false);
+                }}
+            >
+                <Form labelCol={{ span: 6 }} form={form}>
+                    <Form.Item
+                        label="字段名称"
+                        name="columnName"
+                        rules={[
+                            { required: true, message: '请输入字段名称' },
+                            { max: 20, message: '字段名称不能超过 20 个字' }
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="字段类型" name="columnType" rules={[{ required: true, message: '请选择字段类型' }]}>
+                        <Select options={materialFieldTypeList} />
+                    </Form.Item>
+                    <Form.Item initialValue={0} label="字段序号" name="sequence" rules={[{ required: true, message: '请输入字段序号' }]}>
+                        <InputNumber className="w-full" min={0} />
+                    </Form.Item>
+                    <Form.Item initialValue={false} label="是否为分组字段" name="isGroupColumn" valuePropName="checked">
+                        <Switch />
+                    </Form.Item>
+                    <Form.Item initialValue={false} label="是否必填" name="isRequired" valuePropName="checked">
+                        <Switch />
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </Modal>
     );
 };
-const memoHeaderField = (oldValue: any, newValue: any) => {
-    return (
-        _.isEqual(oldValue.materialFieldTypeList, newValue.materialFieldTypeList) &&
-        _.isEqual(oldValue.materialTableData, newValue.materialTableData)
-    );
-};
-export default memo(HeaderField, memoHeaderField);
+export default HeaderField;

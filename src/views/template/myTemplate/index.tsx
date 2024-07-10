@@ -26,6 +26,7 @@ import _ from 'lodash-es';
 import './index.css';
 import { getRecommendApp, appCreate } from 'api/template/index';
 import { ENUM_TENANT, getTenant } from 'utils/permission';
+import MaterialTable from 'views/pages/batchSmallRedBooks/components/materialTable';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -173,6 +174,7 @@ function MyTemplate() {
     const timeoutRef = useRef<any>();
     return (
         <Box>
+            <MaterialTable />
             <Row className="mt-4" gutter={[16, 16]}>
                 <Col span={6}>
                     <TextField

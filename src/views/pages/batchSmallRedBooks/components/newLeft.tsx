@@ -412,7 +412,7 @@ const Lefts = ({
             {
                 title: '操作',
                 align: 'center',
-                valueType: 'option',
+                dataIndex: 'operation',
                 width: 200,
                 fixed: 'right',
                 render: (text: any, record: any, index: number, action: any) => (
@@ -420,7 +420,7 @@ const Lefts = ({
                         <Button
                             type="link"
                             onClick={() => {
-                                action?.startEditable?.(record.uuid);
+                                handleEdit(record, index);
                             }}
                         >
                             编辑

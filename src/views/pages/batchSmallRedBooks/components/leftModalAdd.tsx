@@ -1,4 +1,4 @@
-import { Modal, Button, Tooltip } from 'antd';
+import { Modal, Button, Tooltip, Table } from 'antd';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useEffect, useState, memo, useMemo } from 'react';
@@ -205,14 +205,31 @@ const LeftModalAdd = ({
                         )}
                     </div>
                 </div>
-                <TablePro
+                <Table
+                    pagination={{
+                        defaultPageSize: 20,
+                        pageSizeOptions: [20, 50, 100, 300, 500],
+                        onChange: (page) => {
+                            setPage(page);
+                        }
+                    }}
+                    rowKey={(record, index) => {
+                        return record.uuid;
+                    }}
+                    loading={tableLoading}
+                    size="small"
+                    virtual
+                    columns={columns}
+                    dataSource={tableData}
+                />
+                {/* <TablePro
                     tableData={tableData}
                     selectedRowKeys={selectedRowKeys}
                     setSelectedRowKeys={setSelectedRowKeys}
                     columns={columns}
                     setPage={setPage}
                     setTableData={setTableData}
-                />
+                /> */}
             </div>
             {/* AI素材生成 */}
             <Modal width={800} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>

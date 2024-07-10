@@ -16,7 +16,8 @@ import {
     Input,
     Badge,
     Tooltip,
-    Radio
+    Radio,
+    Table
 } from 'antd';
 import { EditableProTable } from '@ant-design/pro-components';
 import { AccordionDetails, AccordionSummary, Accordion } from '@mui/material';
@@ -413,14 +414,15 @@ const Lefts = ({
                 title: '操作',
                 align: 'center',
                 valueType: 'option',
-                width: 200,
+                width: 120,
                 fixed: 'right',
                 render: (text: any, record: any, index: number, action: any) => (
                     <div className="flex items-center justify-center h-[102px]">
                         <Button
                             type="link"
                             onClick={() => {
-                                action?.startEditable?.(record.uuid);
+                                handleEdit(record, index);
+                                // action?.startEditable?.(record.uuid);
                             }}
                         >
                             编辑
@@ -1803,7 +1805,7 @@ const Lefts = ({
                                                     ></Button>
                                                 </div>
                                             </div>
-                                            <EditableProTable<any>
+                                            {/* <EditableProTable<any>
                                                 rowKey="uuid"
                                                 toolBarRender={false}
                                                 columns={columns}
@@ -1833,8 +1835,8 @@ const Lefts = ({
                                                     tableRef.current = data;
                                                     setTableData(tableRef.current);
                                                 }}
-                                            />
-                                            {/* <Table
+                                            /> */}
+                                            <Table
                                                 pagination={{
                                                     defaultPageSize: 20,
                                                     pageSizeOptions: [20, 50, 100, 300, 500],
@@ -1850,7 +1852,7 @@ const Lefts = ({
                                                 virtual
                                                 columns={columns}
                                                 dataSource={tableData}
-                                            /> */}
+                                            />
                                         </>
                                     )}
                                 </div>

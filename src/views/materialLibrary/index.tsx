@@ -97,7 +97,7 @@ const MaterialLibrary = () => {
             renderText: (_, record) => {
                 return (
                     <div className="flex items-center">
-                        <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={48} />
+                        <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
                         <span className="ml-2">{record.name}</span>
                     </div>
                 );

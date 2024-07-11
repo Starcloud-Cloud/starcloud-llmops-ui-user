@@ -416,7 +416,7 @@ const MaterialLibraryDetail = () => {
 
     return (
         <>
-            <div id="materialDetail" className=" flex justify-between items-center">
+            <div id="materialDetail" className=" flex justify-between flex-col">
                 <div className="flex items-center mb-2">
                     <div>{detail?.iconUrl && <Avatar shape="square" icon={<IconRenderer value={detail?.iconUrl} />} size={48} />}</div>
                     <div className="flex flex-col ml-2">
@@ -425,13 +425,24 @@ const MaterialLibraryDetail = () => {
                         </div>
                     </div>
                 </div>
-                <div>
+                <div className="flex justify-between items-center mb-2">
                     <Space>
-                        {selectedRowKeys.length > 0 && (
-                            <Popconfirm title="确认删除?" onConfirm={handleBatchDel}>
-                                <Button danger>批量删除</Button>
-                            </Popconfirm>
-                        )}
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                setEditOpen(true);
+                                setTitle('新增素材');
+                            }}
+                        >
+                            新增素材
+                        </Button>
+                        <Popconfirm title="确认删除?" onConfirm={handleBatchDel}>
+                            <Button disabled={selectedRowKeys.length === 0} danger>
+                                批量删除({selectedRowKeys.length})
+                            </Button>
+                        </Popconfirm>
+                    </Space>
+                    <Space>
                         <Dropdown menu={{ items }}>
                             <Button>
                                 <Space>
@@ -440,15 +451,6 @@ const MaterialLibraryDetail = () => {
                                 </Space>
                             </Button>
                         </Dropdown>
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                setEditOpen(true);
-                                setTitle('添加内容');
-                            }}
-                        >
-                            添加内容
-                        </Button>
                     </Space>
                 </div>
             </div>
@@ -521,7 +523,7 @@ const MaterialLibraryDetail = () => {
                     }}
                 >
                     <div className="flex justify-center mb-3">
-                        <Image width={500} src={currentRecord[filedName]} preview={false} />
+                        <Image width={500} height={500} className="object-cover" src={currentRecord[filedName]} preview={false} />
                     </div>
                     <ProFormSelect mode="tags" name={filedName + 'tags'} label="标签" />
                     <ProFormTextArea name={filedName + 'description'} label="描述" />

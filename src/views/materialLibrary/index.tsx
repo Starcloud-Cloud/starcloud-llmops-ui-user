@@ -19,6 +19,7 @@ import HeaderField from '../pages/batchSmallRedBooks/components/components/heade
 const { Option } = Select;
 const { Search } = Input;
 const { confirm } = Modal;
+import './index.scss';
 
 export const IconRenderer = ({ value }: { value: string }) => {
     let SelectedIcon = value.includes('http') ? AppstoreOutlined : allIcons['AppstoreAddOutlined'];
@@ -68,22 +69,25 @@ const MaterialLibrary = () => {
     const items: any = [
         {
             key: '1',
-            label: '编辑',
-            onClick: () => {
-                setRecord(record);
-                form.setFieldsValue(record);
-                setIsModalOpen(true);
-            }
+            label: '编辑'
         },
         {
             key: '2',
             label: '删除',
-            danger: true,
-            onClick: async () => {
-                await showConfirm();
-            }
+            danger: true
         }
     ];
+
+    const onClick: MenuProps['onClick'] = async ({ key, domEvent }) => {
+        domEvent.stopPropagation();
+        if (key === '1') {
+            setRecord(record);
+            form.setFieldsValue(record);
+            setIsModalOpen(true);
+        } else {
+            await showConfirm();
+        }
+    };
 
     const columns: ProColumns<any>[] = [
         {
@@ -93,7 +97,7 @@ const MaterialLibrary = () => {
             renderText: (_, record) => {
                 return (
                     <div className="flex items-center">
-                        <Avatar shape="square" icon={<IconRenderer value={record.iconUrl} />} size={48} />
+                        <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={48} />
                         <span className="ml-2">{record.name}</span>
                     </div>
                 );
@@ -105,14 +109,14 @@ const MaterialLibrary = () => {
             search: false,
             ellipsis: true
         },
-        {
-            title: '类型',
-            dataIndex: 'formatType',
-            search: false,
-            width: 100,
-            align: 'center',
-            renderText: (text) => handleTypeLabel(text)
-        },
+        // {
+        //     title: '类型',
+        //     dataIndex: 'formatType',
+        //     search: false,
+        //     width: 100,
+        //     align: 'center',
+        //     renderText: (text) => handleTypeLabel(text)
+        // },
         {
             title: '数据量',
             dataIndex: 'fileCount',
@@ -158,13 +162,14 @@ const MaterialLibrary = () => {
             align: 'right',
             render: (_, row) => (
                 <Dropdown
-                    menu={{ items }}
+                    menu={{ items, onClick }}
                     onOpenChange={() => {
                         setRecord(row);
                     }}
                 >
                     <MoreOutlined
                         onClick={(e) => {
+                            e.preventDefault();
                             e.stopPropagation();
                         }}
                         className="cursor-pointer p-1"
@@ -266,7 +271,7 @@ const MaterialLibrary = () => {
     const [form] = Form.useForm();
 
     return (
-        <div className="h-full">
+        <div className="h-full material-index">
             <Tabs items={TabsItems}></Tabs>
             {isModalOpen && (
                 <Modal width={580} title={record ? '修改知识库' : '新增知识库'} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
@@ -277,7 +282,7 @@ const MaterialLibrary = () => {
                         <Form.Item label="描述" name={'description'} rules={[{ required: true }]}>
                             <Input.TextArea placeholder="填写描述" />
                         </Form.Item>
-                        <Form.Item label="分类" name="formatType" rules={[{ required: true }]}>
+                        {/* <Form.Item label="分类" name="formatType" rules={[{ required: true }]}>
                             <Select placeholder="请选择分类">
                                 {typeList.map((item, index) => (
                                     <Option key={index} value={item.value}>
@@ -285,10 +290,10 @@ const MaterialLibrary = () => {
                                     </Option>
                                 ))}
                             </Select>
-                        </Form.Item>
+                        </Form.Item> */}
 
                         <Icon component={selectIcon as any} />
-                        <Form.Item label="图标" name="iconUrl" rules={[{ required: true }]}>
+                        <Form.Item label="图标" name="iconUrl">
                             <IconSelect
                                 onChange={(value) => {
                                     setSelectIcon(value);
@@ -296,17 +301,16 @@ const MaterialLibrary = () => {
                                 value={selectIcon}
                             />
                         </Form.Item>
-                        <Form.Item name="checkbox-group" className="w-full" label="导入类型">
-                            <CheckCard.Group style={{ width: '100%' }}>
+                        <Form.Item name="importType" className="w-full" label="导入类型">
+                            <CheckCard.Group style={{ width: '100%' }} defaultValue={1}>
                                 <Row gutter={16}>
                                     <Col span={12}>
                                         <CheckCard
-                                            disabled
                                             className="w-[100%]"
                                             title="本地文档"
                                             avatar={<UploadOutlined />}
                                             description="上传Excel或者CSV格式的文档"
-                                            value="SpringBoot"
+                                            value={1}
                                         />
                                     </Col>
                                     <Col span={12}>
@@ -316,7 +320,7 @@ const MaterialLibrary = () => {
                                             title="API"
                                             avatar={<ApiOutlined />}
                                             description="获取JSON格式API内容"
-                                            value="SOFABoot"
+                                            value={2}
                                         />
                                     </Col>
                                 </Row>

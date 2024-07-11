@@ -20,6 +20,7 @@ import FormModal from './components/formModal';
 import './edit-table.css';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import HeaderField from '../pages/batchSmallRedBooks/components/components/headerField';
+import _ from 'lodash';
 
 export enum EditType {
     String = 0,
@@ -39,6 +40,7 @@ const MaterialLibraryDetail = () => {
     const [typeList, setTypeList] = useState<any[]>([]);
     const [canUpload, setCanUpload] = useState(true);
     const [forceUpdate, setForceUpdate] = useState(0);
+    const [forceUpdateHeader, setForceUpdateHeader] = useState(0);
     const [editOpen, setEditOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [currentRecord, setCurrentRecord] = useState<any>(null);
@@ -47,15 +49,6 @@ const MaterialLibraryDetail = () => {
     const [selectImg, setSelectImg] = useState<any>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [tableDataOriginal, setTableDataOriginal] = useState<any>([]);
-
-    useEffect(() => {
-        if (tableRef.current.length && selectImg?.largeImageURL) {
-            const result: any = currentRecord;
-            result[filedName] = selectImg?.largeImageURL;
-
-            handleEditColumn(result);
-        }
-    }, [selectImg]);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -69,6 +62,15 @@ const MaterialLibraryDetail = () => {
     const [imageForm] = Form.useForm();
 
     useEffect(() => {
+        if (tableRef.current.length && selectImg?.largeImageURL) {
+            const result: any = currentRecord;
+            result[filedName] = selectImg?.largeImageURL;
+
+            handleEditColumn(result);
+        }
+    }, [selectImg]);
+
+    useEffect(() => {
         dictData('', 'material_format_type').then((res) => {
             setTypeList(res.list);
         });
@@ -79,7 +81,7 @@ const MaterialLibraryDetail = () => {
             setDetail(data);
             tableMetaRef.current = data.tableMeta;
         });
-    }, []);
+    }, [forceUpdateHeader]);
 
     useEffect(() => {
         if (detail) {
@@ -242,7 +244,7 @@ const MaterialLibraryDetail = () => {
                     align: 'center',
                     dataIndex: 'operation',
                     className: 'align-middle',
-                    width: 200,
+                    width: 100,
                     fixed: 'right',
                     render: (text: any, record: any, index: number) => (
                         <div className="flex items-center justify-center">
@@ -275,7 +277,7 @@ const MaterialLibraryDetail = () => {
 
             setColumns(columnData);
         }
-    }, [canUpload, detail, tableDataOriginal]);
+    }, [canUpload, detail, tableDataOriginal, tableData]);
 
     useEffect(() => {
         getMaterialLibraryDataList({ libraryId: id }).then((data) => {
@@ -298,7 +300,7 @@ const MaterialLibraryDetail = () => {
                 });
                 newList.push(obj);
             });
-            setTableData(newList);
+            setTableData([...newList]);
             tableRef.current = newList;
         });
     }, [forceUpdate]);
@@ -411,11 +413,10 @@ const MaterialLibraryDetail = () => {
 
     //字段配置
     const [colOpen, setColOpen] = useState(false);
-    // console.log(previewImageDataRef.current, 'previewImageDataRef.current');
 
     return (
         <>
-            <div className="flex justify-between items-center">
+            <div id="materialDetail" className=" flex justify-between items-center">
                 <div className="flex items-center mb-2">
                     <div>{detail?.iconUrl && <Avatar shape="square" icon={<IconRenderer value={detail?.iconUrl} />} size={48} />}</div>
                     <div className="flex flex-col ml-2">
@@ -454,6 +455,7 @@ const MaterialLibraryDetail = () => {
             <div className="material-detail-table">
                 {columns.length > 0 && tableData.length > 0 && (
                     <TablePro
+                        key={forceUpdate}
                         handleEditColumn={handleEditColumn}
                         onUpdateColumn={handleUpdateColumn}
                         actionRef={actionRef}
@@ -487,7 +489,14 @@ const MaterialLibraryDetail = () => {
                     values={null}
                 />
             )}
-            {colOpen && <HeaderField colOpen={colOpen} setColOpen={setColOpen} />}
+            {colOpen && (
+                <HeaderField
+                    libraryId={detail?.id}
+                    colOpen={colOpen}
+                    setColOpen={setColOpen}
+                    headerSave={() => setForceUpdateHeader(forceUpdateHeader + 1)}
+                />
+            )}
 
             {previewOpen && (
                 <ModalForm

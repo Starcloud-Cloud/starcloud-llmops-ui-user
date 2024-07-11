@@ -39,6 +39,16 @@ const TablePro = ({
     const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
     const [dataIndex, setDataIndex] = useState<any[]>([]);
 
+    const handleClick = (e: any) => {
+        console.log(e.target);
+    };
+    React.useEffect(() => {
+        document.addEventListener('click', handleClick);
+        return () => {
+            document.removeEventListener('click', handleClick);
+        };
+    }, []);
+
     useEffect(() => {
         setColumn(columns);
     }, [columns]);
@@ -108,6 +118,10 @@ const TablePro = ({
                 setEditableRowKeys([getRowKey(record, rowIndex)]);
                 setDataIndex([item.dataIndex || (item.key as string)]);
             },
+            // onMouseLeave: () => {
+            //     setDataIndex([]);
+            //     setEditableRowKeys([]);
+            // },
             onBlur: async (e: any) => {
                 if (item.required && !e.target.value) {
                     // 必填项
@@ -125,7 +139,8 @@ const TablePro = ({
     }));
 
     return dataColumns.length > 0 ? (
-        <EditableProTable<any>
+        <EditableProTable
+            id="edit-table"
             className="edit-table"
             rowKey={rowKey}
             tableAlertRender={false}
@@ -168,11 +183,13 @@ const TablePro = ({
     ) : null;
 };
 
-const memoTablePro = (oldValue: any, newValue: any) => {
-    return (
-        _.isEqual(oldValue.tableData, newValue.tableData) &&
-        _.isEqual(oldValue.selectedRowKeys, newValue.selectedRowKeys) &&
-        _.isEqual(oldValue.columns, newValue.columns)
-    );
-};
-export default memo(TablePro, memoTablePro);
+// const memoTablePro = (oldValue: any, newValue: any) => {
+//     return (
+//         _.isEqual(oldValue.tableData, newValue.tableData) &&
+//         _.isEqual(oldValue.selectedRowKeys, newValue.selectedRowKeys) &&
+//         _.isEqual(oldValue.columns, newValue.columns)
+//     );
+// };
+// export default memo(TablePro, memoTablePro);
+
+export default TablePro;

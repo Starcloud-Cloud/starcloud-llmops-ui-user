@@ -37,8 +37,7 @@ import {
     metadata,
     planModifyConfig,
     materialJudge,
-    createSameApp,
-    createMaterialList
+    createSameApp
 } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template/index';
 import FormModal, { propShow } from './formModal';
@@ -59,6 +58,7 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import './newLeft.scss';
 import { SearchOutlined } from '@ant-design/icons';
 import React from 'react';
+import MaterialTable from './materialTable';
 
 const Lefts = ({
     detailShow = true,
@@ -570,6 +570,9 @@ const Lefts = ({
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
     const [selectImgLoading, setSelectImgLoading] = useState(false);
 
+    //获取libraryId
+    const [library, setlibrary] = useState<any>(null);
+
     const getList = async (flag?: boolean, appUpdate?: boolean, isimgStyle?: boolean) => {
         let result;
         let newList: any;
@@ -689,6 +692,14 @@ const Lefts = ({
         });
         const materiallist = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables;
+        const newStr = materiallist?.find((item: any) => item?.field === 'LIBRARY_QUERY')?.value;
+        let newLibrary: any;
+        try {
+            newLibrary = JSON.parse(newStr);
+        } catch (err) {
+            newLibrary = newStr;
+        }
+        setlibrary(newLibrary);
         const judge = await materialJudge({
             uid: data ? result.planUid : searchParams.get('uid') ? searchParams.get('uid') : detail ? detail?.uid : result.uid,
             planSource: detail ? 'app' : 'market'
@@ -707,12 +718,7 @@ const Lefts = ({
                 ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value || [];
         const picList = result?.configuration?.materialList;
         setMaterialType(newMater);
-        let tableDataList;
-        if (!data) {
-            tableDataList = await createMaterialList({
-                uid: result.uid
-            });
-        }
+        let tableDataList: any[] = [];
         if (judge) {
             if (!data) {
                 setFileList(
@@ -1759,7 +1765,7 @@ const Lefts = ({
                                         </>
                                     ) : (
                                         <>
-                                            <div className="flex justify-between items-center mb-[10px]">
+                                            {/* <div className="flex justify-between items-center mb-[10px]">
                                                 <div className="flex gap-2">
                                                     <Button
                                                         size="small"
@@ -1774,24 +1780,6 @@ const Lefts = ({
                                                     >
                                                         批量导入
                                                     </Button>
-                                                    {/* <AiCreate
-                                                        materialType={materialType}
-                                                        columns={columns}
-                                                        MokeList={MokeList}
-                                                        tableData={tableData}
-                                                        setPage={setPage}
-                                                        setcustom={setcustom}
-                                                        setField={setField}
-                                                        downTableData={downTableData}
-                                                        setSelectedRowKeys={(data) => {
-                                                            setZoomOpen(true);
-                                                            setSelectedRowKeys(data);
-                                                        }}
-                                                        setFieldCompletionData={setFieldCompletionData}
-                                                        fieldCompletionData={fieldCompletionData}
-                                                        setVariableData={setVariableData}
-                                                        variableData={variableData}
-                                                    /> */}
                                                 </div>
                                                 <div className="flex gap-2 items-end">
                                                     <div className="text-xs text-black/50">点击放大编辑</div>
@@ -1802,8 +1790,9 @@ const Lefts = ({
                                                         icon={<ZoomInOutlined />}
                                                     ></Button>
                                                 </div>
-                                            </div>
-                                            <EditableProTable<any>
+                                            </div> */}
+                                            <MaterialTable libraryUid={library[0].libraryUid} />
+                                            {/* <EditableProTable<any>
                                                 rowKey="uuid"
                                                 toolBarRender={false}
                                                 columns={columns}
@@ -1833,7 +1822,7 @@ const Lefts = ({
                                                     tableRef.current = data;
                                                     setTableData(tableRef.current);
                                                 }}
-                                            />
+                                            /> */}
                                             {/* <Table
                                                 pagination={{
                                                     defaultPageSize: 20,

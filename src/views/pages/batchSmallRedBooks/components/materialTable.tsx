@@ -1,20 +1,24 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
-import { ActionType } from '@ant-design/pro-components';
+import { useState, useRef, useEffect, useMemo, memo } from 'react';
+import { ActionType, ModalForm, ProFormTextArea, ProFormSelect } from '@ant-design/pro-components';
 import TablePro from './components/antdProTable';
-import { getMaterialTitle, getMaterialPage } from 'api/redBook/material';
+import { getMaterialTitle, getMaterialPage, createMaterial, updateMaterial, delMaterial } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
-import { Upload, Image, Tooltip, Popconfirm, Button, Form } from 'antd';
-import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal } from 'antd';
+import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
+import { PicImagePick } from 'ui-component/PicImagePick';
 import FormModal from '../components/formModal';
-const MaterialTable = ({ uid = '373e6d9caeeb4307bca70bf4039fd84a' }: any) => {
+import LeftModalAdd from './newLeftModal';
+import _ from 'lodash-es';
+const MaterialTable = ({ libraryUid }: any) => {
+    console.log(libraryUid);
+
     const [form] = Form.useForm();
+    const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
     const tableRef = useRef<any[]>([]);
     const [tableLoading, setTableLoading] = useState(false);
     const [tableData, setTableData] = useState<any[]>([]);
-    const [selectedRowKeys, setSelectRowKeys] = useState<any>([]);
-    const handleEditColumn = () => {};
     const handleUpdateColumn = () => {};
     const [previewOpen, setPreviewOpen] = useState(false);
     const actionRef = useRef<ActionType>();
@@ -23,6 +27,7 @@ const MaterialTable = ({ uid = '373e6d9caeeb4307bca70bf4039fd84a' }: any) => {
     const [currentRecord, setCurrentRecord] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filedName, setFiledName] = useState<string>('');
+    const [selectImg, setSelectImg] = useState<any>(null);
     const getClumns = useMemo(() => {
         if (columns.length === 0) [];
         const list = columns?.map((item: any) => ({
@@ -222,28 +227,88 @@ const MaterialTable = ({ uid = '373e6d9caeeb4307bca70bf4039fd84a' }: any) => {
     });
     const formOk = async () => {
         const values = await form.validateFields();
-        console.log(currentRecord);
         if (currentRecord) {
-            // await handleEditColumn({ ...values, id: currentRecord.id }, 1);
+            handleEditColumn({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values }, 1);
             setEditOpen(false);
             setCurrentRecord(null);
         } else {
-            // await handleEditColumn({ ...values }, 2);
+            await handleEditColumn({ ...values }, 2);
             setEditOpen(false);
             setCurrentRecord(null);
         }
     };
-    const handleDel = (id: string) => {};
-    const getList = () => {
-        getMaterialTitle({ uid }).then((res) => {
-            setColumns(res.tableMeta);
+    //创建编辑最终逻辑
+    const handleEditColumn = async (record: any, type = 1) => {
+        const tableMetaList = _.cloneDeep(columns);
+        const recordKeys = Object.keys(record);
+        const content = tableMetaList.map((item) => {
+            if (recordKeys.includes(item.columnCode)) {
+                if (item.columnType === EditType.Image) {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: record[item.columnCode],
+                        description: record[item.columnCode + '_description'],
+                        tags: record[item.columnCode + '_tags']
+                    };
+                } else {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: record[item.columnCode]
+                    };
+                }
+            }
         });
+
+        const data = {
+            libraryId: record.libraryId || libraryId,
+            id: record.id,
+            content: content
+        };
+        let result;
+        if (type === 1) {
+            result = await updateMaterial(data);
+        } else {
+            result = await createMaterial(data);
+        }
+        if (result) {
+            if (type === 1) {
+                message.success('更新成功');
+                form.resetFields();
+                getList();
+                // setForceUpdate(forceUpdate + 1);
+            } else {
+                message.success('新增成功');
+                form.resetFields();
+                getList();
+                // setForceUpdate(forceUpdate + 1);
+            }
+        }
+    };
+    const handleDel = async (id: string) => {
+        await delMaterial({ id });
+        message.success('删除成功');
+        getList();
+    };
+    useEffect(() => {
+        if (tableRef.current.length && selectImg?.largeImageURL) {
+            const result: any = currentRecord;
+            result[filedName] = selectImg?.largeImageURL;
+
+            handleEditColumn(result);
+        }
+    }, [selectImg]);
+    const getList = () => {
         setTableLoading(true);
-        getMaterialPage({ ...page, libraryUid: uid, id: 429 }).then((res) => {
+        getMaterialPage({ ...page, libraryUid, id: 429 }).then((res) => {
             let newList: any = [];
             res.list.map((item: any) => {
                 let obj: any = {
-                    id: item.id
+                    id: item.id,
+                    libraryId: item.libraryId
                 };
                 item.content.forEach((item1: any) => {
                     if (item1?.['columnCode']) {
@@ -263,27 +328,115 @@ const MaterialTable = ({ uid = '373e6d9caeeb4307bca70bf4039fd84a' }: any) => {
             setTableLoading(false);
         });
     };
+    //素材库 libraryId
+    const [libraryId, setLibraryId] = useState('');
+    const getTitleList = () => {
+        getMaterialTitle({ uid: libraryUid }).then((res) => {
+            setLibraryId(res.id);
+            setColumns(res.tableMeta);
+        });
+    };
     useEffect(() => {
-        getList();
-    }, []);
+        if (libraryUid) {
+            getList();
+            getTitleList();
+        }
+    }, [libraryUid]);
+
+    //弹窗
+    const [zoomOpen, setZoomOpen] = useState(false);
     return (
         <div>
+            <div className="flex justify-end">
+                <div className="flex gap-2 items-end">
+                    <div className="text-xs text-black/50">点击放大编辑</div>
+                    <Button onClick={() => setZoomOpen(true)} type="primary" shape="circle" icon={<ZoomInOutlined />}></Button>
+                </div>
+            </div>
             <TablePro
+                isSelection={true}
                 actionRef={actionRef}
                 columns={getClumns}
                 tableData={tableData}
                 tableLoading={tableLoading}
-                selectedRowKeys={selectedRowKeys}
-                setSelectedRowKeys={setSelectRowKeys}
                 setPage={setPage}
-                setTableData={setTableData}
+                setTableData={(data: any) => {
+                    tableRef.current = data;
+                    setTableData(data);
+                }}
                 handleEditColumn={handleEditColumn}
                 onUpdateColumn={handleUpdateColumn}
             />
             {editOpen && (
                 <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={getClumns} form={form} formOk={formOk} />
             )}
+            <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
+                <LeftModalAdd
+                    libraryId={libraryId}
+                    tableLoading={tableLoading}
+                    columns={getClumns}
+                    tableData={tableData}
+                    setTableData={setTableData}
+                    setPage={setPage}
+                    setEditOpen={setEditOpen}
+                    setTitle={setTitle}
+                    getList={getList}
+                    getTitleList={getTitleList}
+                />
+            </Modal>
+            {isModalOpen && (
+                <PicImagePick
+                    getList={() => {
+                        // if (detail) {
+                        //     setImgPre(1);
+                        //     getAppList && getAppList();
+                        // } else {
+                        //     getList(true);
+                        // }
+                    }}
+                    materialList={[]}
+                    allData={null}
+                    details={null}
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    setSelectImg={setSelectImg}
+                    columns={columns}
+                    values={null}
+                />
+            )}
+            {previewOpen && (
+                <ModalForm
+                    onInit={async () => {
+                        const tags = currentRecord[filedName + '_tags'];
+                        const description = currentRecord[filedName + '_description'];
+                        await imageForm.setFieldsValue({ tags, description });
+                    }}
+                    layout="horizontal"
+                    form={imageForm}
+                    width={800}
+                    title="预览"
+                    open={previewOpen}
+                    onOpenChange={setPreviewOpen}
+                    onFinish={async () => {
+                        const value = await imageForm.getFieldsValue();
+                        const result = await handleEditColumn({
+                            ...currentRecord,
+                            ...value
+                        });
+                        setPreviewOpen(false);
+                    }}
+                >
+                    <div className="flex justify-center mb-3">
+                        <Image width={500} src={currentRecord[filedName]} preview={false} />
+                    </div>
+                    <ProFormSelect mode="tags" name={filedName + 'tags'} label="标签" />
+                    <ProFormTextArea name={filedName + 'description'} label="描述" />
+                </ModalForm>
+            )}
         </div>
     );
 };
-export default MaterialTable;
+const memoMaterialTable = (pre: any, next: any) => {
+    return _.isEqual(pre.libraryUid, next.libraryUid);
+};
+export default memo(MaterialTable, memoMaterialTable);

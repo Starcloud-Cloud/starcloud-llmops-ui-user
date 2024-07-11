@@ -1,13 +1,21 @@
 import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { ActionType, ModalForm, ProFormTextArea, ProFormSelect } from '@ant-design/pro-components';
 import TablePro from './components/antdProTable';
-import { getMaterialTitle, getMaterialPage, createMaterial, updateMaterial, delMaterial } from 'api/redBook/material';
+import {
+    getMaterialTitle,
+    getMaterialPage,
+    createMaterial,
+    updateMaterial,
+    delMaterial,
+    templateExport,
+    templateImport
+} from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
-import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal } from 'antd';
+import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps } from 'antd';
 import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { PicImagePick } from 'ui-component/PicImagePick';
-import FormModal from '../components/formModal';
+import FormModal from 'views/materialLibrary/components/formModal';
 import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
 const MaterialTable = ({ libraryUid }: any) => {
@@ -70,7 +78,7 @@ const MaterialTable = ({ libraryUid }: any) => {
                                                 data[index][item.fieldName] = info?.file?.response?.data?.url;
                                                 tableRef.current = data;
                                                 setTableData([...data]);
-                                                // handleEditColumn({ ...row, [item.fieldName]: info?.file?.response?.data?.url });
+                                                handleEditColumn({ ...row, [item.fieldName]: info?.file?.response?.data?.url });
                                             }
                                         }}
                                     >
@@ -189,10 +197,10 @@ const MaterialTable = ({ libraryUid }: any) => {
                 align: 'center',
                 dataIndex: 'operation',
                 className: 'align-middle',
-                width: 120,
+                width: 60,
                 fixed: 'right',
                 render: (text: any, record: any, index: number) => (
-                    <div className="flex items-center justify-center">
+                    <div className="flex flex-col gap-2 justify-center">
                         <Button
                             type="link"
                             onClick={async () => {
@@ -220,6 +228,10 @@ const MaterialTable = ({ libraryUid }: any) => {
             }
         ];
     }, [columns]);
+    const getClumn = useMemo(() => {
+        if (columns.length === 0) [];
+        return getClumns?.map((item) => ({ ...item, readonly: true }));
+    }, [getClumns]);
     const [editOpen, setEditOpen] = useState(false);
     const [page, setPage] = useState({
         pageNo: 1,
@@ -343,11 +355,72 @@ const MaterialTable = ({ libraryUid }: any) => {
         }
     }, [libraryUid]);
 
-    //弹窗
+    //批量导入
+    const [uploadOpen, setUploadOpen] = useState(false);
+    const [radioType, setRadioType] = useState(1);
+    const handleDownLoad = async () => {
+        //下载模板
+        const res = await templateExport({ id: libraryUid });
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(res);
+        downloadLink.download = '模版.zip';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    };
+    const [uploadLoading, setUploadLoading] = useState(false); //上传文件开启进度条
+    const perRef = useRef<number>(0);
+    const [percent, setPercent] = useState(0); //模拟进度条数据
+    const timer1: any = useRef(null);
+    useEffect(() => {
+        if (uploadLoading) {
+            timer1.current = setInterval(() => {
+                if (percent < 100) {
+                    perRef.current += 30;
+                    setPercent(perRef.current);
+                }
+            }, 20);
+        } else {
+            clearInterval(timer1.current);
+            setPercent(0);
+        }
+    }, [uploadLoading]);
+    const props1: UploadProps = {
+        //上传压缩包
+        showUploadList: false,
+        accept: '.zip,.rar',
+        beforeUpload: async (file, fileList) => {
+            setUploadLoading(true);
+            try {
+                const result = await templateImport({
+                    libraryId,
+                    materialType: 2,
+                    file
+                });
+                perRef.current = 100;
+                setPercent(perRef.current);
+                setTableLoading(true);
+                setUploadOpen(false);
+                setUploadLoading(false);
+                getList();
+                return false;
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                setUploadLoading(false);
+            }
+        }
+    };
+
+    //放大编辑弹窗
     const [zoomOpen, setZoomOpen] = useState(false);
     return (
         <div>
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between mb-4">
+                <div>
+                    <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                        批量导入
+                    </Button>
+                </div>
                 <div className="flex gap-2 items-end">
                     <div className="text-xs text-black/50">点击放大编辑</div>
                     <Button onClick={() => setZoomOpen(true)} type="primary" shape="circle" icon={<ZoomInOutlined />}></Button>
@@ -356,7 +429,7 @@ const MaterialTable = ({ libraryUid }: any) => {
             <TablePro
                 isSelection={true}
                 actionRef={actionRef}
-                columns={getClumns}
+                columns={getClumn}
                 tableData={tableData}
                 tableLoading={tableLoading}
                 setPage={setPage}
@@ -376,12 +449,16 @@ const MaterialTable = ({ libraryUid }: any) => {
                     tableLoading={tableLoading}
                     columns={getClumns}
                     tableData={tableData}
-                    setTableData={setTableData}
+                    setTableData={(data) => {
+                        tableRef.current = data;
+                        setTableData(data);
+                    }}
                     setPage={setPage}
                     setEditOpen={setEditOpen}
                     setTitle={setTitle}
                     getList={getList}
                     getTitleList={getTitleList}
+                    handleEditColumn={handleEditColumn}
                 />
             </Modal>
             {isModalOpen && (
@@ -433,6 +510,29 @@ const MaterialTable = ({ libraryUid }: any) => {
                     <ProFormTextArea name={filedName + 'description'} label="描述" />
                 </ModalForm>
             )}
+            <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
+                <p>
+                    支持以 XLS 文件形式批量导入数据，导入文件将自动刷新素材列表。
+                    <span className="text-[#673ab7] cursor-pointer" onClick={handleDownLoad}>
+                        下载导入 XLS 模板
+                    </span>
+                </p>
+                <div className="my-4 flex justify-center">
+                    <Radio.Group onChange={(e) => setRadioType(e.target.value)} value={radioType}>
+                        <Radio value={1}>累加数据</Radio>
+                        <Radio value={2}>覆盖已有数据</Radio>
+                    </Radio.Group>
+                </div>
+                <div className="flex justify-center">
+                    <div className="flex flex-col items-center">
+                        <Upload {...props1}>
+                            <Button type="primary">上传 ZIP</Button>
+                        </Upload>
+                        <div className="text-xs text-black/50 mt-2">请把下载的内容修改后，对目录打包后再上传</div>
+                    </div>
+                </div>
+                {uploadLoading && <Progress size="small" percent={percent} />}
+            </Modal>
         </div>
     );
 };

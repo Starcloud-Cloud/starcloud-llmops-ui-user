@@ -17,7 +17,8 @@ const LeftModalAdd = ({
     setEditOpen,
     setPage,
     getList,
-    getTitleList
+    getTitleList,
+    handleEditColumn
 }: {
     libraryId: string;
     tableLoading: boolean;
@@ -29,6 +30,7 @@ const LeftModalAdd = ({
     setPage: (data: any) => void;
     getList: () => void;
     getTitleList: () => void;
+    handleEditColumn: (data: any) => void;
 }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
     const handleDels = async () => {
@@ -102,6 +104,7 @@ const LeftModalAdd = ({
                     columns={columns}
                     setPage={setPage}
                     setTableData={setTableData}
+                    handleEditColumn={handleEditColumn}
                 />
             </div>
             {/* AI素材生成 */}

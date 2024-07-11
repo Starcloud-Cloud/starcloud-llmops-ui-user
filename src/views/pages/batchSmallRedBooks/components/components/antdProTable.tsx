@@ -1,11 +1,12 @@
 import { EditableProTable } from '@ant-design/pro-components';
-import { useState, memo, useEffect, useCallback } from 'react';
+import { useState, memo, useEffect, useCallback, useRef } from 'react';
 import _ from 'lodash-es';
 import { Resizable } from 'react-resizable';
 import './index.css';
 import React from 'react';
 import { GetRowKey } from 'antd/lib/table/interface';
 import { EditType } from 'views/materialLibrary/detail';
+import { useClickAway } from 'react-use';
 
 const ResizeableTitle = (props: any) => {
     const { onResize, width, ...restProps } = props;
@@ -39,15 +40,10 @@ const TablePro = ({
     const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
     const [dataIndex, setDataIndex] = useState<any[]>([]);
 
-    const handleClick = (e: any) => {
-        console.log(e.target);
-    };
-    React.useEffect(() => {
-        document.addEventListener('click', handleClick);
-        return () => {
-            document.removeEventListener('click', handleClick);
-        };
-    }, []);
+    const ref = useRef(null);
+    useClickAway(ref, () => {
+        setEditableRowKeys([]);
+    });
 
     useEffect(() => {
         setColumn(columns);
@@ -139,47 +135,49 @@ const TablePro = ({
     }));
 
     return dataColumns.length > 0 ? (
-        <EditableProTable
-            id="edit-table"
-            className="edit-table"
-            rowKey={rowKey}
-            tableAlertRender={false}
-            loading={tableLoading}
-            components={components}
-            rowSelection={
-                isSelection
-                    ? false
-                    : {
-                          type: 'checkbox',
-                          fixed: true,
-                          columnWidth: 50,
-                          selectedRowKeys: selectedRowKeys,
-                          onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-                              setSelectedRowKeys(selectedRowKeys);
+        <div ref={ref}>
+            <EditableProTable
+                id="edit-table"
+                className="edit-table"
+                rowKey={rowKey}
+                tableAlertRender={false}
+                loading={tableLoading}
+                components={components}
+                rowSelection={
+                    isSelection
+                        ? false
+                        : {
+                              type: 'checkbox',
+                              fixed: true,
+                              columnWidth: 50,
+                              selectedRowKeys: selectedRowKeys,
+                              onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+                                  setSelectedRowKeys(selectedRowKeys);
+                              }
                           }
-                      }
-            }
-            editableFormRef={actionRef}
-            toolBarRender={false}
-            columns={dataColumns}
-            value={tableData}
-            pagination={
-                isPagination
-                    ? false
-                    : {
-                          pageSize: 20,
-                          pageSizeOptions: [20, 50, 100, 300, 500],
-                          onChange: (page) => setPage(page)
-                      }
-            }
-            recordCreatorProps={false}
-            editable={{
-                editableKeys: editableKeys,
-                onValuesChange: (record, recordList) => {
-                    setTableData(recordList);
                 }
-            }}
-        />
+                editableFormRef={actionRef}
+                toolBarRender={false}
+                columns={dataColumns}
+                value={tableData}
+                pagination={
+                    isPagination
+                        ? false
+                        : {
+                              pageSize: 20,
+                              pageSizeOptions: [20, 50, 100, 300, 500],
+                              onChange: (page) => setPage(page)
+                          }
+                }
+                recordCreatorProps={false}
+                editable={{
+                    editableKeys: editableKeys,
+                    onValuesChange: (record, recordList) => {
+                        setTableData(recordList);
+                    }
+                }}
+            />
+        </div>
     ) : null;
 };
 

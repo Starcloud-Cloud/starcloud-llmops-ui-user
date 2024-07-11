@@ -1,4 +1,4 @@
-import { Modal, Form, Button, Popconfirm, Tag, Input, InputNumber, Switch, Select } from 'antd';
+import { Modal, Form, Button, Popconfirm, Tag, Input, InputNumber, Switch, Select, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { ActionType } from '@ant-design/pro-components';
 import { useState, useRef, useEffect } from 'react';
@@ -9,11 +9,13 @@ import { getColumn, createColumn, updateColumn, delColumn } from 'api/material/f
 const HeaderField = ({
     libraryId = '77',
     colOpen,
-    setColOpen
+    setColOpen,
+    headerSave
 }: {
     libraryId?: string;
     colOpen: boolean;
     setColOpen: (data: boolean) => void;
+    headerSave?: () => void;
 }) => {
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
@@ -157,6 +159,19 @@ const HeaderField = ({
             >
                 新增（{tableData.length}/30）
             </Button>
+            <div className="flex justify-center mt-4">
+                <Button
+                    onClick={() => {
+                        headerSave && headerSave();
+                        setColOpen(false);
+                        message.success('保存成功');
+                    }}
+                    className="mt-4"
+                    type="primary"
+                >
+                    保存
+                </Button>
+            </div>
             <Modal
                 title={'新增字段配置'}
                 onOk={async () => {

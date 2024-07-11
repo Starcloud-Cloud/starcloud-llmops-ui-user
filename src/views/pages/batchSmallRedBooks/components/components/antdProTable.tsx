@@ -181,13 +181,11 @@ const TablePro = ({
     ) : null;
 };
 
-// const memoTablePro = (oldValue: any, newValue: any) => {
-//     return (
-//         _.isEqual(oldValue.tableData, newValue.tableData) &&
-//         _.isEqual(oldValue.selectedRowKeys, newValue.selectedRowKeys) &&
-//         _.isEqual(oldValue.columns, newValue.columns)
-//     );
-// };
-// export default memo(TablePro, memoTablePro);
-
-export default TablePro;
+const memoTablePro = (oldValue: any, newValue: any) => {
+    return (
+        _.isEqual(oldValue.tableData, newValue.tableData) &&
+        _.isEqual(oldValue.selectedRowKeys, newValue.selectedRowKeys) &&
+        _.isEqual(oldValue.columns, newValue.columns)
+    );
+};
+export default memo(TablePro, memoTablePro);

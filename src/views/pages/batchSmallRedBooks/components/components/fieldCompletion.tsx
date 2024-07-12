@@ -14,7 +14,7 @@ const FieldCompletion = ({
     setField
 }: {
     fieldCompletionData: any;
-    setFieldCompletionData: (data: any) => void;
+    setFieldCompletionData?: (data: any) => void;
     checkedList: any[];
     setSelOpen: (data: boolean) => void;
     selList: any[];
@@ -55,39 +55,39 @@ const FieldCompletion = ({
             <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
             <Checkbox.Group
                 onChange={(e) => {
-                    if (fieldCompletionData.checkedFieldList.length > e.length) {
-                        setFieldCompletionData({
-                            ...fieldCompletionData,
-                            checkedFieldList: e
-                        });
-                    } else {
-                        if (e.length > 6) {
-                            if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
-                                setFieldCompletionData({
-                                    ...fieldCompletionData,
-                                    checkedFieldList: e
-                                });
-                            } else {
-                                dispatch(
-                                    openSnackbar({
-                                        open: true,
-                                        message: '最多只能选择6个字段',
-                                        variant: 'alert',
-                                        alert: {
-                                            color: 'error'
-                                        },
-                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                        close: false
-                                    })
-                                );
-                            }
-                        } else {
-                            setFieldCompletionData({
-                                ...fieldCompletionData,
-                                checkedFieldList: e
-                            });
-                        }
-                    }
+                    // if (fieldCompletionData.checkedFieldList.length > e.length) {
+                    //     setFieldCompletionData({
+                    //         ...fieldCompletionData,
+                    //         checkedFieldList: e
+                    //     });
+                    // } else {
+                    //     if (e.length > 6) {
+                    //         if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
+                    //             setFieldCompletionData({
+                    //                 ...fieldCompletionData,
+                    //                 checkedFieldList: e
+                    //             });
+                    //         } else {
+                    //             dispatch(
+                    //                 openSnackbar({
+                    //                     open: true,
+                    //                     message: '最多只能选择6个字段',
+                    //                     variant: 'alert',
+                    //                     alert: {
+                    //                         color: 'error'
+                    //                     },
+                    //                     anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    //                     close: false
+                    //                 })
+                    //             );
+                    //         }
+                    //     } else {
+                    //         setFieldCompletionData({
+                    //             ...fieldCompletionData,
+                    //             checkedFieldList: e
+                    //         });
+                    //     }
+                    // }
                 }}
                 value={fieldCompletionData.checkedFieldList}
             >
@@ -103,7 +103,7 @@ const FieldCompletion = ({
                 defaultValue={fieldCompletionData.requirement}
                 status={!fieldCompletionData.requirement && requirementStatusOpen ? 'error' : ''}
                 onBlur={(e) => {
-                    setFieldCompletionData({ ...fieldCompletionData, requirement: e.target.value });
+                    // setFieldCompletionData({ ...fieldCompletionData, requirement: e.target.value });
                     setrequirementStatusOpen(true);
                 }}
                 rows={10}

@@ -7,9 +7,11 @@ import TablePro from './components/antdProTable';
 import HeaderField from './components/headerField';
 import PlugMarket from 'views/materialLibrary/components/plugMarket';
 import { delsMaterial } from 'api/redBook/material';
+import AiCreate from './AICreate';
 const LeftModalAdd = ({
     libraryId,
     tableLoading,
+    actionRefs,
     columns,
     tableData,
     setTableData,
@@ -22,6 +24,7 @@ const LeftModalAdd = ({
 }: {
     libraryId: string;
     tableLoading: boolean;
+    actionRefs: any;
     columns: any[];
     tableData: any[];
     setTableData: (data: any[]) => void;
@@ -97,6 +100,7 @@ const LeftModalAdd = ({
                     </div>
                 </div>
                 <TablePro
+                    actionRefs={actionRefs}
                     tableLoading={tableLoading}
                     tableData={tableData}
                     selectedRowKeys={selectedRowKeys}
@@ -126,15 +130,15 @@ const LeftModalAdd = ({
                     //     plugValue={plugValue}
                     //     setPlugOpen={setPlugOpen}
                     //     columns={columns}
-                    //     MokeList={MokeList}
-                    //     tableData={tableData}
-                    //     setPage={setPage}
-                    //     setSelectedRowKeys={setSelectedRowKeys}
-                    //     downTableData={downTableData}
-                    //     setFieldCompletionData={setFieldCompletionData}
-                    //     fieldCompletionData={fieldCompletionData}
-                    //     setVariableData={setVariableData}
-                    //     variableData={variableData}
+                    // MokeList={MokeList}
+                    // tableData={tableData}
+                    // setPage={setPage}
+                    // setSelectedRowKeys={setSelectedRowKeys}
+                    // downTableData={downTableData}
+                    // setFieldCompletionData={setFieldCompletionData}
+                    // fieldCompletionData={fieldCompletionData}
+                    // setVariableData={setVariableData}
+                    // variableData={variableData}
                     // />
                 }
             </Modal>
@@ -143,12 +147,7 @@ const LeftModalAdd = ({
     );
 };
 const memoLeftModal = (pre: any, next: any) => {
-    return (
-        _.isEqual(pre.editableKey, next.editableKey) &&
-        _.isEqual(pre.columns, next.columns) &&
-        _.isEqual(pre.MokeList, next.MokeList) &&
-        _.isEqual(pre.tableData, next.tableData)
-    );
+    return _.isEqual(pre.editableKey, next.editableKey) && _.isEqual(pre.columns, next.columns) && _.isEqual(pre.tableData, next.tableData);
 };
 export default memo(LeftModalAdd, memoLeftModal);
 // export default LeftModalAdd;

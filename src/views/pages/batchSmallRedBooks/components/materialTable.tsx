@@ -30,6 +30,7 @@ const MaterialTable = ({ libraryUid }: any) => {
     const handleUpdateColumn = () => {};
     const [previewOpen, setPreviewOpen] = useState(false);
     const actionRef = useRef<ActionType>();
+    const actionRefs = useRef<ActionType>();
     const [canUpload, setCanUpload] = useState(true); //禁用上传
     const [title, setTitle] = useState('');
     const [currentRecord, setCurrentRecord] = useState<any>(null);
@@ -240,6 +241,7 @@ const MaterialTable = ({ libraryUid }: any) => {
         const values = await form.validateFields();
         if (currentRecord) {
             handleEditColumn({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values }, 1);
+            ({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values });
             setEditOpen(false);
             setCurrentRecord(null);
         } else {
@@ -248,7 +250,6 @@ const MaterialTable = ({ libraryUid }: any) => {
             setCurrentRecord(null);
         }
     };
-    const [tableProkey, setTableProKey] = useState(0);
     //创建编辑最终逻辑
     const handleEditColumn = async (record: any, type = 1) => {
         const tableMetaList = _.cloneDeep(columns);
@@ -291,7 +292,6 @@ const MaterialTable = ({ libraryUid }: any) => {
                 message.success('更新成功');
                 form.resetFields();
                 getList();
-                actionRef.current?.reload();
             } else {
                 message.success('新增成功');
                 form.resetFields();
@@ -336,8 +336,6 @@ const MaterialTable = ({ libraryUid }: any) => {
             });
             setTableData(newList);
             tableRef.current = newList;
-            console.log(11111);
-
             setTableLoading(false);
         });
     };
@@ -414,8 +412,8 @@ const MaterialTable = ({ libraryUid }: any) => {
         }
     };
     useEffect(() => {
-        console.log(tableLoading);
-    }, [tableLoading]);
+        actionRefs.current?.reload();
+    }, [tableData]);
     //放大编辑弹窗
     const [zoomOpen, setZoomOpen] = useState(false);
     return (
@@ -452,6 +450,7 @@ const MaterialTable = ({ libraryUid }: any) => {
                 <LeftModalAdd
                     libraryId={libraryId}
                     tableLoading={tableLoading}
+                    actionRefs={actionRefs}
                     columns={getClumns}
                     tableData={tableData}
                     setTableData={(data) => {

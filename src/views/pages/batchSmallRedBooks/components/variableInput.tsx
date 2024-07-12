@@ -232,9 +232,9 @@ const VariableInput = ({
                                 <img
                                     className="w-[15px]"
                                     src={
-                                        item.desc?.split('-')[1] === 'image'
+                                        item.desc?.split('-')[1] === '5'
                                             ? image
-                                            : item.desc?.split('-')[1] === 'string'
+                                            : item.desc?.split('-')[1] === '0'
                                             ? string
                                             : item.desc?.split('-')[1] === 'textBox'
                                             ? textBox

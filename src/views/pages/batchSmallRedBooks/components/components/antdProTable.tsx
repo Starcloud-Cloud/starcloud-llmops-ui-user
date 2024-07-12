@@ -26,6 +26,7 @@ const TablePro = ({
     tableLoading = false,
     isSelection = false,
     isPagination = false,
+    actionRefs,
     tableData,
     selectedRowKeys,
     setSelectedRowKeys,
@@ -163,6 +164,7 @@ const TablePro = ({
                               }
                           }
                 }
+                actionRef={actionRefs}
                 editableFormRef={actionRef}
                 toolBarRender={false}
                 columns={dataColumns}

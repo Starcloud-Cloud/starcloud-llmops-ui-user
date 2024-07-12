@@ -40,11 +40,8 @@ const HeaderField = ({
     const actionRef = useRef<any>();
     const materialFieldTypeList = [
         { label: '字符串输入框', value: 0 },
-        { label: '整数', value: 1 },
-        { label: '时间', value: 2 },
-        { label: '数字', value: 3 },
-        { label: '布尔值', value: 4 },
-        { label: '图片', value: 5 }
+        { label: '图片', value: 5 },
+        { label: '文档路径', value: 6 }
     ];
     const materialColumns: any = [
         {
@@ -184,7 +181,12 @@ const HeaderField = ({
                             <Popconfirm
                                 title="提示"
                                 description="请再次确认是否要删除"
-                                onConfirm={() => {
+                                onConfirm={async () => {
+                                    console.log(row);
+
+                                    if (!row.uuid) {
+                                        await delColumn({ id: row.id });
+                                    }
                                     setTableData(tableData.filter((item) => item.id !== row.id));
                                 }}
                                 okText="Yes"

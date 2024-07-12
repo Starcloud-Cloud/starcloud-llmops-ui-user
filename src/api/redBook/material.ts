@@ -26,9 +26,9 @@ export const delsMaterial = (data: any) => {
 };
 //下载模板
 export const templateExport = (params: any) => {
-    return request.post({ url: `/llm/material-library/export-template`, params });
+    return request.download({ url: `/llm/material-library/export-template`, params });
 };
 //批量导入
 export const templateImport = (data: any) => {
-    return request.post({ url: `/llm/material-library/import`, data });
+    return request.upload({ url: `/llm/material-library/import`, data });
 };

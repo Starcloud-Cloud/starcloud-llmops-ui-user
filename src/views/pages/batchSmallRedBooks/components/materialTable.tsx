@@ -196,7 +196,6 @@ const MaterialTable = ({ libraryUid }: any) => {
                 title: '操作',
                 align: 'center',
                 dataIndex: 'operation',
-                className: 'align-middle',
                 width: 60,
                 fixed: 'right',
                 render: (text: any, record: any, index: number) => (
@@ -249,6 +248,7 @@ const MaterialTable = ({ libraryUid }: any) => {
             setCurrentRecord(null);
         }
     };
+    const [tableProkey, setTableProKey] = useState(0);
     //创建编辑最终逻辑
     const handleEditColumn = async (record: any, type = 1) => {
         const tableMetaList = _.cloneDeep(columns);
@@ -291,12 +291,11 @@ const MaterialTable = ({ libraryUid }: any) => {
                 message.success('更新成功');
                 form.resetFields();
                 getList();
-                // setForceUpdate(forceUpdate + 1);
+                actionRef.current?.reload();
             } else {
                 message.success('新增成功');
                 form.resetFields();
                 getList();
-                // setForceUpdate(forceUpdate + 1);
             }
         }
     };
@@ -337,6 +336,8 @@ const MaterialTable = ({ libraryUid }: any) => {
             });
             setTableData(newList);
             tableRef.current = newList;
+            console.log(11111);
+
             setTableLoading(false);
         });
     };
@@ -360,7 +361,9 @@ const MaterialTable = ({ libraryUid }: any) => {
     const [radioType, setRadioType] = useState(1);
     const handleDownLoad = async () => {
         //下载模板
-        const res = await templateExport({ id: libraryUid });
+        const res = await templateExport({ id: libraryId });
+        console.log(res);
+
         const downloadLink = document.createElement('a');
         downloadLink.href = window.URL.createObjectURL(res);
         downloadLink.download = '模版.zip';
@@ -392,7 +395,7 @@ const MaterialTable = ({ libraryUid }: any) => {
         beforeUpload: async (file, fileList) => {
             setUploadLoading(true);
             try {
-                const result = await templateImport({
+                await templateImport({
                     libraryId,
                     materialType: 2,
                     file
@@ -410,7 +413,9 @@ const MaterialTable = ({ libraryUid }: any) => {
             }
         }
     };
-
+    useEffect(() => {
+        console.log(tableLoading);
+    }, [tableLoading]);
     //放大编辑弹窗
     const [zoomOpen, setZoomOpen] = useState(false);
     return (
@@ -537,6 +542,8 @@ const MaterialTable = ({ libraryUid }: any) => {
     );
 };
 const memoMaterialTable = (pre: any, next: any) => {
+    console.log(_.isEqual(pre.libraryUid, next.libraryUid));
+
     return _.isEqual(pre.libraryUid, next.libraryUid);
 };
 export default memo(MaterialTable, memoMaterialTable);

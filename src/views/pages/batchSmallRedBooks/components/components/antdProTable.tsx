@@ -140,7 +140,7 @@ const TablePro = ({
         <div ref={ref}>
             <EditableProTable
                 id="edit-table"
-                className="edit-table"
+                className="edit-table w-full"
                 rowKey={rowKey}
                 tableAlertRender={false}
                 loading={tableLoading}
@@ -190,6 +190,7 @@ const TablePro = ({
 
 const memoTablePro = (oldValue: any, newValue: any) => {
     return (
+        _.isEqual(oldValue.tableLoading, newValue.tableLoading) &&
         _.isEqual(oldValue.tableData, newValue.tableData) &&
         _.isEqual(oldValue.selectedRowKeys, newValue.selectedRowKeys) &&
         _.isEqual(oldValue.columns, newValue.columns)

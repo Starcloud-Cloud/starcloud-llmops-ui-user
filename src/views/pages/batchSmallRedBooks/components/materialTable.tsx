@@ -18,9 +18,8 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import FormModal from 'views/materialLibrary/components/formModal';
 import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
-const MaterialTable = ({ libraryUid }: any) => {
-    console.log(libraryUid);
 
+const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -34,7 +33,6 @@ const MaterialTable = ({ libraryUid }: any) => {
     const [canUpload, setCanUpload] = useState(true); //禁用上传
     const [title, setTitle] = useState('');
     const [currentRecord, setCurrentRecord] = useState<any>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [filedName, setFiledName] = useState<string>('');
     const [selectImg, setSelectImg] = useState<any>(null);
     const getClumns = useMemo(() => {
@@ -465,7 +463,7 @@ const MaterialTable = ({ libraryUid }: any) => {
                     handleEditColumn={handleEditColumn}
                 />
             </Modal>
-            {isModalOpen && (
+            {/* {isModalOpen && (
                 <PicImagePick
                     getList={() => {
                         // if (detail) {
@@ -484,7 +482,7 @@ const MaterialTable = ({ libraryUid }: any) => {
                     columns={columns}
                     values={null}
                 />
-            )}
+            )} */}
             {previewOpen && (
                 <ModalForm
                     onInit={async () => {

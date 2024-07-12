@@ -122,7 +122,8 @@ const MaterialLibrary = () => {
             dataIndex: 'fileCount',
             search: false,
             width: 80,
-            align: 'center'
+            align: 'center',
+            sorter: (a, b) => a.fileCount - b.fileCount
         },
         {
             title: '创建时间',
@@ -130,6 +131,7 @@ const MaterialLibrary = () => {
             dataIndex: 'createTime',
             search: false,
             width: 150,
+            sorter: (a, b) => a.createTime - b.createTime,
             renderText: (text) => text && dayjs(text).format('YYYY-MM-DD HH:mm')
         },
         {
@@ -210,7 +212,8 @@ const MaterialLibrary = () => {
                 actionRef={actionRef}
                 columns={columns}
                 search={false}
-                request={async (params) => {
+                request={async (params, sort) => {
+                    console.log('🚀 ~ request={ ~ sort:', sort);
                     params.pageNo = params.current;
                     params.name = query?.name;
                     const data = await getMaterialPage(params);

@@ -99,6 +99,13 @@ const FormModal = ({
             width={'60%'}
             title={title}
             open={editOpen}
+            styles={{
+                body: {
+                    height: '60vh',
+                    padding: '0 8px',
+                    overflow: 'auto'
+                }
+            }}
             onCancel={() => {
                 form.resetFields();
                 setEditOpen(false);

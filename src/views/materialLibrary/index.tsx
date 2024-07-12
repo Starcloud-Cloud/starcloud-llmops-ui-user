@@ -139,22 +139,22 @@ const MaterialLibrary = () => {
             width: 120,
             search: false
         },
-        {
-            title: '启用',
-            align: 'center',
-            dataIndex: 'status',
-            search: false,
-            width: 80,
-            renderText: (text, record) => (
-                <Switch
-                    value={!!text}
-                    onChange={(value, e) => {
-                        e.stopPropagation();
-                        handleStatus({ ...record, status: value ? 1 : 0 });
-                    }}
-                />
-            )
-        },
+        // {
+        //     title: '启用',
+        //     align: 'center',
+        //     dataIndex: 'status',
+        //     search: false,
+        //     width: 80,
+        //     renderText: (text, record) => (
+        //         <Switch
+        //             value={!!text}
+        //             onChange={(value, e) => {
+        //                 e.stopPropagation();
+        //                 handleStatus({ ...record, status: value ? 1 : 0 });
+        //             }}
+        //         />
+        //     )
+        // },
         {
             title: '操作',
             width: 50,
@@ -177,72 +177,6 @@ const MaterialLibrary = () => {
                 </Dropdown>
             )
         }
-    ];
-
-    const TabsItems: TabsProps['items'] = [
-        {
-            label: '我的素材库',
-            key: '1',
-            children: (
-                <div>
-                    <ProTable
-                        actionRef={actionRef}
-                        columns={columns}
-                        search={false}
-                        request={async (params) => {
-                            params.pageNo = params.current;
-                            params.name = query?.name;
-                            const data = await getMaterialPage(params);
-                            return {
-                                data: data.list,
-                                success: true,
-                                total: data.total
-                            };
-                        }}
-                        onRow={(record) => {
-                            return {
-                                onClick: () => {
-                                    navigate(`/material/detail?id=${record.id}`);
-                                }
-                            };
-                        }}
-                        options={false}
-                        headerTitle={
-                            <Button
-                                type={'primary'}
-                                icon={<PlusOutlined />}
-                                onClick={() => {
-                                    setRecord(null);
-                                    setIsModalOpen(true);
-                                }}
-                            >
-                                创建知识库
-                            </Button>
-                        }
-                        toolBarRender={() => [
-                            <Search
-                                placeholder="搜索"
-                                style={{ width: 200 }}
-                                allowClear
-                                onSearch={(value) => {
-                                    setQuery({ name: value });
-                                    actionRef.current?.reload();
-                                }}
-                            />
-                            // <Select placeholder="请选择分类" value={''} style={{ width: 100 }}>
-                            //     <Option value={''}>全部</Option>
-                            //     {typeList.map((item, index) => (
-                            //         <Option key={index} value={item.value}>
-                            //             {item.label}
-                            //         </Option>
-                            //     ))}
-                            // </Select>
-                        ]}
-                    />
-                </div>
-            )
-        },
-        { label: '系统素材库', key: '2', children: <div>222</div> }
     ];
 
     const handleStatus = async (record: any) => {
@@ -272,14 +206,67 @@ const MaterialLibrary = () => {
 
     return (
         <div className="h-full material-index">
-            <Tabs items={TabsItems}></Tabs>
+            <ProTable
+                actionRef={actionRef}
+                columns={columns}
+                search={false}
+                request={async (params) => {
+                    params.pageNo = params.current;
+                    params.name = query?.name;
+                    const data = await getMaterialPage(params);
+                    return {
+                        data: data.list,
+                        success: true,
+                        total: data.total
+                    };
+                }}
+                onRow={(record) => {
+                    return {
+                        onClick: () => {
+                            navigate(`/material/detail?id=${record.id}`);
+                        }
+                    };
+                }}
+                options={false}
+                headerTitle={
+                    <Button
+                        type={'primary'}
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                            setRecord(null);
+                            setIsModalOpen(true);
+                        }}
+                    >
+                        创建知识库
+                    </Button>
+                }
+                toolBarRender={() => [
+                    <Search
+                        placeholder="搜索"
+                        style={{ width: 200 }}
+                        allowClear
+                        onSearch={(value) => {
+                            setQuery({ name: value });
+                            actionRef.current?.reload();
+                        }}
+                    />
+                    // <Select placeholder="请选择分类" value={''} style={{ width: 100 }}>
+                    //     <Option value={''}>全部</Option>
+                    //     {typeList.map((item, index) => (
+                    //         <Option key={index} value={item.value}>
+                    //             {item.label}
+                    //         </Option>
+                    //     ))}
+                    // </Select>
+                ]}
+            />
             {isModalOpen && (
                 <Modal width={580} title={record ? '修改知识库' : '新增知识库'} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                     <Form layout="vertical" form={form}>
                         <Form.Item label="名称" name="name" rules={[{ required: true }]}>
                             <Input placeholder="填写名称" />
                         </Form.Item>
-                        <Form.Item label="描述" name={'description'} rules={[{ required: true }]}>
+                        <Form.Item label="描述" name={'description'}>
                             <Input.TextArea placeholder="填写描述" />
                         </Form.Item>
                         {/* <Form.Item label="分类" name="formatType" rules={[{ required: true }]}>
@@ -292,7 +279,7 @@ const MaterialLibrary = () => {
                             </Select>
                         </Form.Item> */}
 
-                        <Icon component={selectIcon as any} />
+                        {/* <Icon component={selectIcon as any} />
                         <Form.Item label="图标" name="iconUrl">
                             <IconSelect
                                 onChange={(value) => {
@@ -300,31 +287,30 @@ const MaterialLibrary = () => {
                                 }}
                                 value={selectIcon}
                             />
-                        </Form.Item>
+                        </Form.Item> */}
                         <Form.Item name="importType" className="w-full" label="导入类型">
-                            <CheckCard.Group style={{ width: '100%' }} defaultValue={1}>
-                                <Row gutter={16}>
-                                    <Col span={12}>
-                                        <CheckCard
-                                            className="w-[100%]"
-                                            title="本地文档"
-                                            avatar={<UploadOutlined />}
-                                            description="上传Excel或者CSV格式的文档"
-                                            value={1}
-                                        />
-                                    </Col>
-                                    <Col span={12}>
-                                        <CheckCard
-                                            disabled
-                                            className="w-[100%]"
-                                            title="API"
-                                            avatar={<ApiOutlined />}
-                                            description="获取JSON格式API内容"
-                                            value={2}
-                                        />
-                                    </Col>
-                                </Row>
-                            </CheckCard.Group>
+                            {/* <CheckCard.Group style={{ width: '100%' }}> */}
+                            <Row gutter={16}>
+                                <Col span={12}>
+                                    <CheckCard
+                                        checked
+                                        className="w-[100%]"
+                                        title="本地文档"
+                                        avatar={<UploadOutlined />}
+                                        description="上传Excel或者CSV格式的文档"
+                                    />
+                                </Col>
+                                <Col span={12}>
+                                    <CheckCard
+                                        disabled
+                                        className="w-[100%]"
+                                        title="API"
+                                        avatar={<ApiOutlined />}
+                                        description="获取JSON格式API内容(开发中)"
+                                    />
+                                </Col>
+                            </Row>
+                            {/* </CheckCard.Group> */}
                         </Form.Item>
                         {/* <Form.Item label="是否系统库" rules={[{ required: true }]}>
                         <Switch />

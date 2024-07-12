@@ -573,6 +573,8 @@ const Lefts = ({
     const [library, setlibrary] = useState<any>(null);
 
     const getList = async (flag?: boolean, appUpdate?: boolean, isimgStyle?: boolean) => {
+        console.log(1112132);
+
         let result;
         let newList: any;
         setTableLoading(true);
@@ -1790,7 +1792,7 @@ const Lefts = ({
                                                     ></Button>
                                                 </div>
                                             </div> */}
-                                            <MaterialTable libraryUid={library[0]?.libraryUid} />
+                                            <MaterialTable libraryUid={library && library[0]?.libraryUid} />
                                             {/* <EditableProTable<any>
                                                 rowKey="uuid"
                                                 toolBarRender={false}

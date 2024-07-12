@@ -96,8 +96,6 @@ const MaterialLibraryDetail = () => {
             const newList = list?.map((item: any) => {
                 return {
                     title: item.desc,
-                    align: 'center',
-                    className: 'align-middle',
                     required: !!item.required,
                     width: item.width || 400,
                     dataIndex: item.fieldName,
@@ -109,7 +107,7 @@ const MaterialLibraryDetail = () => {
                     fieldProps: { autoSize: { minRows: 1, maxRows: 5 } },
                     render: (text: any, row: any, index: number) => {
                         return (
-                            <div className="flex justify-center items-center gap-2">
+                            <div className="flex justify-start items-center gap-2">
                                 {item.type === EditType.Image ? (
                                     <div className="relative">
                                         <Upload

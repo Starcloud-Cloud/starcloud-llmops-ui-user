@@ -5,10 +5,11 @@
     z-index: 1;
 }
 
-.material-detail-table .ant-table-cel {
+.material-detail-table .ant-table-cell {
     display: flex;
     justify-content: center;
     align-items: center;
+    /* vertical-align: middle; */
 }
 
 .material-detail-table .ant-table-selection-column {

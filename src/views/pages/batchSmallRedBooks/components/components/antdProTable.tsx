@@ -42,7 +42,9 @@ const TablePro = ({
 
     const ref = useRef(null);
     useClickAway(ref, () => {
-        setEditableRowKeys([]);
+        setTimeout(() => {
+            setEditableRowKeys([]);
+        }, 500);
     });
 
     useEffect(() => {
@@ -143,6 +145,11 @@ const TablePro = ({
                 tableAlertRender={false}
                 loading={tableLoading}
                 components={components}
+                onHeaderRow={() => {
+                    return {
+                        onClick: () => setEditableRowKeys([]) // 点击表头行
+                    };
+                }}
                 rowSelection={
                     isSelection
                         ? false

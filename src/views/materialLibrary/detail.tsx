@@ -11,7 +11,7 @@ import {
 } from 'api/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import TablePro from 'views/pages/batchSmallRedBooks/components/components/antdProTable';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { IconRenderer } from './index';
@@ -21,6 +21,9 @@ import './edit-table.css';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import HeaderField from '../pages/batchSmallRedBooks/components/components/headerField';
 import _ from 'lodash';
+import SubCard from 'ui-component/cards/SubCard';
+import { IconButton } from '@mui/material';
+import { KeyboardBackspace } from '@mui/icons-material';
 
 export enum EditType {
     String = 0,
@@ -60,6 +63,15 @@ const MaterialLibraryDetail = () => {
 
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const el = document.querySelector('.MuiContainer-root');
+        el?.classList.remove('overflow-y-auto');
+        return () => {
+            el?.classList.add('overflow-y-auto');
+        };
+    }, []);
 
     useEffect(() => {
         if (tableRef.current.length && selectImg?.largeImageURL) {
@@ -328,6 +340,7 @@ const MaterialLibraryDetail = () => {
         const data = await delBatchMaterialLibrarySlice(selectedRowKeys);
         if (data) {
             setForceUpdate(forceUpdate + 1);
+            setSelectRowKeys([]);
             message.success('删除成功');
         }
     };
@@ -413,17 +426,30 @@ const MaterialLibraryDetail = () => {
     const [colOpen, setColOpen] = useState(false);
 
     return (
-        <>
-            <div id="materialDetail" className=" flex justify-between flex-col">
-                <div className="flex items-center mb-2">
+        <div className="h-full">
+            <SubCard
+                contentSX={{
+                    p: '10px !important'
+                }}
+                sx={{ mb: '16px' }}
+            >
+                <div>
+                    <IconButton onClick={() => navigate('/material')} color="secondary">
+                        <KeyboardBackspace fontSize="small" />
+                    </IconButton>
+                    <span className="text-[#000c] font-[500]">素材中心</span>
+                </div>
+            </SubCard>
+            <div id="materialDetail" className="flex justify-between flex-col">
+                <div className="flex  mb-4">
                     <div>{detail?.iconUrl && <Avatar shape="square" icon={<IconRenderer value={detail?.iconUrl} />} size={48} />}</div>
-                    <div className="flex flex-col ml-2">
-                        <div className="cursor-pointer flex items-center">
+                    <div className="flex flex-col ml-3">
+                        <div className="cursor-pointer flex">
                             <span className="text-[20px] font-semibold">{detail?.name}</span>
                         </div>
                     </div>
                 </div>
-                <div className="flex justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-4">
                     <Space>
                         <Button
                             type="primary"
@@ -452,7 +478,7 @@ const MaterialLibraryDetail = () => {
                     </Space>
                 </div>
             </div>
-            <div className="material-detail-table">
+            <div className="material-detail-table overflow-auto h-[calc(100%-96px)]">
                 {columns.length > 0 && tableData.length > 0 && (
                     <TablePro
                         key={forceUpdate}
@@ -468,7 +494,9 @@ const MaterialLibraryDetail = () => {
                     />
                 )}
             </div>
-            <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
+            {editOpen && (
+                <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
+            )}
             {isModalOpen && (
                 <PicImagePick
                     getList={() => {
@@ -521,13 +549,13 @@ const MaterialLibraryDetail = () => {
                     }}
                 >
                     <div className="flex justify-center mb-3">
-                        <Image width={500} height={500} className="object-cover" src={currentRecord[filedName]} preview={false} />
+                        <Image width={500} height={500} className="object-contain" src={currentRecord[filedName]} preview={false} />
                     </div>
                     <ProFormSelect mode="tags" name={filedName + 'tags'} label="标签" />
                     <ProFormTextArea name={filedName + 'description'} label="描述" />
                 </ModalForm>
             )}
-        </>
+        </div>
     );
 };
 

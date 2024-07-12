@@ -6,10 +6,7 @@
 }
 
 .material-detail-table .ant-table-cell {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* vertical-align: middle; */
+    vertical-align: middle;
 }
 
 .material-detail-table .ant-table-selection-column {

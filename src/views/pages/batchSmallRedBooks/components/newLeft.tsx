@@ -1792,7 +1792,7 @@ const Lefts = ({
                                                     ></Button>
                                                 </div>
                                             </div> */}
-                                            <MaterialTable libraryUid={library && library[0]?.libraryUid} />
+                                            <MaterialTable setIsModalOpen={setIsModalOpen} libraryUid={library && library[0]?.libraryUid} />
                                             {/* <EditableProTable<any>
                                                 rowKey="uuid"
                                                 toolBarRender={false}

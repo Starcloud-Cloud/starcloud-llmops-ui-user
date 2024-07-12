@@ -11,6 +11,10 @@ export const createColumn = (data: any) => {
 export const updateColumn = (data: any) => {
     return request.put({ url: '/llm/material-library-table-column/update', data });
 };
+//批量更新
+export const updatesColumn = (data: any) => {
+    return request.post({ url: '/llm/material-library-table-column/update-batch', data });
+};
 //删除表头
 export const delColumn = (params: any) => {
     return request.delete({ url: '/llm/material-library-table-column/delete', params });

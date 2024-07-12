@@ -18,7 +18,6 @@ import {
     Tooltip,
     Radio
 } from 'antd';
-import { EditableProTable } from '@ant-design/pro-components';
 import { AccordionDetails, AccordionSummary, Accordion } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { PlusOutlined, SaveOutlined, ZoomInOutlined, InfoCircleOutlined, CloudUploadOutlined, RightOutlined } from '@ant-design/icons';
@@ -1791,7 +1790,7 @@ const Lefts = ({
                                                     ></Button>
                                                 </div>
                                             </div> */}
-                                            <MaterialTable libraryUid={library[0].libraryUid} />
+                                            <MaterialTable libraryUid={library[0]?.libraryUid} />
                                             {/* <EditableProTable<any>
                                                 rowKey="uuid"
                                                 toolBarRender={false}

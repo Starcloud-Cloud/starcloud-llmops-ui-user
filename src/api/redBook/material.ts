@@ -24,3 +24,11 @@ export const delMaterial = (params: any) => {
 export const delsMaterial = (data: any) => {
     return request.post({ url: '/llm/material-library-slice/delete-batch', data });
 };
+//下载模板
+export const templateExport = (params: any) => {
+    return request.post({ url: `/llm/material-library/export-template`, params });
+};
+//批量导入
+export const templateImport = (data: any) => {
+    return request.post({ url: `/llm/material-library/import`, data });
+};

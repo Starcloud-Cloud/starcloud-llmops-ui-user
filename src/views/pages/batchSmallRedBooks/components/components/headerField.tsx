@@ -1,11 +1,23 @@
 import { Modal, Form, Button, Popconfirm, Tag, Input, InputNumber, Switch, Select, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { ActionType } from '@ant-design/pro-components';
-import { useState, useRef, useEffect } from 'react';
+import { EditableProTable } from '@ant-design/pro-components';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { Resizable } from 'react-resizable';
 import _ from 'lodash-es';
-import TablePro from './antdProTable';
-import { getColumn, createColumn, updateColumn, delColumn } from 'api/material/field';
+import { getColumn, createColumn, updatesColumn, delColumn } from 'api/material/field';
+const ResizeableTitle = (props: any) => {
+    const { onResize, width, ...restProps } = props;
 
+    if (!width) {
+        return <th {...restProps} />;
+    }
+
+    return (
+        <Resizable width={width} height={0} onResize={onResize} draggableOpts={{ enableUserSelectHack: false }}>
+            <th {...restProps} />
+        </Resizable>
+    );
+};
 const HeaderField = ({
     libraryId = '77',
     colOpen,
@@ -17,9 +29,15 @@ const HeaderField = ({
     setColOpen: (data: boolean) => void;
     headerSave?: () => void;
 }) => {
+    const components = {
+        header: {
+            cell: ResizeableTitle
+        }
+    };
+    const rowKey = 'id';
     const [form] = Form.useForm();
     const [open, setOpen] = useState(false);
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<any>();
     const materialFieldTypeList = [
         { label: '字符串输入框', value: 0 },
         { label: '整数', value: 1 },
@@ -87,8 +105,9 @@ const HeaderField = ({
         {
             title: '操作',
             align: 'center',
-            dataIndex: 'operation',
+            valueType: 'option',
             width: 60,
+            fixed: 'right',
             render: (text: any, row: any, index: any) => (
                 <div className="w-full flex justify-center gap-2">
                     {/* <Button
@@ -121,16 +140,13 @@ const HeaderField = ({
         }
     ];
     const [tableData, setTableData] = useState<any[]>([]);
-    //编辑
-    const handleEditColumn = async (record: any, type = 1) => {
-        await updateColumn(record);
-        getList();
-    };
+    const [editableKeys, seteditableKeys] = useState<React.Key[]>([]);
     const [tableLoading, setTableLoading] = useState(false);
     const getList = async () => {
         setTableLoading(true);
         const result = await getColumn({ libraryId });
         setTableLoading(false);
+        seteditableKeys(result.map((item: any) => item.id));
         setTableData(result);
     };
     useEffect(() => {
@@ -138,17 +154,58 @@ const HeaderField = ({
     }, []);
     return (
         <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
-            <TablePro
-                isSelection={true}
-                isPagination={true}
-                tableLoading={tableLoading}
-                handleEditColumn={handleEditColumn}
-                actionRef={actionRef}
-                tableData={tableData}
+            <EditableProTable<any>
+                className="edit-table"
+                rowKey={rowKey}
+                maxLength={30}
+                tableAlertRender={false}
+                loading={tableLoading}
+                components={components}
+                rowSelection={false}
+                editableFormRef={actionRef}
+                toolBarRender={false}
                 columns={materialColumns}
-                setTableData={setTableData}
+                value={tableData}
+                pagination={false}
+                recordCreatorProps={{
+                    newRecordType: 'dataSource',
+                    record: () => ({
+                        id: Date.now(),
+                        uuid: Date.now(),
+                        isRequired: false,
+                        isGroupColumn: false
+                    })
+                }}
+                editable={{
+                    type: 'multiple',
+                    editableKeys: editableKeys,
+                    actionRender: (row, config, defaultDoms) => {
+                        return [
+                            <Popconfirm
+                                title="提示"
+                                description="请再次确认是否要删除"
+                                onConfirm={() => {
+                                    setTableData(tableData.filter((item) => item.id !== row.id));
+                                }}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button type="link" danger>
+                                    删除
+                                </Button>
+                            </Popconfirm>
+                        ];
+                    },
+                    onValuesChange: (record, recordList) => {
+                        setTableData(recordList);
+                    },
+                    onChange: seteditableKeys
+                }}
+                onChange={(data) => {
+                    console.log(data);
+                }}
             />
-            <Button
+            {/* <Button
                 onClick={() => {
                     setOpen(true);
                 }}
@@ -158,10 +215,30 @@ const HeaderField = ({
                 icon={<PlusOutlined />}
             >
                 新增（{tableData.length}/30）
-            </Button>
+            </Button> */}
             <div className="flex justify-center mt-4">
                 <Button
-                    onClick={() => {
+                    onClick={async () => {
+                        if (tableData.some((item) => !item.columnName || (item!.columnType !== 0 && !item.columnType))) {
+                            return false;
+                        }
+                        await updatesColumn({
+                            libraryId,
+                            tableColumnSaveReqVOList: tableData.map((item, index) => {
+                                if (item.uuid) {
+                                    return {
+                                        columnWidth: 400,
+                                        libraryId,
+                                        ...item,
+                                        id: undefined,
+                                        uuid: undefined,
+                                        sequence: index
+                                    };
+                                } else {
+                                    return { ...item, sequence: index };
+                                }
+                            })
+                        });
                         headerSave && headerSave();
                         setColOpen(false);
                         message.success('保存成功');

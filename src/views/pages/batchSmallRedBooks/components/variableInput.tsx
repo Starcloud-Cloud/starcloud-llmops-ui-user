@@ -94,10 +94,10 @@ const VariableInput = ({
                         label: key,
                         title: property?.title,
                         desc: property?.description,
-                        children: getjsonschma(property, name + '.' + key)
+                        children: getjsonschma(property, name + '.' + key, jsonType)
                     });
                 } else {
-                    const convertedProperty = getjsonschma(property, name);
+                    const convertedProperty = getjsonschma(property, name, jsonType);
                     arr.push(convertedProperty);
                 }
             } else if (property.type === 'array' && property?.items?.type === 'object') {
@@ -128,7 +128,7 @@ const VariableInput = ({
                 }
             } else {
                 if (code === 'PosterActionHandler') {
-                    if (property?.description?.split('-')[1] === 'image') {
+                    if (property?.description?.split('-')[1] === '5') {
                         arr.push({
                             key: jsonType ? name + `.list('${key}')` : name + '.' + key,
                             label: key,
@@ -204,7 +204,7 @@ const VariableInput = ({
                         {renderMenuItems(item.children, index)}
                     </SubMenu>
                 );
-            } else {
+            } else if (!item.children) {
                 return (
                     <Menu.Item
                         onClick={({ domEvent, key }: any) => {

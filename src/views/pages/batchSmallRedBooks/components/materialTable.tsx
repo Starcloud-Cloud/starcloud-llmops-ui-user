@@ -18,6 +18,7 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import FormModal from 'views/materialLibrary/components/formModal';
 import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
+import DownMaterial from 'views/materialLibrary/components/downMaterial';
 
 const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
     const [form] = Form.useForm();
@@ -228,7 +229,13 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
     }, [columns]);
     const getClumn = useMemo(() => {
         if (columns.length === 0) [];
-        return getClumns?.map((item) => ({ ...item, readonly: true }));
+        return getClumns?.map((item) => ({
+            ...item,
+            readonly: true,
+            editable: () => {
+                return false;
+            }
+        }));
     }, [getClumns]);
     const [editOpen, setEditOpen] = useState(false);
     const [page, setPage] = useState({
@@ -355,60 +362,6 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
     //批量导入
     const [uploadOpen, setUploadOpen] = useState(false);
     const [radioType, setRadioType] = useState(1);
-    const handleDownLoad = async () => {
-        //下载模板
-        const res = await templateExport({ id: libraryId });
-        console.log(res);
-
-        const downloadLink = document.createElement('a');
-        downloadLink.href = window.URL.createObjectURL(res);
-        downloadLink.download = '模版.zip';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-    };
-    const [uploadLoading, setUploadLoading] = useState(false); //上传文件开启进度条
-    const perRef = useRef<number>(0);
-    const [percent, setPercent] = useState(0); //模拟进度条数据
-    const timer1: any = useRef(null);
-    useEffect(() => {
-        if (uploadLoading) {
-            timer1.current = setInterval(() => {
-                if (percent < 100) {
-                    perRef.current += 30;
-                    setPercent(perRef.current);
-                }
-            }, 20);
-        } else {
-            clearInterval(timer1.current);
-            setPercent(0);
-        }
-    }, [uploadLoading]);
-    const props1: UploadProps = {
-        //上传压缩包
-        showUploadList: false,
-        accept: '.zip,.rar',
-        beforeUpload: async (file, fileList) => {
-            setUploadLoading(true);
-            try {
-                await templateImport({
-                    libraryId,
-                    materialType: 2,
-                    file
-                });
-                perRef.current = 100;
-                setPercent(perRef.current);
-                setTableLoading(true);
-                setUploadOpen(false);
-                setUploadLoading(false);
-                getList();
-                return false;
-            } catch (error) {
-                console.error('Error uploading file:', error);
-                setUploadLoading(false);
-            }
-        }
-    };
     useEffect(() => {
         actionRefs.current?.reload();
     }, [tableData]);
@@ -428,6 +381,7 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
                 </div>
             </div>
             <TablePro
+                key={getClumn}
                 isSelection={true}
                 actionRef={actionRef}
                 columns={getClumn}
@@ -512,29 +466,7 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
                     <ProFormTextArea name={filedName + 'description'} label="描述" />
                 </ModalForm>
             )}
-            <Modal width={400} title="批量导入" open={uploadOpen} footer={null} onCancel={() => setUploadOpen(false)}>
-                <p>
-                    支持以 XLS 文件形式批量导入数据，导入文件将自动刷新素材列表。
-                    <span className="text-[#673ab7] cursor-pointer" onClick={handleDownLoad}>
-                        下载导入 XLS 模板
-                    </span>
-                </p>
-                <div className="my-4 flex justify-center">
-                    <Radio.Group onChange={(e) => setRadioType(e.target.value)} value={radioType}>
-                        <Radio value={1}>累加数据</Radio>
-                        <Radio value={2}>覆盖已有数据</Radio>
-                    </Radio.Group>
-                </div>
-                <div className="flex justify-center">
-                    <div className="flex flex-col items-center">
-                        <Upload {...props1}>
-                            <Button type="primary">上传 ZIP</Button>
-                        </Upload>
-                        <div className="text-xs text-black/50 mt-2">请把下载的内容修改后，对目录打包后再上传</div>
-                    </div>
-                </div>
-                {uploadLoading && <Progress size="small" percent={percent} />}
-            </Modal>
+            {uploadOpen && <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />}
         </div>
     );
 };

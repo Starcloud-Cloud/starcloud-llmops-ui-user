@@ -7,7 +7,7 @@ import TablePro from './components/antdProTable';
 import HeaderField from './components/headerField';
 import PlugMarket from 'views/materialLibrary/components/plugMarket';
 import { delsMaterial } from 'api/redBook/material';
-import AiCreate from './AICreate';
+import AiCreate from './newAI';
 const LeftModalAdd = ({
     libraryId,
     tableLoading,

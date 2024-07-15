@@ -266,6 +266,12 @@ const MaterialLibraryDetail = () => {
                 },
                 ...newList,
                 {
+                    title: '使用次数',
+                    dataIndex: 'useTimes',
+                    align: 'center',
+                    width: 100
+                },
+                {
                     title: '操作',
                     align: 'center',
                     dataIndex: 'operation',

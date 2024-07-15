@@ -6,7 +6,7 @@ import request from 'utils/axios';
  * @returns
  */
 export const getMaterialPage = (data: any) => {
-    return request.get({ url: '/llm/material-library/page', params: data });
+    return request.post({ url: '/llm/material-library/page', data });
 };
 
 /**

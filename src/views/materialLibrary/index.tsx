@@ -34,7 +34,7 @@ const MaterialLibrary = () => {
     const [query, setQuery] = useState<{
         name: string;
     } | null>(null);
-    const [activeKey, setActiveKey] = useState(1);
+    const [activeKey, setActiveKey] = useState<string>('1');
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
@@ -98,7 +98,9 @@ const MaterialLibrary = () => {
             renderText: (_, record) => {
                 return (
                     <div className="flex items-center">
-                        <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
+                        <div className="w-[56px]">
+                            <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
+                        </div>
                         <div className="ml-2 flex flex-col">
                             <span className="font-extrabold">{record.name}</span>
                             <span className="text-[12px] text-[#06070980]">{record.description}</span>
@@ -127,6 +129,7 @@ const MaterialLibrary = () => {
             search: false,
             width: 80,
             align: 'center',
+            renderText: (text) => text || 0,
             sorter: (a, b) => a.fileCount - b.fileCount
         },
         {
@@ -228,20 +231,20 @@ const MaterialLibrary = () => {
                 toolbar={{
                     menu: {
                         type: 'tab',
-                        // activeKey: activeKey,
                         items: [
                             {
-                                key: 'tab1',
+                                key: '1',
                                 label: <span>我的素材库</span>
                             },
                             {
-                                key: 'tab2',
+                                key: '0',
                                 label: <span>系统素材库</span>
                             }
-                        ]
-                        // onChange: (key) => {
-                        //     setActiveKey(key as string);
-                        // }
+                        ],
+                        onChange: (key) => {
+                            setActiveKey(key as string);
+                            actionRef.current?.reload();
+                        }
                     }
                 }}
                 actionRef={actionRef}
@@ -250,7 +253,27 @@ const MaterialLibrary = () => {
                 request={async (params, sort) => {
                     params.pageNo = params.current;
                     params.name = query?.name;
-                    const data = await getMaterialPage(params);
+                    params.libraryType = +activeKey;
+                    let sortingFields = [];
+
+                    const key = Object.keys(sort)?.[0];
+                    if (sort[key]) {
+                        if (key === 'createTime') {
+                            sortingFields.push({
+                                field: 'create_time',
+                                order: sort[key] === 'ascend' ? 'asc' : 'desc'
+                            });
+                        } else {
+                            sortingFields.push({
+                                field: 'file_count',
+                                order: sort[key] === 'ascend' ? 'asc' : 'desc'
+                            });
+                        }
+                    } else {
+                        sortingFields = [];
+                    }
+
+                    const data = await getMaterialPage({ ...params, sortingFields });
                     return {
                         data: data.list,
                         success: true,

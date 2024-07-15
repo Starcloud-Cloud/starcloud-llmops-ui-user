@@ -242,8 +242,7 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
         pageNo: 1,
         pageSize: 100
     });
-    const formOk = async () => {
-        const values = await form.validateFields();
+    const formOk = async (values: any) => {
         if (currentRecord) {
             handleEditColumn({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values }, 1);
             ({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values });
@@ -440,7 +439,16 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
                 onUpdateColumn={handleUpdateColumn}
             />
             {editOpen && (
-                <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={getClumns} form={form} formOk={formOk} />
+                <FormModal
+                    setIsModalOpenApp={setIsModalOpen}
+                    title={title}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={getClumns}
+                    form={form}
+                    formOk={formOk}
+                    row={currentRecord}
+                />
             )}
             <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
@@ -487,9 +495,10 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
             {previewOpen && (
                 <ModalForm
                     onInit={async () => {
-                        const tags = currentRecord[filedName + '_tags'];
-                        const description = currentRecord[filedName + '_description'];
-                        await imageForm.setFieldsValue({ tags, description });
+                        const value: any = {};
+                        value[filedName + '_tags'] = currentRecord[filedName + '_tags'];
+                        value[filedName + '_description'] = currentRecord[filedName + '_description'];
+                        await imageForm.setFieldsValue(value);
                     }}
                     layout="horizontal"
                     form={imageForm}
@@ -507,10 +516,10 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
                     }}
                 >
                     <div className="flex justify-center mb-3">
-                        <Image width={500} src={currentRecord[filedName]} preview={false} />
+                        <Image width={500} height={500} className="object-contain" src={currentRecord[filedName]} preview={false} />
                     </div>
-                    <ProFormSelect mode="tags" name={filedName + 'tags'} label="标签" />
-                    <ProFormTextArea name={filedName + 'description'} label="描述" />
+                    <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
+                    <ProFormTextArea name={filedName + '_description'} label="描述" />
                 </ModalForm>
             )}
             {uploadOpen && <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />}

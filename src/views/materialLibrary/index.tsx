@@ -34,6 +34,7 @@ const MaterialLibrary = () => {
     const [query, setQuery] = useState<{
         name: string;
     } | null>(null);
+    const [activeKey, setActiveKey] = useState(1);
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
@@ -98,17 +99,20 @@ const MaterialLibrary = () => {
                 return (
                     <div className="flex items-center">
                         <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
-                        <span className="ml-2">{record.name}</span>
+                        <div className="ml-2 flex flex-col">
+                            <span className="font-extrabold">{record.name}</span>
+                            <span className="text-[12px] text-[#06070980]">{record.description}</span>
+                        </div>
                     </div>
                 );
             }
         },
-        {
-            title: '描述',
-            dataIndex: 'description',
-            search: false,
-            ellipsis: true
-        },
+        // {
+        //     title: '描述',
+        //     dataIndex: 'description',
+        //     search: false,
+        //     ellipsis: true
+        // },
         // {
         //     title: '类型',
         //     dataIndex: 'formatType',
@@ -126,6 +130,13 @@ const MaterialLibrary = () => {
             sorter: (a, b) => a.fileCount - b.fileCount
         },
         {
+            title: '创作者',
+            align: 'center',
+            dataIndex: 'createName',
+            width: 120,
+            search: false
+        },
+        {
             title: '创建时间',
             align: 'center',
             dataIndex: 'createTime',
@@ -133,13 +144,6 @@ const MaterialLibrary = () => {
             width: 150,
             sorter: (a, b) => a.createTime - b.createTime,
             renderText: (text) => text && dayjs(text).format('YYYY-MM-DD HH:mm')
-        },
-        {
-            title: '创作者',
-            align: 'center',
-            dataIndex: 'createName',
-            width: 120,
-            search: false
         },
         // {
         //     title: '启用',
@@ -207,13 +211,43 @@ const MaterialLibrary = () => {
     const [form] = Form.useForm();
 
     return (
-        <div className="h-full material-index">
+        <div className="h-full material-index bg-white">
+            <div className="px-6 pt-2">
+                <Button
+                    type={'primary'}
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                        setRecord(null);
+                        setIsModalOpen(true);
+                    }}
+                >
+                    创建知识库
+                </Button>
+            </div>
             <ProTable
+                toolbar={{
+                    menu: {
+                        type: 'tab',
+                        // activeKey: activeKey,
+                        items: [
+                            {
+                                key: 'tab1',
+                                label: <span>我的素材库</span>
+                            },
+                            {
+                                key: 'tab2',
+                                label: <span>系统素材库</span>
+                            }
+                        ]
+                        // onChange: (key) => {
+                        //     setActiveKey(key as string);
+                        // }
+                    }
+                }}
                 actionRef={actionRef}
                 columns={columns}
                 search={false}
                 request={async (params, sort) => {
-                    console.log('🚀 ~ request={ ~ sort:', sort);
                     params.pageNo = params.current;
                     params.name = query?.name;
                     const data = await getMaterialPage(params);
@@ -231,18 +265,6 @@ const MaterialLibrary = () => {
                     };
                 }}
                 options={false}
-                headerTitle={
-                    <Button
-                        type={'primary'}
-                        icon={<PlusOutlined />}
-                        onClick={() => {
-                            setRecord(null);
-                            setIsModalOpen(true);
-                        }}
-                    >
-                        创建知识库
-                    </Button>
-                }
                 toolBarRender={() => [
                     <Search
                         placeholder="搜索"

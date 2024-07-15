@@ -460,7 +460,7 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
                     }}
                 >
                     <div className="flex justify-center mb-3">
-                        <Image width={500} src={currentRecord[filedName]} preview={false} />
+                        <Image width={500} height={500} className="object-contain" src={currentRecord[filedName]} preview={false} />
                     </div>
                     <ProFormSelect mode="tags" name={filedName + 'tags'} label="标签" />
                     <ProFormTextArea name={filedName + 'description'} label="描述" />

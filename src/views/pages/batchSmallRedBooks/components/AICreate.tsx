@@ -446,7 +446,7 @@ const AiCreate = ({
     }, [redBookData?.fieldList, redBookData]);
     return (
         <div>
-            {plugValue === 'extraction' ? (
+            {/* {plugValue === 'extraction' ? (
                 //文本智能提取
                 <TextExtraction />
             ) : plugValue === 'imageOcr' ? (
@@ -485,7 +485,7 @@ const AiCreate = ({
                         aimaterialCreate={aimaterialCreate}
                     />
                 </div>
-            ) : null}
+            ) : null} */}
             {/* 选择素材 */}
             <Modal
                 className="relative"

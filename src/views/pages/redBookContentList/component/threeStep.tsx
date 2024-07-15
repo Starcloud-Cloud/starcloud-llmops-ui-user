@@ -205,7 +205,6 @@ const ThreeStep = ({
     const [saveLoading, setSaveLoading] = useState(false);
     const [aginLoading, setAginLoading] = useState(false);
     const timer = useRef<any>(null);
-    const [fieldHead, setFieldHead] = useState(null);
     return (
         <div
             className="h-full"
@@ -528,8 +527,6 @@ const ThreeStep = ({
                         detailShow={false}
                         data={data}
                         saveLoading={saveLoading}
-                        setFieldHead={setFieldHead}
-                        fieldHead={fieldHead}
                         newSave={async (data: any) => {
                             try {
                                 setSaveLoading(true);

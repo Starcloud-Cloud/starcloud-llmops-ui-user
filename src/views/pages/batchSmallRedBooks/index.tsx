@@ -40,19 +40,10 @@ const BatcSmallRedBooks = forwardRef(
     ) => {
         useImperativeHandle(ref, () => ({
             getDetail: getData,
-            moke: moke,
-            imageMoke: imageMoke, //图片
-            mokeAI: defaultVariableData, //批量生成
-            fieldAI: defaultField, //字段补齐
-            fieldHead: fieldHead //上传素材表头
+            imageMoke: imageMoke //图片
         }));
         const [appDescription, setAppDescription] = useState('');
-
-        const [defaultVariableData, setDefaultVariableData] = useState<any>(null);
-        const [defaultField, setDefaultField] = useState<any>(null);
         const [getData, setGetData] = useState<any>(null);
-        const [fieldHead, setFieldHead] = useState(null);
-        const [moke, setMoke] = useState<any[]>([]);
         const [imageMoke, setImageMoke] = useState<any[]>([]);
         const navigate = useNavigate();
         const timer: any = useRef([]);
@@ -373,18 +364,11 @@ const BatcSmallRedBooks = forwardRef(
                                 }
                             }}
                             getAppList={getAppList}
-                            setFieldHead={setFieldHead}
-                            setMoke={setMoke}
                             setImageMoke={setImageMoke}
                             setCollData={setCollData}
                             newSave={newSave}
                             setDetail={setDetail}
                             setPlanUid={setPlanUid}
-                            defaultVariableData={defaultVariableData}
-                            defaultField={defaultField}
-                            fieldHead={fieldHead}
-                            setDefaultVariableData={setDefaultVariableData}
-                            setDefaultField={setDefaultField}
                         />
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">

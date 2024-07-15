@@ -11,13 +11,13 @@ const AiCreate = ({
     variableData,
     setVariableData,
     checkedList,
-    setcustom,
+    saveConfig,
     aimaterialCreate
 }: {
     variableData: any;
     setVariableData: (data: any) => void;
     checkedList: any[];
-    setcustom?: (data: any) => void;
+    saveConfig: (data: string) => void;
     aimaterialCreate: () => void;
 }) => {
     const { TextArea } = Input;
@@ -224,7 +224,7 @@ const AiCreate = ({
                             setrequirementStatusOpen(true);
                             return false;
                         }
-                        setcustom && setcustom(JSON.stringify(variableData));
+                        saveConfig('generate_material_batch');
                     }}
                     type="primary"
                 >

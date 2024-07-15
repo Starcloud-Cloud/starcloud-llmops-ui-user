@@ -10,6 +10,8 @@ import { delsMaterial } from 'api/redBook/material';
 import AiCreate from './newAI';
 const LeftModalAdd = ({
     libraryId,
+    libraryUid,
+    pluginConfig,
     tableLoading,
     actionRefs,
     columns,
@@ -20,9 +22,12 @@ const LeftModalAdd = ({
     setPage,
     getList,
     getTitleList,
+    downTableData,
     handleEditColumn
 }: {
     libraryId: string;
+    libraryUid: string;
+    pluginConfig: string | null;
     tableLoading: boolean;
     actionRefs: any;
     columns: any[];
@@ -33,6 +38,7 @@ const LeftModalAdd = ({
     setPage: (data: any) => void;
     getList: () => void;
     getTitleList: () => void;
+    downTableData: (data: any, num: number) => void;
     handleEditColumn: (data: any) => void;
 }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
@@ -117,30 +123,28 @@ const LeftModalAdd = ({
                     {plugValue && <Button onClick={() => setPlugValue(null)} size="small" shape="circle" icon={<LeftOutlined />} />}
                     {plugTitle}
                 </div>
-                {
-                    !plugValue ? (
-                        <PlugMarket
-                            onOk={(title: string, value: string) => {
-                                setPlugTitle(title);
-                                setPlugValue(value);
-                            }}
-                        />
-                    ) : null
-                    // <AiCreate
-                    //     plugValue={plugValue}
-                    //     setPlugOpen={setPlugOpen}
-                    //     columns={columns}
-                    // MokeList={MokeList}
-                    // tableData={tableData}
-                    // setPage={setPage}
-                    // setSelectedRowKeys={setSelectedRowKeys}
-                    // downTableData={downTableData}
-                    // setFieldCompletionData={setFieldCompletionData}
-                    // fieldCompletionData={fieldCompletionData}
-                    // setVariableData={setVariableData}
-                    // variableData={variableData}
-                    // />
-                }
+                {!plugValue ? (
+                    <PlugMarket
+                        onOk={(title: string, value: string) => {
+                            setPlugTitle(title);
+                            setPlugValue(value);
+                        }}
+                    />
+                ) : (
+                    <AiCreate
+                        libraryId={libraryId}
+                        libraryUid={libraryUid}
+                        pluginConfig={pluginConfig}
+                        plugValue={plugValue}
+                        setPlugOpen={setPlugOpen}
+                        columns={columns}
+                        tableData={tableData}
+                        setPage={setPage}
+                        setSelectedRowKeys={setSelectedRowKeys}
+                        downTableData={downTableData}
+                        getTitleList={getTitleList}
+                    />
+                )}
             </Modal>
             {colOpen && <HeaderField libraryId={libraryId} colOpen={colOpen} setColOpen={setColOpen} headerSave={getTitleList} />}
         </div>

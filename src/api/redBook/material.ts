@@ -12,9 +12,17 @@ export const getMaterialPage = (params: any) => {
 export const createMaterial = (data: any) => {
     return request.post({ url: '/llm/material-library-slice/create', data });
 };
+//批量创建表格
+export const createBatchMaterial = (data: any) => {
+    return request.post({ url: '/llm/material-library-slice/create-batch', data });
+};
 //编辑表格
 export const updateMaterial = (data: any) => {
     return request.put({ url: '/llm/material-library-slice/update', data });
+};
+//批量编辑表格
+export const updateBatchMaterial = (data: any) => {
+    return request.put({ url: '/llm/material-library-slice/update-batch', data });
 };
 //删除表格
 export const delMaterial = (params: any) => {
@@ -31,4 +39,9 @@ export const templateExport = (params: any) => {
 //批量导入
 export const templateImport = (data: any) => {
     return request.upload({ url: `/llm/material-library/import`, data });
+};
+
+//更新插件市场的配置
+export const templateUpdate = (data: any) => {
+    return request.post({ url: `/llm/material-library/update-plugin-Config`, data });
 };

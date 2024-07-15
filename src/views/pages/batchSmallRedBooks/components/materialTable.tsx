@@ -7,8 +7,8 @@ import {
     createMaterial,
     updateMaterial,
     delMaterial,
-    templateExport,
-    templateImport
+    createBatchMaterial,
+    updateBatchMaterial
 } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
 import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps } from 'antd';
@@ -346,8 +346,11 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
     };
     //素材库 libraryId
     const [libraryId, setLibraryId] = useState('');
+    //素材库的值
+    const [pluginConfig, setpluginConfig] = useState<string | null>(null);
     const getTitleList = () => {
         getMaterialTitle({ uid: libraryUid }).then((res) => {
+            setpluginConfig(res.pluginConfig);
             setLibraryId(res.id);
             setColumns(res.tableMeta);
         });
@@ -365,6 +368,47 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
     useEffect(() => {
         actionRefs.current?.reload();
     }, [tableData]);
+    //插入数据
+    const downTableData = async (data: any[], num: number) => {
+        console.log(data, num);
+        const tableMetaList = _.cloneDeep(columns);
+        const newData = data.map((record) => {
+            const recordKeys = Object.keys(record);
+            const content = tableMetaList.map((item) => {
+                if (recordKeys.includes(item.columnCode)) {
+                    if (item.columnType === EditType.Image) {
+                        return {
+                            columnId: item.id,
+                            columnName: item.columnName,
+                            columnCode: item.columnCode,
+                            value: record[item.columnCode],
+                            description: record[item.columnCode + '_description'],
+                            tags: record[item.columnCode + '_tags']
+                        };
+                    } else {
+                        return {
+                            columnId: item.id,
+                            columnName: item.columnName,
+                            columnCode: item.columnCode,
+                            value: record[item.columnCode]
+                        };
+                    }
+                }
+            });
+            return {
+                libraryId: record.libraryId || libraryId,
+                id: record.id,
+                content: content
+            };
+        });
+        if (num === 1) {
+            createBatchMaterial({ saveReqVOS: newData });
+            getList();
+        } else {
+            updateBatchMaterial({ saveReqVOS: newData });
+            getList();
+        }
+    };
     //放大编辑弹窗
     const [zoomOpen, setZoomOpen] = useState(false);
     return (
@@ -401,6 +445,8 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
             <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
                     libraryId={libraryId}
+                    libraryUid={libraryUid}
+                    pluginConfig={pluginConfig}
                     tableLoading={tableLoading}
                     actionRefs={actionRefs}
                     columns={getClumns}
@@ -409,6 +455,7 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
                         tableRef.current = data;
                         setTableData(data);
                     }}
+                    downTableData={downTableData}
                     setPage={setPage}
                     setEditOpen={setEditOpen}
                     setTitle={setTitle}

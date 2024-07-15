@@ -429,8 +429,8 @@ const MaterialLibraryDetail = () => {
         }
     };
 
-    const formOk = async () => {
-        const values = await form.validateFields();
+    const formOk = async (values: any) => {
+        // const values = await form.validateFields();
         if (currentRecord) {
             await handleEditColumn({ ...values, id: currentRecord.id }, 1);
             setEditOpen(false);
@@ -461,16 +461,16 @@ const MaterialLibraryDetail = () => {
                 </div>
             </SubCard>
             <div className="bg-[#fff] rounded-md p-3 h-[calc(100%-80px)]">
-                {/* <div id="materialDetail" className="flex justify-between flex-col">
+                <div id="materialDetail" className="flex justify-between flex-col">
                     <div className="flex  mb-4">
-                        <div>{detail?.iconUrl && <Avatar shape="square" icon={<IconRenderer value={detail?.iconUrl} />} size={48} />}</div>
+                        <Avatar shape="square" icon={<IconRenderer value={detail?.iconUrl || 'AreaChartOutlined'} />} size={48} />
                         <div className="flex flex-col ml-3">
                             <div className="cursor-pointer flex">
                                 <span className="text-[20px] font-semibold">{detail?.name}</span>
                             </div>
                         </div>
                     </div>
-                    <div className="flex justify-between items-center mb-4">
+                    {/* <div className="flex justify-between items-center mb-4">
                         <Space>
                             <Button
                                 type="primary"
@@ -497,14 +497,14 @@ const MaterialLibraryDetail = () => {
                                 </Button>
                             </Dropdown>
                         </Space>
-                    </div>
-                </div> */}
+                    </div> */}
+                </div>
 
-                <div className="bg-white rounded-md border flex justify-between border-1 border-[#d9d9d9] border-solid mb-3">
+                <div className="bg-white rounded-md border flex justify-between mb-3">
                     <div className="flex">
                         <Space>
                             <div
-                                className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border"
+                                className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]"
                                 onClick={() => {
                                     setEditOpen(true);
                                     setTitle('新增素材');
@@ -524,19 +524,19 @@ const MaterialLibraryDetail = () => {
                                         p-id="1941"
                                     ></path>
                                 </svg>
-                                <div>新增素材</div>
+                                <div className="text-[12px] font-bold mt-1">新增素材</div>
                             </div>
                             <Popconfirm title="确认删除?" onConfirm={handleBatchDel}>
-                                <div className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border">
+                                <div className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]">
                                     <DeleteOutlined className="text-[30px]" />
-                                    <div>批量删除</div>
+                                    <div className="text-[12px] font-bold mt-1">批量删除</div>
                                 </div>
                             </Popconfirm>
                         </Space>
                     </div>
                     <div className="flex">
                         <Space>
-                            <div className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border">
+                            <div className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]">
                                 <svg
                                     viewBox="0 0 1024 1024"
                                     version="1.1"
@@ -556,9 +556,9 @@ const MaterialLibraryDetail = () => {
                                         p-id="4318"
                                     ></path>
                                 </svg>
-                                <div>小红书分析</div>
+                                <div className="text-[12px] font-bold mt-1">小红书分析</div>
                             </div>
-                            <div className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border">
+                            <div className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]">
                                 <svg
                                     viewBox="0 0 1024 1024"
                                     version="1.1"
@@ -573,9 +573,9 @@ const MaterialLibraryDetail = () => {
                                         p-id="5362"
                                     ></path>
                                 </svg>
-                                <div>AI素材生成</div>
+                                <div className="text-[12px] font-bold mt-1">AI素材生成</div>
                             </div>
-                            <div className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border">
+                            <div className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]">
                                 <svg
                                     viewBox="0 0 1024 1024"
                                     version="1.1"
@@ -593,9 +593,9 @@ const MaterialLibraryDetail = () => {
                                         p-id="6762"
                                     ></path>
                                 </svg>
-                                <div>文本智能提取</div>
+                                <div className="text-[12px] font-bold mt-1">文本智能提取</div>
                             </div>
-                            <div className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border">
+                            <div className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]">
                                 <svg
                                     viewBox="0 0 1024 1024"
                                     version="1.1"
@@ -609,9 +609,9 @@ const MaterialLibraryDetail = () => {
                                         p-id="9624"
                                     ></path>
                                 </svg>
-                                <div>图片OCR提取</div>
+                                <div className="text-[12px] font-bold mt-1">图片OCR提取</div>
                             </div>
-                            <div className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border">
+                            <div className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]">
                                 <svg
                                     viewBox="0 0 1024 1024"
                                     version="1.1"
@@ -633,9 +633,9 @@ const MaterialLibraryDetail = () => {
                                         p-id="12643"
                                     ></path>
                                 </svg>
-                                <div>AI字段补齐</div>
+                                <div className="text-[12px] font-bold mt-1">AI字段补齐</div>
                             </div>
-                            <div className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border">
+                            <div className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]">
                                 <svg
                                     viewBox="0 0 1024 1024"
                                     version="1.1"
@@ -650,7 +650,7 @@ const MaterialLibraryDetail = () => {
                                         p-id="13726"
                                     ></path>
                                 </svg>
-                                <div>切换素材库</div>
+                                <div className="text-[12px] font-bold mt-1">切换素材库</div>
                             </div>
                         </Space>
                     </div>
@@ -658,15 +658,15 @@ const MaterialLibraryDetail = () => {
                     <div className="flex">
                         <Space>
                             <div
-                                className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border"
+                                className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]"
                                 onClick={() => setColOpen(true)}
                             >
                                 <PlusOutlined className="text-[30px]" />
-                                <div>编辑素材字段</div>
+                                <div className="text-[12px] font-bold mt-1">编辑素材字段</div>
                             </div>
-                            <div className="flex items-center flex-col cursor-pointer hover:bg-[#f5f5f5] p-2 border">
+                            <div className="flex items-center flex-col cursor-pointer bg-[#f5f5f5] p-2 rounded w-[100px]">
                                 <UploadOutlined className="text-[30px]" />
-                                <div>导入素材字段</div>
+                                <div className="text-[12px] font-bold mt-1">导入素材字段</div>
                             </div>
                         </Space>
                     </div>
@@ -700,7 +700,15 @@ const MaterialLibraryDetail = () => {
                 </div>
             </div>
             {editOpen && (
-                <FormModal title={title} editOpen={editOpen} setEditOpen={setEditOpen} columns={columns} form={form} formOk={formOk} />
+                <FormModal
+                    title={title}
+                    editOpen={editOpen}
+                    setEditOpen={setEditOpen}
+                    columns={columns}
+                    row={currentRecord}
+                    form={form}
+                    formOk={formOk}
+                />
             )}
             {isModalOpen && (
                 <PicImagePick
@@ -734,9 +742,10 @@ const MaterialLibraryDetail = () => {
             {previewOpen && (
                 <ModalForm
                     onInit={async () => {
-                        const tags = currentRecord[filedName + '_tags'];
-                        const description = currentRecord[filedName + '_description'];
-                        await imageForm.setFieldsValue({ tags, description });
+                        const value: any = {};
+                        value[filedName + '_tags'] = currentRecord[filedName + '_tags'];
+                        value[filedName + '_description'] = currentRecord[filedName + '_description'];
+                        await imageForm.setFieldsValue(value);
                     }}
                     layout="horizontal"
                     form={imageForm}
@@ -756,8 +765,8 @@ const MaterialLibraryDetail = () => {
                     <div className="flex justify-center mb-3">
                         <Image width={500} height={500} className="object-contain" src={currentRecord[filedName]} preview={false} />
                     </div>
-                    <ProFormSelect mode="tags" name={filedName + 'tags'} label="标签" />
-                    <ProFormTextArea name={filedName + 'description'} label="描述" />
+                    <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
+                    <ProFormTextArea name={filedName + '_description'} label="描述" />
                 </ModalForm>
             )}
         </div>

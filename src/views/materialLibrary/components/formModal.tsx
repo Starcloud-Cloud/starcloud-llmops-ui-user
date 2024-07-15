@@ -1,5 +1,5 @@
 import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select, Tooltip } from 'antd';
-import { LoadingOutlined, PlusOutlined, CloudUploadOutlined, SearchOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, CloudUploadOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import { getAccessToken } from 'utils/auth';
 import { dispatch } from 'store';
@@ -10,6 +10,7 @@ import _ from 'lodash-es';
 import './index.scss';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import { EditType } from '../detail';
+import { ModalForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
 
 export const propShow: UploadProps = {
     name: 'image',
@@ -30,7 +31,9 @@ const FormModal = ({
     form,
     formOk,
     sourceList,
-    materialType
+    materialType,
+    row,
+    setIsModalOpenApp
 }: {
     getList?: any;
     materialList?: any;
@@ -44,6 +47,8 @@ const FormModal = ({
     formOk: (data: any) => void;
     sourceList?: any[];
     materialType?: string;
+    row?: any;
+    setIsModalOpenApp?: any;
 }) => {
     const { TextArea } = Input;
     const uploadRef = useRef<any>([]);
@@ -55,6 +60,12 @@ const FormModal = ({
     const [imageDataIndex, setImageDataIndex] = useState<string>('');
     const [canUpload, setCanUpload] = useState(true);
     const [values, setValues] = useState({});
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [filedName, setFiledName] = useState('');
+    const [currentRecord, setCurrentRecord] = useState(null);
+    const [imageData, setImageData] = useState<any>({});
+
+    const [imageForm] = Form.useForm();
 
     useEffect(() => {
         if (selectImg && imageDataIndex) {
@@ -115,7 +126,10 @@ const FormModal = ({
                 if (result?.images) {
                     result.images = fileList?.map((item: any) => item?.response?.data?.url) || [];
                 }
-                formOk(result);
+                result[filedName + '_description'] = imageData.description;
+                result[filedName + '_tags'] = imageData.tags;
+
+                await formOk({ ...result });
             }}
         >
             <Form form={form} labelCol={{ span: 7 }}>
@@ -161,9 +175,10 @@ const FormModal = ({
                                         {form.getFieldValue(item.dataIndex) ? (
                                             <div className="relative">
                                                 <Image
-                                                    preview={{
-                                                        src: selectImg?.largeImageURL || form.getFieldValue(item.dataIndex)
-                                                    }}
+                                                    // preview={{
+                                                    //     src: selectImg?.largeImageURL || form.getFieldValue(item.dataIndex)
+                                                    // }}
+                                                    preview={false}
                                                     onMouseEnter={() => setCanUpload(false)}
                                                     onClick={(e) => e.stopPropagation()}
                                                     width={102}
@@ -173,6 +188,21 @@ const FormModal = ({
                                                         '?x-oss-process=image/resize,w_100/quality,q_80'
                                                     }
                                                 />
+                                                <div
+                                                    className="absolute z-[1] cursor-pointer inset-0 bg-[rgba(0, 0, 0, 0.5)] flex justify-center items-center text-white opacity-0 hover:opacity-100"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewOpen(true);
+                                                        console.log(item);
+                                                        setCurrentRecord(item);
+                                                        setFiledName(item.dataIndex);
+                                                    }}
+                                                >
+                                                    <div>
+                                                        <EyeOutlined />
+                                                        预览
+                                                    </div>
+                                                </div>
                                                 <div className="bottom-0 z-[100] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]">
                                                     <Tooltip title="上传">
                                                         <div
@@ -187,7 +217,7 @@ const FormModal = ({
                                                         <div
                                                             className="flex-1 flex justify-center !cursor-pointer"
                                                             onClick={async (e) => {
-                                                                setIsModalOpen(true);
+                                                                setIsModalOpenApp ? setIsModalOpenApp(true) : setIsModalOpen(true);
                                                                 e.stopPropagation();
                                                                 setImageDataIndex(item.dataIndex);
                                                                 const result = await form.getFieldsValue();
@@ -305,6 +335,32 @@ const FormModal = ({
                     columns={columns}
                     values={values}
                 />
+            )}
+            {previewOpen && (
+                <ModalForm
+                    onInit={async () => {
+                        const tags = row?.[filedName + '_tags'];
+                        const description = row?.[filedName + '_description'];
+                        await imageForm.setFieldsValue({ tags, description });
+                    }}
+                    layout="horizontal"
+                    form={imageForm}
+                    width={800}
+                    title="预览"
+                    open={previewOpen}
+                    onOpenChange={setPreviewOpen}
+                    onFinish={async () => {
+                        const values = await imageForm.getFieldsValue();
+                        setImageData(values);
+                        setPreviewOpen(false);
+                    }}
+                >
+                    <div className="flex justify-center mb-3">
+                        <Image width={500} height={500} className="object-contain" src={form.getFieldValue(filedName)} preview={false} />
+                    </div>
+                    <ProFormSelect mode="tags" name={'tags'} label="标签" />
+                    <ProFormTextArea name={'description'} label="描述" />
+                </ModalForm>
             )}
         </Modal>
     );

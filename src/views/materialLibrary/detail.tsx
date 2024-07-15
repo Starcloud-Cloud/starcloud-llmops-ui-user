@@ -495,8 +495,8 @@ const MaterialLibraryDetail = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-md border flex justify-between mb-3">
-                    <div className="flex">
+                <div className="bg-white rounded-md border flex justify-between mb-3 ">
+                    <div className="flex items-end w-[210px]">
                         <Space>
                             <Button
                                 type="primary"
@@ -514,7 +514,7 @@ const MaterialLibraryDetail = () => {
                             </Popconfirm>
                         </Space>
                     </div>
-                    <div className="flex border border-solid rounded border-[#d9d9d9]">
+                    <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm">
                         <Space>
                             <div className="flex items-center flex-col cursor-pointer py-[5px] w-[80px] hover:bg-[#d9d9d9]">
                                 <svg
@@ -619,7 +619,7 @@ const MaterialLibraryDetail = () => {
                         </Space>
                     </div>
 
-                    <div className="flex items-center">
+                    <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
                         <div>
                             <Dropdown menu={{ items }}>
                                 <Button>

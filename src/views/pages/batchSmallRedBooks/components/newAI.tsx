@@ -419,6 +419,8 @@ const AiCreate = ({
         );
     };
     useEffect(() => {
+        console.log(pluginConfig);
+
         if (pluginConfig) {
             const values = JSON.parse(pluginConfig);
             if (plugValue === 'generate_material_batch') {

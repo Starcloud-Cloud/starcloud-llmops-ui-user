@@ -171,25 +171,25 @@ const LeftModalAdd = ({
                             setPlugValue(value);
                         }}
                     />
-                ) : (
-                    <AiCreate
-                        plugValue={plugValue}
-                        setPlugOpen={setPlugOpen}
-                        materialType={materialType}
-                        columns={columns}
-                        MokeList={MokeList}
-                        tableData={tableData}
-                        setPage={setPage}
-                        setcustom={setcustom}
-                        setField={setField}
-                        setSelectedRowKeys={setSelectedRowKeys}
-                        downTableData={downTableData}
-                        setFieldCompletionData={setFieldCompletionData}
-                        fieldCompletionData={fieldCompletionData}
-                        setVariableData={setVariableData}
-                        variableData={variableData}
-                    />
-                )}
+                ) : null
+                // <AiCreate
+                //     plugValue={plugValue}
+                //     setPlugOpen={setPlugOpen}
+                //     materialType={materialType}
+                //     columns={columns}
+                //     MokeList={MokeList}
+                //     tableData={tableData}
+                //     setPage={setPage}
+                //     setcustom={setcustom}
+                //     setField={setField}
+                //     setSelectedRowKeys={setSelectedRowKeys}
+                //     downTableData={downTableData}
+                //     setFieldCompletionData={setFieldCompletionData}
+                //     fieldCompletionData={fieldCompletionData}
+                //     setVariableData={setVariableData}
+                //     variableData={variableData}
+                // />
+                }
             </Modal>
             {colOpen && <HeaderField colOpen={colOpen} setColOpen={setColOpen} />}
         </div>

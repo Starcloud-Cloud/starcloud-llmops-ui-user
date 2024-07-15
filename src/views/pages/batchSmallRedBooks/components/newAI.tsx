@@ -1,7 +1,7 @@
 import { Modal, Button, Table, Progress, Tag } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
 import { materialGenerate, customMaterialGenerate, pluginsXhsOcr } from 'api/redBook/batchIndex';
-import { v4 as uuidv4 } from 'uuid';
+import { templateUpdate } from 'api/redBook/material';
 import _ from 'lodash-es';
 import './aiCreate.css';
 import AICreates from './components/AICreate';
@@ -9,41 +9,35 @@ import FieldCompletion from './components/fieldCompletion';
 import RedBookAnalysis from './components/redBookAnalysis';
 import ImgOcr from './components/imgOcr';
 import TextExtraction from './components/textExtraction';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 const AiCreate = ({
+    libraryId,
+    libraryUid,
+    pluginConfig,
     plugValue,
-    materialType,
     columns,
-    MokeList,
     tableData,
     setPage,
-    setcustom,
-    setField,
     downTableData,
     setSelectedRowKeys,
-    setFieldCompletionData,
-    fieldCompletionData,
-    setVariableData,
-    variableData,
-    setPlugOpen
+    setPlugOpen,
+    getTitleList
 }: {
+    libraryId: string;
+    libraryUid: string;
+    pluginConfig: string | null;
     plugValue: string | null;
-    materialType: any;
     columns: any[];
-    MokeList: any[];
     tableData: any[];
     setPage: (data: any) => void;
-    setcustom?: (data: any) => void;
-    setField?: (data: any) => void;
     downTableData: (data: any, num: number) => void;
     setSelectedRowKeys: (data: any) => void;
-    fieldCompletionData: any;
-    setFieldCompletionData: (data: any) => void;
-    variableData: any;
-    setVariableData: (data: any) => void;
     setPlugOpen: (data: boolean) => void;
+    getTitleList: () => void;
 }) => {
     const checkedList = useMemo(() => {
-        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image' && item.type !== 'document');
+        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 5 && item.type !== 6);
     }, [columns]);
     const imgCheckedList = useMemo(() => {
         return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type === 'image');
@@ -88,6 +82,80 @@ const AiCreate = ({
         return ((successCountRef.current / totalCountRef.current) * 100) | 0;
     }, [successCount, totalCount]);
     const aref = useRef(false);
+    //loading 弹窗
+    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
+
+    //素材生成
+    const getTextStream = async (retry?: boolean) => {
+        if (!retry) {
+            materialzanListRef.current = [];
+            setMaterialzanList(materialzanListRef.current);
+            uuidListsRef.current = [];
+            setUuidLists(uuidListsRef.current);
+        }
+        aref.current = false;
+        setMaterialExecutionOpen(true);
+        let chunks;
+        if (!retry) {
+            const i = Array.from({ length: variableData.generateCount * variableData.groupNum }, (_, index) => index);
+            totalCountRef.current = i?.length;
+            setTotalCount(totalCountRef.current);
+            chunks = chunkArray(i, variableData.generateCount);
+        } else {
+            chunks = chunkArray(
+                Array.from({ length: retryNumRef.current }, (_, index) => index),
+                variableData.generateCount
+            );
+        }
+        retryNumRef.current = 0;
+        let index = 0;
+        while (index < chunks?.length && !aref.current) {
+            const resArr: any[] = [];
+            const currentBatch = chunks.slice(index, index + 3);
+            executionCountRef.current = currentBatch?.flat()?.length;
+            setExecutionCount(executionCountRef.current);
+            await Promise.all(
+                currentBatch.map(async (group, i) => {
+                    try {
+                        const res = await customMaterialGenerate({ ...variableData, libraryUid, generateCount: group?.length });
+                        if (!aref.current) {
+                            const timers = new Date().getTime();
+                            const newMaterialzan = _.cloneDeep(materialzanListRef.current);
+                            const newRes = res?.map((item: any) => ({ ...item, group: timers }));
+                            newMaterialzan.push(...newRes);
+                            resArr.push(...newRes);
+                            materialzanListRef.current = newMaterialzan;
+                            setMaterialzanList(materialzanListRef.current);
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            successCountRef.current += group?.length;
+                            setExecutionCount(executionCountRef.current);
+                            setSuccessCount(successCountRef.current);
+                        }
+                    } catch (error: any) {
+                        console.log(error);
+                        const newList = _.cloneDeep(errorMessageRef.current);
+                        newList.push(error.msg);
+                        let newretryNum = _.cloneDeep(retryNumRef.current);
+                        newretryNum += 1;
+                        retryNumRef.current = newretryNum;
+                        errorMessageRef.current = newList;
+                        setErrorMessage(errorMessageRef.current);
+                        executionCountRef.current -= group?.length;
+                        setExecutionCount(executionCountRef.current);
+                        errorCountRef.current += group?.length;
+                        if (errorCountRef.current >= 9) {
+                            aref.current = true;
+                        }
+                        setErrorCount(errorCountRef.current);
+                    }
+                })
+            );
+            index += 3;
+        }
+        executionCountRef.current = 0;
+        setExecutionCount(executionCountRef.current);
+    };
+    //字段补齐
     const handleMaterial = async (num: number, retry?: boolean) => {
         if (!retry) {
             materialzanListRef.current = [];
@@ -99,16 +167,15 @@ const AiCreate = ({
         setMaterialExecutionOpen(true);
         //记录原有数据下标
         const indexList: any[] = [];
-        let theStaging = _.cloneDeep(tableData);
         if (retry) {
             tableData?.map((item, index) => {
-                if (retryListRef.current?.find((el) => el.uuid === item.uuid)) {
+                if (retryListRef.current?.find((el) => el.id === item.id)) {
                     indexList.push(index);
                 }
             });
         } else if (num === 1) {
             tableData?.map((item, index) => {
-                if (selList?.find((el) => el.uuid === item.uuid)) {
+                if (selList?.find((el) => el.id === item.id)) {
                     indexList.push(index);
                 }
             });
@@ -127,7 +194,6 @@ const AiCreate = ({
         while (index < chunks.length && !aref.current) {
             const resArr: any[] = [];
             const newResArr: any[] = [];
-            const uuidList: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             // try {
             executionCountRef.current = currentBatch?.flat()?.length;
@@ -138,7 +204,7 @@ const AiCreate = ({
                     try {
                         const res = await materialGenerate({
                             materialList: group,
-                            fieldList: MokeList,
+                            libraryUid,
                             ...fieldCompletionData
                         });
                         if (!aref.current) {
@@ -148,15 +214,6 @@ const AiCreate = ({
                                     ...(res[t] ? res[t] : {})
                                 }))
                             );
-                            // if (res?.length === group?.length) {
-                            //     resArr[index + i] = res;
-                            // } else if (res?.length !== group?.length && res.length === 1) {
-                            //     resArr[index + i] = [...res, {}, {}];
-                            // } else if (res?.length !== group?.length && res.length === 2) {
-                            //     resArr[index + i] = [...res, {}];
-                            // } else {
-                            //     resArr[index + i] = res;
-                            // }
                             executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
                             setExecutionCount(executionCountRef.current);
@@ -191,119 +248,13 @@ const AiCreate = ({
             if (!aref.current) {
                 const newArr = _.cloneDeep(materialzanListRef.current);
                 console.log(newArr, currentBatch, resArr);
-                // for (let i = 0; i < currentBatch.flat().length; i++) {
-                //     const obj: any = {};
-                //     resArr.flat()[i] &&
-                //         Object.keys(resArr.flat()[i]).map((item) => {
-                //             obj[item] = resArr.flat()[i][item];
-                //         });
-                //     newArr.push(obj);
-                //     uuidList.push(newList[indexList[i + index * 3]]?.uuid);
-                //     newList[indexList[i + index * 3]] = {
-                //         ...newList[indexList[i + index * 3]],
-                //         ...obj
-                //     };
-                // }
                 const updatedMaterialzanList = [...materialzanListRef.current, ...newResArr];
                 materialzanListRef.current = updatedMaterialzanList;
                 setMaterialzanList(materialzanListRef.current);
-                uuidListsRef.current = materialzanListRef.current?.map((item) => item.uuid);
+                uuidListsRef.current = materialzanListRef.current?.map((item) => item.id);
                 setUuidLists(uuidListsRef.current);
-                materialFieldexeDataRef.current = theStaging?.map((item) => {
-                    const arrinclude = materialzanListRef.current.find((el) => el.uuid === item.uuid);
-                    if (arrinclude) {
-                        return arrinclude;
-                    } else {
-                        return item;
-                    }
-                });
                 index += 3;
             }
-        }
-        executionCountRef.current = 0;
-        setExecutionCount(executionCountRef.current);
-    };
-    //loading 弹窗
-    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
-
-    //素材预览
-    const getTextStream = async (retry?: boolean) => {
-        if (!retry) {
-            materialzanListRef.current = [];
-            setMaterialzanList(materialzanListRef.current);
-            uuidListsRef.current = [];
-            setUuidLists(uuidListsRef.current);
-        }
-        aref.current = false;
-        setMaterialExecutionOpen(true);
-        let chunks;
-        if (!retry) {
-            const i = Array.from({ length: variableData.generateCount * variableData.groupNum }, (_, index) => index);
-            totalCountRef.current = i?.length;
-            setTotalCount(totalCountRef.current);
-            chunks = chunkArray(i, variableData.generateCount);
-        } else {
-            chunks = chunkArray(
-                Array.from({ length: retryNumRef.current }, (_, index) => index),
-                variableData.generateCount
-            );
-        }
-        retryNumRef.current = 0;
-        let index = 0;
-        // let theStaging = _.cloneDeep(tableData);
-        while (index < chunks?.length && !aref.current) {
-            const resArr: any[] = [];
-            const currentBatch = chunks.slice(index, index + 3);
-            executionCountRef.current = currentBatch?.flat()?.length;
-            setExecutionCount(executionCountRef.current);
-            await Promise.all(
-                currentBatch.map(async (group, i) => {
-                    try {
-                        const res = await customMaterialGenerate({ ...variableData, fieldList: MokeList, generateCount: group?.length });
-                        if (!aref.current) {
-                            const timers = new Date().getTime();
-                            const newMaterialzan = _.cloneDeep(materialzanListRef.current);
-                            const newRes = res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType, group: timers }));
-                            newMaterialzan.push(...newRes);
-                            resArr.push(...newRes);
-                            materialzanListRef.current = newMaterialzan;
-                            setMaterialzanList(materialzanListRef.current);
-                            executionCountRef.current = executionCountRef.current - group?.length;
-                            successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
-                            setSuccessCount(successCountRef.current);
-                        }
-                    } catch (error: any) {
-                        console.log(error);
-                        const newList = _.cloneDeep(errorMessageRef.current);
-                        newList.push(error.msg);
-                        let newretryNum = _.cloneDeep(retryNumRef.current);
-                        newretryNum += 1;
-                        retryNumRef.current = newretryNum;
-                        errorMessageRef.current = newList;
-                        setErrorMessage(errorMessageRef.current);
-                        executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
-                        errorCountRef.current += group?.length;
-                        if (errorCountRef.current >= 9) {
-                            aref.current = true;
-                        }
-                        setErrorCount(errorCountRef.current);
-                    }
-                })
-            );
-            // let newList = _.cloneDeep(theStaging);
-            // newList.unshift(...resArr);
-            // theStaging = _.cloneDeep(newList);
-            if (!aref.current) {
-                const newL = _.cloneDeep(uuidListsRef.current);
-                newL?.push(...resArr?.map((item) => item.uuid));
-                uuidListsRef.current = newL;
-                setUuidLists(uuidListsRef.current);
-            }
-
-            // downTableData(theStaging);
-            index += 3;
         }
         executionCountRef.current = 0;
         setExecutionCount(executionCountRef.current);
@@ -346,11 +297,7 @@ const AiCreate = ({
         }
         aref.current = false;
         setMaterialExecutionOpen(true);
-        console.log(redBookData.requirement);
-
         let requirementData = redBookData.requirement?.split(/[,\n\r，]+/).filter(Boolean);
-        console.log(requirementData);
-
         let chunks;
         if (!retry) {
             totalCountRef.current = requirementData?.length;
@@ -378,8 +325,6 @@ const AiCreate = ({
                             newCheckbox.forEach((dt) => {
                                 obj[selectData[dt]] = res[dt]?.url || res[dt];
                             });
-                            obj.uuid = uuidv4();
-                            console.log(obj);
                             newMaterialzan.push(obj);
                             resArr.push(obj);
                             materialzanListRef.current = newMaterialzan;
@@ -406,25 +351,16 @@ const AiCreate = ({
                     }
                 })
             );
-            if (!aref.current) {
-                const newL = _.cloneDeep(uuidListsRef.current);
-                newL?.push(...resArr?.map((item) => item.uuid));
-                uuidListsRef.current = newL;
-                setUuidLists(uuidListsRef.current);
-            }
             index += 3;
         }
         executionCountRef.current = 0;
         setExecutionCount(executionCountRef.current);
     };
-
     //新增插入表格
     const [selectValue, setSelectValue] = useState('');
     const batchNum = useRef(-1);
-    const materialFieldexeDataRef = useRef<any>(null);
     const materialzanListRef = useRef<any[]>([]);
     const [materialzanList, setMaterialzanList] = useState<any[]>([]);
-
     //小红书数据
     const [redBookData, setRedBookData] = useState<any>({
         requirement: '',
@@ -439,7 +375,70 @@ const AiCreate = ({
         titleField: 1,
         contentField: 1
     });
-
+    //素材生成
+    const [variableData, setVariableData] = useState<any>({
+        checkedFieldList: [],
+        requirement: undefined,
+        groupNum: 1,
+        generateCount: 1
+    });
+    //字段补齐
+    const [fieldCompletionData, setFieldCompletionData] = useState<any>({
+        checkedFieldList: [],
+        requirement: ''
+    });
+    //保存配置
+    const saveConfig = async (data: string) => {
+        let newValue: any = {};
+        if (pluginConfig) {
+            newValue = JSON.parse(pluginConfig);
+        }
+        if (plugValue === 'generate_material_batch') {
+            newValue.variableData = variableData;
+        } else if (plugValue === 'generate_material_one') {
+            newValue.fieldCompletionData = fieldCompletionData;
+        } else if (plugValue === 'xhsOcr') {
+            newValue.redBookData = redBookData;
+        }
+        await templateUpdate({
+            id: libraryId,
+            pluginConfig: JSON.stringify(newValue)
+        });
+        getTitleList();
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '保存成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                close: false
+            })
+        );
+    };
+    useEffect(() => {
+        if (pluginConfig) {
+            const values = JSON.parse(pluginConfig);
+            if (plugValue === 'generate_material_batch') {
+                setVariableData(values.variableData);
+            } else if (plugValue === 'generate_material_one') {
+                setFieldCompletionData(values.fieldCompletionData);
+            } else if (plugValue === 'xhsOcr') {
+                setRedBookData(values.redBookData);
+            }
+        } else {
+            if (plugValue === 'generate_material_batch') {
+                setVariableData({
+                    ...variableData,
+                    checkedFieldList: columns
+                        ?.filter((item) => item.required && item.type !== 5 && item.type !== 6)
+                        ?.map((item) => item.dataIndex)
+                });
+            }
+        }
+    }, [pluginConfig]);
     const xhsCloumns = useMemo(() => {
         const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
         return columns?.filter((item) => arr?.includes(item.dataIndex));
@@ -472,7 +471,7 @@ const AiCreate = ({
                     tableData={tableData}
                     setSelOpen={setSelOpen}
                     editMaterial={editMaterial}
-                    setField={setField}
+                    saveConfig={saveConfig}
                 />
             ) : plugValue === 'generate_material_batch' ? (
                 // 素材生成
@@ -481,7 +480,7 @@ const AiCreate = ({
                         variableData={variableData}
                         setVariableData={setVariableData}
                         checkedList={checkedList}
-                        setcustom={setcustom}
+                        saveConfig={saveConfig}
                         aimaterialCreate={aimaterialCreate}
                     />
                 </div>
@@ -505,7 +504,7 @@ const AiCreate = ({
                     </div>
                     <Table
                         rowKey={(record, index) => {
-                            return record.uuid;
+                            return record.id;
                         }}
                         pagination={{
                             showSizeChanger: true,
@@ -637,7 +636,7 @@ const AiCreate = ({
                                         setSelectedRowKeys(uuidListsRef.current);
                                     } else if (selectValue === 'field') {
                                         setSelList([]);
-                                        downTableData(materialFieldexeDataRef.current, 2);
+                                        downTableData(materialzanListRef.current, 2);
                                         setMaterialExecutionOpen(false);
                                         setPlugOpen(false);
                                         setSelectedRowKeys(uuidLists);
@@ -677,9 +676,8 @@ const AiCreate = ({
 };
 const memoAiCreate = (pre: any, next: any) => {
     return (
-        JSON.stringify(pre.materialType) === JSON.stringify(JSON.stringify(next.materialType)) &&
         JSON.stringify(pre.columns) === JSON.stringify(JSON.stringify(next.columns)) &&
-        JSON.stringify(pre.MokeList) === JSON.stringify(JSON.stringify(next.MokeList)) &&
+        JSON.stringify(pre.pluginConfig) === JSON.stringify(JSON.stringify(next.pluginConfig)) &&
         JSON.stringify(pre.tableData) === JSON.stringify(JSON.stringify(next.tableData)) &&
         JSON.stringify(pre.fieldCompletionData) === JSON.stringify(JSON.stringify(next.fieldCompletionData)) &&
         JSON.stringify(pre.variableData) === JSON.stringify(JSON.stringify(next.variableData))

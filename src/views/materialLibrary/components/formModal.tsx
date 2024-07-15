@@ -129,7 +129,7 @@ const FormModal = ({
                 result[filedName + '_description'] = imageData.description;
                 result[filedName + '_tags'] = imageData.tags;
 
-                await formOk({ ...result });
+                await formOk({ ...row, ...result });
             }}
         >
             <Form form={form} labelCol={{ span: 7 }}>
@@ -137,6 +137,7 @@ const FormModal = ({
                     (item, index) =>
                         item.title !== '操作' &&
                         item.title !== '序号' &&
+                        item.title !== '使用次数' &&
                         (item.type !== 'weburl' ? (
                             <Form.Item
                                 key={index}

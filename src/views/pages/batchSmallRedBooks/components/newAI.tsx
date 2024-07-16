@@ -19,7 +19,6 @@ const AiCreate = ({
     plugValue,
     columns,
     tableData,
-    setPage,
     downTableData,
     setSelectedRowKeys,
     setPlugOpen,
@@ -31,7 +30,6 @@ const AiCreate = ({
     plugValue: string | null;
     columns: any[];
     tableData: any[];
-    setPage: (data: any) => void;
     downTableData: (data: any, num: number) => void;
     setSelectedRowKeys: (data: any) => void;
     setPlugOpen: (data: boolean) => void;
@@ -515,14 +513,7 @@ const AiCreate = ({
                             rowKey={(record, index) => {
                                 return record.id;
                             }}
-                            pagination={{
-                                showSizeChanger: true,
-                                defaultPageSize: 20,
-                                pageSizeOptions: [20, 50, 100, 300, 500],
-                                onChange: (page) => {
-                                    setPage(page);
-                                }
-                            }}
+                            pagination={false}
                             size="small"
                             virtual
                             rowSelection={{
@@ -688,11 +679,12 @@ const AiCreate = ({
 };
 const memoAiCreate = (pre: any, next: any) => {
     return (
-        JSON.stringify(pre.columns) === JSON.stringify(JSON.stringify(next.columns)) &&
-        JSON.stringify(pre.pluginConfig) === JSON.stringify(JSON.stringify(next.pluginConfig)) &&
-        JSON.stringify(pre.tableData) === JSON.stringify(JSON.stringify(next.tableData)) &&
-        JSON.stringify(pre.fieldCompletionData) === JSON.stringify(JSON.stringify(next.fieldCompletionData)) &&
-        JSON.stringify(pre.variableData) === JSON.stringify(JSON.stringify(next.variableData))
+        _.isEqual(pre.libraryId, next.libraryId) &&
+        _.isEqual(pre.libraryUid, next.libraryUid) &&
+        _.isEqual(pre.pluginConfig, next.pluginConfig) &&
+        _.isEqual(pre.plugValue, next.plugValue) &&
+        _.isEqual(pre.columns, next.columns) &&
+        _.isEqual(pre.tableData, next.tableData)
     );
 };
 export default memo(AiCreate, memoAiCreate);

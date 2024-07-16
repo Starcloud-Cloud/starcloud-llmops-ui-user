@@ -460,6 +460,7 @@ const MaterialTable = ({ libraryUid }: any) => {
                     tableLoading={tableLoading}
                     actionRefs={actionRefs}
                     columns={getClumns}
+                    tableMeta={columns}
                     tableData={tableData}
                     setTableData={(data) => {
                         tableRef.current = data;

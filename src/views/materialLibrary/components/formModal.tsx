@@ -104,6 +104,8 @@ const FormModal = ({
     const [imageUrl, setImageUrl] = useState('');
     const [fileList, setFileList] = useState<any[]>([]);
 
+    console.log(imageData, 'imageData');
+
     return (
         <Modal
             zIndex={1000}
@@ -126,10 +128,10 @@ const FormModal = ({
                 if (result?.images) {
                     result.images = fileList?.map((item: any) => item?.response?.data?.url) || [];
                 }
-                result[filedName + '_description'] = imageData.description;
-                result[filedName + '_tags'] = imageData.tags;
+                // result[filedName + '_description'] = imageData.description;
+                // result[filedName + '_tags'] = imageData.tags;
 
-                await formOk({ ...row, ...result });
+                await formOk({ ...row, ...imageData, ...result });
             }}
         >
             <Form form={form} labelCol={{ span: 7 }}>
@@ -340,9 +342,10 @@ const FormModal = ({
             {previewOpen && (
                 <ModalForm
                     onInit={async () => {
-                        const tags = row?.[filedName + '_tags'];
-                        const description = row?.[filedName + '_description'];
-                        await imageForm.setFieldsValue({ tags, description });
+                        const value: any = {};
+                        value[filedName + '_tags'] = imageData[filedName + '_tags'] || row[filedName + '_tags'];
+                        value[filedName + '_description'] = imageData[filedName + '_description'] || row[filedName + '_description'];
+                        await imageForm.setFieldsValue(value);
                     }}
                     layout="horizontal"
                     form={imageForm}
@@ -352,15 +355,15 @@ const FormModal = ({
                     onOpenChange={setPreviewOpen}
                     onFinish={async () => {
                         const values = await imageForm.getFieldsValue();
-                        setImageData(values);
+                        setImageData({ ...imageData, ...values });
                         setPreviewOpen(false);
                     }}
                 >
                     <div className="flex justify-center mb-3">
                         <Image width={500} height={500} className="object-contain" src={form.getFieldValue(filedName)} preview={false} />
                     </div>
-                    <ProFormSelect mode="tags" name={'tags'} label="标签" />
-                    <ProFormTextArea name={'description'} label="描述" />
+                    <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
+                    <ProFormTextArea name={filedName + '_description'} label="描述" />
                 </ModalForm>
             )}
         </Modal>

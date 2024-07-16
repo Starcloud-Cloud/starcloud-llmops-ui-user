@@ -71,8 +71,8 @@ const LeftModalAdd = ({
                     setSelectedRowKeys={setSelectedRowKeys}
                     getTitleList={getTitleList}
                     getList={getList}
-                    // TODO
                     libraryType={1}
+                    canSwitch={true}
                 />
                 <div className="material-index material-detail-table">
                     <TablePro

@@ -29,11 +29,13 @@ export const IconRenderer = ({ value }: { value: string }) => {
 const MaterialLibrary = ({
     mode = 'page',
     setSelectedRowKeys,
-    selectedRowKeys
+    appUid,
+    libraryId
 }: {
     mode: 'select' | 'page';
     setSelectedRowKeys: (keys: React.Key[]) => void;
-    selectedRowKeys: React.Key[];
+    appUid?: string;
+    libraryId?: string;
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectIcon, setSelectIcon] = useState('');
@@ -298,7 +300,7 @@ const MaterialLibrary = ({
                     const data =
                         mode === 'page'
                             ? await getMaterialPage({ ...params, sortingFields })
-                            : getMaterialBindPage({ ...params, sortingFields, appUid: '12345tyuiofdsa', libraryId: 76 });
+                            : await getMaterialBindPage({ ...params, sortingFields, appUid, libraryId });
                     return {
                         data: data.list,
                         success: true,

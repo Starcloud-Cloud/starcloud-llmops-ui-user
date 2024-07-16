@@ -26,7 +26,15 @@ export const IconRenderer = ({ value }: { value: string }) => {
     return <SelectedIcon />;
 };
 
-const MaterialLibrary = () => {
+const MaterialLibrary = ({
+    mode = 'page',
+    setSelectedRowKeys,
+    selectedRowKeys
+}: {
+    mode: 'select' | 'page';
+    setSelectedRowKeys: (keys: React.Key[]) => void;
+    selectedRowKeys: React.Key[];
+}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectIcon, setSelectIcon] = useState('');
     const [typeList, setTypeList] = useState<any[]>([]);
@@ -147,7 +155,7 @@ const MaterialLibrary = () => {
             width: 150,
             sorter: (a, b) => a.createTime - b.createTime,
             renderText: (text) => text && dayjs(text).format('YYYY-MM-DD HH:mm')
-        },
+        }
         // {
         //     title: '启用',
         //     align: 'center',
@@ -164,7 +172,10 @@ const MaterialLibrary = () => {
         //         />
         //     )
         // },
-        {
+    ];
+
+    if (mode === 'page' && activeKey === '1') {
+        columns.push({
             title: '操作',
             width: 50,
             search: false,
@@ -185,8 +196,8 @@ const MaterialLibrary = () => {
                     />
                 </Dropdown>
             )
-        }
-    ];
+        });
+    }
 
     const handleStatus = async (record: any) => {
         const data = await updateMaterial(record);
@@ -215,18 +226,20 @@ const MaterialLibrary = () => {
 
     return (
         <div className="h-full material-index bg-white">
-            <div className="px-6 pt-2">
-                <Button
-                    type={'primary'}
-                    icon={<PlusOutlined />}
-                    onClick={() => {
-                        setRecord(null);
-                        setIsModalOpen(true);
-                    }}
-                >
-                    创建知识库
-                </Button>
-            </div>
+            {mode === 'page' && activeKey === '1' && (
+                <div className="px-6 pt-2">
+                    <Button
+                        type={'primary'}
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                            setRecord(null);
+                            setIsModalOpen(true);
+                        }}
+                    >
+                        创建知识库
+                    </Button>
+                </div>
+            )}
             <ProTable
                 toolbar={{
                     menu: {
@@ -247,9 +260,18 @@ const MaterialLibrary = () => {
                         }
                     }
                 }}
+                rowSelection={
+                    mode === 'select' && {
+                        onChange(selectedRowKeys, selectedRows, info) {
+                            setSelectedRowKeys(selectedRowKeys);
+                        },
+                        type: 'radio'
+                    }
+                }
                 actionRef={actionRef}
                 columns={columns}
                 search={false}
+                rowKey={'id'}
                 request={async (params, sort) => {
                     params.pageNo = params.current;
                     params.name = query?.name;

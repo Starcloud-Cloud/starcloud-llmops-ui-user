@@ -52,6 +52,7 @@ import _ from 'lodash';
 import SubCard from 'ui-component/cards/SubCard';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
+import MaterialLibrary from './index';
 
 export enum EditType {
     String = 0,
@@ -80,6 +81,8 @@ const MaterialLibraryDetail = () => {
     const [selectImg, setSelectImg] = useState<any>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [tableDataOriginal, setTableDataOriginal] = useState<any>([]);
+    const [openSwitchMaterial, setOpenSwitchMaterial] = useState(false);
+    const [selectedMaterialRowKeys, setSelectedMaterialRowKeys] = useState<React.Key[]>([]);
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -488,9 +491,31 @@ const MaterialLibraryDetail = () => {
                 <div id="materialDetail" className="flex justify-between flex-col">
                     <div className="flex  mb-4">
                         <Avatar shape="square" icon={<IconRenderer value={detail?.iconUrl || 'AreaChartOutlined'} />} size={48} />
-                        <div className="flex flex-col ml-3">
-                            <div className="cursor-pointer flex">
-                                <span className="text-[20px] font-semibold">{detail?.name}</span>
+                        <div className="flex flex-col ml-3 justify-between">
+                            <div className="cursor-pointer flex items-center ">
+                                <span className="text-[20px] font-semibold mr-1">{detail?.name}</span>
+                                <Tooltip title="切换素材">
+                                    <svg
+                                        onClick={() => setOpenSwitchMaterial(true)}
+                                        viewBox="0 0 1024 1024"
+                                        version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        p-id="4263"
+                                        width="20"
+                                        height="20"
+                                    >
+                                        <path
+                                            d="M810.752 205.397333a213.333333 213.333333 0 0 1 213.333333 213.333334v128h-85.333333v-128a128 128 0 0 0-128-128h-768a42.666667 42.666667 0 0 1-24.746667-77.397334L316.586667 0l49.493333 69.461333-190.293333 135.936h634.88z m-597.333333 597.333334a213.333333 213.333333 0 0 1-213.333334-213.333334v-128h85.333334v128a128 128 0 0 0 128 128h768a42.666667 42.666667 0 0 1 24.746666 77.397334l-298.666666 213.333333-49.493334-69.461333 190.293334-135.936H213.333333z"
+                                            fill="#333333"
+                                            p-id="4264"
+                                        ></path>
+                                    </svg>
+                                </Tooltip>
+                            </div>
+                            <div>
+                                <Space size={4}>
+                                    <Tag bordered={false}>系统默认</Tag>
+                                </Space>
                             </div>
                         </div>
                     </div>
@@ -729,6 +754,18 @@ const MaterialLibraryDetail = () => {
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
                     <ProFormTextArea name={filedName + '_description'} label="描述" />
+                </ModalForm>
+            )}
+
+            {openSwitchMaterial && (
+                <ModalForm width={1000} title="切换素材" open={openSwitchMaterial} onOpenChange={setOpenSwitchMaterial}>
+                    <div className="h-[calc(100vh-300px)] overflow-auto">
+                        <MaterialLibrary
+                            mode={'select'}
+                            selectedRowKeys={selectedMaterialRowKeys}
+                            setSelectedRowKeys={setSelectedMaterialRowKeys}
+                        />
+                    </div>
                 </ModalForm>
             )}
         </div>

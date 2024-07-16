@@ -11,7 +11,7 @@ import Icon, {
     UploadOutlined
 } from '@ant-design/icons';
 import { ActionType, CheckCard, ProColumns, ProTable } from '@ant-design/pro-components';
-import { addMaterial, delMaterial, getMaterialPage, updateMaterial } from 'api/material';
+import { addMaterial, delMaterial, getMaterialBindPage, getMaterialPage, updateMaterial } from 'api/material';
 import dayjs from 'dayjs';
 import { dictData } from 'api/template';
 import { useNavigate } from 'react-router-dom';
@@ -295,7 +295,10 @@ const MaterialLibrary = ({
                         sortingFields = [];
                     }
 
-                    const data = await getMaterialPage({ ...params, sortingFields });
+                    const data =
+                        mode === 'page'
+                            ? await getMaterialPage({ ...params, sortingFields })
+                            : getMaterialBindPage({ ...params, sortingFields, appUid: '12345tyuiofdsa', libraryId: 76 });
                     return {
                         data: data.list,
                         success: true,

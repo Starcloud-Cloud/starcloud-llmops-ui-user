@@ -10,6 +10,24 @@ export const getMaterialPage = (data: any) => {
 };
 
 /**
+ * 获取绑定分页
+ * @param data
+ * @returns
+ */
+export const getMaterialBindPage = (data: any) => {
+    return request.post({ url: '/llm/material-library-app-bind/page', data });
+};
+
+/**
+ * 修改绑定素材库
+ * @param data
+ * @returns
+ */
+export const createMaterialLibraryAppBind = (data: any) => {
+    return request.post({ url: '/llm/material-library-app-bind/update', data });
+};
+
+/**
  * 新增
  * @param data
  * @returns

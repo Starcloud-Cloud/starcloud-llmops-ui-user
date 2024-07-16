@@ -17,19 +17,20 @@ const RedBookAnalysis = ({
 }) => {
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const redList = [
-        { label: ' 小红书标题', value: 'title' },
-        { label: ' 小红书内容', value: 'content' },
-        { label: ' 小红书标签', value: 'tags' },
-        { label: ' 图片 1', value: 'image1' },
-        { label: ' 图片 2', value: 'image2' },
-        { label: ' 图片 3', value: 'image3' },
-        { label: ' 图片 4', value: 'image4' },
-        { label: ' 图片 5', value: 'image5' },
-        { label: ' 图片 6', value: 'image6' },
-        { label: ' 图片 7', value: 'image7' },
-        { label: ' 图片 8', value: 'image8' },
-        { label: ' 图片 9', value: 'image9' },
-        { label: ' 图片 10', value: 'image10' }
+        { label: '小红书标题', value: 'title' },
+        { label: '小红书内容', value: 'content' },
+        { label: '小红书标签', value: 'tags' },
+        { label: '图片 1', value: 'image1' },
+        { label: '图片 2', value: 'image2' },
+        { label: '图片 3', value: 'image3' },
+        { label: '图片 4', value: 'image4' },
+        { label: '图片 5', value: 'image5' },
+        { label: '图片 6', value: 'image6' },
+        { label: '图片 7', value: 'image7' },
+        { label: '图片 8', value: 'image8' },
+        { label: '图片 9', value: 'image9' },
+        { label: '图片 10', value: 'image10' },
+        { label: '全部 OCR 信息', value: 'allOcrContent' }
     ];
 
     return (
@@ -63,6 +64,7 @@ const RedBookAnalysis = ({
                             <div className="flex items-center">
                                 <span className="text-xs">绑定字段：</span>
                                 <Select
+                                    allowClear
                                     value={redBookData.bindFieldData[item.value]}
                                     status={
                                         redBookData.fieldList.includes(item.value) && !redBookData.bindFieldData[item.value] ? 'error' : ''

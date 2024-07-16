@@ -29,7 +29,6 @@ import {
     Divider
 } from 'antd';
 import {
-    createMaterialLibraryAppBind,
     createMaterialLibrarySlice,
     delBatchMaterialLibrarySlice,
     delMaterialLibrarySlice,
@@ -38,6 +37,7 @@ import {
     updateMaterialLibrarySlice,
     updateMaterialLibraryTitle
 } from 'api/material';
+import { createBatchMaterial, updateBatchMaterial } from 'api/redBook/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -54,6 +54,7 @@ import SubCard from 'ui-component/cards/SubCard';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
 import MaterialLibrary from './index';
+import AiCreate from '../pages/batchSmallRedBooks/components/newAI';
 
 export enum EditType {
     String = 0,
@@ -64,7 +65,7 @@ export enum EditType {
     Image = 5
 }
 
-const TableHeader = ({
+export const TableHeader = ({
     setOpenSwitchMaterial,
     iconUrl,
     name,
@@ -72,7 +73,17 @@ const TableHeader = ({
     setColOpen,
     setTitle,
     selectedRowKeys,
-    handleBatchDel
+    handleBatchDel,
+    libraryId,
+    libraryUid,
+    pluginConfig,
+    columns,
+    tableMeta,
+    tableData,
+    setSelectedRowKeys,
+    getTitleList,
+    getList,
+    libraryType
 }: {
     //切换素材
     setOpenSwitchMaterial?: (open: boolean) => void;
@@ -90,6 +101,23 @@ const TableHeader = ({
     handleBatchDel: () => void;
     // 选中的行
     selectedRowKeys: any;
+    libraryId: string;
+    libraryUid: string;
+    //存储的配置
+    pluginConfig: string | null;
+    //表头
+    columns: any[];
+    tableMeta: any[];
+    //表格
+    tableData: any[];
+    //选中的行保存配置之后更新的数据
+    setSelectedRowKeys: (data: any) => void;
+    //刷新表头数据
+    getTitleList: () => void;
+    //刷新表格数据
+    getList: () => void;
+    // 素材类型
+    libraryType: number;
 }) => {
     const items: any = [
         {
@@ -103,9 +131,60 @@ const TableHeader = ({
             onClick: async () => {}
         }
     ];
+    const [plugOpen, setPlugOpen] = useState(false);
+    const [plugTitle, setPlugTitle] = useState('插件市场');
+    const [plugValue, setPlugValue] = useState<null | string>(null);
+    useEffect(() => {
+        if (!plugOpen) {
+            setPlugValue(null);
+            setPlugTitle('插件市场');
+        }
+    }, [plugOpen]);
+
+    const downTableData = async (data: any[], num: number) => {
+        const tableMetaList = _.cloneDeep(tableMeta);
+
+        const newData = data.map((record) => {
+            const recordKeys = Object.keys(record);
+            const content = tableMetaList.map((item) => {
+                if (recordKeys.includes(item.columnCode)) {
+                    if (item.columnType === EditType.Image) {
+                        return {
+                            columnId: item.id,
+                            columnName: item.columnName,
+                            columnCode: item.columnCode,
+                            value: record[item.columnCode],
+                            description: record[item.columnCode + '_description'],
+                            tags: record[item.columnCode + '_tags'],
+                            extend: record.extend
+                        };
+                    } else {
+                        return {
+                            columnId: item.id,
+                            columnName: item.columnName,
+                            columnCode: item.columnCode,
+                            value: record[item.columnCode]
+                        };
+                    }
+                }
+            });
+            return {
+                libraryId: record.libraryId || libraryId,
+                id: record.id,
+                content: content
+            };
+        });
+        if (num === 1) {
+            createBatchMaterial({ saveReqVOS: newData });
+            getList();
+        } else {
+            updateBatchMaterial({ saveReqVOS: newData });
+            getList();
+        }
+    };
 
     return (
-        <>
+        <div>
             <div className="flex  mb-4">
                 <Avatar shape="square" icon={<IconRenderer value={iconUrl || 'AreaChartOutlined'} />} size={48} />
                 <div className="flex flex-col ml-3 justify-between">
@@ -133,12 +212,13 @@ const TableHeader = ({
                     </div>
                     <div>
                         <Space size={4}>
-                            <Tag bordered={false}>系统默认</Tag>
+                            {libraryType === 0 && <Tag bordered={false}>系统默认素材</Tag>}
+                            {libraryType === 1 && <Tag bordered={false}>我的素材</Tag>}
+                            {libraryType === 9 && <Tag bordered={false}>应用市场素材</Tag>}
                         </Space>
                     </div>
                 </div>
             </div>
-
             <div className="bg-white rounded-md border flex justify-between mb-3 ">
                 <div className="flex items-end w-[210px]">
                     <Space>
@@ -160,7 +240,14 @@ const TableHeader = ({
                 </div>
                 <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm">
                     <Space>
-                        <div className="flex items-center flex-col cursor-pointer py-[5px] w-[80px] hover:bg-[#d9d9d9]">
+                        <div
+                            onClick={() => {
+                                setPlugOpen(true);
+                                setPlugTitle('小红书分析');
+                                setPlugValue('xhsOcr');
+                            }}
+                            className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                        >
                             <svg
                                 viewBox="0 0 1024 1024"
                                 version="1.1"
@@ -182,7 +269,14 @@ const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">小红书分析</div>
                         </div>
-                        <div className="flex items-center flex-col cursor-pointer  py-[5px] w-[80px] hover:bg-[#d9d9d9]">
+                        <div
+                            onClick={() => {
+                                setPlugOpen(true);
+                                setPlugTitle('AI素材生成');
+                                setPlugValue('generate_material_batch');
+                            }}
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                        >
                             <svg
                                 viewBox="0 0 1024 1024"
                                 version="1.1"
@@ -200,14 +294,21 @@ const TableHeader = ({
                             <div className="text-[12px] font-bold mt-1">AI素材生成</div>
                         </div>
                         <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
-                        <div className="flex items-center flex-col cursor-pointer  py-[5px] w-[80px] hover:bg-[#d9d9d9]">
+                        <div
+                            onClick={() => {
+                                setPlugOpen(true);
+                                setPlugTitle('文本智能提取');
+                                setPlugValue('extraction');
+                            }}
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                        >
                             <svg
                                 viewBox="0 0 1024 1024"
                                 version="1.1"
                                 xmlns="http://www.w3.org/2000/svg"
                                 p-id="6760"
-                                width="20"
-                                height="20"
+                                width="24"
+                                height="24"
                             >
                                 <path
                                     d="M791.466667 699.2l47.466666 47.466667h-215.466666v52.266666h215.466666l-47.466666 47.466667 36.8 37.333333 109.866666-110.933333-109.866666-110.933333-36.8 37.333333zM576 669.866667H181.333333V196.8h669.333334v367.466667h70.4V199.466667c0-43.2-34.666667-77.866667-77.866667-77.866667H188.8c-43.2 0-77.866667 34.666667-77.866667 77.866667v467.733333c0 43.2 34.666667 77.866667 77.866667 77.866667H576v-75.2zM569.066667 820.266667H248c-24 0-43.2 16.533333-43.2 37.333333s19.2 37.333333 43.2 37.333333h321.066667v-74.666666z"
@@ -220,7 +321,14 @@ const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">文本智能提取</div>
                         </div>
-                        <div className="flex items-center flex-col cursor-pointer  py-[5px] w-[80px] hover:bg-[#d9d9d9]">
+                        <div
+                            onClick={() => {
+                                setPlugOpen(true);
+                                setPlugTitle('图片OCR提取');
+                                setPlugValue('imageOcr');
+                            }}
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                        >
                             <svg
                                 viewBox="0 0 1024 1024"
                                 version="1.1"
@@ -236,7 +344,14 @@ const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">图片OCR提取</div>
                         </div>
-                        <div className="flex items-center flex-col cursor-pointer py-[5px] w-[80px] hover:bg-[#d9d9d9]">
+                        <div
+                            onClick={() => {
+                                setPlugOpen(true);
+                                setPlugTitle('AI字段补齐');
+                                setPlugValue('generate_material_one');
+                            }}
+                            className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                        >
                             <svg
                                 viewBox="0 0 1024 1024"
                                 version="1.1"
@@ -276,13 +391,29 @@ const TableHeader = ({
                     </div>
                 </div>
             </div>
-        </>
+            <Modal width={800} maskClosable={false} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>
+                <div className="font-bold text-xl mb-8 flex items-center gap-2">{plugTitle}</div>
+                <AiCreate
+                    libraryId={libraryId}
+                    libraryUid={libraryUid}
+                    pluginConfig={pluginConfig}
+                    plugValue={plugValue}
+                    setPlugOpen={setPlugOpen}
+                    columns={columns}
+                    tableData={tableData}
+                    setSelectedRowKeys={setSelectedRowKeys}
+                    downTableData={downTableData}
+                    getTitleList={getTitleList}
+                />
+            </Modal>
+        </div>
     );
 };
 
 const MaterialLibraryDetail = () => {
     const [columns, setColumns] = useState<any>([]);
     const [tableData, setTableData] = useState<any>([]);
+    const [pluginConfig, setPluginConfig] = useState<any>(null);
     const [detail, setDetail] = useState<any>(null);
     const [selectedRowKeys, setSelectRowKeys] = useState<any>([]);
     const [page, setPage] = useState(1);
@@ -338,21 +469,22 @@ const MaterialLibraryDetail = () => {
 
     useEffect(() => {
         getMaterialLibraryTitleList({ id }).then((data) => {
+            setPluginConfig(data.pluginConfig);
             setDetail(data);
             tableMetaRef.current = data.tableMeta;
         });
     }, [forceUpdateHeader]);
-
+    const [tableMeta, seTtableMeta] = useState<any[]>([]);
     useEffect(() => {
         if (detail) {
-            const list =
-                detail?.tableMeta?.map((item: any) => ({
-                    desc: item.columnName,
-                    fieldName: item.columnCode,
-                    type: item.columnType,
-                    required: item.isRequired,
-                    width: item.columnWidth
-                })) || [];
+            seTtableMeta(detail?.tableMeta);
+            const list = detail?.tableMeta?.map((item: any) => ({
+                desc: item.columnName,
+                fieldName: item.columnCode,
+                type: item.columnType,
+                required: item.isRequired,
+                width: item.columnWidth
+            }));
 
             const newList =
                 list?.map((item: any) => {
@@ -868,7 +1000,7 @@ const MaterialLibraryDetail = () => {
                         </div>
                     </div>
                 </div> */}
-                <TableHeader
+                {/* <TableHeader
                     setOpenSwitchMaterial={setOpenSwitchMaterial}
                     name={detail?.name}
                     iconUrl={detail?.iconUrl}
@@ -877,6 +1009,26 @@ const MaterialLibraryDetail = () => {
                     setColOpen={setColOpen}
                     handleBatchDel={handleBatchDel}
                     selectedRowKeys={selectedRowKeys}
+                /> */}
+                <TableHeader
+                    setOpenSwitchMaterial={setOpenSwitchMaterial}
+                    name={detail?.name}
+                    iconUrl={detail?.iconUrl}
+                    setTitle={setTitle}
+                    setEditOpen={setEditOpen}
+                    setColOpen={setColOpen}
+                    selectedRowKeys={selectedRowKeys}
+                    handleBatchDel={handleBatchDel}
+                    libraryId={detail?.id}
+                    libraryUid={detail?.uid}
+                    pluginConfig={pluginConfig}
+                    columns={columns}
+                    tableMeta={tableMeta}
+                    tableData={tableData}
+                    setSelectedRowKeys={setSelectRowKeys}
+                    getTitleList={() => setForceUpdateHeader(forceUpdateHeader + 1)}
+                    getList={() => setForceUpdate(forceUpdate + 1)}
+                    libraryType={detail?.libraryType}
                 />
 
                 <div className="material-detail-table overflow-hidden h-[calc(100%-96px)]">
@@ -978,21 +1130,7 @@ const MaterialLibraryDetail = () => {
             )}
 
             {openSwitchMaterial && (
-                <ModalForm
-                    width={1000}
-                    title="切换素材"
-                    open={openSwitchMaterial}
-                    onOpenChange={setOpenSwitchMaterial}
-                    onFinish={async () => {
-                        const result = await createMaterialLibraryAppBind({
-                            libraryId: selectedMaterialRowKeys[0],
-                            appUid: selectedMaterialRowKeys
-                        });
-                        if (result) {
-                            message.success('切换成功');
-                        }
-                    }}
-                >
+                <ModalForm width={1000} title="切换素材" open={openSwitchMaterial} onOpenChange={setOpenSwitchMaterial}>
                     <div className="h-[calc(100vh-300px)] overflow-auto">
                         <MaterialLibrary
                             mode={'select'}

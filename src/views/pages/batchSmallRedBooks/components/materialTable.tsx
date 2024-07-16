@@ -231,12 +231,11 @@ const MaterialTable = ({ libraryUid }: any) => {
     }, [columns]);
     const getClumn = useMemo(() => {
         if (columns.length === 0) [];
-        return getClumns?.map((item) => ({
+        return getClumns?.map((item, index) => ({
             ...item,
             readonly: true,
-            editable: () => {
-                return false;
-            }
+            // dataIndex: index !== getClumns.length - 1 ? 'index' : item.dataIndex,
+            editable: false
         }));
     }, [getClumns]);
     const [editOpen, setEditOpen] = useState(false);
@@ -258,6 +257,8 @@ const MaterialTable = ({ libraryUid }: any) => {
     };
     //创建编辑最终逻辑
     const handleEditColumn = async (record: any, type = 1) => {
+        console.log(record);
+
         const tableMetaList = _.cloneDeep(columns);
         const recordKeys = Object.keys(record);
         const content = tableMetaList.map((item) => {
@@ -384,7 +385,8 @@ const MaterialTable = ({ libraryUid }: any) => {
                             columnCode: item.columnCode,
                             value: record[item.columnCode],
                             description: record[item.columnCode + '_description'],
-                            tags: record[item.columnCode + '_tags']
+                            tags: record[item.columnCode + '_tags'],
+                            extend: record.extend
                         };
                     } else {
                         return {
@@ -426,7 +428,6 @@ const MaterialTable = ({ libraryUid }: any) => {
                 </div>
             </div>
             <TablePro
-                key={getClumn}
                 isSelection={true}
                 actionRef={actionRef}
                 columns={getClumn}
@@ -459,6 +460,7 @@ const MaterialTable = ({ libraryUid }: any) => {
                     tableLoading={tableLoading}
                     actionRefs={actionRefs}
                     columns={getClumns}
+                    tableMeta={columns}
                     tableData={tableData}
                     setTableData={(data) => {
                         tableRef.current = data;

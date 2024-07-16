@@ -11,6 +11,7 @@ import ImgOcr from './components/imgOcr';
 import TextExtraction from './components/textExtraction';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import '../../../materialLibrary/index.scss';
 const AiCreate = ({
     libraryId,
     libraryUid,
@@ -18,7 +19,6 @@ const AiCreate = ({
     plugValue,
     columns,
     tableData,
-    setPage,
     downTableData,
     setSelectedRowKeys,
     setPlugOpen,
@@ -30,7 +30,6 @@ const AiCreate = ({
     plugValue: string | null;
     columns: any[];
     tableData: any[];
-    setPage: (data: any) => void;
     downTableData: (data: any, num: number) => void;
     setSelectedRowKeys: (data: any) => void;
     setPlugOpen: (data: boolean) => void;
@@ -324,6 +323,9 @@ const AiCreate = ({
                             const obj: any = {};
                             newCheckbox.forEach((dt) => {
                                 obj[selectData[dt]] = res[dt]?.url || res[dt];
+                                obj.extend = JSON.stringify(res[dt]);
+                                obj[selectData[dt] + '_tags'] = res[dt]?.tag;
+                                obj[selectData[dt] + '_description'] = res[dt]?.content;
                             });
                             newMaterialzan.push(obj);
                             resArr.push(obj);
@@ -423,6 +425,8 @@ const AiCreate = ({
 
         if (pluginConfig) {
             const values = JSON.parse(pluginConfig);
+            console.log(plugValue, values);
+
             if (plugValue === 'generate_material_batch') {
                 setVariableData(values.variableData);
             } else if (plugValue === 'generate_material_one') {
@@ -504,29 +508,24 @@ const AiCreate = ({
                             确认选择({selList?.length})
                         </Button>
                     </div>
-                    <Table
-                        rowKey={(record, index) => {
-                            return record.id;
-                        }}
-                        pagination={{
-                            showSizeChanger: true,
-                            defaultPageSize: 20,
-                            pageSizeOptions: [20, 50, 100, 300, 500],
-                            onChange: (page) => {
-                                setPage(page);
-                            }
-                        }}
-                        size="small"
-                        virtual
-                        rowSelection={{
-                            type: 'checkbox',
-                            ...rowSelection,
-                            fixed: true,
-                            columnWidth: 50
-                        }}
-                        columns={columns?.slice(0, columns?.length - 1)}
-                        dataSource={tableData}
-                    />
+                    <div className="material-index">
+                        <Table
+                            rowKey={(record, index) => {
+                                return record.id;
+                            }}
+                            pagination={false}
+                            size="small"
+                            virtual
+                            rowSelection={{
+                                type: 'checkbox',
+                                ...rowSelection,
+                                fixed: true,
+                                columnWidth: 50
+                            }}
+                            columns={columns?.slice(0, columns?.length - 1)}
+                            dataSource={tableData}
+                        />
+                    </div>
                 </div>
             </Modal>
             {/* 素材执行 loading */}
@@ -571,19 +570,21 @@ const AiCreate = ({
                         <Tag color="error">执行失败：{errorCount}</Tag>
                     </div>
                 </div>
-                <Table
-                    columns={[
-                        { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
-                        ...(selectValue === 'field'
-                            ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
-                            : selectValue === 'batch'
-                            ? columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex))
-                            : selectValue === 'xhs'
-                            ? xhsCloumns
-                            : [])
-                    ]}
-                    dataSource={materialzanList}
-                />
+                <div className="material-index">
+                    <Table
+                        columns={[
+                            { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
+                            ...(selectValue === 'field'
+                                ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
+                                : selectValue === 'batch'
+                                ? columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex))
+                                : selectValue === 'xhs'
+                                ? xhsCloumns
+                                : [])
+                        ]}
+                        dataSource={materialzanList}
+                    />
+                </div>
                 <div className="flex justify-center gap-2 mt-4">
                     {executionCount === 0 && (
                         <>
@@ -678,11 +679,12 @@ const AiCreate = ({
 };
 const memoAiCreate = (pre: any, next: any) => {
     return (
-        JSON.stringify(pre.columns) === JSON.stringify(JSON.stringify(next.columns)) &&
-        JSON.stringify(pre.pluginConfig) === JSON.stringify(JSON.stringify(next.pluginConfig)) &&
-        JSON.stringify(pre.tableData) === JSON.stringify(JSON.stringify(next.tableData)) &&
-        JSON.stringify(pre.fieldCompletionData) === JSON.stringify(JSON.stringify(next.fieldCompletionData)) &&
-        JSON.stringify(pre.variableData) === JSON.stringify(JSON.stringify(next.variableData))
+        _.isEqual(pre.libraryId, next.libraryId) &&
+        _.isEqual(pre.libraryUid, next.libraryUid) &&
+        _.isEqual(pre.pluginConfig, next.pluginConfig) &&
+        _.isEqual(pre.plugValue, next.plugValue) &&
+        _.isEqual(pre.columns, next.columns) &&
+        _.isEqual(pre.tableData, next.tableData)
     );
 };
 export default memo(AiCreate, memoAiCreate);

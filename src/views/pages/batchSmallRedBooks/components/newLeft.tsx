@@ -221,8 +221,9 @@ const Lefts = ({
             setSelectImgLoading(true);
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
             setSelectImgLoading(false);
-            const res = await marketDeatail({ uid: searchParams.get('appUid') });
-            setVersion(res?.version || 0);
+            marketDeatail({ uid: searchParams.get('appUid') }).then((res) => {
+                setVersion(res?.version || 0);
+            });
             newList = _.cloneDeep(result?.configuration?.appInformation);
             const collData: any = result?.configuration?.appInformation?.example;
             if (collData) {

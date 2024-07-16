@@ -148,12 +148,13 @@ const StepEdit = ({
     //新增文案与风格
     const [focuActive, setFocuActive] = useState<any[]>([]);
     const materialTypeStatus = useMemo(() => {
-        if (handler === 'MaterialActionHandler') {
-            const newList = variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value;
-            return JSON.parse(newList)?.length === 1 && JSON.parse(newList)[0]?.type === 'image' ? true : false;
-        } else {
-            return false;
-        }
+        return false;
+        // if (handler === 'MaterialActionHandler') {
+        //     const newList = variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value;
+        //     return JSON.parse(newList)?.length === 1 && JSON.parse(newList)[0]?.type === 'image' ? true : false;
+        // } else {
+        //     return false;
+        // }
     }, [variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value]);
     return (
         <div>

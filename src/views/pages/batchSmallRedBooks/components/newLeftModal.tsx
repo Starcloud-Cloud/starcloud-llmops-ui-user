@@ -1,11 +1,11 @@
 import { Modal, Button, Space, Dropdown, message } from 'antd';
 import { DownOutlined, SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, memo, useMemo } from 'react';
-import { LeftOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import TablePro from './components/antdProTable';
 import HeaderField from './components/headerField';
-import PlugMarket from 'views/materialLibrary/components/plugMarket';
+import '../../../materialLibrary/index.scss';
+import '../../../materialLibrary/edit-table.css';
 import { delsMaterial } from 'api/redBook/material';
 import AiCreate from './newAI';
 const LeftModalAdd = ({
@@ -240,20 +240,22 @@ const LeftModalAdd = ({
                         </Dropdown>
                     </div>
                 </div>
-                <TablePro
-                    actionRefs={actionRefs}
-                    tableLoading={tableLoading}
-                    tableData={tableData}
-                    selectedRowKeys={selectedRowKeys}
-                    setSelectedRowKeys={setSelectedRowKeys}
-                    columns={columns}
-                    setPage={setPage}
-                    setTableData={setTableData}
-                    handleEditColumn={handleEditColumn}
-                />
+                <div className="material-index material-detail-table">
+                    <TablePro
+                        actionRefs={actionRefs}
+                        tableLoading={tableLoading}
+                        tableData={tableData}
+                        selectedRowKeys={selectedRowKeys}
+                        setSelectedRowKeys={setSelectedRowKeys}
+                        columns={columns}
+                        setPage={setPage}
+                        setTableData={setTableData}
+                        handleEditColumn={handleEditColumn}
+                    />
+                </div>
             </div>
             {/* AI素材生成 */}
-            <Modal width={800} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>
+            <Modal width={800} maskClosable={false} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>
                 <div className="font-bold text-xl mb-8 flex items-center gap-2">{plugTitle}</div>
                 <AiCreate
                     libraryId={libraryId}

@@ -136,9 +136,9 @@ const MaterialLibraryDetail = () => {
             const newList = list?.map((item: any) => {
                 return {
                     title: (
-                        <div>
+                        <div className="flex items-center">
                             {item.desc}
-                            {item.type === EditType.Image ? <FileImageOutlined /> : <FileTextOutlined />}
+                            {item.type === EditType.Image ? <FileImageOutlined className="ml-1" /> : <FileTextOutlined className="ml-1" />}
                         </div>
                     ),
                     required: !!item.required,
@@ -270,16 +270,16 @@ const MaterialLibraryDetail = () => {
             });
             const columnData = [
                 {
-                    title: '序号',
+                    title: 'ID',
                     align: 'center',
                     className: 'align-middle',
-                    dataIndex: 'index',
+                    dataIndex: 'id',
                     editable: () => {
                         return false;
                     },
                     width: 70,
-                    fixed: true,
-                    render: (_: any, row: any, index: number) => <span>{index + 1}</span>
+                    fixed: true
+                    // render: (_: any, row: any, index: number) => <span>{index + 1}</span>
                 },
                 ...newList,
                 {
@@ -634,7 +634,7 @@ const MaterialLibraryDetail = () => {
                     </div>
                 </div>
 
-                <div className="material-detail-table overflow-auto h-[calc(100%-96px)]">
+                <div className="material-detail-table overflow-hidden h-[calc(100%-96px)]">
                     {columns.length > 0 ? (
                         <TablePro
                             key={forceUpdate}

@@ -138,7 +138,7 @@ const TablePro = ({
     }));
 
     return dataColumns.length > 0 ? (
-        <div ref={ref}>
+        <div ref={ref} className="h-[100%]">
             <EditableProTable
                 id="edit-table"
                 className="edit-table w-full"
@@ -146,6 +146,7 @@ const TablePro = ({
                 tableAlertRender={false}
                 loading={tableLoading}
                 components={components}
+                sticky={{ offsetHeader: 0 }}
                 onHeaderRow={() => {
                     return {
                         onClick: () => setEditableRowKeys([]) // 点击表头行

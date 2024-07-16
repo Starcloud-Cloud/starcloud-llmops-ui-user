@@ -139,6 +139,7 @@ const FormModal = ({
                     (item, index) =>
                         item.title !== '操作' &&
                         item.title !== '序号' &&
+                        item.title !== 'ID' &&
                         item.title !== '使用次数' &&
                         (item.type !== 'weburl' ? (
                             <Form.Item

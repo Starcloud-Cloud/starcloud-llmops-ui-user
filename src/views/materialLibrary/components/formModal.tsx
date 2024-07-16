@@ -104,8 +104,6 @@ const FormModal = ({
     const [imageUrl, setImageUrl] = useState('');
     const [fileList, setFileList] = useState<any[]>([]);
 
-    console.log(imageData, 'imageData');
-
     return (
         <Modal
             zIndex={1000}

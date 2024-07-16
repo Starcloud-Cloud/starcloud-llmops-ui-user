@@ -12,6 +12,7 @@ import { TableHeader } from '../../../materialLibrary/detail';
 const LeftModalAdd = ({
     libraryId,
     libraryUid,
+    libraryType,
     pluginConfig,
     tableLoading,
     actionRefs,
@@ -29,6 +30,7 @@ const LeftModalAdd = ({
 }: {
     libraryId: string;
     libraryUid: string;
+    libraryType: number;
     pluginConfig: string | null;
     tableLoading: boolean;
     actionRefs: any;
@@ -71,8 +73,13 @@ const LeftModalAdd = ({
                     setSelectedRowKeys={setSelectedRowKeys}
                     getTitleList={getTitleList}
                     getList={getList}
+<<<<<<< HEAD
                     libraryType={1}
                     canSwitch={true}
+=======
+                    // TODO
+                    libraryType={libraryType}
+>>>>>>> 2c50a673fed9f9b0a53bd6af254258ec3fd16cc6
                 />
                 <div className="material-index material-detail-table">
                     <TablePro

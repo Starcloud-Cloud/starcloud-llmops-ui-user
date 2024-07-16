@@ -350,8 +350,10 @@ const MaterialTable = ({ libraryUid }: any) => {
     const [libraryId, setLibraryId] = useState('');
     //素材库的值
     const [pluginConfig, setpluginConfig] = useState<string | null>(null);
+    const [libraryType, setLibraryType] = useState(-1);
     const getTitleList = () => {
         getMaterialTitle({ uid: libraryUid }).then((res) => {
+            setLibraryType(res.libraryType);
             setpluginConfig(res.pluginConfig);
             setLibraryId(res.id);
             setColumns(res.tableMeta);
@@ -455,6 +457,7 @@ const MaterialTable = ({ libraryUid }: any) => {
             <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
                     libraryId={libraryId}
+                    libraryType={libraryType}
                     libraryUid={libraryUid}
                     pluginConfig={pluginConfig}
                     tableLoading={tableLoading}

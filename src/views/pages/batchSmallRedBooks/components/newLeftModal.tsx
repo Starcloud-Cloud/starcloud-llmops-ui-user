@@ -60,7 +60,7 @@ const LeftModalAdd = ({
     }, [plugOpen]);
     return (
         <div>
-            <div className="max-h-[60vh] overflow-y-auto mt-6">
+            <div className="overflow-y-auto mt-6">
                 <div className="flex gap-2 justify-between items-center mb-[20px]">
                     <div className="flex gap-2">
                         <Button

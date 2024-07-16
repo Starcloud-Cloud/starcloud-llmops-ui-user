@@ -20,7 +20,7 @@ import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
 
-const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
+const MaterialTable = ({ libraryUid }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -36,6 +36,8 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
     const [currentRecord, setCurrentRecord] = useState<any>(null);
     const [filedName, setFiledName] = useState<string>('');
     const [selectImg, setSelectImg] = useState<any>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const getClumns = useMemo(() => {
         if (columns.length === 0) [];
         const list = columns?.map((item: any) => ({
@@ -440,7 +442,6 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
             />
             {editOpen && (
                 <FormModal
-                    setIsModalOpenApp={setIsModalOpen}
                     title={title}
                     editOpen={editOpen}
                     setEditOpen={setEditOpen}
@@ -472,26 +473,26 @@ const MaterialTable = ({ libraryUid, setIsModalOpen }: any) => {
                     handleEditColumn={handleEditColumn}
                 />
             </Modal>
-            {/* {isModalOpen && (
+            {isModalOpen && (
                 <PicImagePick
-                    getList={() => {
-                        // if (detail) {
-                        //     setImgPre(1);
-                        //     getAppList && getAppList();
-                        // } else {
-                        //     getList(true);
-                        // }
-                    }}
-                    materialList={[]}
-                    allData={null}
-                    details={null}
+                    // getList={() => {
+                    //     if (detail) {
+                    //         setImgPre(1);
+                    //         getAppList && getAppList();
+                    //     } else {
+                    //         getList(true);
+                    //     }
+                    // }}
+                    // materialList={materialList}
+                    // allData={appData}
+                    // details={all?.configuration?.appInformation}
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
                     setSelectImg={setSelectImg}
                     columns={columns}
-                    values={null}
+                    // values={values}
                 />
-            )} */}
+            )}
             {previewOpen && (
                 <ModalForm
                     onInit={async () => {

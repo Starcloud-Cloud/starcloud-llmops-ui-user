@@ -32,8 +32,7 @@ const FormModal = ({
     formOk,
     sourceList,
     materialType,
-    row,
-    setIsModalOpenApp
+    row
 }: {
     getList?: any;
     materialList?: any;
@@ -48,7 +47,6 @@ const FormModal = ({
     sourceList?: any[];
     materialType?: string;
     row?: any;
-    setIsModalOpenApp?: any;
 }) => {
     const { TextArea } = Input;
     const uploadRef = useRef<any>([]);
@@ -219,7 +217,7 @@ const FormModal = ({
                                                         <div
                                                             className="flex-1 flex justify-center !cursor-pointer"
                                                             onClick={async (e) => {
-                                                                setIsModalOpenApp ? setIsModalOpenApp(true) : setIsModalOpen(true);
+                                                                setIsModalOpen(true);
                                                                 e.stopPropagation();
                                                                 setImageDataIndex(item.dataIndex);
                                                                 const result = await form.getFieldsValue();

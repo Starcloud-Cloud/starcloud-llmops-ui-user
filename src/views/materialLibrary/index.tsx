@@ -26,7 +26,15 @@ export const IconRenderer = ({ value }: { value: string }) => {
     return <SelectedIcon />;
 };
 
-const MaterialLibrary = () => {
+const MaterialLibrary = ({
+    mode = 'page',
+    setSelectedRowKeys,
+    selectedRowKeys
+}: {
+    mode: 'select' | 'page';
+    setSelectedRowKeys: (keys: React.Key[]) => void;
+    selectedRowKeys: React.Key[];
+}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectIcon, setSelectIcon] = useState('');
     const [typeList, setTypeList] = useState<any[]>([]);
@@ -34,7 +42,7 @@ const MaterialLibrary = () => {
     const [query, setQuery] = useState<{
         name: string;
     } | null>(null);
-    const [activeKey, setActiveKey] = useState(1);
+    const [activeKey, setActiveKey] = useState<string>('1');
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
@@ -98,7 +106,9 @@ const MaterialLibrary = () => {
             renderText: (_, record) => {
                 return (
                     <div className="flex items-center">
-                        <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
+                        <div className="w-[56px]">
+                            <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
+                        </div>
                         <div className="ml-2 flex flex-col">
                             <span className="font-extrabold">{record.name}</span>
                             <span className="text-[12px] text-[#06070980]">{record.description}</span>
@@ -127,6 +137,7 @@ const MaterialLibrary = () => {
             search: false,
             width: 80,
             align: 'center',
+            renderText: (text) => text || 0,
             sorter: (a, b) => a.fileCount - b.fileCount
         },
         {
@@ -144,7 +155,7 @@ const MaterialLibrary = () => {
             width: 150,
             sorter: (a, b) => a.createTime - b.createTime,
             renderText: (text) => text && dayjs(text).format('YYYY-MM-DD HH:mm')
-        },
+        }
         // {
         //     title: '启用',
         //     align: 'center',
@@ -161,7 +172,10 @@ const MaterialLibrary = () => {
         //         />
         //     )
         // },
-        {
+    ];
+
+    if (mode === 'page' && activeKey === '1') {
+        columns.push({
             title: '操作',
             width: 50,
             search: false,
@@ -182,8 +196,8 @@ const MaterialLibrary = () => {
                     />
                 </Dropdown>
             )
-        }
-    ];
+        });
+    }
 
     const handleStatus = async (record: any) => {
         const data = await updateMaterial(record);
@@ -212,45 +226,76 @@ const MaterialLibrary = () => {
 
     return (
         <div className="h-full material-index bg-white">
-            <div className="px-6 pt-2">
-                <Button
-                    type={'primary'}
-                    icon={<PlusOutlined />}
-                    onClick={() => {
-                        setRecord(null);
-                        setIsModalOpen(true);
-                    }}
-                >
-                    创建知识库
-                </Button>
-            </div>
+            {mode === 'page' && activeKey === '1' && (
+                <div className="px-6 pt-2">
+                    <Button
+                        type={'primary'}
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                            setRecord(null);
+                            setIsModalOpen(true);
+                        }}
+                    >
+                        创建知识库
+                    </Button>
+                </div>
+            )}
             <ProTable
                 toolbar={{
                     menu: {
                         type: 'tab',
-                        // activeKey: activeKey,
                         items: [
                             {
-                                key: 'tab1',
+                                key: '1',
                                 label: <span>我的素材库</span>
                             },
                             {
-                                key: 'tab2',
+                                key: '0',
                                 label: <span>系统素材库</span>
                             }
-                        ]
-                        // onChange: (key) => {
-                        //     setActiveKey(key as string);
-                        // }
+                        ],
+                        onChange: (key) => {
+                            setActiveKey(key as string);
+                            actionRef.current?.reload();
+                        }
                     }
                 }}
+                rowSelection={
+                    mode === 'select' && {
+                        onChange(selectedRowKeys, selectedRows, info) {
+                            setSelectedRowKeys(selectedRowKeys);
+                        },
+                        type: 'radio'
+                    }
+                }
                 actionRef={actionRef}
                 columns={columns}
                 search={false}
+                rowKey={'id'}
                 request={async (params, sort) => {
                     params.pageNo = params.current;
                     params.name = query?.name;
-                    const data = await getMaterialPage(params);
+                    params.libraryType = +activeKey;
+                    let sortingFields = [];
+
+                    const key = Object.keys(sort)?.[0];
+                    if (sort[key]) {
+                        if (key === 'createTime') {
+                            sortingFields.push({
+                                field: 'create_time',
+                                order: sort[key] === 'ascend' ? 'asc' : 'desc'
+                            });
+                        } else {
+                            sortingFields.push({
+                                field: 'file_count',
+                                order: sort[key] === 'ascend' ? 'asc' : 'desc'
+                            });
+                        }
+                    } else {
+                        sortingFields = [];
+                    }
+
+                    const data = await getMaterialPage({ ...params, sortingFields });
                     return {
                         data: data.list,
                         success: true,

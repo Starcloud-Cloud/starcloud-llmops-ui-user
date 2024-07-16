@@ -38,15 +38,17 @@ const RedBookAnalysis = ({
             <div className="text-[16px] font-bold mb-4">1.输入需要抓取的小红书链接，最大支持 20 个</div>
             <TextArea
                 placeholder=" 使用逗号或回车来分割"
-                defaultValue={redBookData.requirement}
-                status={!redBookData.requirement && requirementStatusOpen ? 'error' : ''}
+                defaultValue={redBookData?.requirement}
+                status={!redBookData?.requirement && requirementStatusOpen ? 'error' : ''}
                 onBlur={(e) => {
                     setRedBookData({ ...redBookData, requirement: e.target.value });
                     setrequirementStatusOpen(true);
                 }}
                 rows={10}
             />
-            {!redBookData.requirement && requirementStatusOpen && <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>}
+            {!redBookData?.requirement && requirementStatusOpen && (
+                <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
+            )}
 
             <div className="text-[16px] font-bold my-4">2.绑定小红书字段</div>
             <div className="flex items-center gap-6">
@@ -65,15 +67,17 @@ const RedBookAnalysis = ({
                                 <span className="text-xs">绑定字段：</span>
                                 <Select
                                     allowClear
-                                    value={redBookData.bindFieldData[item.value]}
+                                    value={redBookData?.bindFieldData && redBookData?.bindFieldData[item.value]}
                                     status={
-                                        redBookData.fieldList.includes(item.value) && !redBookData.bindFieldData[item.value] ? 'error' : ''
+                                        redBookData?.fieldList?.includes(item.value) && !redBookData?.bindFieldData[item.value]
+                                            ? 'error'
+                                            : ''
                                     }
                                     onChange={(e) =>
                                         setRedBookData({
                                             ...redBookData,
                                             bindFieldData: {
-                                                ...redBookData.bindFieldData,
+                                                ...redBookData?.bindFieldData,
                                                 [item.value]: e
                                             }
                                         })
@@ -85,7 +89,7 @@ const RedBookAnalysis = ({
                                     ))}
                                 </Select>
                             </div>
-                            {redBookData.fieldList.includes(item.value) && !redBookData.bindFieldData[item.value] ? (
+                            {redBookData?.fieldList?.includes(item.value) && !redBookData?.bindFieldData[item.value] ? (
                                 <span className="text-xs text-[#ff4d4f] ml-[4px] h-[22px]">该字段为必填项</span>
                             ) : (
                                 <div className="h-[22px]"> </div>

@@ -116,7 +116,7 @@ const AiCreate = ({
             await Promise.all(
                 currentBatch.map(async (group, i) => {
                     try {
-                        const res = await customMaterialGenerate({ ...variableData, libraryUid, generateCount: group?.length });
+                        const res = await customMaterialGenerate({ ...variableData, bizUid: libraryUid, generateCount: group?.length });
                         if (!aref.current) {
                             const timers = new Date().getTime();
                             const newMaterialzan = _.cloneDeep(materialzanListRef.current);
@@ -203,7 +203,7 @@ const AiCreate = ({
                     try {
                         const res = await materialGenerate({
                             materialList: group,
-                            libraryUid,
+                            bizUid: libraryUid,
                             ...fieldCompletionData
                         });
                         if (!aref.current) {
@@ -435,16 +435,14 @@ const AiCreate = ({
                 setRedBookData(values.redBookData);
             }
         } else {
-            if (plugValue === 'generate_material_batch') {
-                setVariableData({
-                    ...variableData,
-                    checkedFieldList: columns
-                        ?.filter((item) => item.required && item.type !== 5 && item.type !== 6)
-                        ?.map((item) => item.dataIndex)
-                });
-            }
+            setVariableData({
+                ...variableData,
+                checkedFieldList: columns
+                    ?.filter((item) => item.required && item.type !== 5 && item.type !== 6)
+                    ?.map((item) => item.dataIndex)
+            });
         }
-    }, [pluginConfig]);
+    }, [pluginConfig, plugValue]);
     const xhsCloumns = useMemo(() => {
         const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
         return columns?.filter((item) => arr?.includes(item.dataIndex));

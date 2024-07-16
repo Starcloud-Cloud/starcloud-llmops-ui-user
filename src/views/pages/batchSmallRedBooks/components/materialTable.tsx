@@ -20,7 +20,7 @@ import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
 
-const MaterialTable = ({ libraryUid }: any) => {
+const MaterialTable = ({ appUid, libraryUid }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -456,6 +456,7 @@ const MaterialTable = ({ libraryUid }: any) => {
             )}
             <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
+                    appUid={appUid}
                     libraryId={libraryId}
                     libraryType={libraryType}
                     libraryUid={libraryUid}
@@ -535,6 +536,6 @@ const MaterialTable = ({ libraryUid }: any) => {
 const memoMaterialTable = (pre: any, next: any) => {
     console.log(_.isEqual(pre.libraryUid, next.libraryUid));
 
-    return _.isEqual(pre.libraryUid, next.libraryUid);
+    return _.isEqual(pre.libraryUid, next.libraryUid) && _.isEqual(pre.appUid, next.appUid);
 };
 export default memo(MaterialTable, memoMaterialTable);

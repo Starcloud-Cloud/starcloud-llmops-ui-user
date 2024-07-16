@@ -421,17 +421,13 @@ const AiCreate = ({
         );
     };
     useEffect(() => {
-        console.log(pluginConfig);
-
         if (pluginConfig) {
             const values = JSON.parse(pluginConfig);
-            console.log(plugValue, values);
-
-            if (plugValue === 'generate_material_batch') {
+            if (plugValue === 'generate_material_batch' && values.variableData) {
                 setVariableData(values.variableData);
-            } else if (plugValue === 'generate_material_one') {
+            } else if (plugValue === 'generate_material_one' && values.fieldCompletionData) {
                 setFieldCompletionData(values.fieldCompletionData);
-            } else if (plugValue === 'xhsOcr') {
+            } else if (plugValue === 'xhsOcr' && values.redBookData) {
                 setRedBookData(values.redBookData);
             }
         } else {

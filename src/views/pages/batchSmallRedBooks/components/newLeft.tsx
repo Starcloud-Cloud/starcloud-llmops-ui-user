@@ -973,7 +973,7 @@ const Lefts = ({
             getList(true, false, true);
         }
     }, [imageStylePre]);
-    console.log(3333);
+    console.log(appData);
     return (
         <>
             <div className="relative h-full">
@@ -1125,7 +1125,11 @@ const Lefts = ({
                                             </div>
                                         </>
                                     ) : (
-                                        <MaterialTable setIsModalOpen={setIsModalOpen} libraryUid={library && library[0]?.libraryUid} />
+                                        <MaterialTable
+                                            setIsModalOpen={setIsModalOpen}
+                                            appUid={appData.uid}
+                                            libraryUid={library && library[0]?.libraryUid}
+                                        />
                                     )}
                                 </div>
                             </Tabs.TabPane>

@@ -10,6 +10,7 @@ import { delsMaterial } from 'api/redBook/material';
 import AiCreate from './newAI';
 import { TableHeader } from '../../../materialLibrary/detail';
 const LeftModalAdd = ({
+    appUid,
     libraryId,
     libraryUid,
     libraryType,
@@ -28,6 +29,7 @@ const LeftModalAdd = ({
     downTableData,
     handleEditColumn
 }: {
+    appUid: string;
     libraryId: string;
     libraryUid: string;
     libraryType: number;
@@ -46,6 +48,8 @@ const LeftModalAdd = ({
     downTableData: (data: any, num: number) => void;
     handleEditColumn: (data: any) => void;
 }) => {
+    console.log(appUid);
+
     const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
     const handleDels = async () => {
         await delsMaterial(selectedRowKeys);
@@ -66,6 +70,7 @@ const LeftModalAdd = ({
                     handleBatchDel={handleDels}
                     libraryId={libraryId}
                     libraryUid={libraryUid}
+                    appUid={appUid}
                     pluginConfig={pluginConfig}
                     columns={columns}
                     tableMeta={tableMeta}
@@ -73,13 +78,8 @@ const LeftModalAdd = ({
                     setSelectedRowKeys={setSelectedRowKeys}
                     getTitleList={getTitleList}
                     getList={getList}
-<<<<<<< HEAD
-                    libraryType={1}
-                    canSwitch={true}
-=======
-                    // TODO
                     libraryType={libraryType}
->>>>>>> 2c50a673fed9f9b0a53bd6af254258ec3fd16cc6
+                    canSwitch={true}
                 />
                 <div className="material-index material-detail-table">
                     <TablePro
@@ -101,6 +101,7 @@ const LeftModalAdd = ({
 };
 const memoLeftModal = (pre: any, next: any) => {
     return (
+        _.isEqual(pre.appUid, next.appUid) &&
         _.isEqual(pre.libraryId, next.libraryId) &&
         _.isEqual(pre.libraryUid, next.libraryUid) &&
         _.isEqual(pre.pluginConfig, next.pluginConfig) &&

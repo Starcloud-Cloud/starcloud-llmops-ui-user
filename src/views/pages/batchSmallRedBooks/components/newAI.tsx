@@ -47,8 +47,11 @@ const AiCreate = ({
     //AI 字段补齐
     const [selOpen, setSelOpen] = useState(false);
     const [selList, setSelList] = useState<any[]>([]);
+    const [selKeyList, setSelKeyList] = useState<any[]>([]);
     const rowSelection = {
+        selectedRowKeys: selKeyList,
         onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+            setSelKeyList(selectedRowKeys);
             setSelList(selectedRows);
         }
     };
@@ -633,6 +636,7 @@ const AiCreate = ({
                                         setSelectedRowKeys(uuidListsRef.current);
                                     } else if (selectValue === 'field') {
                                         setSelList([]);
+                                        setSelKeyList([]);
                                         downTableData(materialzanListRef.current, 2);
                                         setMaterialExecutionOpen(false);
                                         setPlugOpen(false);

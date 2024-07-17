@@ -11,7 +11,7 @@ import {
     updateBatchMaterial
 } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
-import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps } from 'antd';
+import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps, Tag } from 'antd';
 import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { PicImagePick } from 'ui-component/PicImagePick';
@@ -270,7 +270,8 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                         columnCode: item.columnCode,
                         value: record[item.columnCode],
                         description: record[item.columnCode + '_description'],
-                        tags: record[item.columnCode + '_tags']
+                        tags: record[item.columnCode + '_tags'],
+                        extend: record[item.columnCode + '_extend']
                     };
                 } else {
                     return {
@@ -337,6 +338,9 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                         if (item1.tags) {
                             obj[item1['columnCode'] + '_tags'] = item1?.['tags'];
                         }
+                        if (item1.extend) {
+                            obj[item1['columnCode'] + '_extend'] = item1?.['extend'];
+                        }
                     }
                 });
                 newList.push(obj);
@@ -391,7 +395,7 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                             value: record[item.columnCode],
                             description: record[item.columnCode + '_description'],
                             tags: record[item.columnCode + '_tags'],
-                            extend: record.extend
+                            extend: record[item.columnCode + '_extend']
                         };
                     } else {
                         return {
@@ -535,6 +539,11 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
                     <ProFormTextArea name={filedName + '_description'} label="描述" />
+                    {currentRecord[filedName + '_extend'] && (
+                        <div>
+                            <Tag>有扩展字段</Tag>
+                        </div>
+                    )}
                 </ModalForm>
             )}
             {uploadOpen && <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />}

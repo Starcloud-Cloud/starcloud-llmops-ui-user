@@ -127,6 +127,7 @@ const FormModal = ({
                 // result[filedName + '_description'] = imageData.description;
                 // result[filedName + '_tags'] = imageData.tags;
 
+                console.log(row, 'row');
                 await formOk({ ...row, ...imageData, ...result });
             }}
         >

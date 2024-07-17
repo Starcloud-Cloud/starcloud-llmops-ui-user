@@ -270,7 +270,8 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                         columnCode: item.columnCode,
                         value: record[item.columnCode],
                         description: record[item.columnCode + '_description'],
-                        tags: record[item.columnCode + '_tags']
+                        tags: record[item.columnCode + '_tags'],
+                        extend: record[item.columnCode + '_extend']
                     };
                 } else {
                     return {
@@ -337,6 +338,9 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                         if (item1.tags) {
                             obj[item1['columnCode'] + '_tags'] = item1?.['tags'];
                         }
+                        if (item1.extend) {
+                            obj[item1['columnCode'] + '_extend'] = item1?.['extend'];
+                        }
                     }
                 });
                 newList.push(obj);
@@ -391,7 +395,7 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                             value: record[item.columnCode],
                             description: record[item.columnCode + '_description'],
                             tags: record[item.columnCode + '_tags'],
-                            extend: record.extend
+                            extend: record[item.columnCode + '_extend']
                         };
                     } else {
                         return {

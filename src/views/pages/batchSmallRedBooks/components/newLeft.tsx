@@ -1130,6 +1130,7 @@ const Lefts = ({
                                             appUid={appData.uid}
                                             libraryUid={library && library[0]?.libraryUid}
                                             handleExecute={() => {
+                                                console.log(detail, 'detail');
                                                 if (!detail) {
                                                     handleSaveClick(true);
                                                 } else {

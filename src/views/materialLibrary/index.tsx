@@ -228,7 +228,7 @@ const MaterialLibrary = ({
 
     return (
         <div className="h-full material-index bg-white">
-            {mode === 'page' && activeKey === '1' && (
+            {mode === 'page' && (
                 <div className="px-6 pt-2">
                     <Button
                         type={'primary'}

@@ -27,7 +27,8 @@ const LeftModalAdd = ({
     getList,
     getTitleList,
     downTableData,
-    handleEditColumn
+    handleEditColumn,
+    handleExecute
 }: {
     appUid: string;
     libraryId: string;
@@ -47,6 +48,7 @@ const LeftModalAdd = ({
     getTitleList: () => void;
     downTableData: (data: any, num: number) => void;
     handleEditColumn: (data: any) => void;
+    handleExecute: any;
 }) => {
     console.log(appUid);
 
@@ -80,6 +82,8 @@ const LeftModalAdd = ({
                     getList={getList}
                     libraryType={libraryType}
                     canSwitch={true}
+                    canExecute={true}
+                    handleExecute={handleExecute}
                 />
                 <div className="material-index material-detail-table">
                     <TablePro

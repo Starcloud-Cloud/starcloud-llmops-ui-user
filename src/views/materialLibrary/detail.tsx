@@ -67,7 +67,9 @@ export const TableHeader = ({
     getList,
     libraryType,
     appUid,
-    canSwitch
+    canSwitch,
+    canExecute,
+    handleExecute
 }: {
     // 图标
     iconUrl?: string;
@@ -102,7 +104,12 @@ export const TableHeader = ({
     libraryType: number;
     // 应用appUid
     appUid?: string;
+    // 可否切换
     canSwitch: boolean;
+    // 可否执行
+    canExecute: boolean;
+    // 执行
+    handleExecute?: () => void;
 }) => {
     const [plugOpen, setPlugOpen] = useState(false);
     const [plugTitle, setPlugTitle] = useState('插件市场');
@@ -210,20 +217,16 @@ export const TableHeader = ({
             <div className="bg-white rounded-md border flex justify-between mb-3 ">
                 <div className="flex items-end w-[210px]">
                     <Space>
-                        <Button
-                            type="primary"
-                            onClick={() => {
-                                setEditOpen(true);
-                                setTitle('新增素材');
-                            }}
-                        >
-                            新增素材
-                        </Button>
                         <Popconfirm title="确认删除?" onConfirm={handleBatchDel}>
                             <Button disabled={selectedRowKeys.length === 0} danger>
                                 批量删除({selectedRowKeys.length})
                             </Button>
                         </Popconfirm>
+                        {canExecute && (
+                            <Button type="primary" onClick={handleExecute}>
+                                执行应用
+                            </Button>
+                        )}
                     </Space>
                 </div>
                 <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm">
@@ -295,8 +298,8 @@ export const TableHeader = ({
                                 version="1.1"
                                 xmlns="http://www.w3.org/2000/svg"
                                 p-id="6760"
-                                width="24"
-                                height="24"
+                                width="20"
+                                height="20"
                             >
                                 <path
                                     d="M791.466667 699.2l47.466666 47.466667h-215.466666v52.266666h215.466666l-47.466666 47.466667 36.8 37.333333 109.866666-110.933333-109.866666-110.933333-36.8 37.333333zM576 669.866667H181.333333V196.8h669.333334v367.466667h70.4V199.466667c0-43.2-34.666667-77.866667-77.866667-77.866667H188.8c-43.2 0-77.866667 34.666667-77.866667 77.866667v467.733333c0 43.2 34.666667 77.866667 77.866667 77.866667H576v-75.2zM569.066667 820.266667H248c-24 0-43.2 16.533333-43.2 37.333333s19.2 37.333333 43.2 37.333333h321.066667v-74.666666z"
@@ -367,7 +370,16 @@ export const TableHeader = ({
                 </div>
 
                 <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
-                    <div>
+                    <Space>
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                setEditOpen(true);
+                                setTitle('新增素材');
+                            }}
+                        >
+                            新增素材
+                        </Button>
                         <Dropdown menu={{ items }}>
                             <Button>
                                 <Space>
@@ -376,7 +388,7 @@ export const TableHeader = ({
                                 </Space>
                             </Button>
                         </Dropdown>
-                    </div>
+                    </Space>
                 </div>
             </div>
             <Modal width={800} maskClosable={false} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>
@@ -644,6 +656,7 @@ const MaterialLibraryDetail = () => {
                     align: 'center',
                     className: 'align-middle',
                     dataIndex: 'id',
+                    isDefault: true,
                     editable: () => {
                         return false;
                     },
@@ -657,6 +670,7 @@ const MaterialLibraryDetail = () => {
                     dataIndex: 'usedCount',
                     align: 'center',
                     width: 100,
+                    isDefault: true,
                     renderText: (text: any) => text || 0
                 },
                 {
@@ -664,6 +678,7 @@ const MaterialLibraryDetail = () => {
                     align: 'center',
                     dataIndex: 'operation',
                     className: 'align-middle',
+                    isDefault: true,
                     width: 100,
                     fixed: 'right',
                     render: (text: any, record: any, index: number) => (
@@ -826,6 +841,10 @@ const MaterialLibraryDetail = () => {
     //字段配置
     const [colOpen, setColOpen] = useState(false);
 
+    if (!columns.length) {
+        return null;
+    }
+
     return (
         <div className="h-full">
             <SubCard
@@ -861,10 +880,11 @@ const MaterialLibraryDetail = () => {
                     getList={() => setForceUpdate(forceUpdate + 1)}
                     libraryType={detail?.libraryType}
                     canSwitch={false}
+                    canExecute={false}
                 />
 
                 <div className="material-detail-table overflow-hidden h-[calc(100%-96px)]">
-                    {columns.length > 0 ? (
+                    {columns.filter((item: any) => !item.isDefault).length > 0 ? (
                         <TablePro
                             key={forceUpdate}
                             handleEditColumn={handleEditColumn}

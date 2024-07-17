@@ -1129,6 +1129,13 @@ const Lefts = ({
                                             setIsModalOpen={setIsModalOpen}
                                             appUid={appData.uid}
                                             libraryUid={library && library[0]?.libraryUid}
+                                            handleExecute={() => {
+                                                if (!detail) {
+                                                    handleSaveClick(true);
+                                                } else {
+                                                    gessaveApp();
+                                                }
+                                            }}
                                         />
                                     )}
                                 </div>

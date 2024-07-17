@@ -20,7 +20,7 @@ import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
 
-const MaterialTable = ({ appUid, libraryUid }: any) => {
+const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -477,6 +477,10 @@ const MaterialTable = ({ appUid, libraryUid }: any) => {
                     getList={getList}
                     getTitleList={getTitleList}
                     handleEditColumn={handleEditColumn}
+                    handleExecute={() => {
+                        handleExecute();
+                        setZoomOpen(false);
+                    }}
                 />
             </Modal>
             {isModalOpen && (

@@ -140,6 +140,7 @@ export const TableHeader = ({
         const tableMetaList = _.cloneDeep(tableMeta);
 
         const newData = data.map((record) => {
+            console.log(record);
             const recordKeys = Object.keys(record);
             const content = tableMetaList.map((item) => {
                 if (recordKeys.includes(item.columnCode)) {
@@ -158,11 +159,14 @@ export const TableHeader = ({
                             columnId: item.id,
                             columnName: item.columnName,
                             columnCode: item.columnCode,
-                            value: record[item.columnCode]
+                            value: record[item.columnCode],
+                            extend: record.extend
                         };
                     }
                 }
             });
+            console.log(content);
+
             return {
                 libraryId: record.libraryId || libraryId,
                 id: record.id,

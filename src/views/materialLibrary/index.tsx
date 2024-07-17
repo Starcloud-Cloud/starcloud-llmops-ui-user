@@ -297,10 +297,7 @@ const MaterialLibrary = ({
                         sortingFields = [];
                     }
 
-                    const data =
-                        mode === 'page'
-                            ? await getMaterialPage({ ...params, sortingFields })
-                            : await getMaterialBindPage({ ...params, sortingFields, appUid, libraryId });
+                    const data = await getMaterialPage({ ...params, sortingFields });
                     return {
                         data: data.list,
                         success: true,

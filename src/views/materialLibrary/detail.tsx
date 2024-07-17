@@ -160,7 +160,7 @@ export const TableHeader = ({
                             columnName: item.columnName,
                             columnCode: item.columnCode,
                             value: record[item.columnCode],
-                            extend: record.extend
+                            extend: record[item.columnCode + '_extend']
                         };
                     }
                 }

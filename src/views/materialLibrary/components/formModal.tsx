@@ -1,4 +1,4 @@
-import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select, Tooltip } from 'antd';
+import { Modal, Form, Upload, UploadProps, Image, Input, Button, Select, Tooltip, Tag } from 'antd';
 import { LoadingOutlined, PlusOutlined, CloudUploadOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import { getAccessToken } from 'utils/auth';
@@ -362,6 +362,11 @@ const FormModal = ({
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
                     <ProFormTextArea name={filedName + '_description'} label="描述" />
+                    {row && row[filedName + '_extend'] && (
+                        <div>
+                            <Tag>有扩展字段</Tag>
+                        </div>
+                    )}
                 </ModalForm>
             )}
         </Modal>

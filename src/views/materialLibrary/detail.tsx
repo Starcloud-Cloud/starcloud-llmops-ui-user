@@ -982,6 +982,11 @@ const MaterialLibraryDetail = () => {
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
                     <ProFormTextArea name={filedName + '_description'} label="描述" />
+                    {currentRecord && currentRecord[filedName + '_extend'] && (
+                        <div>
+                            <Tag>有扩展字段</Tag>
+                        </div>
+                    )}
                 </ModalForm>
             )}
         </div>

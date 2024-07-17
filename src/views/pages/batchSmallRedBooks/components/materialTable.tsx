@@ -11,7 +11,7 @@ import {
     updateBatchMaterial
 } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
-import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps } from 'antd';
+import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps, Tag } from 'antd';
 import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { PicImagePick } from 'ui-component/PicImagePick';
@@ -539,6 +539,11 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
                     <ProFormTextArea name={filedName + '_description'} label="描述" />
+                    {currentRecord[filedName + '_extend'] && (
+                        <div>
+                            <Tag>有扩展字段</Tag>
+                        </div>
+                    )}
                 </ModalForm>
             )}
             {uploadOpen && <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />}

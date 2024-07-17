@@ -323,7 +323,7 @@ const AiCreate = ({
                             const obj: any = {};
                             newCheckbox.forEach((dt) => {
                                 obj[selectData[dt]] = res[dt]?.url || res[dt];
-                                obj.extend = JSON.stringify(res[dt]);
+                                obj.extend = res[dt]?.data;
                                 obj[selectData[dt] + '_tags'] = res[dt]?.tag;
                                 obj[selectData[dt] + '_description'] = res[dt]?.content;
                             });

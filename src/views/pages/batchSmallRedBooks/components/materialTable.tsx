@@ -348,12 +348,15 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
     };
     //素材库 libraryId
     const [libraryId, setLibraryId] = useState('');
+    //素材库名称
+    const [libraryName, setLibraryName] = useState('');
     //素材库的值
     const [pluginConfig, setpluginConfig] = useState<string | null>(null);
     const [libraryType, setLibraryType] = useState(-1);
     const getTitleList = () => {
         getMaterialTitle({ uid: libraryUid }).then((res) => {
             setLibraryType(res.libraryType);
+            setLibraryName(res.name);
             setpluginConfig(res.pluginConfig);
             setLibraryId(res.id);
             setColumns(res.tableMeta);
@@ -460,6 +463,7 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                     libraryId={libraryId}
                     libraryType={libraryType}
                     libraryUid={libraryUid}
+                    libraryName={libraryName}
                     pluginConfig={pluginConfig}
                     tableLoading={tableLoading}
                     actionRefs={actionRefs}

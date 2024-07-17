@@ -13,6 +13,7 @@ const LeftModalAdd = ({
     appUid,
     libraryId,
     libraryUid,
+    libraryName,
     libraryType,
     pluginConfig,
     tableLoading,
@@ -33,6 +34,7 @@ const LeftModalAdd = ({
     appUid: string;
     libraryId: string;
     libraryUid: string;
+    libraryName: string;
     libraryType: number;
     pluginConfig: string | null;
     tableLoading: boolean;
@@ -64,7 +66,7 @@ const LeftModalAdd = ({
         <div>
             <div className="overflow-y-auto mt-6">
                 <TableHeader
-                    name=""
+                    name={libraryName}
                     setTitle={setTitle}
                     setEditOpen={setEditOpen}
                     setColOpen={setColOpen}
@@ -108,6 +110,7 @@ const memoLeftModal = (pre: any, next: any) => {
         _.isEqual(pre.appUid, next.appUid) &&
         _.isEqual(pre.libraryId, next.libraryId) &&
         _.isEqual(pre.libraryUid, next.libraryUid) &&
+        _.isEqual(pre.libraryName, next.libraryName) &&
         _.isEqual(pre.pluginConfig, next.pluginConfig) &&
         _.isEqual(pre.tableLoading, next.tableLoading) &&
         _.isEqual(pre.columns, next.columns) &&

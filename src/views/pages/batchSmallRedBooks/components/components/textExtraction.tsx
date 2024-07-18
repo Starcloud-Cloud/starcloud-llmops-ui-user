@@ -48,6 +48,12 @@ const TextExtraction = ({
         });
     };
     const handleExe = (num: number) => {
+        if (!textData.checkedFieldList) {
+            return false;
+        }
+        if (textData.requirementList.length === 0 || textData.requirementList.some((item: any) => !item.value)) {
+            return false;
+        }
         handleTextData(num);
     };
     return (
@@ -84,6 +90,7 @@ const TextExtraction = ({
                         <Col span={7}>
                             <Select
                                 placeholder="写入到"
+                                status={!item.value ? 'error' : ''}
                                 allowClear
                                 value={item.value}
                                 onChange={(e) => handleEdit('value', e, index)}
@@ -98,6 +105,7 @@ const TextExtraction = ({
                                     </Option>
                                 ))}
                             </Select>
+                            {!item.value && <span className="text-xs text-[#ff4d4f] ml-[5px]">此选项必填</span>}
                         </Col>
                         <Col span={2}>
                             <Button onClick={() => handleDel(index)} type="text" danger shape="circle" icon={<DeleteOutlined />} />

@@ -189,15 +189,25 @@ const MaterialTable = ({ appUid, libraryUid, tableTitle, handleExecute }: any) =
                 editable: () => {
                     return false;
                 },
+                isDefault: true,
                 width: 70,
                 fixed: true,
                 render: (_: any, row: any, index: number) => <span>{index + 1}</span>
             },
             ...newList,
             {
+                title: '使用次数',
+                dataIndex: 'usedCount',
+                align: 'center',
+                width: 100,
+                isDefault: true,
+                renderText: (text: any) => text || 0
+            },
+            {
                 title: '操作',
                 align: 'center',
                 dataIndex: 'operation',
+                isDefault: true,
                 width: 60,
                 fixed: 'right',
                 render: (text: any, record: any, index: number) => (

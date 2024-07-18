@@ -7,9 +7,11 @@ import FormExecute from 'views/template/components/newValidaForm';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
 import CreateVariable from 'views/pages/copywriting/components/spliceCmponents/variable';
 import NewPrompt from './newPrompt';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import _ from 'lodash-es';
 import useUserStore from 'store/user';
+import HeaderField from 'views/pages/batchSmallRedBooks/components/components/headerField';
+import { getMaterialTitle } from 'api/redBook/material';
 const StepEdit = ({
     detail,
     variableStyle, //变量类型
@@ -25,7 +27,8 @@ const StepEdit = ({
     resReadOnly, //响应类型是否禁用
     resType, //响应类型
     resJsonSchema, //响应数据
-    saveImageStyle //保存图片风格
+    saveImageStyle, //保存图片风格
+    setTableTitle
 }: {
     detail: any;
     variableStyle: any[];
@@ -42,6 +45,7 @@ const StepEdit = ({
     resType: string;
     resJsonSchema: string;
     saveImageStyle: () => void;
+    setTableTitle: () => void;
 }) => {
     const permissions = useUserStore((state) => state.permissions);
     const { TextArea } = Input;
@@ -156,9 +160,23 @@ const StepEdit = ({
         //     return false;
         // }
     }, [variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value]);
+    const [libraryId, setLibraryId] = useState('');
+    useEffect(() => {
+        const str = variable?.find((item) => item.field === 'LIBRARY_QUERY')?.value;
+        if (str) {
+            getMaterialTitle({ uid: JSON.parse(str)[0].libraryUid }).then((res) => {
+                setLibraryId(res.id);
+            });
+        }
+    }, [variable?.find((item) => item.field === 'LIBRARY_QUERY')?.value]);
     return (
         <div>
             <Tabs>
+                {handler === 'MaterialActionHandler' && (
+                    <Tabs.TabPane tab="素材字段编辑" key="-1">
+                        <HeaderField libraryId={libraryId} headerSave={setTableTitle} />
+                    </Tabs.TabPane>
+                )}
                 {handler === 'MaterialActionHandler' && (
                     <Tabs.TabPane tab="拼图生成模式" key="0">
                         <div className="flex gap-2 items-center mr-4">

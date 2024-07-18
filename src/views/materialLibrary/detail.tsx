@@ -232,7 +232,7 @@ export const TableHeader = ({
                                 type="primary"
                                 onClick={() => handleExecute && handleExecute(selectedRowKeys)}
                             >
-                                执行应用
+                                选择执行
                             </Button>
                         )}
                     </Space>
@@ -388,14 +388,14 @@ export const TableHeader = ({
                         >
                             新增素材
                         </Button>
-                        <Dropdown menu={{ items }}>
+                        {/* <Dropdown menu={{ items }}>
                             <Button>
                                 <Space>
                                     <SettingOutlined className="p-1 cursor-pointer" />
                                     <DownOutlined />
                                 </Space>
                             </Button>
-                        </Dropdown>
+                        </Dropdown> */}
                     </Space>
                 </div>
             </div>
@@ -953,14 +953,14 @@ const MaterialLibraryDetail = () => {
                     values={null}
                 />
             )}
-            {colOpen && (
+            {/* {colOpen && (
                 <HeaderField
                     libraryId={detail?.id}
                     colOpen={colOpen}
                     setColOpen={setColOpen}
                     headerSave={() => setForceUpdateHeader(forceUpdateHeader + 1)}
                 />
-            )}
+            )} */}
 
             {previewOpen && (
                 <ModalForm

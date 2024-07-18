@@ -21,7 +21,8 @@ function Arrange({
     tableCopy,
     tableDataDel,
     tableDataMove,
-    saveImageStyle
+    saveImageStyle,
+    setTableTitle
 }: any) {
     //增加节点
     const [expanded, setExpanded] = useState<any[]>([]);
@@ -358,6 +359,7 @@ function Arrange({
                                 resType={item?.flowStep?.response?.type}
                                 resJsonSchema={item?.flowStep?.response?.output?.jsonSchema}
                                 saveImageStyle={saveImageStyle}
+                                setTableTitle={setTableTitle}
                             />
                         </AccordionDetails>
                     </Accordion>

@@ -19,14 +19,14 @@ const ResizeableTitle = (props: any) => {
     );
 };
 const HeaderField = ({
-    libraryId = '77',
-    colOpen,
-    setColOpen,
+    libraryId,
+    // colOpen,
+    // setColOpen,
     headerSave
 }: {
     libraryId?: string;
-    colOpen: boolean;
-    setColOpen: (data: boolean) => void;
+    // colOpen: boolean;
+    // setColOpen: (data: boolean) => void;
     headerSave?: () => void;
 }) => {
     const components = {
@@ -147,10 +147,13 @@ const HeaderField = ({
         setTableData(result);
     };
     useEffect(() => {
-        getList();
-    }, []);
+        if (libraryId) {
+            getList();
+        }
+    }, [libraryId]);
     return (
-        <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置">
+        <>
+            {/* <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置"> */}
             <EditableProTable<any>
                 className="edit-table"
                 rowKey={rowKey}
@@ -188,6 +191,7 @@ const HeaderField = ({
                                         await delColumn({ id: row.id });
                                     }
                                     setTableData(tableData.filter((item) => item.id !== row.id));
+                                    headerSave && headerSave();
                                 }}
                                 okText="Yes"
                                 cancelText="No"
@@ -242,7 +246,7 @@ const HeaderField = ({
                             })
                         });
                         headerSave && headerSave();
-                        setColOpen(false);
+                        // setColOpen(false);
                         message.success('保存成功');
                     }}
                     className="mt-4"
@@ -291,7 +295,8 @@ const HeaderField = ({
                     </Form.Item>
                 </Form>
             </Modal>
-        </Modal>
+            {/* </Modal> */}
+        </>
     );
 };
 export default HeaderField;

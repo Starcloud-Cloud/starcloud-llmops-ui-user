@@ -39,6 +39,7 @@ const Lefts = ({
     detailShow = true,
     planState,
     pre,
+    tableTitle,
     imageStylePre,
     isMyApp,
     changePre,
@@ -58,6 +59,7 @@ const Lefts = ({
     detailShow?: boolean;
     planState?: number;
     isMyApp?: boolean;
+    tableTitle?: number;
     pre?: number;
     imageStylePre?: number;
     changePre?: number;
@@ -1151,6 +1153,7 @@ const Lefts = ({
                                         <MaterialTable
                                             setIsModalOpen={setIsModalOpen}
                                             appUid={appData.uid}
+                                            tableTitle={tableTitle}
                                             libraryUid={library && library[0]?.libraryUid}
                                             handleExecute={(data: number[]) => {
                                                 seleSave('SELECT', data);

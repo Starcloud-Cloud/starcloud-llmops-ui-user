@@ -20,7 +20,7 @@ import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
 
-const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
+const MaterialTable = ({ appUid, libraryUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -243,15 +243,18 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
         pageNo: 1,
         pageSize: 100
     });
+    const [tableProKey, setTableProKey] = useState(0);
     const formOk = async (values: any) => {
         if (currentRecord) {
             handleEditColumn({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values }, 1);
             ({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values });
             setEditOpen(false);
+            setTableProKey(tableProKey + 1);
             setCurrentRecord(null);
         } else {
             await handleEditColumn({ ...values }, 2);
             setEditOpen(false);
+            setTableProKey(tableProKey + 1);
             setCurrentRecord(null);
         }
     };
@@ -368,8 +371,12 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
     };
     useEffect(() => {
         if (libraryUid) {
-            getList();
             getTitleList();
+        }
+    }, [libraryUid, tableTitle]);
+    useEffect(() => {
+        if (libraryUid) {
+            getList();
         }
     }, [libraryUid]);
 
@@ -468,6 +475,7 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                     libraryType={libraryType}
                     libraryUid={libraryUid}
                     libraryName={libraryName}
+                    tableProKey={tableProKey}
                     pluginConfig={pluginConfig}
                     tableLoading={tableLoading}
                     actionRefs={actionRefs}
@@ -553,6 +561,6 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
 const memoMaterialTable = (pre: any, next: any) => {
     console.log(_.isEqual(pre.libraryUid, next.libraryUid));
 
-    return _.isEqual(pre.libraryUid, next.libraryUid) && _.isEqual(pre.appUid, next.appUid);
+    return _.isEqual(pre.libraryUid, next.libraryUid) && _.isEqual(pre.appUid, next.appUid) && _.isEqual(pre.tableTitle, next.tableTitle);
 };
 export default memo(MaterialTable, memoMaterialTable);

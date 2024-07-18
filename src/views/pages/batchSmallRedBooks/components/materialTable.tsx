@@ -195,6 +195,14 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
             },
             ...newList,
             {
+                title: '使用次数',
+                dataIndex: 'usedCount',
+                align: 'center',
+                width: 100,
+                isDefault: true,
+                renderText: (text: any) => text || 0
+            },
+            {
                 title: '操作',
                 align: 'center',
                 dataIndex: 'operation',

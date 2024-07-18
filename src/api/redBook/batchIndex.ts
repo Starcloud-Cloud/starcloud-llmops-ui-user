@@ -140,3 +140,7 @@ export const createMaterialInfoPageByMarketUid = (data: any) => {
 export const pluginsXhsOcr = (data: any) => {
     return request.post({ url: `/llm/creative/plugins/xhsOcr`, data });
 };
+//文本智能提取
+export const extraction = (data: any) => {
+    return request.post({ url: `/llm/creative/plugins/extraction`, data });
+};

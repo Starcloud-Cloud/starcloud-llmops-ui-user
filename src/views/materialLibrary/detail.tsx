@@ -109,7 +109,7 @@ export const TableHeader = ({
     // 可否执行
     canExecute: boolean;
     // 执行
-    handleExecute?: () => void;
+    handleExecute?: (data: any[]) => void;
 }) => {
     const [plugOpen, setPlugOpen] = useState(false);
     const [plugTitle, setPlugTitle] = useState('插件市场');
@@ -140,6 +140,7 @@ export const TableHeader = ({
         const tableMetaList = _.cloneDeep(tableMeta);
 
         const newData = data.map((record) => {
+            console.log(record);
             const recordKeys = Object.keys(record);
             const content = tableMetaList.map((item) => {
                 if (recordKeys.includes(item.columnCode)) {
@@ -158,11 +159,14 @@ export const TableHeader = ({
                             columnId: item.id,
                             columnName: item.columnName,
                             columnCode: item.columnCode,
-                            value: record[item.columnCode]
+                            value: record[item.columnCode],
+                            extend: record[item.columnCode + '_extend']
                         };
                     }
                 }
             });
+            console.log(content);
+
             return {
                 libraryId: record.libraryId || libraryId,
                 id: record.id,
@@ -223,7 +227,11 @@ export const TableHeader = ({
                             </Button>
                         </Popconfirm>
                         {canExecute && (
-                            <Button type="primary" onClick={handleExecute}>
+                            <Button
+                                disabled={selectedRowKeys.length === 0}
+                                type="primary"
+                                onClick={() => handleExecute && handleExecute(selectedRowKeys)}
+                            >
                                 执行应用
                             </Button>
                         )}

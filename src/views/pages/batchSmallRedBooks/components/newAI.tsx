@@ -370,16 +370,15 @@ const AiCreate = ({
             uuidListsRef.current = [];
             setUuidLists(uuidListsRef.current);
         }
-        const newList = _.cloneDeep(requirementList);
+        const newList = _.cloneDeep(textData.requirementList);
         const define: any = {};
-        newList?.map((item: any) => {
-            define[item.title] = item.value;
+        newList?.map((item: any, index: number) => {
+            define[index] = item.title;
         });
         aref.current = false;
         setMaterialExecutionOpen(true);
         //记录原有数据下标
         const indexList: any[] = [];
-        let theStaging = _.cloneDeep(tableData);
         if (retry) {
             tableData?.map((item, index) => {
                 if (retryListRef.current?.find((el) => el.uuid === item.uuid)) {
@@ -423,11 +422,10 @@ const AiCreate = ({
                         });
 
                         if (!aref.current) {
-                            const newCheckbox: any[] = _.cloneDeep(textData.fieldList);
-                            const selectData = _.cloneDeep(textData.bindFieldData);
+                            const newCheckbox: any[] = _.cloneDeep(textData.requirementList);
                             const obj: any = {};
-                            newCheckbox.forEach((dt) => {
-                                obj[selectData[dt]] = res[dt]?.url || res[dt];
+                            newCheckbox.forEach((dt, i) => {
+                                obj[dt.value] = res[i];
                             });
                             console.log(obj);
 
@@ -469,11 +467,12 @@ const AiCreate = ({
                 })
             );
             if (!aref.current) {
-                const newArr = _.cloneDeep(materialzanListRef.current);
                 const updatedMaterialzanList = [...materialzanListRef.current, ...newResArr];
                 console.log(updatedMaterialzanList);
 
                 materialzanListRef.current = updatedMaterialzanList;
+                console.log(materialzanListRef.current);
+
                 setMaterialzanList(materialzanListRef.current);
                 uuidListsRef.current = materialzanListRef.current?.map((item) => item.uuid);
                 setUuidLists(uuidListsRef.current);
@@ -515,19 +514,14 @@ const AiCreate = ({
         requirement: ''
     });
     //文本智能提取数据
-    const [requirementList, setRequirementList] = useState<any[]>([]);
     const [textData, setTextData] = useState<any>({
         checkedFieldList: '',
-        fieldList: [],
-        bindFieldData: {}
+        requirementList: []
     });
-    useEffect(() => {
-        console.log(textData, requirementList);
-    }, [textData, requirementList]);
     const textCloumns = useMemo(() => {
-        const arr = textData?.fieldList?.map((item: any) => textData?.bindFieldData[item])?.filter((item: any) => item);
+        const arr = textData?.requirementList?.map((item: any) => item.value);
         return columns?.filter((item) => arr?.includes(item.dataIndex));
-    }, [textData?.fieldList, textData?.bindFieldData]);
+    }, [textData.requirementList]);
     //保存配置
     const saveConfig = async (data: string) => {
         let newValue: any = {};
@@ -587,9 +581,7 @@ const AiCreate = ({
             {plugValue === 'extraction' ? (
                 //文本智能提取
                 <TextExtraction
-                    requirementList={requirementList}
                     textData={textData}
-                    setRequirementList={setRequirementList}
                     setTextData={setTextData}
                     checkedList={checkedList}
                     selListLength={selList?.length || 0}
@@ -794,6 +786,13 @@ const AiCreate = ({
                                         setMaterialExecutionOpen(false);
                                         setPlugOpen(false);
                                         setSelectedRowKeys(uuidListsRef.current);
+                                    } else if (selectValue === 'text') {
+                                        setSelList([]);
+                                        setSelKeyList([]);
+                                        downTableData(materialzanListRef.current, 2);
+                                        setMaterialExecutionOpen(false);
+                                        setPlugOpen(false);
+                                        setSelectedRowKeys(uuidLists);
                                     }
                                 }}
                                 className="w-[100px]"

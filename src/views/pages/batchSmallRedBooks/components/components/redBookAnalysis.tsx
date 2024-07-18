@@ -1,7 +1,7 @@
-import { Input, Checkbox, Select, Button } from 'antd';
+import { Input, Checkbox, Select, Button, Table, message } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { pluginsXhsOcr } from 'api/redBook/batchIndex';
 import { isEqual, sortBy } from 'lodash-es';
 const RedBookAnalysis = ({
@@ -16,6 +16,8 @@ const RedBookAnalysis = ({
     xhsAnalysis: () => void;
 }) => {
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
+    const [data, setData] = useState<any[]>([]);
+
     const redList = [
         { label: '小红书标题', value: 'title' },
         { label: '小红书内容', value: 'content' },
@@ -32,6 +34,16 @@ const RedBookAnalysis = ({
         { label: '图片 10', value: 'image10' },
         { label: '全部 OCR 信息', value: 'allOcrContent' }
     ];
+
+    useEffect(() => {
+        const data = redList.map((item) => {
+            return {
+                label: item.label,
+                label_key: item.value
+            };
+        });
+        setData(data);
+    }, [redList]);
 
     return (
         <div>
@@ -51,7 +63,7 @@ const RedBookAnalysis = ({
             )}
 
             <div className="text-[16px] font-bold my-4">2.绑定小红书字段</div>
-            <div className="flex items-center gap-6">
+            {/* <div className="flex items-center gap-6">
                 <Checkbox.Group
                     onChange={(data) =>
                         setRedBookData({
@@ -97,7 +109,83 @@ const RedBookAnalysis = ({
                         </div>
                     ))}
                 </Checkbox.Group>
+            </div> */}
+            <div>
+                <Table
+                    pagination={false}
+                    bordered
+                    size="small"
+                    columns={[
+                        {
+                            title: '小红书字段',
+                            dataIndex: 'label',
+                            align: 'center'
+                        },
+                        {
+                            title: '绑定到',
+                            align: 'center',
+                            render: () => (
+                                <svg
+                                    viewBox="0 0 1024 1024"
+                                    version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    p-id="7263"
+                                    width="20"
+                                    height="20"
+                                >
+                                    <path
+                                        d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
+                                        fill="#8a8a8a"
+                                        p-id="7264"
+                                    ></path>
+                                </svg>
+                            )
+                        },
+                        {
+                            title: '素材字段',
+                            dataIndex: 'value',
+                            align: 'center',
+                            render: (_, record) => {
+                                return (
+                                    <Select
+                                        style={{ width: 160 }}
+                                        allowClear
+                                        onChange={(value) => {
+                                            let fieldList = redBookData.fieldList;
+                                            let bindFieldData = redBookData.bindFieldData;
+                                            if (value) {
+                                                fieldList = [...fieldList, record.label_key];
+                                                bindFieldData[record.label_key] = value;
+                                            } else {
+                                                fieldList = fieldList.filter((item: any) => item !== record.label_key);
+                                                delete bindFieldData[record.label_key];
+                                            }
+
+                                            setRedBookData((pre: any) => {
+                                                return {
+                                                    ...pre,
+                                                    fieldList,
+                                                    bindFieldData
+                                                };
+                                            });
+                                        }}
+                                    >
+                                        {columns
+                                            .filter((item) => item.title !== '使用次数')
+                                            ?.map((item) => (
+                                                <Option key={item.dataIndex} value={item.dataIndex}>
+                                                    {item.title}
+                                                </Option>
+                                            ))}
+                                    </Select>
+                                );
+                            }
+                        }
+                    ]}
+                    dataSource={data}
+                />
             </div>
+
             <div className="flex justify-center gap-6 mt-6">
                 {/* <Button
                     onClick={() => {
@@ -112,16 +200,16 @@ const RedBookAnalysis = ({
                 </Button> */}
                 <Button
                     onClick={() => {
-                        if (!redBookData.requirement) {
-                            setrequirementStatusOpen(true);
-                            return false;
-                        }
-
-                        let fieldList = redBookData.fieldList;
-                        const bindFieldData = Object.keys(redBookData.bindFieldData);
-                        const areArraysEqual = isEqual(sortBy(fieldList), sortBy(bindFieldData));
-                        if (!areArraysEqual) {
-                            return false;
+                        console.log(redBookData, 'redBookData');
+                        // let fieldList = redBookData.fieldList;
+                        // const bindFieldData = Object.keys(redBookData.bindFieldData);
+                        // const areArraysEqual = isEqual(sortBy(fieldList), sortBy(bindFieldData));
+                        // if (!areArraysEqual) {
+                        //     return false;
+                        // }
+                        if (!redBookData.fieldList?.length) {
+                            message.error('请至少绑定一素材字段!');
+                            return;
                         }
                         xhsAnalysis();
                     }}

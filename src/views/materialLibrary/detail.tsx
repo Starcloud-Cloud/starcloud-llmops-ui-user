@@ -109,7 +109,7 @@ export const TableHeader = ({
     // 可否执行
     canExecute: boolean;
     // 执行
-    handleExecute?: () => void;
+    handleExecute?: (data: any[]) => void;
 }) => {
     const [plugOpen, setPlugOpen] = useState(false);
     const [plugTitle, setPlugTitle] = useState('插件市场');
@@ -227,7 +227,11 @@ export const TableHeader = ({
                             </Button>
                         </Popconfirm>
                         {canExecute && (
-                            <Button type="primary" onClick={handleExecute}>
+                            <Button
+                                disabled={selectedRowKeys.length === 0}
+                                type="primary"
+                                onClick={() => handleExecute && handleExecute(selectedRowKeys)}
+                            >
                                 执行应用
                             </Button>
                         )}

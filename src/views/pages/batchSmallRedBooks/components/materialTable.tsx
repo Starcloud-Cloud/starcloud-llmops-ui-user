@@ -485,8 +485,8 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                     getList={getList}
                     getTitleList={getTitleList}
                     handleEditColumn={handleEditColumn}
-                    handleExecute={() => {
-                        handleExecute();
+                    handleExecute={(data: number[]) => {
+                        handleExecute(data);
                         setZoomOpen(false);
                     }}
                 />

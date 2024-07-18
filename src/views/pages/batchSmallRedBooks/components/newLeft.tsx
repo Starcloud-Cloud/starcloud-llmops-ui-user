@@ -973,7 +973,30 @@ const Lefts = ({
             getList(true, false, true);
         }
     }, [imageStylePre]);
-    console.log(appData);
+    //选中保存
+    const seleSave = (data: string, arr: any) => {
+        console.log(arr, appRef.current, detail, 'detail');
+        const newData = _.cloneDeep(appRef.current);
+        newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
+            (item: any) => item.field === 'MATERIAL_USAGE_MODEL'
+        ).value = data;
+        const queryList = JSON.parse(
+            newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
+                (item: any) => item.field === 'LIBRARY_QUERY'
+            ).value
+        );
+        queryList[0].sliceIdList = arr;
+        newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
+            (item: any) => item.field === 'LIBRARY_QUERY'
+        ).value = JSON.stringify(queryList);
+        appRef.current = newData;
+        setAppData(appRef.current);
+        if (!detail) {
+            handleSaveClick(true);
+        } else {
+            gessaveApp();
+        }
+    };
     return (
         <>
             <div className="relative h-full">
@@ -1129,13 +1152,8 @@ const Lefts = ({
                                             setIsModalOpen={setIsModalOpen}
                                             appUid={appData.uid}
                                             libraryUid={library && library[0]?.libraryUid}
-                                            handleExecute={() => {
-                                                console.log(detail, 'detail');
-                                                if (!detail) {
-                                                    handleSaveClick(true);
-                                                } else {
-                                                    gessaveApp();
-                                                }
+                                            handleExecute={(data: number[]) => {
+                                                seleSave('SELECT', data);
                                             }}
                                         />
                                     )}
@@ -1470,11 +1488,7 @@ const Lefts = ({
                                 className="w-full"
                                 type="primary"
                                 onClick={() => {
-                                    if (!detail) {
-                                        handleSaveClick(true);
-                                    } else {
-                                        gessaveApp();
-                                    }
+                                    seleSave('FILTER_USAGE', null);
                                 }}
                             >
                                 保存并开始生成

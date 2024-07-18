@@ -189,6 +189,7 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                 editable: () => {
                     return false;
                 },
+                isDefault: true,
                 width: 70,
                 fixed: true,
                 render: (_: any, row: any, index: number) => <span>{index + 1}</span>
@@ -206,6 +207,7 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                 title: '操作',
                 align: 'center',
                 dataIndex: 'operation',
+                isDefault: true,
                 width: 60,
                 fixed: 'right',
                 render: (text: any, record: any, index: number) => (

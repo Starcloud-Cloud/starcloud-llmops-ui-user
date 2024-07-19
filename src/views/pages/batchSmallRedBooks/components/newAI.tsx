@@ -36,7 +36,7 @@ const AiCreate = ({
     getTitleList: () => void;
 }) => {
     const checkedList = useMemo(() => {
-        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 5 && item.type !== 6);
+        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 5 && item.type !== 6 && !item.isDefault);
     }, [columns]);
     const imgCheckedList = useMemo(() => {
         return columns?.filter((item) => item.type === 5);
@@ -373,7 +373,7 @@ const AiCreate = ({
         const newList = _.cloneDeep(textData.requirementList);
         const define: any = {};
         newList?.map((item: any, index: number) => {
-            define[index] = item.title;
+            define[textCloumns.find((el) => el.dataIndex === item.value).title] = item.title;
         });
         aref.current = false;
         setMaterialExecutionOpen(true);
@@ -425,7 +425,7 @@ const AiCreate = ({
                             const newCheckbox: any[] = _.cloneDeep(textData.requirementList);
                             const obj: any = {};
                             newCheckbox.forEach((dt, i) => {
-                                obj[dt.value] = res[i];
+                                obj[dt.value] = res[textCloumns.find((el) => el.dataIndex === dt.value).title];
                             });
                             console.log(obj);
 

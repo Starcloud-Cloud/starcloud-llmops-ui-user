@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, memo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ActionType, ModalForm, ProFormTextArea, ProFormSelect } from '@ant-design/pro-components';
 import TablePro from './components/antdProTable';
 import {
@@ -20,7 +21,7 @@ import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
 
-const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
+const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -201,7 +202,8 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
                 align: 'center',
                 width: 100,
                 isDefault: true,
-                renderText: (text: any) => text || 0
+                renderText: (text: any) => text || 0,
+                sorter: (a: any, b: any) => a.usedCount - b.usedCount
             },
             {
                 title: '操作',
@@ -253,15 +255,18 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
         pageNo: 1,
         pageSize: 100
     });
+    const [tableProKey, setTableProKey] = useState(0);
     const formOk = async (values: any) => {
         if (currentRecord) {
             handleEditColumn({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values }, 1);
             ({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values });
             setEditOpen(false);
+            setTableProKey(tableProKey + 1);
             setCurrentRecord(null);
         } else {
             await handleEditColumn({ ...values }, 2);
             setEditOpen(false);
+            setTableProKey(tableProKey + 1);
             setCurrentRecord(null);
         }
     };
@@ -330,9 +335,9 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
             handleEditColumn(result);
         }
     }, [selectImg]);
-    const getList = () => {
+    const getList = (data?: any) => {
         setTableLoading(true);
-        getMaterialPage({ ...page, libraryUid, id: 429 }).then((res) => {
+        getMaterialPage({ ...page, appUid, sortingFields: data }).then((res) => {
             let newList: any = [];
             res.list.map((item: any) => {
                 let obj: any = {
@@ -368,7 +373,7 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
     const [pluginConfig, setpluginConfig] = useState<string | null>(null);
     const [libraryType, setLibraryType] = useState(-1);
     const getTitleList = () => {
-        getMaterialTitle({ uid: libraryUid }).then((res) => {
+        getMaterialTitle({ appUid }).then((res) => {
             setLibraryType(res.libraryType);
             setLibraryName(res.name);
             setpluginConfig(res.pluginConfig);
@@ -377,11 +382,15 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
         });
     };
     useEffect(() => {
-        if (libraryUid) {
-            getList();
+        if (appUid) {
             getTitleList();
         }
-    }, [libraryUid]);
+    }, [appUid, tableTitle]);
+    useEffect(() => {
+        if (appUid) {
+            getList();
+        }
+    }, [appUid]);
 
     //批量导入
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -473,11 +482,12 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
             )}
             <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
-                    appUid={appUid}
+                    appUid={uid}
                     libraryId={libraryId}
                     libraryType={libraryType}
-                    libraryUid={libraryUid}
+                    libraryUid={appUid}
                     libraryName={libraryName}
+                    tableProKey={tableProKey}
                     pluginConfig={pluginConfig}
                     tableLoading={tableLoading}
                     actionRefs={actionRefs}
@@ -567,8 +577,6 @@ const MaterialTable = ({ appUid, libraryUid, handleExecute }: any) => {
     );
 };
 const memoMaterialTable = (pre: any, next: any) => {
-    console.log(_.isEqual(pre.libraryUid, next.libraryUid));
-
-    return _.isEqual(pre.libraryUid, next.libraryUid) && _.isEqual(pre.appUid, next.appUid);
+    return _.isEqual(pre.uid, next.uid) && _.isEqual(pre.appUid, next.appUid) && _.isEqual(pre.tableTitle, next.tableTitle);
 };
 export default memo(MaterialTable, memoMaterialTable);

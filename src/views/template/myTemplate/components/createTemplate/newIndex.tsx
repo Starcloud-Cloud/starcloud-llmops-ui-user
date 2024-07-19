@@ -983,6 +983,7 @@ function CreateDetail() {
         }
     }, []);
     const [changePre, setChangePre] = useState(0);
+    const [tableTitle, setTableTitle] = useState(0);
     console.log(1);
 
     return searchParams.get('source') === 'market' ? (
@@ -1011,6 +1012,7 @@ function CreateDetail() {
                                     getAppList={getList}
                                     changePre={changePre}
                                     planState={planState}
+                                    tableTitle={tableTitle}
                                     detail={_.cloneDeep(detailRef.current)}
                                     setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
                                     isMyApp={false}
@@ -1266,6 +1268,7 @@ function CreateDetail() {
                                             tableDataDel={tableDataDel}
                                             tableDataMove={tableDataMove}
                                             saveImageStyle={saveImageStyle}
+                                            setTableTitle={() => setTableTitle(new Date().getTime())}
                                         />
                                     </div>
                                 </div>
@@ -1281,6 +1284,7 @@ function CreateDetail() {
                                             <CreatePlan
                                                 ref={createPlanRef}
                                                 imageStylePre={imageStylePre}
+                                                tableTitle={tableTitle}
                                                 getAppList={getList}
                                                 changePre={changePre}
                                                 planState={planState}

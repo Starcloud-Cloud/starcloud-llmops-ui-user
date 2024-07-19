@@ -49,6 +49,7 @@ export enum EditType {
 }
 
 export const TableHeader = ({
+    isShowField,
     iconUrl,
     name,
     setEditOpen,
@@ -71,6 +72,7 @@ export const TableHeader = ({
     canExecute,
     handleExecute
 }: {
+    isShowField?: boolean;
     // 图标
     iconUrl?: string;
     // 素材库名称
@@ -143,27 +145,27 @@ export const TableHeader = ({
             console.log(record);
             const recordKeys = Object.keys(record);
             const content = tableMetaList.map((item) => {
-                if (recordKeys.includes(item.columnCode)) {
-                    if (item.columnType === EditType.Image) {
-                        return {
-                            columnId: item.id,
-                            columnName: item.columnName,
-                            columnCode: item.columnCode,
-                            value: record[item.columnCode],
-                            description: record[item.columnCode + '_description'],
-                            tags: record[item.columnCode + '_tags'],
-                            extend: record[item.columnCode + '_extend']
-                        };
-                    } else {
-                        return {
-                            columnId: item.id,
-                            columnName: item.columnName,
-                            columnCode: item.columnCode,
-                            value: record[item.columnCode],
-                            extend: record[item.columnCode + '_extend']
-                        };
-                    }
+                // if (recordKeys.includes(item.columnCode)) {
+                if (item.columnType === EditType.Image) {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: record[item.columnCode] || '',
+                        description: record[item.columnCode + '_description'],
+                        tags: record[item.columnCode + '_tags'],
+                        extend: record[item.columnCode + '_extend']
+                    };
+                } else {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: record[item.columnCode],
+                        extend: record[item.columnCode + '_extend']
+                    };
                 }
+                // }
             });
             console.log(content);
 
@@ -232,7 +234,7 @@ export const TableHeader = ({
                                 type="primary"
                                 onClick={() => handleExecute && handleExecute(selectedRowKeys)}
                             >
-                                执行应用
+                                选择执行
                             </Button>
                         )}
                     </Space>
@@ -388,14 +390,16 @@ export const TableHeader = ({
                         >
                             新增素材
                         </Button>
-                        <Dropdown menu={{ items }}>
-                            <Button>
-                                <Space>
-                                    <SettingOutlined className="p-1 cursor-pointer" />
-                                    <DownOutlined />
-                                </Space>
-                            </Button>
-                        </Dropdown>
+                        {isShowField && (
+                            <Dropdown menu={{ items }}>
+                                <Button>
+                                    <Space>
+                                        <SettingOutlined className="p-1 cursor-pointer" />
+                                        <DownOutlined />
+                                    </Space>
+                                </Button>
+                            </Dropdown>
+                        )}
                     </Space>
                 </div>
             </div>
@@ -642,7 +646,7 @@ const MaterialLibraryDetail = () => {
                                             </Upload>
                                         </div>
                                     ) : (
-                                        <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
+                                        <div className="break-all line-clamp-4 h-[88px]">{row[item.fieldName]}</div>
                                     )}
                                 </div>
                             );
@@ -893,6 +897,7 @@ const MaterialLibraryDetail = () => {
                     libraryType={detail?.libraryType}
                     canSwitch={false}
                     canExecute={false}
+                    isShowField={true}
                 />
 
                 <div className="material-detail-table overflow-hidden h-[calc(100%-96px)]">
@@ -954,12 +959,9 @@ const MaterialLibraryDetail = () => {
                 />
             )}
             {colOpen && (
-                <HeaderField
-                    libraryId={detail?.id}
-                    colOpen={colOpen}
-                    setColOpen={setColOpen}
-                    headerSave={() => setForceUpdateHeader(forceUpdateHeader + 1)}
-                />
+                <Modal width={'80%'} footer={false} title="素材字段配置" open={colOpen} onCancel={() => setColOpen(false)}>
+                    <HeaderField libraryId={detail?.id} headerSave={() => setForceUpdateHeader(forceUpdateHeader + 1)} />
+                </Modal>
             )}
 
             {previewOpen && (

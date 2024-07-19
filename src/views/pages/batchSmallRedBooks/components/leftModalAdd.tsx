@@ -120,7 +120,7 @@ const LeftModalAdd = ({
                         <Button type="primary" onClick={() => setPlugOpen(true)}>
                             AI 素材生成
                         </Button>
-                        {detail && (
+                        {/* {detail && (
                             <Dropdown
                                 menu={{
                                     items: [
@@ -144,7 +144,7 @@ const LeftModalAdd = ({
                                     </Space>
                                 </Button>
                             </Dropdown>
-                        )}
+                        )} */}
                     </div>
                 </div>
                 <TablePro
@@ -162,36 +162,37 @@ const LeftModalAdd = ({
                     {plugValue && <Button onClick={() => setPlugValue(null)} size="small" shape="circle" icon={<LeftOutlined />} />}
                     {plugTitle}
                 </div>
-                {!plugValue ? (
-                    <PlugMarket
-                        onOk={(title: string, value: string) => {
-                            console.log(value);
+                {
+                    !plugValue ? (
+                        <PlugMarket
+                            onOk={(title: string, value: string) => {
+                                console.log(value);
 
-                            setPlugTitle(title);
-                            setPlugValue(value);
-                        }}
-                    />
-                ) : null
-                // <AiCreate
-                //     plugValue={plugValue}
-                //     setPlugOpen={setPlugOpen}
-                //     materialType={materialType}
-                //     columns={columns}
-                //     MokeList={MokeList}
-                //     tableData={tableData}
-                //     setPage={setPage}
-                //     setcustom={setcustom}
-                //     setField={setField}
-                //     setSelectedRowKeys={setSelectedRowKeys}
-                //     downTableData={downTableData}
-                //     setFieldCompletionData={setFieldCompletionData}
-                //     fieldCompletionData={fieldCompletionData}
-                //     setVariableData={setVariableData}
-                //     variableData={variableData}
-                // />
+                                setPlugTitle(title);
+                                setPlugValue(value);
+                            }}
+                        />
+                    ) : null
+                    // <AiCreate
+                    //     plugValue={plugValue}
+                    //     setPlugOpen={setPlugOpen}
+                    //     materialType={materialType}
+                    //     columns={columns}
+                    //     MokeList={MokeList}
+                    //     tableData={tableData}
+                    //     setPage={setPage}
+                    //     setcustom={setcustom}
+                    //     setField={setField}
+                    //     setSelectedRowKeys={setSelectedRowKeys}
+                    //     downTableData={downTableData}
+                    //     setFieldCompletionData={setFieldCompletionData}
+                    //     fieldCompletionData={fieldCompletionData}
+                    //     setVariableData={setVariableData}
+                    //     variableData={variableData}
+                    // />
                 }
             </Modal>
-            {colOpen && <HeaderField colOpen={colOpen} setColOpen={setColOpen} />}
+            {/* {colOpen && <HeaderField colOpen={colOpen} setColOpen={setColOpen} />} */}
         </div>
     );
 };

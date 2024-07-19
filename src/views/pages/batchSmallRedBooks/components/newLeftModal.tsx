@@ -15,6 +15,7 @@ const LeftModalAdd = ({
     libraryUid,
     libraryName,
     libraryType,
+    tableProKey,
     pluginConfig,
     tableLoading,
     actionRefs,
@@ -36,6 +37,7 @@ const LeftModalAdd = ({
     libraryUid: string;
     libraryName: string;
     libraryType: number;
+    tableProKey: number;
     pluginConfig: string | null;
     tableLoading: boolean;
     actionRefs: any;
@@ -46,7 +48,7 @@ const LeftModalAdd = ({
     setTitle: (data: string) => void;
     setEditOpen: (data: boolean) => void;
     setPage: (data: any) => void;
-    getList: () => void;
+    getList: (data?: any) => void;
     getTitleList: () => void;
     downTableData: (data: any, num: number) => void;
     handleEditColumn: (data: any) => void;
@@ -89,6 +91,7 @@ const LeftModalAdd = ({
                 />
                 <div className="material-index material-detail-table">
                     <TablePro
+                        key={tableProKey}
                         actionRefs={actionRefs}
                         tableLoading={tableLoading}
                         tableData={tableData}
@@ -101,7 +104,7 @@ const LeftModalAdd = ({
                     />
                 </div>
             </div>
-            {colOpen && <HeaderField libraryId={libraryId} colOpen={colOpen} setColOpen={setColOpen} headerSave={getTitleList} />}
+            {/* {colOpen && <HeaderField libraryId={libraryId} colOpen={colOpen} setColOpen={setColOpen} headerSave={getTitleList} />} */}
         </div>
     );
 };
@@ -111,6 +114,7 @@ const memoLeftModal = (pre: any, next: any) => {
         _.isEqual(pre.libraryId, next.libraryId) &&
         _.isEqual(pre.libraryUid, next.libraryUid) &&
         _.isEqual(pre.libraryName, next.libraryName) &&
+        _.isEqual(pre.tableProKey, next.tableProKey) &&
         _.isEqual(pre.pluginConfig, next.pluginConfig) &&
         _.isEqual(pre.tableLoading, next.tableLoading) &&
         _.isEqual(pre.columns, next.columns) &&

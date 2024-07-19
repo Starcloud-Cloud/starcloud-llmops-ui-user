@@ -989,6 +989,12 @@ const MaterialLibraryDetail = () => {
                         <Image width={500} height={500} className="object-contain" src={currentRecord[filedName]} preview={false} />
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
+                    <div>
+                        <Space>
+                            <Button>图片OCR</Button>
+                            <Button>清洗OCR内容</Button>
+                        </Space>
+                    </div>
                     <ProFormTextArea name={filedName + '_description'} label="描述" />
                     {currentRecord && currentRecord[filedName + '_extend'] && (
                         <div>

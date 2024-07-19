@@ -331,6 +331,7 @@ function Arrange({
                         <AccordionDetails>
                             <StepEdit
                                 detail={detail}
+                                appUid={detail?.uid}
                                 variableStyle={variableStyle}
                                 index={index}
                                 variable={item?.variable?.variables}

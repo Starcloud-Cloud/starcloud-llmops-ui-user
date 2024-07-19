@@ -49,6 +49,7 @@ export enum EditType {
 }
 
 export const TableHeader = ({
+    isShowField,
     iconUrl,
     name,
     setEditOpen,
@@ -71,6 +72,7 @@ export const TableHeader = ({
     canExecute,
     handleExecute
 }: {
+    isShowField?: boolean;
     // 图标
     iconUrl?: string;
     // 素材库名称
@@ -388,14 +390,16 @@ export const TableHeader = ({
                         >
                             新增素材
                         </Button>
-                        {/* <Dropdown menu={{ items }}>
-                            <Button>
-                                <Space>
-                                    <SettingOutlined className="p-1 cursor-pointer" />
-                                    <DownOutlined />
-                                </Space>
-                            </Button>
-                        </Dropdown> */}
+                        {isShowField && (
+                            <Dropdown menu={{ items }}>
+                                <Button>
+                                    <Space>
+                                        <SettingOutlined className="p-1 cursor-pointer" />
+                                        <DownOutlined />
+                                    </Space>
+                                </Button>
+                            </Dropdown>
+                        )}
                     </Space>
                 </div>
             </div>
@@ -893,6 +897,7 @@ const MaterialLibraryDetail = () => {
                     libraryType={detail?.libraryType}
                     canSwitch={false}
                     canExecute={false}
+                    isShowField={true}
                 />
 
                 <div className="material-detail-table overflow-hidden h-[calc(100%-96px)]">
@@ -953,14 +958,11 @@ const MaterialLibraryDetail = () => {
                     values={null}
                 />
             )}
-            {/* {colOpen && (
-                <HeaderField
-                    libraryId={detail?.id}
-                    colOpen={colOpen}
-                    setColOpen={setColOpen}
-                    headerSave={() => setForceUpdateHeader(forceUpdateHeader + 1)}
-                />
-            )} */}
+            {colOpen && (
+                <Modal title="素材字段配置" open={colOpen} onCancel={() => setColOpen(false)}>
+                    <HeaderField libraryId={detail?.id} headerSave={() => setForceUpdateHeader(forceUpdateHeader + 1)} />
+                </Modal>
+            )}
 
             {previewOpen && (
                 <ModalForm

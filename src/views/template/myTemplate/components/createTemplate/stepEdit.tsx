@@ -14,6 +14,7 @@ import HeaderField from 'views/pages/batchSmallRedBooks/components/components/he
 import { getMaterialTitle } from 'api/redBook/material';
 const StepEdit = ({
     detail,
+    appUid,
     variableStyle, //变量类型
     index, //步骤几
     variable, //变量
@@ -31,6 +32,7 @@ const StepEdit = ({
     setTableTitle
 }: {
     detail: any;
+    appUid: string;
     variableStyle: any[];
     index: number;
     variable: any[];
@@ -61,11 +63,6 @@ const StepEdit = ({
             align: 'center'
         },
         {
-            title: '变量类型',
-            align: 'center',
-            render: (_, row) => <span>{variableStyle?.find((item) => item.value === row.style)?.label}</span>
-        },
-        {
             title: '变量默认值',
             align: 'center',
             render: (_, row) => <div className="line-clamp-3">{row?.defaultValue}</div>
@@ -73,7 +70,12 @@ const StepEdit = ({
         {
             title: '变量状态',
             align: 'center',
-            render: (_, row) => <Tag color="processing">{row?.isShow ? '显示' : '隐藏'}</Tag>
+            render: (_, row) => <Tag color={row?.isShow ? 'processing' : 'warning'}>{row?.isShow ? '显示' : '隐藏'}</Tag>
+        },
+        {
+            title: '变量类型',
+            align: 'center',
+            render: (_, row) => <span>{variableStyle?.find((item) => item.value === row.style)?.label}</span>
         },
         {
             title: '操作',
@@ -162,13 +164,12 @@ const StepEdit = ({
     }, [variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value]);
     const [libraryId, setLibraryId] = useState('');
     useEffect(() => {
-        const str = variable?.find((item) => item.field === 'LIBRARY_QUERY')?.value;
-        if (str) {
-            getMaterialTitle({ uid: JSON.parse(str)[0].libraryUid }).then((res) => {
+        if (appUid && handler === 'MaterialActionHandler') {
+            getMaterialTitle({ appUid }).then((res) => {
                 setLibraryId(res.id);
             });
         }
-    }, [variable?.find((item) => item.field === 'LIBRARY_QUERY')?.value]);
+    }, [appUid]);
     return (
         <div>
             <Tabs>

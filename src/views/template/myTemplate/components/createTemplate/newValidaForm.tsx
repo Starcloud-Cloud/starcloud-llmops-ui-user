@@ -60,14 +60,14 @@ const Valida = ({
             align: 'center'
         },
         {
-            title: '变量类型',
-            align: 'center',
-            render: (_, row) => <span>{variableStyle?.find((item) => item.value === row.style)?.label}</span>
-        },
-        {
             title: '变量默认值',
             align: 'center',
             render: (_, row) => <div className="line-clamp-3">{row?.defaultValue}</div>
+        },
+        {
+            title: '变量类型',
+            align: 'center',
+            render: (_, row) => <span>{variableStyle?.find((item) => item.value === row.style)?.label}</span>
         },
         {
             title: '是否显示',

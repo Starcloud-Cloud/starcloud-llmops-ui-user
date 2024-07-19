@@ -2,11 +2,11 @@ import request from 'utils/axios';
 
 //获取素材库表头
 export const getMaterialTitle = (params: any) => {
-    return request.get({ url: '/llm/material-library/get-uid', params });
+    return request.post({ url: '/llm/material-library/get-app-uid', params });
 };
 //获取素材库表格内容
-export const getMaterialPage = (params: any) => {
-    return request.get({ url: '/llm/material-library-slice/page-uid', params });
+export const getMaterialPage = (data: any) => {
+    return request.post({ url: '/llm/material-library-slice/page-app-uid', data });
 };
 //创建表格
 export const createMaterial = (data: any) => {

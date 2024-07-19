@@ -1,7 +1,8 @@
 import { Box, Typography, Switch, Tooltip, Chip, FormControlLabel } from '@mui/material';
+import { Popover } from 'antd';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Input } from 'antd';
-import { useRef, useState, useEffect, memo, useMemo } from 'react';
+import { useRef, useState, useEffect, memo } from 'react';
 import { t } from 'hooks/web/useI18n';
 import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
@@ -105,7 +106,16 @@ const NewPrompt = ({
             )}
             <Box mb={1}>
                 {variable?.map((item) => (
-                    <Tooltip key={item.field} placement="top" title={t('market.fields')}>
+                    <Popover
+                        key={item.field}
+                        placement="top"
+                        content={
+                            <div>
+                                <div className="flex justify-center mb-1 font-bold">{item.label}</div>
+                                <div>点击变量，增加到提示词中</div>
+                            </div>
+                        }
+                    >
                         <Chip
                             sx={{ mr: 1, mt: 1 }}
                             size="small"
@@ -113,7 +123,16 @@ const NewPrompt = ({
                             onClick={() => changePrompt(item.field, i)}
                             label={item.field}
                         ></Chip>
-                    </Tooltip>
+                    </Popover>
+                    // <Tooltip key={item.field} placement="top" title={'点击变量，增加到提示词中'}>
+                    //     <Chip
+                    //         sx={{ mr: 1, mt: 1 }}
+                    //         size="small"
+                    //         color="primary"
+                    //         onClick={() => changePrompt(item.field, i)}
+                    //         label={item.field}
+                    //     ></Chip>
+                    // </Tooltip>
                 ))}
             </Box>
         </div>

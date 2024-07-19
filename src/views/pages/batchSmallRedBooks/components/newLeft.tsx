@@ -176,10 +176,6 @@ const Lefts = ({
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
     const [selectImgLoading, setSelectImgLoading] = useState(false);
-
-    //获取libraryId
-    const [library, setlibrary] = useState<any>(null);
-
     const getList = async (flag?: boolean, appUpdate?: boolean, isimgStyle?: boolean) => {
         console.log(1112132);
 
@@ -300,14 +296,6 @@ const Lefts = ({
         });
         const materiallist = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables;
-        const newStr = materiallist?.find((item: any) => item?.field === 'LIBRARY_QUERY')?.value;
-        let newLibrary: any;
-        try {
-            newLibrary = JSON.parse(newStr);
-        } catch (err) {
-            newLibrary = newStr;
-        }
-        setlibrary(newLibrary);
         const judge = await materialJudge({
             uid: data ? result.planUid : searchParams.get('uid') ? searchParams.get('uid') : detail ? detail?.uid : result.uid,
             planSource: detail ? 'app' : 'market'
@@ -982,11 +970,16 @@ const Lefts = ({
         newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
             (item: any) => item.field === 'MATERIAL_USAGE_MODEL'
         ).value = data;
-        const queryList = JSON.parse(
-            newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
-                (item: any) => item.field === 'LIBRARY_QUERY'
-            ).value
-        );
+        const newQuery = newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
+            (item: any) => item.field === 'LIBRARY_QUERY'
+        ).value;
+        let queryList;
+        if (newQuery) {
+            queryList = JSON.parse(newQuery);
+        } else {
+            queryList = [{ sliceIdList: [] }];
+        }
+
         queryList[0].sliceIdList = arr;
         newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
             (item: any) => item.field === 'LIBRARY_QUERY'
@@ -1152,9 +1145,12 @@ const Lefts = ({
                                     ) : (
                                         <MaterialTable
                                             setIsModalOpen={setIsModalOpen}
-                                            appUid={appData.uid}
+                                            appUid={
+                                                // appData.appUid
+                                                '41f33e98b7cd48d390b2b1e169c57e11'
+                                            }
+                                            uid={appData.uid}
                                             tableTitle={tableTitle}
-                                            libraryUid={library && library[0]?.libraryUid}
                                             handleExecute={(data: number[]) => {
                                                 seleSave('SELECT', data);
                                             }}

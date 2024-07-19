@@ -145,27 +145,27 @@ export const TableHeader = ({
             console.log(record);
             const recordKeys = Object.keys(record);
             const content = tableMetaList.map((item) => {
-                if (recordKeys.includes(item.columnCode)) {
-                    if (item.columnType === EditType.Image) {
-                        return {
-                            columnId: item.id,
-                            columnName: item.columnName,
-                            columnCode: item.columnCode,
-                            value: record[item.columnCode],
-                            description: record[item.columnCode + '_description'],
-                            tags: record[item.columnCode + '_tags'],
-                            extend: record[item.columnCode + '_extend']
-                        };
-                    } else {
-                        return {
-                            columnId: item.id,
-                            columnName: item.columnName,
-                            columnCode: item.columnCode,
-                            value: record[item.columnCode],
-                            extend: record[item.columnCode + '_extend']
-                        };
-                    }
+                // if (recordKeys.includes(item.columnCode)) {
+                if (item.columnType === EditType.Image) {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: record[item.columnCode] || '',
+                        description: record[item.columnCode + '_description'],
+                        tags: record[item.columnCode + '_tags'],
+                        extend: record[item.columnCode + '_extend']
+                    };
+                } else {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: record[item.columnCode],
+                        extend: record[item.columnCode + '_extend']
+                    };
                 }
+                // }
             });
             console.log(content);
 
@@ -646,7 +646,7 @@ const MaterialLibraryDetail = () => {
                                             </Upload>
                                         </div>
                                     ) : (
-                                        <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
+                                        <div className="break-all line-clamp-4 h-[88px]">{row[item.fieldName]}</div>
                                     )}
                                 </div>
                             );
@@ -959,7 +959,7 @@ const MaterialLibraryDetail = () => {
                 />
             )}
             {colOpen && (
-                <Modal title="素材字段配置" open={colOpen} onCancel={() => setColOpen(false)}>
+                <Modal width={'80%'} footer={false} title="素材字段配置" open={colOpen} onCancel={() => setColOpen(false)}>
                     <HeaderField libraryId={detail?.id} headerSave={() => setForceUpdateHeader(forceUpdateHeader + 1)} />
                 </Modal>
             )}

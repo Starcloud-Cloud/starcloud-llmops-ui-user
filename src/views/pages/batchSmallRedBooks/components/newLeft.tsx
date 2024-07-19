@@ -1145,7 +1145,7 @@ const Lefts = ({
                                     ) : (
                                         <MaterialTable
                                             setIsModalOpen={setIsModalOpen}
-                                            appUid={appData.appUid}
+                                            appUid={detail ? appData.appUid : appData.uid}
                                             uid={appData.uid}
                                             tableTitle={tableTitle}
                                             handleExecute={(data: number[]) => {

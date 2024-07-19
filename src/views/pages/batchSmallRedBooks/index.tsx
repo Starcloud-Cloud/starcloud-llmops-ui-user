@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
+import { Popconfirm, Tabs, Button, Badge } from 'antd';
 import { getContentPage } from 'api/redBook';
 import { planExecute, batchPages, getListExample } from 'api/redBook/batchIndex';
 import SubCard from 'ui-component/cards/SubCard';
@@ -301,6 +302,8 @@ const BatcSmallRedBooks = forwardRef(
         const batchDataListRef = useRef<any[]>([]);
         const [batchDataList, setBatchDataList] = useState<any[]>([]);
         const [leftWidth, setLeftWidth] = useState('');
+
+        const [updataTip, setUpdataTip] = useState('0');
         return (
             <div
                 style={{
@@ -317,23 +320,86 @@ const BatcSmallRedBooks = forwardRef(
                             p: '10px !important'
                         }}
                     >
-                        <div>
+                        <div className="flex items-center gap-2">
                             <IconButton onClick={() => navigate('/appMarket')} color="secondary">
                                 <KeyboardBackspace fontSize="small" />
                             </IconButton>
-                            <span className="text-[#000c] font-[500]">应用市场</span>
-                            {appDescription && (
-                                <span
-                                    className="2xl:ml-[430px] xl:ml-[340px] lg:ml-[300px]  ml-[300px] text-[#673ab7] cursor-pointer"
-                                    onClick={() => {
-                                        window.open(appDescription);
+                            <div className="text-[#000c] font-[500]">合同号-人开抢</div>
+                            <div className="flex flex-col items-center">
+                                <div></div>
+                                <div>
+                                    <Popconfirm
+                                        title="更新提示"
+                                        description={
+                                            <div className="ml-[-24px]">
+                                                <Tabs
+                                                    activeKey={updataTip}
+                                                    onChange={(e) => setUpdataTip(e)}
+                                                    items={[
+                                                        {
+                                                            key: '0',
+                                                            label: '更新应用',
+                                                            children: (
+                                                                <div className="w-[240px] mb-4">
+                                                                    {/* <div>当前应用最新版本为：{version}</div>
+                                                                <div>你使用的应用版本为：{appData?.version}</div> */}
+                                                                    <div>是否需要更新版本，获得最佳创作效果</div>
+                                                                </div>
+                                                            )
+                                                        },
+                                                        {
+                                                            key: '1',
+                                                            label: '初始化应用',
+                                                            children: (
+                                                                <div className="w-[240px] mb-4">
+                                                                    是否需要初始化为最新的应用配置。
+                                                                    <br />
+                                                                    <span className="text-[#ff4d4f]">注意:</span>
+                                                                    会覆盖所有已修改的应用配置，请自行备份相关内容
+                                                                </div>
+                                                            )
+                                                        }
+                                                    ]}
+                                                ></Tabs>
+                                            </div>
+                                        }
+                                        // okButtonProps={{
+                                        //     disabled: (appData?.version ? appData?.version : 0) === version && updataTip === '0'
+                                        // }}
+                                        onConfirm={() => {}}
+                                        okText="更新"
+                                        cancelText="取消"
+                                    >
+                                        <Badge count={1} dot>
+                                            <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
+                                                版本号： <span className="font-blod">{0}</span>
+                                            </span>
+                                        </Badge>
+                                    </Popconfirm>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            {!detail && (
+                                <Button
+                                    // loading={createAppStatus}
+                                    onClick={async () => {
+                                        // setCreateAppStatus(true);
+                                        // const result = await createSameApp({
+                                        //     appMarketUid: searchParams.get('appUid'),
+                                        //     planUid: searchParams.get('uid')
+                                        // });
+                                        // navigate('/createApp?uid=' + result);
+                                        // setCreateAppStatus(false);
                                     }}
+                                    type="primary"
+                                    size="small"
+                                    className="mr-1"
                                 >
-                                    应用说明
-                                </span>
+                                    创作同款应用
+                                </Button>
                             )}
                         </div>
-                        <div></div>
                     </SubCard>
                 )}
                 <div

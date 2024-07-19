@@ -172,7 +172,7 @@ export const PicImagePick = ({
 
         // Step 2: 创建FormData对象
         const formData = new FormData();
-        formData.append('image', imageBlob, 'image.jpg'); // 'file' 是服务器端接收图片的字段名，'downloaded-image.jpg' 是文件名
+        formData.append('image', imageBlob, 'image.png'); // 'file' 是服务器端接收图片的字段名，'downloaded-image.jpg' 是文件名
 
         setPercent({
             label: '图片上传到云端',

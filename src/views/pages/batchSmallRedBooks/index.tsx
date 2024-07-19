@@ -324,11 +324,11 @@ const BatcSmallRedBooks = forwardRef(
                             <IconButton onClick={() => navigate('/appMarket')} color="secondary">
                                 <KeyboardBackspace fontSize="small" />
                             </IconButton>
-                            <div className="text-[#000c] font-[500]">合同号-人开抢</div>
+                            <div className="text-[#000c] font-[500]">应用市场</div>
                             <div className="flex flex-col items-center">
                                 <div></div>
                                 <div>
-                                    <Popconfirm
+                                    {/* <Popconfirm
                                         title="更新提示"
                                         description={
                                             <div className="ml-[-24px]">
@@ -341,8 +341,8 @@ const BatcSmallRedBooks = forwardRef(
                                                             label: '更新应用',
                                                             children: (
                                                                 <div className="w-[240px] mb-4">
-                                                                    {/* <div>当前应用最新版本为：{version}</div>
-                                                                <div>你使用的应用版本为：{appData?.version}</div> */}
+                                                                    <div>当前应用最新版本为：{version}</div>
+                                                                <div>你使用的应用版本为：{appData?.version}</div>
                                                                     <div>是否需要更新版本，获得最佳创作效果</div>
                                                                 </div>
                                                             )
@@ -363,9 +363,9 @@ const BatcSmallRedBooks = forwardRef(
                                                 ></Tabs>
                                             </div>
                                         }
-                                        // okButtonProps={{
-                                        //     disabled: (appData?.version ? appData?.version : 0) === version && updataTip === '0'
-                                        // }}
+                                        okButtonProps={{
+                                            disabled: (appData?.version ? appData?.version : 0) === version && updataTip === '0'
+                                        }}
                                         onConfirm={() => {}}
                                         okText="更新"
                                         cancelText="取消"
@@ -375,30 +375,30 @@ const BatcSmallRedBooks = forwardRef(
                                                 版本号： <span className="font-blod">{0}</span>
                                             </span>
                                         </Badge>
-                                    </Popconfirm>
+                                    </Popconfirm> */}
                                 </div>
                             </div>
                         </div>
                         <div>
-                            {!detail && (
-                                <Button
-                                    // loading={createAppStatus}
+                            {/* {!detail && ( */}
+                            {/* <Button
+                                    loading={createAppStatus}
                                     onClick={async () => {
-                                        // setCreateAppStatus(true);
-                                        // const result = await createSameApp({
-                                        //     appMarketUid: searchParams.get('appUid'),
-                                        //     planUid: searchParams.get('uid')
-                                        // });
-                                        // navigate('/createApp?uid=' + result);
-                                        // setCreateAppStatus(false);
+                                        setCreateAppStatus(true);
+                                        const result = await createSameApp({
+                                            appMarketUid: searchParams.get('appUid'),
+                                            planUid: searchParams.get('uid')
+                                        });
+                                        navigate('/createApp?uid=' + result);
+                                        setCreateAppStatus(false);
                                     }}
                                     type="primary"
                                     size="small"
                                     className="mr-1"
                                 >
                                     创作同款应用
-                                </Button>
-                            )}
+                                </Button> */}
+                            {/* )} */}
                         </div>
                     </SubCard>
                 )}

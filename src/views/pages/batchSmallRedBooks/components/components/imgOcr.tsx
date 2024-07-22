@@ -1,4 +1,5 @@
-import { Checkbox, Button, Switch } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Checkbox, Button, Switch, Tooltip } from 'antd';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const ImgOcr = ({
@@ -54,7 +55,13 @@ const ImgOcr = ({
                 ))}
             </Checkbox.Group>
             <div className="flex items-center pt-2">
-                <span className="text-sm font-medium mr-2">OCR内容清洗:</span>
+                <span className="text-sm font-medium mr-2">
+                    OCR内容清洗
+                    <Tooltip title={'开启后，对OCR的内容进行AI清洗，解决直接OCR后的内容错别字混乱等问题。 注意开启后耗时更久。'}>
+                    <QuestionCircleOutlined className="cursor-pointer ml-1" />
+                    </Tooltip>
+                    :
+                </span>
                 <Switch
                     checkedChildren="开启"
                     unCheckedChildren="关闭"

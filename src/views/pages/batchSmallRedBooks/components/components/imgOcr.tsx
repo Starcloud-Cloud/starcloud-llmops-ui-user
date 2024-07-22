@@ -7,7 +7,8 @@ const ImgOcr = ({
     setOcrData,
     setSelOpen,
     selList,
-    tableDataLength
+    tableDataLength,
+    handleOCR
 }: {
     imgCheckedList: any[];
     ocrData: any;
@@ -15,6 +16,7 @@ const ImgOcr = ({
     setSelOpen: (data: boolean) => void;
     selList: any[];
     tableDataLength: number;
+    handleOCR: (type: number) => void;
 }) => {
     const handleExe = (num: number) => {
         if (ocrData.checkedFieldList?.length === 0) {
@@ -32,6 +34,7 @@ const ImgOcr = ({
             );
             return false;
         }
+        handleOCR(num);
         // editMaterial(num);
     };
     return (
@@ -73,31 +76,6 @@ const ImgOcr = ({
                         处理全部素材
                         <div>({tableDataLength})</div>
                     </div>
-                </Button>
-            </div>
-            <div className="flex justify-center gap-6 mt-6">
-                <Button
-                    onClick={() => {
-                        if (ocrData.checkedFieldList?.length === 0) {
-                            dispatch(
-                                openSnackbar({
-                                    open: true,
-                                    message: 'AI 补齐字段最少选一个',
-                                    variant: 'alert',
-                                    alert: {
-                                        color: 'error'
-                                    },
-                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                    close: false
-                                })
-                            );
-                            return false;
-                        }
-                        // setField && setField(JSON.stringify(ocrData));
-                    }}
-                    type="primary"
-                >
-                    保存配置
                 </Button>
             </div>
         </div>

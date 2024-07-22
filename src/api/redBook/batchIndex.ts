@@ -144,3 +144,8 @@ export const pluginsXhsOcr = (data: any) => {
 export const extraction = (data: any) => {
     return request.post({ url: `/llm/creative/plugins/extraction`, data });
 };
+
+//ocr
+export const imageOcr = (data: any) => {
+    return request.post({ url: `/llm/creative/plugins/imageOcr`, data });
+};

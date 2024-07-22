@@ -1,6 +1,6 @@
 import { Modal, Button, Table, Progress, Tag } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
-import { materialGenerate, customMaterialGenerate, pluginsXhsOcr, extraction } from 'api/redBook/batchIndex';
+import { materialGenerate, customMaterialGenerate, pluginsXhsOcr, extraction, imageOcr } from 'api/redBook/batchIndex';
 import { templateUpdate } from 'api/redBook/material';
 import _ from 'lodash-es';
 import './aiCreate.css';
@@ -39,7 +39,7 @@ const AiCreate = ({
         return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 5 && item.type !== 6 && !item.isDefault);
     }, [columns]);
     const imgCheckedList = useMemo(() => {
-        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type === 'image');
+        return columns?.filter((item) => item.type === 5);
     }, [columns]);
     const allColumns = useMemo(() => {
         return columns?.slice(1, columns?.length - 1);
@@ -482,6 +482,60 @@ const AiCreate = ({
         executionCountRef.current = 0;
         setExecutionCount(executionCountRef.current);
     };
+
+    const handleOCR = async (num = 1, retry = false) => {
+        if (!retry) {
+            materialzanListRef.current = [];
+            setMaterialzanList(materialzanListRef.current);
+            uuidListsRef.current = [];
+            setUuidLists(uuidListsRef.current);
+        }
+        let materialList: any = [];
+        if (num === 1) {
+            materialList = selList;
+        } else {
+            materialList = tableData;
+        }
+
+        setSelectValue('ocr');
+
+        setMaterialExecutionOpen(true);
+        setTotalCount(materialList.length);
+        totalCountRef.current = materialList.length;
+
+        materialList.map(async (item: any) => {
+            // 选择图片字段
+            const imageList = ocrData.checkedFieldList.map((v: string) => ({ id: item.id, url: item[v], key: v }));
+
+            try {
+                const data = await imageOcr({ imageUrl: imageList[0].url });
+                const resultList = [data];
+
+                // const key = ocrData.checkedFieldList[0];
+                const copyMaterialzanList = _.cloneDeep(materialzanListRef.current);
+                copyMaterialzanList.push({
+                    id: item.id
+                });
+
+                materialzanListRef.current = copyMaterialzanList;
+                setMaterialzanList(copyMaterialzanList);
+
+                const copySuccessCount = successCountRef.current;
+
+                setSuccessCount(copySuccessCount + 1);
+                successCountRef.current = copySuccessCount + 1;
+            } catch (e) {
+                const copyErrorCountRef = errorCountRef.current;
+                setErrorCount(copyErrorCountRef + 1);
+                errorCountRef.current = copyErrorCountRef + 1;
+            }
+        });
+
+        // // await imageOcr();
+
+        setSelectValue('ocr');
+    };
+
     //新增插入表格
     const [selectValue, setSelectValue] = useState('');
     const batchNum = useRef(-1);
@@ -494,12 +548,13 @@ const AiCreate = ({
         bindFieldData: {}
     });
     // OCR 提取数据
-    const [ocrData, setOcrData] = useState({
+    const [ocrData, setOcrData] = useState<any>({
         requirement: '',
         title: true,
         content: true,
         titleField: 1,
-        contentField: 1
+        contentField: 1,
+        checkedFieldList: []
     });
     //素材生成
     const [variableData, setVariableData] = useState<any>({
@@ -598,6 +653,7 @@ const AiCreate = ({
                     selList={selList}
                     tableDataLength={tableData?.length || 0}
                     setSelOpen={setSelOpen}
+                    handleOCR={handleOCR}
                 />
             ) : plugValue === 'xhsOcr' ? (
                 //小红书分析
@@ -683,6 +739,7 @@ const AiCreate = ({
                             </div>
                         ))}
                 </div>
+
                 {totalCount === successCount + errorCount && successCount !== 0 && (
                     <div className="my-4 text-xs flex justify-center">
                         <span className="font-bold">已经生成完成，点击确认导入素材</span>
@@ -717,6 +774,8 @@ const AiCreate = ({
                                 ? xhsCloumns
                                 : selectValue === 'text'
                                 ? textCloumns
+                                : selectValue === 'ocr'
+                                ? columns?.filter((item: any) => ocrData.checkedFieldList?.includes(item.dataIndex))
                                 : [])
                         ]}
                         dataSource={materialzanList}

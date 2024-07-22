@@ -12,7 +12,7 @@ import {
     updateBatchMaterial
 } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
-import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Tag } from 'antd';
+import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps, Tag, Space } from 'antd';
 import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { PicImagePick } from 'ui-component/PicImagePick';
@@ -558,6 +558,12 @@ const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
                         <Image width={500} height={500} className="object-contain" src={currentRecord[filedName]} preview={false} />
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
+                    <div className="flex justify-end mb-2">
+                        <Space>
+                            <Button>图片OCR</Button>
+                            <Button>清洗OCR内容</Button>
+                        </Space>
+                    </div>
                     <ProFormTextArea name={filedName + '_description'} label="描述" />
                     {currentRecord[filedName + '_extend'] && (
                         <div>

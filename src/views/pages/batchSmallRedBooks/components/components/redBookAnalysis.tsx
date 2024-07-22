@@ -1,7 +1,7 @@
-import { Input, Checkbox, Select, Button, Table, message } from 'antd';
+import { Input, Checkbox, Select, Button, Table, message, Switch } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { pluginsXhsOcr } from 'api/redBook/batchIndex';
 import { isEqual, sortBy } from 'lodash-es';
 const RedBookAnalysis = ({
@@ -62,7 +62,13 @@ const RedBookAnalysis = ({
                 <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
             )}
 
-            <div className="text-[16px] font-bold my-4">2.绑定小红书字段</div>
+            <div className="text-[16px] font-bold my-4 flex justify-between">
+                <span>2.绑定小红书字段</span>
+                <div className="flex items-center justify-center">
+                    <span className="text-sm font-medium mr-2">OCR内容清洗:</span>
+                    <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked />
+                </div>
+            </div>
             {/* <div className="flex items-center gap-6">
                 <Checkbox.Group
                     onChange={(data) =>
@@ -172,11 +178,17 @@ const RedBookAnalysis = ({
                                     >
                                         {columns
                                             .filter((item) => item.title !== '使用次数')
-                                            ?.map((item) => (
-                                                <Option key={item.dataIndex} value={item.dataIndex}>
-                                                    {item.title}
-                                                </Option>
-                                            ))}
+                                            ?.map((item) => {
+                                                return (
+                                                    <Option
+                                                        key={item.dataIndex}
+                                                        value={item.dataIndex}
+                                                        disabled={Object.values(redBookData.bindFieldData).includes(item.dataIndex)}
+                                                    >
+                                                        {item.title}
+                                                    </Option>
+                                                );
+                                            })}
                                     </Select>
                                 );
                             }

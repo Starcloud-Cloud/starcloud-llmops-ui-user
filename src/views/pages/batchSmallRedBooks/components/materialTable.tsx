@@ -343,10 +343,7 @@ const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
         getMaterialPage({ ...page, appUid, sortingFields: data }).then((res) => {
             let newList: any = [];
             res.list.map((item: any) => {
-                let obj: any = {
-                    id: item.id,
-                    libraryId: item.libraryId
-                };
+                let obj: any = _.cloneDeep(item);
                 item.content.forEach((item1: any) => {
                     if (item1?.['columnCode']) {
                         obj[item1['columnCode']] = item1?.['value'];

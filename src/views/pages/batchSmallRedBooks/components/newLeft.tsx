@@ -231,7 +231,8 @@ const Lefts = ({
             setAppInfo({
                 name: appRef.current?.configuration?.appInformation?.name,
                 version: appRef.current.version,
-                status: appRef.current.status
+                status: appRef.current.status,
+                updateTime: appRef.current.updateTime
             });
         if (data) {
             appRef.current.executeParam.appInformation = newList;

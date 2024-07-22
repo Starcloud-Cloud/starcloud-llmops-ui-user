@@ -16,6 +16,7 @@ import Right from './components/right';
 import jsCookie from 'js-cookie';
 import { createSameApp } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template';
+import dayjs from 'dayjs';
 const BatcSmallRedBooks = forwardRef(
     (
         {
@@ -344,58 +345,63 @@ const BatcSmallRedBooks = forwardRef(
                             <IconButton onClick={() => navigate('/appMarket')} color="secondary">
                                 <KeyboardBackspace fontSize="small" />
                             </IconButton>
-                            <div className="text-[#000c] font-[500]">{appInfo.name}</div>
-                            <div className="flex gap-2 flex-col ml-4">
-                                <div>状态：{getStatus(appInfo.status)}</div>
-                                <div>
-                                    <Popconfirm
-                                        title="更新提示"
-                                        description={
-                                            <div className="ml-[-24px]">
-                                                <Tabs
-                                                    activeKey={updataTip}
-                                                    onChange={(e) => setUpdataTip(e)}
-                                                    items={[
-                                                        {
-                                                            key: '0',
-                                                            label: '更新应用',
-                                                            children: (
-                                                                <div className="w-[240px] mb-4">
-                                                                    <div>当前应用最新版本为：{version}</div>
-                                                                    <div>你使用的应用版本为：{appInfo.version}</div>
-                                                                    <div>是否需要更新版本，获得最佳创作效果</div>
-                                                                </div>
-                                                            )
-                                                        },
-                                                        {
-                                                            key: '1',
-                                                            label: '初始化应用',
-                                                            children: (
-                                                                <div className="w-[240px] mb-4">
-                                                                    是否需要初始化为最新的应用配置。
-                                                                    <br />
-                                                                    <span className="text-[#ff4d4f]">注意:</span>
-                                                                    会覆盖所有已修改的应用配置，请自行备份相关内容
-                                                                </div>
-                                                            )
-                                                        }
-                                                    ]}
-                                                ></Tabs>
-                                            </div>
-                                        }
-                                        okButtonProps={{
-                                            disabled: (appInfo?.version ? appInfo?.version : 0) === version && updataTip === '0'
-                                        }}
-                                        onConfirm={() => setVersionPre(versionPre + 1)}
-                                        okText="更新"
-                                        cancelText="取消"
-                                    >
-                                        <Badge count={(appInfo?.version ? appInfo?.version : 0) !== version ? 1 : 0} dot>
-                                            <span className="cursor-pointer hover:shadow-md">
-                                                版本号： <span className="font-blod">{appInfo.version || 0}</span>
-                                            </span>
-                                        </Badge>
-                                    </Popconfirm>
+                            <div className="flex flex-col">
+                                <div className="text-[#000c] text-lg font-[500]">{appInfo.name}</div>
+                                <div className="flex items-center gap-2 !text-xs">
+                                    <div>状态：{getStatus(appInfo.status)}</div>
+                                    <div>
+                                        <Popconfirm
+                                            title="更新提示"
+                                            description={
+                                                <div className="ml-[-24px]">
+                                                    <Tabs
+                                                        activeKey={updataTip}
+                                                        onChange={(e) => setUpdataTip(e)}
+                                                        items={[
+                                                            {
+                                                                key: '0',
+                                                                label: '更新应用',
+                                                                children: (
+                                                                    <div className="w-[240px] mb-4">
+                                                                        <div>当前应用最新版本为：{version}</div>
+                                                                        <div>你使用的应用版本为：{appInfo.version}</div>
+                                                                        <div>是否需要更新版本，获得最佳创作效果</div>
+                                                                    </div>
+                                                                )
+                                                            },
+                                                            {
+                                                                key: '1',
+                                                                label: '初始化应用',
+                                                                children: (
+                                                                    <div className="w-[240px] mb-4">
+                                                                        是否需要初始化为最新的应用配置。
+                                                                        <br />
+                                                                        <span className="text-[#ff4d4f]">注意:</span>
+                                                                        会覆盖所有已修改的应用配置，请自行备份相关内容
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        ]}
+                                                    ></Tabs>
+                                                </div>
+                                            }
+                                            okButtonProps={{
+                                                disabled: (appInfo?.version ? appInfo?.version : 0) === version && updataTip === '0'
+                                            }}
+                                            onConfirm={() => setVersionPre(versionPre + 1)}
+                                            okText="更新"
+                                            cancelText="取消"
+                                        >
+                                            <Badge count={(appInfo?.version ? appInfo?.version : 0) !== version ? 1 : 0} dot>
+                                                <span className="text-xs cursor-pointer hover:shadow-md">
+                                                    版本号： <span className="font-blod">{appInfo.version || 0}</span>
+                                                </span>
+                                            </Badge>
+                                        </Popconfirm>
+                                    </div>
+                                    <div className=" text-black/50">
+                                        最后更新时间：{dayjs(appInfo.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -413,10 +419,9 @@ const BatcSmallRedBooks = forwardRef(
                                         setCreateAppStatus(false);
                                     }}
                                     type="primary"
-                                    size="small"
                                     className="mr-1"
                                 >
-                                    创作同款应用
+                                    复制应用
                                 </Button>
                             )}
                         </div>

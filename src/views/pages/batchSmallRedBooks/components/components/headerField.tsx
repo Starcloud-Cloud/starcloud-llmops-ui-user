@@ -1,8 +1,14 @@
 import { Modal, Form, Button, Popconfirm, Tag, Input, InputNumber, Switch, Select, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { HolderOutlined } from '@ant-design/icons';
 import { EditableProTable } from '@ant-design/pro-components';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useContext } from 'react';
 import { Resizable } from 'react-resizable';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { DndContext } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import _ from 'lodash-es';
 import { getColumn, createColumn, updatesColumn, delColumn } from 'api/material/field';
 const ResizeableTitle = (props: any) => {
@@ -16,6 +22,41 @@ const ResizeableTitle = (props: any) => {
         <Resizable width={width} height={0} onResize={onResize} draggableOpts={{ enableUserSelectHack: false }}>
             <th {...restProps} />
         </Resizable>
+    );
+};
+
+interface RowContextProps {
+    setActivatorNodeRef?: (element: HTMLElement | null) => void;
+    listeners?: SyntheticListenerMap;
+}
+const RowContext = React.createContext<RowContextProps>({});
+const DragHandle: React.FC = () => {
+    const { setActivatorNodeRef, listeners } = useContext(RowContext);
+    return (
+        <Button type="text" size="small" icon={<HolderOutlined />} style={{ cursor: 'move' }} ref={setActivatorNodeRef} {...listeners} />
+    );
+};
+interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+    'data-row-key': string;
+}
+const Row: React.FC<RowProps> = (props) => {
+    const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+        id: props['data-row-key']
+    });
+
+    const style: React.CSSProperties = {
+        ...props.style,
+        transform: CSS.Translate.toString(transform),
+        transition,
+        ...(isDragging ? { position: 'relative', zIndex: 9999 } : {})
+    };
+
+    const contextValue = useMemo<RowContextProps>(() => ({ setActivatorNodeRef, listeners }), [setActivatorNodeRef, listeners]);
+
+    return (
+        <RowContext.Provider value={contextValue}>
+            <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+        </RowContext.Provider>
     );
 };
 const HeaderField = ({
@@ -32,7 +73,8 @@ const HeaderField = ({
     const components = {
         header: {
             cell: ResizeableTitle
-        }
+        },
+        body: { row: Row }
     };
     const rowKey = 'id';
     const [form] = Form.useForm();
@@ -44,6 +86,7 @@ const HeaderField = ({
         { label: '文档路径', value: 6 }
     ];
     const materialColumns: any = [
+        { key: 'sort', align: 'center', width: 80, render: () => <DragHandle />, editable: false },
         {
             title: '字段名称',
             align: 'center',
@@ -146,6 +189,23 @@ const HeaderField = ({
         seteditableKeys(result.map((item: any) => item.id));
         setTableData(result);
     };
+    const onDragEnd = ({ active, over }: DragEndEvent) => {
+        if (active.id !== over?.id) {
+            console.log((prevState: any) => {
+                const activeIndex = prevState.findIndex((record: any) => record.key === active?.id);
+                const overIndex = prevState.findIndex((record: any) => record.key === over?.id);
+                return arrayMove(prevState, activeIndex, overIndex);
+            });
+
+            setTableData((prevState) => {
+                const activeIndex = prevState.findIndex((record) => record.key === active?.id);
+                const overIndex = prevState.findIndex((record) => record.key === over?.id);
+                console.log(arrayMove(prevState, activeIndex, overIndex));
+
+                return arrayMove(prevState, activeIndex, overIndex);
+            });
+        }
+    };
     useEffect(() => {
         if (libraryId) {
             getList();
@@ -154,63 +214,65 @@ const HeaderField = ({
     return (
         <>
             {/* <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置"> */}
-            <EditableProTable<any>
-                className="edit-table"
-                rowKey={rowKey}
-                maxLength={30}
-                tableAlertRender={false}
-                loading={tableLoading}
-                components={components}
-                rowSelection={false}
-                editableFormRef={actionRef}
-                toolBarRender={false}
-                columns={materialColumns}
-                value={tableData}
-                pagination={false}
-                recordCreatorProps={{
-                    newRecordType: 'dataSource',
-                    record: () => ({
-                        id: Date.now(),
-                        uuid: Date.now(),
-                        isRequired: false,
-                        isGroupColumn: false
-                    })
-                }}
-                editable={{
-                    type: 'multiple',
-                    editableKeys: editableKeys,
-                    actionRender: (row, config, defaultDoms) => {
-                        return [
-                            <Popconfirm
-                                title="提示"
-                                description="请再次确认是否要删除"
-                                onConfirm={async () => {
-                                    console.log(row);
+            <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+                <EditableProTable<any>
+                    className="edit-table"
+                    rowKey={rowKey}
+                    maxLength={30}
+                    tableAlertRender={false}
+                    loading={tableLoading}
+                    components={components}
+                    rowSelection={false}
+                    editableFormRef={actionRef}
+                    toolBarRender={false}
+                    columns={materialColumns}
+                    value={tableData}
+                    pagination={false}
+                    recordCreatorProps={{
+                        newRecordType: 'dataSource',
+                        record: () => ({
+                            id: Date.now(),
+                            uuid: Date.now(),
+                            isRequired: false,
+                            isGroupColumn: false
+                        })
+                    }}
+                    editable={{
+                        type: 'multiple',
+                        editableKeys: editableKeys,
+                        actionRender: (row, config, defaultDoms) => {
+                            return [
+                                <Popconfirm
+                                    title="提示"
+                                    description="请再次确认是否要删除"
+                                    onConfirm={async () => {
+                                        console.log(row);
 
-                                    if (!row.uuid) {
-                                        await delColumn({ id: row.id });
-                                    }
-                                    setTableData(tableData.filter((item) => item.id !== row.id));
-                                    headerSave && headerSave();
-                                }}
-                                okText="Yes"
-                                cancelText="No"
-                            >
-                                <Button type="link" danger>
-                                    删除
-                                </Button>
-                            </Popconfirm>
-                        ];
-                    },
-                    onValuesChange: (record, recordList) => {
-                        setTableData(recordList);
-                    },
-                    onChange: seteditableKeys
-                }}
-                onChange={(data) => {
-                    console.log(data);
-                }}
-            />
+                                        if (!row.uuid) {
+                                            await delColumn({ id: row.id });
+                                        }
+                                        setTableData(tableData.filter((item) => item.id !== row.id));
+                                        headerSave && headerSave();
+                                    }}
+                                    okText="Yes"
+                                    cancelText="No"
+                                >
+                                    <Button type="link" danger>
+                                        删除
+                                    </Button>
+                                </Popconfirm>
+                            ];
+                        },
+                        onValuesChange: (record, recordList) => {
+                            setTableData(recordList);
+                        },
+                        onChange: seteditableKeys
+                    }}
+                    onChange={(data) => {
+                        console.log(data);
+                    }}
+                />
+            </DndContext>
             {/* <Button
                 onClick={() => {
                     setOpen(true);

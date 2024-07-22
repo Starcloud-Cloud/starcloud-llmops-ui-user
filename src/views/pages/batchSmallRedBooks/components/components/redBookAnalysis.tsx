@@ -4,6 +4,8 @@ const { Option } = Select;
 import { memo, useEffect, useState } from 'react';
 import { pluginsXhsOcr } from 'api/redBook/batchIndex';
 import { isEqual, sortBy } from 'lodash-es';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Tooltip } from '@mui/material';
 const RedBookAnalysis = ({
     columns,
     redBookData,
@@ -32,7 +34,17 @@ const RedBookAnalysis = ({
         { label: '图片 8', value: 'image8' },
         { label: '图片 9', value: 'image9' },
         { label: '图片 10', value: 'image10' },
-        { label: '全部 OCR 信息', value: 'allOcrContent' }
+        {
+            label: (
+                <div>
+                    全部 OCR 信息
+                    <Tooltip title={'全部笔记图片OCR内容的合并'}>
+                        <QuestionCircleOutlined className="cursor-pointer ml-1" />
+                    </Tooltip>
+                </div>
+            ),
+            value: 'allOcrContent'
+        }
     ];
 
     useEffect(() => {
@@ -65,7 +77,13 @@ const RedBookAnalysis = ({
             <div className="text-[16px] font-bold my-4 flex justify-between">
                 <span>2.绑定小红书字段</span>
                 <div className="flex items-center justify-center">
-                    <span className="text-sm font-medium mr-2">OCR内容清洗:</span>
+                    <span className="text-sm font-medium mr-2">
+                        OCR内容清洗
+                        <Tooltip title={'开启后，对OCR的内容进行AI清洗，解决直接OCR后的内容错别字混乱等问题。 注意开启后耗时更久。'}>
+                            <QuestionCircleOutlined className="cursor-pointer ml-1" />
+                        </Tooltip>
+                        :
+                    </span>
                     <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked />
                 </div>
             </div>

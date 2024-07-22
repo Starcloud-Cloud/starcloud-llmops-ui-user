@@ -157,6 +157,16 @@ const MaterialLibrary = ({
             width: 150,
             sorter: (a, b) => a.createTime - b.createTime,
             renderText: (text) => text && dayjs(text).format('YYYY-MM-DD HH:mm')
+        },
+        {
+            title: '更新时间',
+            align: 'center',
+            dataIndex: 'updateTime',
+            defaultSortOrder: 'descend',
+            search: false,
+            width: 150,
+            sorter: (a, b) => a.createTime - b.createTime,
+            renderText: (text) => text && dayjs(text).format('YYYY-MM-DD HH:mm')
         }
         // {
         //     title: '启用',
@@ -287,9 +297,14 @@ const MaterialLibrary = ({
                                 field: 'create_time',
                                 order: sort[key] === 'ascend' ? 'asc' : 'desc'
                             });
-                        } else {
+                        } else if (key === 'fileCount') {
                             sortingFields.push({
                                 field: 'file_count',
+                                order: sort[key] === 'ascend' ? 'asc' : 'desc'
+                            });
+                        } else {
+                            sortingFields.push({
+                                field: 'update_time',
                                 order: sort[key] === 'ascend' ? 'asc' : 'desc'
                             });
                         }
@@ -307,7 +322,7 @@ const MaterialLibrary = ({
                 onRow={(record) => {
                     return {
                         onClick: () => {
-                            navigate(`/material/detail?id=${record.id}`);
+                            mode === 'page' ? navigate(`/material/detail?id=${record.id}`) : null;
                         }
                     };
                 }}

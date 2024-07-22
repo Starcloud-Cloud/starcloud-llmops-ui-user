@@ -484,6 +484,7 @@ const AiCreate = ({
     };
 
     const handleOCR = async (num = 1, retry = false) => {
+        ocrNum.current = num;
         if (!retry) {
             materialzanListRef.current = [];
             setMaterialzanList(materialzanListRef.current);
@@ -503,42 +504,61 @@ const AiCreate = ({
         setTotalCount(materialList.length);
         totalCountRef.current = materialList.length;
 
+        const idList = materialList.map((item: any) => item.id);
+        uuidListsRef.current = idList;
+        setUuidLists(idList);
+
+        setExecutionCount(materialList.length);
+        executionCountRef.current = materialList.length;
+
         materialList.map(async (item: any) => {
+            let obj: any = {};
             // 选择图片字段
-            const imageList = ocrData.checkedFieldList.map((v: string) => ({ id: item.id, url: item[v], key: v }));
-
+            const imageUrlList = ocrData.checkedFieldList.map((v: string) => item[v]).filter((url: string) => url);
             try {
-                const data = await imageOcr({ imageUrl: imageList[0].url });
-                const resultList = [data];
-
-                // const key = ocrData.checkedFieldList[0];
-                const copyMaterialzanList = _.cloneDeep(materialzanListRef.current);
-                copyMaterialzanList.push({
-                    id: item.id
+                const data = await imageOcr({ imageUrls: imageUrlList, cleansing: ocrData.cleansing });
+                Object.keys(item).forEach((v: any) => {
+                    data.list.forEach((v1: any) => {
+                        if (item[v] === v1.url) {
+                            (obj = item),
+                                (obj.id = item.id),
+                                (obj[v] = item[v]),
+                                (obj[v + '_tag'] = v1.ocrGeneralDTO.tag),
+                                (obj[v + '_description'] = v1.ocrGeneralDTO.content),
+                                (obj[v + '_extend'] = v1.ocrGeneralDTO.data);
+                        }
+                    });
                 });
+
+                const copyMaterialzanList = _.cloneDeep(materialzanListRef.current);
+                copyMaterialzanList.push(obj);
 
                 materialzanListRef.current = copyMaterialzanList;
                 setMaterialzanList(copyMaterialzanList);
 
-                const copySuccessCount = successCountRef.current;
+                const exeCount = executionCountRef.current;
+                setExecutionCount(exeCount - 1);
+                executionCountRef.current = exeCount - 1;
 
+                const copySuccessCount = successCountRef.current;
                 setSuccessCount(copySuccessCount + 1);
                 successCountRef.current = copySuccessCount + 1;
             } catch (e) {
+                const exeCount = executionCountRef.current;
+                setExecutionCount(exeCount - 1);
+                executionCountRef.current = exeCount - 1;
+
                 const copyErrorCountRef = errorCountRef.current;
                 setErrorCount(copyErrorCountRef + 1);
                 errorCountRef.current = copyErrorCountRef + 1;
             }
         });
-
-        // // await imageOcr();
-
-        setSelectValue('ocr');
     };
 
     //新增插入表格
     const [selectValue, setSelectValue] = useState('');
     const batchNum = useRef(-1);
+    const ocrNum = useRef(0);
     const materialzanListRef = useRef<any[]>([]);
     const [materialzanList, setMaterialzanList] = useState<any[]>([]);
     //小红书数据
@@ -798,6 +818,8 @@ const AiCreate = ({
                                     setErrorMessage(errorMessageRef.current);
                                     if (selectValue === 'batch') {
                                         aimaterialCreate();
+                                    } else if (selectValue === 'ocr') {
+                                        handleOCR(ocrNum.current);
                                     } else {
                                         editMaterial(batchNum.current);
                                     }
@@ -846,6 +868,13 @@ const AiCreate = ({
                                         setPlugOpen(false);
                                         setSelectedRowKeys(uuidListsRef.current);
                                     } else if (selectValue === 'text') {
+                                        setSelList([]);
+                                        setSelKeyList([]);
+                                        downTableData(materialzanListRef.current, 2);
+                                        setMaterialExecutionOpen(false);
+                                        setPlugOpen(false);
+                                        setSelectedRowKeys(uuidLists);
+                                    } else if (selectValue === 'ocr') {
                                         setSelList([]);
                                         setSelKeyList([]);
                                         downTableData(materialzanListRef.current, 2);

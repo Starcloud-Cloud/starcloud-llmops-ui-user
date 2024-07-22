@@ -38,6 +38,7 @@ import { KeyboardBackspace } from '@mui/icons-material';
 import MaterialLibrary from './index';
 import AiCreate from '../pages/batchSmallRedBooks/components/newAI';
 import React from 'react';
+import { imageOcr } from 'api/redBook/batchIndex';
 
 export enum EditType {
     String = 0,
@@ -467,6 +468,8 @@ const MaterialLibraryDetail = () => {
     const [tableDataOriginal, setTableDataOriginal] = useState<any>([]);
     const [openSwitchMaterial, setOpenSwitchMaterial] = useState(false);
     const [selectedMaterialRowKeys, setSelectedMaterialRowKeys] = useState<React.Key[]>([]);
+    const [btnLoading, setBtnLoading] = useState(-1);
+    const [extend, setExtend] = useState<any>({});
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -861,6 +864,16 @@ const MaterialLibraryDetail = () => {
         return null;
     }
 
+    const handleOcr = async (filedName: string, url: string, type: number) => {
+        setBtnLoading(type);
+        const data = await imageOcr({ imageUrls: [url], cleansing: !!type });
+        const result = data?.list?.[0].ocrGeneralDTO;
+        imageForm.setFieldValue(`${filedName}_tag`, result.tag);
+        imageForm.setFieldValue(`${filedName}_description`, result.content);
+        setBtnLoading(-1);
+        setExtend({ [filedName + '_extend']: result.data });
+    };
+
     return (
         <div className="h-full">
             <SubCard
@@ -982,7 +995,8 @@ const MaterialLibraryDetail = () => {
                         const value = await imageForm.getFieldsValue();
                         const result = await handleEditColumn({
                             ...currentRecord,
-                            ...value
+                            ...value,
+                            ...extend
                         });
                         setPreviewOpen(false);
                     }}
@@ -991,10 +1005,14 @@ const MaterialLibraryDetail = () => {
                         <Image width={500} height={500} className="object-contain" src={currentRecord[filedName]} preview={false} />
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
-                    <div>
+                    <div className="flex justify-end mb-2">
                         <Space>
-                            <Button>图片OCR</Button>
-                            <Button>清洗OCR内容</Button>
+                            <Button loading={btnLoading == 0} onClick={() => handleOcr(filedName, currentRecord[filedName], 0)}>
+                                图片OCR
+                            </Button>
+                            <Button loading={btnLoading === 1} onClick={() => handleOcr(filedName, currentRecord[filedName], 1)}>
+                                清洗OCR内容
+                            </Button>
                         </Space>
                     </div>
                     <ProFormTextArea name={filedName + '_description'} label="描述" />

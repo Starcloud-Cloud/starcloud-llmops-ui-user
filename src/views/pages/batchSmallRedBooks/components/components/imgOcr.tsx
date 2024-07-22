@@ -1,4 +1,4 @@
-import { Checkbox, Button } from 'antd';
+import { Checkbox, Button, Switch } from 'antd';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const ImgOcr = ({
@@ -53,6 +53,21 @@ const ImgOcr = ({
                     <Checkbox value={item.dataIndex}>{item.title}</Checkbox>
                 ))}
             </Checkbox.Group>
+            <div className="flex items-center pt-2">
+                <span className="text-sm font-medium mr-2">OCR内容清洗:</span>
+                <Switch
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                    defaultChecked
+                    checked={ocrData.cleansing}
+                    onChange={(value) =>
+                        setOcrData({
+                            ...ocrData,
+                            cleansing: value
+                        })
+                    }
+                />
+            </div>
             <div className="text-[16px] font-bold my-4">2.如何处理素材</div>
             <Button className="mb-4" type="primary" size="small" onClick={() => setSelOpen(true)}>
                 选择素材

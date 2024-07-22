@@ -986,86 +986,7 @@ function CreateDetail() {
     const [tableTitle, setTableTitle] = useState(0);
     console.log(1);
 
-    return searchParams.get('source') === 'market' ? (
-        detail ? (
-            <>
-                <SubCard
-                    contentSX={{
-                        p: '10px !important'
-                    }}
-                    sx={{ mb: '16px' }}
-                >
-                    <div>
-                        <IconButton onClick={() => navigate('/appMarket')} color="secondary">
-                            <KeyboardBackspace fontSize="small" />
-                        </IconButton>
-                        <span className="text-[#000c] font-[500]">应用市场</span>
-                    </div>
-                </SubCard>
-                <div className="h-[calc(100%-74px)] ">
-                    {detail?.type === 'MEDIA_MATRIX' ? (
-                        <Spin spinning={viewLoading} tip="Loading">
-                            <div className="h-[calc(100vh-220px)] bg-[rgb(244,246,248)]">
-                                <CreatePlan
-                                    ref={createPlanRef}
-                                    imageStylePre={imageStylePre}
-                                    getAppList={getList}
-                                    changePre={changePre}
-                                    planState={planState}
-                                    tableTitle={tableTitle}
-                                    detail={_.cloneDeep(detailRef.current)}
-                                    setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
-                                    isMyApp={false}
-                                    isblack={false}
-                                />
-                            </div>
-                        </Spin>
-                    ) : (
-                        <Card elevation={2} sx={{ p: 2 }}>
-                            <Header
-                                permissions={permissions}
-                                detail={detail}
-                                aiModel={aiModel}
-                                setOpenUpgradeModel={setOpenUpgradeModel}
-                                setAiModel={setAiModel}
-                                appModels={appModels}
-                            />
-                            <Perform
-                                columns={stepMaterial}
-                                setEditOpen={setEditOpen}
-                                setStep={(data: any) => {
-                                    stepRef.current = data;
-                                    setStep(stepRef.current);
-                                }}
-                                getList={getList}
-                                setMaterialType={setMaterialType}
-                                setTitle={setTitle}
-                                isShows={isShows}
-                                details={_.cloneDeep(detailRef.current)}
-                                config={_.cloneDeep(detailRef.current?.workflowConfig)}
-                                changeConfigs={changeConfigs}
-                                changeSon={changeData}
-                                changeanswer={changeanswer}
-                                loadings={loadings}
-                                isDisables={isDisables}
-                                variableChange={exeChange}
-                                promptChange={promptChange}
-                                isallExecute={(flag: boolean) => {
-                                    isAllExecute = flag;
-                                }}
-                                addStyle={addStyle}
-                                source="myApp"
-                            />
-                        </Card>
-                    )}
-                </div>
-            </>
-        ) : (
-            <div className="w-full h-full flex justify-center items-center">
-                <Spin spinning={true} />
-            </div>
-        )
-    ) : (
+    return detail ? (
         <Card sx={{ height: '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
                 sx={{ padding: 2 }}
@@ -1075,7 +996,9 @@ function CreateDetail() {
                         variant="contained"
                         startIcon={<ArrowBack />}
                         color="secondary"
-                        onClick={() => navigate('/template/createCenter')}
+                        onClick={() => {
+                            searchParams.get('source') === 'market' ? navigate('/appMarket') : navigate('/template/createCenter');
+                        }}
                     >
                         {t('myApp.back')}
                     </Buttons>
@@ -1383,6 +1306,10 @@ function CreateDetail() {
                 />
             )}
         </Card>
+    ) : (
+        <div className="w-full h-full flex justify-center items-center">
+            <Spin spinning={true} />
+        </div>
     );
 }
 export default CreateDetail;

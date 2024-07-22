@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
-import { Popconfirm, Tabs, Button, Badge } from 'antd';
+import { Popconfirm, Tabs, Button, Badge, Tag } from 'antd';
 import { getContentPage } from 'api/redBook';
 import { planExecute, batchPages, getListExample } from 'api/redBook/batchIndex';
 import SubCard from 'ui-component/cards/SubCard';
@@ -14,7 +14,7 @@ import './index.scss';
 import Left from './components/newLeft';
 import Right from './components/right';
 import jsCookie from 'js-cookie';
-import { MoreOutlined, SwapOutlined } from '@ant-design/icons';
+import { createSameApp } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template';
 const BatcSmallRedBooks = forwardRef(
     (
@@ -67,11 +67,8 @@ const BatcSmallRedBooks = forwardRef(
                     return false;
                 }
                 const res = await marketDeatail({ uid: searchParams.get('appUid') });
-                if (res.description) {
-                    const urlPattern = /https?:\/\/[^\s]+(?:\.com|\.cn|\.org|\.net|\.edu\.com.cn)/g;
-                    const urls = res?.description?.match(urlPattern);
-                    setAppDescription(urls?.[0] || '');
-                }
+                console.log(res);
+                setVersion(res.version);
             })();
         }, []);
 
@@ -304,6 +301,29 @@ const BatcSmallRedBooks = forwardRef(
         const [leftWidth, setLeftWidth] = useState('');
 
         const [updataTip, setUpdataTip] = useState('0');
+        const [version, setVersion] = useState(0);
+        const [appInfo, setAppInfo] = useState<any>({});
+        const [versionPre, setVersionPre] = useState(0);
+        const [createAppStatus, setCreateAppStatus] = useState(false);
+
+        const getStatus = (status: any) => {
+            switch (status) {
+                case 'PENDING':
+                    return <Tag>待执行</Tag>;
+                case 'RUNNING':
+                    return <Tag color="processing">执行中</Tag>;
+                case 'PAUSE':
+                    return <Tag color="warning">暂停</Tag>;
+                case 'CANCELED':
+                    return <Tag>已取消</Tag>;
+                case 'COMPLETE':
+                    return <Tag color="success">已完成</Tag>;
+                case 'FAILURE':
+                    return <Tag color="error">失败</Tag>;
+                default:
+                    return <Tag>待执行</Tag>;
+            }
+        };
         return (
             <div
                 style={{
@@ -324,11 +344,11 @@ const BatcSmallRedBooks = forwardRef(
                             <IconButton onClick={() => navigate('/appMarket')} color="secondary">
                                 <KeyboardBackspace fontSize="small" />
                             </IconButton>
-                            <div className="text-[#000c] font-[500]">应用市场</div>
-                            <div className="flex flex-col items-center">
-                                <div></div>
+                            <div className="text-[#000c] font-[500]">{appInfo.name}</div>
+                            <div className="flex gap-2 flex-col ml-4">
+                                <div>状态：{getStatus(appInfo.status)}</div>
                                 <div>
-                                    {/* <Popconfirm
+                                    <Popconfirm
                                         title="更新提示"
                                         description={
                                             <div className="ml-[-24px]">
@@ -342,7 +362,7 @@ const BatcSmallRedBooks = forwardRef(
                                                             children: (
                                                                 <div className="w-[240px] mb-4">
                                                                     <div>当前应用最新版本为：{version}</div>
-                                                                <div>你使用的应用版本为：{appData?.version}</div>
+                                                                    <div>你使用的应用版本为：{appInfo.version}</div>
                                                                     <div>是否需要更新版本，获得最佳创作效果</div>
                                                                 </div>
                                                             )
@@ -364,24 +384,24 @@ const BatcSmallRedBooks = forwardRef(
                                             </div>
                                         }
                                         okButtonProps={{
-                                            disabled: (appData?.version ? appData?.version : 0) === version && updataTip === '0'
+                                            disabled: (appInfo?.version ? appInfo?.version : 0) === version && updataTip === '0'
                                         }}
-                                        onConfirm={() => {}}
+                                        onConfirm={() => setVersionPre(versionPre + 1)}
                                         okText="更新"
                                         cancelText="取消"
                                     >
-                                        <Badge count={1} dot>
-                                            <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
-                                                版本号： <span className="font-blod">{0}</span>
+                                        <Badge count={(appInfo?.version ? appInfo?.version : 0) !== version ? 1 : 0} dot>
+                                            <span className="cursor-pointer hover:shadow-md">
+                                                版本号： <span className="font-blod">{appInfo.version || 0}</span>
                                             </span>
                                         </Badge>
-                                    </Popconfirm> */}
+                                    </Popconfirm>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            {/* {!detail && ( */}
-                            {/* <Button
+                            {!detail && (
+                                <Button
                                     loading={createAppStatus}
                                     onClick={async () => {
                                         setCreateAppStatus(true);
@@ -397,8 +417,8 @@ const BatcSmallRedBooks = forwardRef(
                                     className="mr-1"
                                 >
                                     创作同款应用
-                                </Button> */}
-                            {/* )} */}
+                                </Button>
+                            )}
                         </div>
                     </SubCard>
                 )}
@@ -417,6 +437,8 @@ const BatcSmallRedBooks = forwardRef(
                     >
                         <Left
                             pre={pre}
+                            updataTip={updataTip}
+                            versionPre={versionPre}
                             tableTitle={tableTitle}
                             imageStylePre={imageStylePre}
                             isMyApp={isMyApp}
@@ -432,6 +454,7 @@ const BatcSmallRedBooks = forwardRef(
                                     setLeftWidth('50%');
                                 }
                             }}
+                            setAppInfo={setAppInfo}
                             getAppList={getAppList}
                             setImageMoke={setImageMoke}
                             setCollData={setCollData}

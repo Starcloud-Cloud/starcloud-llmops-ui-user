@@ -234,7 +234,7 @@ export const TableHeader = ({
                                 type="primary"
                                 onClick={() => handleExecute && handleExecute(selectedRowKeys)}
                             >
-                                选择执行
+                                选择执行({selectedRowKeys.length})
                             </Button>
                         )}
                     </Space>

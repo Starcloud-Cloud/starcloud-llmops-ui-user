@@ -121,7 +121,7 @@ const NewPrompt = ({
                             size="small"
                             color="primary"
                             onClick={() => changePrompt(item.field, i)}
-                            label={item.field}
+                            label={item.label}
                         ></Chip>
                     </Popover>
                     // <Tooltip key={item.field} placement="top" title={'点击变量，增加到提示词中'}>

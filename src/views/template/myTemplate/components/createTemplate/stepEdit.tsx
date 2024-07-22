@@ -51,6 +51,11 @@ const StepEdit = ({
 }) => {
     const permissions = useUserStore((state) => state.permissions);
     const { TextArea } = Input;
+    const groupList = [
+        { label: '系统变量', value: 'SYSTEM' },
+        { label: '通用变量', value: 'PARAMS' },
+        { label: '高级变量', value: 'ADVANCED' }
+    ];
     const columns: TableProps<any>['columns'] = [
         {
             title: '变量 KEY',
@@ -76,6 +81,11 @@ const StepEdit = ({
             title: '变量类型',
             align: 'center',
             render: (_, row) => <span>{variableStyle?.find((item) => item.value === row.style)?.label}</span>
+        },
+        {
+            title: '变量分组',
+            align: 'center',
+            render: (_, row) => <span>{groupList?.find((item) => item.value === row.group)?.label}</span>
         },
         {
             title: '操作',

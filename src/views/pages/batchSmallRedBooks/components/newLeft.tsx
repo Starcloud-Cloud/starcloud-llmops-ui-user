@@ -6,17 +6,7 @@ import { PlusOutlined, SaveOutlined, InfoCircleOutlined, RightOutlined } from '@
 import { getAccessToken } from 'utils/auth';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import {
-    materialTemplate,
-    getPlan,
-    planModify,
-    planUpgrade,
-    metadata,
-    planModifyConfig,
-    materialJudge,
-    createSameApp
-} from 'api/redBook/batchIndex';
-import { marketDeatail } from 'api/template/index';
+import { materialTemplate, getPlan, planModify, planUpgrade, metadata, planModifyConfig, materialJudge } from 'api/redBook/batchIndex';
 import FormModal, { propShow } from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import AddStyleApp from 'ui-component/AddStyle/indexApp';
@@ -39,6 +29,8 @@ const Lefts = ({
     detailShow = true,
     planState,
     pre,
+    updataTip,
+    versionPre,
     tableTitle,
     imageStylePre,
     isMyApp,
@@ -54,6 +46,7 @@ const Lefts = ({
     setPlanUid,
     leftWidth,
     setWidth,
+    setAppInfo,
     getAppList
 }: {
     detailShow?: boolean;
@@ -61,6 +54,8 @@ const Lefts = ({
     isMyApp?: boolean;
     tableTitle?: number;
     pre?: number;
+    updataTip?: string;
+    versionPre?: number;
     imageStylePre?: number;
     changePre?: number;
     detail?: any;
@@ -74,6 +69,7 @@ const Lefts = ({
     setDetail?: (data: any, fieldShow?: boolean) => void;
     setPlanUid: (data: any) => void;
     setWidth?: () => void;
+    setAppInfo?: (data: any) => void;
     getAppList?: () => void;
 }) => {
     const navigate = useNavigate();
@@ -219,9 +215,6 @@ const Lefts = ({
             setSelectImgLoading(true);
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
             setSelectImgLoading(false);
-            marketDeatail({ uid: searchParams.get('appUid') }).then((res) => {
-                setVersion(res?.version || 0);
-            });
             newList = _.cloneDeep(result?.configuration?.appInformation);
             const collData: any = result?.configuration?.appInformation?.example;
             if (collData) {
@@ -234,6 +227,12 @@ const Lefts = ({
         setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
         appRef.current = result;
+        setAppInfo &&
+            setAppInfo({
+                name: appRef.current?.configuration?.appInformation?.name,
+                version: appRef.current.version,
+                status: appRef.current.status
+            });
         if (data) {
             appRef.current.executeParam.appInformation = newList;
         } else {
@@ -802,7 +801,7 @@ const Lefts = ({
         }
     };
     const [tabKey, setTabKey] = useState('1');
-    const upDateVersion = async (updataTip: string) => {
+    const upDateVersion = async () => {
         const result = await planUpgrade({
             uid: appData?.uid,
             appUid: searchParams.get('appUid'),
@@ -824,6 +823,11 @@ const Lefts = ({
         );
         getList(true);
     };
+    useEffect(() => {
+        if (versionPre) {
+            upDateVersion();
+        }
+    }, [versionPre]);
     //token 不足弹框
     const [botOpen, setBotOpen] = useState(false);
     useEffect(() => {
@@ -902,10 +906,6 @@ const Lefts = ({
                 }
             });
     };
-    const [updataTip, setUpdataTip] = useState('0');
-
-    //创作同款应用状态
-    const [createAppStatus, setCreateAppStatus] = useState(false);
     const addName: any = (name: string) => {
         const nameList = appRef.current.configuration?.appInformation?.workflowConfig?.steps?.map((item: any) => item.name);
 
@@ -1008,86 +1008,6 @@ const Lefts = ({
                         <RightOutlined />
                     </Button>
                 </Tooltip>
-                {isMyApp && (
-                    <div className="text-[22px] whitespace-nowrap mx-2 mb-4 pt-4 mr-4">{appData?.configuration?.appInformation?.name}</div>
-                )}
-                {detailShow && !detail && (
-                    <div className="flex gap-2 justify-between items-center mx-2 mb-4 pt-4 mr-4">
-                        <div className="text-[22px] whitespace-nowrap">{appData?.configuration?.appInformation?.name}</div>
-                        <div>
-                            {!detail && (
-                                <Button
-                                    loading={createAppStatus}
-                                    onClick={async () => {
-                                        setCreateAppStatus(true);
-                                        const result = await createSameApp({
-                                            appMarketUid: searchParams.get('appUid'),
-                                            planUid: searchParams.get('uid')
-                                        });
-                                        navigate('/createApp?uid=' + result);
-                                        setCreateAppStatus(false);
-                                    }}
-                                    type="primary"
-                                    size="small"
-                                    className="mr-1"
-                                >
-                                    创作同款应用
-                                </Button>
-                            )}
-                            状态：{getStatus1(appData?.status)}
-                            <div className="inline-block whitespace-nowrap">
-                                <Popconfirm
-                                    title="更新提示"
-                                    description={
-                                        <div className="ml-[-24px]">
-                                            <Tabs
-                                                activeKey={updataTip}
-                                                onChange={(e) => setUpdataTip(e)}
-                                                items={[
-                                                    {
-                                                        key: '0',
-                                                        label: '更新应用',
-                                                        children: (
-                                                            <div className="w-[240px] mb-4">
-                                                                <div>当前应用最新版本为：{version}</div>
-                                                                <div>你使用的应用版本为：{appData?.version}</div>
-                                                                <div>是否需要更新版本，获得最佳创作效果</div>
-                                                            </div>
-                                                        )
-                                                    },
-                                                    {
-                                                        key: '1',
-                                                        label: '初始化应用',
-                                                        children: (
-                                                            <div className="w-[240px] mb-4">
-                                                                是否需要初始化为最新的应用配置。
-                                                                <br />
-                                                                <span className="text-[#ff4d4f]">注意:</span>
-                                                                会覆盖所有已修改的应用配置，请自行备份相关内容
-                                                            </div>
-                                                        )
-                                                    }
-                                                ]}
-                                            ></Tabs>
-                                        </div>
-                                    }
-                                    okButtonProps={{
-                                        disabled: (appData?.version ? appData?.version : 0) === version && updataTip === '0'
-                                    }}
-                                    onConfirm={() => upDateVersion(updataTip)}
-                                    okText="更新"
-                                    cancelText="取消"
-                                >
-                                    <Badge count={(appData?.version ? appData?.version : 0) !== version ? 1 : 0} dot>
-                                        <span className="p-2 rounded-md cursor-pointer hover:shadow-md">
-                                            版本号： <span className="font-blod">{appData?.version || 0}</span>
-                                        </span>
-                                    </Badge>
-                                </Popconfirm>
-                            </div>
-                        </div>
-                    </div>
-                )}
                 <div
                     style={{
                         height: detailShow

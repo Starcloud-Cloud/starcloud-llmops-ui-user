@@ -191,19 +191,12 @@ const HeaderField = ({
     };
     const onDragEnd = ({ active, over }: DragEndEvent) => {
         if (active.id !== over?.id) {
-            console.log((prevState: any) => {
-                const activeIndex = prevState.findIndex((record: any) => record.key === active?.id);
-                const overIndex = prevState.findIndex((record: any) => record.key === over?.id);
+            const newList = (prevState: any) => {
+                const activeIndex = prevState.findIndex((record: any) => record.id === active?.id);
+                const overIndex = prevState.findIndex((record: any) => record.id === over?.id);
                 return arrayMove(prevState, activeIndex, overIndex);
-            });
-
-            setTableData((prevState) => {
-                const activeIndex = prevState.findIndex((record) => record.key === active?.id);
-                const overIndex = prevState.findIndex((record) => record.key === over?.id);
-                console.log(arrayMove(prevState, activeIndex, overIndex));
-
-                return arrayMove(prevState, activeIndex, overIndex);
-            });
+            };
+            setTableData(newList(tableData));
         }
     };
     useEffect(() => {
@@ -215,63 +208,65 @@ const HeaderField = ({
         <>
             {/* <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置"> */}
             <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
-                <EditableProTable<any>
-                    className="edit-table"
-                    rowKey={rowKey}
-                    maxLength={30}
-                    tableAlertRender={false}
-                    loading={tableLoading}
-                    components={components}
-                    rowSelection={false}
-                    editableFormRef={actionRef}
-                    toolBarRender={false}
-                    columns={materialColumns}
-                    value={tableData}
-                    pagination={false}
-                    recordCreatorProps={{
-                        newRecordType: 'dataSource',
-                        record: () => ({
-                            id: Date.now(),
-                            uuid: Date.now(),
-                            isRequired: false,
-                            isGroupColumn: false
-                        })
-                    }}
-                    editable={{
-                        type: 'multiple',
-                        editableKeys: editableKeys,
-                        actionRender: (row, config, defaultDoms) => {
-                            return [
-                                <Popconfirm
-                                    title="提示"
-                                    description="请再次确认是否要删除"
-                                    onConfirm={async () => {
-                                        console.log(row);
+                <SortableContext items={tableData.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+                    <EditableProTable<any>
+                        className="edit-table"
+                        rowKey={rowKey}
+                        maxLength={30}
+                        tableAlertRender={false}
+                        loading={tableLoading}
+                        components={components}
+                        rowSelection={false}
+                        editableFormRef={actionRef}
+                        toolBarRender={false}
+                        columns={materialColumns}
+                        value={tableData}
+                        pagination={false}
+                        recordCreatorProps={{
+                            newRecordType: 'dataSource',
+                            record: () => ({
+                                id: Date.now(),
+                                uuid: Date.now(),
+                                isRequired: false,
+                                isGroupColumn: false
+                            })
+                        }}
+                        editable={{
+                            type: 'multiple',
+                            editableKeys: editableKeys,
+                            actionRender: (row, config, defaultDoms) => {
+                                return [
+                                    <Popconfirm
+                                        title="提示"
+                                        description="请再次确认是否要删除"
+                                        onConfirm={async () => {
+                                            console.log(row);
 
-                                        if (!row.uuid) {
-                                            await delColumn({ id: row.id });
-                                        }
-                                        setTableData(tableData.filter((item) => item.id !== row.id));
-                                        headerSave && headerSave();
-                                    }}
-                                    okText="Yes"
-                                    cancelText="No"
-                                >
-                                    <Button type="link" danger>
-                                        删除
-                                    </Button>
-                                </Popconfirm>
-                            ];
-                        },
-                        onValuesChange: (record, recordList) => {
-                            setTableData(recordList);
-                        },
-                        onChange: seteditableKeys
-                    }}
-                    onChange={(data) => {
-                        console.log(data);
-                    }}
-                />
+                                            if (!row.uuid) {
+                                                await delColumn({ id: row.id });
+                                            }
+                                            setTableData(tableData.filter((item) => item.id !== row.id));
+                                            headerSave && headerSave();
+                                        }}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button type="link" danger>
+                                            删除
+                                        </Button>
+                                    </Popconfirm>
+                                ];
+                            },
+                            onValuesChange: (record, recordList) => {
+                                setTableData(recordList);
+                            },
+                            onChange: seteditableKeys
+                        }}
+                        onChange={(data) => {
+                            console.log(data);
+                        }}
+                    />
+                </SortableContext>
             </DndContext>
             {/* <Button
                 onClick={() => {

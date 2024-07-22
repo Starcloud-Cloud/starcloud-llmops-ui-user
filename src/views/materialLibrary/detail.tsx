@@ -735,7 +735,7 @@ const MaterialLibraryDetail = () => {
             let newList: any = [];
             data.map((item: any) => {
                 let obj: any = {
-                    id: item.id
+                    ...item
                 };
                 item.content.forEach((item1: any) => {
                     if (item1?.['columnCode']) {

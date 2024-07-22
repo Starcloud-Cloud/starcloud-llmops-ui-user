@@ -20,6 +20,7 @@ import FormModal from 'views/materialLibrary/components/formModal';
 import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
+import { imageOcr } from 'api/redBook/batchIndex';
 
 const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
@@ -38,6 +39,8 @@ const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
     const [filedName, setFiledName] = useState<string>('');
     const [selectImg, setSelectImg] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [btnLoading, setBtnLoading] = useState(-1);
+    const [extend, setExtend] = useState<any>({});
 
     const getClumns = useMemo(() => {
         if (columns.length === 0) [];
@@ -442,6 +445,17 @@ const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
     };
     //放大编辑弹窗
     const [zoomOpen, setZoomOpen] = useState(false);
+
+    const handleOcr = async (filedName: string, url: string, type: number) => {
+        setBtnLoading(type);
+        const data = await imageOcr({ imageUrls: [url], cleansing: !!type });
+        const result = data?.list?.[0].ocrGeneralDTO;
+        imageForm.setFieldValue(`${filedName}_tag`, result.tag);
+        imageForm.setFieldValue(`${filedName}_description`, result.content);
+        setBtnLoading(-1);
+        setExtend({ [filedName + '_extend']: result.data });
+    };
+
     return (
         <div>
             <div className="flex items-center justify-between mb-4">
@@ -549,7 +563,8 @@ const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
                         const value = await imageForm.getFieldsValue();
                         const result = await handleEditColumn({
                             ...currentRecord,
-                            ...value
+                            ...value,
+                            ...extend
                         });
                         setPreviewOpen(false);
                     }}
@@ -560,8 +575,12 @@ const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
                     <div className="flex justify-end mb-2">
                         <Space>
-                            <Button>图片OCR</Button>
-                            <Button>清洗OCR内容</Button>
+                            <Button loading={btnLoading == 0} onClick={() => handleOcr(filedName, currentRecord[filedName], 0)}>
+                                图片OCR
+                            </Button>
+                            <Button loading={btnLoading === 1} onClick={() => handleOcr(filedName, currentRecord[filedName], 1)}>
+                                清洗OCR内容
+                            </Button>
                         </Space>
                     </div>
                     <ProFormTextArea name={filedName + '_description'} label="描述" />

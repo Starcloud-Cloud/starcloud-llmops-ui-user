@@ -11,6 +11,7 @@ import './index.scss';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import { EditType } from '../detail';
 import { ModalForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
+import { imageOcr } from 'api/redBook/batchIndex';
 
 export const propShow: UploadProps = {
     name: 'image',
@@ -62,6 +63,8 @@ const FormModal = ({
     const [filedName, setFiledName] = useState('');
     const [currentRecord, setCurrentRecord] = useState(null);
     const [imageData, setImageData] = useState<any>({});
+    const [btnLoading, setBtnLoading] = useState(-1)
+    const [extend, setExtend] = useState<any>({})
 
     const [imageForm] = Form.useForm();
 
@@ -101,6 +104,17 @@ const FormModal = ({
     const [open, setOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const [fileList, setFileList] = useState<any[]>([]);
+
+
+    const handleOcr = async (filedName: string, url: string, type: number) => {
+        setBtnLoading(type)
+        const data = await imageOcr({ imageUrls: [url], cleansing: !!type });
+        const result = data?.list?.[0].ocrGeneralDTO
+        imageForm.setFieldValue(`${filedName}_tag`, result.tag)
+        imageForm.setFieldValue(`${filedName}_description`, result.content)
+        setBtnLoading(-1)
+        setExtend({[filedName + '_extend'] :result.data})
+    }
 
     return (
         <Modal
@@ -353,7 +367,7 @@ const FormModal = ({
                     onOpenChange={setPreviewOpen}
                     onFinish={async () => {
                         const values = await imageForm.getFieldsValue();
-                        setImageData({ ...imageData, ...values });
+                        setImageData({ ...imageData, ...values, ...extend });
                         setPreviewOpen(false);
                     }}
                 >
@@ -361,10 +375,10 @@ const FormModal = ({
                         <Image width={500} height={500} className="object-contain" src={form.getFieldValue(filedName)} preview={false} />
                     </div>
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
-                    <div>
+                    <div className='flex justify-end mb-2'>
                         <Space>
-                            <Button>图片OCR</Button>
-                            <Button>清洗OCR内容</Button>
+                            <Button loading={btnLoading == 0} onClick={() => handleOcr(filedName, form.getFieldValue(filedName), 0)}>图片OCR</Button>
+                            <Button loading={btnLoading === 1} onClick={() => handleOcr(filedName, form.getFieldValue(filedName), 1)}>清洗OCR内容</Button>
                         </Space>
                     </div>
                     <ProFormTextArea name={filedName + '_description'} label="描述" />

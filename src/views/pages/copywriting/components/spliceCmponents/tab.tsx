@@ -236,6 +236,7 @@ const CreateTab = ({
 };
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
+        JSON.stringify(prevProps?.appData) === JSON.stringify(nextProps?.appData) &&
         JSON.stringify(prevProps?.mode) === JSON.stringify(nextProps?.mode) &&
         JSON.stringify(prevProps?.imageStyleData) === JSON.stringify(nextProps?.imageStyleData) &&
         JSON.stringify(prevProps?.focuActive) === JSON.stringify(nextProps?.focuActive) &&

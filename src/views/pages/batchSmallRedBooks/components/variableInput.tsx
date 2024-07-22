@@ -1,4 +1,5 @@
 import { Popover, Menu, Input, Checkbox, Button, Tooltip } from 'antd';
+import { useLocation } from 'react-router-dom';
 import _ from 'lodash-es';
 import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
 import { useState, useRef, useEffect, useMemo } from 'react';
@@ -50,6 +51,10 @@ const VariableInput = ({
     disabled?: boolean;
     isPageText?: boolean;
 }) => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const appUid = searchParams.get('appUid');
+    const planUid = searchParams.get('uid');
     const inputList: any = useRef([]);
     const tipRef = useRef<any>('');
     const [tipValue, setTipValue] = useState('');
@@ -287,24 +292,26 @@ const VariableInput = ({
     };
     useEffect(() => {
         if (open) {
-            schemeOptions({ stepCode, appReqVO: newDeatil }).then((res) => {
-                const newList = res
-                    ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
-                    ?.map((item: any) => ({
-                        label: item.name,
-                        key: item.code,
-                        description: item.description,
-                        children: item.inJsonSchema
-                            ? getjsonschma(getJSON(item), item.name)
-                            : item.outJsonSchema
-                            ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
-                            : []
-                    }))
-                    ?.filter((item: any) => item?.children?.length > 0);
-                console.log(newList);
+            schemeOptions({ stepCode, appReqVO: newDeatil, source: appUid ? 'MARKET' : 'APP', planUid: appUid ? planUid : undefined }).then(
+                (res) => {
+                    const newList = res
+                        ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
+                        ?.map((item: any) => ({
+                            label: item.name,
+                            key: item.code,
+                            description: item.description,
+                            children: item.inJsonSchema
+                                ? getjsonschma(getJSON(item), item.name)
+                                : item.outJsonSchema
+                                ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
+                                : []
+                        }))
+                        ?.filter((item: any) => item?.children?.length > 0);
+                    console.log(newList);
 
-                setSchemaList(newList);
-            });
+                    setSchemaList(newList);
+                }
+            );
         }
     }, [open]);
     const [newValues, setNewValue] = useState('');

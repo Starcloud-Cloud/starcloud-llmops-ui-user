@@ -238,7 +238,7 @@ const ThreeStep = ({
                             {/* {jsCookie.get('isClient')&&
                             <Button>加入代发布列表</Button>
                             } */}
-                            <Button onClick={doRetry}>重新生成</Button>
+                            {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
                                 <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                     编辑

@@ -123,6 +123,7 @@ const Lefts = ({
     const [materialType, setMaterialType] = useState('');
     const [materialTypeStatus, setMaterialTypeStatus] = useState(false); //获取状态 true图片 false 表格
     const materialStatus = useMemo(() => {
+        console.log(123);
         return (
             appData?.configuration?.appInformation?.workflowConfig?.steps
                 ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
@@ -650,6 +651,7 @@ const Lefts = ({
     const [exeState, setExeState] = useState(false);
 
     const materialList = React.useMemo(() => {
+        console.log(123);
         return materialStatus === 'picture'
             ? fileList?.map((item) => ({
                   pictureUrl: item?.response?.data?.url,
@@ -825,6 +827,7 @@ const Lefts = ({
         getList(true);
     };
     useEffect(() => {
+        console.log(111);
         if (versionPre) {
             upDateVersion();
         }
@@ -993,6 +996,8 @@ const Lefts = ({
             gessaveApp();
         }
     };
+    console.log(1111111);
+
     return (
         <>
             <div className="relative h-full">

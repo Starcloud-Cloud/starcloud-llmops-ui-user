@@ -55,7 +55,7 @@ const RedBookAnalysis = ({
             };
         });
         setData(data);
-    }, [redList]);
+    }, []);
 
     return (
         <div>

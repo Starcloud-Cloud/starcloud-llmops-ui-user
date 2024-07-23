@@ -222,9 +222,9 @@ const MaterialLibrary = ({
 
     const handleOk = async () => {
         const values = await form.validateFields();
-        const data = record ? await updateMaterial({ ...values, id: record.id }) : await addMaterial({ ...values, status: 1 });
+        const data = record ? await updateMaterial({ ...values, id: record.id, status: 1 }) : await addMaterial({ ...values, status: 1 });
         if (data) {
-            message.success('添加成功!');
+            record ? message.success('修改成功!') : message.success('添加成功!');
             setIsModalOpen(false);
             actionRef.current?.reload();
         }

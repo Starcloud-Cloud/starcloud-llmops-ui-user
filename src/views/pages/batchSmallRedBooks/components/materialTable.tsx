@@ -22,7 +22,7 @@ import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
 import { imageOcr } from 'api/redBook/batchIndex';
 
-const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
+const MaterialTable = ({ uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -496,7 +496,8 @@ const MaterialTable = ({ uid, appUid, tableTitle, handleExecute }: any) => {
                     appUid={uid}
                     libraryId={libraryId}
                     libraryType={libraryType}
-                    libraryUid={appUid}
+                    bizUid={bizUid}
+                    bizType={bizType}
                     libraryName={libraryName}
                     tableProKey={tableProKey}
                     pluginConfig={pluginConfig}

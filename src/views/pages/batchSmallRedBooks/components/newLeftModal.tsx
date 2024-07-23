@@ -11,8 +11,9 @@ import AiCreate from './newAI';
 import { TableHeader } from '../../../materialLibrary/detail';
 const LeftModalAdd = ({
     appUid,
+    bizUid,
+    bizType,
     libraryId,
-    libraryUid,
     libraryName,
     libraryType,
     tableProKey,
@@ -33,8 +34,9 @@ const LeftModalAdd = ({
     handleExecute
 }: {
     appUid: string;
+    bizUid: string;
+    bizType: string;
     libraryId: string;
-    libraryUid: string;
     libraryName: string;
     libraryType: number;
     tableProKey: number;
@@ -75,7 +77,8 @@ const LeftModalAdd = ({
                     selectedRowKeys={selectedRowKeys}
                     handleBatchDel={handleDels}
                     libraryId={libraryId}
-                    libraryUid={libraryUid}
+                    bizType={bizType}
+                    bizUid={bizUid}
                     appUid={appUid}
                     pluginConfig={pluginConfig}
                     columns={columns}
@@ -112,7 +115,8 @@ const memoLeftModal = (pre: any, next: any) => {
     return (
         _.isEqual(pre.appUid, next.appUid) &&
         _.isEqual(pre.libraryId, next.libraryId) &&
-        _.isEqual(pre.libraryUid, next.libraryUid) &&
+        _.isEqual(pre.bizType, next.bizType) &&
+        _.isEqual(pre.bizUid, next.bizUid) &&
         _.isEqual(pre.libraryName, next.libraryName) &&
         _.isEqual(pre.tableProKey, next.tableProKey) &&
         _.isEqual(pre.pluginConfig, next.pluginConfig) &&

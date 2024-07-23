@@ -59,7 +59,8 @@ export const TableHeader = ({
     selectedRowKeys,
     handleBatchDel,
     libraryId,
-    libraryUid,
+    bizUid,
+    bizType,
     pluginConfig,
     columns,
     tableMeta,
@@ -89,7 +90,8 @@ export const TableHeader = ({
     // 选中的行
     selectedRowKeys: React.Key[];
     libraryId: string;
-    libraryUid: string;
+    bizUid: string;
+    bizType: string;
     //存储的配置
     pluginConfig: string | null;
     //表头
@@ -408,7 +410,8 @@ export const TableHeader = ({
                 <div className="font-bold text-xl mb-8 flex items-center gap-2">{plugTitle}</div>
                 <AiCreate
                     libraryId={libraryId}
-                    libraryUid={libraryUid}
+                    bizType={bizType}
+                    bizUid={bizUid}
                     pluginConfig={pluginConfig}
                     plugValue={plugValue}
                     setPlugOpen={setPlugOpen}
@@ -501,12 +504,14 @@ const MaterialLibraryDetail = () => {
     }, [selectImg]);
 
     useEffect(() => {
+        console.log(123);
         dictData('', 'material_format_type').then((res) => {
             setTypeList(res.list);
         });
     }, []);
 
     useEffect(() => {
+        console.log(123);
         getMaterialLibraryTitleList({ id }).then((data) => {
             setPluginConfig(data.pluginConfig);
             setDetail(data);
@@ -515,6 +520,7 @@ const MaterialLibraryDetail = () => {
     }, [forceUpdateHeader]);
     const [tableMeta, seTtableMeta] = useState<any[]>([]);
     useEffect(() => {
+        console.log(123);
         if (detail) {
             seTtableMeta(detail?.tableMeta);
             const list = detail?.tableMeta?.map((item: any) => ({
@@ -649,7 +655,7 @@ const MaterialLibraryDetail = () => {
                                             </Upload>
                                         </div>
                                     ) : (
-                                        <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
+                                        <div className="break-all line-clamp-4 h-[88px]">{row[item.fieldName]}</div>
                                     )}
                                 </div>
                             );
@@ -730,6 +736,7 @@ const MaterialLibraryDetail = () => {
     }, [canUpload, detail, tableDataOriginal, tableData]);
 
     useEffect(() => {
+        console.log(123);
         getMaterialLibraryDataList({ libraryId: id }).then((data) => {
             setTableDataOriginal(data);
             let newList: any = [];
@@ -899,7 +906,8 @@ const MaterialLibraryDetail = () => {
                     selectedRowKeys={selectedRowKeys}
                     handleBatchDel={handleBatchDel}
                     libraryId={detail?.id}
-                    libraryUid={detail?.uid}
+                    bizType={'MATERIAL_LIBRARY'}
+                    bizUid={detail?.uid}
                     pluginConfig={pluginConfig}
                     columns={columns}
                     tableMeta={tableMeta}

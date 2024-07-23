@@ -14,7 +14,8 @@ import { openSnackbar } from 'store/slices/snackbar';
 import '../../../materialLibrary/index.scss';
 const AiCreate = ({
     libraryId,
-    libraryUid,
+    bizType,
+    bizUid,
     pluginConfig,
     plugValue,
     columns,
@@ -25,7 +26,8 @@ const AiCreate = ({
     getTitleList
 }: {
     libraryId: string;
-    libraryUid: string;
+    bizType: string;
+    bizUid: string;
     pluginConfig: string | null;
     plugValue: string | null;
     columns: any[];
@@ -119,7 +121,7 @@ const AiCreate = ({
             await Promise.all(
                 currentBatch.map(async (group, i) => {
                     try {
-                        const res = await customMaterialGenerate({ ...variableData, bizUid: libraryUid, generateCount: group?.length });
+                        const res = await customMaterialGenerate({ ...variableData, bizType, bizUid, generateCount: group?.length });
                         if (!aref.current) {
                             const timers = new Date().getTime();
                             const newMaterialzan = _.cloneDeep(materialzanListRef.current);
@@ -206,7 +208,8 @@ const AiCreate = ({
                     try {
                         const res = await materialGenerate({
                             materialList: group,
-                            bizUid: libraryUid,
+                            bizType,
+                            bizUid,
                             ...fieldCompletionData
                         });
                         if (!aref.current) {
@@ -923,7 +926,8 @@ const AiCreate = ({
 const memoAiCreate = (pre: any, next: any) => {
     return (
         _.isEqual(pre.libraryId, next.libraryId) &&
-        _.isEqual(pre.libraryUid, next.libraryUid) &&
+        _.isEqual(pre.bizType, next.bizType) &&
+        _.isEqual(pre.bizUid, next.bizUid) &&
         _.isEqual(pre.pluginConfig, next.pluginConfig) &&
         _.isEqual(pre.plugValue, next.plugValue) &&
         _.isEqual(pre.columns, next.columns) &&

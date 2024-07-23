@@ -490,12 +490,20 @@ const AiCreate = ({
             setMaterialzanList(materialzanListRef.current);
             uuidListsRef.current = [];
             setUuidLists(uuidListsRef.current);
+        }else {
+            setErrorCount(0)
+            errorCountRef.current = 0
         }
+
         let materialList: any = [];
-        if (num === 1) {
-            materialList = selList;
+        if (!retry) {
+            if (num === 1) {
+                materialList = selList;
+            } else {
+                materialList = tableData;
+            }
         } else {
-            materialList = tableData;
+            materialList = retryListRef.current;
         }
 
         setSelectValue('ocr');
@@ -514,7 +522,8 @@ const AiCreate = ({
         materialList.map(async (item: any) => {
             let obj: any = {};
             // 选择图片字段
-            const imageUrlList = ocrData.checkedFieldList.map((v: string) => item[v]).filter((url: string) => url);
+            const imageUrlList = ocrData.checkedFieldList.map((v: string) => item[v]);
+            // .filter((url: string) => url);
             try {
                 const data = await imageOcr({ imageUrls: imageUrlList, cleansing: ocrData.cleansing });
                 Object.keys(item).forEach((v: any) => {
@@ -543,7 +552,7 @@ const AiCreate = ({
                 const copySuccessCount = successCountRef.current;
                 setSuccessCount(copySuccessCount + 1);
                 successCountRef.current = copySuccessCount + 1;
-            } catch (e) {
+            } catch (error: any) {
                 const exeCount = executionCountRef.current;
                 setExecutionCount(exeCount - 1);
                 executionCountRef.current = exeCount - 1;
@@ -551,6 +560,17 @@ const AiCreate = ({
                 const copyErrorCountRef = errorCountRef.current;
                 setErrorCount(copyErrorCountRef + 1);
                 errorCountRef.current = copyErrorCountRef + 1;
+
+                const copyRetryList = retryListRef.current;
+                copyRetryList.push(item);
+                retryListRef.current = copyRetryList;
+
+                const newList = _.cloneDeep(errorMessageRef.current);
+                newList.push(error.msg);
+                errorMessageRef.current = newList;
+                setErrorMessage(errorMessageRef.current);
+
+                setErrorCount(errorCountRef.current);
             }
         });
     };
@@ -840,6 +860,8 @@ const AiCreate = ({
                                         setErrorMessage(errorMessageRef.current);
                                         if (selectValue === 'batch') {
                                             aimaterialCreate(true);
+                                        } else if (selectValue === 'ocr') {
+                                            handleOCR(ocrNum.current, true);
                                         } else {
                                             editMaterial(batchNum.current, true);
                                         }

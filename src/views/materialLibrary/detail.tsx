@@ -179,10 +179,10 @@ export const TableHeader = ({
             };
         });
         if (num === 1) {
-            createBatchMaterial({ saveReqVOS: newData });
+            await createBatchMaterial({ saveReqVOS: newData });
             getList();
         } else {
-            updateBatchMaterial({ saveReqVOS: newData });
+            await updateBatchMaterial({ saveReqVOS: newData });
             getList();
         }
     };

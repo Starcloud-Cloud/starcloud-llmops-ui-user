@@ -1,4 +1,4 @@
-import { Modal, Button, Table, Progress, Tag } from 'antd';
+import { Modal, Button, Table, Progress, Tag, Image } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
 import { materialGenerate, customMaterialGenerate, pluginsXhsOcr, extraction, imageOcr } from 'api/redBook/batchIndex';
 import { templateUpdate } from 'api/redBook/material';
@@ -11,6 +11,7 @@ import ImgOcr from './components/imgOcr';
 import TextExtraction from './components/textExtraction';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { EditType } from 'views/materialLibrary/detail';
 import '../../../materialLibrary/index.scss';
 const AiCreate = ({
     libraryId,
@@ -494,10 +495,10 @@ const AiCreate = ({
             setMaterialzanList(materialzanListRef.current);
             uuidListsRef.current = [];
             setUuidLists(uuidListsRef.current);
-        }else {
-            setErrorCount(0)
-            errorCountRef.current = 0
-            errorMessageRef.current = []
+        } else {
+            setErrorCount(0);
+            errorCountRef.current = 0;
+            errorMessageRef.current = [];
         }
 
         let materialList: any = [];
@@ -525,7 +526,7 @@ const AiCreate = ({
         executionCountRef.current = materialList.length;
 
         materialList.map(async (item: any) => {
-            retryListRef.current = []
+            retryListRef.current = [];
             let obj: any = {};
             // 选择图片字段
             const imageUrlList = ocrData.checkedFieldList.map((v: string) => item[v]).filter((url: string) => url);
@@ -617,6 +618,26 @@ const AiCreate = ({
         checkedFieldList: '',
         requirementList: []
     });
+
+    const imageExe = (list: any[]) => {
+        return list?.map((item: any) => {
+            if (item.type === EditType.Image) {
+                return {
+                    ...item,
+                    render: (_: any, row: any) => (
+                        <Image
+                            preview={{ src: row[item.dataIndex] }}
+                            width={82}
+                            height={82}
+                            src={row[item.dataIndex] + '?x-oss-process=image/resize,w_100/quality,q_80'}
+                        />
+                    )
+                };
+            } else {
+                return item;
+            }
+        });
+    };
     const textCloumns = useMemo(() => {
         const arr = textData?.requirementList?.map((item: any) => item.value);
         return columns?.filter((item) => arr?.includes(item.dataIndex));
@@ -673,7 +694,7 @@ const AiCreate = ({
     }, [pluginConfig, plugValue]);
     const xhsCloumns = useMemo(() => {
         const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
-        return columns?.filter((item) => arr?.includes(item.dataIndex));
+        return columns?.filter((item) => arr?.includes(item.dataIndex))?.map((item) => {});
     }, [redBookData?.fieldList, redBookData]);
     return (
         <div>
@@ -808,6 +829,7 @@ const AiCreate = ({
                 </div>
                 <div className="material-index">
                     <Table
+                        className=" overflow-auto"
                         columns={[
                             { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
                             ...(selectValue === 'field'
@@ -819,7 +841,7 @@ const AiCreate = ({
                                 : selectValue === 'text'
                                 ? textCloumns
                                 : selectValue === 'ocr'
-                                ? columns?.filter((item: any) => ocrData.checkedFieldList?.includes(item.dataIndex))
+                                ? imageExe(columns?.filter((item: any) => ocrData.checkedFieldList?.includes(item.dataIndex)))
                                 : [])
                         ]}
                         dataSource={materialzanList}

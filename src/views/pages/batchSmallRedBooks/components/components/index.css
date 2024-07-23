@@ -25,8 +25,9 @@
 }
 
 #edit-table .ant-table-body {
-    overflow:  visible !important;
-} 
+    overflow-y: visible !important;
+    overflow-x: auto !important;
+}
 
 :where(.css-dev-only-do-not-override-kip0qf)
     .ant-table-wrapper
@@ -40,7 +41,6 @@
     > td:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
     background-color: #ccc !important; /* 使用 !important 来提高优先级 */
 }
-
 
 /* #edit-table .ant-table-cell {
     height: 113px !important;

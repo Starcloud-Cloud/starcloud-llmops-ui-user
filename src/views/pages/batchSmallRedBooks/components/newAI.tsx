@@ -363,6 +363,7 @@ const AiCreate = ({
     };
     //文本智能提取
     const handleTextData = async (num: number, retry?: boolean) => {
+        textNum.current = num;
         setSelectValue('text');
         if (!retry) {
             materialzanListRef.current = [];
@@ -459,7 +460,7 @@ const AiCreate = ({
                         executionCountRef.current -= group?.length;
                         setExecutionCount(executionCountRef.current);
                         errorCountRef.current += group?.length;
-                        if (errorCountRef.current >= 9) {
+                        if (errorCountRef.current >= 3) {
                             aref.current = true;
                         }
                         setErrorCount(errorCountRef.current);
@@ -559,6 +560,7 @@ const AiCreate = ({
     const [selectValue, setSelectValue] = useState('');
     const batchNum = useRef(-1);
     const ocrNum = useRef(0);
+    const textNum = useRef(-1);
     const materialzanListRef = useRef<any[]>([]);
     const [materialzanList, setMaterialzanList] = useState<any[]>([]);
     //小红书数据
@@ -820,8 +822,12 @@ const AiCreate = ({
                                         aimaterialCreate();
                                     } else if (selectValue === 'ocr') {
                                         handleOCR(ocrNum.current);
-                                    } else {
+                                    } else if (selectValue === 'field') {
                                         editMaterial(batchNum.current);
+                                    } else if (selectValue === 'xhs') {
+                                        xhsAnalysis();
+                                    } else if (selectValue === 'text') {
+                                        handleTextData(textNum.current);
                                     }
                                 }}
                             >
@@ -840,8 +846,12 @@ const AiCreate = ({
                                         setErrorMessage(errorMessageRef.current);
                                         if (selectValue === 'batch') {
                                             aimaterialCreate(true);
-                                        } else {
+                                        } else if (selectValue === 'field') {
                                             editMaterial(batchNum.current, true);
+                                        } else if (selectValue === 'xhs') {
+                                            xhsAnalysis(true);
+                                        } else if (selectValue === 'text') {
+                                            handleTextData(textNum.current, true);
                                         }
                                     }}
                                 >

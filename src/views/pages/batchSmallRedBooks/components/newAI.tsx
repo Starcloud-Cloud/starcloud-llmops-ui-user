@@ -640,7 +640,7 @@ const AiCreate = ({
     };
     const textCloumns = useMemo(() => {
         const arr = textData?.requirementList?.map((item: any) => item.value);
-        return columns?.filter((item) => arr?.includes(item.dataIndex));
+        return imageExe(columns?.filter((item) => arr?.includes(item.dataIndex)));
     }, [textData.requirementList]);
     //保存配置
     const saveConfig = async (data: string) => {
@@ -694,7 +694,7 @@ const AiCreate = ({
     }, [pluginConfig, plugValue]);
     const xhsCloumns = useMemo(() => {
         const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
-        return columns?.filter((item) => arr?.includes(item.dataIndex))?.map((item) => {});
+        return imageExe(columns?.filter((item) => arr?.includes(item.dataIndex)));
     }, [redBookData?.fieldList, redBookData]);
     return (
         <div>
@@ -833,9 +833,9 @@ const AiCreate = ({
                         columns={[
                             { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
                             ...(selectValue === 'field'
-                                ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
+                                ? imageExe(columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex)))
                                 : selectValue === 'batch'
-                                ? columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex))
+                                ? imageExe(columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex)))
                                 : selectValue === 'xhs'
                                 ? xhsCloumns
                                 : selectValue === 'text'

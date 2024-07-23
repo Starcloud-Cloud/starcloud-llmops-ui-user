@@ -649,7 +649,7 @@ const MaterialLibraryDetail = () => {
                                             </Upload>
                                         </div>
                                     ) : (
-                                        <div className="break-all line-clamp-4 h-[88px]">{row[item.fieldName]}</div>
+                                        <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
                                     )}
                                 </div>
                             );

@@ -1,6 +1,6 @@
 .material-detail-table textarea {
     position: absolute;
-    top: -25px;
+    top: 0;
     left: 0;
     z-index: 1;
 }

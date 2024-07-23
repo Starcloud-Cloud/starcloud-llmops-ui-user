@@ -24,6 +24,10 @@
     z-index: 1;
 }
 
+#edit-table .ant-table-body {
+    overflow:  visible !important;
+} 
+
 :where(.css-dev-only-do-not-override-kip0qf)
     .ant-table-wrapper
     .ant-table-thead
@@ -38,6 +42,6 @@
 }
 
 
-#edit-table .ant-table-cell {
+/* #edit-table .ant-table-cell {
     height: 113px !important;
-}
+} */

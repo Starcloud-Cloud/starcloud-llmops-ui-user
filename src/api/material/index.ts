@@ -9,6 +9,10 @@ export const getMaterialPage = (data: any) => {
     return request.post({ url: '/llm/material-library/page', data });
 };
 
+export const getSelectSysMaterialPage = (data: any) => {
+    return request.post({ url: '/llm/material-library-app-bind/page', data });
+};
+
 /**
  * 获取绑定分页
  * @param data

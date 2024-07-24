@@ -11,7 +11,7 @@ import Icon, {
     UploadOutlined
 } from '@ant-design/icons';
 import { ActionType, CheckCard, ProColumns, ProTable } from '@ant-design/pro-components';
-import { addMaterial, delMaterial, getMaterialBindPage, getMaterialPage, updateMaterial } from 'api/material';
+import { addMaterial, delMaterial, getMaterialBindPage, getMaterialPage, getSelectSysMaterialPage, updateMaterial } from 'api/material';
 import dayjs from 'dayjs';
 import { dictData } from 'api/template';
 import { useNavigate } from 'react-router-dom';
@@ -248,7 +248,7 @@ const MaterialLibrary = ({
                             setIsModalOpen(true);
                         }}
                     >
-                        创建知识库
+                        创建素材库
                     </Button>
                 </div>
             )}
@@ -316,7 +316,12 @@ const MaterialLibrary = ({
                         sortingFields = [];
                     }
 
-                    const data = await getMaterialPage({ ...params, sortingFields });
+                    let data: any = {};
+                    if (mode === 'select' && +activeKey === 0) {
+                        data = await getSelectSysMaterialPage({ ...params, sortingFields, appUid });
+                    }else {
+                        data = await getMaterialPage({ ...params, sortingFields }); 
+                    }
                     return {
                         data: data.list,
                         success: true,

@@ -113,7 +113,7 @@ const MaterialLibrary = ({
                         </div>
                         <div className="ml-2 flex flex-col">
                             <span className="font-extrabold">{record.name}</span>
-                            <span className="text-[12px] text-[#06070980]">{record.description}</span>
+                            <div className="text-[12px] h-[18px] text-[#06070980]">{record.description}</div>
                         </div>
                     </div>
                 );
@@ -264,6 +264,10 @@ const MaterialLibrary = ({
                             {
                                 key: '0',
                                 label: <span>系统素材库</span>
+                            },
+                            {
+                                key: '9',
+                                label: <span>已发布素材库</span>
                             }
                         ],
                         onChange: (key) => {

@@ -170,6 +170,7 @@ const TablePro = ({
                 toolBarRender={false}
                 columns={dataColumns}
                 value={tableData}
+                controlled
                 pagination={
                     isPagination
                         ? false

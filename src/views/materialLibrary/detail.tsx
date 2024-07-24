@@ -924,7 +924,7 @@ const MaterialLibraryDetail = () => {
                 <div className="material-detail-table overflow-hidden h-[calc(100%-96px)]">
                     {columns.filter((item: any) => !item.isDefault).length > 0 ? (
                         <TablePro
-                            key={forceUpdate}
+                            // key={forceUpdate}
                             handleEditColumn={handleEditColumn}
                             onUpdateColumn={handleUpdateColumn}
                             actionRef={actionRef}

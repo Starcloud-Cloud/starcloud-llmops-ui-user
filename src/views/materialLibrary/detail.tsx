@@ -8,7 +8,7 @@ import {
     FileImageOutlined,
     FileTextOutlined
 } from '@ant-design/icons';
-import { Button, Space, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message, Form, Modal, Empty, Card, Divider } from 'antd';
+import { Button, Space, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message, Form, Modal, Empty, Card, Divider, Spin } from 'antd';
 import {
     createMaterialLibraryAppBind,
     createMaterialLibrarySlice,
@@ -1027,7 +1027,9 @@ const MaterialLibraryDetail = () => {
                             </Button>
                         </Space>
                     </div>
-                    <ProFormTextArea name={filedName + '_description'} label="描述" />
+                    <Spin spinning={btnLoading !== -1}>
+                        <ProFormTextArea name={filedName + '_description'} label="描述" />
+                    </Spin>
                     {currentRecord && currentRecord[filedName + '_extend'] && (
                         <div>
                             <Tag>有扩展字段</Tag>

@@ -12,7 +12,7 @@ import {
     updateBatchMaterial
 } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
-import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps, Tag, Space } from 'antd';
+import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps, Tag, Space, Spin } from 'antd';
 import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { PicImagePick } from 'ui-component/PicImagePick';
@@ -524,6 +524,7 @@ const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, 
                     <div className="flex justify-center mb-3">
                         <Image width={500} height={500} className="object-contain" src={currentRecord[filedName]} preview={false} />
                     </div>
+
                     <ProFormSelect mode="tags" name={filedName + '_tags'} label="标签" />
                     <div className="flex justify-end mb-2">
                         <Space>
@@ -535,7 +536,9 @@ const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, 
                             </Button>
                         </Space>
                     </div>
-                    <ProFormTextArea name={filedName + '_description'} label="描述" />
+                    <Spin spinning={btnLoading !== -1}>
+                        <ProFormTextArea name={filedName + '_description'} label="描述" />
+                    </Spin>
                     {currentRecord[filedName + '_extend'] && (
                         <div>
                             <Tag>有扩展字段</Tag>

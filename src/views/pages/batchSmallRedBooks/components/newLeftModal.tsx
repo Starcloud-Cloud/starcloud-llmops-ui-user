@@ -16,7 +16,6 @@ const LeftModalAdd = ({
     libraryId,
     libraryName,
     libraryType,
-    tableProKey,
     pluginConfig,
     tableLoading,
     actionRefs,
@@ -38,7 +37,6 @@ const LeftModalAdd = ({
     libraryId: string;
     libraryName: string;
     libraryType: number;
-    tableProKey: number;
     pluginConfig: string | null;
     tableLoading: boolean;
     actionRefs: any;
@@ -92,7 +90,6 @@ const LeftModalAdd = ({
                 />
                 <div className="material-index material-detail-table">
                     <TablePro
-                        key={tableProKey}
                         actionRefs={actionRefs}
                         tableLoading={tableLoading}
                         tableData={tableData}
@@ -117,7 +114,6 @@ const memoLeftModal = (pre: any, next: any) => {
         _.isEqual(pre.bizType, next.bizType) &&
         _.isEqual(pre.bizUid, next.bizUid) &&
         _.isEqual(pre.libraryName, next.libraryName) &&
-        _.isEqual(pre.tableProKey, next.tableProKey) &&
         _.isEqual(pre.pluginConfig, next.pluginConfig) &&
         _.isEqual(pre.tableLoading, next.tableLoading) &&
         _.isEqual(pre.columns, next.columns) &&

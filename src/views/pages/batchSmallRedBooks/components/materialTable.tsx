@@ -258,18 +258,15 @@ const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, 
         pageNo: 1,
         pageSize: 100
     });
-    const [tableProKey, setTableProKey] = useState(0);
     const formOk = async (values: any) => {
         if (currentRecord) {
             handleEditColumn({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values }, 1);
             ({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values });
             setEditOpen(false);
-            setTableProKey(tableProKey + 1);
             setCurrentRecord(null);
         } else {
             await handleEditColumn({ ...values }, 2);
             setEditOpen(false);
-            setTableProKey(tableProKey + 1);
             setCurrentRecord(null);
         }
     };
@@ -458,7 +455,6 @@ const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, 
                     bizUid={bizUid}
                     bizType={bizType}
                     libraryName={libraryName}
-                    tableProKey={tableProKey}
                     pluginConfig={pluginConfig}
                     tableLoading={tableLoading}
                     actionRefs={actionRefs}

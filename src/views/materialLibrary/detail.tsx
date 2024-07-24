@@ -692,6 +692,7 @@ const MaterialLibraryDetail = () => {
                     align: 'center',
                     width: 100,
                     isDefault: true,
+                    sorter: true,
                     renderText: (text: any) => text || 0
                 },
                 {
@@ -734,10 +735,8 @@ const MaterialLibraryDetail = () => {
             setColumns(columnData);
         }
     }, [canUpload, detail, tableDataOriginal, tableData]);
-
-    useEffect(() => {
-        console.log(123);
-        getMaterialLibraryDataList({ libraryId: id }).then((data) => {
+    const getTableList = (data?: any) => {
+        getMaterialLibraryDataList({ libraryId: id, sortingFields: data }).then((data) => {
             setTableDataOriginal(data);
             let newList: any = [];
             data.map((item: any) => {
@@ -763,6 +762,10 @@ const MaterialLibraryDetail = () => {
             setTableData([...newList]);
             tableRef.current = newList;
         });
+    };
+    useEffect(() => {
+        getTableList();
+        console.log(123);
     }, [forceUpdate]);
 
     const handleDel = async (id: number) => {
@@ -933,6 +936,7 @@ const MaterialLibraryDetail = () => {
                             setSelectedRowKeys={setSelectRowKeys}
                             columns={columns}
                             setPage={setPage}
+                            getList={getTableList}
                             setTableData={setTableData}
                         />
                     ) : (

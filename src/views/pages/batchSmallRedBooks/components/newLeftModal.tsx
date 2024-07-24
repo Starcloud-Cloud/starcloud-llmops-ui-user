@@ -29,7 +29,6 @@ const LeftModalAdd = ({
     setPage,
     getList,
     getTitleList,
-    downTableData,
     handleEditColumn,
     handleExecute
 }: {
@@ -52,7 +51,6 @@ const LeftModalAdd = ({
     setPage: (data: any) => void;
     getList: (data?: any) => void;
     getTitleList: () => void;
-    downTableData: (data: any, num: number) => void;
     handleEditColumn: (data: any) => void;
     handleExecute: any;
 }) => {
@@ -88,7 +86,7 @@ const LeftModalAdd = ({
                     getTitleList={getTitleList}
                     getList={getList}
                     libraryType={libraryType}
-                    canSwitch={true}
+                    canSwitch={bizType === 'APP' ? true : false}
                     canExecute={true}
                     handleExecute={handleExecute}
                 />
@@ -104,6 +102,7 @@ const LeftModalAdd = ({
                         setPage={setPage}
                         setTableData={setTableData}
                         handleEditColumn={handleEditColumn}
+                        getList={getList}
                     />
                 </div>
             </div>

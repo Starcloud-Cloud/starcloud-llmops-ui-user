@@ -35,7 +35,8 @@ const TablePro = ({
     setTableData,
     actionRef,
     onUpdateColumn,
-    handleEditColumn
+    handleEditColumn,
+    getList
 }: any) => {
     const [column, setColumn] = useState<any[]>([]);
     const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
@@ -165,6 +166,20 @@ const TablePro = ({
                               }
                           }
                 }
+                onTableChange={async (pagination, filters, sorter: any) => {
+                    console.log(sorter.order);
+
+                    if (sorter.order) {
+                        getList([
+                            {
+                                field: 'used_count',
+                                order: sorter.order === 'ascend' ? 'asc' : 'desc'
+                            }
+                        ]);
+                    } else {
+                        getList();
+                    }
+                }}
                 actionRef={actionRefs}
                 editableFormRef={actionRef}
                 toolBarRender={false}

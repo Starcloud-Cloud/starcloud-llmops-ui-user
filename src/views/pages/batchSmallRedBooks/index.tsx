@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
-import { Popconfirm, Tabs, Button, Badge, Tag } from 'antd';
+import { Popconfirm, Tabs, Button, Badge, Tag, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { getContentPage } from 'api/redBook';
 import { planExecute, batchPages, getListExample } from 'api/redBook/batchIndex';
 import SubCard from 'ui-component/cards/SubCard';
@@ -401,29 +402,35 @@ const BatcSmallRedBooks = forwardRef(
                                         </Popconfirm>
                                     </div>
                                     <div className=" text-black/50">
-                                        最后更新时间：{dayjs(appInfo.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                        最后修改时间：{dayjs(appInfo.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div>
                             {!detail && (
-                                <Button
-                                    loading={createAppStatus}
-                                    onClick={async () => {
-                                        setCreateAppStatus(true);
-                                        const result = await createSameApp({
-                                            appMarketUid: searchParams.get('appUid'),
-                                            planUid: searchParams.get('uid')
-                                        });
-                                        navigate('/createApp?uid=' + result);
-                                        setCreateAppStatus(false);
-                                    }}
-                                    type="primary"
-                                    className="mr-1"
-                                >
-                                    复制应用
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                    <Tooltip title="复制应用后,可自定义素材字段，流程节点，图片模版等内容">
+                                        <InfoCircleOutlined />
+                                    </Tooltip>
+
+                                    <Button
+                                        loading={createAppStatus}
+                                        onClick={async () => {
+                                            setCreateAppStatus(true);
+                                            const result = await createSameApp({
+                                                appMarketUid: searchParams.get('appUid'),
+                                                planUid: searchParams.get('uid')
+                                            });
+                                            navigate('/createApp?uid=' + result);
+                                            setCreateAppStatus(false);
+                                        }}
+                                        type="primary"
+                                        className="mr-1"
+                                    >
+                                        复制应用
+                                    </Button>
+                                </div>
                             )}
                         </div>
                     </SubCard>

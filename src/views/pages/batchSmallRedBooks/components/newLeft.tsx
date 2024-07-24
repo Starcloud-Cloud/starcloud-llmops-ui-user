@@ -100,25 +100,6 @@ const Lefts = ({
             setTableData([...data]);
         }
     }, [selectImg]);
-
-    const getStatus1 = (status: any) => {
-        switch (status) {
-            case 'PENDING':
-                return <Tag>待执行</Tag>;
-            case 'RUNNING':
-                return <Tag color="processing">执行中</Tag>;
-            case 'PAUSE':
-                return <Tag color="warning">暂停</Tag>;
-            case 'CANCELED':
-                return <Tag>已取消</Tag>;
-            case 'COMPLETE':
-                return <Tag color="success">已完成</Tag>;
-            case 'FAILURE':
-                return <Tag color="error">失败</Tag>;
-            default:
-                return <Tag>待执行</Tag>;
-        }
-    };
     //上传素材
     const [materialType, setMaterialType] = useState('');
     const [materialTypeStatus, setMaterialTypeStatus] = useState(false); //获取状态 true图片 false 表格
@@ -714,17 +695,15 @@ const Lefts = ({
             ];
             newSave(data);
         } else {
-            let styleData = imageRef.current?.record?.variable?.variables?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value;
+            const newMem = imageRef.current
+                ? imageRef.current?.record
+                : appRef.current.configuration.appInformation.workflowConfig.steps?.find(
+                      (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                  );
+            let styleData = newMem?.variable?.variables?.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value;
             if (typeof styleData === 'string') {
                 styleData = JSON.parse(styleData);
             }
-            console.log(imageRef.current);
-            console.log(
-                appRef.current.configuration.appInformation.workflowConfig.steps?.find(
-                    (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
-                )
-            );
-
             const data = {
                 uid: appRef.current?.uid,
                 totalCount,
@@ -804,6 +783,7 @@ const Lefts = ({
         }
     };
     const [tabKey, setTabKey] = useState('1');
+    const [updataTable, setUpdataTable] = useState(0);
     const upDateVersion = async () => {
         const result = await planUpgrade({
             uid: appData?.uid,
@@ -825,6 +805,7 @@ const Lefts = ({
             })
         );
         getList(true);
+        setUpdataTable(updataTable + 1);
     };
     useEffect(() => {
         console.log(111);
@@ -953,16 +934,12 @@ const Lefts = ({
     }, [changePre]);
     const [imgPre, setImgPre] = useState(0);
     useEffect(() => {
-        console.log(8);
-
         if (imgPre === 1) {
             getList(true);
             setImgPre(0);
         }
     }, [detail]);
     useEffect(() => {
-        console.log(9);
-
         if (imageStylePre) {
             getList(true, false, true);
         }
@@ -1070,6 +1047,7 @@ const Lefts = ({
                                         </>
                                     ) : (
                                         <MaterialTable
+                                            updataTable={updataTable}
                                             setIsModalOpen={setIsModalOpen}
                                             appUid={detail ? appData.appUid : appData.uid}
                                             bizUid={appData.appUid}

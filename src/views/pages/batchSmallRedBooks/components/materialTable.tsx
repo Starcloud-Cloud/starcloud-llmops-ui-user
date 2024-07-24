@@ -22,7 +22,7 @@ import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
 import { imageOcr } from 'api/redBook/batchIndex';
 
-const MaterialTable = ({ uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
+const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -385,12 +385,12 @@ const MaterialTable = ({ uid, bizUid, bizType, appUid, tableTitle, handleExecute
         if (appUid) {
             getTitleList();
         }
-    }, [appUid, tableTitle]);
+    }, [appUid, tableTitle, updataTable]);
     useEffect(() => {
         if (appUid) {
             getList();
         }
-    }, [appUid]);
+    }, [appUid, updataTable]);
 
     //批量导入
     const [uploadOpen, setUploadOpen] = useState(false);
@@ -398,48 +398,6 @@ const MaterialTable = ({ uid, bizUid, bizType, appUid, tableTitle, handleExecute
     useEffect(() => {
         actionRefs.current?.reload();
     }, [tableData]);
-    //插入数据
-    const downTableData = async (data: any[], num: number) => {
-        console.log(data, num);
-        const tableMetaList = _.cloneDeep(columns);
-        const newData = data.map((record) => {
-            const recordKeys = Object.keys(record);
-            const content = tableMetaList.map((item) => {
-                if (recordKeys.includes(item.columnCode)) {
-                    if (item.columnType === EditType.Image) {
-                        return {
-                            columnId: item.id,
-                            columnName: item.columnName,
-                            columnCode: item.columnCode,
-                            value: record[item.columnCode],
-                            description: record[item.columnCode + '_description'],
-                            tags: record[item.columnCode + '_tags'],
-                            extend: record[item.columnCode + '_extend']
-                        };
-                    } else {
-                        return {
-                            columnId: item.id,
-                            columnName: item.columnName,
-                            columnCode: item.columnCode,
-                            value: record[item.columnCode]
-                        };
-                    }
-                }
-            });
-            return {
-                libraryId: record.libraryId || libraryId,
-                id: record.id,
-                content: content
-            };
-        });
-        if (num === 1) {
-            createBatchMaterial({ saveReqVOS: newData });
-            getList();
-        } else {
-            updateBatchMaterial({ saveReqVOS: newData });
-            getList();
-        }
-    };
     //放大编辑弹窗
     const [zoomOpen, setZoomOpen] = useState(false);
 
@@ -477,6 +435,7 @@ const MaterialTable = ({ uid, bizUid, bizType, appUid, tableTitle, handleExecute
                     tableRef.current = data;
                     setTableData(data);
                 }}
+                getList={getList}
                 handleEditColumn={handleEditColumn}
                 onUpdateColumn={handleUpdateColumn}
             />
@@ -510,7 +469,6 @@ const MaterialTable = ({ uid, bizUid, bizType, appUid, tableTitle, handleExecute
                         tableRef.current = data;
                         setTableData(data);
                     }}
-                    downTableData={downTableData}
                     setPage={setPage}
                     setEditOpen={setEditOpen}
                     setTitle={setTitle}
@@ -594,6 +552,11 @@ const MaterialTable = ({ uid, bizUid, bizType, appUid, tableTitle, handleExecute
     );
 };
 const memoMaterialTable = (pre: any, next: any) => {
-    return _.isEqual(pre.uid, next.uid) && _.isEqual(pre.appUid, next.appUid) && _.isEqual(pre.tableTitle, next.tableTitle);
+    return (
+        _.isEqual(pre.updataTable, next.updataTable) &&
+        _.isEqual(pre.uid, next.uid) &&
+        _.isEqual(pre.appUid, next.appUid) &&
+        _.isEqual(pre.tableTitle, next.tableTitle)
+    );
 };
 export default memo(MaterialTable, memoMaterialTable);

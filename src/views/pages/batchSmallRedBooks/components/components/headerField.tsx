@@ -81,7 +81,7 @@ const HeaderField = ({
     const [open, setOpen] = useState(false);
     const actionRef = useRef<any>();
     const materialFieldTypeList = [
-        { label: '字符串输入框', value: 0 },
+        { label: '字符串', value: 0 },
         { label: '图片', value: 5 },
         { label: '文档路径', value: 6 }
     ];
@@ -228,6 +228,7 @@ const HeaderField = ({
                                 id: Date.now(),
                                 uuid: Date.now(),
                                 isRequired: false,
+                                columnType: 0,
                                 isGroupColumn: false
                             })
                         }}
@@ -236,25 +237,15 @@ const HeaderField = ({
                             editableKeys: editableKeys,
                             actionRender: (row, config, defaultDoms) => {
                                 return [
-                                    <Popconfirm
-                                        title="提示"
-                                        description="请再次确认是否要删除"
-                                        onConfirm={async () => {
-                                            console.log(row);
-
-                                            if (!row.uuid) {
-                                                await delColumn({ id: row.id });
-                                            }
-                                            setTableData(tableData.filter((item) => item.id !== row.id));
-                                            headerSave && headerSave();
+                                    <Button
+                                        onClick={() => {
+                                            setTableData(tableData.filter((item, index) => index !== row.index));
                                         }}
-                                        okText="Yes"
-                                        cancelText="No"
+                                        type="link"
+                                        danger
                                     >
-                                        <Button type="link" danger>
-                                            删除
-                                        </Button>
-                                    </Popconfirm>
+                                        删除
+                                    </Button>
                                 ];
                             },
                             onValuesChange: (record, recordList) => {
@@ -280,37 +271,40 @@ const HeaderField = ({
                 新增（{tableData.length}/30）
             </Button> */}
             <div className="flex justify-center mt-4">
-                <Button
-                    onClick={async () => {
-                        if (tableData.some((item) => !item.columnName || (item!.columnType !== 0 && !item.columnType))) {
-                            return false;
-                        }
-                        await updatesColumn({
-                            libraryId,
-                            tableColumnSaveReqVOList: tableData.map((item, index) => {
-                                if (item.uuid) {
-                                    return {
-                                        columnWidth: 400,
-                                        libraryId,
-                                        ...item,
-                                        id: undefined,
-                                        uuid: undefined,
-                                        sequence: index
-                                    };
-                                } else {
-                                    return { ...item, sequence: index };
-                                }
-                            })
-                        });
-                        headerSave && headerSave();
-                        // setColOpen(false);
-                        message.success('保存成功');
-                    }}
-                    className="mt-4"
-                    type="primary"
-                >
-                    保存
-                </Button>
+                <div>
+                    <Button
+                        onClick={async () => {
+                            if (tableData.some((item) => !item.columnName || (item!.columnType !== 0 && !item.columnType))) {
+                                return false;
+                            }
+                            await updatesColumn({
+                                libraryId,
+                                tableColumnSaveReqVOList: tableData.map((item, index) => {
+                                    if (item.uuid) {
+                                        return {
+                                            columnWidth: 400,
+                                            libraryId,
+                                            ...item,
+                                            id: undefined,
+                                            uuid: undefined,
+                                            sequence: index
+                                        };
+                                    } else {
+                                        return { ...item, sequence: index };
+                                    }
+                                })
+                            });
+                            headerSave && headerSave();
+                            // setColOpen(false);
+                            message.success('保存成功');
+                        }}
+                        className="mt-4"
+                        type="primary"
+                    >
+                        保存
+                    </Button>
+                    <div className="text-xs text-black/50 mt-3">编辑后请保存</div>
+                </div>
             </div>
             <Modal
                 title={'新增字段配置'}

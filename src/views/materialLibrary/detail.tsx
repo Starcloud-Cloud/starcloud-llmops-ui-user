@@ -195,7 +195,7 @@ export const TableHeader = ({
                     <div className="cursor-pointer flex items-center ">
                         <span className="text-[20px] font-semibold mr-1">{name}</span>
                         {canSwitch && (
-                            <Tooltip title="切换素材">
+                            <Tooltip title="切换素材库">
                                 <svg
                                     onClick={() => setOpenSwitchMaterial(true)}
                                     viewBox="0 0 1024 1024"
@@ -425,7 +425,7 @@ export const TableHeader = ({
             {openSwitchMaterial && (
                 <ModalForm
                     width={1000}
-                    title="切换素材"
+                    title="切换素材库"
                     open={openSwitchMaterial}
                     onOpenChange={setOpenSwitchMaterial}
                     onFinish={async () => {
@@ -442,7 +442,7 @@ export const TableHeader = ({
                     }}
                 >
                     <div className="h-[calc(100vh-300px)] overflow-auto">
-                        <MaterialLibrary mode={'select'} setSelectedRowKeys={setSelectedRowKeys} appUid={appUid} libraryId={libraryId} />
+                        <MaterialLibrary mode={'select'} setSelectedRowKeys={setSelectedRowKeys} appUid={appUid} libraryId={libraryId}  bizUid={bizUid} />
                     </div>
                 </ModalForm>
             )}

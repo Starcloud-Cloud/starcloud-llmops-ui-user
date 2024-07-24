@@ -655,7 +655,7 @@ const MaterialLibraryDetail = () => {
                                             </Upload>
                                         </div>
                                     ) : (
-                                        <div className="break-all line-clamp-4 h-[88px]">{row[item.fieldName]}</div>
+                                        <div className="break-all line-clamp-4">{row[item.fieldName]}</div>
                                     )}
                                 </div>
                             );
@@ -927,7 +927,7 @@ const MaterialLibraryDetail = () => {
                 <div className="material-detail-table overflow-hidden h-[calc(100%-96px)]">
                     {columns.filter((item: any) => !item.isDefault).length > 0 ? (
                         <TablePro
-                            key={forceUpdate}
+                            // key={forceUpdate}
                             handleEditColumn={handleEditColumn}
                             onUpdateColumn={handleUpdateColumn}
                             actionRef={actionRef}

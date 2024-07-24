@@ -48,14 +48,31 @@ const RedBookAnalysis = ({
     ];
 
     useEffect(() => {
-        const data = redList.map((item) => {
+        const imageColumns = columns.filter((item) => item.type === 5);
+        const data = redList.map((redItem, index) => {
             return {
-                label: item.label,
-                label_key: item.value
+                label: redItem.label,
+                label_key: redItem.value,
+                value: imageColumns[index - 3]?.dataIndex || ''
             };
         });
+
+        const filterData = data.filter((item) => item.value);
+        const fieldList = filterData.map((item) => item.label_key);
+        const obj: any = {};
+        filterData.forEach((item) => {
+            obj[item.label_key] = item.value;
+        });
+        setRedBookData((pre: any) => ({
+            ...pre,
+            fieldList: fieldList,
+            bindFieldData: obj
+        }));
+
         setData(data);
-    }, []);
+    }, [columns]);
+
+    console.log(data, 'data');
 
     return (
         <div>
@@ -71,7 +88,7 @@ const RedBookAnalysis = ({
                 rows={10}
             />
             {!redBookData?.requirement && requirementStatusOpen && (
-                <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
+                <span className="text-xs text-[#ff4d4f] ml-[4px]">小红书链接字段内容必填</span>
             )}
 
             <div className="text-[16px] font-bold my-4 flex justify-between">
@@ -171,43 +188,51 @@ const RedBookAnalysis = ({
                             align: 'center',
                             render: (_, record) => {
                                 return (
-                                    <Select
-                                        style={{ width: 160 }}
-                                        allowClear
-                                        onChange={(value) => {
-                                            let fieldList = redBookData.fieldList;
-                                            let bindFieldData = redBookData.bindFieldData;
-                                            if (value) {
-                                                fieldList = [...fieldList, record.label_key];
-                                                bindFieldData[record.label_key] = value;
-                                            } else {
-                                                fieldList = fieldList.filter((item: any) => item !== record.label_key);
-                                                delete bindFieldData[record.label_key];
-                                            }
+                                    data.length > 0 && (
+                                        <Select
+                                            style={{ width: 160 }}
+                                            allowClear
+                                            value={record.value}
+                                            onChange={(value) => {
+                                                let fieldList = redBookData.fieldList;
+                                                let bindFieldData = redBookData.bindFieldData;
+                                                if (value) {
+                                                    fieldList = [...fieldList, record.label_key];
+                                                    bindFieldData[record.label_key] = value;
+                                                } else {
+                                                    fieldList = fieldList.filter((item: any) => item !== record.label_key);
+                                                    delete bindFieldData[record.label_key];
+                                                }
 
-                                            setRedBookData((pre: any) => {
-                                                return {
-                                                    ...pre,
-                                                    fieldList,
-                                                    bindFieldData
-                                                };
-                                            });
-                                        }}
-                                    >
-                                        {columns
-                                            .filter((item) => item.title !== '使用次数')
-                                            ?.map((item) => {
-                                                return (
-                                                    <Option
-                                                        key={item.dataIndex}
-                                                        value={item.dataIndex}
-                                                        disabled={Object.values(redBookData.bindFieldData).includes(item.dataIndex)}
-                                                    >
-                                                        {item.title}
-                                                    </Option>
-                                                );
-                                            })}
-                                    </Select>
+                                                const copyData = [...data];
+                                                const index = copyData.findIndex((item) => item.label_key === record.label_key);
+                                                copyData[index].value = value;
+                                                setData(copyData);
+
+                                                setRedBookData((pre: any) => {
+                                                    return {
+                                                        ...pre,
+                                                        fieldList,
+                                                        bindFieldData
+                                                    };
+                                                });
+                                            }}
+                                        >
+                                            {columns
+                                                .filter((item) => item.title !== '使用次数')
+                                                ?.map((item) => {
+                                                    return (
+                                                        <Option
+                                                            key={item.dataIndex}
+                                                            value={item.dataIndex}
+                                                            disabled={Object.values(redBookData.bindFieldData).includes(item.dataIndex)}
+                                                        >
+                                                            {item.title}
+                                                        </Option>
+                                                    );
+                                                })}
+                                        </Select>
+                                    )
                                 );
                             }
                         }
@@ -230,13 +255,10 @@ const RedBookAnalysis = ({
                 </Button> */}
                 <Button
                     onClick={() => {
-                        console.log(redBookData, 'redBookData');
-                        // let fieldList = redBookData.fieldList;
-                        // const bindFieldData = Object.keys(redBookData.bindFieldData);
-                        // const areArraysEqual = isEqual(sortBy(fieldList), sortBy(bindFieldData));
-                        // if (!areArraysEqual) {
-                        //     return false;
-                        // }
+                        if (!redBookData.requirement) {
+                            message.error('请输入小红书链接!');
+                            return;
+                        }
                         if (!redBookData.fieldList?.length) {
                             message.error('请至少绑定一素材字段!');
                             return;

@@ -109,7 +109,7 @@ const TablePro = ({
         editable: dataIndex.flat(1).join('.') === [item.dataIndex || item.key].flat(1).join('.') ? undefined : false,
         onCell: (record: any, rowIndex: any) => ({
             onClick: () => {
-                if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
+                if (item.dataIndex === 'id' || item.dataIndex === 'operation' || item.editType === EditType.Image || item.title === '使用次数') {
                     setDataIndex([]);
                     setEditableRowKeys([]);
                     return;

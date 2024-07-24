@@ -1162,7 +1162,7 @@ function CreateDetail() {
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
-                                className="h-[calc(100vh-190px)] overflow-y-auto mt-[-16px]"
+                                className="h-[calc(100vh-210px)] overflow-y-auto mt-[-16px]"
                                 style={{
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
@@ -1263,14 +1263,14 @@ function CreateDetail() {
                     )}
                     {detailRef.current?.uid && searchParams.get('uid') && permissions.includes('app:analyze') && (
                         <Tabs.TabPane tab="应用分析" key="2">
-                            <div className="px-4">
+                            <div className="h-[calc(100vh-220px)] overflow-y-auto px-4">
                                 <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
                             </div>
                         </Tabs.TabPane>
                     )}
                     {searchParams.get('uid') && permissions.includes('app:publish') && (
                         <Tabs.TabPane tab="应用发布" key="3">
-                            <div className="px-4">
+                            <div className="h-[calc(100vh-220px)] overflow-y-auto px-4">
                                 <Upload
                                     appUid={searchParams.get('uid') as string}
                                     saveState={saveState}

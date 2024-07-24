@@ -29,11 +29,13 @@ export const IconRenderer = ({ value }: { value: string }) => {
 const MaterialLibrary = ({
     mode = 'page',
     setSelectedRowKeys,
+    bizUid,
     appUid,
     libraryId
 }: {
     mode: 'select' | 'page';
     setSelectedRowKeys: (keys: React.Key[]) => void;
+    bizUid?: string;
     appUid?: string;
     libraryId?: string;
 }) => {
@@ -113,7 +115,7 @@ const MaterialLibrary = ({
                         </div>
                         <div className="ml-2 flex flex-col">
                             <span className="font-extrabold">{record.name}</span>
-                            <div className="text-[12px] h-[18px] text-[#06070980]">{record.description}</div>
+                            <div className="text-[12px] h-[18px] text-[#06070980] line-clamp-1">{record.description}</div>
                         </div>
                     </div>
                 );
@@ -256,20 +258,32 @@ const MaterialLibrary = ({
                 toolbar={{
                     menu: {
                         type: 'tab',
-                        items: [
-                            {
-                                key: '1',
-                                label: <span>我的素材库</span>
-                            },
-                            {
-                                key: '0',
-                                label: <span>系统素材库</span>
-                            },
-                            {
-                                key: '9',
-                                label: <span>已发布素材库</span>
-                            }
-                        ],
+                        items:
+                            mode === 'select'
+                                ? [
+                                      {
+                                          key: '1',
+                                          label: <span>我的素材库</span>
+                                      },
+                                      {
+                                          key: '0',
+                                          label: <span>系统素材库</span>
+                                      }
+                                  ]
+                                : [
+                                    {
+                                        key: '1',
+                                        label: <span>我的素材库</span>
+                                    },
+                                    {
+                                        key: '0',
+                                        label: <span>系统素材库</span>
+                                    },
+                                    {
+                                        key: '9',
+                                        label: <span>已发布素材库</span>
+                                    }
+                                ],
                         onChange: (key) => {
                             setActiveKey(key as string);
                             actionRef.current?.reload();
@@ -318,9 +332,9 @@ const MaterialLibrary = ({
 
                     let data: any = {};
                     if (mode === 'select' && +activeKey === 0) {
-                        data = await getSelectSysMaterialPage({ ...params, sortingFields, appUid });
-                    }else {
-                        data = await getMaterialPage({ ...params, sortingFields }); 
+                        data = await getSelectSysMaterialPage({ ...params, sortingFields, appUid: bizUid });
+                    } else {
+                        data = await getMaterialPage({ ...params, sortingFields });
                     }
                     return {
                         data: data.list,

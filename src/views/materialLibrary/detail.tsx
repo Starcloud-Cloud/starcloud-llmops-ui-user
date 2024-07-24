@@ -431,7 +431,7 @@ export const TableHeader = ({
                     onFinish={async () => {
                         const data = await createMaterialLibraryAppBind({
                             libraryId: selectedRowKeys[0],
-                            appUid: appUid
+                            appUid: bizUid
                         });
                         if (data) {
                             message.success('切换成功!');

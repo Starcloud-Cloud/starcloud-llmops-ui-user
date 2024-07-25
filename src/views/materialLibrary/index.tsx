@@ -267,7 +267,7 @@ const MaterialLibrary = ({
                                       },
                                       {
                                           key: '0',
-                                          label: <span>系统素材库</span>
+                                          label: <span>绑定记录</span>
                                       }
                                   ]
                                 : [

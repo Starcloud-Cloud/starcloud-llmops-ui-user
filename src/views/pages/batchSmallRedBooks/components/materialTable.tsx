@@ -389,13 +389,17 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
     const [zoomOpen, setZoomOpen] = useState(false);
 
     const handleOcr = async (filedName: string, url: string, type: number) => {
-        setBtnLoading(type);
-        const data = await imageOcr({ imageUrls: [url], cleansing: !!type });
-        const result = data?.list?.[0].ocrGeneralDTO;
-        imageForm.setFieldValue(`${filedName}_tag`, result.tag);
-        imageForm.setFieldValue(`${filedName}_description`, result.content);
-        setBtnLoading(-1);
-        setExtend({ [filedName + '_extend']: result.data });
+        try {
+            setBtnLoading(type);
+            const data = await imageOcr({ imageUrls: [url], cleansing: !!type });
+            const result = data?.list?.[0].ocrGeneralDTO;
+            imageForm.setFieldValue(`${filedName}_tag`, result.tag);
+            imageForm.setFieldValue(`${filedName}_description`, result.content);
+            setBtnLoading(-1);
+            setExtend({ [filedName + '_extend']: result.data });
+        } catch (e) {
+            setBtnLoading(-1);
+        }
     };
     const [fileList, setfileList] = useState<any[]>([]);
     const props: UploadProps = {

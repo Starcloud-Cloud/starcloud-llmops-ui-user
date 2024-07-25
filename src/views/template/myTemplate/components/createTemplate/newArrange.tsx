@@ -85,8 +85,6 @@ function Arrange({
         }
     };
     const addStep = (step: any, index: number) => {
-        console.log(step, index);
-
         const newList = _.cloneDeep(stepOpen);
         newList[index] = false;
         setStepOpen(newList);

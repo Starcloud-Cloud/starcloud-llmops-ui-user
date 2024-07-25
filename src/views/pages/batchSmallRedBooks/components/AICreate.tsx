@@ -1,26 +1,20 @@
-import { Modal, Button, Table, Input, Progress, Tabs, Checkbox, InputNumber, Tag, TabsProps, Popover, List, Drawer } from 'antd';
+import { Modal, Button, Table, Progress, Tag } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
-import { materialGenerate, customMaterialGenerate, createMaterialInfoPageByMarketUid } from 'api/redBook/batchIndex';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/slices/snackbar';
+import { materialGenerate, customMaterialGenerate, pluginsXhsOcr } from 'api/redBook/batchIndex';
 import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
-import { ExclamationCircleFilled, ClockCircleOutlined } from '@ant-design/icons';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import dayjs from 'dayjs';
 import './aiCreate.css';
-const { confirm } = Modal;
-
+import AICreates from './components/AICreate';
+import FieldCompletion from './components/fieldCompletion';
+import RedBookAnalysis from './components/redBookAnalysis';
+import ImgOcr from './components/imgOcr';
+import TextExtraction from './components/textExtraction';
 const AiCreate = ({
-    title,
-    detail,
-    setColOpen,
+    plugValue,
     materialType,
     columns,
     MokeList,
     tableData,
-    defaultVariableData,
-    defaultField,
     setPage,
     setcustom,
     setField,
@@ -29,11 +23,10 @@ const AiCreate = ({
     setFieldCompletionData,
     fieldCompletionData,
     setVariableData,
-    variableData
+    variableData,
+    setPlugOpen
 }: {
-    title: string;
-    detail: any;
-    setColOpen: (data: boolean) => void;
+    plugValue: string | null;
     materialType: any;
     columns: any[];
     MokeList: any[];
@@ -43,21 +36,20 @@ const AiCreate = ({
     setField?: (data: any) => void;
     downTableData: (data: any, num: number) => void;
     setSelectedRowKeys: (data: any) => void;
-    defaultVariableData?: any;
-    defaultField?: any;
-    setFieldCompletionData: (data: any) => void;
     fieldCompletionData: any;
-    setVariableData: (data: any) => void;
+    setFieldCompletionData: (data: any) => void;
     variableData: any;
+    setVariableData: (data: any) => void;
+    setPlugOpen: (data: boolean) => void;
 }) => {
-    useEffect(() => {
-        if (MokeList?.length > 0) {
-        }
-    }, [MokeList]);
-    const { TextArea } = Input;
-    const [open, setOpen] = useState(false);
     const checkedList = useMemo(() => {
         return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image' && item.type !== 'document');
+    }, [columns]);
+    const imgCheckedList = useMemo(() => {
+        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type === 'image');
+    }, [columns]);
+    const allColumns = useMemo(() => {
+        return columns?.slice(1, columns?.length - 1);
     }, [columns]);
     //AI 字段补齐
     const [selOpen, setSelOpen] = useState(false);
@@ -67,7 +59,6 @@ const AiCreate = ({
             setSelList(selectedRows);
         }
     };
-
     function chunkArray(myArray: any[], chunk_size: any) {
         var index = 0;
         var arrayLength = myArray.length;
@@ -91,9 +82,8 @@ const AiCreate = ({
     const errorMessageRef = useRef<any[]>([]);
     const [errorMessage, setErrorMessage] = useState<any[]>([]);
     const retryNumRef = useRef(0);
-    const [retryNum, setRetryNum] = useState(0);
     const retryListRef = useRef<any[]>([]);
-    const [retryList, setRetryList] = useState<any[]>([]);
+    const xhsListRef = useRef<any[]>([]);
     const materialPre = useMemo(() => {
         return ((successCountRef.current / totalCountRef.current) * 100) | 0;
     }, [successCount, totalCount]);
@@ -134,7 +124,6 @@ const AiCreate = ({
         let index = 0;
         const chunks = chunkArray(retry ? retryListRef.current : num === 1 ? selList : tableData, 3);
         retryListRef.current = [];
-        setRetryList(retryListRef.current);
         while (index < chunks.length && !aref.current) {
             const resArr: any[] = [];
             const newResArr: any[] = [];
@@ -177,7 +166,6 @@ const AiCreate = ({
                         const newRetry = _.cloneDeep(retryListRef.current);
                         newRetry.push(...group);
                         retryListRef.current = newRetry;
-                        setRetryList(retryListRef.current);
                         group?.map((item) => {
                             if (!resArr[index + i]) {
                                 resArr[index + i] = [{}];
@@ -237,8 +225,6 @@ const AiCreate = ({
     };
     //loading 弹窗
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
-    // AI 批量生成
-    const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
 
     //素材预览
     const getTextStream = async (retry?: boolean) => {
@@ -263,7 +249,6 @@ const AiCreate = ({
             );
         }
         retryNumRef.current = 0;
-        setRetryNum(retryNumRef.current);
         let index = 0;
         // let theStaging = _.cloneDeep(tableData);
         while (index < chunks?.length && !aref.current) {
@@ -295,7 +280,6 @@ const AiCreate = ({
                         let newretryNum = _.cloneDeep(retryNumRef.current);
                         newretryNum += 1;
                         retryNumRef.current = newretryNum;
-                        setRetryNum(retryNumRef.current);
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
@@ -343,482 +327,165 @@ const AiCreate = ({
     //AI 素材生成
     const aimaterialCreate = (retry?: boolean) => {
         setSelectValue('batch');
-        if (variableData.checkedFieldList?.length === 0) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: 'AI 补齐字段最少选一个',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    close: false
-                })
-            );
-            return false;
-        }
-        if (!variableData.requirement) {
-            setrequirementStatusOpen(true);
-            return false;
-        }
         getTextStream(retry);
     };
     //处理素材
     const editMaterial = (num: number, retry?: boolean) => {
         setSelectValue('field');
-        if (!fieldCompletionData.requirement) {
-            setrequirementStatusOpen(true);
-            return false;
-        }
-        if (fieldCompletionData.checkedFieldList?.length === 0) {
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: 'AI 补齐字段最少选一个',
-                    variant: 'alert',
-                    alert: {
-                        color: 'error'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    close: false
-                })
-            );
-            return false;
-        }
         batchNum.current = num;
         handleMaterial(num, retry);
     };
+    //小红书分析
+    const xhsAnalysis = async (retry?: boolean) => {
+        setSelectValue('xhs');
+        if (!retry) {
+            materialzanListRef.current = [];
+            setMaterialzanList(materialzanListRef.current);
+            uuidListsRef.current = [];
+            setUuidLists(uuidListsRef.current);
+        }
+        aref.current = false;
+        setMaterialExecutionOpen(true);
+        console.log(redBookData.requirement);
+
+        let requirementData = redBookData.requirement?.split(/[,\n\r，]+/).filter(Boolean);
+        console.log(requirementData);
+
+        let chunks;
+        if (!retry) {
+            totalCountRef.current = requirementData?.length;
+            setTotalCount(totalCountRef.current);
+            chunks = chunkArray(requirementData, 1);
+        } else {
+            chunks = chunkArray(xhsListRef.current, 1);
+        }
+        xhsListRef.current = [];
+        let index = 0;
+        while (index < chunks?.length && !aref.current) {
+            const resArr: any[] = [];
+            const currentBatch = chunks.slice(index, index + 3);
+            executionCountRef.current = currentBatch?.flat()?.length;
+            setExecutionCount(executionCountRef.current);
+            await Promise.all(
+                currentBatch.map(async (group, i) => {
+                    try {
+                        const res = await pluginsXhsOcr({ xhsNoteUrl: String(group) });
+                        if (!aref.current) {
+                            const newMaterialzan = _.cloneDeep(materialzanListRef.current);
+                            const newCheckbox: any[] = _.cloneDeep(redBookData.fieldList);
+                            const selectData = _.cloneDeep(redBookData.bindFieldData);
+                            const obj: any = {};
+                            newCheckbox.forEach((dt) => {
+                                obj[selectData[dt]] = res[dt]?.url || res[dt];
+                            });
+                            obj.uuid = uuidv4();
+                            console.log(obj);
+                            newMaterialzan.push(obj);
+                            resArr.push(obj);
+                            materialzanListRef.current = newMaterialzan;
+                            setMaterialzanList(materialzanListRef.current);
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            successCountRef.current += group?.length;
+                            setExecutionCount(executionCountRef.current);
+                            setSuccessCount(successCountRef.current);
+                        }
+                    } catch (error: any) {
+                        console.log(error);
+                        const newList = _.cloneDeep(errorMessageRef.current);
+                        newList.push(error.msg);
+                        xhsListRef.current.push(group);
+                        errorMessageRef.current = newList;
+                        setErrorMessage(errorMessageRef.current);
+                        executionCountRef.current -= group?.length;
+                        setExecutionCount(executionCountRef.current);
+                        errorCountRef.current += group?.length;
+                        if (errorCountRef.current >= 3) {
+                            aref.current = true;
+                        }
+                        setErrorCount(errorCountRef.current);
+                    }
+                })
+            );
+            if (!aref.current) {
+                const newL = _.cloneDeep(uuidListsRef.current);
+                newL?.push(...resArr?.map((item) => item.uuid));
+                uuidListsRef.current = newL;
+                setUuidLists(uuidListsRef.current);
+            }
+            index += 3;
+        }
+        executionCountRef.current = 0;
+        setExecutionCount(executionCountRef.current);
+    };
+
     //新增插入表格
     const [selectValue, setSelectValue] = useState('');
     const batchNum = useRef(-1);
     const materialFieldexeDataRef = useRef<any>(null);
     const materialzanListRef = useRef<any[]>([]);
     const [materialzanList, setMaterialzanList] = useState<any[]>([]);
-    const items: TabsProps['items'] = [
-        {
-            key: '1',
-            label: '示例1',
-            children: (
-                <div className="text-xs max-w-[600px] leading-5">
-                    <span>
-                        帮我生成一些唐诗，包括：古诗名称，作者，一句诗句 <br />
-                    </span>
-                    <span>标题：古诗名</span>
-                    <br />
-                    <span>语句：一句诗句</span>
-                    <br />
-                </div>
-            )
-        },
-        {
-            key: '2',
-            label: '示例2',
-            children: (
-                <div className="text-xs max-w-[600px] leading-5">
-                    <span>
-                        作为小红书养生博主，结合主题“这6种食物千万别二次加热“，生成6种食物信息
-                        <br />
-                    </span>
-                    <span>返回的字段要求：</span> <br />
-                    <span>标题：食物名称，不超过6个汉字</span> <br />
-                    <span>节内容：一句话说明为什么不能二次加热的原因，不少于过20个汉字</span> <br />
-                    <span>节内容2：为什么不能二次加热的详细原因，不少于100个汉字</span>
-                    <br />
-                </div>
-            )
-        }
-    ];
 
-    //历史数据
-    const [historyOpen, setHistoryOpen] = useState(false);
-    const [hisTotal, setHistoryTotal] = useState(0);
-    const [dataSource, setdataSource] = useState<any[]>([]);
-    const [historyPage, setHistoryPage] = useState({
-        pageNo: 1,
-        pageSize: 10
+    //小红书数据
+    const [redBookData, setRedBookData] = useState<any>({
+        requirement: '',
+        fieldList: [],
+        bindFieldData: {}
     });
-    const getHistoryData = async () => {
-        const result = await createMaterialInfoPageByMarketUid(historyPage);
-        setdataSource(result.list);
-        setHistoryTotal(result.total);
-        console.log(result);
-    };
+    // OCR 提取数据
+    const [ocrData, setOcrData] = useState({
+        requirement: '',
+        title: true,
+        content: true,
+        titleField: 1,
+        contentField: 1
+    });
+
+    const xhsCloumns = useMemo(() => {
+        const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
+        return columns?.filter((item) => arr?.includes(item.dataIndex));
+    }, [redBookData?.fieldList, redBookData]);
     return (
         <div>
-            <Button
-                size={title === 'AI 生成' ? 'small' : 'middle'}
-                onClick={() => {
-                    if (detail && columns?.filter((item) => item.title !== '序号' && item.title !== '操作')?.length === 0) {
-                        confirm({
-                            title: '提示',
-                            content: '还未配置素材字段',
-                            icon: <ExclamationCircleFilled />,
-                            okText: '去配置',
-                            cancelText: '再想想',
-                            onOk() {
-                                setColOpen(true);
-                            }
-                        });
-                    } else {
-                        setOpen(true);
-                    }
-                }}
-                type="primary"
-            >
-                {title}
-            </Button>
-            <Modal title="素材AI生成" maskClosable={false} width={'60%'} open={open} footer={null} onCancel={() => setOpen(false)}>
+            {/* {plugValue === 'extraction' ? (
+                //文本智能提取
+                <TextExtraction />
+            ) : plugValue === 'imageOcr' ? (
+                //OCR 提取
+                <ImgOcr
+                    imgCheckedList={imgCheckedList}
+                    ocrData={ocrData}
+                    setOcrData={setOcrData}
+                    selList={selList}
+                    tableDataLength={tableData?.length || 0}
+                    setSelOpen={setSelOpen}
+                />
+            ) : plugValue === 'xhsOcr' ? (
+                //小红书分析
+                <RedBookAnalysis columns={allColumns} redBookData={redBookData} setRedBookData={setRedBookData} xhsAnalysis={xhsAnalysis} />
+            ) : plugValue === 'generate_material_one' ? (
+                // 素材字段补齐
+                <FieldCompletion
+                    fieldCompletionData={fieldCompletionData}
+                    setFieldCompletionData={setFieldCompletionData}
+                    checkedList={checkedList}
+                    selList={selList}
+                    tableData={tableData}
+                    setSelOpen={setSelOpen}
+                    editMaterial={editMaterial}
+                    setField={setField}
+                />
+            ) : plugValue === 'generate_material_batch' ? (
+                // 素材生成
                 <div className="relative">
-                    <Tabs
-                        items={[
-                            {
-                                key: '1',
-                                label: '批量生成',
-                                children: (
-                                    <div>
-                                        <div className="text-xs text-black/50">
-                                            告诉AI你想生成的素材描述，越详细越好。AI会自动生成多条素材内容。
-                                        </div>
-                                        <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
-                                        <Checkbox.Group
-                                            onChange={(e) => {
-                                                if (variableData.checkedFieldList.length > e.length) {
-                                                    setVariableData({
-                                                        ...variableData,
-                                                        checkedFieldList: e
-                                                    });
-                                                } else {
-                                                    if (e.length > 6) {
-                                                        if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
-                                                            setVariableData({
-                                                                ...variableData,
-                                                                checkedFieldList: e
-                                                            });
-                                                        } else {
-                                                            dispatch(
-                                                                openSnackbar({
-                                                                    open: true,
-                                                                    message: '最多只能选择6个字段',
-                                                                    variant: 'alert',
-                                                                    alert: {
-                                                                        color: 'error'
-                                                                    },
-                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                    close: false
-                                                                })
-                                                            );
-                                                        }
-                                                    } else {
-                                                        setVariableData({
-                                                            ...variableData,
-                                                            checkedFieldList: e
-                                                        });
-                                                    }
-                                                }
-                                            }}
-                                            value={variableData.checkedFieldList}
-                                        >
-                                            {checkedList?.map((item) => (
-                                                <Checkbox disabled={item.required} value={item.dataIndex}>
-                                                    {item.title}
-                                                    {item.required ? '*' : ''}
-                                                </Checkbox>
-                                            ))}
-                                        </Checkbox.Group>
-                                        <div className="text-[16px] font-bold mt-4 flex items-center">
-                                            <span>2.告诉 AI 如何生成这些字段内容</span>
-                                            <Popover
-                                                content={
-                                                    <div className="max-w-[230px] sm:max-w-[600px]">
-                                                        <div>
-                                                            <Tabs size="small" defaultActiveKey="1" items={items} />
-                                                        </div>
-                                                    </div>
-                                                }
-                                                placement="bottomLeft"
-                                                arrow={false}
-                                                trigger="hover"
-                                            >
-                                                <HelpOutlineIcon className="text-base ml-1 cursor-pointer" />
-                                            </Popover>
-                                        </div>
-                                        <div className="relative pt-8">
-                                            <TextArea
-                                                className="flex-1"
-                                                key={variableData.requirement}
-                                                defaultValue={variableData.requirement}
-                                                status={!variableData.requirement && requirementStatusOpen ? 'error' : ''}
-                                                onBlur={(e) => {
-                                                    setrequirementStatusOpen(true);
-                                                    setVariableData({
-                                                        ...variableData,
-                                                        requirement: e.target.value
-                                                    });
-                                                }}
-                                                rows={10}
-                                            />
-                                            <div className=" absolute top-1 right-1 flex gap-1 items-end">
-                                                <div className="text-xs text-black/50">查看历史数据</div>
-                                                <Button
-                                                    className="group"
-                                                    onClick={async () => {
-                                                        getHistoryData();
-                                                        setHistoryOpen(true);
-                                                    }}
-                                                    size="small"
-                                                    icon={<ClockCircleOutlined className="text-[#673ab7] group-hover:text-[#d9d9d9]" />}
-                                                    shape="circle"
-                                                />
-                                            </div>
-                                        </div>
-                                        {!variableData.requirement && requirementStatusOpen && (
-                                            <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
-                                        )}
-                                        <div className="text-[16px] font-bold my-4">3.如何生成素材</div>
-                                        <div className="flex gap-2 items-center text-xs mb-4">
-                                            <div>一组生成多少条</div>
-                                            <InputNumber
-                                                value={variableData.generateCount}
-                                                onChange={(value) => {
-                                                    if (value) {
-                                                        setVariableData({
-                                                            ...variableData,
-                                                            generateCount: value
-                                                        });
-                                                    }
-                                                }}
-                                                className="w-[200px]"
-                                                min={1}
-                                                max={12}
-                                            />
-                                        </div>
-                                        <div className="flex gap-2 items-center text-xs">
-                                            <div>共生成几组素材</div>
-                                            <InputNumber
-                                                value={variableData.groupNum}
-                                                onChange={(value) => {
-                                                    if (value) {
-                                                        setVariableData({
-                                                            ...variableData,
-                                                            groupNum: value
-                                                        });
-                                                    }
-                                                }}
-                                                className="w-[200px]"
-                                                min={1}
-                                                max={20}
-                                            />
-                                        </div>
-                                        <div className="flex justify-center gap-6 mt-6">
-                                            <Button
-                                                onClick={() => {
-                                                    if (variableData.checkedFieldList?.length === 0) {
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: 'AI 补齐字段最少选一个',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'error'
-                                                                },
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                close: false
-                                                            })
-                                                        );
-                                                        return false;
-                                                    }
-                                                    if (!variableData.requirement) {
-                                                        setrequirementStatusOpen(true);
-                                                        return false;
-                                                    }
-                                                    setcustom && setcustom(JSON.stringify(variableData));
-                                                }}
-                                                type="primary"
-                                            >
-                                                保存配置
-                                            </Button>
-                                            <Button type="primary" onClick={() => aimaterialCreate()}>
-                                                AI 生成素材
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )
-                            },
-                            {
-                                key: '0',
-                                label: '字段补齐',
-                                children: (
-                                    <div>
-                                        <div className="text-xs text-black/50">
-                                            <p>先选择已选素材上想要补齐内容的字段，然后告诉AI你想生成的素材描述，越详细越好。</p>
-                                            <p>AI会自动生成已选素材的空缺字段的内容。</p>
-                                        </div>
-                                        <div className="text-[16px] font-bold my-4">1.选择需要 AI 补齐的字段</div>
-                                        <Checkbox.Group
-                                            onChange={(e) => {
-                                                if (fieldCompletionData.checkedFieldList.length > e.length) {
-                                                    setFieldCompletionData({
-                                                        ...fieldCompletionData,
-                                                        checkedFieldList: e
-                                                    });
-                                                } else {
-                                                    if (e.length > 6) {
-                                                        if (checkedList?.find((item) => item.dataIndex === e[e.length - 1])?.required) {
-                                                            setFieldCompletionData({
-                                                                ...fieldCompletionData,
-                                                                checkedFieldList: e
-                                                            });
-                                                        } else {
-                                                            dispatch(
-                                                                openSnackbar({
-                                                                    open: true,
-                                                                    message: '最多只能选择6个字段',
-                                                                    variant: 'alert',
-                                                                    alert: {
-                                                                        color: 'error'
-                                                                    },
-                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                    close: false
-                                                                })
-                                                            );
-                                                        }
-                                                    } else {
-                                                        setFieldCompletionData({
-                                                            ...fieldCompletionData,
-                                                            checkedFieldList: e
-                                                        });
-                                                    }
-                                                }
-                                            }}
-                                            value={fieldCompletionData.checkedFieldList}
-                                        >
-                                            {checkedList?.map((item) => (
-                                                <Checkbox value={item.dataIndex}>
-                                                    {item.title}
-                                                    {item.required ? '*' : ''}
-                                                </Checkbox>
-                                            ))}
-                                        </Checkbox.Group>
-                                        <div className="text-[16px] font-bold my-4">2.告诉 AI 如何生成这些字段内容</div>
-                                        <TextArea
-                                            defaultValue={fieldCompletionData.requirement}
-                                            status={!fieldCompletionData.requirement && requirementStatusOpen ? 'error' : ''}
-                                            onBlur={(e) => {
-                                                setFieldCompletionData({ ...fieldCompletionData, requirement: e.target.value });
-                                                setrequirementStatusOpen(true);
-                                            }}
-                                            rows={10}
-                                        />
-                                        {!fieldCompletionData.requirement && requirementStatusOpen && (
-                                            <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>
-                                        )}
-                                        <div className="text-[16px] font-bold my-4">3.如何处理素材</div>
-                                        <Button className="mb-4" type="primary" size="small" onClick={() => setSelOpen(true)}>
-                                            选择素材
-                                        </Button>
-                                        <div className="flex justify-center gap-2">
-                                            <Button
-                                                className="h-[50px]"
-                                                disabled={selList?.length === 0}
-                                                onClick={() => editMaterial(1)}
-                                                type="primary"
-                                            >
-                                                <div className="flex flex-col items-center">
-                                                    处理选中的素材
-                                                    <div>({selList?.length})</div>
-                                                </div>
-                                            </Button>
-                                            <Button
-                                                className="h-[50px]"
-                                                disabled={tableData?.length === 0}
-                                                onClick={() => {
-                                                    editMaterial(2);
-                                                }}
-                                                type="primary"
-                                            >
-                                                <div className="flex flex-col items-center">
-                                                    处理全部素材
-                                                    <div>({tableData?.length})</div>
-                                                </div>
-                                            </Button>
-                                        </div>
-                                        <div className="flex justify-center gap-6 mt-6">
-                                            <Button
-                                                onClick={() => {
-                                                    if (!fieldCompletionData.requirement) {
-                                                        setrequirementStatusOpen(true);
-                                                        return false;
-                                                    }
-                                                    if (fieldCompletionData.checkedFieldList?.length === 0) {
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: 'AI 补齐字段最少选一个',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'error'
-                                                                },
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                close: false
-                                                            })
-                                                        );
-                                                        return false;
-                                                    }
-                                                    setField && setField(JSON.stringify(fieldCompletionData));
-                                                }}
-                                                type="primary"
-                                            >
-                                                保存配置
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )
-                            }
-                        ]}
-                        defaultActiveKey="1"
-                    ></Tabs>
-                    <Drawer
-                        title="历史数据"
-                        placement="right"
-                        closable={false}
-                        onClose={() => {
-                            setHistoryOpen(false);
-                        }}
-                        open={historyOpen}
-                        getContainer={false}
-                    >
-                        <List
-                            className="flex-1"
-                            itemLayout="horizontal"
-                            dataSource={dataSource}
-                            renderItem={(item, index) => (
-                                <List.Item>
-                                    <List.Item.Meta
-                                        title={
-                                            <div
-                                                onClick={() => {
-                                                    setVariableData({
-                                                        ...variableData,
-                                                        requirement: item.requestContent
-                                                    });
-                                                    setHistoryOpen(false);
-                                                }}
-                                                className="line-clamp-3 text-xs text-black/50 cursor-pointer"
-                                            >
-                                                <span className="text-black mr-2">
-                                                    {dayjs(item?.createTime).format('YYYY-MM-DD HH:mm:ss')}
-                                                </span>
-                                                {item?.requestContent}
-                                            </div>
-                                        }
-                                    />
-                                </List.Item>
-                            )}
-                        />
-                    </Drawer>
+                    <AICreates
+                        variableData={variableData}
+                        setVariableData={setVariableData}
+                        checkedList={checkedList}
+                        setcustom={setcustom}
+                        aimaterialCreate={aimaterialCreate}
+                    />
                 </div>
-            </Modal>
+            ) : null} */}
             {/* 选择素材 */}
             <Modal
                 className="relative"
@@ -908,7 +575,11 @@ const AiCreate = ({
                         { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
                         ...(selectValue === 'field'
                             ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
-                            : columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex)))
+                            : selectValue === 'batch'
+                            ? columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex))
+                            : selectValue === 'xhs'
+                            ? xhsCloumns
+                            : [])
                     ]}
                     dataSource={materialzanList}
                 />
@@ -962,16 +633,19 @@ const AiCreate = ({
                                     if (selectValue === 'batch') {
                                         downTableData(materialzanListRef.current, 1);
                                         setMaterialExecutionOpen(false);
-                                        setOpen(false);
+                                        setPlugOpen(false);
                                         setSelectedRowKeys(uuidListsRef.current);
-                                    } else {
+                                    } else if (selectValue === 'field') {
                                         setSelList([]);
-                                        console.log(materialFieldexeDataRef.current);
-
                                         downTableData(materialFieldexeDataRef.current, 2);
                                         setMaterialExecutionOpen(false);
-                                        setOpen(false);
+                                        setPlugOpen(false);
                                         setSelectedRowKeys(uuidLists);
+                                    } else if (selectValue === 'xhs') {
+                                        downTableData(materialzanListRef.current, 1);
+                                        setMaterialExecutionOpen(false);
+                                        setPlugOpen(false);
+                                        setSelectedRowKeys(uuidListsRef.current);
                                     }
                                 }}
                                 className="w-[100px]"
@@ -1003,7 +677,6 @@ const AiCreate = ({
 };
 const memoAiCreate = (pre: any, next: any) => {
     return (
-        JSON.stringify(pre.title) === JSON.stringify(JSON.stringify(next.title)) &&
         JSON.stringify(pre.materialType) === JSON.stringify(JSON.stringify(next.materialType)) &&
         JSON.stringify(pre.columns) === JSON.stringify(JSON.stringify(next.columns)) &&
         JSON.stringify(pre.MokeList) === JSON.stringify(JSON.stringify(next.MokeList)) &&

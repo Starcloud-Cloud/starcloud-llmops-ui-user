@@ -1,0 +1,20 @@
+.material-detail-table textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.material-detail-table .ant-table-cell {
+    vertical-align: middle;
+}
+
+.material-detail-table .ant-table-selection-column {
+    vertical-align: middle;
+}
+
+.material-detail-table .ant-upload-select {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+}

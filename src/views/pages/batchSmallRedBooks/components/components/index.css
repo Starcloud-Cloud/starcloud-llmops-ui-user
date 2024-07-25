@@ -1,0 +1,47 @@
+#edit-table .react-resizable {
+    position: relative;
+    background-clip: padding-box;
+}
+
+#edit-table .react-resizable-handle {
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    bottom: 0;
+    right: -5px;
+    cursor: col-resize;
+    z-index: 1;
+}
+
+#edit-table {
+    overflow: hidden;
+    overflow-y: auto;
+    height: calc(100vh - 410px);
+}
+#edit-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+#edit-table .ant-table-body {
+    overflow-y: visible !important;
+    overflow-x: auto !important;
+}
+
+:where(.css-dev-only-do-not-override-kip0qf)
+    .ant-table-wrapper
+    .ant-table-thead
+    > tr
+    > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before,
+:where(.css-dev-only-do-not-override-kip0qf)
+    .ant-table-wrapper
+    .ant-table-thead
+    > tr
+    > td:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+    background-color: #ccc !important; /* 使用 !important 来提高优先级 */
+}
+
+/* #edit-table .ant-table-cell {
+    height: 113px !important;
+} */

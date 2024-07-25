@@ -983,40 +983,10 @@ function CreateDetail() {
         }
     }, []);
     const [changePre, setChangePre] = useState(0);
-    return searchParams.get('source') === 'market' ? (
-        detail ? (
-            <>
-                <SubCard
-                    contentSX={{
-                        p: '10px !important'
-                    }}
-                    sx={{ mb: '16px' }}
-                >
-                    <div>
-                        <IconButton onClick={() => navigate('/appMarket')} color="secondary">
-                            <KeyboardBackspace fontSize="small" />
-                        </IconButton>
-                        <span className="text-[#000c] font-[500]">应用市场</span>
-                    </div>
-                </SubCard>
-                <div className="h-[calc(100%-74px)] ">
-                    <CreatePlan
-                        ref={createPlanRef}
-                        planState={planState}
-                        getAppList={getList}
-                        detail={_.cloneDeep(detailRef.current)}
-                        setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
-                        isMyApp={true}
-                        isblack={false}
-                    />
-                </div>
-            </>
-        ) : (
-            <div className="w-full h-full flex justify-center items-center">
-                <Spin spinning={true} />
-            </div>
-        )
-    ) : (
+    const [tableTitle, setTableTitle] = useState(0);
+    console.log(1);
+
+    return detail ? (
         <Card sx={{ height: '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
                 sx={{ padding: 2 }}
@@ -1026,7 +996,9 @@ function CreateDetail() {
                         variant="contained"
                         startIcon={<ArrowBack />}
                         color="secondary"
-                        onClick={() => navigate('/template/createCenter')}
+                        onClick={() => {
+                            searchParams.get('source') === 'market' ? navigate('/appMarket') : navigate('/template/createCenter');
+                        }}
                     >
                         {t('myApp.back')}
                     </Buttons>
@@ -1190,7 +1162,7 @@ function CreateDetail() {
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
-                                className="h-[calc(100vh-190px)] mt-[-16px]"
+                                className="h-[calc(100vh-210px)] overflow-y-auto mt-[-16px]"
                                 style={{
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
@@ -1199,7 +1171,7 @@ function CreateDetail() {
                             >
                                 <div className="h-[16px]"></div>
                                 <Alert
-                                    className="my-4 mx-4"
+                                    className="mb-4 mx-4"
                                     message="修改流程后，可直接在 ”运行应用“ 处进行测试，验证流程是否符合需求"
                                     type="warning"
                                     closable
@@ -1219,6 +1191,7 @@ function CreateDetail() {
                                             tableDataDel={tableDataDel}
                                             tableDataMove={tableDataMove}
                                             saveImageStyle={saveImageStyle}
+                                            setTableTitle={() => setTableTitle(new Date().getTime())}
                                         />
                                     </div>
                                 </div>
@@ -1234,6 +1207,7 @@ function CreateDetail() {
                                             <CreatePlan
                                                 ref={createPlanRef}
                                                 imageStylePre={imageStylePre}
+                                                tableTitle={tableTitle}
                                                 getAppList={getList}
                                                 changePre={changePre}
                                                 planState={planState}
@@ -1289,14 +1263,14 @@ function CreateDetail() {
                     )}
                     {detailRef.current?.uid && searchParams.get('uid') && permissions.includes('app:analyze') && (
                         <Tabs.TabPane tab="应用分析" key="2">
-                            <div className="px-4">
+                            <div className="h-[calc(100vh-220px)] overflow-y-auto px-4">
                                 <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
                             </div>
                         </Tabs.TabPane>
                     )}
                     {searchParams.get('uid') && permissions.includes('app:publish') && (
                         <Tabs.TabPane tab="应用发布" key="3">
-                            <div className="px-4">
+                            <div className="h-[calc(100vh-220px)] overflow-y-auto px-4">
                                 <Upload
                                     appUid={searchParams.get('uid') as string}
                                     saveState={saveState}
@@ -1332,6 +1306,10 @@ function CreateDetail() {
                 />
             )}
         </Card>
+    ) : (
+        <div className="w-full h-full flex justify-center items-center">
+            <Spin spinning={true} />
+        </div>
     );
 }
 export default CreateDetail;

@@ -7,11 +7,14 @@ import FormExecute from 'views/template/components/newValidaForm';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
 import CreateVariable from 'views/pages/copywriting/components/spliceCmponents/variable';
 import NewPrompt from './newPrompt';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import _ from 'lodash-es';
 import useUserStore from 'store/user';
+import HeaderField from 'views/pages/batchSmallRedBooks/components/components/headerField';
+import { getMaterialTitle } from 'api/redBook/material';
 const StepEdit = ({
     detail,
+    appUid,
     variableStyle, //变量类型
     index, //步骤几
     variable, //变量
@@ -25,9 +28,11 @@ const StepEdit = ({
     resReadOnly, //响应类型是否禁用
     resType, //响应类型
     resJsonSchema, //响应数据
-    saveImageStyle //保存图片风格
+    saveImageStyle, //保存图片风格
+    setTableTitle
 }: {
     detail: any;
+    appUid: string;
     variableStyle: any[];
     index: number;
     variable: any[];
@@ -42,9 +47,15 @@ const StepEdit = ({
     resType: string;
     resJsonSchema: string;
     saveImageStyle: () => void;
+    setTableTitle: () => void;
 }) => {
     const permissions = useUserStore((state) => state.permissions);
     const { TextArea } = Input;
+    const groupList = [
+        { label: '系统变量', value: 'SYSTEM' },
+        { label: '通用变量', value: 'PARAMS' },
+        { label: '高级变量', value: 'ADVANCED' }
+    ];
     const columns: TableProps<any>['columns'] = [
         {
             title: '变量 KEY',
@@ -57,11 +68,6 @@ const StepEdit = ({
             align: 'center'
         },
         {
-            title: '变量类型',
-            align: 'center',
-            render: (_, row) => <span>{variableStyle?.find((item) => item.value === row.style)?.label}</span>
-        },
-        {
             title: '变量默认值',
             align: 'center',
             render: (_, row) => <div className="line-clamp-3">{row?.defaultValue}</div>
@@ -69,7 +75,17 @@ const StepEdit = ({
         {
             title: '变量状态',
             align: 'center',
-            render: (_, row) => <Tag color="processing">{row?.isShow ? '显示' : '隐藏'}</Tag>
+            render: (_, row) => <Tag color={row?.isShow ? 'processing' : 'warning'}>{row?.isShow ? '显示' : '隐藏'}</Tag>
+        },
+        {
+            title: '变量类型',
+            align: 'center',
+            render: (_, row) => <span>{variableStyle?.find((item) => item.value === row.style)?.label}</span>
+        },
+        {
+            title: '变量分组',
+            align: 'center',
+            render: (_, row) => <span>{groupList?.find((item) => item.value === row.group)?.label}</span>
         },
         {
             title: '操作',
@@ -148,16 +164,30 @@ const StepEdit = ({
     //新增文案与风格
     const [focuActive, setFocuActive] = useState<any[]>([]);
     const materialTypeStatus = useMemo(() => {
-        if (handler === 'MaterialActionHandler') {
-            const newList = variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value;
-            return JSON.parse(newList)?.length === 1 && JSON.parse(newList)[0]?.type === 'image' ? true : false;
-        } else {
-            return false;
-        }
+        return false;
+        // if (handler === 'MaterialActionHandler') {
+        //     const newList = variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value;
+        //     return JSON.parse(newList)?.length === 1 && JSON.parse(newList)[0]?.type === 'image' ? true : false;
+        // } else {
+        //     return false;
+        // }
     }, [variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value]);
+    const [libraryId, setLibraryId] = useState('');
+    useEffect(() => {
+        if (appUid && handler === 'MaterialActionHandler') {
+            getMaterialTitle({ appUid }).then((res) => {
+                setLibraryId(res.id);
+            });
+        }
+    }, [appUid]);
     return (
         <div>
             <Tabs>
+                {handler === 'MaterialActionHandler' && (
+                    <Tabs.TabPane tab="素材字段编辑" key="-1">
+                        <HeaderField libraryId={libraryId} headerSave={setTableTitle} />
+                    </Tabs.TabPane>
+                )}
                 {handler === 'MaterialActionHandler' && (
                     <Tabs.TabPane tab="拼图生成模式" key="0">
                         <div className="flex gap-2 items-center mr-4">

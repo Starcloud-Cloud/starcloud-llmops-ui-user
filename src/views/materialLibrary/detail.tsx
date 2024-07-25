@@ -8,7 +8,24 @@ import {
     FileImageOutlined,
     FileTextOutlined
 } from '@ant-design/icons';
-import { Button, Space, Tag, Dropdown, Avatar, Popconfirm, Upload, Image, Tooltip, message, Form, Modal, Empty, Card, Divider, Spin } from 'antd';
+import {
+    Button,
+    Space,
+    Tag,
+    Dropdown,
+    Avatar,
+    Popconfirm,
+    Upload,
+    Image,
+    Tooltip,
+    message,
+    Form,
+    Modal,
+    Empty,
+    Card,
+    Divider,
+    Spin
+} from 'antd';
 import {
     createMaterialLibraryAppBind,
     createMaterialLibrarySlice,
@@ -39,6 +56,7 @@ import MaterialLibrary from './index';
 import AiCreate from '../pages/batchSmallRedBooks/components/newAI';
 import React from 'react';
 import { imageOcr } from 'api/redBook/batchIndex';
+import DownMaterial from './components/downMaterial';
 
 export enum EditType {
     String = 0,
@@ -120,6 +138,7 @@ export const TableHeader = ({
     const [plugTitle, setPlugTitle] = useState('插件市场');
     const [plugValue, setPlugValue] = useState<null | string>(null);
     const [openSwitchMaterial, setOpenSwitchMaterial] = React.useState(false);
+    const [uploadOpen, setUploadOpen] = useState(false);
 
     const items: any = [
         {
@@ -130,7 +149,7 @@ export const TableHeader = ({
         {
             key: '2',
             label: '导入素材字段',
-            onClick: async () => {}
+            onClick: async () => setUploadOpen(true)
         }
     ];
 
@@ -442,10 +461,17 @@ export const TableHeader = ({
                     }}
                 >
                     <div className="h-[calc(100vh-300px)] overflow-auto">
-                        <MaterialLibrary mode={'select'} setSelectedRowKeys={setSelectedRowKeys} appUid={appUid} libraryId={libraryId}  bizUid={bizUid} />
+                        <MaterialLibrary
+                            mode={'select'}
+                            setSelectedRowKeys={setSelectedRowKeys}
+                            appUid={appUid}
+                            libraryId={libraryId}
+                            bizUid={bizUid}
+                        />
                     </div>
                 </ModalForm>
             )}
+            <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />
         </div>
     );
 };
@@ -962,14 +988,14 @@ const MaterialLibraryDetail = () => {
                     formOk={formOk}
                     libraryId={id}
                     pluginConfig={detail.pluginConfig}
-                    getList={() => setForceUpdateHeader(pre => pre + 1)}
+                    getList={() => setForceUpdateHeader((pre) => pre + 1)}
                 />
             )}
             {isModalOpen && (
                 <PicImagePick
                     libraryId={id}
                     pluginConfig={detail.pluginConfig}
-                    getList={() => setForceUpdateHeader(pre => pre + 1)}
+                    getList={() => setForceUpdateHeader((pre) => pre + 1)}
                     materialList={[]}
                     allData={null}
                     details={null}

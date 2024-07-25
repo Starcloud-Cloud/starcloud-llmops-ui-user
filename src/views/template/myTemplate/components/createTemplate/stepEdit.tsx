@@ -12,6 +12,7 @@ import _ from 'lodash-es';
 import useUserStore from 'store/user';
 import HeaderField from 'views/pages/batchSmallRedBooks/components/components/headerField';
 import { getMaterialTitle } from 'api/redBook/material';
+import { EditType } from 'views/materialLibrary/detail';
 const StepEdit = ({
     detail,
     appUid,
@@ -163,20 +164,20 @@ const StepEdit = ({
     };
     //新增文案与风格
     const [focuActive, setFocuActive] = useState<any[]>([]);
+    const [titleList, setTitleList] = useState<any[]>([]);
     const materialTypeStatus = useMemo(() => {
-        return false;
-        // if (handler === 'MaterialActionHandler') {
-        //     const newList = variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value;
-        //     return JSON.parse(newList)?.length === 1 && JSON.parse(newList)[0]?.type === 'image' ? true : false;
-        // } else {
-        //     return false;
-        // }
-    }, [variable?.find((item) => item.field === 'MATERIAL_DEFINE')?.value]);
+        if (handler === 'MaterialActionHandler') {
+            return titleList?.length === 1 && titleList[0]?.columnType === EditType.Image ? true : false;
+        } else {
+            return false;
+        }
+    }, [titleList]);
     const [libraryId, setLibraryId] = useState('');
     useEffect(() => {
         if (appUid && handler === 'MaterialActionHandler') {
             getMaterialTitle({ appUid }).then((res) => {
                 setLibraryId(res.id);
+                setTitleList(res.tableMeta);
             });
         }
     }, [appUid]);
@@ -185,7 +186,7 @@ const StepEdit = ({
             <Tabs>
                 {handler === 'MaterialActionHandler' && (
                     <Tabs.TabPane tab="素材字段编辑" key="-1">
-                        <HeaderField libraryId={libraryId} headerSave={setTableTitle} />
+                        <HeaderField libraryId={libraryId} setPattern={setTitleList} headerSave={setTableTitle} />
                     </Tabs.TabPane>
                 )}
                 {handler === 'MaterialActionHandler' && (

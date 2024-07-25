@@ -9,6 +9,8 @@ import FieldCompletion from './components/fieldCompletion';
 import RedBookAnalysis from './components/redBookAnalysis';
 import ImgOcr from './components/imgOcr';
 import TextExtraction from './components/textExtraction';
+
+// @Deprecated
 const AiCreate = ({
     plugValue,
     materialType,

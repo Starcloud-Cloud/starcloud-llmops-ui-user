@@ -511,7 +511,6 @@ const MaterialLibraryDetail = () => {
     }, []);
 
     useEffect(() => {
-        console.log(123);
         getMaterialLibraryTitleList({ id }).then((data) => {
             setPluginConfig(data.pluginConfig);
             setDetail(data);
@@ -961,18 +960,16 @@ const MaterialLibraryDetail = () => {
                     row={currentRecord}
                     form={form}
                     formOk={formOk}
+                    libraryId={id}
+                    pluginConfig={detail.pluginConfig}
+                    getList={() => setForceUpdateHeader(pre => pre + 1)}
                 />
             )}
             {isModalOpen && (
                 <PicImagePick
-                    getList={() => {
-                        // if (detail) {
-                        //     setImgPre(1);
-                        //     getAppList && getAppList();
-                        // } else {
-                        //     getList(true);
-                        // }
-                    }}
+                    libraryId={id}
+                    pluginConfig={detail.pluginConfig}
+                    getList={() => setForceUpdateHeader(pre => pre + 1)}
                     materialList={[]}
                     allData={null}
                     details={null}

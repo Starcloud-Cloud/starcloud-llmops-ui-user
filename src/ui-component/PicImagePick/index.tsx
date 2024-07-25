@@ -1,4 +1,4 @@
-import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag, Empty, Spin, Progress } from 'antd';
+import { Modal, Input, Image, Checkbox, Select, Space, Popover, InputNumber, Button, Tag, Empty, Spin, Progress, message } from 'antd';
 import { imageSearch } from 'api/redBook/imageSearch';
 import { appModify } from 'api/template';
 import axios from 'axios';
@@ -10,6 +10,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { getAccessToken } from 'utils/auth';
 import { planModifyConfig } from 'api/redBook/batchIndex';
 import _ from 'lodash';
+import { templateUpdate } from 'api/redBook/material';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -19,11 +20,13 @@ export const PicImagePick = ({
     materialList,
     allData,
     details,
+    libraryId,
     isModalOpen,
     setIsModalOpen,
     setSelectImg,
     columns,
-    values
+    values,
+    pluginConfig
 }: {
     getList?: any;
     materialList?: any;
@@ -34,6 +37,8 @@ export const PicImagePick = ({
     setSelectImg: (selectImg: any) => void;
     columns?: any[];
     values?: any;
+    pluginConfig?: string;
+    libraryId?: string | null;
 }) => {
     const [hits, setHits] = useState<any[]>([]);
     const [totalHits, setTotalHits] = useState(0);
@@ -50,13 +55,12 @@ export const PicImagePick = ({
         label: '图片下载中',
         value: 0
     });
-    // const [currentDetails, setCurrentDetails] = React.useState<any>(null);
-    const [visibleSaveFilter, setVisibleSaveFilter] = React.useState(false);
     const [canSearch, setCanSearch] = React.useState(false);
 
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
     const currentPageRef = React.useRef(currentPage);
+
 
     useEffect(() => {
         totalHitsRef.current = totalHits;
@@ -69,37 +73,13 @@ export const PicImagePick = ({
 
     // 回显
     useEffect(() => {
-        if (details) {
-            details.workflowConfig.steps.forEach((item: any) => {
-                if (item.flowStep.handler === 'MaterialActionHandler') {
-                    const searchHabits = item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS');
-                    if (searchHabits) {
-                        setVisibleSaveFilter(true);
-                        const searchHabitsStringJson = JSON.parse(
-                            searchHabits.value === 'null' || !searchHabits.value ? '{}' : searchHabits.value
-                        );
-                        setQuery(searchHabitsStringJson?.query || {});
-                        setSize(searchHabitsStringJson?.size || {});
-                    }
-                }
-            });
+        if (pluginConfig) {
+            const jsonPluginConfig = JSON.parse(pluginConfig);
+            const picImagePickQuery = jsonPluginConfig.picImagePickQuery;
+            setQuery(picImagePickQuery?.query || {});
+            setSize(picImagePickQuery?.size || {});
         }
-    }, [JSON.stringify(details)]);
-
-    const currentDetails = React.useMemo(() => {
-        const copyDetails = _.cloneDeep(details);
-        copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
-            if (item.flowStep.handler === 'MaterialActionHandler') {
-                if (item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS')) {
-                    item.variable.variables.find((i: any) => i.field === 'SEARCH_HABITS').value = JSON.stringify({ query, size });
-                }
-                if (item.variable.variables.find((i: any) => i.field === 'MATERIAL_LIST')) {
-                    item.variable.variables.find((i: any) => i.field === 'MATERIAL_LIST').value = JSON.stringify(materialList);
-                }
-            }
-        });
-        return copyDetails;
-    }, [JSON.stringify(details), JSON.stringify(query), JSON.stringify(size)]);
+    }, [pluginConfig]);
 
     const handleScroll = useCallback(
         debounce(() => {
@@ -258,67 +238,18 @@ export const PicImagePick = ({
         setInputValue(selectedTags.join('+'));
     }, [selectedTags]);
 
-    const handleFilter = () => {
-        // 保存筛选项
-        currentDetails?.workflowConfig?.steps?.forEach((item: any) => {
-            const arr = item?.variable?.variables;
-            const arr1 = item?.flowStep?.variable?.variables;
-            arr?.forEach((el: any) => {
-                if (el.value && typeof el.value === 'object') {
-                    el.value = JSON.stringify(el.value);
-                }
-            });
-            arr1?.forEach((el: any) => {
-                if (el.value && typeof el.value === 'object') {
-                    el.value = JSON.stringify(el.value);
-                }
-            });
-        });
+    const handleFilter = async () => {
+        const jsonPluginConfig = JSON.parse(pluginConfig || '{}');
+        jsonPluginConfig.picImagePickQuery = { query, size };
 
-        // 我的里面两个都调用, 应用市场只调用计划
-        // 我的应用
-        if (details?.source) {
-            appModify(currentDetails).then((res) => {
-                planModifyConfig({
-                    ...allData,
-                    configuration: { ...allData.configuration, appInformation: currentDetails, materialList: materialList },
-                    validate: false
-                }).then((planRes) => {
-                    getList && getList();
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: '创作计划保存成功',
-                            variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
-                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                            close: false
-                        })
-                    );
-                });
-            });
-        } else {
-            planModifyConfig({
-                ...allData,
-                configuration: { ...allData.configuration, appInformation: currentDetails, materialList: materialList },
-                validate: false
-            }).then((planRes) => {
-                getList && getList();
-                dispatch(
-                    openSnackbar({
-                        open: true,
-                        message: '创作计划保存成功',
-                        variant: 'alert',
-                        alert: {
-                            color: 'success'
-                        },
-                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                        close: false
-                    })
-                );
-            });
+        // 保存筛选项
+        const res = await templateUpdate({
+            id: libraryId,
+            pluginConfig: JSON.stringify(jsonPluginConfig)
+        });
+        if(res){
+            getList()
+            message.success('保存成功!')
         }
     };
 
@@ -485,11 +416,9 @@ export const PicImagePick = ({
                         <Option value={'black'}>黑色</Option>
                         <Option value={'brown'}>棕色</Option>
                     </Select>
-                    {visibleSaveFilter && (
-                        <Button type="primary" onClick={() => handleFilter()}>
-                            保存筛选项
-                        </Button>
-                    )}
+                    <Button type="primary" onClick={() => handleFilter()}>
+                        保存筛选项
+                    </Button>
                 </Space>
             </div>
 

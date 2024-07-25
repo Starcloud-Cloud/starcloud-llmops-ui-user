@@ -1,28 +1,23 @@
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Upload, UploadProps, Button, Modal, Image, Popconfirm, Form, Tabs, InputNumber, Tag, Row, Col, Input, Badge, Tooltip } from 'antd';
+import { Button, Image, Popconfirm, Form, Tabs, InputNumber, Tag, Row, Col, Input, Badge, Tooltip } from 'antd';
 import { AccordionDetails, AccordionSummary, Accordion } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
-import { PlusOutlined, SaveOutlined, InfoCircleOutlined, RightOutlined } from '@ant-design/icons';
-import { getAccessToken } from 'utils/auth';
+import { SaveOutlined, InfoCircleOutlined, RightOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { materialTemplate, getPlan, planModify, planUpgrade, metadata, planModifyConfig, materialJudge } from 'api/redBook/batchIndex';
-import FormModal, { propShow } from './formModal';
+import { materialTemplate, getPlan, planModify, planUpgrade, planModifyConfig } from 'api/redBook/batchIndex';
+import FormModal from './formModal';
 import MarketForm from '../../../template/components/marketForm';
 import AddStyleApp from 'ui-component/AddStyle/indexApp';
 import AddStyle from 'ui-component/AddStyle/index';
 import { useLocation } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import Forms from '../../smallRedBook/components/form';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useAllDetail } from 'contexts/JWTContext';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { useNavigate } from 'react-router-dom';
-import AiCreate from './AICreate';
-import { PicImagePick } from 'ui-component/PicImagePick';
 import './newLeft.scss';
-import React from 'react';
 import MaterialTable from './materialTable';
 
 const Lefts = ({
@@ -79,30 +74,8 @@ const Lefts = ({
     //存储的数据
     const appRef = useRef<any>(null);
     const [appData, setAppData] = useState<any>(null);
-    const [version, setVersion] = useState(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectImg, setSelectImg] = useState<any>(null);
-    const [imageDataIndex, setImageDataIndex] = useState(0);
-    const [filedName, setFiledName] = useState('');
-    const [values, setValues] = useState({});
-    const tableRef = useRef<any[]>([]);
-
-    useEffect(() => {
-        console.log(1);
-        if (tableRef.current.length && selectImg?.largeImageURL) {
-            const data = _.cloneDeep(tableRef.current);
-            data.forEach((item) => {
-                if (item.uuid === imageDataIndex) {
-                    item[filedName] = selectImg?.largeImageURL;
-                }
-            });
-            tableRef.current = data;
-            setTableData([...data]);
-        }
-    }, [selectImg]);
     //上传素材
     const [materialType, setMaterialType] = useState('');
-    const [materialTypeStatus, setMaterialTypeStatus] = useState(false); //获取状态 true图片 false 表格
     const materialStatus = useMemo(() => {
         console.log(123);
         return (
@@ -115,34 +88,6 @@ const Lefts = ({
             ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
             ?.variable?.variables?.find((el: any) => el.field === 'BUSINESS_TYPE')?.value
     ]);
-    //上传图片
-    const [open, setOpen] = useState(false);
-    const [previewImage, setpreviewImage] = useState('');
-    const [fileList, setFileList] = useState<any[]>([]);
-    const props: UploadProps = {
-        name: 'image',
-        multiple: true,
-        listType: 'picture-card',
-        fileList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
-        headers: {
-            Authorization: 'Bearer ' + getAccessToken()
-        },
-        maxCount: 500,
-        onChange(info) {
-            setFileList(info.fileList);
-        },
-        onPreview: (file) => {
-            setpreviewImage(file?.response?.data?.url);
-            setOpen(true);
-        },
-        onDrop(e) {
-            console.log('Dropped files', e.dataTransfer.files);
-        }
-    };
-
-    //批量上传素材
-    const [tableData, setTableData] = useState<any[]>([]);
     //获取表头数据
     const typeList = [
         { label: '小红书', value: 'SMALL_RED_BOOK' },
@@ -278,109 +223,15 @@ const Lefts = ({
         });
         const materiallist = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
             ?.variable?.variables;
-        const judge = await materialJudge({
-            uid: data ? result.planUid : searchParams.get('uid') ? searchParams.get('uid') : detail ? detail?.uid : result.uid,
-            planSource: detail ? 'app' : 'market'
-        });
-        setMaterialTypeStatus(judge);
         const newMater = materiallist?.find((item: any) => item.field === 'MATERIAL_TYPE')?.value;
-        const valueList =
-            newList?.workflowConfig?.steps
-                ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')?.value || [];
-        const picList = result?.configuration?.materialList;
         setMaterialType(newMater);
-        let tableDataList: any[] = [];
-        if (judge) {
-            if (!data) {
-                setFileList(
-                    tableDataList?.map((item: any) => ({
-                        uid: uuidv4(),
-                        thumbUrl: item?.pictureUrl,
-                        response: {
-                            data: {
-                                url: item?.pictureUrl
-                            }
-                        }
-                    })) ||
-                        result?.configuration?.materialList?.map((item: any) => ({
-                            uid: uuidv4(),
-                            thumbUrl: item?.pictureUrl,
-                            response: {
-                                data: {
-                                    url: item?.pictureUrl
-                                }
-                            }
-                        }))
-                );
-            } else {
-                const resul = newList?.workflowConfig?.steps
-                    ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                    ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
-                    ?.value?.map((item: any) => ({
-                        uid: uuidv4(),
-                        thumbUrl: item?.pictureUrl,
-                        response: {
-                            data: {
-                                url: item?.pictureUrl
-                            }
-                        }
-                    }));
-                setFileList(
-                    picList && picList?.length > 0
-                        ? valueList?.map((item: any) => ({
-                              uid: uuidv4(),
-                              thumbUrl: item?.pictureUrl,
-                              response: {
-                                  data: {
-                                      url: item?.pictureUrl
-                                  }
-                              }
-                          }))
-                        : resul
-                        ? resul
-                        : []
-                );
-            }
-        } else {
-            if (data) {
-                tableRef.current = newList?.workflowConfig?.steps
-                    ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                    ?.variable?.variables?.find((item: any) => item.style === 'MATERIAL')
-                    ?.value?.map((item: any, index: number) => {
-                        if (index === 0) {
-                            return {
-                                ...item,
-                                uuid: '123'
-                            };
-                        } else {
-                            return {
-                                ...item,
-                                uuid: uuidv4()
-                            };
-                        }
-                    });
-                setTableData(tableRef.current || []);
-            } else {
-                tableRef.current =
-                    tableDataList?.map((item: any) => ({
-                        ...item,
-                        uuid: uuidv4()
-                    })) ||
-                    picList?.map((item: any) => ({
-                        ...item,
-                        uuid: uuidv4()
-                    }));
-                console.log(tableRef.current, 'tableRef.current');
-                setTableData(tableRef.current || []);
-            }
-        }
         generRef.current = _.cloneDeep(
             newList?.workflowConfig?.steps?.filter(
                 (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
             )
         );
         setGenerateList(generRef.current);
+        getStepMater();
         const newImage = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         newImage?.flowStep?.variable?.variables?.forEach((item: any) => {
             if (item.field === 'SYSTEM_POSTER_STYLE_CONFIG' && item.value && typeof item.value === 'string') {
@@ -396,6 +247,27 @@ const Lefts = ({
         if (isimgStyle) {
             saveTemplate();
         }
+    };
+    const getStepMater = async () => {
+        const arr: any[] = [];
+        const newList = generRef.current?.map((item: any) => {
+            const arr = item?.variable?.variables;
+            return (
+                arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.value ||
+                arr?.find((i: any) => i?.field === 'MATERIAL_TYPE')?.defaultValue
+            );
+        });
+        const allper = newList?.map(async (el: any, index: number) => {
+            if (el) {
+                const res = await materialTemplate(el);
+                arr[index] = getHeader(res?.fieldDefine, index);
+            } else {
+                arr[index] = undefined;
+            }
+        });
+        await Promise.all(allper);
+        stepMarRef.current = arr;
+        setStepMaterial(stepMarRef?.current);
     };
     const getOtherList = () => {};
     //页面进入给 Tabs 分配值
@@ -630,20 +502,6 @@ const Lefts = ({
         }
     }, [planState]);
     const [exeState, setExeState] = useState(false);
-
-    const materialList = React.useMemo(() => {
-        console.log(123);
-        return materialStatus === 'picture'
-            ? fileList?.map((item) => ({
-                  pictureUrl: item?.response?.data?.url,
-                  type: 'picture'
-              }))
-            : tableData?.map((item) => ({
-                  ...item,
-                  type: materialType
-              }));
-    }, [materialStatus, fileList, tableData]);
-
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
         // verifyList();
@@ -666,24 +524,6 @@ const Lefts = ({
             const upData = data?.executeParam?.appInformation?.workflowConfig?.steps?.find(
                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
             );
-            upData?.variable?.variables?.forEach((item: any) => {
-                if (item?.style === 'MATERIAL') {
-                    item.value =
-                        materialStatus === 'picture'
-                            ? JSON.stringify(
-                                  fileList?.map((item) => ({
-                                      pictureUrl: item?.response?.data?.url,
-                                      type: 'picture'
-                                  }))
-                              )
-                            : JSON.stringify(
-                                  tableData?.map((item) => ({
-                                      ...item,
-                                      type: materialType
-                                  }))
-                              );
-                }
-            });
             data.executeParam.appInformation.workflowConfig.steps = [
                 upData,
                 ...newList,
@@ -716,16 +556,6 @@ const Lefts = ({
                               index: index + 1
                           }))
                         : imageMater?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value,
-                    materialList:
-                        materialStatus === 'picture'
-                            ? fileList?.map((item) => ({
-                                  pictureUrl: item?.response?.data?.url,
-                                  type: 'picture'
-                              }))
-                            : tableData?.map((item) => ({
-                                  ...item,
-                                  type: materialType
-                              })),
                     appInformation: {
                         ...appRef.current.configuration.appInformation,
                         workflowConfig: {
@@ -755,11 +585,6 @@ const Lefts = ({
             } else {
                 result = await planModifyConfig(data);
             }
-            const judge = await materialJudge({
-                uid: searchParams.get('uid'),
-                planSource: searchParams.get('appUid') ? 'market' : 'app'
-            });
-            setMaterialTypeStatus(judge);
             dispatch(
                 openSnackbar({
                     open: true,
@@ -833,14 +658,6 @@ const Lefts = ({
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         );
         if (a) {
-            a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                materialStatus === 'picture'
-                    ? fileList?.map((item: any) => ({
-                          pictureUrl: item?.response?.data?.url
-                      }))
-                    : tableData?.map((item: any) => ({
-                          ...item
-                      }));
             a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value =
                 data ||
                 appRef.current.configuration?.appInformation?.workflowConfig?.steps
@@ -930,6 +747,7 @@ const Lefts = ({
                 return item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler';
             });
             setGenerateList(generRef.current);
+            getStepMater();
         }
     }, [changePre]);
     const [imgPre, setImgPre] = useState(0);
@@ -1017,48 +835,19 @@ const Lefts = ({
                                     </div>
                                 </div>
                                 <div>
-                                    {materialStatus === 'picture' ? (
-                                        <>
-                                            <div className="text-[12px] font-[500] flex items-center justify-between">
-                                                <div>图片总量：{fileList?.length}</div>
-                                                {fileList?.length > 0 && (
-                                                    <Button
-                                                        danger
-                                                        onClick={() => {
-                                                            setFileList([]);
-                                                        }}
-                                                        size="small"
-                                                        type="text"
-                                                    >
-                                                        全部清除
-                                                    </Button>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
-                                                <div>
-                                                    <Upload {...props}>
-                                                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                                            <PlusOutlined />
-                                                            <div style={{ marginTop: 8 }}>Upload</div>
-                                                        </div>
-                                                    </Upload>
-                                                </div>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <MaterialTable
-                                            updataTable={updataTable}
-                                            setIsModalOpen={setIsModalOpen}
-                                            appUid={detail ? appData.appUid : appData.uid}
-                                            bizUid={appData.appUid}
-                                            bizType={detail ? 'APP' : 'APP_MARKET'}
-                                            uid={appData.uid}
-                                            tableTitle={tableTitle}
-                                            handleExecute={(data: number[]) => {
-                                                seleSave('SELECT', data);
-                                            }}
-                                        />
-                                    )}
+                                    <MaterialTable
+                                        materialStatus={materialStatus}
+                                        updataTable={updataTable}
+                                        appUid={detail ? appData.appUid : appData.uid}
+                                        bizUid={appData.appUid}
+                                        bizType={detail ? 'APP' : 'APP_MARKET'}
+                                        uid={appData.uid}
+                                        tableTitle={tableTitle}
+                                        handleExecute={(data: number[]) => {
+                                            seleSave('SELECT', data);
+                                        }}
+                                    />
+                                    {/* // )} */}
                                 </div>
                             </Tabs.TabPane>
                         )}
@@ -1080,17 +869,6 @@ const Lefts = ({
                                     <InfoCircleOutlined />
                                     <span className="text-sm ml-1 text-stone-600">配置 AI生成规则，灵活定制生成的内容</span>
                                 </div>
-                                {/* {detail && (
-                                    <Tooltip title="流程配置">
-                                        <Button
-                                            icon={<SettingOutlined  />}
-                                            shape="circle"
-                                            size="small"
-                                            type="primary"
-                                            onClick={() => setSettingOpen(true)}
-                                        />
-                                    </Tooltip>
-                                )} */}
                             </div>
 
                             {generateList?.map((item: any, index: number) => (
@@ -1119,106 +897,222 @@ const Lefts = ({
                                                 {item?.flowStep?.handler !== 'VariableActionHandler' ? (
                                                     item?.variable?.variables?.map((el: any, i: number) => (
                                                         <div key={el.field}>
-                                                            {el?.isShow && (
-                                                                <MarketForm
-                                                                    item={el}
-                                                                    materialType={''}
-                                                                    details={
-                                                                        appData?.configuration?.appInformation ||
-                                                                        appData?.executeParam?.appInformation
-                                                                    }
-                                                                    materialList={
-                                                                        item?.variable?.variables?.find(
-                                                                            (item: any) => item?.field === 'MATERIAL_TYPE'
-                                                                        )?.options || []
-                                                                    }
-                                                                    materialValue={
-                                                                        item?.variable?.variables?.find(
-                                                                            (item: any) => item?.field === 'MATERIAL_TYPE'
-                                                                        )?.value
-                                                                    }
-                                                                    stepCode={item?.field}
-                                                                    model={''}
-                                                                    handlerCode={item?.flowStep?.handler}
-                                                                    history={false}
-                                                                    promptShow={true}
-                                                                    setEditOpen={setEditOpens}
-                                                                    setTitle={setTitles}
-                                                                    setStep={() => {
-                                                                        stepRef.current = index;
-                                                                        setStep(stepRef.current);
-                                                                    }}
-                                                                    columns={stepMaterial[index]}
-                                                                    setMaterialType={(e: any) => {
-                                                                        if (e) {
-                                                                            setMaterialTypes(e);
-                                                                            const newList = _.cloneDeep(generRef.current);
-                                                                            newList[index].variable.variables.find(
-                                                                                (dt: any) => dt.field === 'MATERIAL_TYPE'
-                                                                            ).value = e;
-                                                                            generRef.current = newList;
-                                                                            setGenerateList(generRef.current);
-                                                                            newList[index].variable.variables[
-                                                                                item.variable.variables?.findIndex(
-                                                                                    (item: any) => item.style === 'MATERIAL'
-                                                                                )
-                                                                            ].value = [];
-                                                                            stepRef.current = index;
-                                                                            setStep(stepRef.current);
-                                                                            setTableDatas(e, index);
-                                                                        } else {
-                                                                            setMaterialTypes(
-                                                                                item?.variable?.variables?.find(
-                                                                                    (i: any) => i.field === 'MATERIAL_TYPE'
-                                                                                )?.value
-                                                                            );
-                                                                        }
-                                                                    }}
-                                                                    onChange={(e: any) => {
-                                                                        const newList = _.cloneDeep(generRef.current);
-                                                                        const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
-                                                                        const code = item?.flowStep?.handler;
-                                                                        newList[index].variable.variables[i].value = e.value;
-                                                                        if (
-                                                                            type &&
-                                                                            item.variable.variables?.find(
-                                                                                (item: any) => item.style === 'MATERIAL'
-                                                                            )
-                                                                        ) {
-                                                                            newList[index].variable.variables[
-                                                                                item.variable.variables?.findIndex(
-                                                                                    (item: any) => item.style === 'MATERIAL'
-                                                                                )
-                                                                            ].value = [];
-                                                                            stepRef.current = index;
-                                                                            setStep(stepRef.current);
-                                                                            setTableDatas(type, index);
-                                                                        }
-                                                                        if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
-                                                                            const num = item.variable.variables?.findIndex(
-                                                                                (item: any) => item.field === 'REQUIREMENT'
-                                                                            );
-                                                                            const num1 = item.variable.variables?.findIndex(
-                                                                                (item: any) => item.style === 'MATERIAL'
-                                                                            );
-                                                                            if (e.value === 'RANDOM') {
-                                                                                newList[index].variable.variables[num].isShow = false;
-                                                                                newList[index].variable.variables[num1].isShow = true;
-                                                                            } else if (e.value === 'AI_PARODY') {
-                                                                                newList[index].variable.variables[num].isShow = true;
-                                                                                newList[index].variable.variables[num1].isShow = true;
-                                                                            } else {
-                                                                                newList[index].variable.variables[num1].isShow = false;
-                                                                                newList[index].variable.variables[num].isShow = true;
-                                                                            }
-                                                                        }
-                                                                        generRef.current = newList;
-                                                                        setGenerateList(generRef.current);
-                                                                        setAppDataGen();
-                                                                        setAppData(appRef.current);
-                                                                    }}
-                                                                />
-                                                            )}
+                                                            {el.field === 'REFERS'
+                                                                ? item?.variable?.variables?.find((dt: any) => dt.field === 'GENERATE_MODE')
+                                                                      .value === 'AI_PARODY' && (
+                                                                      <MarketForm
+                                                                          item={el}
+                                                                          materialType={''}
+                                                                          details={
+                                                                              appData?.configuration?.appInformation ||
+                                                                              appData?.executeParam?.appInformation
+                                                                          }
+                                                                          materialList={
+                                                                              item?.variable?.variables?.find(
+                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                              )?.options || []
+                                                                          }
+                                                                          materialValue={
+                                                                              item?.variable?.variables?.find(
+                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                              )?.value ||
+                                                                              item?.variable?.variables?.find(
+                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                              )?.defaultValue
+                                                                          }
+                                                                          stepCode={item?.field}
+                                                                          model={''}
+                                                                          handlerCode={item?.flowStep?.handler}
+                                                                          history={false}
+                                                                          promptShow={true}
+                                                                          setEditOpen={setEditOpens}
+                                                                          setTitle={setTitles}
+                                                                          setStep={() => {
+                                                                              stepRef.current = index;
+                                                                              setStep(stepRef.current);
+                                                                          }}
+                                                                          columns={stepMaterial[index]}
+                                                                          setMaterialType={(e: any) => {
+                                                                              if (e) {
+                                                                                  setMaterialTypes(e);
+                                                                                  const newList = _.cloneDeep(generRef.current);
+                                                                                  newList[index].variable.variables.find(
+                                                                                      (dt: any) => dt.field === 'MATERIAL_TYPE'
+                                                                                  ).value = e;
+                                                                                  generRef.current = newList;
+                                                                                  setGenerateList(generRef.current);
+                                                                                  newList[index].variable.variables[
+                                                                                      item.variable.variables?.findIndex(
+                                                                                          (item: any) => item.style === 'MATERIAL'
+                                                                                      )
+                                                                                  ].value = [];
+                                                                                  stepRef.current = index;
+                                                                                  setStep(stepRef.current);
+                                                                                  setTableDatas(e, index);
+                                                                              } else {
+                                                                                  setMaterialTypes(
+                                                                                      item?.variable?.variables?.find(
+                                                                                          (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                                      )?.value
+                                                                                  );
+                                                                              }
+                                                                          }}
+                                                                          onChange={(e: any) => {
+                                                                              const newList = _.cloneDeep(generRef.current);
+                                                                              const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                                              const code = item?.flowStep?.handler;
+                                                                              newList[index].variable.variables[i].value = e.value;
+                                                                              if (
+                                                                                  type &&
+                                                                                  item.variable.variables?.find(
+                                                                                      (item: any) => item.style === 'MATERIAL'
+                                                                                  )
+                                                                              ) {
+                                                                                  newList[index].variable.variables[
+                                                                                      item.variable.variables?.findIndex(
+                                                                                          (item: any) => item.style === 'MATERIAL'
+                                                                                      )
+                                                                                  ].value = [];
+                                                                                  stepRef.current = index;
+                                                                                  setStep(stepRef.current);
+                                                                                  setTableDatas(type, index);
+                                                                              }
+                                                                              if (
+                                                                                  code === 'CustomActionHandler' &&
+                                                                                  e.name === 'GENERATE_MODE'
+                                                                              ) {
+                                                                                  const num = item.variable.variables?.findIndex(
+                                                                                      (item: any) => item.field === 'REQUIREMENT'
+                                                                                  );
+                                                                                  const num1 = item.variable.variables?.findIndex(
+                                                                                      (item: any) => item.style === 'MATERIAL'
+                                                                                  );
+                                                                                  if (e.value === 'RANDOM') {
+                                                                                      newList[index].variable.variables[num].isShow = false;
+                                                                                      newList[index].variable.variables[num1].isShow = true;
+                                                                                  } else if (e.value === 'AI_PARODY') {
+                                                                                      newList[index].variable.variables[num].isShow = true;
+                                                                                      newList[index].variable.variables[num1].isShow = true;
+                                                                                  } else {
+                                                                                      newList[index].variable.variables[num1].isShow =
+                                                                                          false;
+                                                                                      newList[index].variable.variables[num].isShow = true;
+                                                                                  }
+                                                                              }
+                                                                              generRef.current = newList;
+                                                                              setGenerateList(generRef.current);
+                                                                              setAppDataGen();
+                                                                              setAppData(appRef.current);
+                                                                          }}
+                                                                      />
+                                                                  )
+                                                                : el?.isShow && (
+                                                                      <MarketForm
+                                                                          item={el}
+                                                                          materialType={''}
+                                                                          details={
+                                                                              appData?.configuration?.appInformation ||
+                                                                              appData?.executeParam?.appInformation
+                                                                          }
+                                                                          materialList={
+                                                                              item?.variable?.variables?.find(
+                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                              )?.options || []
+                                                                          }
+                                                                          materialValue={
+                                                                              item?.variable?.variables?.find(
+                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                              )?.value ||
+                                                                              item?.variable?.variables?.find(
+                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
+                                                                              )?.defaultValue
+                                                                          }
+                                                                          stepCode={item?.field}
+                                                                          model={''}
+                                                                          handlerCode={item?.flowStep?.handler}
+                                                                          history={false}
+                                                                          promptShow={true}
+                                                                          setEditOpen={setEditOpens}
+                                                                          setTitle={setTitles}
+                                                                          setStep={() => {
+                                                                              stepRef.current = index;
+                                                                              setStep(stepRef.current);
+                                                                          }}
+                                                                          columns={stepMaterial[index]}
+                                                                          setMaterialType={(e: any) => {
+                                                                              if (e) {
+                                                                                  setMaterialTypes(e);
+                                                                                  const newList = _.cloneDeep(generRef.current);
+                                                                                  newList[index].variable.variables.find(
+                                                                                      (dt: any) => dt.field === 'MATERIAL_TYPE'
+                                                                                  ).value = e;
+                                                                                  generRef.current = newList;
+                                                                                  setGenerateList(generRef.current);
+                                                                                  newList[index].variable.variables[
+                                                                                      item.variable.variables?.findIndex(
+                                                                                          (item: any) => item.style === 'MATERIAL'
+                                                                                      )
+                                                                                  ].value = [];
+                                                                                  stepRef.current = index;
+                                                                                  setStep(stepRef.current);
+                                                                                  setTableDatas(e, index);
+                                                                              } else {
+                                                                                  setMaterialTypes(
+                                                                                      item?.variable?.variables?.find(
+                                                                                          (i: any) => i.field === 'MATERIAL_TYPE'
+                                                                                      )?.value
+                                                                                  );
+                                                                              }
+                                                                          }}
+                                                                          onChange={(e: any) => {
+                                                                              const newList = _.cloneDeep(generRef.current);
+                                                                              const type = e.name === 'MATERIAL_TYPE' ? e.value : undefined;
+                                                                              const code = item?.flowStep?.handler;
+                                                                              newList[index].variable.variables[i].value = e.value;
+                                                                              if (
+                                                                                  type &&
+                                                                                  item.variable.variables?.find(
+                                                                                      (item: any) => item.style === 'MATERIAL'
+                                                                                  )
+                                                                              ) {
+                                                                                  newList[index].variable.variables[
+                                                                                      item.variable.variables?.findIndex(
+                                                                                          (item: any) => item.style === 'MATERIAL'
+                                                                                      )
+                                                                                  ].value = [];
+                                                                                  stepRef.current = index;
+                                                                                  setStep(stepRef.current);
+                                                                                  setTableDatas(type, index);
+                                                                              }
+                                                                              if (
+                                                                                  code === 'CustomActionHandler' &&
+                                                                                  e.name === 'GENERATE_MODE'
+                                                                              ) {
+                                                                                  const num = item.variable.variables?.findIndex(
+                                                                                      (item: any) => item.field === 'REQUIREMENT'
+                                                                                  );
+                                                                                  const num1 = item.variable.variables?.findIndex(
+                                                                                      (item: any) => item.style === 'MATERIAL'
+                                                                                  );
+                                                                                  if (e.value === 'RANDOM') {
+                                                                                      newList[index].variable.variables[num].isShow = false;
+                                                                                      newList[index].variable.variables[num1].isShow = true;
+                                                                                  } else if (e.value === 'AI_PARODY') {
+                                                                                      newList[index].variable.variables[num].isShow = true;
+                                                                                      newList[index].variable.variables[num1].isShow = true;
+                                                                                  } else {
+                                                                                      newList[index].variable.variables[num1].isShow =
+                                                                                          false;
+                                                                                      newList[index].variable.variables[num].isShow = true;
+                                                                                  }
+                                                                              }
+                                                                              generRef.current = newList;
+                                                                              setGenerateList(generRef.current);
+                                                                              setAppDataGen();
+                                                                              setAppData(appRef.current);
+                                                                          }}
+                                                                      />
+                                                                  )}
                                                         </div>
                                                     ))
                                                 ) : (
@@ -1240,23 +1134,6 @@ const Lefts = ({
                                                             </Col>
                                                         ))}
                                                     </Row>
-                                                    // <Tabs defaultActiveKey="1">
-                                                    //     {/* <Tabs.TabPane tab="变量编辑" key="1"> */}
-
-                                                    //     {/* </Tabs.TabPane> */}
-                                                    //     {/* <Tabs.TabPane tab="变量列表" key="2">
-                                                    //         <CreateVariable
-                                                    //             rows={item?.variable?.variables}
-                                                    //             setRows={(data: any[]) => {
-                                                    //                 const newList = _.cloneDeep(generRef.current);
-                                                    //                 newList[index].variable.variables = data;
-                                                    //                 generRef.current = newList;
-                                                    //                 setGenerateList(generRef.current);
-                                                    //                 setAppDataGen();
-                                                    //             }}
-                                                    //         />
-                                                    //     </Tabs.TabPane> */}
-                                                    // {/* </Tabs> */}
                                                 )}
                                             </div>
                                         </AccordionDetails>
@@ -1404,18 +1281,9 @@ const Lefts = ({
                     )}
                 </div>
             </div>
-            <Modal zIndex={9999} open={open} footer={null} onCancel={() => setOpen(false)}>
-                <Image
-                    className="min-w-[472px]"
-                    preview={false}
-                    alt="example"
-                    src={previewImage + '?x-oss-process=image/resize,w_100/quality,q_80'}
-                />
-            </Modal>
             {editOpens && (
                 <FormModal
                     getList={() => getList(true)}
-                    materialList={materialList}
                     allData={appData}
                     details={appData?.configuration?.appInformation}
                     title={titles}
@@ -1431,26 +1299,6 @@ const Lefts = ({
             {botOpen && (
                 <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`权益不足，去升级`} from={''} />
             )}
-            {/* {isModalOpen && (
-                <PicImagePick
-                    getList={() => {
-                        if (detail) {
-                            setImgPre(1);
-                            getAppList && getAppList();
-                        } else {
-                            getList(true);
-                        }
-                    }}
-                    materialList={materialList}
-                    allData={appData}
-                    details={appData?.configuration?.appInformation}
-                    isModalOpen={isModalOpen}
-                    setIsModalOpen={setIsModalOpen}
-                    setSelectImg={setSelectImg}
-                    columns={columns}
-                    values={values}
-                />
-            )} */}
         </>
     );
 };

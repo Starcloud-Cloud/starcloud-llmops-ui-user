@@ -17,6 +17,8 @@ export const propShow: UploadProps = {
         Authorization: 'Bearer ' + getAccessToken()
     }
 };
+
+// @Deprecated
 const FormModal = ({
     getList,
     materialList,

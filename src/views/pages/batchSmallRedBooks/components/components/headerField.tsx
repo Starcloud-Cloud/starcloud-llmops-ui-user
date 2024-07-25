@@ -63,11 +63,13 @@ const HeaderField = ({
     libraryId,
     // colOpen,
     // setColOpen,
+    setPattern,
     headerSave
 }: {
     libraryId?: string;
     // colOpen: boolean;
     // setColOpen: (data: boolean) => void;
+    setPattern?: (data: any[]) => void; //方便拼图生成模式
     headerSave?: () => void;
 }) => {
     const components = {
@@ -295,6 +297,7 @@ const HeaderField = ({
                                 })
                             });
                             headerSave && headerSave();
+                            setPattern && setPattern(tableData);
                             // setColOpen(false);
                             message.success('保存成功');
                         }}

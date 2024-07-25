@@ -1017,48 +1017,20 @@ const Lefts = ({
                                     </div>
                                 </div>
                                 <div>
-                                    {materialStatus === 'picture' ? (
-                                        <>
-                                            <div className="text-[12px] font-[500] flex items-center justify-between">
-                                                <div>图片总量：{fileList?.length}</div>
-                                                {fileList?.length > 0 && (
-                                                    <Button
-                                                        danger
-                                                        onClick={() => {
-                                                            setFileList([]);
-                                                        }}
-                                                        size="small"
-                                                        type="text"
-                                                    >
-                                                        全部清除
-                                                    </Button>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-wrap gap-[10px] h-[300px] overflow-y-auto shadow">
-                                                <div>
-                                                    <Upload {...props}>
-                                                        <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
-                                                            <PlusOutlined />
-                                                            <div style={{ marginTop: 8 }}>Upload</div>
-                                                        </div>
-                                                    </Upload>
-                                                </div>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <MaterialTable
-                                            updataTable={updataTable}
-                                            setIsModalOpen={setIsModalOpen}
-                                            appUid={detail ? appData.appUid : appData.uid}
-                                            bizUid={appData.appUid}
-                                            bizType={detail ? 'APP' : 'APP_MARKET'}
-                                            uid={appData.uid}
-                                            tableTitle={tableTitle}
-                                            handleExecute={(data: number[]) => {
-                                                seleSave('SELECT', data);
-                                            }}
-                                        />
-                                    )}
+                                    <MaterialTable
+                                        materialStatus={materialStatus}
+                                        updataTable={updataTable}
+                                        setIsModalOpen={setIsModalOpen}
+                                        appUid={detail ? appData.appUid : appData.uid}
+                                        bizUid={appData.appUid}
+                                        bizType={detail ? 'APP' : 'APP_MARKET'}
+                                        uid={appData.uid}
+                                        tableTitle={tableTitle}
+                                        handleExecute={(data: number[]) => {
+                                            seleSave('SELECT', data);
+                                        }}
+                                    />
+                                    {/* // )} */}
                                 </div>
                             </Tabs.TabPane>
                         )}

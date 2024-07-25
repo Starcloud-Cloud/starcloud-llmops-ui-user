@@ -2,15 +2,7 @@ import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ActionType, ModalForm, ProFormTextArea, ProFormSelect } from '@ant-design/pro-components';
 import TablePro from './components/antdProTable';
-import {
-    getMaterialTitle,
-    getMaterialPage,
-    createMaterial,
-    updateMaterial,
-    delMaterial,
-    createBatchMaterial,
-    updateBatchMaterial
-} from 'api/redBook/material';
+import { getMaterialTitle, getMaterialPage, createMaterial, updateMaterial, delMaterial, delsMaterial } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
 import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps, Tag, Space, Spin } from 'antd';
 import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
@@ -21,8 +13,10 @@ import LeftModalAdd from './newLeftModal';
 import _ from 'lodash-es';
 import DownMaterial from 'views/materialLibrary/components/downMaterial';
 import { imageOcr } from 'api/redBook/batchIndex';
+import { getAccessToken } from 'utils/auth';
+import { v4 as uuidv4 } from 'uuid';
 
-const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
+const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [columns, setColumns] = useState<any[]>([]);
@@ -273,7 +267,6 @@ const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, 
     //创建编辑最终逻辑
     const handleEditColumn = async (record: any, type = 1) => {
         console.log(record);
-
         const tableMetaList = _.cloneDeep(columns);
         const recordKeys = Object.keys(record);
         const content = tableMetaList.map((item) => {
@@ -392,9 +385,6 @@ const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, 
     //批量导入
     const [uploadOpen, setUploadOpen] = useState(false);
     const [radioType, setRadioType] = useState(1);
-    useEffect(() => {
-        actionRefs.current?.reload();
-    }, [tableData]);
     //放大编辑弹窗
     const [zoomOpen, setZoomOpen] = useState(false);
 
@@ -407,35 +397,128 @@ const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, 
         setBtnLoading(-1);
         setExtend({ [filedName + '_extend']: result.data });
     };
-
+    const [fileList, setfileList] = useState<any[]>([]);
+    const props: UploadProps = {
+        name: 'image',
+        multiple: true,
+        listType: 'picture-card',
+        fileList,
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 500,
+        onChange(info) {
+            setfileList(info.fileList);
+            if (info.file.status === 'done') {
+                const tableMetaList = _.cloneDeep(columns);
+                const content = tableMetaList.map((item) => {
+                    return {
+                        columnId: item.id,
+                        columnName: item.columnName,
+                        columnCode: item.columnCode,
+                        value: info?.file?.response?.data?.url
+                    };
+                });
+                const data = {
+                    libraryId,
+                    content: content
+                };
+                createMaterial(data);
+            }
+            if (info.fileList?.every((item) => item.status === 'done')) {
+                setTimeout(() => {
+                    getList();
+                }, 1000);
+            }
+        },
+        onRemove(info: any) {
+            delMaterial({ id: info.id }).then((res) => {
+                getList();
+            });
+        },
+        onDrop(e) {
+            console.log('Dropped files', e.dataTransfer.files);
+        }
+    };
+    useEffect(() => {
+        if (materialStatus === 'picture') {
+            const field = columns.find((el) => el.columnType === EditType.Image)?.columnCode;
+            setfileList(
+                tableData?.map((item) => ({
+                    uid: uuidv4(),
+                    id: item.id,
+                    thumbUrl: item[field],
+                    response: {
+                        data: {
+                            url: item[field]
+                        }
+                    }
+                }))
+            );
+        }
+    }, [tableData, materialStatus]);
     return (
         <div>
-            <div className="flex items-center justify-between mb-4">
-                <div>
-                    <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
-                        批量导入
-                    </Button>
-                </div>
-                <div className="flex gap-2 items-end">
-                    <div className="text-xs text-black/50">点击放大编辑</div>
-                    <Button onClick={() => setZoomOpen(true)} type="primary" shape="circle" icon={<ZoomInOutlined />}></Button>
-                </div>
-            </div>
-            <TablePro
-                isSelection={true}
-                actionRef={actionRef}
-                columns={getClumn}
-                tableData={tableData}
-                tableLoading={tableLoading}
-                setPage={setPage}
-                setTableData={(data: any) => {
-                    tableRef.current = data;
-                    setTableData(data);
-                }}
-                getList={getList}
-                handleEditColumn={handleEditColumn}
-                onUpdateColumn={handleUpdateColumn}
-            />
+            {materialStatus === 'picture' ? (
+                <>
+                    <div className="text-[12px] font-[500] flex items-center justify-between">
+                        <div>图片总量：{fileList?.length}</div>
+                        {fileList?.length > 0 && (
+                            <Button
+                                danger
+                                onClick={async () => {
+                                    await delsMaterial(tableData?.map((item) => item.id));
+                                    getList();
+                                }}
+                                size="small"
+                                type="text"
+                            >
+                                全部清除
+                            </Button>
+                        )}
+                    </div>
+                    <div className="flex flex-wrap gap-[10px] overflow-y-auto">
+                        <div>
+                            <Upload {...props}>
+                                <div className=" w-[100px] h-[100px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer">
+                                    <PlusOutlined />
+                                    <div style={{ marginTop: 8 }}>Upload</div>
+                                </div>
+                            </Upload>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                                批量导入
+                            </Button>
+                        </div>
+                        <div className="flex gap-2 items-end">
+                            <div className="text-xs text-black/50">点击放大编辑</div>
+                            <Button onClick={() => setZoomOpen(true)} type="primary" shape="circle" icon={<ZoomInOutlined />}></Button>
+                        </div>
+                    </div>
+                    <TablePro
+                        isSelection={true}
+                        actionRef={actionRef}
+                        columns={getClumn}
+                        tableData={tableData}
+                        tableLoading={tableLoading}
+                        setPage={setPage}
+                        setTableData={(data: any) => {
+                            tableRef.current = data;
+                            setTableData(data);
+                        }}
+                        getList={getList}
+                        handleEditColumn={handleEditColumn}
+                        onUpdateColumn={handleUpdateColumn}
+                    />
+                </>
+            )}
             {editOpen && (
                 <FormModal
                     title={title}
@@ -552,6 +635,7 @@ const MaterialTable = ({ updataTable, uid, bizUid, bizType, appUid, tableTitle, 
 };
 const memoMaterialTable = (pre: any, next: any) => {
     return (
+        _.isEqual(pre.materialStatus, next.materialStatus) &&
         _.isEqual(pre.updataTable, next.updataTable) &&
         _.isEqual(pre.uid, next.uid) &&
         _.isEqual(pre.appUid, next.appUid) &&

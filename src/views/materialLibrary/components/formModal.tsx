@@ -22,6 +22,8 @@ export const propShow: UploadProps = {
 };
 const FormModal = ({
     getList,
+    pluginConfig,
+    libraryId,
     materialList,
     details,
     allData,
@@ -35,6 +37,8 @@ const FormModal = ({
     materialType,
     row
 }: {
+    pluginConfig?: string;
+    libraryId?: string | null;
     getList?: any;
     materialList?: any;
     details?: any;
@@ -340,6 +344,8 @@ const FormModal = ({
             {isModalOpen && (
                 <PicImagePick
                     getList={getList}
+                    libraryId={libraryId}
+                    pluginConfig={pluginConfig}
                     materialList={materialList}
                     allData={allData}
                     details={details}

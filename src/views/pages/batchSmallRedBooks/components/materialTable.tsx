@@ -521,6 +521,11 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             )}
             {editOpen && (
                 <FormModal
+                    getList={() => {
+                        getTitleList();
+                    }}
+                    libraryId={libraryId}
+                    pluginConfig={pluginConfig as any}
                     title={title}
                     editOpen={editOpen}
                     setEditOpen={setEditOpen}
@@ -562,6 +567,11 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             </Modal>
             {isModalOpen && (
                 <PicImagePick
+                    getList={() => {
+                        getTitleList();
+                    }}
+                    libraryId={libraryId}
+                    pluginConfig={pluginConfig as any}
                     // getList={() => {
                     //     if (detail) {
                     //         setImgPre(1);

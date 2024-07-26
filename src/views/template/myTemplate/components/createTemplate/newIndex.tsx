@@ -700,6 +700,8 @@ function CreateDetail() {
     const permissions = useUserStore((state) => state.permissions);
 
     //检测 model
+    console.log(detail?.workflowConfig);
+
     useEffect(() => {
         if (detail?.workflowConfig?.steps?.length === 1) {
             setAiModel(detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.find((item: any) => item.field === 'model')?.value);
@@ -1013,7 +1015,7 @@ function CreateDetail() {
                                 aria-controls={delOpen ? 'long-menu' : undefined}
                                 aria-expanded={delOpen ? 'true' : undefined}
                                 aria-haspopup="true"
-                                sx={{ zIndex: 10 }}
+                                sx={{ zIndex: 9 }}
                                 onClick={(e) => {
                                     setDelAnchorEl(e.currentTarget);
                                 }}
@@ -1080,7 +1082,7 @@ function CreateDetail() {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                        <Buttons sx={{ zIndex: 10 }} variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
+                        <Buttons sx={{ zIndex: 9 }} variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
                             {t('myApp.save')}
                         </Buttons>
                     </>

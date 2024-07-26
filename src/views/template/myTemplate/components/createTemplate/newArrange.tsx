@@ -35,6 +35,8 @@ function Arrange({
         tableDataDel(index);
         const newValue = _.cloneDeep(config);
         newValue.steps.splice(index, 1);
+        console.log(newValue);
+
         changeConfigs(newValue);
     };
     //复制步骤

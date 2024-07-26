@@ -506,21 +506,23 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                             <Button onClick={() => setZoomOpen(true)} type="primary" shape="circle" icon={<ZoomInOutlined />}></Button>
                         </div>
                     </div>
-                    <TablePro
-                        isSelection={true}
-                        actionRef={actionRef}
-                        columns={getClumn}
-                        tableData={tableData}
-                        tableLoading={tableLoading}
-                        setPage={setPage}
-                        setTableData={(data: any) => {
-                            tableRef.current = data;
-                            setTableData(data);
-                        }}
-                        getList={getList}
-                        handleEditColumn={handleEditColumn}
-                        onUpdateColumn={handleUpdateColumn}
-                    />
+                    <div className="material-index material-detail-table">
+                        <TablePro
+                            isSelection={true}
+                            actionRef={actionRef}
+                            columns={getClumn}
+                            tableData={tableData}
+                            tableLoading={tableLoading}
+                            setPage={setPage}
+                            setTableData={(data: any) => {
+                                tableRef.current = data;
+                                setTableData(data);
+                            }}
+                            getList={getList}
+                            handleEditColumn={handleEditColumn}
+                            onUpdateColumn={handleUpdateColumn}
+                        />
+                    </div>
                 </>
             )}
             {editOpen && (

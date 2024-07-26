@@ -700,6 +700,8 @@ function CreateDetail() {
     const permissions = useUserStore((state) => state.permissions);
 
     //检测 model
+    console.log(detail?.workflowConfig);
+
     useEffect(() => {
         if (detail?.workflowConfig?.steps?.length === 1) {
             setAiModel(detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.find((item: any) => item.field === 'model')?.value);

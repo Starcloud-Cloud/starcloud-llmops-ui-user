@@ -624,14 +624,15 @@ const AiCreate = ({
             if (item.type === EditType.Image) {
                 return {
                     ...item,
-                    render: (_: any, row: any) => (
-                        <Image
-                            preview={{ src: row[item.dataIndex] }}
-                            width={82}
-                            height={82}
-                            src={row[item.dataIndex] + '?x-oss-process=image/resize,w_100/quality,q_80'}
-                        />
-                    )
+                    render: (_: any, row: any) =>
+                        row[item.dataIndex] ? (
+                            <Image
+                                preview={{ src: row[item.dataIndex] }}
+                                width={82}
+                                height={82}
+                                src={row[item.dataIndex] + '?x-oss-process=image/resize,w_100/quality,q_80'}
+                            />
+                        ) : null
                 };
             } else {
                 return item;

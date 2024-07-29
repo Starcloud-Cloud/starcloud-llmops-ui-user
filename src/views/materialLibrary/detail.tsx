@@ -140,7 +140,7 @@ export const TableHeader = ({
     const [plugValue, setPlugValue] = useState<null | string>(null);
     const [openSwitchMaterial, setOpenSwitchMaterial] = React.useState(false);
     const [uploadOpen, setUploadOpen] = useState(false);
-    const [selectSwitchRowKeys, setSelectSwitchRowKeys] = React.useState<any[]>([])
+    const [selectSwitchRowKeys, setSelectSwitchRowKeys] = React.useState<any[]>([]);
 
     const items: any = [
         {
@@ -506,8 +506,8 @@ const MaterialLibraryDetail = () => {
     const [selectedMaterialRowKeys, setSelectedMaterialRowKeys] = useState<React.Key[]>([]);
     const [btnLoading, setBtnLoading] = useState(-1);
     const [extend, setExtend] = useState<any>({});
-    const [total, setTotal] = React.useState(0)
- 
+    const [total, setTotal] = React.useState(0);
+
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const id = searchParams.get('id');
@@ -769,8 +769,8 @@ const MaterialLibraryDetail = () => {
             setColumns(columnData);
         }
     }, [canUpload, detail, tableDataOriginal, tableData]);
-    const getTableList = (data?: any, pageNum = 1 ) => {
-        getMaterialLibraryDataPage({ libraryId: id, sortingFields: data, pageSize: 20, pageNum: pageNum }).then((data) => {
+    const getTableList = (data?: any, pageNum = 1) => {
+        getMaterialLibraryDataPage({ libraryId: id, sortingFields: data, pageSize: 20, pageNo: pageNum }).then((data) => {
             setTableDataOriginal(data.list);
             setTotal(data.total);
             let newList: any = [];
@@ -799,7 +799,7 @@ const MaterialLibraryDetail = () => {
         });
     };
     useEffect(() => {
-        getTableList(null ,page);
+        getTableList(null, page);
     }, [forceUpdate]);
 
     const handleDel = async (id: number) => {
@@ -969,6 +969,7 @@ const MaterialLibraryDetail = () => {
                             selectedRowKeys={selectedRowKeys}
                             setSelectedRowKeys={setSelectRowKeys}
                             columns={columns}
+                            page={page}
                             setPage={setPage}
                             getList={getTableList}
                             setTableData={setTableData}

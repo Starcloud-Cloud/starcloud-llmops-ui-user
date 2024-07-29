@@ -31,6 +31,7 @@ const TablePro = ({
     selectedRowKeys,
     setSelectedRowKeys,
     columns,
+    page,
     setPage,
     setTableData,
     actionRef,
@@ -203,8 +204,9 @@ const TablePro = ({
                         ? false
                         : {
                               total: total || tableData?.length,
+                              current: page,
                               pageSize: 20,
-                                pageSizeOptions: [20, 50, 100, 300, 500],
+                              pageSizeOptions: [20, 50, 100, 300, 500],
                               onChange: (page) => setPage(page)
                           }
                 }

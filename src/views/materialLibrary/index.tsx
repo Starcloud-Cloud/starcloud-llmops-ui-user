@@ -62,6 +62,7 @@ const MaterialLibrary = ({
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
+    const formCopyLibrary = useRef<any>(null)
 
     useEffect(() => {
         dictData('', 'material_format_type').then((res) => {
@@ -261,7 +262,7 @@ const MaterialLibrary = ({
         align: 'right',
         render: (_, row) => (
             <Dropdown
-                menu={activeKey === '10' ? { items, onClick } : { items: itemsSys, onClick }}
+                menu={activeKey === '20' ? { items, onClick } : { items: itemsSys, onClick }}
                 onOpenChange={() => {
                     setRecord(row);
                 }}
@@ -499,10 +500,14 @@ const MaterialLibrary = ({
                 </Modal>
             )}
 
-            {copyLibraryOpen && (
+            {copyLibraryOpen &&  (
                 <ModalForm
                     width={600}
                     open={copyLibraryOpen}
+                    onInit={() => {
+                        formCopyLibrary.current.setFieldsValue({ name: `${record?.name}-复制` });
+                    }}
+                    formRef={formCopyLibrary} 
                     onOpenChange={setCopyLibraryOpen}
                     title="复制素材库"
                     onFinish={async (value) => {
@@ -515,7 +520,7 @@ const MaterialLibrary = ({
                         }
                     }}
                 >
-                    <ProFormText required name="name" label="输入素材库名称" />
+                    <ProFormText  required name="name" label="输入素材库名称" />
                 </ModalForm>
             )}
         </div>

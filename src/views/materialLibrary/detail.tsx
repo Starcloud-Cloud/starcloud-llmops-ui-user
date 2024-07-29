@@ -403,6 +403,11 @@ export const TableHeader = ({
 
                 <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
                     <Space>
+                        {!isShowField && (
+                            <Button type="primary" onClick={() => setUploadOpen(true)}>
+                                批量导入
+                            </Button>
+                        )}
                         <Button
                             type="primary"
                             onClick={() => {

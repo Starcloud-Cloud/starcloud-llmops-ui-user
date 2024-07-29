@@ -1,5 +1,5 @@
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Button, Image, Popconfirm, Form, Tabs, InputNumber, Tag, Row, Col, Input, Badge, Tooltip } from 'antd';
+import { Button, Image, Popconfirm, Form, Tabs, InputNumber, Tag, Row, Col, List, Drawer, Tooltip } from 'antd';
 import { AccordionDetails, AccordionSummary, Accordion } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { SaveOutlined, InfoCircleOutlined, RightOutlined } from '@ant-design/icons';
@@ -502,6 +502,7 @@ const Lefts = ({
         }
     }, [planState]);
     const [exeState, setExeState] = useState(false);
+    const handleVerify = () => {};
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
         // verifyList();
@@ -1280,6 +1281,25 @@ const Lefts = ({
                         </Button>
                     )}
                 </div>
+
+                {/* <Drawer title="错误信息" placement="right" onClose={() => {}} open={true} mask={false}>
+                    <List
+                        itemLayout="horizontal"
+                        dataSource={[{}, {}, {}]}
+                        renderItem={(item, index) => (
+                            <List.Item>
+                                <List.Item.Meta
+                                    title={11111111}
+                                    description={
+                                        <div className="text-xs text-[red]">
+                                            Ant Design, a design language for background applications, is refined by Ant UED Team
+                                        </div>
+                                    }
+                                />
+                            </List.Item>
+                        )}
+                    />
+                </Drawer> */}
             </div>
             {editOpens && (
                 <FormModal

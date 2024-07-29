@@ -11,7 +11,15 @@ import Icon, {
     UploadOutlined
 } from '@ant-design/icons';
 import { ActionType, CheckCard, ModalForm, ProColumns, ProFormText, ProTable } from '@ant-design/pro-components';
-import { addMaterial, copyMaterialLibrary, delMaterial, getMaterialBindPage, getMaterialPage, getSelectSysMaterialPage, updateMaterial } from 'api/material';
+import {
+    addMaterial,
+    copyMaterialLibrary,
+    delMaterial,
+    getMaterialBindPage,
+    getMaterialPage,
+    getSelectSysMaterialPage,
+    updateMaterial
+} from 'api/material';
 import dayjs from 'dayjs';
 import { dictData } from 'api/template';
 import { useNavigate } from 'react-router-dom';
@@ -49,9 +57,8 @@ const MaterialLibrary = ({
     } | null>(null);
     const [activeKey, setActiveKey] = useState<string>('20');
     const [copyLibraryOpen, setCopyLibraryOpen] = useState(false);
-    const [copyType, setCopyType] = useState(0)
-    const [current, setCurrent] = useState(1)
-
+    const [copyType, setCopyType] = useState(0);
+    const [current, setCurrent] = useState(1);
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
@@ -65,8 +72,8 @@ const MaterialLibrary = ({
     useEffect(() => {
         dictData('', 'material_create_source').then((res) => {
             setSourceList(res.list);
-        })
-    }, [])
+        });
+    }, []);
 
     const handleTypeLabel = (value: string) => {
         return typeList.find((v) => v.value === value.toString())?.label || '未知';
@@ -97,11 +104,11 @@ const MaterialLibrary = ({
         },
         {
             key: 'copy_filed',
-            label: '复制字段',
+            label: '复制字段'
         },
         {
             key: 'copy_filed_data',
-            label: '复制字段和数据',
+            label: '复制字段和数据'
         },
         {
             key: '2',
@@ -113,12 +120,12 @@ const MaterialLibrary = ({
     const itemsSys: any = [
         {
             key: 'copy_filed',
-            label: '复制字段',
+            label: '复制字段'
         },
         {
             key: 'copy_filed_data',
-            label: '复制字段和数据',
-        },
+            label: '复制字段和数据'
+        }
     ];
 
     const onClick: MenuProps['onClick'] = async ({ key, domEvent }) => {
@@ -127,16 +134,16 @@ const MaterialLibrary = ({
             setRecord(record);
             form.setFieldsValue(record);
             setIsModalOpen(true);
-        } else if(key === '2') {
+        } else if (key === '2') {
             await showConfirm();
-        } else if(key === 'copy_filed') {
+        } else if (key === 'copy_filed') {
             setRecord(record);
-            setCopyLibraryOpen(true); 
-            setCopyType(0)
+            setCopyLibraryOpen(true);
+            setCopyType(0);
         } else {
             setRecord(record);
-            setCopyLibraryOpen(true); 
-            setCopyType(1)
+            setCopyLibraryOpen(true);
+            setCopyType(1);
         }
     };
 
@@ -152,7 +159,13 @@ const MaterialLibrary = ({
                             <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
                         </div>
                         <div className="ml-2 flex flex-col">
-                            <span className="font-extrabold">{record.name}</span>
+                            <span
+                                onClick={mode === 'select' ? () => navigate(`/material/detail?id=${record.id}`) : () => null}
+                                className="font-extrabold cursor-pointer"
+                            >
+                                {record.name}
+                            </span>
+
                             <div className="text-[12px] h-[18px] text-[#06070980] line-clamp-1">{record.description}</div>
                         </div>
                     </div>
@@ -173,7 +186,7 @@ const MaterialLibrary = ({
         //     align: 'center',
         //     renderText: (text) => handleTypeLabel(text)
         // },
-        
+
         {
             title: '数据量',
             dataIndex: 'fileCount',
@@ -227,43 +240,42 @@ const MaterialLibrary = ({
         // },
     ];
 
-    if(activeKey !== '20') {
-        
-    columns.splice(1, 0, {
-        title: '来源',
-        dataIndex: 'createSource',
-        search: false,
-        width: 80,
-        align: 'center',
-        renderText: (text) => {
-            return sourceList.find((v) => +v.value === text)?.label || '未知'; 
-        }
-    })
+    if (activeKey !== '20') {
+        columns.splice(1, 0, {
+            title: '来源',
+            dataIndex: 'createSource',
+            search: false,
+            width: 80,
+            align: 'center',
+            renderText: (text) => {
+                return sourceList.find((v) => +v.value === text)?.label || '未知';
+            }
+        });
     }
 
     // if (mode === 'page' && activeKey === '1') {
-        columns.push({
-            title: '操作',
-            width: 50,
-            search: false,
-            align: 'right',
-            render: (_, row) => (
-                <Dropdown
-                    menu={activeKey === '10' ? { items, onClick }: { items: itemsSys, onClick }}
-                    onOpenChange={() => {
-                        setRecord(row);
+    columns.push({
+        title: '操作',
+        width: 50,
+        search: false,
+        align: 'right',
+        render: (_, row) => (
+            <Dropdown
+                menu={activeKey === '10' ? { items, onClick } : { items: itemsSys, onClick }}
+                onOpenChange={() => {
+                    setRecord(row);
+                }}
+            >
+                <MoreOutlined
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                     }}
-                >
-                    <MoreOutlined
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }}
-                        className="cursor-pointer p-1"
-                    />
-                </Dropdown>
-            )
-        });
+                    className="cursor-pointer p-1"
+                />
+            </Dropdown>
+        )
+    });
     // }
 
     const handleStatus = async (record: any) => {
@@ -335,7 +347,7 @@ const MaterialLibrary = ({
                                       }
                                   ],
                         onChange: (key) => {
-                            setCurrent(1)
+                            setCurrent(1);
                             setActiveKey(key as string);
                             actionRef.current?.reload();
                         }
@@ -354,7 +366,7 @@ const MaterialLibrary = ({
                 search={false}
                 rowKey={'id'}
                 pagination={{
-                    current: current,
+                    current: current
                 }}
                 request={async (params, sort) => {
                     setCurrent(params.current as number);
@@ -487,17 +499,25 @@ const MaterialLibrary = ({
                 </Modal>
             )}
 
-            {copyLibraryOpen && <ModalForm width={600} open={copyLibraryOpen} onOpenChange={setCopyLibraryOpen} title="复制素材库" onFinish={async(value) => {
-                const result = await copyMaterialLibrary({...value, id: record.id, copyAll: !!copyType});
-                if(result){
-                    // 回到我的素材
-                    setActiveKey('20')
-                    actionRef.current?.reload();
-                    setCopyLibraryOpen(false);
-                }
-            }}>
-                <ProFormText required name="name" label="输入素材库名称" />
-            </ModalForm>}
+            {copyLibraryOpen && (
+                <ModalForm
+                    width={600}
+                    open={copyLibraryOpen}
+                    onOpenChange={setCopyLibraryOpen}
+                    title="复制素材库"
+                    onFinish={async (value) => {
+                        const result = await copyMaterialLibrary({ ...value, id: record.id, copyAll: !!copyType });
+                        if (result) {
+                            // 回到我的素材
+                            setActiveKey('20');
+                            actionRef.current?.reload();
+                            setCopyLibraryOpen(false);
+                        }
+                    }}
+                >
+                    <ProFormText required name="name" label="输入素材库名称" />
+                </ModalForm>
+            )}
         </div>
     );
 };

@@ -32,6 +32,7 @@ import {
     delBatchMaterialLibrarySlice,
     delMaterialLibrarySlice,
     getMaterialLibraryDataList,
+    getMaterialLibraryDataPage,
     getMaterialLibraryTitleList,
     updateMaterialLibrarySlice,
     updateMaterialLibraryTitle
@@ -139,6 +140,7 @@ export const TableHeader = ({
     const [plugValue, setPlugValue] = useState<null | string>(null);
     const [openSwitchMaterial, setOpenSwitchMaterial] = React.useState(false);
     const [uploadOpen, setUploadOpen] = useState(false);
+    const [selectSwitchRowKeys, setSelectSwitchRowKeys] = React.useState<any[]>([])
 
     const items: any = [
         {
@@ -463,7 +465,7 @@ export const TableHeader = ({
                     <div className="h-[calc(100vh-300px)] overflow-auto">
                         <MaterialLibrary
                             mode={'select'}
-                            setSelectedRowKeys={setSelectedRowKeys}
+                            setSelectedRowKeys={setSelectSwitchRowKeys}
                             appUid={appUid}
                             libraryId={libraryId}
                             bizUid={bizUid}
@@ -499,7 +501,8 @@ const MaterialLibraryDetail = () => {
     const [selectedMaterialRowKeys, setSelectedMaterialRowKeys] = useState<React.Key[]>([]);
     const [btnLoading, setBtnLoading] = useState(-1);
     const [extend, setExtend] = useState<any>({});
-
+    const [total, setTotal] = React.useState(0)
+ 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const id = searchParams.get('id');
@@ -703,6 +706,7 @@ const MaterialLibraryDetail = () => {
                     className: 'align-middle',
                     dataIndex: 'id',
                     isDefault: true,
+                    sorter: (a: any, b: any) => a.id - b.id,
                     editable: () => {
                         return false;
                     },
@@ -717,7 +721,7 @@ const MaterialLibraryDetail = () => {
                     align: 'center',
                     width: 100,
                     isDefault: true,
-                    sorter: true,
+                    sorter: (a: any, b: any) => a.usedCount - b.usedCount,
                     renderText: (text: any) => text || 0
                 },
                 {
@@ -760,11 +764,12 @@ const MaterialLibraryDetail = () => {
             setColumns(columnData);
         }
     }, [canUpload, detail, tableDataOriginal, tableData]);
-    const getTableList = (data?: any) => {
-        getMaterialLibraryDataList({ libraryId: id, sortingFields: data }).then((data) => {
-            setTableDataOriginal(data);
+    const getTableList = (data?: any, pageNum = 1 ) => {
+        getMaterialLibraryDataPage({ libraryId: id, sortingFields: data, pageSize: 20, pageNum: pageNum }).then((data) => {
+            setTableDataOriginal(data.list);
+            setTotal(data.total);
             let newList: any = [];
-            data.map((item: any) => {
+            data.list.map((item: any) => {
                 let obj: any = {
                     ...item
                 };
@@ -789,8 +794,7 @@ const MaterialLibraryDetail = () => {
         });
     };
     useEffect(() => {
-        getTableList();
-        console.log(123);
+        getTableList(null ,page);
     }, [forceUpdate]);
 
     const handleDel = async (id: number) => {
@@ -963,6 +967,7 @@ const MaterialLibraryDetail = () => {
                             setPage={setPage}
                             getList={getTableList}
                             setTableData={setTableData}
+                            total={total}
                         />
                     ) : (
                         <Empty

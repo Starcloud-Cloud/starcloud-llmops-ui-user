@@ -10,8 +10,8 @@ import Icon, {
     PlusOutlined,
     UploadOutlined
 } from '@ant-design/icons';
-import { ActionType, CheckCard, ProColumns, ProTable } from '@ant-design/pro-components';
-import { addMaterial, delMaterial, getMaterialBindPage, getMaterialPage, getSelectSysMaterialPage, updateMaterial } from 'api/material';
+import { ActionType, CheckCard, ModalForm, ProColumns, ProFormText, ProTable } from '@ant-design/pro-components';
+import { addMaterial, copyMaterialLibrary, delMaterial, getMaterialBindPage, getMaterialPage, getSelectSysMaterialPage, updateMaterial } from 'api/material';
 import dayjs from 'dayjs';
 import { dictData } from 'api/template';
 import { useNavigate } from 'react-router-dom';
@@ -42,11 +42,16 @@ const MaterialLibrary = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectIcon, setSelectIcon] = useState('');
     const [typeList, setTypeList] = useState<any[]>([]);
+    const [sourceList, setSourceList] = useState<any[]>([]);
     const [record, setRecord] = useState<any>(null);
     const [query, setQuery] = useState<{
         name: string;
     } | null>(null);
-    const [activeKey, setActiveKey] = useState<string>('1');
+    const [activeKey, setActiveKey] = useState<string>('20');
+    const [copyLibraryOpen, setCopyLibraryOpen] = useState(false);
+    const [copyType, setCopyType] = useState(0)
+    const [current, setCurrent] = useState(1)
+
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
@@ -56,6 +61,12 @@ const MaterialLibrary = ({
             setTypeList(res.list);
         });
     }, []);
+
+    useEffect(() => {
+        dictData('', 'material_create_source').then((res) => {
+            setSourceList(res.list);
+        })
+    }, [])
 
     const handleTypeLabel = (value: string) => {
         return typeList.find((v) => v.value === value.toString())?.label || '未知';
@@ -85,10 +96,29 @@ const MaterialLibrary = ({
             label: '编辑'
         },
         {
+            key: 'copy_filed',
+            label: '复制字段',
+        },
+        {
+            key: 'copy_filed_data',
+            label: '复制字段和数据',
+        },
+        {
             key: '2',
             label: '删除',
             danger: true
         }
+    ];
+
+    const itemsSys: any = [
+        {
+            key: 'copy_filed',
+            label: '复制字段',
+        },
+        {
+            key: 'copy_filed_data',
+            label: '复制字段和数据',
+        },
     ];
 
     const onClick: MenuProps['onClick'] = async ({ key, domEvent }) => {
@@ -97,8 +127,16 @@ const MaterialLibrary = ({
             setRecord(record);
             form.setFieldsValue(record);
             setIsModalOpen(true);
-        } else {
+        } else if(key === '2') {
             await showConfirm();
+        } else if(key === 'copy_filed') {
+            setRecord(record);
+            setCopyLibraryOpen(true); 
+            setCopyType(0)
+        } else {
+            setRecord(record);
+            setCopyLibraryOpen(true); 
+            setCopyType(1)
         }
     };
 
@@ -135,6 +173,7 @@ const MaterialLibrary = ({
         //     align: 'center',
         //     renderText: (text) => handleTypeLabel(text)
         // },
+        
         {
             title: '数据量',
             dataIndex: 'fileCount',
@@ -188,7 +227,21 @@ const MaterialLibrary = ({
         // },
     ];
 
-    if (mode === 'page' && activeKey === '1') {
+    if(activeKey !== '20') {
+        
+    columns.splice(1, 0, {
+        title: '来源',
+        dataIndex: 'createSource',
+        search: false,
+        width: 80,
+        align: 'center',
+        renderText: (text) => {
+            return sourceList.find((v) => +v.value === text)?.label || '未知'; 
+        }
+    })
+    }
+
+    // if (mode === 'page' && activeKey === '1') {
         columns.push({
             title: '操作',
             width: 50,
@@ -196,7 +249,7 @@ const MaterialLibrary = ({
             align: 'right',
             render: (_, row) => (
                 <Dropdown
-                    menu={{ items, onClick }}
+                    menu={activeKey === '10' ? { items, onClick }: { items: itemsSys, onClick }}
                     onOpenChange={() => {
                         setRecord(row);
                     }}
@@ -211,7 +264,7 @@ const MaterialLibrary = ({
                 </Dropdown>
             )
         });
-    }
+    // }
 
     const handleStatus = async (record: any) => {
         const data = await updateMaterial(record);
@@ -258,11 +311,12 @@ const MaterialLibrary = ({
                 toolbar={{
                     menu: {
                         type: 'tab',
+                        activeKey: activeKey,
                         items:
                             mode === 'select'
                                 ? [
                                       {
-                                          key: '1',
+                                          key: '20',
                                           label: <span>我的素材库</span>
                                       },
                                       {
@@ -271,20 +325,17 @@ const MaterialLibrary = ({
                                       }
                                   ]
                                 : [
-                                    {
-                                        key: '1',
-                                        label: <span>我的素材库</span>
-                                    },
-                                    {
-                                        key: '0',
-                                        label: <span>系统素材库</span>
-                                    },
-                                    {
-                                        key: '9',
-                                        label: <span>已发布素材库</span>
-                                    }
-                                ],
+                                      {
+                                          key: '20',
+                                          label: <span>我的素材库</span>
+                                      },
+                                      {
+                                          key: '10',
+                                          label: <span>系统素材库</span>
+                                      }
+                                  ],
                         onChange: (key) => {
+                            setCurrent(1)
                             setActiveKey(key as string);
                             actionRef.current?.reload();
                         }
@@ -302,7 +353,11 @@ const MaterialLibrary = ({
                 columns={columns}
                 search={false}
                 rowKey={'id'}
+                pagination={{
+                    current: current,
+                }}
                 request={async (params, sort) => {
+                    setCurrent(params.current as number);
                     params.pageNo = params.current;
                     params.name = query?.name;
                     params.libraryType = +activeKey;
@@ -431,6 +486,18 @@ const MaterialLibrary = ({
                     </Form>
                 </Modal>
             )}
+
+            {copyLibraryOpen && <ModalForm width={600} open={copyLibraryOpen} onOpenChange={setCopyLibraryOpen} title="复制素材库" onFinish={async(value) => {
+                const result = await copyMaterialLibrary({...value, id: record.id, copyAll: !!copyType});
+                if(result){
+                    // 回到我的素材
+                    setActiveKey('20')
+                    actionRef.current?.reload();
+                    setCopyLibraryOpen(false);
+                }
+            }}>
+                <ProFormText required name="name" label="输入素材库名称" />
+            </ModalForm>}
         </div>
     );
 };

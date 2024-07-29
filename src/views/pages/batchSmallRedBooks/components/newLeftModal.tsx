@@ -84,7 +84,7 @@ const LeftModalAdd = ({
                     getTitleList={getTitleList}
                     getList={getList}
                     libraryType={libraryType}
-                    canSwitch={bizType === 'APP' ? true : false}
+                    canSwitch={true}
                     canExecute={true}
                     handleExecute={handleExecute}
                 />

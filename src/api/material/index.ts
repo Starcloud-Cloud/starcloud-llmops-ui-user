@@ -80,7 +80,7 @@ export const updateMaterialLibraryTitle = (data: any) => {
  * @returns
  */
 export const getMaterialLibraryDataPage = (data: any) => {
-    return request.get({ url: '/llm/material-library-slice/page', params: data });
+    return request.post({ url: '/llm/material-library-slice/page', data });
 };
 
 /**
@@ -126,4 +126,13 @@ export const delMaterialLibrarySlice = (data: any) => {
  */
 export const delBatchMaterialLibrarySlice = (data: any) => {
     return request.post({ url: '/llm/material-library-slice/delete-batch', data });
+};
+
+/**
+ * 拷贝素材
+ * @param data 
+ * @returns 
+ */
+export const copyMaterialLibrary= (data: any) => {
+    return request.post({ url: '/llm/material-library/copy', data });
 };

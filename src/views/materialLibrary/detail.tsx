@@ -456,7 +456,7 @@ export const TableHeader = ({
                     onOpenChange={setOpenSwitchMaterial}
                     onFinish={async () => {
                         const data = await createMaterialLibraryAppBind({
-                            libraryId: selectedRowKeys[0],
+                            libraryId: selectSwitchRowKeys[0],
                             appUid: bizUid
                         });
                         if (data) {

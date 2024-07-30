@@ -989,7 +989,7 @@ function CreateDetail() {
     console.log(1);
 
     return detail ? (
-        <Card sx={{ height: '100%', overflowY: 'auto', position: 'relative' }}>
+        <Card className="h-[calc(100vh)]" sx={{ overflowY: 'auto', position: 'relative' }}>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={

@@ -400,7 +400,7 @@ const MaterialLibrary = ({
 
                     let data: any = {};
                     if (mode === 'select' && +activeKey === 0) {
-                        data = await getSelectSysMaterialPage({ ...params, sortingFields, appUid: bizUid });
+                        data = await getSelectSysMaterialPage({ ...params, sortingFields, appUid: appUid });
                     } else {
                         data = await getMaterialPage({ ...params, sortingFields });
                     }

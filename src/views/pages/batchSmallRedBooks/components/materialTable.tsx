@@ -549,7 +549,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             )}
             <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
-                    appUid={uid}
+                    appUid={appUid}
                     libraryId={libraryId}
                     libraryType={libraryType}
                     bizUid={bizUid}

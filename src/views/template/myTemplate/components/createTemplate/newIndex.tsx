@@ -1089,7 +1089,7 @@ function CreateDetail() {
                 }
             ></CardHeader>
             <Divider />
-            <div className="w-full absolute top-[24px]">
+            <div className="w-full absolute top-[24px] h-[calc(100vh-200px)]">
                 <Tabs
                     activeKey={value}
                     centered={true}

@@ -19,6 +19,8 @@ const LeftModalAdd = ({
     pluginConfig,
     tableLoading,
     actionRefs,
+    page,
+    total,
     columns,
     tableMeta,
     tableData,
@@ -40,6 +42,8 @@ const LeftModalAdd = ({
     pluginConfig: string | null;
     tableLoading: boolean;
     actionRefs: any;
+    page: number;
+    total: number;
     columns: any[];
     tableMeta: any[];
     tableData: any[];
@@ -84,7 +88,7 @@ const LeftModalAdd = ({
                     getTitleList={getTitleList}
                     getList={getList}
                     libraryType={libraryType}
-                    canSwitch={bizType === 'APP' ? true : false}
+                    canSwitch={true}
                     canExecute={true}
                     handleExecute={handleExecute}
                 />
@@ -96,6 +100,8 @@ const LeftModalAdd = ({
                         selectedRowKeys={selectedRowKeys}
                         setSelectedRowKeys={setSelectedRowKeys}
                         columns={columns}
+                        total={total}
+                        page={page}
                         setPage={setPage}
                         setTableData={setTableData}
                         handleEditColumn={handleEditColumn}
@@ -116,6 +122,7 @@ const memoLeftModal = (pre: any, next: any) => {
         _.isEqual(pre.libraryName, next.libraryName) &&
         _.isEqual(pre.pluginConfig, next.pluginConfig) &&
         _.isEqual(pre.tableLoading, next.tableLoading) &&
+        _.isEqual(pre.total, next.total) &&
         _.isEqual(pre.columns, next.columns) &&
         _.isEqual(pre.tableData, next.tableData)
     );

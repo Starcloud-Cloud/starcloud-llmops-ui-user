@@ -19,6 +19,8 @@ import { v4 as uuidv4 } from 'uuid';
 const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
     const [columns, setColumns] = useState<any[]>([]);
     const tableRef = useRef<any[]>([]);
     const [tableLoading, setTableLoading] = useState(false);
@@ -192,6 +194,15 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 fixed: true,
                 render: (_: any, row: any, index: number) => <span>{index + 1}</span>
             },
+            {
+                title: 'ID',
+                dataIndex: 'id',
+                align: 'center',
+                width: 80,
+                isDefault: true,
+                renderText: (text: any) => text || 0,
+                sorter: (a: any, b: any) => a.usedCount - b.usedCount
+            },
             ...newList,
             {
                 title: '使用次数',
@@ -248,10 +259,6 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         }));
     }, [getClumns]);
     const [editOpen, setEditOpen] = useState(false);
-    const [page, setPage] = useState({
-        pageNo: 1,
-        pageSize: 100
-    });
     const formOk = async (values: any) => {
         if (currentRecord) {
             handleEditColumn({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values }, 1);
@@ -328,9 +335,9 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             handleEditColumn(result);
         }
     }, [selectImg]);
-    const getList = (data?: any) => {
+    const getList = (data?: any, pageNo?: any) => {
         setTableLoading(true);
-        getMaterialPage({ ...page, appUid, sortingFields: data }).then((res) => {
+        getMaterialPage({ pageNo: pageNo || page, pageSize: 20, appUid, sortingFields: data }).then((res) => {
             let newList: any = [];
             res.list.map((item: any) => {
                 let obj: any = _.cloneDeep(item);
@@ -352,6 +359,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             });
             setTableData(newList);
             tableRef.current = newList;
+            setTotal(res.total);
             setTableLoading(false);
         });
     };
@@ -364,7 +372,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
     const [libraryType, setLibraryType] = useState(-1);
     const getTitleList = () => {
         getMaterialTitle({ appUid }).then((res) => {
-            setLibraryType(res.libraryType);
+            setLibraryType(res.createSource);
             setLibraryName(res.name);
             setpluginConfig(res.pluginConfig);
             setLibraryId(res.id);
@@ -513,7 +521,9 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                             columns={getClumn}
                             tableData={tableData}
                             tableLoading={tableLoading}
+                            page={page}
                             setPage={setPage}
+                            total={total}
                             setTableData={(data: any) => {
                                 tableRef.current = data;
                                 setTableData(data);
@@ -543,7 +553,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             )}
             <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
-                    appUid={uid}
+                    appUid={appUid}
                     libraryId={libraryId}
                     libraryType={libraryType}
                     bizUid={bizUid}
@@ -555,10 +565,12 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     columns={getClumns}
                     tableMeta={columns}
                     tableData={tableData}
+                    total={total}
                     setTableData={(data) => {
                         tableRef.current = data;
                         setTableData(data);
                     }}
+                    page={page}
                     setPage={setPage}
                     setEditOpen={setEditOpen}
                     setTitle={setTitle}

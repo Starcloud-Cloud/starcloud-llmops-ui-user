@@ -1,6 +1,6 @@
 import { EditableProTable } from '@ant-design/pro-components';
 import { useState, memo, useEffect, useCallback, useRef } from 'react';
-import _ from 'lodash-es';
+import _, { sortBy } from 'lodash-es';
 import { Resizable } from 'react-resizable';
 import './index.css';
 import React from 'react';
@@ -31,12 +31,14 @@ const TablePro = ({
     selectedRowKeys,
     setSelectedRowKeys,
     columns,
+    page,
     setPage,
     setTableData,
     actionRef,
     onUpdateColumn,
     handleEditColumn,
-    getList
+    getList,
+    total
 }: any) => {
     const [column, setColumn] = useState<any[]>([]);
     const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
@@ -110,7 +112,12 @@ const TablePro = ({
         editable: dataIndex.flat(1).join('.') === [item.dataIndex || item.key].flat(1).join('.') ? undefined : false,
         onCell: (record: any, rowIndex: any) => ({
             onClick: () => {
-                if (item.dataIndex === 'id' || item.dataIndex === 'operation' || item.editType === EditType.Image || item.title === '使用次数') {
+                if (
+                    item.dataIndex === 'id' ||
+                    item.dataIndex === 'operation' ||
+                    item.editType === EditType.Image ||
+                    item.title === '使用次数'
+                ) {
                     setDataIndex([]);
                     setEditableRowKeys([]);
                     return;
@@ -167,18 +174,24 @@ const TablePro = ({
                           }
                 }
                 onTableChange={async (pagination, filters, sorter: any) => {
-                    console.log(sorter.order);
-
-                    if (sorter.order) {
-                        getList([
+                    let param;
+                    if (sorter.field === 'usedCount') {
+                        param = [
                             {
                                 field: 'used_count',
                                 order: sorter.order === 'ascend' ? 'asc' : 'desc'
                             }
-                        ]);
-                    } else {
-                        getList();
+                        ];
                     }
+                    if (sorter.field === 'id') {
+                        param = [
+                            {
+                                field: 'id',
+                                order: sorter.order === 'ascend' ? 'asc' : 'desc'
+                            }
+                        ];
+                    }
+                    getList(param, pagination.current);
                 }}
                 actionRef={actionRefs}
                 editableFormRef={actionRef}
@@ -190,6 +203,8 @@ const TablePro = ({
                     isPagination
                         ? false
                         : {
+                              total: total || tableData?.length,
+                              current: page,
                               pageSize: 20,
                               pageSizeOptions: [20, 50, 100, 300, 500],
                               onChange: (page) => setPage(page)

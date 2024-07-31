@@ -160,6 +160,7 @@ export const TableHeader = ({
     const [selectSwitchRowKeys, setSelectSwitchRowKeys] = React.useState<any[]>([]);
     const [sourceList, setSourceList] = useState<any[]>([]);
     const [addOpen, setAddOpen] = useState(false);
+    const [plugType, setPlugType] = useState('');
 
     useEffect(() => {
         dictData('', 'material_create_source').then((res) => {
@@ -320,6 +321,7 @@ export const TableHeader = ({
             pluginUid: record.uid
         });
         setPlugUid(record.uid);
+        setPlugType(record.scene);
         setPlugConfigOpen(record);
         setPlugRecord({
             ...plugInfo,
@@ -805,7 +807,7 @@ export const TableHeader = ({
                     }}
                 />
             )}
-            {plugConfigOpen && (
+            {plugConfigOpen && plugType === 'DATA_ADDED' && (
                 <PlugAnalysis
                     columns={columns}
                     handleAnalysis={() => null}

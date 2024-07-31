@@ -149,3 +149,11 @@ export const extraction = (data: any) => {
 export const imageOcr = (data: any) => {
     return request.post({ url: `/llm/creative/plugins/imageOcr`, data });
 };
+//微信公共号
+export const plugChat = (data: any) => {
+    return request.post({ url: `/llm/coze/temp/chat`, data });
+};
+//ocr
+export const plugList = (params: any) => {
+    return request.get({ url: `llm/coze/temp/chat/result`, params });
+};

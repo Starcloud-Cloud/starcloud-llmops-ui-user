@@ -1,6 +1,6 @@
 import { Modal, Button, Table, Progress, Tag, Image } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
-import { materialGenerate, customMaterialGenerate, pluginsXhsOcr, extraction, imageOcr } from 'api/redBook/batchIndex';
+import { materialGenerate, customMaterialGenerate, pluginsXhsOcr, extraction, imageOcr, plugChat, plugList } from 'api/redBook/batchIndex';
 import { templateUpdate } from 'api/redBook/material';
 import _ from 'lodash-es';
 import './aiCreate.css';
@@ -9,6 +9,7 @@ import FieldCompletion from './components/fieldCompletion';
 import RedBookAnalysis from './components/redBookAnalysis';
 import ImgOcr from './components/imgOcr';
 import TextExtraction from './components/textExtraction';
+import PlugModal from './components/plugModal';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { EditType } from 'views/materialLibrary/detail';
@@ -83,12 +84,48 @@ const AiCreate = ({
     const retryNumRef = useRef(0);
     const retryListRef = useRef<any[]>([]);
     const xhsListRef = useRef<any[]>([]);
+
+    const preeNum = useRef(0);
+    const [prenum, setPrenum] = useState(0);
     const materialPre = useMemo(() => {
-        return ((successCountRef.current / totalCountRef.current) * 100) | 0;
-    }, [successCount, totalCount]);
+        return ((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current;
+    }, [successCount, totalCount, prenum]);
     const aref = useRef(false);
     //loading 弹窗
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
+    const timeLoading = useRef<any>(null);
+    const grupPre = useRef(0);
+    useEffect(() => {
+        if (materialExecutionOpen) {
+            const newNum = grupPre.current || executionCountRef.current || 1;
+            console.log(newNum, totalCountRef.current);
+
+            const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
+            timeLoading.current = setInterval(() => {
+                console.log(newNum, preeNum.current, newSuccessNum);
+
+                if (preeNum.current < newSuccessNum - 1) {
+                    preeNum.current += 1;
+                    setPrenum(preeNum.current);
+                } else {
+                    clearInterval(timeLoading.current);
+                }
+            }, 50);
+        } else {
+            clearInterval(timeLoading.current);
+        }
+    }, [materialExecutionOpen, executionCount]);
+    useEffect(() => {
+        if (successCount || errorCount) {
+            preeNum.current = 0;
+            setPrenum(preeNum.current);
+            clearInterval(timeLoading.current);
+            console.log(11111, preeNum.current);
+        }
+        return () => {
+            clearInterval(timeLoading.current);
+        };
+    }, [successCount, errorCount]);
 
     //素材生成
     const getTextStream = async (retry?: boolean) => {
@@ -118,6 +155,7 @@ const AiCreate = ({
             const resArr: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             executionCountRef.current = currentBatch?.flat()?.length;
+            grupPre.current = (executionCountRef.current / 3) | 0 || 1;
             setExecutionCount(executionCountRef.current);
             await Promise.all(
                 currentBatch.map(async (group, i) => {
@@ -133,8 +171,8 @@ const AiCreate = ({
                             setMaterialzanList(materialzanListRef.current);
                             executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
                             setSuccessCount(successCountRef.current);
+                            setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         }
                     } catch (error: any) {
                         console.log(error);
@@ -146,7 +184,7 @@ const AiCreate = ({
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
+                        setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         errorCountRef.current += group?.length;
                         if (errorCountRef.current >= 9) {
                             aref.current = true;
@@ -202,6 +240,7 @@ const AiCreate = ({
             const currentBatch = chunks.slice(index, index + 3);
             // try {
             executionCountRef.current = currentBatch?.flat()?.length;
+            grupPre.current = (executionCountRef.current / 3) | 0 || 1;
             setExecutionCount(executionCountRef.current);
 
             await Promise.all(
@@ -222,8 +261,8 @@ const AiCreate = ({
                             );
                             executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
                             setSuccessCount(successCountRef.current);
+                            setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         }
                     } catch (error: any) {
                         const newRetry = _.cloneDeep(retryListRef.current);
@@ -242,7 +281,7 @@ const AiCreate = ({
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
+                        setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         errorCountRef.current += group?.length;
                         if (errorCountRef.current >= 9) {
                             aref.current = true;
@@ -318,6 +357,9 @@ const AiCreate = ({
             const resArr: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             executionCountRef.current = currentBatch?.flat()?.length;
+            grupPre.current = (executionCountRef.current / 3) | 0 || 1;
+            console.log(executionCountRef.current, grupPre.current);
+
             setExecutionCount(executionCountRef.current);
             await Promise.all(
                 currentBatch.map(async (group, i) => {
@@ -338,10 +380,10 @@ const AiCreate = ({
                             resArr.push(obj);
                             materialzanListRef.current = newMaterialzan;
                             setMaterialzanList(materialzanListRef.current);
-                            executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
                             setSuccessCount(successCountRef.current);
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         }
                     } catch (error: any) {
                         console.log(error);
@@ -351,7 +393,7 @@ const AiCreate = ({
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
+                        setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         errorCountRef.current += group?.length;
                         if (errorCountRef.current >= 3) {
                             aref.current = true;
@@ -413,6 +455,7 @@ const AiCreate = ({
             const newResArr: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             executionCountRef.current = currentBatch?.flat()?.length;
+            grupPre.current = (executionCountRef.current / 3) | 0 || 1;
             setExecutionCount(executionCountRef.current);
             console.log(currentBatch);
 
@@ -440,10 +483,10 @@ const AiCreate = ({
                                     ...obj
                                 }))
                             );
-                            executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
                             setSuccessCount(successCountRef.current);
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         }
                     } catch (error: any) {
                         const newRetry = _.cloneDeep(retryListRef.current);
@@ -462,7 +505,7 @@ const AiCreate = ({
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
+                        setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         errorCountRef.current += group?.length;
                         if (errorCountRef.current >= 3) {
                             aref.current = true;
@@ -523,6 +566,7 @@ const AiCreate = ({
         setUuidLists(idList);
 
         setExecutionCount(materialList.length);
+        grupPre.current = (executionCountRef.current / 3) | 0 || 1;
         executionCountRef.current = materialList.length;
 
         materialList.map(async (item: any) => {
@@ -550,17 +594,16 @@ const AiCreate = ({
 
                 materialzanListRef.current = copyMaterialzanList;
                 setMaterialzanList(copyMaterialzanList);
-
-                const exeCount = executionCountRef.current;
-                setExecutionCount(exeCount - 1);
-                executionCountRef.current = exeCount - 1;
-
                 const copySuccessCount = successCountRef.current;
                 setSuccessCount(copySuccessCount + 1);
                 successCountRef.current = copySuccessCount + 1;
+
+                const exeCount = executionCountRef.current;
+                setTimeout(() => setExecutionCount(exeCount - 1), 1);
+                executionCountRef.current = exeCount - 1;
             } catch (error: any) {
                 const exeCount = executionCountRef.current;
-                setExecutionCount(exeCount - 1);
+                setTimeout(() => setExecutionCount(exeCount - 1), 1);
                 executionCountRef.current = exeCount - 1;
 
                 const copyErrorCountRef = errorCountRef.current;
@@ -578,7 +621,55 @@ const AiCreate = ({
             }
         });
     };
-
+    //微信公共号
+    const timer = useRef<any>();
+    const urlsRef = useRef('');
+    const handleWchat = async (url: any, retry = false) => {
+        setSelectValue('wchat');
+        if (url) {
+            urlsRef.current = url;
+        }
+        const urls = url || urlsRef.current;
+        totalCountRef.current = 1;
+        setTotalCount(totalCountRef.current);
+        executionCountRef.current = 1;
+        grupPre.current = 0;
+        setExecutionCount(executionCountRef.current);
+        errorCountRef.current = 0;
+        setErrorCount(errorCountRef.current);
+        successCountRef.current = 0;
+        setSuccessCount(successCountRef.current);
+        setMaterialExecutionOpen(true);
+        try {
+            const result = await plugChat({ urls });
+            timer.current = setInterval(async () => {
+                const res = await plugList({
+                    conversation_id: result.conversation_id,
+                    chat_id: result.id
+                });
+                if (res.complete) {
+                    clearInterval(timer.current);
+                    successCountRef.current = 1;
+                    setSuccessCount(successCountRef.current);
+                    executionCountRef.current = 0;
+                    setExecutionCount(executionCountRef.current);
+                    materialzanListRef.current = res.materialList;
+                    setMaterialzanList(materialzanListRef.current);
+                }
+            }, 2000);
+        } catch (error) {
+            errorCountRef.current = 1;
+            setErrorCount(errorCountRef.current);
+            executionCountRef.current = 0;
+            setExecutionCount(executionCountRef.current);
+        }
+    };
+    //组件销毁时清除定时器
+    useEffect(() => {
+        return () => {
+            clearInterval(timer.current);
+        };
+    }, []);
     //新增插入表格
     const [selectValue, setSelectValue] = useState('');
     const batchNum = useRef(-1);
@@ -635,7 +726,10 @@ const AiCreate = ({
                         ) : null
                 };
             } else {
-                return item;
+                return {
+                    ...item,
+                    sorter: false
+                };
             }
         });
     };
@@ -697,6 +791,7 @@ const AiCreate = ({
         const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
         return imageExe(columns?.filter((item) => arr?.includes(item.dataIndex)));
     }, [redBookData?.fieldList, redBookData]);
+
     return (
         <div>
             {plugValue === 'extraction' ? (
@@ -747,6 +842,8 @@ const AiCreate = ({
                         aimaterialCreate={aimaterialCreate}
                     />
                 </div>
+            ) : plugValue === 'wchat' ? (
+                <PlugModal handleWchat={handleWchat} />
             ) : null}
             {/* 选择素材 */}
             <Modal
@@ -843,8 +940,11 @@ const AiCreate = ({
                                 ? textCloumns
                                 : selectValue === 'ocr'
                                 ? imageExe(columns?.filter((item: any) => ocrData.checkedFieldList?.includes(item.dataIndex)))
+                                : selectValue === 'wchat'
+                                ? imageExe(columns.slice(0, columns?.length - 2))
                                 : [])
                         ]}
+                        virtual={true}
                         dataSource={materialzanList}
                     />
                 </div>
@@ -873,6 +973,8 @@ const AiCreate = ({
                                         xhsAnalysis();
                                     } else if (selectValue === 'text') {
                                         handleTextData(textNum.current);
+                                    } else if (selectValue === 'wchat') {
+                                        handleWchat(undefined, true);
                                     }
                                 }}
                             >
@@ -899,6 +1001,8 @@ const AiCreate = ({
                                             xhsAnalysis(true);
                                         } else if (selectValue === 'text') {
                                             handleTextData(textNum.current, true);
+                                        } else if (selectValue === 'wchat') {
+                                            handleWchat(undefined, true);
                                         }
                                     }}
                                 >
@@ -938,6 +1042,10 @@ const AiCreate = ({
                                         setMaterialExecutionOpen(false);
                                         setPlugOpen(false);
                                         setSelectedRowKeys(uuidLists);
+                                    } else if (selectValue === 'wchat') {
+                                        downTableData(materialzanListRef.current, 1);
+                                        setMaterialExecutionOpen(false);
+                                        setPlugOpen(false);
                                     }
                                 }}
                                 className="w-[100px]"

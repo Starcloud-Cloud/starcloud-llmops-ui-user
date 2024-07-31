@@ -1,4 +1,4 @@
-import { Select, Input, Row, Col, Tabs, Space, Button, Modal, Form, message, Popconfirm, Dropdown, Avatar, Switch } from 'antd';
+import { Select, Input, Row, Col, Tabs, Space, Button, Modal, Form, message, Popconfirm, Dropdown, Avatar, Switch, Empty } from 'antd';
 import type { MenuProps, TabsProps } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import IconSelect, { allIcons } from 'ui-component/IconSelect';
@@ -62,6 +62,7 @@ const MaterialLibrary = ({
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
+    const formCopyLibrary = useRef<any>(null);
 
     useEffect(() => {
         dictData('', 'material_format_type').then((res) => {
@@ -261,7 +262,7 @@ const MaterialLibrary = ({
         align: 'right',
         render: (_, row) => (
             <Dropdown
-                menu={activeKey === '10' ? { items, onClick } : { items: itemsSys, onClick }}
+                menu={activeKey === '20' ? { items, onClick } : { items: itemsSys, onClick }}
                 onOpenChange={() => {
                     setRecord(row);
                 }}
@@ -320,6 +321,23 @@ const MaterialLibrary = ({
                 </div>
             )}
             <ProTable
+                locale={
+                    mode === 'select'
+                        ? {
+                              emptyText: (
+                                  <Empty
+                                      className="mt-[10%]"
+                                      description={
+                                          <div className="flex flex-col">
+                                              <p>暂未配置素材库</p>
+                                              <a onClick={() => navigate('/material')}>去创建</a>
+                                          </div>
+                                      }
+                                  />
+                              )
+                          }
+                        : { emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /> }
+                }
                 toolbar={{
                     menu: {
                         type: 'tab',
@@ -399,7 +417,7 @@ const MaterialLibrary = ({
 
                     let data: any = {};
                     if (mode === 'select' && +activeKey === 0) {
-                        data = await getSelectSysMaterialPage({ ...params, sortingFields, appUid: bizUid });
+                        data = await getSelectSysMaterialPage({ ...params, sortingFields, appUid: appUid });
                     } else {
                         data = await getMaterialPage({ ...params, sortingFields });
                     }
@@ -441,10 +459,10 @@ const MaterialLibrary = ({
                 <Modal width={580} title={record ? '修改知识库' : '新增知识库'} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                     <Form layout="vertical" form={form}>
                         <Form.Item label="名称" name="name" rules={[{ required: true }]}>
-                            <Input placeholder="填写名称" />
+                            <Input placeholder="填写名称" maxLength={100} showCount />
                         </Form.Item>
                         <Form.Item label="描述" name={'description'}>
-                            <Input.TextArea placeholder="填写描述" />
+                            <Input.TextArea placeholder="填写描述" showCount maxLength={500} rows={3} />
                         </Form.Item>
                         {/* <Form.Item label="分类" name="formatType" rules={[{ required: true }]}>
                             <Select placeholder="请选择分类">
@@ -503,6 +521,10 @@ const MaterialLibrary = ({
                 <ModalForm
                     width={600}
                     open={copyLibraryOpen}
+                    onInit={() => {
+                        formCopyLibrary.current.setFieldsValue({ name: `${record?.name}-复制` });
+                    }}
+                    formRef={formCopyLibrary}
                     onOpenChange={setCopyLibraryOpen}
                     title="复制素材库"
                     onFinish={async (value) => {

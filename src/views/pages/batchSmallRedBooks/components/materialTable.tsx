@@ -372,7 +372,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
     const [libraryType, setLibraryType] = useState(-1);
     const getTitleList = () => {
         getMaterialTitle({ appUid }).then((res) => {
-            setLibraryType(res.libraryType);
+            setLibraryType(res.createSource);
             setLibraryName(res.name);
             setpluginConfig(res.pluginConfig);
             setLibraryId(res.id);
@@ -549,7 +549,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             )}
             <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
                 <LeftModalAdd
-                    appUid={uid}
+                    appUid={appUid}
                     libraryId={libraryId}
                     libraryType={libraryType}
                     bizUid={bizUid}

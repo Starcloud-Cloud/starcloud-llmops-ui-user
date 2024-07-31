@@ -87,7 +87,7 @@ export const TableHeader = ({
     setSelectedRowKeys,
     getTitleList,
     getList,
-    libraryType,
+    libraryType, // 实际值为createSource
     appUid,
     canSwitch,
     canExecute,
@@ -141,6 +141,13 @@ export const TableHeader = ({
     const [openSwitchMaterial, setOpenSwitchMaterial] = React.useState(false);
     const [uploadOpen, setUploadOpen] = useState(false);
     const [selectSwitchRowKeys, setSelectSwitchRowKeys] = React.useState<any[]>([]);
+    const [sourceList, setSourceList] = useState<any[]>([]);
+
+    useEffect(() => {
+        dictData('', 'material_create_source').then((res) => {
+            setSourceList(res.list);
+        });
+    }, []);
 
     const items: any = [
         {
@@ -237,9 +244,7 @@ export const TableHeader = ({
                     </div>
                     <div>
                         <Space size={4}>
-                            {libraryType === 0 && <Tag bordered={false}>系统默认素材</Tag>}
-                            {libraryType === 1 && <Tag bordered={false}>我的素材</Tag>}
-                            {libraryType === 9 && <Tag bordered={false}>应用市场素材</Tag>}
+                            <Tag bordered={false}>{sourceList?.find((v) => +v.value === libraryType)?.label || '未知'}</Tag>
                         </Space>
                     </div>
                 </div>
@@ -487,7 +492,7 @@ export const TableHeader = ({
                     onOpenChange={setOpenSwitchMaterial}
                     onFinish={async () => {
                         const data = await createMaterialLibraryAppBind({
-                            libraryId: selectedRowKeys[0],
+                            libraryId: selectSwitchRowKeys[0],
                             appUid: bizUid
                         });
                         if (data) {
@@ -983,7 +988,7 @@ const MaterialLibraryDetail = () => {
                     setSelectedRowKeys={setSelectRowKeys}
                     getTitleList={() => setForceUpdateHeader(forceUpdateHeader + 1)}
                     getList={() => setForceUpdate(forceUpdate + 1)}
-                    libraryType={detail?.libraryType}
+                    libraryType={detail?.createSource}
                     canSwitch={false}
                     canExecute={false}
                     isShowField={true}

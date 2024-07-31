@@ -6,7 +6,8 @@ import {
     SearchOutlined,
     SettingOutlined,
     FileImageOutlined,
-    FileTextOutlined
+    FileTextOutlined,
+    ExclamationCircleFilled
 } from '@ant-design/icons';
 import {
     Button,
@@ -27,6 +28,7 @@ import {
     Spin
 } from 'antd';
 import {
+    checkMaterialLibrary,
     createMaterialLibraryAppBind,
     createMaterialLibrarySlice,
     delBatchMaterialLibrarySlice,
@@ -491,15 +493,42 @@ export const TableHeader = ({
                     open={openSwitchMaterial}
                     onOpenChange={setOpenSwitchMaterial}
                     onFinish={async () => {
-                        const data = await createMaterialLibraryAppBind({
+                        const result = await checkMaterialLibrary({
                             libraryId: selectSwitchRowKeys[0],
                             appUid: bizUid
                         });
-                        if (data) {
-                            message.success('切换成功!');
-                            getTitleList();
-                            getList();
-                            setOpenSwitchMaterial(false);
+                        if (result) {
+                            const data = await createMaterialLibraryAppBind({
+                                libraryId: selectSwitchRowKeys[0],
+                                appUid: bizUid
+                            });
+                            if (data) {
+                                message.success('切换成功!');
+                                getTitleList();
+                                getList();
+                                setOpenSwitchMaterial(false);
+                            }
+                        } else {
+                            Modal.confirm({
+                                title: '提示',
+                                icon: <ExclamationCircleFilled />,
+                                content: '当前素材库与原始素材库存在差异, 确认切换',
+                                async onOk() {
+                                    const data = await createMaterialLibraryAppBind({
+                                        libraryId: selectSwitchRowKeys[0],
+                                        appUid: bizUid
+                                    });
+                                    if (data) {
+                                        message.success('切换成功!');
+                                        getTitleList();
+                                        getList();
+                                        setOpenSwitchMaterial(false);
+                                    }
+                                },
+                                onCancel() {
+                                    console.log('Cancel');
+                                }
+                            });
                         }
                     }}
                 >
@@ -519,7 +548,15 @@ export const TableHeader = ({
     );
 };
 
-const MaterialLibraryDetail = () => {
+const MaterialLibraryDetail = ({
+    materialId,
+    mode = 'page',
+    isSelection = false
+}: {
+    materialId: number;
+    mode: 'preview' | 'page';
+    isSelection: boolean;
+}) => {
     const [columns, setColumns] = useState<any>([]);
     const [tableData, setTableData] = useState<any>([]);
     const [pluginConfig, setPluginConfig] = useState<any>(null);
@@ -546,7 +583,7 @@ const MaterialLibraryDetail = () => {
 
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-    const id = searchParams.get('id');
+    const id = (searchParams.get('id') || materialId) as string;
 
     const tableRef = useRef<any[]>([]);
     const actionRef = useRef<ActionType>();
@@ -764,8 +801,11 @@ const MaterialLibraryDetail = () => {
                     isDefault: true,
                     sorter: (a: any, b: any) => a.usedCount - b.usedCount,
                     renderText: (text: any) => text || 0
-                },
-                {
+                }
+            ];
+
+            if (mode === 'page') {
+                columnData.push({
                     title: '操作',
                     align: 'center',
                     dataIndex: 'operation',
@@ -799,8 +839,8 @@ const MaterialLibraryDetail = () => {
                             </Popconfirm>
                         </div>
                     )
-                }
-            ];
+                });
+            }
 
             setColumns(columnData);
         }
@@ -956,47 +996,52 @@ const MaterialLibraryDetail = () => {
 
     return (
         <div className="h-full">
-            <SubCard
-                contentSX={{
-                    p: '10px !important'
-                }}
-                sx={{ mb: '16px' }}
-            >
-                <div>
-                    <IconButton onClick={() => navigate('/material')} color="secondary">
-                        <KeyboardBackspace fontSize="small" />
-                    </IconButton>
-                    <span className="text-[#000c] font-[500]">素材中心</span>
-                </div>
-            </SubCard>
+            {mode === 'page' && (
+                <SubCard
+                    contentSX={{
+                        p: '10px !important'
+                    }}
+                    sx={{ mb: '16px' }}
+                >
+                    <div>
+                        <IconButton onClick={() => navigate('/material')} color="secondary">
+                            <KeyboardBackspace fontSize="small" />
+                        </IconButton>
+                        <span className="text-[#000c] font-[500]">素材中心</span>
+                    </div>
+                </SubCard>
+            )}
             <div className="bg-[#fff] rounded-md p-3 h-[calc(100%-80px)]">
-                <TableHeader
-                    name={detail?.name}
-                    iconUrl={detail?.iconUrl}
-                    setTitle={setTitle}
-                    setEditOpen={setEditOpen}
-                    setColOpen={setColOpen}
-                    selectedRowKeys={selectedRowKeys}
-                    handleBatchDel={handleBatchDel}
-                    libraryId={detail?.id}
-                    bizType={'MATERIAL_LIBRARY'}
-                    bizUid={detail?.uid}
-                    pluginConfig={pluginConfig}
-                    columns={columns}
-                    tableMeta={tableMeta}
-                    tableData={tableData}
-                    setSelectedRowKeys={setSelectRowKeys}
-                    getTitleList={() => setForceUpdateHeader(forceUpdateHeader + 1)}
-                    getList={() => setForceUpdate(forceUpdate + 1)}
-                    libraryType={detail?.createSource}
-                    canSwitch={false}
-                    canExecute={false}
-                    isShowField={true}
-                />
+                {mode === 'page' && (
+                    <TableHeader
+                        name={detail?.name}
+                        iconUrl={detail?.iconUrl}
+                        setTitle={setTitle}
+                        setEditOpen={setEditOpen}
+                        setColOpen={setColOpen}
+                        selectedRowKeys={selectedRowKeys}
+                        handleBatchDel={handleBatchDel}
+                        libraryId={detail?.id}
+                        bizType={'MATERIAL_LIBRARY'}
+                        bizUid={detail?.uid}
+                        pluginConfig={pluginConfig}
+                        columns={columns}
+                        tableMeta={tableMeta}
+                        tableData={tableData}
+                        setSelectedRowKeys={setSelectRowKeys}
+                        getTitleList={() => setForceUpdateHeader(forceUpdateHeader + 1)}
+                        getList={() => setForceUpdate(forceUpdate + 1)}
+                        libraryType={detail?.createSource}
+                        canSwitch={false}
+                        canExecute={false}
+                        isShowField={true}
+                    />
+                )}
 
                 <div className="material-detail-table overflow-hidden h-[calc(100%-96px)]">
                     {columns.filter((item: any) => !item.isDefault).length > 0 ? (
                         <TablePro
+                            isSelection={isSelection}
                             // key={forceUpdate}
                             handleEditColumn={handleEditColumn}
                             onUpdateColumn={handleUpdateColumn}

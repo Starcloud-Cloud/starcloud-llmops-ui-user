@@ -28,6 +28,7 @@ const { Option } = Select;
 const { Search } = Input;
 const { confirm } = Modal;
 import './index.scss';
+import MaterialLibraryDetail from './detail';
 
 export const IconRenderer = ({ value }: { value: string }) => {
     let SelectedIcon = value.includes('http') ? AppstoreOutlined : allIcons['AppstoreAddOutlined'];
@@ -59,6 +60,7 @@ const MaterialLibrary = ({
     const [copyLibraryOpen, setCopyLibraryOpen] = useState(false);
     const [copyType, setCopyType] = useState(0);
     const [current, setCurrent] = useState(1);
+    const [openPreview, setOpenPreview] = useState(false);
 
     const navigate = useNavigate();
     const actionRef = useRef<ActionType>();
@@ -427,11 +429,14 @@ const MaterialLibrary = ({
                         total: data.total
                     };
                 }}
-                onRow={(record) => {
+                onRow={(record: any) => {
+                    const handleOpenPreview = () => {
+                        setRecord(record);
+                        setOpenPreview(true);
+                    };
+
                     return {
-                        onClick: () => {
-                            mode === 'page' ? navigate(`/material/detail?id=${record.id}`) : null;
-                        }
+                        onClick: () => (mode === 'page' ? navigate(`/material/detail?id=${record.id}`) : handleOpenPreview())
                     };
                 }}
                 options={false}
@@ -538,6 +543,12 @@ const MaterialLibrary = ({
                     }}
                 >
                     <ProFormText required name="name" label="输入素材库名称" />
+                </ModalForm>
+            )}
+
+            {openPreview && (
+                <ModalForm submitter={false} width={1000} open={openPreview} onOpenChange={setOpenPreview} title={record.name}>
+                    <MaterialLibraryDetail materialId={record?.id} mode={'preview'} isSelection={true} />
                 </ModalForm>
             )}
         </div>

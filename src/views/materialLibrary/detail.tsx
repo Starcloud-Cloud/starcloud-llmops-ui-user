@@ -312,7 +312,9 @@ export const TableHeader = ({
         console.log(data, 'data');
         setPlugRecord({
             ...record,
-            ...data
+            ...data,
+            libraryUid,
+            pluginUid: record.uid
         });
     };
 
@@ -776,7 +778,6 @@ export const TableHeader = ({
                     handleAnalysis={() => null}
                     onOpenChange={setPlugConfigOpen}
                     open={plugConfigOpen}
-                    plugUid={plugUid}
                     record={plugRecord}
                 />
             )}

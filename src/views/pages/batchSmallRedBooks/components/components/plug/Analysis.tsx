@@ -22,14 +22,12 @@ const PlugAnalysis = ({
     handleAnalysis,
     onOpenChange,
     open,
-    plugUid,
     record
 }: {
     columns: any[];
     handleAnalysis: () => void;
     onOpenChange: any;
     open: any;
-    plugUid: string;
     record: any;
 }) => {
     const [execountLoading, setExecountLoading] = useState(false);
@@ -51,7 +49,7 @@ const PlugAnalysis = ({
     const handleExecute = async () => {
         setExecountLoading(true);
         const code = await plugExecute({
-            uuid: plugUid,
+            uuid: record.uid,
             inputParams: {
                 URL: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
             }
@@ -60,7 +58,7 @@ const PlugAnalysis = ({
             timer.current = setInterval(async () => {
                 const res = await plugexEcuteResult({
                     code,
-                    uuid: plugUid
+                    uuid: record.uid
                 });
                 if (res.status !== 'in_progress') {
                     setExecountLoading(false);
@@ -74,64 +72,71 @@ const PlugAnalysis = ({
     };
 
     useEffect(() => {
-        let data: any[] = [];
-        redList.forEach((redItem: any) => {
-            const value =
-                columns.find((item) => item.title === redItem.des)?.dataIndex ||
-                columns.find((item) => item.dataIndex === redItem.value)?.dataIndex;
-
-            data.push({
-                label: redItem.label,
-                label_key: redItem.value,
-                des: redItem.des,
-                value: value
-            });
-        });
-
-        const filterData = data.filter((item: any) => item.value);
-        const fieldList = filterData.map((item: any) => item.label_key);
-        const obj: any = {};
-        filterData.forEach((item: any) => {
-            obj[item.label_key] = item.value;
-        });
-
-        setRedBookData((pre: any) => ({
-            ...pre,
-            fieldList: fieldList,
-            bindFieldData: obj
-        }));
-        setData(data);
         return () => {
             clearInterval(timer.current);
         };
-    }, [columns]);
+    }, []);
 
-    // useEffect(() => {
-    //     const fieldMap = JSON.parse(record.fieldMap || '{}');
+    useEffect(() => {
+        if (!record?.fieldMap) {
+            let data: any[] = [];
+            redList.forEach((redItem: any) => {
+                const value =
+                    columns.find((item) => item.title === redItem.des)?.dataIndex ||
+                    columns.find((item) => item.dataIndex === redItem.value)?.dataIndex;
 
-    //     const data = redList.map((redItem: any, index: number) => {
-    //         return {
-    //             label: redItem.label,
-    //             label_key: redItem.value,
-    //             des: redItem.des,
-    //             value: columns.map((item) => item.dataIndex).includes(fieldMap?.[redItem.value]) ? fieldMap?.[redItem.value] : ''
-    //         };
-    //     });
+                data.push({
+                    label: redItem.label,
+                    label_key: redItem.value,
+                    des: redItem.des,
+                    value: value
+                });
+            });
 
-    //     const filterData = data.filter((item: any) => item.value);
-    //     const fieldList = filterData.map((item: any) => item.label_key);
-    //     const obj: any = {};
-    //     filterData.forEach((item: any) => {
-    //         obj[item.label_key] = item.value;
-    //     });
-    //     setRedBookData((pre: any) => ({
-    //         ...pre,
-    //         fieldList: fieldList,
-    //         bindFieldData: obj
-    //     }));
+            const filterData = data.filter((item: any) => item.value);
+            const fieldList = filterData.map((item: any) => item.label_key);
+            const obj: any = {};
+            filterData.forEach((item: any) => {
+                obj[item.label_key] = item.value;
+            });
 
-    //     setData(data);
-    // }, [columns]);
+            setRedBookData((pre: any) => ({
+                ...pre,
+                fieldList: fieldList,
+                bindFieldData: obj
+            }));
+            setData(data);
+        }
+    }, [columns, record]);
+
+    useEffect(() => {
+        if (record.fieldMap) {
+            const fieldMap = JSON.parse(record.fieldMap || '{}');
+
+            const data = redList.map((redItem: any, index: number) => {
+                return {
+                    label: redItem.label,
+                    label_key: redItem.value,
+                    des: redItem.des,
+                    value: columns.map((item) => item.dataIndex).includes(fieldMap?.[redItem.value]) ? fieldMap?.[redItem.value] : ''
+                };
+            });
+
+            const filterData = data.filter((item: any) => item.value);
+            const fieldList = filterData.map((item: any) => item.label_key);
+            const obj: any = {};
+            filterData.forEach((item: any) => {
+                obj[item.label_key] = item.value;
+            });
+            setRedBookData((pre: any) => ({
+                ...pre,
+                fieldList: fieldList,
+                bindFieldData: obj
+            }));
+
+            setData(data);
+        }
+    }, [columns, record]);
 
     return (
         <ModalForm

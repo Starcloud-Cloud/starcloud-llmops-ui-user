@@ -328,12 +328,7 @@ const BatcSmallRedBooks = forwardRef(
         };
         console.log(1231);
         return (
-            <div
-                style={{
-                    height: jsCookie.get('isClient') ? '100vh' : '100%'
-                }}
-                className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto"
-            >
+            <div className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto">
                 {!detail && (
                     <SubCard
                         contentSX={{

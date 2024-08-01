@@ -37,7 +37,7 @@ import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 import { schemeMetadata } from 'api/redBook/copywriting';
 import CreatePlan from 'views/pages/batchSmallRedBooks';
 import useUserStore from 'store/user';
-import SubCard from 'ui-component/cards/SubCard';
+import jsCookie from 'js-cookie';
 interface Items {
     label: string;
     value: string;
@@ -989,7 +989,7 @@ function CreateDetail() {
     console.log(1);
 
     return detail ? (
-        <Card sx={{ height: '100%', overflowY: 'auto', position: 'relative' }}>
+        <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={
@@ -1142,7 +1142,7 @@ function CreateDetail() {
                 >
                     <Tabs.TabPane tab=" 基础设置" key="0">
                         <div className="flex justify-center ">
-                            <div className="xl:w-[80%] lg:w-full">
+                            <div className="xl:w-[80%] lg:w-full md:w-full">
                                 <Basis
                                     detail={{
                                         name: detail?.name,
@@ -1164,8 +1164,9 @@ function CreateDetail() {
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
-                                className="h-[calc(100vh-210px)] overflow-y-auto mt-[-16px]"
+                                className="overflow-y-auto mt-[-16px]"
                                 style={{
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 210px)',
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
                                     backgroundRepeat: 'repeat'
@@ -1205,7 +1206,12 @@ function CreateDetail() {
                             <div className="w-full">
                                 {detail?.type === 'MEDIA_MATRIX' ? (
                                     <Spin spinning={viewLoading} tip="Loading">
-                                        <div className="h-[calc(100vh-220px)] bg-[rgb(244,246,248)]">
+                                        <div
+                                            style={{
+                                                height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 220px)'
+                                            }}
+                                            className="bg-[rgb(244,246,248)]"
+                                        >
                                             <CreatePlan
                                                 ref={createPlanRef}
                                                 imageStylePre={imageStylePre}
@@ -1265,14 +1271,24 @@ function CreateDetail() {
                     )}
                     {detailRef.current?.uid && searchParams.get('uid') && permissions.includes('app:analyze') && (
                         <Tabs.TabPane tab="应用分析" key="2">
-                            <div className="h-[calc(100vh-220px)] overflow-y-auto px-4">
+                            <div
+                                style={{
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 210px)'
+                                }}
+                                className="overflow-y-auto px-4"
+                            >
                                 <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
                             </div>
                         </Tabs.TabPane>
                     )}
                     {searchParams.get('uid') && permissions.includes('app:publish') && (
                         <Tabs.TabPane tab="应用发布" key="3">
-                            <div className="h-[calc(100vh-220px)] overflow-y-auto px-4">
+                            <div
+                                style={{
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 220px)'
+                                }}
+                                className="overflow-y-auto px-4"
+                            >
                                 <Upload
                                     appUid={searchParams.get('uid') as string}
                                     saveState={saveState}

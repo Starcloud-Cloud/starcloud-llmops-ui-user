@@ -542,6 +542,8 @@ const Lefts = ({
             setMessageOpen(true);
             setErrMessageList(newList);
             return false;
+        } else {
+            return true;
         }
     };
     //保存

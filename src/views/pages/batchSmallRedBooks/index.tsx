@@ -156,13 +156,17 @@ const BatcSmallRedBooks = forwardRef(
                         setBatchTotal(res.total);
                     });
                 }
-                const newList = _.cloneDeep(batchDataListRef.current);
-                newList[collIndexRef.current] = res.list;
-                console.log(newList, collIndexRef.current);
-
-                batchDataListRef.current = newList;
-                setBatchDataList(batchDataListRef.current);
-                setbatchOpen(false);
+                if (
+                    res.list?.every((item: any) => item.progress) ||
+                    res.list?.some((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE')
+                ) {
+                    const newList = _.cloneDeep(batchDataListRef.current);
+                    newList[collIndexRef.current] = res.list;
+                    console.log(newList, collIndexRef.current);
+                    batchDataListRef.current = newList;
+                    setBatchDataList(batchDataListRef.current);
+                    setbatchOpen(false);
+                }
             });
         };
         const [collapseActive, setcollapseActive] = useState<any[]>([]);

@@ -110,7 +110,7 @@ const AiCreate = ({
                 } else {
                     clearInterval(timeLoading.current);
                 }
-            }, 50);
+            }, 200);
         } else {
             clearInterval(timeLoading.current);
         }

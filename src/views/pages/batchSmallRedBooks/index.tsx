@@ -99,7 +99,6 @@ const BatcSmallRedBooks = forwardRef(
                 clearInterval(item);
             });
             batchOpenRef.current = true;
-            setBathOpen(batchOpenRef.current);
             await planExecute({ uid });
             const res = await batchPages({ batchPage, planUid: uid });
             setRightPage(rightPage + 1);
@@ -192,7 +191,6 @@ const BatcSmallRedBooks = forwardRef(
                         ) {
                             clearInterval(timer.current[0]);
                             batchOpenRef.current = false;
-                            setBathOpen(batchOpenRef.current);
                             setPre(pre + 1);
                             return;
                         }
@@ -215,7 +213,6 @@ const BatcSmallRedBooks = forwardRef(
                             ) {
                                 clearInterval(timer.current[0]);
                                 batchOpenRef.current = false;
-                                setBathOpen(batchOpenRef.current);
                                 setPre(pre + 1);
                                 return;
                             }
@@ -228,7 +225,6 @@ const BatcSmallRedBooks = forwardRef(
             }
         };
         const batchOpenRef = useRef(true);
-        const [bathOpen, setBathOpen] = useState(true);
         useEffect(() => {
             if (bathList?.length !== 0 && batchOpenRef.current) {
                 collIndexRef.current = 0;
@@ -260,7 +256,6 @@ const BatcSmallRedBooks = forwardRef(
                     }, 2000);
                 }
                 batchOpenRef.current = false;
-                setBathOpen(batchOpenRef.current);
             }
         }, [bathList]);
 
@@ -511,7 +506,6 @@ const BatcSmallRedBooks = forwardRef(
                                     getLists(pageNo);
                                 }, 2000);
                                 batchOpenRef.current = false;
-                                setBathOpen(batchOpenRef.current);
                             }}
                         />
                     </div>

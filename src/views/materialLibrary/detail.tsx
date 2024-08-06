@@ -878,18 +878,18 @@ const MaterialLibraryDetail = ({
                 }) || [];
             const columnData = [
                 {
-                    title: 'ID',
+                    title: '序号',
                     align: 'center',
                     className: 'align-middle',
-                    dataIndex: 'id',
+                    dataIndex: 'index',
                     isDefault: true,
-                    sorter: (a: any, b: any) => a.id - b.id,
+                    // sorter: (a: any, b: any) => a.id - b.id,
                     editable: () => {
                         return false;
                     },
                     width: 70,
-                    fixed: true
-                    // render: (_: any, row: any, index: number) => <span>{index + 1}</span>
+                    fixed: true,
+                    render: (_: any, row: any, index: number) => <span>{index + 1}</span>
                 },
                 ...newList,
                 {

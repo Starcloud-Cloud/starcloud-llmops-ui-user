@@ -113,7 +113,7 @@ const TablePro = ({
         onCell: (record: any, rowIndex: any) => ({
             onClick: () => {
                 if (
-                    item.dataIndex === 'id' ||
+                    item.dataIndex === 'index' ||
                     item.dataIndex === 'operation' ||
                     item.editType === EditType.Image ||
                     item.title === '使用次数'

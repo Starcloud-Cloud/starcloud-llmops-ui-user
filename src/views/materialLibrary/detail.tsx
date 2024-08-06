@@ -564,12 +564,12 @@ export const TableHeader = ({
                     onFinish={async () => {
                         const result = await checkMaterialLibrary({
                             libraryId: selectSwitchRowKeys[0],
-                            appUid: bizUid
+                            appUid
                         });
                         if (result) {
                             const data = await createMaterialLibraryAppBind({
                                 libraryId: selectSwitchRowKeys[0],
-                                appUid: bizUid
+                                appUid
                             });
                             if (data) {
                                 message.success('切换成功!');

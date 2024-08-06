@@ -479,7 +479,7 @@ export const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">微信公众号分析</div>
                         </div>
-                        <div
+                        {/* <div
                             onClick={() => {
                                 setPlugMarketOpen(true);
                             }}
@@ -507,7 +507,7 @@ export const TableHeader = ({
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">插件市场</div>
-                        </div>
+                        </div> */}
                     </Space>
                 </div>
                 <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
@@ -658,7 +658,10 @@ const MaterialLibraryDetail = ({
     const [pluginConfig, setPluginConfig] = useState<any>(null);
     const [detail, setDetail] = useState<any>(null);
     const [selectedRowKeys, setSelectRowKeys] = useState<any>([]);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState({
+        pageNo: 1,
+        pageSize: 20
+    });
     const [typeList, setTypeList] = useState<any[]>([]);
     const [canUpload, setCanUpload] = useState(true);
     const [forceUpdate, setForceUpdate] = useState(0);
@@ -941,8 +944,13 @@ const MaterialLibraryDetail = ({
             setColumns(columnData);
         }
     }, [canUpload, detail, tableDataOriginal, tableData]);
-    const getTableList = (data?: any, pageNum = 1) => {
-        getMaterialLibraryDataPage({ libraryId: id, sortingFields: data, pageSize: 20, pageNo: pageNum }).then((data) => {
+    const getTableList = (data?: any, pages?: number, pageSize?: number) => {
+        getMaterialLibraryDataPage({
+            libraryId: id,
+            sortingFields: data,
+            pageSize: pageSize || page.pageSize,
+            pageNo: pages || page.pageNo
+        }).then((data) => {
             setTableDataOriginal(data.list);
             setTotal(data.total);
             let newList: any = [];
@@ -971,7 +979,7 @@ const MaterialLibraryDetail = ({
         });
     };
     useEffect(() => {
-        getTableList(null, page);
+        getTableList(null, page.pageNo);
     }, [forceUpdate]);
 
     const handleDel = async (id: number) => {

@@ -191,7 +191,11 @@ const TablePro = ({
                             }
                         ];
                     }
-                    getList(param, pagination.current);
+                    setPage({
+                        pageNo: pagination.current,
+                        pageSize: pagination.pageSize
+                    });
+                    getList(param, pagination.current, pagination.pageSize);
                 }}
                 actionRef={actionRefs}
                 editableFormRef={actionRef}
@@ -204,10 +208,16 @@ const TablePro = ({
                         ? false
                         : {
                               total: total || tableData?.length,
-                              current: page,
-                              pageSize: 20,
-                              pageSizeOptions: [20, 50, 100, 300, 500],
-                              onChange: (page) => setPage(page)
+                              current: page.pageNo,
+                              pageSize: page.pageSize,
+                              showSizeChanger: true,
+                              pageSizeOptions: [20, 30, 50],
+                              onChange: (pageNo, pageSize) => {
+                                  setPage({
+                                      pageNo,
+                                      pageSize
+                                  });
+                              }
                           }
                 }
                 recordCreatorProps={false}

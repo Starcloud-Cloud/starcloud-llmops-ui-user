@@ -42,7 +42,7 @@ const LeftModalAdd = ({
     pluginConfig: string | null;
     tableLoading: boolean;
     actionRefs: any;
-    page: number;
+    page: any;
     total: number;
     columns: any[];
     tableMeta: any[];

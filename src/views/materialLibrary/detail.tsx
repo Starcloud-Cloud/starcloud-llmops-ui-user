@@ -23,10 +23,12 @@ import {
     Form,
     Modal,
     Empty,
-    Card,
+    Tabs,
     Divider,
-    Spin
+    Spin,
+    Table
 } from 'antd';
+import type { TableProps } from 'antd';
 import {
     checkMaterialLibrary,
     createMaterialLibraryAppBind,
@@ -60,6 +62,8 @@ import AiCreate from '../pages/batchSmallRedBooks/components/newAI';
 import React from 'react';
 import { imageOcr } from 'api/redBook/batchIndex';
 import DownMaterial from './components/downMaterial';
+import AddPlug from './components/addplug';
+import { CheckCard } from '@ant-design/pro-components';
 
 export enum EditType {
     String = 0,
@@ -144,6 +148,7 @@ export const TableHeader = ({
     const [uploadOpen, setUploadOpen] = useState(false);
     const [selectSwitchRowKeys, setSelectSwitchRowKeys] = React.useState<any[]>([]);
     const [sourceList, setSourceList] = useState<any[]>([]);
+    const [addOpen, setAddOpen] = useState(false);
 
     useEffect(() => {
         dictData('', 'material_create_source').then((res) => {
@@ -217,6 +222,42 @@ export const TableHeader = ({
         }
     };
 
+    const PlugColumns: TableProps<any>['columns'] = [
+        {
+            title: 'ID',
+            dataIndex: 'ID',
+            align: 'center'
+        },
+        {
+            title: '插件名称',
+            dataIndex: 'name',
+            align: 'center'
+        },
+        {
+            title: '使用场景',
+            dataIndex: 'secen',
+            align: 'center'
+        },
+        {
+            title: '发布到应用市场',
+            dataIndex: 'matket',
+            align: 'center'
+        },
+        {
+            title: '操作',
+            align: 'center',
+            render: (_, record, index) => (
+                <Space>
+                    <Button type="link">编辑</Button>
+                    <Button danger type="primary">
+                        删除
+                    </Button>
+                </Space>
+            )
+        }
+    ];
+    const [plugMarketOpen, setPlugMarketOpen] = useState(false);
+    const [plugTableData, setPlugTableData] = useState<any[]>([]);
     return (
         <div>
             <div className="flex  mb-4">
@@ -438,9 +479,37 @@ export const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">微信公众号分析</div>
                         </div>
+                        <div
+                            onClick={() => {
+                                setPlugMarketOpen(true);
+                            }}
+                            className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                        >
+                            <svg
+                                viewBox="0 0 1024 1024"
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                p-id="12640"
+                                width="20"
+                                height="20"
+                            >
+                                <path
+                                    d="M589.6 364.3c3 5 8.7 7.7 14.5 7l25.2-3.1c9.4-1.1 15.3-10.7 12.3-19.6l-28.4-82.8c-2.1-6-7.7-10.1-14.1-10.1H292.9c-6.2 0-11.7 3.8-13.9 9.5l-32 82.9c-3.5 9.2 2.6 19.2 12.4 20.2l28.8 2.9c5.8 0.6 11.4-2.2 14.4-7.3l1.6-2.8c20.2-34.2 31.2-42.8 35-44.9 3.9-2.2 16.6-7.2 51.7-7.2 3.3 0 6 0 8.3 0.1V574c-1.9 0.2-4.5 0.5-8.3 0.5h-33.5c-8.2 0-14.9 6.7-14.9 14.9v21.8c0 8.2 6.7 14.9 14.9 14.9h173.9c8.2 0 14.9-6.7 14.9-14.9v-21.8c0-8.2-6.7-14.9-14.9-14.9h-33.5c-3.7 0-6.5-0.3-8.3-0.8V310.4v-1c4.3-0.1 10-0.2 17.8-0.2 36.3 0 45.3 5.9 46.2 6.6 3.4 2.5 13.4 12 34.4 45.8l1.7 2.7z"
+                                    p-id="12641"
+                                ></path>
+                                <path
+                                    d="M880 112H144c-17.6 0-32 14.4-32 32v736c0 17.6 14.4 32 32 32h422.1c8.8 0 16-7.2 16-16v-40c0-8.8-7.2-16-16-16H184V184h656v389.6c0 8.8 7.2 16 16 16h40c8.8 0 16-7.2 16-16V144c0-17.6-14.4-32-32-32z"
+                                    p-id="12642"
+                                ></path>
+                                <path
+                                    d="M895.6 703.4h-97.8v-97.8c0-8.8-7.2-16-16-16H722c-8.8 0-16 7.2-16 16v97.8h-97.8c-8.8 0-16 7.2-16 16v59.8c0 8.8 7.2 16 16 16H706V893c0 8.8 7.2 16 16 16h59.8c8.8 0 16-7.2 16-16v-97.8h97.8c8.8 0 16-7.2 16-16v-59.8c0-8.8-7.2-16-16-16z"
+                                    p-id="12643"
+                                ></path>
+                            </svg>
+                            <div className="text-[12px] font-bold mt-1">插件市场</div>
+                        </div>
                     </Space>
                 </div>
-
                 <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
                     <Space>
                         {!isShowField && (
@@ -543,7 +612,34 @@ export const TableHeader = ({
                     </div>
                 </ModalForm>
             )}
+            <Modal width="60%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} title="插件市场">
+                <Tabs
+                    items={[
+                        {
+                            label: '插件市场',
+                            key: '1',
+                            children: (
+                                <div>
+                                    <div className="text-[16px] font-bold mb-4">1.场景内容一</div>
+                                    <CheckCard.Group size="small">
+                                        <CheckCard title={'插件一'} description={'我是描述'} value={'插件一'} />
+                                        <CheckCard title={'插件二'} description={'我是描述'} value={'插件二'} />
+                                        <CheckCard title={'插件三'} description={'我是描述'} value={'插件三'} />
+                                        <CheckCard title={'插件四'} description={'我是描述'} value={'插件四'} />
+                                    </CheckCard.Group>
+                                </div>
+                            )
+                        },
+                        {
+                            label: '我的插件',
+                            key: '2',
+                            children: <Table columns={PlugColumns} dataSource={plugTableData} />
+                        }
+                    ]}
+                ></Tabs>
+            </Modal>
             <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />
+            <AddPlug open={addOpen} setOpen={setAddOpen} />
         </div>
     );
 };

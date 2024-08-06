@@ -1,17 +1,21 @@
-import { Button } from 'antd';
+import { Button, Image } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Pagination } from 'swiper';
 
 const Swipers = ({ item }: { item: any }) => {
     const [swiperRef, setSwiperRef] = useState<any>(null);
     return (
-        <div className="w-full h-[330px] flex justify-center items-center aspect-[250/335] relative swiperImages m-auto">
+        <div
+            style={{
+                aspectRatio: item?.executeResult?.imageList?.length === 0 ? '263 / 351' : 'auto'
+            }}
+            className="relative swiperImages "
+        >
             <Swiper
                 onSwiper={(swiper) => {
                     setSwiperRef(swiper);
@@ -22,7 +26,7 @@ const Swipers = ({ item }: { item: any }) => {
                 loop
                 pagination={{ clickable: true }}
                 modules={[Pagination]}
-                className="mySwiper h-full"
+                className="mySwiper w-full h-full"
                 autoplay={{
                     delay: 2500,
                     disableOnInteraction: false
@@ -30,7 +34,7 @@ const Swipers = ({ item }: { item: any }) => {
             >
                 {item?.executeResult?.imageList?.map((el: any, index: number) => (
                     <SwiperSlide key={el?.url}>
-                        <img className="w-full h-full object-contain" src={el?.url} />
+                        <Image width={'100%'} height={'100%'} preview={false} src={el?.url} />
                     </SwiperSlide>
                 ))}
             </Swiper>
@@ -39,8 +43,9 @@ const Swipers = ({ item }: { item: any }) => {
                     <Button
                         icon={<KeyboardBackspaceIcon />}
                         shape="circle"
-                        onClick={() => {
+                        onClick={(e) => {
                             swiperRef?.slidePrev();
+                            e.stopPropagation();
                         }}
                     />
                     <Button
@@ -48,8 +53,9 @@ const Swipers = ({ item }: { item: any }) => {
                         style={{ marginLeft: '10px' }}
                         icon={<ArrowForwardIcon />}
                         shape="circle"
-                        onClick={() => {
+                        onClick={(e) => {
                             swiperRef?.slideNext();
+                            e.stopPropagation();
                         }}
                     />
                 </div>

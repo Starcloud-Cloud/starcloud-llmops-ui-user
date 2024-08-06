@@ -19,7 +19,10 @@ import { v4 as uuidv4 } from 'uuid';
 const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState({
+        pageNo: 1,
+        pageSize: 20
+    });
     const [total, setTotal] = useState(0);
     const [columns, setColumns] = useState<any[]>([]);
     const tableRef = useRef<any[]>([]);
@@ -194,15 +197,15 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 fixed: true,
                 render: (_: any, row: any, index: number) => <span>{index + 1}</span>
             },
-            {
-                title: 'ID',
-                dataIndex: 'id',
-                align: 'center',
-                width: 80,
-                isDefault: true,
-                renderText: (text: any) => text || 0,
-                sorter: (a: any, b: any) => a.usedCount - b.usedCount
-            },
+            // {
+            //     title: 'ID',
+            //     dataIndex: 'id',
+            //     align: 'center',
+            //     width: 80,
+            //     isDefault: true,
+            //     renderText: (text: any) => text || 0,
+            //     sorter: (a: any, b: any) => a.usedCount - b.usedCount
+            // },
             ...newList,
             {
                 title: '使用次数',
@@ -335,9 +338,9 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             handleEditColumn(result);
         }
     }, [selectImg]);
-    const getList = (data?: any, pageNo?: any) => {
+    const getList = (data?: any, pageNo?: any, pageSize?: any) => {
         setTableLoading(true);
-        getMaterialPage({ pageNo: pageNo || page, pageSize: 20, appUid, sortingFields: data }).then((res) => {
+        getMaterialPage({ pageNo: pageNo || page.pageNo, pageSize: pageSize || page.pageSize, appUid, sortingFields: data }).then((res) => {
             let newList: any = [];
             res.list.map((item: any) => {
                 let obj: any = _.cloneDeep(item);

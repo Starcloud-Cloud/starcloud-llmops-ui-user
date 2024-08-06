@@ -13,7 +13,7 @@ const PlanList = ({
     timeFailure: (data: number) => void;
 }) => {
     return (
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5">
+        <div className="w-full grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5">
             {batchDataList?.map((item: any, index: number) => (
                 <Goods
                     key={item.businessUid}

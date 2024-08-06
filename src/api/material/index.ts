@@ -130,9 +130,18 @@ export const delBatchMaterialLibrarySlice = (data: any) => {
 
 /**
  * 拷贝素材
- * @param data 
- * @returns 
+ * @param data
+ * @returns
  */
-export const copyMaterialLibrary= (data: any) => {
+export const copyMaterialLibrary = (data: any) => {
     return request.post({ url: '/llm/material-library/copy', data });
+};
+
+/**
+ * 校验拷贝素材
+ * @param data
+ * @returns
+ */
+export const checkMaterialLibrary = (data: any) => {
+    return request.post({ url: '/llm/material-library-table-column/validate-switch-bind', data });
 };

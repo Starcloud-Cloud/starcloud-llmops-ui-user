@@ -502,7 +502,50 @@ const Lefts = ({
         }
     }, [planState]);
     const [exeState, setExeState] = useState(false);
-    const handleVerify = () => {};
+    const [errMessageList, setErrMessageList] = useState<any[]>([]);
+    const [errMessageOpen, setMessageOpen] = useState(false);
+    const handleVerify = () => {
+        const List = generRef.current?.map((item: any) => {
+            if (item.flowStep.handler === 'CustomActionHandler') {
+                const GENERATE_MODE = item?.variable?.variables?.find((item: any) => item.field === 'GENERATE_MODE')?.value;
+                const REFERS = item?.variable?.variables?.find((item: any) => item.field === 'REFERS')?.value;
+                const REQUIREMENT = item?.variable?.variables?.find((item: any) => item.field === 'REQUIREMENT')?.value;
+                if (GENERATE_MODE === 'AI_PARODY' && !REFERS) {
+                    return `【${item.name}】中的参考数据最少有一个`;
+                } else if (GENERATE_MODE === 'AI_CUSTOM' && !REQUIREMENT) {
+                    return `【${item.name}】中文案生成要求必填`;
+                } else {
+                    return undefined;
+                }
+            } else if (item.flowStep.handler === 'AssembleActionHandler') {
+                const TITLE = item?.variable?.variables?.find((item: any) => item.field === 'TITLE')?.value;
+                const CONTENT = item?.variable?.variables?.find((item: any) => item.field === 'CONTENT')?.value;
+                if (!TITLE) {
+                    return `【${item.name}】中的标题必填`;
+                } else if (!CONTENT) {
+                    return `【${item.name}】中的内容必填`;
+                } else {
+                    return undefined;
+                }
+            } else if (item.flowStep.handler === 'VariableActionHandler') {
+                if (item?.variable?.variables?.length === 0) {
+                    return `【${item.name}】中的变量最少一个`;
+                } else if (!item?.variable?.variables?.every((i: any) => i.value)) {
+                    return `【${item.name}】中的值必填`;
+                } else {
+                    return undefined;
+                }
+            }
+        });
+        const newList = List.filter((item: any) => item);
+        if (newList.length > 0) {
+            setMessageOpen(true);
+            setErrMessageList(newList);
+            return false;
+        } else {
+            return true;
+        }
+    };
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
         // verifyList();
@@ -534,7 +577,9 @@ const Lefts = ({
                           (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                       )
             ];
-            newSave(data);
+            if (handleVerify()) {
+                newSave(data);
+            }
         } else {
             const newMem = imageRef.current
                 ? imageRef.current?.record
@@ -603,7 +648,9 @@ const Lefts = ({
                     setBotOpen(true);
                     return;
                 }
-                newSave(result);
+                if (handleVerify()) {
+                    newSave(result);
+                }
             }
             setExeState(false);
         }
@@ -1282,24 +1329,20 @@ const Lefts = ({
                     )}
                 </div>
 
-                {/* <Drawer title="错误信息" placement="right" onClose={() => {}} open={true} mask={false}>
+                <Drawer title="错误信息" placement="right" onClose={() => setMessageOpen(false)} open={errMessageOpen} mask={false}>
                     <List
                         itemLayout="horizontal"
-                        dataSource={[{}, {}, {}]}
+                        dataSource={errMessageList}
                         renderItem={(item, index) => (
                             <List.Item>
                                 <List.Item.Meta
-                                    title={11111111}
-                                    description={
-                                        <div className="text-xs text-[red]">
-                                            Ant Design, a design language for background applications, is refined by Ant UED Team
-                                        </div>
-                                    }
+                                    title={item.match(/\【([\s\S]+)\】/)[1]}
+                                    description={<div className="text-xs text-[red]">{item}</div>}
                                 />
                             </List.Item>
                         )}
                     />
-                </Drawer> */}
+                </Drawer>
             </div>
             {editOpens && (
                 <FormModal

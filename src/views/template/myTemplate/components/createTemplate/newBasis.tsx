@@ -8,6 +8,7 @@ import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import '../../index.css';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
+import jsCookie from 'js-cookie';
 export interface Anyevent {
     basisPre?: number;
     detail?: {
@@ -78,7 +79,12 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
         }
     }, [basisPre]);
     return (
-        <div className="h-[calc(100vh-325px)] overflow-y-auto mt-[-16px] pt-4">
+        <div
+            style={{
+                height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 325px)'
+            }}
+            className="overflow-y-auto mt-[-16px] pt-4"
+        >
             <TextField
                 color="secondary"
                 fullWidth

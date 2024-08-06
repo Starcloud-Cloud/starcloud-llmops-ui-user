@@ -163,7 +163,14 @@ const MaterialLibrary = ({
                         </div>
                         <div className="ml-2 flex flex-col">
                             <span
-                                onClick={mode === 'select' ? () => navigate(`/material/detail?id=${record.id}`) : () => null}
+                                onClick={
+                                    mode === 'select'
+                                        ? (e) => {
+                                              e.stopPropagation();
+                                              window.open(`/material/detail?id=${record.id}`);
+                                          }
+                                        : () => null
+                                }
                                 className="font-extrabold cursor-pointer"
                             >
                                 {record.name}

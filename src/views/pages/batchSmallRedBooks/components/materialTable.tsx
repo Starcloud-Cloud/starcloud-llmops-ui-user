@@ -194,15 +194,15 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 fixed: true,
                 render: (_: any, row: any, index: number) => <span>{index + 1}</span>
             },
-            {
-                title: 'ID',
-                dataIndex: 'id',
-                align: 'center',
-                width: 80,
-                isDefault: true,
-                renderText: (text: any) => text || 0,
-                sorter: (a: any, b: any) => a.usedCount - b.usedCount
-            },
+            // {
+            //     title: 'ID',
+            //     dataIndex: 'id',
+            //     align: 'center',
+            //     width: 80,
+            //     isDefault: true,
+            //     renderText: (text: any) => text || 0,
+            //     sorter: (a: any, b: any) => a.usedCount - b.usedCount
+            // },
             ...newList,
             {
                 title: '使用次数',

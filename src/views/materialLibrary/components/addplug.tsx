@@ -1,10 +1,11 @@
-import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio } from 'antd';
+import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio, Tag } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import { DownOutlined, SisternodeOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
-import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish } from 'api/redBook/plug';
+import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
 const AddPlug = ({
     open,
@@ -26,7 +27,10 @@ const AddPlug = ({
     const [form] = Form.useForm();
     const { TextArea } = Input;
     const { Option } = Select;
+    const navigate = useNavigate();
 
+    const timer = useRef<any>(null);
+    const [status, setStatus] = useState('');
     const [accountList, setAccountList] = useState<any[]>([]);
     const [botList, setBotList] = useState<any[]>([]);
     const [bindData, setBindData] = useState({
@@ -36,12 +40,18 @@ const AddPlug = ({
     });
     const getBotList = async (label: string, value: any) => {
         if (label === 'spaceId') {
+            console.log(value, form.getFieldValue('accessTokenId'));
+
             if (value && form.getFieldValue('accessTokenId')) {
-                const res = await spaceBots({
-                    accessTokenId: form.getFieldValue('accessTokenId'),
-                    spaceId: value
-                });
-                setBotList(res.space_bots);
+                try {
+                    const res = await spaceBots({
+                        accessTokenId: form.getFieldValue('accessTokenId'),
+                        spaceId: value
+                    });
+                    setBotList(res.space_bots);
+                } catch (err) {
+                    console.log(err);
+                }
             }
         } else {
             if (value && form.getFieldValue('spaceId')) {
@@ -64,6 +74,7 @@ const AddPlug = ({
                 accessTokenId: undefined,
                 entityUid: result.botId,
                 cozeTokenId: result.accessTokenId,
+                verifyState: status === 'success' ? true : false,
                 uid: rows.uid
             });
             message.success('编辑成功');
@@ -72,10 +83,9 @@ const AddPlug = ({
                 ...result,
                 botId: undefined,
                 accessTokenId: undefined,
-                entityUid: '7398039516847767602',
-                cozeTokenId: '1'
-                // entityUid:result.botId ,
-                // cozeTokenId: result.accessTokenId,
+                entityUid: result.botId,
+                verifyState: status === 'success' ? true : false,
+                cozeTokenId: result.accessTokenId
             });
             message.success('新增成功');
         }
@@ -99,6 +109,7 @@ const AddPlug = ({
                 botId: rows.entityUid,
                 accessTokenId: rows.cozeTokenId
             });
+            getBotList('spaceId', rows.entityUid);
         }
     }, [rows]);
 
@@ -181,7 +192,12 @@ const AddPlug = ({
                 <Form.Item label="使用场景" name="scene" initialValue={'DATA_ADDED'}>
                     <CheckCard.Group size="small">
                         {sceneList.map((item) => (
-                            <CheckCard disabled={rows ? true : false} title={item.label} description={item.label} value={item.value} />
+                            <CheckCard
+                                disabled={rows ? true : false}
+                                title={item.label}
+                                description={item.description}
+                                value={item.value}
+                            />
                         ))}
                     </CheckCard.Group>
                 </Form.Item>
@@ -195,20 +211,30 @@ const AddPlug = ({
                             return firstInputValue === 'coze' ? (
                                 <>
                                     <Space wrap={true}>
-                                        <Form.Item
-                                            className="w-[400px]"
-                                            label="Coze 绑定的账号"
-                                            name="accessTokenId"
-                                            rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
-                                        >
-                                            <Select onChange={(e) => getBotList('accessTokenId', e)}>
-                                                {accountList?.map((item) => (
-                                                    <Option key={item.id} value={item.id}>
-                                                        {item.nickname}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
+                                        <div>
+                                            <Form.Item
+                                                className="w-[400px]"
+                                                label="Coze 绑定的账号"
+                                                name="accessTokenId"
+                                                rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
+                                            >
+                                                <Select onChange={(e) => getBotList('accessTokenId', e)}>
+                                                    {accountList?.map((item) => (
+                                                        <Option key={item.id} value={item.id.toString()}>
+                                                            {item.nickname}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </Form.Item>
+                                            {accountList?.length === 0 && (
+                                                <div
+                                                    className="text-xs text-[#673ab7] hover:underline cursor-pointer ml-[137px] mt-[-20px]"
+                                                    onClick={() => navigate('/user/account-profile/profile?type=2')}
+                                                >
+                                                    没有账号？去绑定
+                                                </div>
+                                            )}
+                                        </div>
                                         <Form.Item
                                             className="w-[400px]"
                                             label="空间 ID"
@@ -232,15 +258,21 @@ const AddPlug = ({
                                             </Select>
                                         </Form.Item>
                                     </Space>
-                                    <Button
-                                        type="primary"
-                                        onClick={async () => {
-                                            await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
-                                            setPlugOpen(true);
-                                        }}
-                                    >
-                                        验证执行结果
-                                    </Button>
+                                    <Space align="end">
+                                        验证状态：
+                                        <Tag color={status}>
+                                            {status === 'success' ? '校验成功' : status === 'error' ? '检验失败' : '待校验'}
+                                        </Tag>
+                                        <Button
+                                            type="primary"
+                                            onClick={async () => {
+                                                // await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
+                                                setPlugOpen(true);
+                                            }}
+                                        >
+                                            验证执行结果
+                                        </Button>
+                                    </Space>
                                 </>
                             ) : null;
                         }}
@@ -261,31 +293,45 @@ const AddPlug = ({
             <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
                 <Form labelCol={{ span: 6 }}>
                     <Form.Item label="机器人名称">
-                        <div>({botList?.find((item) => item.bot_id)?.bot_name})</div>
+                        <div className="font-bold">{botList?.find((item) => item.bot_id)?.bot_name}</div>
                     </Form.Item>
                     <Form.Item label="Coze参数验证">
-                        <Space>
-                            <Input value={bindData.content} onChange={(e) => setBindData({ ...bindData, content: e.target.value })} />
+                        <div className="flex gap-2 items-center">
+                            <TextArea
+                                className="w-full"
+                                placeholder="可输入触发机器人的对话"
+                                rows={4}
+                                value={bindData.content}
+                                onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
+                            />
                             <Button
                                 loading={bindLoading}
                                 onClick={async () => {
                                     setBindLoading(true);
                                     try {
                                         const res = await plugVerify({
-                                            botId: '7398039516847767602',
-                                            accessTokenId: '1',
-                                            content: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
-                                            // accessTokenId: form.getFieldValue('accessTokenId'),
-                                            // content: bindData.content,
-                                            // botId: form.getFieldValue('botId')
+                                            accessTokenId: form.getFieldValue('accessTokenId'),
+                                            content: bindData.content,
+                                            botId: form.getFieldValue('botId')
                                         });
-                                        setBindData({
-                                            ...bindData,
-                                            arguments: JSON.stringify(res.arguments),
-                                            output: JSON.stringify(res.output)
-                                        });
-                                        setBindLoading(false);
+                                        timer.current = setInterval(async () => {
+                                            const result = await plugVerifyResult({
+                                                code: res,
+                                                accessTokenId: form.getFieldValue('accessTokenId')
+                                            });
+                                            if (result.verifyState) {
+                                                clearInterval(timer.current);
+                                                setStatus('success');
+                                                setBindData({
+                                                    ...bindData,
+                                                    arguments: JSON.stringify(result.arguments),
+                                                    output: JSON.stringify(result.output)
+                                                });
+                                                setBindLoading(false);
+                                            }
+                                        }, 2000);
                                     } catch (err) {
+                                        setStatus('error');
                                         setBindLoading(false);
                                     }
                                 }}
@@ -293,10 +339,10 @@ const AddPlug = ({
                             >
                                 绑定验证
                             </Button>
-                        </Space>
+                        </div>
                     </Form.Item>
                     <Form.Item label="验证状态">
-                        <div className="text-xs"></div>
+                        <Tag color={status}>{status === 'success' ? '校验成功' : status === 'error' ? '检验失败' : '待校验'}</Tag>
                     </Form.Item>
                     <Form.Item label="入参数据示例">
                         <TextArea value={bindData.arguments} disabled rows={6} />

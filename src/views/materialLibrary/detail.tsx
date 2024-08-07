@@ -66,6 +66,7 @@ import { imageOcr } from 'api/redBook/batchIndex';
 import DownMaterial from './components/downMaterial';
 import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
+import dayjs from 'dayjs';
 
 export enum EditType {
     String = 0,
@@ -229,7 +230,7 @@ export const TableHeader = ({
     const PlugColumns: TableProps<any>['columns'] = [
         {
             title: '插件名称',
-            width: 400,
+            width: 200,
             dataIndex: 'pluginName',
             align: 'center'
         },
@@ -242,6 +243,21 @@ export const TableHeader = ({
             title: '发布到应用市场',
             align: 'center',
             render: (_, row) => <Tag color="processing">{row.published ? '是' : '否'}</Tag>
+        },
+        {
+            title: '发布到应用市场',
+            align: 'center',
+            render: (_, row) => <Tag color="processing">{row.published ? '是' : '否'}</Tag>
+        },
+        {
+            title: '创建时间',
+            align: 'center',
+            render: (_, row) => dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')
+        },
+        {
+            title: '创建人',
+            align: 'center',
+            dataIndex: 'creator'
         },
         {
             title: '操作',

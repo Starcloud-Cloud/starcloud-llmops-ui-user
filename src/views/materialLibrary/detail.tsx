@@ -245,11 +245,6 @@ export const TableHeader = ({
             render: (_, row) => <Tag color="processing">{row.published ? '是' : '否'}</Tag>
         },
         {
-            title: '发布到应用市场',
-            align: 'center',
-            render: (_, row) => <Tag color="processing">{row.published ? '是' : '否'}</Tag>
-        },
-        {
             title: '创建时间',
             align: 'center',
             render: (_, row) => dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')

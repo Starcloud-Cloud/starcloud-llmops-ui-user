@@ -30,7 +30,8 @@ const AddPlug = ({
     const navigate = useNavigate();
 
     const timer = useRef<any>(null);
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState('gold');
+    const [errmessage, seterrmessage] = useState('');
     const [accountList, setAccountList] = useState<any[]>([]);
     const [botList, setBotList] = useState<any[]>([]);
     const [bindData, setBindData] = useState({
@@ -40,16 +41,17 @@ const AddPlug = ({
     });
     const getBotList = async (label: string, value: any) => {
         if (label === 'spaceId') {
-            console.log(value, form.getFieldValue('accessTokenId'));
-
             if (value && form.getFieldValue('accessTokenId')) {
                 try {
                     const res = await spaceBots({
                         accessTokenId: form.getFieldValue('accessTokenId'),
                         spaceId: value
                     });
+                    seterrmessage('');
                     setBotList(res.space_bots);
-                } catch (err) {
+                } catch (err: any) {
+                    seterrmessage(err.msg);
+                    form.setFieldValue('botId', '');
                     console.log(err);
                 }
             }
@@ -109,6 +111,7 @@ const AddPlug = ({
                 botId: rows.entityUid,
                 accessTokenId: rows.cozeTokenId
             });
+            setStatus(rows.verifyState ? 'success' : 'error');
             getBotList('spaceId', rows.entityUid);
         }
     }, [rows]);
@@ -190,12 +193,11 @@ const AddPlug = ({
                     <Input />
                 </Form.Item>
                 <Form.Item label="使用场景" name="scene" initialValue={'DATA_ADDED'}>
-                    <CheckCard.Group size="small">
+                    <CheckCard.Group disabled={rows ? true : false} size="small">
                         {sceneList.map((item) => (
                             <CheckCard
-                                disabled={rows ? true : false}
                                 title={item.label}
-                                description={item.description}
+                                description={<div className="line-clamp-2 h-[44px]">{item.description}</div>}
                                 value={item.value}
                             />
                         ))}
@@ -243,20 +245,25 @@ const AddPlug = ({
                                         >
                                             <Input onBlur={async (e) => getBotList('spaceId', e.target.value)} />
                                         </Form.Item>
-                                        <Form.Item
-                                            className="w-[400px]"
-                                            label="选择 Coze 机器人"
-                                            name="botId"
-                                            rules={[{ required: true, message: 'Bot 必填' }]}
-                                        >
-                                            <Select>
-                                                {botList.map((item) => (
-                                                    <Option key={item.bot_id} value={item.bot_id}>
-                                                        {item.bot_name}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
+                                        <div>
+                                            <Form.Item
+                                                className="w-[400px]"
+                                                label="选择 Coze 机器人"
+                                                name="botId"
+                                                rules={[{ required: true, message: 'Bot 必填' }]}
+                                            >
+                                                <Select>
+                                                    {botList.map((item) => (
+                                                        <Option key={item.bot_id} value={item.bot_id}>
+                                                            {item.bot_name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </Form.Item>
+                                            {errmessage && (
+                                                <div className="text-xs text-[#ff4d4f]  ml-[137px] mt-[-20px]">{errmessage}</div>
+                                            )}
+                                        </div>
                                     </Space>
                                     <Space align="end">
                                         验证状态：
@@ -266,7 +273,7 @@ const AddPlug = ({
                                         <Button
                                             type="primary"
                                             onClick={async () => {
-                                                // await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
+                                                await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
                                                 setPlugOpen(true);
                                             }}
                                         >

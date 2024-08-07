@@ -224,6 +224,7 @@ const HeaderField = ({
                         columns={materialColumns}
                         value={tableData}
                         pagination={false}
+                        controlled
                         recordCreatorProps={{
                             newRecordType: 'dataSource',
                             record: () => ({
@@ -296,6 +297,7 @@ const HeaderField = ({
                                     }
                                 })
                             });
+                            getList();
                             headerSave && headerSave();
                             setPattern && setPattern(tableData);
                             // setColOpen(false);

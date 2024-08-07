@@ -687,7 +687,7 @@ export const TableHeader = ({
                                 <div>
                                     <CheckCard.Group size="small">
                                         {plugMarketList?.map((item) => (
-                                            <div>
+                                            <div key={item.uid}>
                                                 <div className="my-4 text-[16px] font-bold">
                                                     {sceneList?.find((i) => i.value === item.scene)?.label}
                                                 </div>

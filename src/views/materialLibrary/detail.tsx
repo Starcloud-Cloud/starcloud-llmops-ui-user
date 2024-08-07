@@ -26,7 +26,8 @@ import {
     Tabs,
     Divider,
     Spin,
-    Table
+    Table,
+    Switch
 } from 'antd';
 import type { TableProps } from 'antd';
 import {
@@ -41,6 +42,7 @@ import {
     updateMaterialLibrarySlice,
     updateMaterialLibraryTitle
 } from 'api/material';
+import { delOwner, publishedList, ownerListList, detailPlug, metadataData } from 'api/redBook/plug';
 import { createBatchMaterial, updateBatchMaterial } from 'api/redBook/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
@@ -222,42 +224,94 @@ export const TableHeader = ({
         }
     };
 
+    const [plugMarketList, setPlugMarketList] = useState<any[]>([]);
+    const [rows, setRows] = useState<any>(null);
     const PlugColumns: TableProps<any>['columns'] = [
         {
-            title: 'ID',
-            dataIndex: 'ID',
-            align: 'center'
-        },
-        {
             title: '插件名称',
-            dataIndex: 'name',
+            width: 400,
+            dataIndex: 'pluginName',
             align: 'center'
         },
         {
             title: '使用场景',
-            dataIndex: 'secen',
-            align: 'center'
+            align: 'center',
+            render: (_, row) => <Tag color="processing">{sceneList?.find((i) => i.value === row.scene)?.label}</Tag>
         },
         {
             title: '发布到应用市场',
-            dataIndex: 'matket',
-            align: 'center'
+            align: 'center',
+            render: (_, row) => <Tag color="processing">{row.published ? '是' : '否'}</Tag>
         },
         {
             title: '操作',
             align: 'center',
+            width: 150,
             render: (_, record, index) => (
                 <Space>
-                    <Button type="link">编辑</Button>
-                    <Button danger type="primary">
-                        删除
+                    <Button
+                        onClick={async () => {
+                            const res = await detailPlug(record.uid);
+                            setRows(res);
+                            setAddOpen(true);
+                        }}
+                        type="link"
+                    >
+                        编辑
                     </Button>
+                    <Popconfirm
+                        title="提示"
+                        description="请再次确认是否删除"
+                        onConfirm={async () => {
+                            await delOwner(record.uid);
+                            getTablePlugList();
+                        }}
+                        okText="确定"
+                        cancelText="取消"
+                    >
+                        <Button danger type="link">
+                            删除
+                        </Button>
+                    </Popconfirm>
                 </Space>
             )
         }
     ];
     const [plugMarketOpen, setPlugMarketOpen] = useState(false);
     const [plugTableData, setPlugTableData] = useState<any[]>([]);
+
+    const [sceneList, setSceneList] = useState<any[]>([]);
+    const [wayList, setWayList] = useState<any[]>([]);
+    const grupList = (list: any) => {
+        const groupedByType = list.reduce((acc: any, item: any) => {
+            const { scene } = item;
+            if (!acc[scene]) {
+                acc[scene] = { scene, children: [] };
+            }
+            acc[scene].children.push(item);
+            return acc;
+        }, {});
+        return Object.values(groupedByType);
+    };
+    const getPlugList = async () => {
+        // await metadataData();
+        const res = await publishedList();
+        const newRes = grupList(res);
+        console.log(newRes);
+        setPlugMarketList(newRes);
+    };
+    const getTablePlugList = async () => {
+        const result = await ownerListList();
+        setPlugTableData(result);
+    };
+    useEffect(() => {
+        metadataData().then((res: any) => {
+            setSceneList(res.scene);
+            setWayList(res.platform);
+        });
+        getPlugList();
+        getTablePlugList();
+    }, []);
     return (
         <div>
             <div className="flex  mb-4">
@@ -479,7 +533,7 @@ export const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">微信公众号分析</div>
                         </div>
-                        {/* <div
+                        <div
                             onClick={() => {
                                 setPlugMarketOpen(true);
                             }}
@@ -507,7 +561,7 @@ export const TableHeader = ({
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">插件市场</div>
-                        </div> */}
+                        </div>
                     </Space>
                 </div>
                 <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
@@ -612,7 +666,7 @@ export const TableHeader = ({
                     </div>
                 </ModalForm>
             )}
-            <Modal width="60%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} title="插件市场">
+            <Modal width="60%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
                 <Tabs
                     items={[
                         {
@@ -620,12 +674,22 @@ export const TableHeader = ({
                             key: '1',
                             children: (
                                 <div>
-                                    <div className="text-[16px] font-bold mb-4">1.场景内容一</div>
                                     <CheckCard.Group size="small">
-                                        <CheckCard title={'插件一'} description={'我是描述'} value={'插件一'} />
-                                        <CheckCard title={'插件二'} description={'我是描述'} value={'插件二'} />
-                                        <CheckCard title={'插件三'} description={'我是描述'} value={'插件三'} />
-                                        <CheckCard title={'插件四'} description={'我是描述'} value={'插件四'} />
+                                        {plugMarketList?.map((item) => (
+                                            <div>
+                                                <div className="my-4 text-[16px] font-bold">
+                                                    {sceneList?.find((i) => i.value === item.scene)?.label}
+                                                </div>
+                                                {item.children?.map((el: any) => (
+                                                    <CheckCard
+                                                        key={el.uid}
+                                                        title={el.pluginName}
+                                                        description={sceneList?.find((i) => i.value === el.scene)?.label}
+                                                        value={el.uid}
+                                                    />
+                                                ))}
+                                            </div>
+                                        ))}
                                     </CheckCard.Group>
                                 </div>
                             )
@@ -633,13 +697,32 @@ export const TableHeader = ({
                         {
                             label: '我的插件',
                             key: '2',
-                            children: <Table columns={PlugColumns} dataSource={plugTableData} />
+                            children: (
+                                <div>
+                                    <div className="flex justify-end mb-4">
+                                        <Button onClick={() => setAddOpen(true)} type="primary">
+                                            创建插件
+                                        </Button>
+                                    </div>
+                                    <Table rowKey={'uid'} columns={PlugColumns} dataSource={plugTableData} />
+                                </div>
+                            )
                         }
                     ]}
                 ></Tabs>
             </Modal>
             <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />
-            <AddPlug open={addOpen} setOpen={setAddOpen} />
+            {addOpen && (
+                <AddPlug
+                    open={addOpen}
+                    setOpen={setAddOpen}
+                    wayList={wayList}
+                    sceneList={sceneList}
+                    rows={rows}
+                    setRows={setRows}
+                    getTablePlugList={getTablePlugList}
+                />
+            )}
         </div>
     );
 };

@@ -1,68 +1,106 @@
-import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox } from 'antd';
+import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import { DownOutlined, SisternodeOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
-const AddPlug = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean) => void }) => {
+import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish } from 'api/redBook/plug';
+import _ from 'lodash-es';
+const AddPlug = ({
+    open,
+    setOpen,
+    wayList,
+    sceneList,
+    rows,
+    setRows,
+    getTablePlugList
+}: {
+    open: boolean;
+    setOpen: (data: boolean) => void;
+    wayList: any[];
+    sceneList: any[];
+    rows: any;
+    setRows: (data: any) => void;
+    getTablePlugList: () => void;
+}) => {
     const [form] = Form.useForm();
     const { TextArea } = Input;
-    const sceneList = [
-        {
-            label: '数据新增',
-            value: 1
-        },
-        {
-            label: '数据补齐',
-            value: 2
-        },
-        {
-            label: '数据提取',
-            value: 3
-        },
-        {
-            label: '数据修改',
-            value: 4
-        },
-        {
-            label: '图片分析',
-            value: 5
+    const { Option } = Select;
+
+    const [accountList, setAccountList] = useState<any[]>([]);
+    const [botList, setBotList] = useState<any[]>([]);
+    const [bindData, setBindData] = useState({
+        content: '',
+        arguments: '',
+        output: ''
+    });
+    const getBotList = async (label: string, value: any) => {
+        if (label === 'spaceId') {
+            if (value && form.getFieldValue('accessTokenId')) {
+                const res = await spaceBots({
+                    accessTokenId: form.getFieldValue('accessTokenId'),
+                    spaceId: value
+                });
+                setBotList(res.space_bots);
+            }
+        } else {
+            if (value && form.getFieldValue('spaceId')) {
+                const res = await spaceBots({
+                    accessTokenId: value,
+                    spaceId: form.getFieldValue('spaceId')
+                });
+                setBotList(res.space_bots);
+            }
         }
-    ];
-    const wayList = [
-        {
-            label: 'coze',
-            value: 1
-        },
-        {
-            label: '应用市场',
-            value: 2
-        }
-    ];
-    const accountList = [
-        {
-            label: '账号 1',
-            value: 1
-        },
-        {
-            label: '账号 2',
-            value: 2
-        }
-    ];
-    const botList = [
-        {
-            label: '机器人 1',
-            value: 1
-        },
-        {
-            label: '机器人 2',
-            value: 2
-        }
-    ];
+    };
     const handleOk = async () => {
         const result = await form.validateFields();
-        console.log(result);
+        if (rows) {
+            await plugPublish(rows.uid);
+            message.success('发布成功');
+            await modifyPlug({
+                ...result,
+                botId: undefined,
+                accessTokenId: undefined,
+                entityUid: result.botId,
+                cozeTokenId: result.accessTokenId,
+                uid: rows.uid
+            });
+            message.success('编辑成功');
+        } else {
+            await createPlug({
+                ...result,
+                botId: undefined,
+                accessTokenId: undefined,
+                entityUid: '7398039516847767602',
+                cozeTokenId: '1'
+                // entityUid:result.botId ,
+                // cozeTokenId: result.accessTokenId,
+            });
+            message.success('新增成功');
+        }
+
+        setRows(null);
+        setOpen(false);
+        form.resetFields();
+        getTablePlugList();
     };
+
+    useEffect(() => {
+        cozePage({ pageNo: 1, pageSize: 100 }).then((res) => {
+            const newList = res.list?.filter((item: any) => item.type === 35);
+            setAccountList(newList);
+        });
+    }, []);
+    useEffect(() => {
+        if (rows) {
+            form.setFieldsValue({
+                ...rows,
+                botId: rows.entityUid,
+                accessTokenId: rows.cozeTokenId
+            });
+        }
+    }, [rows]);
 
     const typeList = [
         { label: 'String', value: 'String' },
@@ -125,62 +163,176 @@ const AddPlug = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean) =>
     const [bindLoading, setBindLoading] = useState(false);
 
     return (
-        <Modal title="插件配置" width={'60%'} onOk={handleOk} open={open} onCancel={() => setOpen(false)}>
-            <Form form={form} labelCol={{ span: 6 }}>
-                <Form.Item label="插件名称" name="name" rules={[{ required: true, message: '插件名称必填' }]}>
+        <Modal
+            title="插件配置"
+            width={'60%'}
+            footer={false}
+            open={open}
+            onCancel={() => {
+                setOpen(false);
+                setRows(null);
+                form.resetFields();
+            }}
+        >
+            <Form form={form} labelCol={{ span: 4 }}>
+                <Form.Item label="插件名称" name="pluginName" rules={[{ required: true, message: '插件名称必填' }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item label="使用场景" name="scene" initialValue={1}>
+                <Form.Item label="使用场景" name="scene" initialValue={'DATA_ADDED'}>
                     <CheckCard.Group size="small">
                         {sceneList.map((item) => (
-                            <CheckCard title={item.label} description={item.label} value={item.value} />
+                            <CheckCard disabled={rows ? true : false} title={item.label} description={item.label} value={item.value} />
                         ))}
                     </CheckCard.Group>
                 </Form.Item>
                 <Form.Item label="实现方式">
-                    <Form.Item name="way" initialValue={1}>
-                        <CheckCard.Group size="small">
-                            {wayList.map((item) => (
-                                <CheckCard title={item.label} description={item.label} value={item.value} />
-                            ))}
-                        </CheckCard.Group>
+                    <Form.Item name="type" initialValue={'coze'}>
+                        <Radio.Group size="small" options={wayList} disabled={rows ? true : false} />
                     </Form.Item>
-                    <Space wrap={true}>
-                        <Form.Item
-                            className="w-[310px]"
-                            label="Coze 绑定的账号"
-                            name="account"
-                            rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
-                        >
-                            <Select options={accountList} />
-                        </Form.Item>
-                        <Form.Item label="空间 ID" name="spaceID" rules={[{ required: true, message: '空间 ID必填' }]}>
-                            <Input />
-                        </Form.Item>
-                        <Form.Item
-                            className="w-[310px]"
-                            label="选择 Coze 机器人"
-                            name="bot"
-                            rules={[{ required: true, message: 'Bot 必填' }]}
-                        >
-                            <Select options={botList} />
-                        </Form.Item>
-                    </Space>
-                    <Button type="primary" onClick={() => setPlugOpen(true)}>
-                        验证执行结果返回结果
-                    </Button>
+                    <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}>
+                        {({ getFieldValue }) => {
+                            const firstInputValue = getFieldValue('type');
+                            return firstInputValue === 'coze' ? (
+                                <>
+                                    <Space wrap={true}>
+                                        <Form.Item
+                                            className="w-[400px]"
+                                            label="Coze 绑定的账号"
+                                            name="accessTokenId"
+                                            rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
+                                        >
+                                            <Select onChange={(e) => getBotList('accessTokenId', e)}>
+                                                {accountList?.map((item) => (
+                                                    <Option key={item.id} value={item.id}>
+                                                        {item.nickname}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item
+                                            className="w-[400px]"
+                                            label="空间 ID"
+                                            name="spaceId"
+                                            rules={[{ required: true, message: '空间 ID必填' }]}
+                                        >
+                                            <Input onBlur={async (e) => getBotList('spaceId', e.target.value)} />
+                                        </Form.Item>
+                                        <Form.Item
+                                            className="w-[400px]"
+                                            label="选择 Coze 机器人"
+                                            name="botId"
+                                            rules={[{ required: true, message: 'Bot 必填' }]}
+                                        >
+                                            <Select>
+                                                {botList.map((item) => (
+                                                    <Option key={item.bot_id} value={item.bot_id}>
+                                                        {item.bot_name}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                    </Space>
+                                    <Button
+                                        type="primary"
+                                        onClick={async () => {
+                                            await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
+                                            setPlugOpen(true);
+                                        }}
+                                    >
+                                        验证执行结果
+                                    </Button>
+                                </>
+                            ) : null;
+                        }}
+                    </Form.Item>
                 </Form.Item>
-                <Form.Item label="入参数据示例" name="result">
-                    <TextArea rows={6} />
+                <Form.Item label="入参数据示例" name="input">
+                    <TextArea disabled rows={6} />
                 </Form.Item>
-                <Form.Item label="出参数据示例" name="res">
-                    <TextArea rows={6} />
+                <Form.Item label="出参数据示例" name="output">
+                    <TextArea disabled rows={6} />
                 </Form.Item>
-                <Form.Item label="发布到应用市场" name="switch" valuePropName="checked" initialValue={true}>
-                    <Switch />
-                </Form.Item>
+                {rows && (
+                    <Form.Item label="发布到应用市场" name="published" valuePropName="checked" initialValue={false}>
+                        <Switch />
+                    </Form.Item>
+                )}
             </Form>
-            <div className="tree">
+            <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
+                <Form labelCol={{ span: 6 }}>
+                    <Form.Item label="机器人名称">
+                        <div>({botList?.find((item) => item.bot_id)?.bot_name})</div>
+                    </Form.Item>
+                    <Form.Item label="Coze参数验证">
+                        <Space>
+                            <Input value={bindData.content} onChange={(e) => setBindData({ ...bindData, content: e.target.value })} />
+                            <Button
+                                loading={bindLoading}
+                                onClick={async () => {
+                                    setBindLoading(true);
+                                    try {
+                                        const res = await plugVerify({
+                                            botId: '7398039516847767602',
+                                            accessTokenId: '1',
+                                            content: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
+                                            // accessTokenId: form.getFieldValue('accessTokenId'),
+                                            // content: bindData.content,
+                                            // botId: form.getFieldValue('botId')
+                                        });
+                                        setBindData({
+                                            ...bindData,
+                                            arguments: JSON.stringify(res.arguments),
+                                            output: JSON.stringify(res.output)
+                                        });
+                                        setBindLoading(false);
+                                    } catch (err) {
+                                        setBindLoading(false);
+                                    }
+                                }}
+                                type="primary"
+                            >
+                                绑定验证
+                            </Button>
+                        </Space>
+                    </Form.Item>
+                    <Form.Item label="验证状态">
+                        <div className="text-xs"></div>
+                    </Form.Item>
+                    <Form.Item label="入参数据示例">
+                        <TextArea value={bindData.arguments} disabled rows={6} />
+                        <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
+                    </Form.Item>
+                    <Form.Item label="出参数据示例">
+                        <TextArea value={bindData.output} disabled rows={6} />
+                        <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
+                    </Form.Item>
+                </Form>
+                <div className="flex justify-center">
+                    <Button
+                        className="w-[100px]"
+                        disabled={!bindData.output && !bindData.arguments ? true : false}
+                        onClick={() => {
+                            form.setFieldValue('input', bindData.arguments);
+                            form.setFieldValue('output', bindData.output);
+                            setBindData({
+                                content: '',
+                                arguments: '',
+                                output: ''
+                            });
+                            setPlugOpen(false);
+                        }}
+                        type="primary"
+                    >
+                        确认
+                    </Button>
+                </div>
+            </Modal>
+            <div className="flex justify-center">
+                <Button onClick={handleOk} type="primary" className="w-[100px]">
+                    保存
+                </Button>
+            </div>
+            {/* <div className="tree">
                 <Tree
                     showLine
                     selectable={false}
@@ -263,37 +415,7 @@ const AddPlug = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean) =>
                 }}
             >
                 新增
-            </Button>
-            <Modal width="60%" title="绑定验证" open={plugOpen} onCancel={() => setPlugOpen(false)}>
-                <Form labelCol={{ span: 6 }}>
-                    <Form.Item label="机器人名称">
-                        <div>(验证状态)</div>
-                    </Form.Item>
-                    <Form.Item label="Coze参数验证">
-                        <Space>
-                            <Input />
-                            <Button
-                                loading={bindLoading}
-                                onClick={() => {
-                                    setBindLoading(true);
-                                }}
-                                type="primary"
-                            >
-                                绑定验证
-                            </Button>
-                        </Space>
-                    </Form.Item>
-                    {/* <div className='text-xs text-black/50'></div> */}
-                    <Form.Item label="入参数据示例">
-                        <TextArea rows={6} />
-                        <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
-                    </Form.Item>
-                    <Form.Item label="出参数据示例">
-                        <TextArea rows={6} />
-                        <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
-                    </Form.Item>
-                </Form>
-            </Modal>
+            </Button> */}
         </Modal>
     );
 };

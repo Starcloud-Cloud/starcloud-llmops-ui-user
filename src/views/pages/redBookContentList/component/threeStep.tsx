@@ -205,7 +205,6 @@ const ThreeStep = ({
     const [saveLoading, setSaveLoading] = useState(false);
     const [aginLoading, setAginLoading] = useState(false);
     const timer = useRef<any>(null);
-    const [fieldHead, setFieldHead] = useState(null);
     return (
         <div
             className="h-full"
@@ -239,7 +238,7 @@ const ThreeStep = ({
                             {/* {jsCookie.get('isClient')&&
                             <Button>加入代发布列表</Button>
                             } */}
-                            <Button onClick={doRetry}>重新生成</Button>
+                            {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
                                 <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                     编辑
@@ -528,8 +527,6 @@ const ThreeStep = ({
                         detailShow={false}
                         data={data}
                         saveLoading={saveLoading}
-                        setFieldHead={setFieldHead}
-                        fieldHead={fieldHead}
                         newSave={async (data: any) => {
                             try {
                                 setSaveLoading(true);

@@ -1,0 +1,21 @@
+.swiperImage {
+    display: none !important;
+}
+
+.swiperImages:hover .swiperImage {
+    display: block !important;
+}
+
+.gu .ant-skeleton-image-svg {
+    display: none;
+}
+
+.ant-select-dropdown {
+    z-index: 9999 !important;
+}
+
+.tree {
+    .ant-tree-treenode {
+        width: 740px;
+    }
+}

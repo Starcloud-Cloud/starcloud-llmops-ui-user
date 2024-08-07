@@ -4,9 +4,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import { memo } from 'react';
 const TextExtraction = ({
-    requirementList,
     textData,
-    setRequirementList,
     setTextData,
     checkedList,
     selListLength,
@@ -14,9 +12,7 @@ const TextExtraction = ({
     setSelOpen,
     handleTextData
 }: {
-    requirementList: any[];
     textData: any;
-    setRequirementList: (data: any) => void;
     setTextData: (data: any) => void;
     checkedList: any[];
     selListLength: number;
@@ -25,52 +21,40 @@ const TextExtraction = ({
     handleTextData: (num: number) => void;
 }) => {
     const handleAdd = () => {
-        let newList = _.cloneDeep(requirementList);
-        newList = [...requirementList, { title: undefined, value: undefined }];
-        setRequirementList(newList);
+        let newList = _.cloneDeep(textData.requirementList);
+        newList = [...textData.requirementList, { title: '', value: '' }];
+        setTextData({
+            ...textData,
+            requirementList: newList
+        });
     };
     const handleEdit = (title: string, value: string, index: number) => {
-        const newList = _.cloneDeep(requirementList);
+        const newList = _.cloneDeep(textData.requirementList);
         newList[index] = {
             ...newList[index],
             [title]: value
         };
-        setRequirementList(newList);
+        setTextData({
+            ...textData,
+            requirementList: newList
+        });
     };
     const handleDel = (index: number) => {
-        const newList = _.cloneDeep(requirementList);
+        let newList = _.cloneDeep(textData.requirementList);
         newList.splice(index, 1);
-        setRequirementList(newList);
+        setTextData({
+            ...textData,
+            requirementList: newList
+        });
     };
     const handleExe = (num: number) => {
         if (!textData.checkedFieldList) {
             return false;
         }
-        if (requirementList.length === 0 || requirementList.some((item: any) => !item.title)) {
-            return false;
-        }
-        const arr = requirementList?.map((item) => item.title);
-        if (new Set(arr).size !== arr.length) {
-            return false;
-        }
-        if (textData.fieldList.length === 0) {
-            return false;
-        }
-        let flag = false;
-        textData.fieldList?.map((item: any) => {
-            if (textData.bindFieldData[textData[item]]) {
-                flag = false;
-            } else {
-                flag = true;
-            }
-        });
-        if (flag) {
+        if (textData.requirementList.length === 0 || textData.requirementList.some((item: any) => !item.value)) {
             return false;
         }
         handleTextData(num);
-    };
-    const fieldState = (title: string) => {
-        return requirementList?.filter((el) => el.title === title)?.length >= 2;
     };
     return (
         <div>
@@ -92,22 +76,36 @@ const TextExtraction = ({
             </Radio.Group>
             {!textData.checkedFieldList && <div className="text-xs text-[#ff4d4f] ml-[5px]">选择需要提取的字段</div>}
             <div className="text-[16px] font-bold my-4">2.写出相提取的字段和内容要求</div>
-            {requirementList.length === 0 && <div className="text-xs text-[#ff4d4f] ml-[5px]">最少添加一个内容和要求</div>}
+            {textData.requirementList.length === 0 && <div className="text-xs text-[#ff4d4f] ml-[5px]">最少添加一个内容和要求</div>}
             <Row gutter={[16, 16]} align={'top'}>
-                {requirementList?.map((item: any, index: number) => (
+                {textData.requirementList?.map((item: any, index: number) => (
                     <>
-                        <Col span={9}>
+                        <Col span={15}>
                             <Input
-                                status={fieldState(item.title) || !item.title ? 'error' : ''}
                                 value={item.title}
                                 onChange={(e) => handleEdit('title', e.target.value, index)}
-                                placeholder="字段描述"
+                                placeholder="想提取内容的要求"
                             />
-                            {fieldState(item.title) && <span className="text-xs text-[#ff4d4f] ml-[5px]">字段描述不能重复</span>}
-                            {!item.title && <span className="text-xs text-[#ff4d4f] ml-[5px]">字段描述必填</span>}
                         </Col>
-                        <Col span={13}>
-                            <Input value={item.value} onChange={(e) => handleEdit('value', e.target.value, index)} placeholder="字段要求" />
+                        <Col span={7}>
+                            <Select
+                                placeholder="写入到"
+                                status={!item.value ? 'error' : ''}
+                                allowClear
+                                value={item.value}
+                                onChange={(e) => handleEdit('value', e, index)}
+                                className="w-full"
+                            >
+                                {checkedList?.map((item) => (
+                                    <Option
+                                        disabled={textData.requirementList.map((i: any) => i.value).includes(item.dataIndex)}
+                                        value={item.dataIndex}
+                                    >
+                                        {item.title}
+                                    </Option>
+                                ))}
+                            </Select>
+                            {!item.value && <span className="text-xs text-[#ff4d4f] ml-[5px]">此选项必填</span>}
                         </Col>
                         <Col span={2}>
                             <Button onClick={() => handleDel(index)} type="text" danger shape="circle" icon={<DeleteOutlined />} />
@@ -118,54 +116,7 @@ const TextExtraction = ({
             <Button className="mt-4" onClick={handleAdd} type="primary" icon={<PlusOutlined />}>
                 增加
             </Button>
-            <div className="text-[16px] font-bold my-4">3. 绑定内容提取的字段</div>
-            <Checkbox.Group
-                key={JSON.stringify(requirementList)}
-                value={textData.fieldList}
-                onChange={(data) => {
-                    setTextData({
-                        ...textData,
-                        fieldList: data
-                    });
-                }}
-            >
-                {requirementList?.map((item: any, i: number) => (
-                    <div key={String(item.title) + i} className="mb-4">
-                        <Checkbox key={String(item.title) + i} value={item.title}>
-                            {item.title}
-                        </Checkbox>
-                        <div className="flex items-center">
-                            <span className="text-xs">绑定字段：</span>
-                            <Select
-                                status={textData.fieldList.includes(item.title) && !textData.bindFieldData[item.title] ? 'error' : ''}
-                                value={textData.bindFieldData[item.title]}
-                                onChange={(e) => {
-                                    setTextData({
-                                        ...textData,
-                                        bindFieldData: {
-                                            ...textData.bindFieldData,
-                                            [item.title]: e
-                                        }
-                                    });
-                                }}
-                                className="w-[100px]"
-                            >
-                                {checkedList?.map((item) => (
-                                    <Option key={item.dataIndex} value={item.dataIndex}>
-                                        {item.title}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </div>
-                        {textData.fieldList.includes(item.title) && !textData.bindFieldData[item.title] ? (
-                            <span className="text-xs text-[#ff4d4f] ml-[4px] h-[22px]">该字段为必填项</span>
-                        ) : (
-                            <div className="h-[22px]"> </div>
-                        )}
-                    </div>
-                ))}
-            </Checkbox.Group>
-            <div className="text-[16px] font-bold my-4">4. 如何处理素材</div>
+            <div className="text-[16px] font-bold my-4">3. 如何处理素材</div>
             <Button className="mb-4" type="primary" size="small" onClick={() => setSelOpen(true)}>
                 选择素材
             </Button>
@@ -195,7 +146,6 @@ const TextExtraction = ({
 };
 const memoTextExtraction = (pre: any, next: any) => {
     return (
-        _.isEqual(pre.requirementList, next.requirementList) &&
         _.isEqual(pre.textData, next.textData) &&
         _.isEqual(pre.checkedList, next.checkedList) &&
         _.isEqual(pre.selListLength, next.selListLength) &&

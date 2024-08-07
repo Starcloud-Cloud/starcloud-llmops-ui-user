@@ -1,7 +1,7 @@
-import { Modal, Button, Table, Progress, Tag } from 'antd';
+import { Modal, Button, Table, Progress, Tag, Image } from 'antd';
 import { useEffect, useMemo, useState, useRef, memo } from 'react';
-import { materialGenerate, customMaterialGenerate, pluginsXhsOcr, extraction } from 'api/redBook/batchIndex';
-import { v4 as uuidv4 } from 'uuid';
+import { materialGenerate, customMaterialGenerate, pluginsXhsOcr, extraction, imageOcr, plugChat, plugList } from 'api/redBook/batchIndex';
+import { templateUpdate } from 'api/redBook/material';
 import _ from 'lodash-es';
 import './aiCreate.css';
 import AICreates from './components/AICreate';
@@ -9,44 +9,41 @@ import FieldCompletion from './components/fieldCompletion';
 import RedBookAnalysis from './components/redBookAnalysis';
 import ImgOcr from './components/imgOcr';
 import TextExtraction from './components/textExtraction';
+import PlugModal from './components/plugModal';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+import { EditType } from 'views/materialLibrary/detail';
+import '../../../materialLibrary/index.scss';
 const AiCreate = ({
+    libraryId,
+    bizType,
+    bizUid,
+    pluginConfig,
     plugValue,
-    materialType,
     columns,
-    MokeList,
     tableData,
-    setPage,
-    setcustom,
-    setField,
     downTableData,
     setSelectedRowKeys,
-    setFieldCompletionData,
-    fieldCompletionData,
-    setVariableData,
-    variableData,
-    setPlugOpen
+    setPlugOpen,
+    getTitleList
 }: {
+    libraryId: string;
+    bizType: string;
+    bizUid: string;
+    pluginConfig: string | null;
     plugValue: string | null;
-    materialType: any;
     columns: any[];
-    MokeList: any[];
     tableData: any[];
-    setPage: (data: any) => void;
-    setcustom?: (data: any) => void;
-    setField?: (data: any) => void;
     downTableData: (data: any, num: number) => void;
     setSelectedRowKeys: (data: any) => void;
-    fieldCompletionData: any;
-    setFieldCompletionData: (data: any) => void;
-    variableData: any;
-    setVariableData: (data: any) => void;
     setPlugOpen: (data: boolean) => void;
+    getTitleList: () => void;
 }) => {
     const checkedList = useMemo(() => {
-        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 'image' && item.type !== 'document');
+        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type !== 5 && item.type !== 6 && !item.isDefault);
     }, [columns]);
     const imgCheckedList = useMemo(() => {
-        return columns?.slice(1, columns?.length - 1)?.filter((item) => item.type === 'image');
+        return columns?.filter((item) => item.type === 5);
     }, [columns]);
     const allColumns = useMemo(() => {
         return columns?.slice(1, columns?.length - 1);
@@ -54,8 +51,11 @@ const AiCreate = ({
     //AI 字段补齐
     const [selOpen, setSelOpen] = useState(false);
     const [selList, setSelList] = useState<any[]>([]);
+    const [selKeyList, setSelKeyList] = useState<any[]>([]);
     const rowSelection = {
+        selectedRowKeys: selKeyList,
         onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+            setSelKeyList(selectedRowKeys);
             setSelList(selectedRows);
         }
     };
@@ -84,149 +84,50 @@ const AiCreate = ({
     const retryNumRef = useRef(0);
     const retryListRef = useRef<any[]>([]);
     const xhsListRef = useRef<any[]>([]);
-    const materialPre = useMemo(() => {
-        return ((successCountRef.current / totalCountRef.current) * 100) | 0;
-    }, [successCount, totalCount]);
-    const aref = useRef(false);
-    const handleMaterial = async (num: number, retry?: boolean) => {
-        if (!retry) {
-            materialzanListRef.current = [];
-            setMaterialzanList(materialzanListRef.current);
-            uuidListsRef.current = [];
-            setUuidLists(uuidListsRef.current);
-        }
-        aref.current = false;
-        setMaterialExecutionOpen(true);
-        //记录原有数据下标
-        const indexList: any[] = [];
-        let theStaging = _.cloneDeep(tableData);
-        if (retry) {
-            tableData?.map((item, index) => {
-                if (retryListRef.current?.find((el) => el.uuid === item.uuid)) {
-                    indexList.push(index);
-                }
-            });
-        } else if (num === 1) {
-            tableData?.map((item, index) => {
-                if (selList?.find((el) => el.uuid === item.uuid)) {
-                    indexList.push(index);
-                }
-            });
-        } else {
-            tableData?.map((item, index) => {
-                indexList.push(index);
-            });
-        }
-        if (!retry) {
-            totalCountRef.current = num === 1 ? selList.length : tableData.length;
-            setTotalCount(totalCountRef.current);
-        }
-        let index = 0;
-        const chunks = chunkArray(retry ? retryListRef.current : num === 1 ? selList : tableData, 3);
-        retryListRef.current = [];
-        while (index < chunks.length && !aref.current) {
-            const resArr: any[] = [];
-            const newResArr: any[] = [];
-            const uuidList: any[] = [];
-            const currentBatch = chunks.slice(index, index + 3);
-            // try {
-            executionCountRef.current = currentBatch?.flat()?.length;
-            setExecutionCount(executionCountRef.current);
 
-            await Promise.all(
-                currentBatch.map(async (group, i) => {
-                    try {
-                        const res = await materialGenerate({
-                            materialList: group,
-                            fieldList: MokeList,
-                            ...fieldCompletionData
-                        });
-                        if (!aref.current) {
-                            newResArr.push(
-                                ...group.map((dt, t) => ({
-                                    ...dt,
-                                    ...(res[t] ? res[t] : {})
-                                }))
-                            );
-                            // if (res?.length === group?.length) {
-                            //     resArr[index + i] = res;
-                            // } else if (res?.length !== group?.length && res.length === 1) {
-                            //     resArr[index + i] = [...res, {}, {}];
-                            // } else if (res?.length !== group?.length && res.length === 2) {
-                            //     resArr[index + i] = [...res, {}];
-                            // } else {
-                            //     resArr[index + i] = res;
-                            // }
-                            executionCountRef.current = executionCountRef.current - group?.length;
-                            successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
-                            setSuccessCount(successCountRef.current);
-                        }
-                    } catch (error: any) {
-                        const newRetry = _.cloneDeep(retryListRef.current);
-                        newRetry.push(...group);
-                        retryListRef.current = newRetry;
-                        group?.map((item) => {
-                            if (!resArr[index + i]) {
-                                resArr[index + i] = [{}];
-                            } else {
-                                resArr[index + i].push({});
-                            }
-                        });
-                        console.log(error);
-                        const newList = _.cloneDeep(errorMessageRef.current);
-                        newList.push(error.msg);
-                        errorMessageRef.current = newList;
-                        setErrorMessage(errorMessageRef.current);
-                        executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
-                        errorCountRef.current += group?.length;
-                        if (errorCountRef.current >= 9) {
-                            aref.current = true;
-                        }
-                        setErrorCount(errorCountRef.current);
-                    }
-                })
-            );
-            if (!aref.current) {
-                const newArr = _.cloneDeep(materialzanListRef.current);
-                console.log(newArr, currentBatch, resArr);
-                // for (let i = 0; i < currentBatch.flat().length; i++) {
-                //     const obj: any = {};
-                //     resArr.flat()[i] &&
-                //         Object.keys(resArr.flat()[i]).map((item) => {
-                //             obj[item] = resArr.flat()[i][item];
-                //         });
-                //     newArr.push(obj);
-                //     uuidList.push(newList[indexList[i + index * 3]]?.uuid);
-                //     newList[indexList[i + index * 3]] = {
-                //         ...newList[indexList[i + index * 3]],
-                //         ...obj
-                //     };
-                // }
-                const updatedMaterialzanList = [...materialzanListRef.current, ...newResArr];
-                materialzanListRef.current = updatedMaterialzanList;
-                setMaterialzanList(materialzanListRef.current);
-                uuidListsRef.current = materialzanListRef.current?.map((item) => item.uuid);
-                setUuidLists(uuidListsRef.current);
-                materialFieldexeDataRef.current = theStaging?.map((item) => {
-                    const arrinclude = materialzanListRef.current.find((el) => el.uuid === item.uuid);
-                    if (arrinclude) {
-                        return arrinclude;
-                    } else {
-                        return item;
-                    }
-                });
-                index += 3;
-            }
-        }
-        executionCountRef.current = 0;
-        setExecutionCount(executionCountRef.current);
-    };
+    const preeNum = useRef(0);
+    const [prenum, setPrenum] = useState(0);
+    const materialPre = useMemo(() => {
+        return ((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current;
+    }, [successCount, totalCount, prenum]);
+    const aref = useRef(false);
     //loading 弹窗
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
+    const timeLoading = useRef<any>(null);
+    const grupPre = useRef(0);
+    useEffect(() => {
+        if (materialExecutionOpen) {
+            const newNum = grupPre.current || executionCountRef.current || 1;
+            console.log(newNum, totalCountRef.current);
 
-    //素材预览
+            const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
+            timeLoading.current = setInterval(() => {
+                console.log(newNum, preeNum.current, newSuccessNum);
+
+                if (preeNum.current < newSuccessNum - 1) {
+                    preeNum.current += 1;
+                    setPrenum(preeNum.current);
+                } else {
+                    clearInterval(timeLoading.current);
+                }
+            }, 200);
+        } else {
+            clearInterval(timeLoading.current);
+        }
+    }, [materialExecutionOpen, executionCount]);
+    useEffect(() => {
+        if (successCount || errorCount) {
+            preeNum.current = 0;
+            setPrenum(preeNum.current);
+            clearInterval(timeLoading.current);
+            console.log(11111, preeNum.current);
+        }
+        return () => {
+            clearInterval(timeLoading.current);
+        };
+    }, [successCount, errorCount]);
+
+    //素材生成
     const getTextStream = async (retry?: boolean) => {
         if (!retry) {
             materialzanListRef.current = [];
@@ -250,28 +151,28 @@ const AiCreate = ({
         }
         retryNumRef.current = 0;
         let index = 0;
-        // let theStaging = _.cloneDeep(tableData);
         while (index < chunks?.length && !aref.current) {
             const resArr: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             executionCountRef.current = currentBatch?.flat()?.length;
+            grupPre.current = (executionCountRef.current / 3) | 0 || 1;
             setExecutionCount(executionCountRef.current);
             await Promise.all(
                 currentBatch.map(async (group, i) => {
                     try {
-                        const res = await customMaterialGenerate({ ...variableData, fieldList: MokeList, generateCount: group?.length });
+                        const res = await customMaterialGenerate({ ...variableData, bizType, bizUid, generateCount: group?.length });
                         if (!aref.current) {
                             const timers = new Date().getTime();
                             const newMaterialzan = _.cloneDeep(materialzanListRef.current);
-                            const newRes = res?.map((item: any) => ({ ...item, uuid: uuidv4(), type: materialType, group: timers }));
+                            const newRes = res?.map((item: any) => ({ ...item, group: timers }));
                             newMaterialzan.push(...newRes);
                             resArr.push(...newRes);
                             materialzanListRef.current = newMaterialzan;
                             setMaterialzanList(materialzanListRef.current);
                             executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
                             setSuccessCount(successCountRef.current);
+                            setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         }
                     } catch (error: any) {
                         console.log(error);
@@ -283,7 +184,7 @@ const AiCreate = ({
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
+                        setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         errorCountRef.current += group?.length;
                         if (errorCountRef.current >= 9) {
                             aref.current = true;
@@ -292,18 +193,113 @@ const AiCreate = ({
                     }
                 })
             );
-            // let newList = _.cloneDeep(theStaging);
-            // newList.unshift(...resArr);
-            // theStaging = _.cloneDeep(newList);
-            if (!aref.current) {
-                const newL = _.cloneDeep(uuidListsRef.current);
-                newL?.push(...resArr?.map((item) => item.uuid));
-                uuidListsRef.current = newL;
-                setUuidLists(uuidListsRef.current);
-            }
-
-            // downTableData(theStaging);
             index += 3;
+        }
+        executionCountRef.current = 0;
+        setExecutionCount(executionCountRef.current);
+    };
+    //字段补齐
+    const handleMaterial = async (num: number, retry?: boolean) => {
+        if (!retry) {
+            materialzanListRef.current = [];
+            setMaterialzanList(materialzanListRef.current);
+            uuidListsRef.current = [];
+            setUuidLists(uuidListsRef.current);
+        }
+        aref.current = false;
+        setMaterialExecutionOpen(true);
+        //记录原有数据下标
+        const indexList: any[] = [];
+        if (retry) {
+            tableData?.map((item, index) => {
+                if (retryListRef.current?.find((el) => el.id === item.id)) {
+                    indexList.push(index);
+                }
+            });
+        } else if (num === 1) {
+            tableData?.map((item, index) => {
+                if (selList?.find((el) => el.id === item.id)) {
+                    indexList.push(index);
+                }
+            });
+        } else {
+            tableData?.map((item, index) => {
+                indexList.push(index);
+            });
+        }
+        if (!retry) {
+            totalCountRef.current = num === 1 ? selList.length : tableData.length;
+            setTotalCount(totalCountRef.current);
+        }
+        let index = 0;
+        const chunks = chunkArray(retry ? retryListRef.current : num === 1 ? selList : tableData, 3);
+        retryListRef.current = [];
+        while (index < chunks.length && !aref.current) {
+            const resArr: any[] = [];
+            const newResArr: any[] = [];
+            const currentBatch = chunks.slice(index, index + 3);
+            // try {
+            executionCountRef.current = currentBatch?.flat()?.length;
+            grupPre.current = (executionCountRef.current / 3) | 0 || 1;
+            setExecutionCount(executionCountRef.current);
+
+            await Promise.all(
+                currentBatch.map(async (group, i) => {
+                    try {
+                        const res = await materialGenerate({
+                            materialList: group,
+                            bizType,
+                            bizUid,
+                            ...fieldCompletionData
+                        });
+                        if (!aref.current) {
+                            newResArr.push(
+                                ...group.map((dt, t) => ({
+                                    ...dt,
+                                    ...(res[t] ? res[t] : {})
+                                }))
+                            );
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            successCountRef.current += group?.length;
+                            setSuccessCount(successCountRef.current);
+                            setTimeout(() => setExecutionCount(executionCountRef.current), 1);
+                        }
+                    } catch (error: any) {
+                        const newRetry = _.cloneDeep(retryListRef.current);
+                        newRetry.push(...group);
+                        retryListRef.current = newRetry;
+                        group?.map((item) => {
+                            if (!resArr[index + i]) {
+                                resArr[index + i] = [{}];
+                            } else {
+                                resArr[index + i].push({});
+                            }
+                        });
+                        console.log(error);
+                        const newList = _.cloneDeep(errorMessageRef.current);
+                        newList.push(error.msg);
+                        errorMessageRef.current = newList;
+                        setErrorMessage(errorMessageRef.current);
+                        executionCountRef.current -= group?.length;
+                        setTimeout(() => setExecutionCount(executionCountRef.current), 1);
+                        errorCountRef.current += group?.length;
+                        if (errorCountRef.current >= 9) {
+                            aref.current = true;
+                        }
+                        setErrorCount(errorCountRef.current);
+                    }
+                })
+            );
+            if (!aref.current) {
+                const newArr = _.cloneDeep(materialzanListRef.current);
+                console.log(newArr, currentBatch, resArr);
+                const updatedMaterialzanList = [...materialzanListRef.current, ...newResArr];
+                materialzanListRef.current = updatedMaterialzanList;
+                setMaterialzanList(materialzanListRef.current);
+                uuidListsRef.current = materialzanListRef.current?.map((item) => item.id);
+                setUuidLists(uuidListsRef.current);
+                index += 3;
+            }
         }
         executionCountRef.current = 0;
         setExecutionCount(executionCountRef.current);
@@ -346,11 +342,7 @@ const AiCreate = ({
         }
         aref.current = false;
         setMaterialExecutionOpen(true);
-        console.log(redBookData.requirement);
-
         let requirementData = redBookData.requirement?.split(/[,\n\r，]+/).filter(Boolean);
-        console.log(requirementData);
-
         let chunks;
         if (!retry) {
             totalCountRef.current = requirementData?.length;
@@ -365,6 +357,9 @@ const AiCreate = ({
             const resArr: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             executionCountRef.current = currentBatch?.flat()?.length;
+            grupPre.current = (executionCountRef.current / 3) | 0 || 1;
+            console.log(executionCountRef.current, grupPre.current);
+
             setExecutionCount(executionCountRef.current);
             await Promise.all(
                 currentBatch.map(async (group, i) => {
@@ -377,17 +372,18 @@ const AiCreate = ({
                             const obj: any = {};
                             newCheckbox.forEach((dt) => {
                                 obj[selectData[dt]] = res[dt]?.url || res[dt];
+                                obj[selectData[dt] + '_extend'] = res[dt]?.data;
+                                obj[selectData[dt] + '_tags'] = res[dt]?.tag;
+                                obj[selectData[dt] + '_description'] = res[dt]?.content;
                             });
-                            obj.uuid = uuidv4();
-                            console.log(obj);
                             newMaterialzan.push(obj);
                             resArr.push(obj);
                             materialzanListRef.current = newMaterialzan;
                             setMaterialzanList(materialzanListRef.current);
-                            executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
                             setSuccessCount(successCountRef.current);
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         }
                     } catch (error: any) {
                         console.log(error);
@@ -397,7 +393,7 @@ const AiCreate = ({
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
+                        setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         errorCountRef.current += group?.length;
                         if (errorCountRef.current >= 3) {
                             aref.current = true;
@@ -406,12 +402,6 @@ const AiCreate = ({
                     }
                 })
             );
-            if (!aref.current) {
-                const newL = _.cloneDeep(uuidListsRef.current);
-                newL?.push(...resArr?.map((item) => item.uuid));
-                uuidListsRef.current = newL;
-                setUuidLists(uuidListsRef.current);
-            }
             index += 3;
         }
         executionCountRef.current = 0;
@@ -419,6 +409,7 @@ const AiCreate = ({
     };
     //文本智能提取
     const handleTextData = async (num: number, retry?: boolean) => {
+        textNum.current = num;
         setSelectValue('text');
         if (!retry) {
             materialzanListRef.current = [];
@@ -426,16 +417,15 @@ const AiCreate = ({
             uuidListsRef.current = [];
             setUuidLists(uuidListsRef.current);
         }
-        const newList = _.cloneDeep(requirementList);
+        const newList = _.cloneDeep(textData.requirementList);
         const define: any = {};
-        newList?.map((item: any) => {
-            define[item.title] = item.value;
+        newList?.map((item: any, index: number) => {
+            define[textCloumns.find((el) => el.dataIndex === item.value).title] = item.title;
         });
         aref.current = false;
         setMaterialExecutionOpen(true);
         //记录原有数据下标
         const indexList: any[] = [];
-        let theStaging = _.cloneDeep(tableData);
         if (retry) {
             tableData?.map((item, index) => {
                 if (retryListRef.current?.find((el) => el.uuid === item.uuid)) {
@@ -465,6 +455,7 @@ const AiCreate = ({
             const newResArr: any[] = [];
             const currentBatch = chunks.slice(index, index + 3);
             executionCountRef.current = currentBatch?.flat()?.length;
+            grupPre.current = (executionCountRef.current / 3) | 0 || 1;
             setExecutionCount(executionCountRef.current);
             console.log(currentBatch);
 
@@ -479,11 +470,10 @@ const AiCreate = ({
                         });
 
                         if (!aref.current) {
-                            const newCheckbox: any[] = _.cloneDeep(textData.fieldList);
-                            const selectData = _.cloneDeep(textData.bindFieldData);
+                            const newCheckbox: any[] = _.cloneDeep(textData.requirementList);
                             const obj: any = {};
-                            newCheckbox.forEach((dt) => {
-                                obj[selectData[dt]] = res[dt]?.url || res[dt];
+                            newCheckbox.forEach((dt, i) => {
+                                obj[dt.value] = res[textCloumns.find((el) => el.dataIndex === dt.value).title];
                             });
                             console.log(obj);
 
@@ -493,10 +483,10 @@ const AiCreate = ({
                                     ...obj
                                 }))
                             );
-                            executionCountRef.current = executionCountRef.current - group?.length;
                             successCountRef.current += group?.length;
-                            setExecutionCount(executionCountRef.current);
                             setSuccessCount(successCountRef.current);
+                            executionCountRef.current = executionCountRef.current - group?.length;
+                            setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         }
                     } catch (error: any) {
                         const newRetry = _.cloneDeep(retryListRef.current);
@@ -515,9 +505,9 @@ const AiCreate = ({
                         errorMessageRef.current = newList;
                         setErrorMessage(errorMessageRef.current);
                         executionCountRef.current -= group?.length;
-                        setExecutionCount(executionCountRef.current);
+                        setTimeout(() => setExecutionCount(executionCountRef.current), 1);
                         errorCountRef.current += group?.length;
-                        if (errorCountRef.current >= 9) {
+                        if (errorCountRef.current >= 3) {
                             aref.current = true;
                         }
                         setErrorCount(errorCountRef.current);
@@ -525,22 +515,15 @@ const AiCreate = ({
                 })
             );
             if (!aref.current) {
-                const newArr = _.cloneDeep(materialzanListRef.current);
                 const updatedMaterialzanList = [...materialzanListRef.current, ...newResArr];
                 console.log(updatedMaterialzanList);
 
                 materialzanListRef.current = updatedMaterialzanList;
+                console.log(materialzanListRef.current);
+
                 setMaterialzanList(materialzanListRef.current);
                 uuidListsRef.current = materialzanListRef.current?.map((item) => item.uuid);
                 setUuidLists(uuidListsRef.current);
-                materialFieldexeDataRef.current = theStaging?.map((item) => {
-                    const arrinclude = materialzanListRef.current.find((el) => el.uuid === item.uuid);
-                    if (arrinclude) {
-                        return arrinclude;
-                    } else {
-                        return item;
-                    }
-                });
                 index += 3;
             }
         }
@@ -548,10 +531,150 @@ const AiCreate = ({
         setExecutionCount(executionCountRef.current);
     };
 
+    const handleOCR = async (num = 1, retry = false) => {
+        ocrNum.current = num;
+        if (!retry) {
+            materialzanListRef.current = [];
+            setMaterialzanList(materialzanListRef.current);
+            uuidListsRef.current = [];
+            setUuidLists(uuidListsRef.current);
+        } else {
+            setErrorCount(0);
+            errorCountRef.current = 0;
+            errorMessageRef.current = [];
+        }
+
+        let materialList: any = [];
+        if (!retry) {
+            if (num === 1) {
+                materialList = selList;
+            } else {
+                materialList = tableData;
+            }
+        } else {
+            materialList = retryListRef.current;
+        }
+
+        setSelectValue('ocr');
+
+        setMaterialExecutionOpen(true);
+        setTotalCount(num === 1 ? selList.length : tableData.length);
+        totalCountRef.current = materialList.length;
+
+        const idList = materialList.map((item: any) => item.id);
+        uuidListsRef.current = idList;
+        setUuidLists(idList);
+
+        setExecutionCount(materialList.length);
+        grupPre.current = (executionCountRef.current / 3) | 0 || 1;
+        executionCountRef.current = materialList.length;
+
+        materialList.map(async (item: any) => {
+            retryListRef.current = [];
+            let obj: any = {};
+            // 选择图片字段
+            const imageUrlList = ocrData.checkedFieldList.map((v: string) => item[v]).filter((url: string) => url);
+            try {
+                const data = await imageOcr({ imageUrls: imageUrlList, cleansing: ocrData.cleansing });
+                Object.keys(item).forEach((v: any) => {
+                    data.list.forEach((v1: any) => {
+                        if (item[v] === v1.url) {
+                            (obj = item),
+                                (obj.id = item.id),
+                                (obj[v] = item[v]),
+                                (obj[v + '_tag'] = v1.ocrGeneralDTO.tag),
+                                (obj[v + '_description'] = v1.ocrGeneralDTO.content),
+                                (obj[v + '_extend'] = v1.ocrGeneralDTO.data);
+                        }
+                    });
+                });
+
+                const copyMaterialzanList = _.cloneDeep(materialzanListRef.current);
+                copyMaterialzanList.push(obj);
+
+                materialzanListRef.current = copyMaterialzanList;
+                setMaterialzanList(copyMaterialzanList);
+                const copySuccessCount = successCountRef.current;
+                setSuccessCount(copySuccessCount + 1);
+                successCountRef.current = copySuccessCount + 1;
+
+                const exeCount = executionCountRef.current;
+                setTimeout(() => setExecutionCount(exeCount - 1), 1);
+                executionCountRef.current = exeCount - 1;
+            } catch (error: any) {
+                const exeCount = executionCountRef.current;
+                setTimeout(() => setExecutionCount(exeCount - 1), 1);
+                executionCountRef.current = exeCount - 1;
+
+                const copyErrorCountRef = errorCountRef.current;
+                setErrorCount(copyErrorCountRef + 1);
+                errorCountRef.current = copyErrorCountRef + 1;
+
+                const copyRetryList = retryListRef.current;
+                copyRetryList.push(item);
+                retryListRef.current = copyRetryList;
+
+                const newList = _.cloneDeep(errorMessageRef.current);
+                newList.push(error.msg);
+                errorMessageRef.current = newList;
+                setErrorMessage(errorMessageRef.current);
+            }
+        });
+    };
+    //微信公共号
+    const timer = useRef<any>();
+    const urlsRef = useRef('');
+    const handleWchat = async (url: any, retry = false) => {
+        setSelectValue('wchat');
+        if (url) {
+            urlsRef.current = url;
+        }
+        const urls = url || urlsRef.current;
+        totalCountRef.current = 1;
+        setTotalCount(totalCountRef.current);
+        executionCountRef.current = 1;
+        grupPre.current = 0;
+        setExecutionCount(executionCountRef.current);
+        errorCountRef.current = 0;
+        setErrorCount(errorCountRef.current);
+        successCountRef.current = 0;
+        setSuccessCount(successCountRef.current);
+        setMaterialExecutionOpen(true);
+        try {
+            const result = await plugChat({ urls });
+            timer.current = setInterval(async () => {
+                const res = await plugList({
+                    conversation_id: result.conversation_id,
+                    chat_id: result.id
+                });
+                if (res.complete) {
+                    clearInterval(timer.current);
+                    successCountRef.current = 1;
+                    setSuccessCount(successCountRef.current);
+                    executionCountRef.current = 0;
+                    setExecutionCount(executionCountRef.current);
+                    materialzanListRef.current = res.materialList;
+                    setMaterialzanList(materialzanListRef.current);
+                }
+            }, 2000);
+        } catch (error) {
+            errorCountRef.current = 1;
+            setErrorCount(errorCountRef.current);
+            executionCountRef.current = 0;
+            setExecutionCount(executionCountRef.current);
+        }
+    };
+    //组件销毁时清除定时器
+    useEffect(() => {
+        return () => {
+            clearInterval(timer.current);
+        };
+    }, []);
     //新增插入表格
     const [selectValue, setSelectValue] = useState('');
     const batchNum = useRef(-1);
-    const materialFieldexeDataRef = useRef<any>(null);
+    const ocrNum = useRef(0);
+    const textNum = useRef(-1);
     const materialzanListRef = useRef<any[]>([]);
     const [materialzanList, setMaterialzanList] = useState<any[]>([]);
     //小红书数据
@@ -560,40 +683,121 @@ const AiCreate = ({
         fieldList: [],
         bindFieldData: {}
     });
-    const xhsCloumns = useMemo(() => {
-        const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
-        return columns?.filter((item) => arr?.includes(item.dataIndex));
-    }, [redBookData?.fieldList, redBookData.bindFieldData]);
     // OCR 提取数据
-    const [ocrData, setOcrData] = useState({
+    const [ocrData, setOcrData] = useState<any>({
         requirement: '',
         title: true,
         content: true,
         titleField: 1,
-        contentField: 1
+        contentField: 1,
+        checkedFieldList: []
+    });
+    //素材生成
+    const [variableData, setVariableData] = useState<any>({
+        checkedFieldList: [],
+        requirement: undefined,
+        groupNum: 1,
+        generateCount: 1
+    });
+    //字段补齐
+    const [fieldCompletionData, setFieldCompletionData] = useState<any>({
+        checkedFieldList: [],
+        requirement: ''
     });
     //文本智能提取数据
-    const [requirementList, setRequirementList] = useState<any[]>([]);
     const [textData, setTextData] = useState<any>({
         checkedFieldList: '',
-        fieldList: [],
-        bindFieldData: {}
+        requirementList: []
     });
-    useEffect(() => {
-        console.log(textData, requirementList);
-    }, [textData, requirementList]);
+
+    const imageExe = (list: any[]) => {
+        return list?.map((item: any) => {
+            if (item.type === EditType.Image) {
+                return {
+                    ...item,
+                    render: (_: any, row: any) =>
+                        row[item.dataIndex] ? (
+                            <Image
+                                preview={{ src: row[item.dataIndex] }}
+                                width={82}
+                                height={82}
+                                src={row[item.dataIndex] + '?x-oss-process=image/resize,w_100/quality,q_80'}
+                            />
+                        ) : null
+                };
+            } else {
+                return {
+                    ...item,
+                    sorter: false
+                };
+            }
+        });
+    };
     const textCloumns = useMemo(() => {
-        const arr = textData?.fieldList?.map((item: any) => textData?.bindFieldData[item])?.filter((item: any) => item);
-        return columns?.filter((item) => arr?.includes(item.dataIndex));
-    }, [textData?.fieldList, textData?.bindFieldData]);
+        const arr = textData?.requirementList?.map((item: any) => item.value);
+        return imageExe(columns?.filter((item) => arr?.includes(item.dataIndex)));
+    }, [textData.requirementList]);
+    //保存配置
+    const saveConfig = async (data: string) => {
+        let newValue: any = {};
+        if (pluginConfig) {
+            newValue = JSON.parse(pluginConfig);
+        }
+        if (plugValue === 'generate_material_batch') {
+            newValue.variableData = variableData;
+        } else if (plugValue === 'generate_material_one') {
+            newValue.fieldCompletionData = fieldCompletionData;
+        } else if (plugValue === 'xhsOcr') {
+            newValue.redBookData = redBookData;
+        }
+        await templateUpdate({
+            id: libraryId,
+            pluginConfig: JSON.stringify(newValue)
+        });
+        getTitleList();
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '保存成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                close: false
+            })
+        );
+    };
+    useEffect(() => {
+        if (pluginConfig) {
+            const values = JSON.parse(pluginConfig);
+            if (plugValue === 'generate_material_batch' && values.variableData) {
+                setVariableData(values.variableData);
+            } else if (plugValue === 'generate_material_one' && values.fieldCompletionData) {
+                setFieldCompletionData(values.fieldCompletionData);
+            } else if (plugValue === 'xhsOcr' && values.redBookData) {
+                setRedBookData(values.redBookData);
+            }
+        } else {
+            setVariableData({
+                ...variableData,
+                checkedFieldList: columns
+                    ?.filter((item) => item.required && item.type !== 5 && item.type !== 6)
+                    ?.map((item) => item.dataIndex)
+            });
+        }
+    }, [pluginConfig, plugValue]);
+    const xhsCloumns = useMemo(() => {
+        const arr = redBookData?.fieldList?.map((item: any) => redBookData?.bindFieldData[item])?.filter((item: any) => item);
+        return imageExe(columns?.filter((item) => arr?.includes(item.dataIndex)));
+    }, [redBookData?.fieldList, redBookData]);
+
     return (
         <div>
             {plugValue === 'extraction' ? (
                 //文本智能提取
                 <TextExtraction
-                    requirementList={requirementList}
                     textData={textData}
-                    setRequirementList={setRequirementList}
                     setTextData={setTextData}
                     checkedList={checkedList}
                     selListLength={selList?.length || 0}
@@ -610,6 +814,7 @@ const AiCreate = ({
                     selList={selList}
                     tableDataLength={tableData?.length || 0}
                     setSelOpen={setSelOpen}
+                    handleOCR={handleOCR}
                 />
             ) : plugValue === 'xhsOcr' ? (
                 //小红书分析
@@ -624,7 +829,7 @@ const AiCreate = ({
                     tableData={tableData}
                     setSelOpen={setSelOpen}
                     editMaterial={editMaterial}
-                    setField={setField}
+                    saveConfig={saveConfig}
                 />
             ) : plugValue === 'generate_material_batch' ? (
                 // 素材生成
@@ -633,10 +838,12 @@ const AiCreate = ({
                         variableData={variableData}
                         setVariableData={setVariableData}
                         checkedList={checkedList}
-                        setcustom={setcustom}
+                        saveConfig={saveConfig}
                         aimaterialCreate={aimaterialCreate}
                     />
                 </div>
+            ) : plugValue === 'wchat' ? (
+                <PlugModal handleWchat={handleWchat} />
             ) : null}
             {/* 选择素材 */}
             <Modal
@@ -655,29 +862,24 @@ const AiCreate = ({
                             确认选择({selList?.length})
                         </Button>
                     </div>
-                    <Table
-                        rowKey={(record, index) => {
-                            return record.uuid;
-                        }}
-                        pagination={{
-                            showSizeChanger: true,
-                            defaultPageSize: 20,
-                            pageSizeOptions: [20, 50, 100, 300, 500],
-                            onChange: (page) => {
-                                setPage(page);
-                            }
-                        }}
-                        size="small"
-                        virtual
-                        rowSelection={{
-                            type: 'checkbox',
-                            ...rowSelection,
-                            fixed: true,
-                            columnWidth: 50
-                        }}
-                        columns={columns?.slice(0, columns?.length - 1)}
-                        dataSource={tableData}
-                    />
+                    <div className="material-index">
+                        <Table
+                            rowKey={(record, index) => {
+                                return record.id;
+                            }}
+                            pagination={false}
+                            size="small"
+                            virtual
+                            rowSelection={{
+                                type: 'checkbox',
+                                ...rowSelection,
+                                fixed: true,
+                                columnWidth: 50
+                            }}
+                            columns={columns?.slice(0, columns?.length - 1)}
+                            dataSource={tableData}
+                        />
+                    </div>
                 </div>
             </Modal>
             {/* 素材执行 loading */}
@@ -694,12 +896,13 @@ const AiCreate = ({
                 <div className="my-4">
                     {errorMessage?.length > 0 &&
                         errorMessage?.map((item, i) => (
-                            <div key={item} className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
+                            <div className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
                                 <span className="font-bold">错误信息 {i + 1}：</span>
                                 {item}
                             </div>
                         ))}
                 </div>
+
                 {totalCount === successCount + errorCount && successCount !== 0 && (
                     <div className="my-4 text-xs flex justify-center">
                         <span className="font-bold">已经生成完成，点击确认导入素材</span>
@@ -722,21 +925,29 @@ const AiCreate = ({
                         <Tag color="error">执行失败：{errorCount}</Tag>
                     </div>
                 </div>
-                <Table
-                    columns={[
-                        { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
-                        ...(selectValue === 'field'
-                            ? columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex))
-                            : selectValue === 'batch'
-                            ? columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex))
-                            : selectValue === 'xhs'
-                            ? xhsCloumns
-                            : selectValue === 'text'
-                            ? textCloumns
-                            : [])
-                    ]}
-                    dataSource={materialzanList}
-                />
+                <div className="material-index">
+                    <Table
+                        className=" overflow-auto"
+                        columns={[
+                            { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
+                            ...(selectValue === 'field'
+                                ? imageExe(columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex)))
+                                : selectValue === 'batch'
+                                ? imageExe(columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex)))
+                                : selectValue === 'xhs'
+                                ? xhsCloumns
+                                : selectValue === 'text'
+                                ? textCloumns
+                                : selectValue === 'ocr'
+                                ? imageExe(columns?.filter((item: any) => ocrData.checkedFieldList?.includes(item.dataIndex)))
+                                : selectValue === 'wchat'
+                                ? imageExe(columns.slice(0, columns?.length - 2))
+                                : [])
+                        ]}
+                        virtual={true}
+                        dataSource={materialzanList}
+                    />
+                </div>
                 <div className="flex justify-center gap-2 mt-4">
                     {executionCount === 0 && (
                         <>
@@ -754,8 +965,16 @@ const AiCreate = ({
                                     setErrorMessage(errorMessageRef.current);
                                     if (selectValue === 'batch') {
                                         aimaterialCreate();
-                                    } else {
+                                    } else if (selectValue === 'ocr') {
+                                        handleOCR(ocrNum.current);
+                                    } else if (selectValue === 'field') {
                                         editMaterial(batchNum.current);
+                                    } else if (selectValue === 'xhs') {
+                                        xhsAnalysis();
+                                    } else if (selectValue === 'text') {
+                                        handleTextData(textNum.current);
+                                    } else if (selectValue === 'wchat') {
+                                        handleWchat(undefined, true);
                                     }
                                 }}
                             >
@@ -774,8 +993,16 @@ const AiCreate = ({
                                         setErrorMessage(errorMessageRef.current);
                                         if (selectValue === 'batch') {
                                             aimaterialCreate(true);
-                                        } else {
+                                        } else if (selectValue === 'field') {
                                             editMaterial(batchNum.current, true);
+                                        } else if (selectValue === 'ocr') {
+                                            handleOCR(ocrNum.current, true);
+                                        } else if (selectValue === 'xhs') {
+                                            xhsAnalysis(true);
+                                        } else if (selectValue === 'text') {
+                                            handleTextData(textNum.current, true);
+                                        } else if (selectValue === 'wchat') {
+                                            handleWchat(undefined, true);
                                         }
                                     }}
                                 >
@@ -791,7 +1018,8 @@ const AiCreate = ({
                                         setSelectedRowKeys(uuidListsRef.current);
                                     } else if (selectValue === 'field') {
                                         setSelList([]);
-                                        downTableData(materialFieldexeDataRef.current, 2);
+                                        setSelKeyList([]);
+                                        downTableData(materialzanListRef.current, 2);
                                         setMaterialExecutionOpen(false);
                                         setPlugOpen(false);
                                         setSelectedRowKeys(uuidLists);
@@ -802,10 +1030,22 @@ const AiCreate = ({
                                         setSelectedRowKeys(uuidListsRef.current);
                                     } else if (selectValue === 'text') {
                                         setSelList([]);
-                                        downTableData(materialFieldexeDataRef.current, 2);
+                                        setSelKeyList([]);
+                                        downTableData(materialzanListRef.current, 2);
                                         setMaterialExecutionOpen(false);
                                         setPlugOpen(false);
                                         setSelectedRowKeys(uuidLists);
+                                    } else if (selectValue === 'ocr') {
+                                        setSelList([]);
+                                        setSelKeyList([]);
+                                        downTableData(materialzanListRef.current, 2);
+                                        setMaterialExecutionOpen(false);
+                                        setPlugOpen(false);
+                                        setSelectedRowKeys(uuidLists);
+                                    } else if (selectValue === 'wchat') {
+                                        downTableData(materialzanListRef.current, 1);
+                                        setMaterialExecutionOpen(false);
+                                        setPlugOpen(false);
                                     }
                                 }}
                                 className="w-[100px]"
@@ -837,12 +1077,13 @@ const AiCreate = ({
 };
 const memoAiCreate = (pre: any, next: any) => {
     return (
-        JSON.stringify(pre.materialType) === JSON.stringify(JSON.stringify(next.materialType)) &&
-        JSON.stringify(pre.columns) === JSON.stringify(JSON.stringify(next.columns)) &&
-        JSON.stringify(pre.MokeList) === JSON.stringify(JSON.stringify(next.MokeList)) &&
-        JSON.stringify(pre.tableData) === JSON.stringify(JSON.stringify(next.tableData)) &&
-        JSON.stringify(pre.fieldCompletionData) === JSON.stringify(JSON.stringify(next.fieldCompletionData)) &&
-        JSON.stringify(pre.variableData) === JSON.stringify(JSON.stringify(next.variableData))
+        _.isEqual(pre.libraryId, next.libraryId) &&
+        _.isEqual(pre.bizType, next.bizType) &&
+        _.isEqual(pre.bizUid, next.bizUid) &&
+        _.isEqual(pre.pluginConfig, next.pluginConfig) &&
+        _.isEqual(pre.plugValue, next.plugValue) &&
+        _.isEqual(pre.columns, next.columns) &&
+        _.isEqual(pre.tableData, next.tableData)
     );
 };
 export default memo(AiCreate, memoAiCreate);

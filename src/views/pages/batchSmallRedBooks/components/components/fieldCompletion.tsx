@@ -11,7 +11,7 @@ const FieldCompletion = ({
     tableData,
     setSelOpen,
     editMaterial,
-    setField
+    saveConfig
 }: {
     fieldCompletionData: any;
     setFieldCompletionData: (data: any) => void;
@@ -20,7 +20,7 @@ const FieldCompletion = ({
     selList: any[];
     tableData: any[];
     editMaterial: (data: any) => void;
-    setField?: (data: any) => void;
+    saveConfig: (data: string) => void;
 }) => {
     const { TextArea } = Input;
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
@@ -158,7 +158,7 @@ const FieldCompletion = ({
                             );
                             return false;
                         }
-                        setField && setField(JSON.stringify(fieldCompletionData));
+                        saveConfig('generate_material_one');
                     }}
                     type="primary"
                 >

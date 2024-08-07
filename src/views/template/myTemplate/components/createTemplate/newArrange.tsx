@@ -21,7 +21,8 @@ function Arrange({
     tableCopy,
     tableDataDel,
     tableDataMove,
-    saveImageStyle
+    saveImageStyle,
+    setTableTitle
 }: any) {
     //增加节点
     const [expanded, setExpanded] = useState<any[]>([]);
@@ -34,6 +35,8 @@ function Arrange({
         tableDataDel(index);
         const newValue = _.cloneDeep(config);
         newValue.steps.splice(index, 1);
+        console.log(newValue);
+
         changeConfigs(newValue);
     };
     //复制步骤
@@ -330,6 +333,7 @@ function Arrange({
                         <AccordionDetails>
                             <StepEdit
                                 detail={detail}
+                                appUid={detail?.uid}
                                 variableStyle={variableStyle}
                                 index={index}
                                 variable={item?.variable?.variables}
@@ -358,6 +362,7 @@ function Arrange({
                                 resType={item?.flowStep?.response?.type}
                                 resJsonSchema={item?.flowStep?.response?.output?.jsonSchema}
                                 saveImageStyle={saveImageStyle}
+                                setTableTitle={setTableTitle}
                             />
                         </AccordionDetails>
                     </Accordion>

@@ -1,4 +1,5 @@
-import { Checkbox, Button } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Checkbox, Button, Switch, Tooltip } from 'antd';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const ImgOcr = ({
@@ -7,7 +8,8 @@ const ImgOcr = ({
     setOcrData,
     setSelOpen,
     selList,
-    tableDataLength
+    tableDataLength,
+    handleOCR
 }: {
     imgCheckedList: any[];
     ocrData: any;
@@ -15,6 +17,7 @@ const ImgOcr = ({
     setSelOpen: (data: boolean) => void;
     selList: any[];
     tableDataLength: number;
+    handleOCR: (type: number) => void;
 }) => {
     const handleExe = (num: number) => {
         if (ocrData.checkedFieldList?.length === 0) {
@@ -32,6 +35,7 @@ const ImgOcr = ({
             );
             return false;
         }
+        handleOCR(num);
         // editMaterial(num);
     };
     return (
@@ -52,6 +56,27 @@ const ImgOcr = ({
                     </Checkbox>
                 ))}
             </Checkbox.Group>
+            <div className="flex items-center pt-2">
+                <span className="text-sm font-medium mr-2">
+                    OCR内容清洗
+                    <Tooltip title={'开启后，对OCR的内容进行AI清洗，解决直接OCR后的内容错别字混乱等问题。 注意开启后耗时更久。'}>
+                    <QuestionCircleOutlined className="cursor-pointer ml-1" />
+                    </Tooltip>
+                    :
+                </span>
+                <Switch
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                    defaultChecked
+                    checked={ocrData.cleansing}
+                    onChange={(value) =>
+                        setOcrData({
+                            ...ocrData,
+                            cleansing: value
+                        })
+                    }
+                />
+            </div>
             <div className="text-[16px] font-bold my-4">2.如何处理素材</div>
             <Button className="mb-4" type="primary" size="small" onClick={() => setSelOpen(true)}>
                 选择素材
@@ -75,31 +100,6 @@ const ImgOcr = ({
                         处理全部素材
                         <div>({tableDataLength})</div>
                     </div>
-                </Button>
-            </div>
-            <div className="flex justify-center gap-6 mt-6">
-                <Button
-                    onClick={() => {
-                        if (ocrData.checkedFieldList?.length === 0) {
-                            dispatch(
-                                openSnackbar({
-                                    open: true,
-                                    message: 'AI 补齐字段最少选一个',
-                                    variant: 'alert',
-                                    alert: {
-                                        color: 'error'
-                                    },
-                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                    close: false
-                                })
-                            );
-                            return false;
-                        }
-                        // setField && setField(JSON.stringify(ocrData));
-                    }}
-                    type="primary"
-                >
-                    保存配置
                 </Button>
             </div>
         </div>

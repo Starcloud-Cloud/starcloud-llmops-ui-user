@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
+import { Popconfirm, Tabs, Button, Badge, Tag, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { getContentPage } from 'api/redBook';
 import { planExecute, batchPages, getListExample } from 'api/redBook/batchIndex';
 import SubCard from 'ui-component/cards/SubCard';
@@ -13,13 +15,15 @@ import './index.scss';
 import Left from './components/newLeft';
 import Right from './components/right';
 import jsCookie from 'js-cookie';
-import { MoreOutlined, SwapOutlined } from '@ant-design/icons';
+import { createSameApp } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template';
+import dayjs from 'dayjs';
 const BatcSmallRedBooks = forwardRef(
     (
         {
             planState,
             imageStylePre,
+            tableTitle,
             changePre,
             getAppList,
             detail,
@@ -29,6 +33,7 @@ const BatcSmallRedBooks = forwardRef(
         }: {
             planState: number;
             imageStylePre?: number;
+            tableTitle?: number;
             changePre?: number;
             getAppList: () => void;
             detail?: any;
@@ -40,19 +45,10 @@ const BatcSmallRedBooks = forwardRef(
     ) => {
         useImperativeHandle(ref, () => ({
             getDetail: getData,
-            moke: moke,
-            imageMoke: imageMoke, //图片
-            mokeAI: defaultVariableData, //批量生成
-            fieldAI: defaultField, //字段补齐
-            fieldHead: fieldHead //上传素材表头
+            imageMoke: imageMoke //图片
         }));
         const [appDescription, setAppDescription] = useState('');
-
-        const [defaultVariableData, setDefaultVariableData] = useState<any>(null);
-        const [defaultField, setDefaultField] = useState<any>(null);
         const [getData, setGetData] = useState<any>(null);
-        const [fieldHead, setFieldHead] = useState(null);
-        const [moke, setMoke] = useState<any[]>([]);
         const [imageMoke, setImageMoke] = useState<any[]>([]);
         const navigate = useNavigate();
         const timer: any = useRef([]);
@@ -73,11 +69,8 @@ const BatcSmallRedBooks = forwardRef(
                     return false;
                 }
                 const res = await marketDeatail({ uid: searchParams.get('appUid') });
-                if (res.description) {
-                    const urlPattern = /https?:\/\/[^\s]+(?:\.com|\.cn|\.org|\.net|\.edu\.com.cn)/g;
-                    const urls = res?.description?.match(urlPattern);
-                    setAppDescription(urls?.[0] || '');
-                }
+                console.log(res);
+                setVersion(res.version);
             })();
         }, []);
 
@@ -106,7 +99,6 @@ const BatcSmallRedBooks = forwardRef(
                 clearInterval(item);
             });
             batchOpenRef.current = true;
-            setBathOpen(batchOpenRef.current);
             await planExecute({ uid });
             const res = await batchPages({ batchPage, planUid: uid });
             setRightPage(rightPage + 1);
@@ -165,13 +157,17 @@ const BatcSmallRedBooks = forwardRef(
                         setBatchTotal(res.total);
                     });
                 }
-                const newList = _.cloneDeep(batchDataListRef.current);
-                newList[collIndexRef.current] = res.list;
-                console.log(newList, collIndexRef.current);
-
-                batchDataListRef.current = newList;
-                setBatchDataList(batchDataListRef.current);
-                setbatchOpen(false);
+                if (
+                    res.list?.every((item: any) => item.progress) ||
+                    res.list?.some((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE')
+                ) {
+                    const newList = _.cloneDeep(batchDataListRef.current);
+                    newList[collIndexRef.current] = res.list;
+                    console.log(newList, collIndexRef.current);
+                    batchDataListRef.current = newList;
+                    setBatchDataList(batchDataListRef.current);
+                    setbatchOpen(false);
+                }
             });
         };
         const [collapseActive, setcollapseActive] = useState<any[]>([]);
@@ -197,7 +193,6 @@ const BatcSmallRedBooks = forwardRef(
                         ) {
                             clearInterval(timer.current[0]);
                             batchOpenRef.current = false;
-                            setBathOpen(batchOpenRef.current);
                             setPre(pre + 1);
                             return;
                         }
@@ -220,7 +215,6 @@ const BatcSmallRedBooks = forwardRef(
                             ) {
                                 clearInterval(timer.current[0]);
                                 batchOpenRef.current = false;
-                                setBathOpen(batchOpenRef.current);
                                 setPre(pre + 1);
                                 return;
                             }
@@ -233,7 +227,6 @@ const BatcSmallRedBooks = forwardRef(
             }
         };
         const batchOpenRef = useRef(true);
-        const [bathOpen, setBathOpen] = useState(true);
         useEffect(() => {
             if (bathList?.length !== 0 && batchOpenRef.current) {
                 collIndexRef.current = 0;
@@ -265,7 +258,6 @@ const BatcSmallRedBooks = forwardRef(
                     }, 2000);
                 }
                 batchOpenRef.current = false;
-                setBathOpen(batchOpenRef.current);
             }
         }, [bathList]);
 
@@ -310,13 +302,34 @@ const BatcSmallRedBooks = forwardRef(
         const batchDataListRef = useRef<any[]>([]);
         const [batchDataList, setBatchDataList] = useState<any[]>([]);
         const [leftWidth, setLeftWidth] = useState('');
+
+        const [updataTip, setUpdataTip] = useState('0');
+        const [version, setVersion] = useState(0);
+        const [appInfo, setAppInfo] = useState<any>({});
+        const [versionPre, setVersionPre] = useState(0);
+        const [createAppStatus, setCreateAppStatus] = useState(false);
+
+        const getStatus = (status: any) => {
+            switch (status) {
+                case 'PENDING':
+                    return <Tag>待执行</Tag>;
+                case 'RUNNING':
+                    return <Tag color="processing">执行中</Tag>;
+                case 'PAUSE':
+                    return <Tag color="warning">暂停</Tag>;
+                case 'CANCELED':
+                    return <Tag>已取消</Tag>;
+                case 'COMPLETE':
+                    return <Tag color="success">已完成</Tag>;
+                case 'FAILURE':
+                    return <Tag color="error">失败</Tag>;
+                default:
+                    return <Tag>待执行</Tag>;
+            }
+        };
+        console.log(1231);
         return (
-            <div
-                style={{
-                    height: jsCookie.get('isClient') ? '100vh' : '100%'
-                }}
-                className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto"
-            >
+            <div className="bg-[rgb(244,246,248)] h-full md:min-w-[1052px] lg:min-w-[1152px] overflow-y-hidden overflow-x-auto">
                 {!detail && (
                     <SubCard
                         contentSX={{
@@ -326,23 +339,96 @@ const BatcSmallRedBooks = forwardRef(
                             p: '10px !important'
                         }}
                     >
-                        <div>
+                        <div className="flex items-center gap-2">
                             <IconButton onClick={() => navigate('/appMarket')} color="secondary">
                                 <KeyboardBackspace fontSize="small" />
                             </IconButton>
-                            <span className="text-[#000c] font-[500]">应用市场</span>
-                            {appDescription && (
-                                <span
-                                    className="2xl:ml-[430px] xl:ml-[340px] lg:ml-[300px]  ml-[300px] text-[#673ab7] cursor-pointer"
-                                    onClick={() => {
-                                        window.open(appDescription);
-                                    }}
-                                >
-                                    应用说明
-                                </span>
+                            <div className="flex flex-col">
+                                <div className="text-[#000c] text-lg font-[500]">{appInfo.name}</div>
+                                <div className="flex items-center gap-2 !text-xs">
+                                    <div>状态：{getStatus(appInfo.status)}</div>
+                                    <div>
+                                        <Popconfirm
+                                            title="更新提示"
+                                            description={
+                                                <div className="ml-[-24px]">
+                                                    <Tabs
+                                                        activeKey={updataTip}
+                                                        onChange={(e) => setUpdataTip(e)}
+                                                        items={[
+                                                            {
+                                                                key: '0',
+                                                                label: '更新应用',
+                                                                children: (
+                                                                    <div className="w-[240px] mb-4">
+                                                                        <div>当前应用最新版本为：{version}</div>
+                                                                        <div>你使用的应用版本为：{appInfo.version}</div>
+                                                                        <div>是否需要更新版本，获得最佳创作效果</div>
+                                                                    </div>
+                                                                )
+                                                            },
+                                                            {
+                                                                key: '1',
+                                                                label: '初始化应用',
+                                                                children: (
+                                                                    <div className="w-[240px] mb-4">
+                                                                        是否需要初始化为最新的应用配置。
+                                                                        <br />
+                                                                        <span className="text-[#ff4d4f]">注意:</span>
+                                                                        会覆盖所有已修改的应用配置，请自行备份相关内容
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        ]}
+                                                    ></Tabs>
+                                                </div>
+                                            }
+                                            okButtonProps={{
+                                                disabled: (appInfo?.version ? appInfo?.version : 0) === version && updataTip === '0'
+                                            }}
+                                            onConfirm={() => setVersionPre(versionPre + 1)}
+                                            okText="更新"
+                                            cancelText="取消"
+                                        >
+                                            <Badge count={(appInfo?.version ? appInfo?.version : 0) !== version ? 1 : 0} dot>
+                                                <span className="text-xs cursor-pointer hover:shadow-md">
+                                                    版本号： <span className="font-blod">{appInfo.version || 0}</span>
+                                                </span>
+                                            </Badge>
+                                        </Popconfirm>
+                                    </div>
+                                    <div className=" text-black/50">
+                                        最后修改时间：{dayjs(appInfo.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            {!detail && (
+                                <div className="flex items-center gap-2">
+                                    <Tooltip title="复制应用后,可自定义素材字段，流程节点，图片模版等内容">
+                                        <InfoCircleOutlined />
+                                    </Tooltip>
+
+                                    <Button
+                                        loading={createAppStatus}
+                                        onClick={async () => {
+                                            setCreateAppStatus(true);
+                                            const result = await createSameApp({
+                                                appMarketUid: searchParams.get('appUid'),
+                                                planUid: searchParams.get('uid')
+                                            });
+                                            navigate('/createApp?uid=' + result);
+                                            setCreateAppStatus(false);
+                                        }}
+                                        type="primary"
+                                        className="mr-1"
+                                    >
+                                        复制应用
+                                    </Button>
+                                </div>
                             )}
                         </div>
-                        <div></div>
                     </SubCard>
                 )}
                 <div
@@ -360,6 +446,9 @@ const BatcSmallRedBooks = forwardRef(
                     >
                         <Left
                             pre={pre}
+                            updataTip={updataTip}
+                            versionPre={versionPre}
+                            tableTitle={tableTitle}
                             imageStylePre={imageStylePre}
                             isMyApp={isMyApp}
                             changePre={changePre}
@@ -374,19 +463,13 @@ const BatcSmallRedBooks = forwardRef(
                                     setLeftWidth('50%');
                                 }
                             }}
+                            setAppInfo={setAppInfo}
                             getAppList={getAppList}
-                            setFieldHead={setFieldHead}
-                            setMoke={setMoke}
                             setImageMoke={setImageMoke}
                             setCollData={setCollData}
                             newSave={newSave}
                             setDetail={setDetail}
                             setPlanUid={setPlanUid}
-                            defaultVariableData={defaultVariableData}
-                            defaultField={defaultField}
-                            fieldHead={fieldHead}
-                            setDefaultVariableData={setDefaultVariableData}
-                            setDefaultField={setDefaultField}
                         />
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
@@ -425,7 +508,6 @@ const BatcSmallRedBooks = forwardRef(
                                     getLists(pageNo);
                                 }, 2000);
                                 batchOpenRef.current = false;
-                                setBathOpen(batchOpenRef.current);
                             }}
                         />
                     </div>

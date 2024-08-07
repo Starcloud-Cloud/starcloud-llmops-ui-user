@@ -37,7 +37,7 @@ import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
 import { schemeMetadata } from 'api/redBook/copywriting';
 import CreatePlan from 'views/pages/batchSmallRedBooks';
 import useUserStore from 'store/user';
-import SubCard from 'ui-component/cards/SubCard';
+import jsCookie from 'js-cookie';
 interface Items {
     label: string;
     value: string;
@@ -700,6 +700,8 @@ function CreateDetail() {
     const permissions = useUserStore((state) => state.permissions);
 
     //检测 model
+    console.log(detail?.workflowConfig);
+
     useEffect(() => {
         if (detail?.workflowConfig?.steps?.length === 1) {
             setAiModel(detail?.workflowConfig.steps[0]?.flowStep?.variable?.variables?.find((item: any) => item.field === 'model')?.value);
@@ -983,88 +985,11 @@ function CreateDetail() {
         }
     }, []);
     const [changePre, setChangePre] = useState(0);
+    const [tableTitle, setTableTitle] = useState(0);
     console.log(1);
 
-    return searchParams.get('source') === 'market' ? (
-        detail ? (
-            <>
-                <SubCard
-                    contentSX={{
-                        p: '10px !important'
-                    }}
-                    sx={{ mb: '16px' }}
-                >
-                    <div>
-                        <IconButton onClick={() => navigate('/appMarket')} color="secondary">
-                            <KeyboardBackspace fontSize="small" />
-                        </IconButton>
-                        <span className="text-[#000c] font-[500]">应用市场</span>
-                    </div>
-                </SubCard>
-                <div className="h-[calc(100%-74px)] ">
-                    {detail?.type === 'MEDIA_MATRIX' ? (
-                        <Spin spinning={viewLoading} tip="Loading">
-                            <div className="h-[calc(100vh-220px)] bg-[rgb(244,246,248)]">
-                                <CreatePlan
-                                    ref={createPlanRef}
-                                    imageStylePre={imageStylePre}
-                                    getAppList={getList}
-                                    changePre={changePre}
-                                    planState={planState}
-                                    detail={_.cloneDeep(detailRef.current)}
-                                    setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
-                                    isMyApp={false}
-                                    isblack={false}
-                                />
-                            </div>
-                        </Spin>
-                    ) : (
-                        <Card elevation={2} sx={{ p: 2 }}>
-                            <Header
-                                permissions={permissions}
-                                detail={detail}
-                                aiModel={aiModel}
-                                setOpenUpgradeModel={setOpenUpgradeModel}
-                                setAiModel={setAiModel}
-                                appModels={appModels}
-                            />
-                            <Perform
-                                columns={stepMaterial}
-                                setEditOpen={setEditOpen}
-                                setStep={(data: any) => {
-                                    stepRef.current = data;
-                                    setStep(stepRef.current);
-                                }}
-                                getList={getList}
-                                setMaterialType={setMaterialType}
-                                setTitle={setTitle}
-                                isShows={isShows}
-                                details={_.cloneDeep(detailRef.current)}
-                                config={_.cloneDeep(detailRef.current?.workflowConfig)}
-                                changeConfigs={changeConfigs}
-                                changeSon={changeData}
-                                changeanswer={changeanswer}
-                                loadings={loadings}
-                                isDisables={isDisables}
-                                variableChange={exeChange}
-                                promptChange={promptChange}
-                                isallExecute={(flag: boolean) => {
-                                    isAllExecute = flag;
-                                }}
-                                addStyle={addStyle}
-                                source="myApp"
-                            />
-                        </Card>
-                    )}
-                </div>
-            </>
-        ) : (
-            <div className="w-full h-full flex justify-center items-center">
-                <Spin spinning={true} />
-            </div>
-        )
-    ) : (
-        <Card sx={{ height: '100%', overflowY: 'auto', position: 'relative' }}>
+    return detail ? (
+        <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
                 sx={{ padding: 2 }}
                 avatar={
@@ -1073,7 +998,9 @@ function CreateDetail() {
                         variant="contained"
                         startIcon={<ArrowBack />}
                         color="secondary"
-                        onClick={() => navigate('/template/createCenter')}
+                        onClick={() => {
+                            searchParams.get('source') === 'market' ? navigate('/appMarket') : navigate('/template/createCenter');
+                        }}
                     >
                         {t('myApp.back')}
                     </Buttons>
@@ -1088,7 +1015,7 @@ function CreateDetail() {
                                 aria-controls={delOpen ? 'long-menu' : undefined}
                                 aria-expanded={delOpen ? 'true' : undefined}
                                 aria-haspopup="true"
-                                sx={{ zIndex: 10 }}
+                                sx={{ zIndex: 9 }}
                                 onClick={(e) => {
                                     setDelAnchorEl(e.currentTarget);
                                 }}
@@ -1155,7 +1082,7 @@ function CreateDetail() {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                        <Buttons sx={{ zIndex: 10 }} variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
+                        <Buttons sx={{ zIndex: 9 }} variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
                             {t('myApp.save')}
                         </Buttons>
                     </>
@@ -1215,7 +1142,7 @@ function CreateDetail() {
                 >
                     <Tabs.TabPane tab=" 基础设置" key="0">
                         <div className="flex justify-center ">
-                            <div className="xl:w-[80%] lg:w-full">
+                            <div className="xl:w-[80%] lg:w-full md:w-full">
                                 <Basis
                                     detail={{
                                         name: detail?.name,
@@ -1237,8 +1164,9 @@ function CreateDetail() {
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
-                                className="h-[calc(100vh-190px)] mt-[-16px]"
+                                className="overflow-y-auto mt-[-16px]"
                                 style={{
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 210px)',
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
                                     backgroundRepeat: 'repeat'
@@ -1266,6 +1194,7 @@ function CreateDetail() {
                                             tableDataDel={tableDataDel}
                                             tableDataMove={tableDataMove}
                                             saveImageStyle={saveImageStyle}
+                                            setTableTitle={() => setTableTitle(new Date().getTime())}
                                         />
                                     </div>
                                 </div>
@@ -1277,10 +1206,16 @@ function CreateDetail() {
                             <div className="w-full">
                                 {detail?.type === 'MEDIA_MATRIX' ? (
                                     <Spin spinning={viewLoading} tip="Loading">
-                                        <div className="h-[calc(100vh-220px)] bg-[rgb(244,246,248)]">
+                                        <div
+                                            style={{
+                                                height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 220px)'
+                                            }}
+                                            className="bg-[rgb(244,246,248)]"
+                                        >
                                             <CreatePlan
                                                 ref={createPlanRef}
                                                 imageStylePre={imageStylePre}
+                                                tableTitle={tableTitle}
                                                 getAppList={getList}
                                                 changePre={changePre}
                                                 planState={planState}
@@ -1336,14 +1271,24 @@ function CreateDetail() {
                     )}
                     {detailRef.current?.uid && searchParams.get('uid') && permissions.includes('app:analyze') && (
                         <Tabs.TabPane tab="应用分析" key="2">
-                            <div className="px-4">
+                            <div
+                                style={{
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 210px)'
+                                }}
+                                className="overflow-y-auto px-4"
+                            >
                                 <ApplicationAnalysis appUid={detail?.uid} value={Number(value)} type="APP_ANALYSIS" />
                             </div>
                         </Tabs.TabPane>
                     )}
                     {searchParams.get('uid') && permissions.includes('app:publish') && (
                         <Tabs.TabPane tab="应用发布" key="3">
-                            <div className="px-4">
+                            <div
+                                style={{
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 220px)'
+                                }}
+                                className="overflow-y-auto px-4"
+                            >
                                 <Upload
                                     appUid={searchParams.get('uid') as string}
                                     saveState={saveState}
@@ -1379,6 +1324,10 @@ function CreateDetail() {
                 />
             )}
         </Card>
+    ) : (
+        <div className="w-full h-full flex justify-center items-center">
+            <Spin spinning={true} />
+        </div>
     );
 }
 export default CreateDetail;

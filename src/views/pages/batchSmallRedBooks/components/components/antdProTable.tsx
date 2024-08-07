@@ -1,10 +1,12 @@
 import { EditableProTable } from '@ant-design/pro-components';
-import { useState, memo, useEffect, useCallback } from 'react';
-import _ from 'lodash-es';
+import { useState, memo, useEffect, useCallback, useRef } from 'react';
+import _, { sortBy } from 'lodash-es';
 import { Resizable } from 'react-resizable';
 import './index.css';
 import React from 'react';
 import { GetRowKey } from 'antd/lib/table/interface';
+import { EditType } from 'views/materialLibrary/detail';
+import { useClickAway } from 'react-use';
 
 const ResizeableTitle = (props: any) => {
     const { onResize, width, ...restProps } = props;
@@ -21,19 +23,33 @@ const ResizeableTitle = (props: any) => {
 };
 
 const TablePro = ({
+    tableLoading = false,
+    isSelection = false,
+    isPagination = false,
+    actionRefs,
     tableData,
     selectedRowKeys,
     setSelectedRowKeys,
     columns,
+    page,
     setPage,
     setTableData,
     actionRef,
     onUpdateColumn,
-    handleEditColumn
+    handleEditColumn,
+    getList,
+    total
 }: any) => {
     const [column, setColumn] = useState<any[]>([]);
     const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
     const [dataIndex, setDataIndex] = useState<any[]>([]);
+
+    const ref = useRef(null);
+    useClickAway(ref, () => {
+        setTimeout(() => {
+            setEditableRowKeys([]);
+        }, 500);
+    });
 
     useEffect(() => {
         setColumn(columns);
@@ -45,7 +61,7 @@ const TablePro = ({
         }
     };
 
-    const rowKey = 'uuid';
+    const rowKey = 'id';
 
     // ============================ RowKey ============================
     const getRowKey = React.useMemo<GetRowKey<any>>(() => {
@@ -83,65 +99,142 @@ const TablePro = ({
 
     const resultColumns = column.map((col: any, index: any) => ({
         ...col,
-        onHeaderCell: (column: any) => ({
-            width: column.width,
-            onResize: handleResize(index)
+        onHeaderCell: (column: any) => {
+            return {
+                width: column.width,
+                onResize: handleResize(index)
+            };
+        }
+    }));
+
+    const dataColumns = resultColumns.map((item) => ({
+        ...item,
+        editable: dataIndex.flat(1).join('.') === [item.dataIndex || item.key].flat(1).join('.') ? undefined : false,
+        onCell: (record: any, rowIndex: any) => ({
+            onClick: () => {
+                if (
+                    item.dataIndex === 'index' ||
+                    item.dataIndex === 'operation' ||
+                    item.editType === EditType.Image ||
+                    item.title === '使用次数'
+                ) {
+                    setDataIndex([]);
+                    setEditableRowKeys([]);
+                    return;
+                }
+                setEditableRowKeys([getRowKey(record, rowIndex)]);
+                setDataIndex([item.dataIndex || (item.key as string)]);
+            },
+            // onMouseLeave: () => {
+            //     setDataIndex([]);
+            //     setEditableRowKeys([]);
+            // },
+            onBlur: async (e: any) => {
+                if (item.required && !e.target.value) {
+                    // 必填项
+                    return;
+                }
+                if (item.dataIndex === 'index' || item.dataIndex === 'operation' || item.editType === EditType.Image) {
+                    setDataIndex([]);
+                    setEditableRowKeys([]);
+                    return;
+                }
+                handleEditColumn(record);
+                setEditableRowKeys([]);
+            }
         })
     }));
 
-    return (
-        <EditableProTable<any>
-            rowKey={rowKey}
-            tableAlertRender={false}
-            components={components}
-            rowSelection={{
-                type: 'checkbox',
-                fixed: true,
-                columnWidth: 50,
-                selectedRowKeys: selectedRowKeys,
-                onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
-                    setSelectedRowKeys(selectedRowKeys);
+    return dataColumns.length > 0 ? (
+        <div ref={ref} className="h-[100%]">
+            <EditableProTable
+                id="edit-table"
+                className="edit-table w-full"
+                rowKey={rowKey}
+                tableAlertRender={false}
+                loading={tableLoading}
+                components={components}
+                sticky={{ offsetHeader: 0 }}
+                onHeaderRow={() => {
+                    return {
+                        onClick: () => setEditableRowKeys([]) // 点击表头行
+                    };
+                }}
+                rowSelection={
+                    isSelection
+                        ? false
+                        : {
+                              type: 'checkbox',
+                              fixed: true,
+                              columnWidth: 50,
+                              selectedRowKeys: selectedRowKeys,
+                              onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+                                  setSelectedRowKeys(selectedRowKeys);
+                              }
+                          }
                 }
-            }}
-            actionRef={actionRef}
-            toolBarRender={false}
-            columns={resultColumns.map((item) => ({
-                ...item,
-                editable: dataIndex.flat(1).join('.') === [item.dataIndex || item.key].flat(1).join('.') ? undefined : false,
-                onCell: (record: any, rowIndex: any) => ({
-                    onClick: () => {
-                        setEditableRowKeys([getRowKey(record, rowIndex)]);
-                        if (item.dataIndex === 'index' || item.dataIndex === 'operation') {
-                            setDataIndex([]);
-                            setEditableRowKeys([]);
-                            return;
-                        }
-                        setDataIndex([item.dataIndex || (item.key as string)]);
-                    },
-                    onBlur: () => {
-                        setEditableRowKeys([]);
+                onTableChange={async (pagination, filters, sorter: any) => {
+                    let param;
+                    if (sorter.field === 'usedCount') {
+                        param = [
+                            {
+                                field: 'used_count',
+                                order: sorter.order === 'ascend' ? 'asc' : 'desc'
+                            }
+                        ];
                     }
-                })
-            }))}
-            value={tableData}
-            pagination={{
-                pageSize: 20,
-                pageSizeOptions: [20, 50, 100, 300, 500],
-                onChange: (page) => setPage(page)
-            }}
-            recordCreatorProps={false}
-            editable={{
-                editableKeys: editableKeys,
-                onValuesChange: (record, recordList) => {
-                    setTableData(recordList);
-                    handleEditColumn(dataIndex, record);
+                    if (sorter.field === 'id') {
+                        param = [
+                            {
+                                field: 'id',
+                                order: sorter.order === 'ascend' ? 'asc' : 'desc'
+                            }
+                        ];
+                    }
+                    setPage({
+                        pageNo: pagination.current,
+                        pageSize: pagination.pageSize
+                    });
+                    getList(param, pagination.current, pagination.pageSize);
+                }}
+                actionRef={actionRefs}
+                editableFormRef={actionRef}
+                toolBarRender={false}
+                columns={dataColumns}
+                value={tableData}
+                controlled
+                pagination={
+                    isPagination
+                        ? false
+                        : {
+                              total: total || tableData?.length,
+                              current: page.pageNo,
+                              pageSize: page.pageSize,
+                              showSizeChanger: true,
+                              pageSizeOptions: [20, 30, 50],
+                              onChange: (pageNo, pageSize) => {
+                                  setPage({
+                                      pageNo,
+                                      pageSize
+                                  });
+                              }
+                          }
                 }
-            }}
-        />
-    );
+                recordCreatorProps={false}
+                editable={{
+                    editableKeys: editableKeys,
+                    onValuesChange: (record, recordList) => {
+                        setTableData(recordList);
+                    }
+                }}
+            />
+        </div>
+    ) : null;
 };
+
 const memoTablePro = (oldValue: any, newValue: any) => {
     return (
+        _.isEqual(oldValue.tableLoading, newValue.tableLoading) &&
         _.isEqual(oldValue.tableData, newValue.tableData) &&
         _.isEqual(oldValue.selectedRowKeys, newValue.selectedRowKeys) &&
         _.isEqual(oldValue.columns, newValue.columns)

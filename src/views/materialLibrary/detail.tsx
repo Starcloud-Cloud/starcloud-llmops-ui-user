@@ -634,12 +634,12 @@ export const TableHeader = ({
                     onFinish={async () => {
                         const result = await checkMaterialLibrary({
                             libraryId: selectSwitchRowKeys[0],
-                            appUid: bizUid
+                            appUid
                         });
                         if (result) {
                             const data = await createMaterialLibraryAppBind({
                                 libraryId: selectSwitchRowKeys[0],
-                                appUid: bizUid
+                                appUid
                             });
                             if (data) {
                                 message.success('切换成功!');
@@ -1188,13 +1188,17 @@ const MaterialLibraryDetail = ({
     }
 
     const handleOcr = async (filedName: string, url: string, type: number) => {
-        setBtnLoading(type);
-        const data = await imageOcr({ imageUrls: [url], cleansing: !!type });
-        const result = data?.list?.[0].ocrGeneralDTO;
-        imageForm.setFieldValue(`${filedName}_tag`, result.tag);
-        imageForm.setFieldValue(`${filedName}_description`, result.content);
-        setBtnLoading(-1);
-        setExtend({ [filedName + '_extend']: result.data });
+        try {
+            setBtnLoading(type);
+            const data = await imageOcr({ imageUrls: [url], cleansing: !!type });
+            const result = data?.list?.[0].ocrGeneralDTO;
+            imageForm.setFieldValue(`${filedName}_tag`, result.tag);
+            imageForm.setFieldValue(`${filedName}_description`, result.content);
+            setBtnLoading(-1);
+            setExtend({ [filedName + '_extend']: result.data });
+        } catch (e) {
+            setBtnLoading(-1);
+        }
     };
 
     return (

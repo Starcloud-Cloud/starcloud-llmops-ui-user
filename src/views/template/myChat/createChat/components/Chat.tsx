@@ -1450,6 +1450,9 @@ export const Chat = ({
                                     <Option value={'QWEN'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
                                         通义千问
                                     </Option>
+                                    <Option value={'QWEN_MAX'} disabled={chatBotInfo.modelProvider === 'GPT4'}>
+                                        通义千问MAX
+                                    </Option>
                                 </Select>
                             </div>
                         </div>

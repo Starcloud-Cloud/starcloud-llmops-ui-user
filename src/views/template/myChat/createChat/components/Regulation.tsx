@@ -387,6 +387,7 @@ export const Regulation = ({
                                 <MenuItem value={'GPT35'}>默认模型3.5</MenuItem>
                                 <MenuItem value={'GPT4'}>默认模型4.0</MenuItem>
                                 <MenuItem value={'QWEN'}>通义千问</MenuItem>
+                                <MenuItem value={'QWEN_MAX'}>通义千问MAX</MenuItem>
                             </Select>
                         </FormControl>
                     </div>

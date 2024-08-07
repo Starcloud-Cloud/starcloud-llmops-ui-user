@@ -1,6 +1,6 @@
 import { useState, useEffect, SyntheticEvent, useRef } from 'react';
-import { Link } from 'react-router-dom';
-
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import AltRouteIcon from '@mui/icons-material/AltRoute';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
@@ -25,6 +25,7 @@ import {
 import MuiTooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import infoStore from 'store/entitlementAction';
+import { Avatar as AntAvatar, List as AntList, Button as AntBtn, Tag, Empty, Typography as AntTypography, message } from 'antd';
 
 // project imports
 // import Profile from './Profile';
@@ -34,7 +35,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import Avatar from 'ui-component/extended/Avatar';
 import SubCard from 'ui-component/cards/SubCard';
-import { ProfileVO } from 'api/system/user/profile';
+import { getAuthList, ProfileVO, unBind } from 'api/system/user/profile';
 
 // assets
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
@@ -49,6 +50,8 @@ import { TabsProps } from 'types';
 import AvatarUpload from './Avatar';
 import { getUserInfo } from 'api/login';
 import { t } from 'hooks/web/useI18n';
+import dayjs from 'dayjs';
+import { authRedirect } from 'api/auth-coze';
 
 // ==============================|| PROFILE 1 ||============================== //
 
@@ -77,7 +80,12 @@ const tabsOption = [
     {
         label: '2profile.info.resetPwd',
         icon: <LockTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+    },
+    {
+        label: '第三方授权',
+        icon: <AltRouteIcon sx={{ fontSize: '1.3rem' }} />
     }
+
     // {
     //     label: '社交信息',
     //     icon: <Diversity3TwoTone sx={{ fontSize: '1.3rem' }} />
@@ -90,7 +98,30 @@ const Profilnew = () => {
     const [userProfile, setUserProfile] = useState<ProfileVO | null>(null);
     const [updateCount, setUpdateCount] = useState(0);
     const { setuse } = infoStore();
+    const [authList, setAuthList] = useState([]);
     const forceUpdate = () => setUpdateCount((pre) => pre + 1);
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const type = searchParams.get('type') || 0;
+
+    useEffect(() => {
+        setValue(Number(type));
+    }, [type]);
+
+    const navigate = useNavigate();
+
+    const fetchAuthList = async () => {
+        const result = await getAuthList({
+            pageNo: 1,
+            pageSize: 100,
+            type: 35
+        });
+        setAuthList(result.list);
+    };
+
+    useEffect(() => {
+        fetchAuthList();
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -140,6 +171,17 @@ const Profilnew = () => {
     const handleConfirm = () => {
         avatarUploadRef.current?.upload();
         handleClose();
+    };
+
+    const handleDelete = async (item: any) => {
+        const data: any = await unBind({
+            type: item.type,
+            openid: item.openid
+        });
+        if (data) {
+            message.success('删除成功');
+            fetchAuthList();
+        }
     };
 
     return (
@@ -270,6 +312,67 @@ const Profilnew = () => {
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <ChangePassword />
+                    </TabPanel>
+                    <TabPanel value={value} index={2}>
+                        <AntTypography.Text type="secondary" className="mb-2">
+                            扣子授权
+                        </AntTypography.Text>
+                        <Divider />
+                        {authList.length ? (
+                            <AntList
+                                itemLayout="horizontal"
+                                dataSource={authList}
+                                renderItem={(item: any) => {
+                                    const rawTokenInfo = JSON.parse(item.rawTokenInfo);
+                                    return (
+                                        <AntList.Item
+                                            actions={[
+                                                <AntBtn danger type="text" onClick={() => handleDelete(item)}>
+                                                    删除
+                                                </AntBtn>
+                                            ]}
+                                        >
+                                            <AntList.Item.Meta
+                                                avatar={<AntAvatar className="bg-[#673ab7]">{item?.nickname[0]?.toUpperCase()}</AntAvatar>}
+                                                title={
+                                                    <div>
+                                                        <span>{item.nickname}</span>
+                                                        <Tag className="ml-2" color="geekblue">
+                                                            扣子
+                                                        </Tag>
+                                                    </div>
+                                                }
+                                                description={
+                                                    <span>
+                                                        到期时间：
+                                                        {dayjs(rawTokenInfo.refreshTokenExpireIn * 1000).format('YYYY-MM-DD HH:mm:ss')}
+                                                    </span>
+                                                }
+                                            />
+                                        </AntList.Item>
+                                    );
+                                }}
+                            />
+                        ) : (
+                            <Empty
+                                image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                                imageStyle={{ height: 60 }}
+                                description={'暂无授权'}
+                            >
+                                <AntBtn
+                                    type="primary"
+                                    onClick={async () => {
+                                        const url = await authRedirect({
+                                            type: 35,
+                                            redirectUri: `${window.location.origin}/auth-coze`
+                                        });
+                                        window.location.href = url;
+                                    }}
+                                >
+                                    去授权
+                                </AntBtn>
+                            </Empty>
+                        )}
                     </TabPanel>
                     {/* <TabPanel value={value} index={2}>
                         <Profile />

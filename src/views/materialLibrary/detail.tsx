@@ -166,7 +166,7 @@ export const TableHeader = ({
         },
         {
             key: '2',
-            label: '导入素材字段',
+            label: '导入数据',
             onClick: async () => setUploadOpen(true)
         }
     ];

@@ -691,6 +691,23 @@ export const TableHeader = ({
                                                 <div className="my-4 text-[16px] font-bold">
                                                     {sceneList?.find((i) => i.value === item.scene)?.label}
                                                 </div>
+                                                {/* <div className="w-full grid justify-content-center responsive-list-container sm:grid-cols-1 md:grid-cols-2 gap-x-2">
+                                                    {item.children?.map((el: any) => (
+                                                        <div className="p-4 border border-solid border-[#d9d9d9] rounded-lg" key={el.uid}>
+                                                            <div className="flex gap-4">
+                                                                <div className="w-[64px] h-[64px] rounded-lg border border-solid border-[#d9d9d9]"></div>
+                                                                <div>
+                                                                    <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                    <div className="line-clamp-3 h-[66px]">
+                                                                        {sceneList?.find((i) => i.value === el.scene)?.label}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <Divider />
+                                                            <div className="flex justify-end">{item.creator}</div>
+                                                        </div>
+                                                    ))}
+                                                </div> */}
                                                 {item.children?.map((el: any) => (
                                                     <CheckCard
                                                         key={el.uid}

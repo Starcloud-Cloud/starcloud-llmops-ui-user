@@ -1,4 +1,6 @@
-import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio, Tag } from 'antd';
+import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio, Tag, Tabs, Table } from 'antd';
+import { EditableProTable } from '@ant-design/pro-components';
+import type { TableProps } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import { DownOutlined, SisternodeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
@@ -7,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
 import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
+import ChatMarkdown from 'ui-component/Markdown';
 const AddPlug = ({
     open,
     setOpen,
@@ -31,6 +34,7 @@ const AddPlug = ({
 
     const timer = useRef<any>(null);
     const [status, setStatus] = useState('gold');
+    const [verifyStatus, setverifyStatus] = useState('gold');
     const [errmessage, seterrmessage] = useState('');
     const [accountList, setAccountList] = useState<any[]>([]);
     const [botList, setBotList] = useState<any[]>([]);
@@ -65,6 +69,94 @@ const AddPlug = ({
             }
         }
     };
+    const value2JsonMd = (value: any) => {
+        if (value) {
+            return `
+~~~json
+${JSON.stringify(JSON.parse(value), null, 2)}
+                    `;
+        } else {
+            return ` ~~~json
+            `;
+        }
+    };
+
+    const typeList = [
+        { label: 'String', value: 'String' },
+        { label: 'Integer', value: 'Integer' },
+        { label: 'Boolean', value: 'Boolean' },
+        { label: 'Number', value: 'Number' },
+        { label: 'Object', value: 'Object' },
+        { label: 'Array<String>', value: 'Array<String>' },
+        { label: 'Array<Integer>', value: 'Array<Integer>' },
+        { label: 'Array<Boolean>', value: 'Array<Boolean>' },
+        { label: 'Array<Object>', value: 'Array<Object>' }
+    ];
+
+    const inputColumns: any = [
+        {
+            title: '字段名称',
+            dataIndex: 'variableKey',
+            align: 'center',
+            editable: false
+        },
+        {
+            title: '字段描述',
+            dataIndex: 'variableDesc',
+            align: 'center'
+        },
+        {
+            title: '字段类型',
+            dataIndex: 'variableType',
+            align: 'center',
+            valueType: 'select',
+            fieldProps: {
+                options: typeList
+            },
+            editable: false
+        },
+        {
+            title: '是否必填',
+            dataIndex: 'required',
+            align: 'center',
+            valueType: 'switch',
+            editable: false,
+            render: (_: any, row: any) => (row?.required ? <Tag color="processing">必填</Tag> : '')
+        },
+        {
+            title: '默认值',
+            width: 200,
+            dataIndex: 'variableValue',
+            align: 'center',
+            render: (_: any, row: any) => <div className="line-clamp-3">{row.variableValue}</div>
+        }
+    ];
+    const [inputKeys, setinputKeys] = useState<any[]>([]);
+    const [outuptKeys, setoutuptKeys] = useState<any[]>([]);
+    const [inputTable, setInputTable] = useState<any[]>([]);
+    const [outputTable, setOutputTable] = useState<any[]>([]);
+    const getTableData = (value: any, setTable: (data: any) => void, setUuid: (data: any) => void) => {
+        let outputObj: any = {};
+        let newoutputObj: any = [];
+        try {
+            const res = JSON.parse(value) || {};
+            if (Array.isArray(res)) {
+                outputObj = res[0];
+            } else {
+                outputObj = res;
+            }
+        } catch (errr) {}
+        for (let key in outputObj) {
+            newoutputObj.push({
+                uuid: uuidv4(),
+                variableKey: key,
+                variableValue: outputObj[key],
+                variableType: 'String'
+            });
+        }
+        setUuid(newoutputObj?.map((item: any) => item.uuid));
+        setTable(newoutputObj);
+    };
     const handleOk = async () => {
         const result = await form.validateFields();
         if (rows) {
@@ -77,6 +169,8 @@ const AddPlug = ({
                 entityUid: result.botId,
                 cozeTokenId: result.accessTokenId,
                 verifyState: status === 'success' ? true : false,
+                inputFormart: JSON.stringify(inputTable),
+                outputFormart: JSON.stringify(outputTable),
                 uid: rows.uid
             });
             message.success('编辑成功');
@@ -87,6 +181,8 @@ const AddPlug = ({
                 accessTokenId: undefined,
                 entityUid: result.botId,
                 verifyState: status === 'success' ? true : false,
+                inputFormart: JSON.stringify(inputTable),
+                outputFormart: JSON.stringify(outputTable),
                 cozeTokenId: result.accessTokenId
             });
             message.success('新增成功');
@@ -111,22 +207,21 @@ const AddPlug = ({
                 botId: rows.entityUid,
                 accessTokenId: rows.cozeTokenId
             });
+            if (rows.inputFormart) {
+                const newList = JSON.parse(rows.inputFormart);
+                setInputTable(newList);
+                setinputKeys(newList?.map((item: any) => item.uuid));
+            }
+            if (rows.outputFormart) {
+                const newList = JSON.parse(rows.outputFormart);
+                setOutputTable(newList);
+                setoutuptKeys(newList?.map((item: any) => item.uuid));
+            }
             setStatus(rows.verifyState ? 'success' : 'error');
-            getBotList('spaceId', rows.entityUid);
+            getBotList('spaceId', rows.spaceId);
         }
     }, [rows]);
 
-    const typeList = [
-        { label: 'String', value: 'String' },
-        { label: 'Integer', value: 'Integer' },
-        { label: 'Boolean', value: 'Boolean' },
-        { label: 'Number', value: 'Number' },
-        { label: 'Object', value: 'Object' },
-        { label: 'Array<String>', value: 'Array<String>' },
-        { label: 'Array<Integer>', value: 'Array<Integer>' },
-        { label: 'Array<Boolean>', value: 'Array<Boolean>' },
-        { label: 'Array<Object>', value: 'Array<Object>' }
-    ];
     const [treeData, setTreeData] = useState<any[]>([]);
     const removeTree = (key: string | number) => {
         const removeNodeRecursively = (data: any) => {
@@ -175,7 +270,6 @@ const AddPlug = ({
 
     const [plugOpen, setPlugOpen] = useState(false);
     const [bindLoading, setBindLoading] = useState(false);
-
     return (
         <Modal
             title="插件配置"
@@ -285,11 +379,87 @@ const AddPlug = ({
                         }}
                     </Form.Item>
                 </Form.Item>
-                <Form.Item label="入参数据示例" name="input">
-                    <TextArea disabled rows={6} />
+                <Form.Item>
+                    <Tabs
+                        items={[
+                            {
+                                label: '入参数据示例',
+                                key: '1',
+                                children: (
+                                    <Form.Item name="input">
+                                        <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.input !== currentValues.input}>
+                                            <ChatMarkdown textContent={value2JsonMd(form.getFieldValue('input'))} />
+                                        </Form.Item>
+                                    </Form.Item>
+                                )
+                            },
+                            {
+                                label: '入参数据结构',
+                                key: '2',
+                                children: (
+                                    <EditableProTable<any>
+                                        rowKey={'uuid'}
+                                        tableAlertRender={false}
+                                        rowSelection={false}
+                                        toolBarRender={false}
+                                        columns={inputColumns}
+                                        value={inputTable}
+                                        pagination={false}
+                                        recordCreatorProps={false}
+                                        editable={{
+                                            type: 'multiple',
+                                            editableKeys: inputKeys,
+                                            onValuesChange: (record, recordList) => {
+                                                setInputTable(recordList);
+                                            },
+                                            onChange: setinputKeys
+                                        }}
+                                    />
+                                )
+                            }
+                        ]}
+                    />
                 </Form.Item>
-                <Form.Item label="出参数据示例" name="output">
-                    <TextArea disabled rows={6} />
+                <Form.Item>
+                    <Tabs
+                        items={[
+                            {
+                                label: '出参数据示例',
+                                key: '1',
+                                children: (
+                                    <Form.Item name="output">
+                                        <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.output !== currentValues.output}>
+                                            <ChatMarkdown textContent={value2JsonMd(form.getFieldValue('output'))} />
+                                        </Form.Item>
+                                    </Form.Item>
+                                )
+                            },
+                            {
+                                label: '出参数据结构',
+                                key: '2',
+                                children: (
+                                    <EditableProTable<any>
+                                        rowKey={'uuid'}
+                                        tableAlertRender={false}
+                                        rowSelection={false}
+                                        toolBarRender={false}
+                                        columns={inputColumns}
+                                        value={outputTable}
+                                        pagination={false}
+                                        recordCreatorProps={false}
+                                        editable={{
+                                            type: 'multiple',
+                                            editableKeys: outuptKeys,
+                                            onValuesChange: (record, recordList) => {
+                                                setOutputTable(recordList);
+                                            },
+                                            onChange: setoutuptKeys
+                                        }}
+                                    />
+                                )
+                            }
+                        ]}
+                    />
                 </Form.Item>
                 {rows && (
                     <Form.Item label="发布到应用市场" name="published" valuePropName="checked" initialValue={false}>
@@ -328,17 +498,17 @@ const AddPlug = ({
                                             });
                                             if (result.verifyState) {
                                                 clearInterval(timer.current);
-                                                setStatus('success');
+                                                setverifyStatus('success');
                                                 setBindData({
                                                     ...bindData,
-                                                    arguments: JSON.stringify(result.arguments),
-                                                    output: JSON.stringify(result.output)
+                                                    arguments: result.arguments ? JSON.stringify(result.arguments) : '',
+                                                    output: result.output ? JSON.stringify(result.output) : ''
                                                 });
                                                 setBindLoading(false);
                                             }
                                         }, 2000);
                                     } catch (err) {
-                                        setStatus('error');
+                                        setverifyStatus('error');
                                         setBindLoading(false);
                                     }
                                 }}
@@ -349,22 +519,25 @@ const AddPlug = ({
                         </div>
                     </Form.Item>
                     <Form.Item label="验证状态">
-                        <Tag color={status}>{status === 'success' ? '校验成功' : status === 'error' ? '检验失败' : '待校验'}</Tag>
+                        <Tag color={verifyStatus}>
+                            {verifyStatus === 'success' ? '校验成功' : verifyStatus === 'error' ? '检验失败' : '待校验'}
+                        </Tag>
                     </Form.Item>
                     <Form.Item label="入参数据示例">
-                        <TextArea value={bindData.arguments} disabled rows={6} />
+                        <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
                         <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
                     </Form.Item>
                     <Form.Item label="出参数据示例">
-                        <TextArea value={bindData.output} disabled rows={6} />
+                        <ChatMarkdown textContent={value2JsonMd(bindData.output)} />
                         <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
                     </Form.Item>
                 </Form>
                 <div className="flex justify-center">
                     <Button
                         className="w-[100px]"
-                        disabled={!bindData.output && !bindData.arguments ? true : false}
+                        disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
                         onClick={() => {
+                            setStatus('success');
                             form.setFieldValue('input', bindData.arguments);
                             form.setFieldValue('output', bindData.output);
                             setBindData({
@@ -372,6 +545,9 @@ const AddPlug = ({
                                 arguments: '',
                                 output: ''
                             });
+                            setverifyStatus('gold');
+                            getTableData(bindData.arguments, setInputTable, setinputKeys);
+                            getTableData(bindData.output, setOutputTable, setoutuptKeys);
                             setPlugOpen(false);
                         }}
                         type="primary"

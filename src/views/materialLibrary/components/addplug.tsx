@@ -151,6 +151,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             newoutputObj.push({
                 uuid: uuidv4(),
                 variableKey: key,
+                require: true,
                 // variableValue: outputObj[key],
                 variableType: 'String'
             });
@@ -161,8 +162,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     const handleOk = async () => {
         const result = await form.validateFields();
         if (rows) {
-            await plugPublish(rows.uid);
-            message.success('发布成功');
             await modifyPlug({
                 ...result,
                 botId: undefined,
@@ -175,6 +174,10 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 uid: rows.uid
             });
             message.success('编辑成功');
+            if (rows.published) {
+                await plugPublish(rows.uid);
+                message.success('发布成功');
+            }
         } else {
             await createPlug({
                 ...result,

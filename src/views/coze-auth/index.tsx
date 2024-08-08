@@ -34,7 +34,7 @@ const CozeAuth = () => {
                 title={result === undefined ? '绑定中' : result === true ? '绑定成功' : '绑定失败'}
                 extra={[
                     <Button type="primary" key="console" onClick={() => navigate('/user/account-profile/profile?type=2')}>
-                        回到首页
+                        返回
                     </Button>
                 ]}
             />

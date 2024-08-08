@@ -36,6 +36,7 @@ const AddPlug = ({
     const [status, setStatus] = useState('gold');
     const [verifyStatus, setverifyStatus] = useState('gold');
     const [errmessage, seterrmessage] = useState('');
+    const [verErrmessage, setVerErrmessage] = useState('');
     const [accountList, setAccountList] = useState<any[]>([]);
     const [botList, setBotList] = useState<any[]>([]);
     const [bindData, setBindData] = useState({
@@ -150,7 +151,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             newoutputObj.push({
                 uuid: uuidv4(),
                 variableKey: key,
-                variableValue: outputObj[key],
+                require: true,
+                // variableValue: outputObj[key],
                 variableType: 'String'
             });
         }
@@ -160,8 +162,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     const handleOk = async () => {
         const result = await form.validateFields();
         if (rows) {
-            await plugPublish(rows.uid);
-            message.success('发布成功');
             await modifyPlug({
                 ...result,
                 botId: undefined,
@@ -174,6 +174,10 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 uid: rows.uid
             });
             message.success('编辑成功');
+            if (rows.published) {
+                await plugPublish(rows.uid);
+                message.success('发布成功');
+            }
         } else {
             await createPlug({
                 ...result,
@@ -507,8 +511,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 setBindLoading(false);
                                             }
                                         }, 2000);
-                                    } catch (err) {
+                                    } catch (err: any) {
                                         setverifyStatus('error');
+                                        setVerErrmessage(err.msg);
                                         setBindLoading(false);
                                     }
                                 }}
@@ -522,6 +527,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         <Tag color={verifyStatus}>
                             {verifyStatus === 'success' ? '校验成功' : verifyStatus === 'error' ? '检验失败' : '待校验'}
                         </Tag>
+                        <span className="text-xs text-[#ff4d4f]">{verErrmessage}</span>
                     </Form.Item>
                     <Form.Item label="入参数据示例">
                         <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
@@ -538,6 +544,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
                         onClick={() => {
                             setStatus('success');
+                            setVerErrmessage('');
                             form.setFieldValue('input', bindData.arguments);
                             form.setFieldValue('output', bindData.output);
                             setBindData({

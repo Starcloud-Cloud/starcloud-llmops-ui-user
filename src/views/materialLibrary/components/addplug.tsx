@@ -1,11 +1,15 @@
-import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio } from 'antd';
+import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio, Tag, Tabs, Table } from 'antd';
+import { EditableProTable } from '@ant-design/pro-components';
+import type { TableProps } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import { DownOutlined, SisternodeOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
-import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish } from 'api/redBook/plug';
+import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
+import ChatMarkdown from 'ui-component/Markdown';
 const AddPlug = ({
     open,
     setOpen,
@@ -26,7 +30,12 @@ const AddPlug = ({
     const [form] = Form.useForm();
     const { TextArea } = Input;
     const { Option } = Select;
+    const navigate = useNavigate();
 
+    const timer = useRef<any>(null);
+    const [status, setStatus] = useState('gold');
+    const [verifyStatus, setverifyStatus] = useState('gold');
+    const [errmessage, seterrmessage] = useState('');
     const [accountList, setAccountList] = useState<any[]>([]);
     const [botList, setBotList] = useState<any[]>([]);
     const [bindData, setBindData] = useState({
@@ -37,11 +46,18 @@ const AddPlug = ({
     const getBotList = async (label: string, value: any) => {
         if (label === 'spaceId') {
             if (value && form.getFieldValue('accessTokenId')) {
-                const res = await spaceBots({
-                    accessTokenId: form.getFieldValue('accessTokenId'),
-                    spaceId: value
-                });
-                setBotList(res.space_bots);
+                try {
+                    const res = await spaceBots({
+                        accessTokenId: form.getFieldValue('accessTokenId'),
+                        spaceId: value
+                    });
+                    seterrmessage('');
+                    setBotList(res.space_bots);
+                } catch (err: any) {
+                    seterrmessage(err.msg);
+                    form.setFieldValue('botId', '');
+                    console.log(err);
+                }
             }
         } else {
             if (value && form.getFieldValue('spaceId')) {
@@ -52,6 +68,94 @@ const AddPlug = ({
                 setBotList(res.space_bots);
             }
         }
+    };
+    const value2JsonMd = (value: any) => {
+        if (value) {
+            return `
+~~~json
+${JSON.stringify(JSON.parse(value), null, 2)}
+                    `;
+        } else {
+            return ` ~~~json
+            `;
+        }
+    };
+
+    const typeList = [
+        { label: 'String', value: 'String' },
+        { label: 'Integer', value: 'Integer' },
+        { label: 'Boolean', value: 'Boolean' },
+        { label: 'Number', value: 'Number' },
+        { label: 'Object', value: 'Object' },
+        { label: 'Array<String>', value: 'Array<String>' },
+        { label: 'Array<Integer>', value: 'Array<Integer>' },
+        { label: 'Array<Boolean>', value: 'Array<Boolean>' },
+        { label: 'Array<Object>', value: 'Array<Object>' }
+    ];
+
+    const inputColumns: any = [
+        {
+            title: '字段名称',
+            dataIndex: 'variableKey',
+            align: 'center',
+            editable: false
+        },
+        {
+            title: '字段描述',
+            dataIndex: 'variableDesc',
+            align: 'center'
+        },
+        {
+            title: '字段类型',
+            dataIndex: 'variableType',
+            align: 'center',
+            valueType: 'select',
+            fieldProps: {
+                options: typeList
+            },
+            editable: false
+        },
+        {
+            title: '是否必填',
+            dataIndex: 'required',
+            align: 'center',
+            valueType: 'switch',
+            editable: false,
+            render: (_: any, row: any) => (row?.required ? <Tag color="processing">必填</Tag> : '')
+        },
+        {
+            title: '默认值',
+            width: 200,
+            dataIndex: 'variableValue',
+            align: 'center',
+            render: (_: any, row: any) => <div className="line-clamp-3">{row.variableValue}</div>
+        }
+    ];
+    const [inputKeys, setinputKeys] = useState<any[]>([]);
+    const [outuptKeys, setoutuptKeys] = useState<any[]>([]);
+    const [inputTable, setInputTable] = useState<any[]>([]);
+    const [outputTable, setOutputTable] = useState<any[]>([]);
+    const getTableData = (value: any, setTable: (data: any) => void, setUuid: (data: any) => void) => {
+        let outputObj: any = {};
+        let newoutputObj: any = [];
+        try {
+            const res = JSON.parse(value) || {};
+            if (Array.isArray(res)) {
+                outputObj = res[0];
+            } else {
+                outputObj = res;
+            }
+        } catch (errr) {}
+        for (let key in outputObj) {
+            newoutputObj.push({
+                uuid: uuidv4(),
+                variableKey: key,
+                variableValue: outputObj[key],
+                variableType: 'String'
+            });
+        }
+        setUuid(newoutputObj?.map((item: any) => item.uuid));
+        setTable(newoutputObj);
     };
     const handleOk = async () => {
         const result = await form.validateFields();
@@ -64,6 +168,9 @@ const AddPlug = ({
                 accessTokenId: undefined,
                 entityUid: result.botId,
                 cozeTokenId: result.accessTokenId,
+                verifyState: status === 'success' ? true : false,
+                inputFormart: JSON.stringify(inputTable),
+                outputFormart: JSON.stringify(outputTable),
                 uid: rows.uid
             });
             message.success('编辑成功');
@@ -72,10 +179,11 @@ const AddPlug = ({
                 ...result,
                 botId: undefined,
                 accessTokenId: undefined,
-                entityUid: '7398039516847767602',
-                cozeTokenId: '1'
-                // entityUid:result.botId ,
-                // cozeTokenId: result.accessTokenId,
+                entityUid: result.botId,
+                verifyState: status === 'success' ? true : false,
+                inputFormart: JSON.stringify(inputTable),
+                outputFormart: JSON.stringify(outputTable),
+                cozeTokenId: result.accessTokenId
             });
             message.success('新增成功');
         }
@@ -99,20 +207,21 @@ const AddPlug = ({
                 botId: rows.entityUid,
                 accessTokenId: rows.cozeTokenId
             });
+            if (rows.inputFormart) {
+                const newList = JSON.parse(rows.inputFormart);
+                setInputTable(newList);
+                setinputKeys(newList?.map((item: any) => item.uuid));
+            }
+            if (rows.outputFormart) {
+                const newList = JSON.parse(rows.outputFormart);
+                setOutputTable(newList);
+                setoutuptKeys(newList?.map((item: any) => item.uuid));
+            }
+            setStatus(rows.verifyState ? 'success' : 'error');
+            getBotList('spaceId', rows.spaceId);
         }
     }, [rows]);
 
-    const typeList = [
-        { label: 'String', value: 'String' },
-        { label: 'Integer', value: 'Integer' },
-        { label: 'Boolean', value: 'Boolean' },
-        { label: 'Number', value: 'Number' },
-        { label: 'Object', value: 'Object' },
-        { label: 'Array<String>', value: 'Array<String>' },
-        { label: 'Array<Integer>', value: 'Array<Integer>' },
-        { label: 'Array<Boolean>', value: 'Array<Boolean>' },
-        { label: 'Array<Object>', value: 'Array<Object>' }
-    ];
     const [treeData, setTreeData] = useState<any[]>([]);
     const removeTree = (key: string | number) => {
         const removeNodeRecursively = (data: any) => {
@@ -161,7 +270,6 @@ const AddPlug = ({
 
     const [plugOpen, setPlugOpen] = useState(false);
     const [bindLoading, setBindLoading] = useState(false);
-
     return (
         <Modal
             title="插件配置"
@@ -179,9 +287,13 @@ const AddPlug = ({
                     <Input />
                 </Form.Item>
                 <Form.Item label="使用场景" name="scene" initialValue={'DATA_ADDED'}>
-                    <CheckCard.Group size="small">
+                    <CheckCard.Group disabled={rows ? true : false} size="small">
                         {sceneList.map((item) => (
-                            <CheckCard disabled={rows ? true : false} title={item.label} description={item.label} value={item.value} />
+                            <CheckCard
+                                title={item.label}
+                                description={<div className="line-clamp-2 h-[44px]">{item.description}</div>}
+                                value={item.value}
+                            />
                         ))}
                     </CheckCard.Group>
                 </Form.Item>
@@ -195,20 +307,30 @@ const AddPlug = ({
                             return firstInputValue === 'coze' ? (
                                 <>
                                     <Space wrap={true}>
-                                        <Form.Item
-                                            className="w-[400px]"
-                                            label="Coze 绑定的账号"
-                                            name="accessTokenId"
-                                            rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
-                                        >
-                                            <Select onChange={(e) => getBotList('accessTokenId', e)}>
-                                                {accountList?.map((item) => (
-                                                    <Option key={item.id} value={item.id}>
-                                                        {item.nickname}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
+                                        <div>
+                                            <Form.Item
+                                                className="w-[400px]"
+                                                label="Coze 绑定的账号"
+                                                name="accessTokenId"
+                                                rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
+                                            >
+                                                <Select onChange={(e) => getBotList('accessTokenId', e)}>
+                                                    {accountList?.map((item) => (
+                                                        <Option key={item.id} value={item.id.toString()}>
+                                                            {item.nickname}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </Form.Item>
+                                            {accountList?.length === 0 && (
+                                                <div
+                                                    className="text-xs text-[#673ab7] hover:underline cursor-pointer ml-[137px] mt-[-20px]"
+                                                    onClick={() => navigate('/user/account-profile/profile?type=2')}
+                                                >
+                                                    没有账号？去绑定
+                                                </div>
+                                            )}
+                                        </div>
                                         <Form.Item
                                             className="w-[400px]"
                                             label="空间 ID"
@@ -217,40 +339,127 @@ const AddPlug = ({
                                         >
                                             <Input onBlur={async (e) => getBotList('spaceId', e.target.value)} />
                                         </Form.Item>
-                                        <Form.Item
-                                            className="w-[400px]"
-                                            label="选择 Coze 机器人"
-                                            name="botId"
-                                            rules={[{ required: true, message: 'Bot 必填' }]}
-                                        >
-                                            <Select>
-                                                {botList.map((item) => (
-                                                    <Option key={item.bot_id} value={item.bot_id}>
-                                                        {item.bot_name}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
+                                        <div>
+                                            <Form.Item
+                                                className="w-[400px]"
+                                                label="选择 Coze 机器人"
+                                                name="botId"
+                                                rules={[{ required: true, message: 'Bot 必填' }]}
+                                            >
+                                                <Select>
+                                                    {botList.map((item) => (
+                                                        <Option key={item.bot_id} value={item.bot_id}>
+                                                            {item.bot_name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </Form.Item>
+                                            {errmessage && (
+                                                <div className="text-xs text-[#ff4d4f]  ml-[137px] mt-[-20px]">{errmessage}</div>
+                                            )}
+                                        </div>
                                     </Space>
-                                    <Button
-                                        type="primary"
-                                        onClick={async () => {
-                                            await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
-                                            setPlugOpen(true);
-                                        }}
-                                    >
-                                        验证执行结果
-                                    </Button>
+                                    <Space align="end">
+                                        验证状态：
+                                        <Tag color={status}>
+                                            {status === 'success' ? '校验成功' : status === 'error' ? '检验失败' : '待校验'}
+                                        </Tag>
+                                        <Button
+                                            type="primary"
+                                            onClick={async () => {
+                                                await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
+                                                setPlugOpen(true);
+                                            }}
+                                        >
+                                            验证执行结果
+                                        </Button>
+                                    </Space>
                                 </>
                             ) : null;
                         }}
                     </Form.Item>
                 </Form.Item>
-                <Form.Item label="入参数据示例" name="input">
-                    <TextArea disabled rows={6} />
+                <Form.Item>
+                    <Tabs
+                        items={[
+                            {
+                                label: '入参数据示例',
+                                key: '1',
+                                children: (
+                                    <Form.Item name="input">
+                                        <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.input !== currentValues.input}>
+                                            <ChatMarkdown textContent={value2JsonMd(form.getFieldValue('input'))} />
+                                        </Form.Item>
+                                    </Form.Item>
+                                )
+                            },
+                            {
+                                label: '入参数据结构',
+                                key: '2',
+                                children: (
+                                    <EditableProTable<any>
+                                        rowKey={'uuid'}
+                                        tableAlertRender={false}
+                                        rowSelection={false}
+                                        toolBarRender={false}
+                                        columns={inputColumns}
+                                        value={inputTable}
+                                        pagination={false}
+                                        recordCreatorProps={false}
+                                        editable={{
+                                            type: 'multiple',
+                                            editableKeys: inputKeys,
+                                            onValuesChange: (record, recordList) => {
+                                                setInputTable(recordList);
+                                            },
+                                            onChange: setinputKeys
+                                        }}
+                                    />
+                                )
+                            }
+                        ]}
+                    />
                 </Form.Item>
-                <Form.Item label="出参数据示例" name="output">
-                    <TextArea disabled rows={6} />
+                <Form.Item>
+                    <Tabs
+                        items={[
+                            {
+                                label: '出参数据示例',
+                                key: '1',
+                                children: (
+                                    <Form.Item name="output">
+                                        <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.output !== currentValues.output}>
+                                            <ChatMarkdown textContent={value2JsonMd(form.getFieldValue('output'))} />
+                                        </Form.Item>
+                                    </Form.Item>
+                                )
+                            },
+                            {
+                                label: '出参数据结构',
+                                key: '2',
+                                children: (
+                                    <EditableProTable<any>
+                                        rowKey={'uuid'}
+                                        tableAlertRender={false}
+                                        rowSelection={false}
+                                        toolBarRender={false}
+                                        columns={inputColumns}
+                                        value={outputTable}
+                                        pagination={false}
+                                        recordCreatorProps={false}
+                                        editable={{
+                                            type: 'multiple',
+                                            editableKeys: outuptKeys,
+                                            onValuesChange: (record, recordList) => {
+                                                setOutputTable(recordList);
+                                            },
+                                            onChange: setoutuptKeys
+                                        }}
+                                    />
+                                )
+                            }
+                        ]}
+                    />
                 </Form.Item>
                 {rows && (
                     <Form.Item label="发布到应用市场" name="published" valuePropName="checked" initialValue={false}>
@@ -261,31 +470,45 @@ const AddPlug = ({
             <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
                 <Form labelCol={{ span: 6 }}>
                     <Form.Item label="机器人名称">
-                        <div>({botList?.find((item) => item.bot_id)?.bot_name})</div>
+                        <div className="font-bold">{botList?.find((item) => item.bot_id)?.bot_name}</div>
                     </Form.Item>
                     <Form.Item label="Coze参数验证">
-                        <Space>
-                            <Input value={bindData.content} onChange={(e) => setBindData({ ...bindData, content: e.target.value })} />
+                        <div className="flex gap-2 items-center">
+                            <TextArea
+                                className="w-full"
+                                placeholder="可输入触发机器人的对话"
+                                rows={4}
+                                value={bindData.content}
+                                onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
+                            />
                             <Button
                                 loading={bindLoading}
                                 onClick={async () => {
                                     setBindLoading(true);
                                     try {
                                         const res = await plugVerify({
-                                            botId: '7398039516847767602',
-                                            accessTokenId: '1',
-                                            content: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
-                                            // accessTokenId: form.getFieldValue('accessTokenId'),
-                                            // content: bindData.content,
-                                            // botId: form.getFieldValue('botId')
+                                            accessTokenId: form.getFieldValue('accessTokenId'),
+                                            content: bindData.content,
+                                            botId: form.getFieldValue('botId')
                                         });
-                                        setBindData({
-                                            ...bindData,
-                                            arguments: JSON.stringify(res.arguments),
-                                            output: JSON.stringify(res.output)
-                                        });
-                                        setBindLoading(false);
+                                        timer.current = setInterval(async () => {
+                                            const result = await plugVerifyResult({
+                                                code: res,
+                                                accessTokenId: form.getFieldValue('accessTokenId')
+                                            });
+                                            if (result.verifyState) {
+                                                clearInterval(timer.current);
+                                                setverifyStatus('success');
+                                                setBindData({
+                                                    ...bindData,
+                                                    arguments: result.arguments ? JSON.stringify(result.arguments) : '',
+                                                    output: result.output ? JSON.stringify(result.output) : ''
+                                                });
+                                                setBindLoading(false);
+                                            }
+                                        }, 2000);
                                     } catch (err) {
+                                        setverifyStatus('error');
                                         setBindLoading(false);
                                     }
                                 }}
@@ -293,25 +516,28 @@ const AddPlug = ({
                             >
                                 绑定验证
                             </Button>
-                        </Space>
+                        </div>
                     </Form.Item>
                     <Form.Item label="验证状态">
-                        <div className="text-xs"></div>
+                        <Tag color={verifyStatus}>
+                            {verifyStatus === 'success' ? '校验成功' : verifyStatus === 'error' ? '检验失败' : '待校验'}
+                        </Tag>
                     </Form.Item>
                     <Form.Item label="入参数据示例">
-                        <TextArea value={bindData.arguments} disabled rows={6} />
+                        <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
                         <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
                     </Form.Item>
                     <Form.Item label="出参数据示例">
-                        <TextArea value={bindData.output} disabled rows={6} />
+                        <ChatMarkdown textContent={value2JsonMd(bindData.output)} />
                         <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
                     </Form.Item>
                 </Form>
                 <div className="flex justify-center">
                     <Button
                         className="w-[100px]"
-                        disabled={!bindData.output && !bindData.arguments ? true : false}
+                        disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
                         onClick={() => {
+                            setStatus('success');
                             form.setFieldValue('input', bindData.arguments);
                             form.setFieldValue('output', bindData.output);
                             setBindData({
@@ -319,6 +545,9 @@ const AddPlug = ({
                                 arguments: '',
                                 output: ''
                             });
+                            setverifyStatus('gold');
+                            getTableData(bindData.arguments, setInputTable, setinputKeys);
+                            getTableData(bindData.output, setOutputTable, setoutuptKeys);
                             setPlugOpen(false);
                         }}
                         type="primary"

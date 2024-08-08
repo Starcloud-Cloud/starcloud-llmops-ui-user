@@ -68,6 +68,7 @@ import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
 import { getPlugConfigInfo, getPlugInfo } from 'api/plug';
 import PlugAnalysis from 'views/pages/batchSmallRedBooks/components/components/plug/Analysis';
+import dayjs from 'dayjs';
 
 export enum EditType {
     String = 0,
@@ -231,7 +232,7 @@ export const TableHeader = ({
     const PlugColumns: TableProps<any>['columns'] = [
         {
             title: '插件名称',
-            width: 400,
+            width: 200,
             dataIndex: 'pluginName',
             align: 'center'
         },
@@ -244,6 +245,16 @@ export const TableHeader = ({
             title: '发布到应用市场',
             align: 'center',
             render: (_, row) => <Tag color="processing">{row.published ? '是' : '否'}</Tag>
+        },
+        {
+            title: '创建时间',
+            align: 'center',
+            render: (_, row) => dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')
+        },
+        {
+            title: '创建人',
+            align: 'center',
+            dataIndex: 'creator'
         },
         {
             title: '操作',
@@ -695,10 +706,27 @@ export const TableHeader = ({
                                 <div>
                                     <CheckCard.Group size="small">
                                         {plugMarketList?.map((item) => (
-                                            <div>
+                                            <div key={item.uid}>
                                                 <div className="my-4 text-[16px] font-bold">
                                                     {sceneList?.find((i) => i.value === item.scene)?.label}
                                                 </div>
+                                                {/* <div className="w-full grid justify-content-center responsive-list-container sm:grid-cols-1 md:grid-cols-2 gap-x-2">
+                                                    {item.children?.map((el: any) => (
+                                                        <div className="p-4 border border-solid border-[#d9d9d9] rounded-lg" key={el.uid}>
+                                                            <div className="flex gap-4">
+                                                                <div className="w-[64px] h-[64px] rounded-lg border border-solid border-[#d9d9d9]"></div>
+                                                                <div>
+                                                                    <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                    <div className="line-clamp-3 h-[66px]">
+                                                                        {sceneList?.find((i) => i.value === el.scene)?.label}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <Divider />
+                                                            <div className="flex justify-end">{item.creator}</div>
+                                                        </div>
+                                                    ))}
+                                                </div> */}
                                                 {item.children?.map((el: any) => (
                                                     <CheckCard
                                                         onClick={() => handleOpenPlug(el)}

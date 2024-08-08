@@ -16,9 +16,13 @@ export const ownerListList = () => {
 export const delOwner = (uid: string) => {
     return request.delete({ url: '/llm/plugin/definition/delete/' + uid });
 };
-//验证执行结果
+//验证
 export const plugVerify = (data: any) => {
     return request.post({ url: '/llm/plugin/definition/verify', data });
+};
+//验证执行结果
+export const plugVerifyResult = (params: any) => {
+    return request.post({ url: '/llm/plugin/definition/verifyResult', params });
 };
 //新增
 export const createPlug = (data: any) => {

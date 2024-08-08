@@ -10,9 +10,9 @@ import { ModalForm } from '@ant-design/pro-components';
 import { addPlugConfigInfo, updatePlugConfigInfo } from 'api/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 
-const value2JsonMd = (value: any, type: number) => `
+const value2JsonMd = (value: any) => `
 ~~~json
-${value}
+${JSON.stringify(value, null, 2)}
 ~~~
 `;
 
@@ -36,7 +36,8 @@ const PlugAnalysis = ({
         const outputFormart = JSON.parse(record?.outputFormart) || [];
         return (
             outputFormart?.map((item: any) => ({
-                label: item.variableDesc || item.variableKey,
+                label: item.variableKey,
+                des: item.variableDesc,
                 value: item.variableKey,
                 tip: item.variableValue
             })) || []
@@ -45,12 +46,13 @@ const PlugAnalysis = ({
 
     useEffect(() => {
         const fieldMap = JSON.parse(record.fieldMap || '{}');
-
+        const keys = redList.map((redItem: any) => redItem.value);
         const data = redList.map((redItem: any, index: number) => {
             return {
                 label: redItem.label,
                 label_key: redItem.value,
-                value: fieldMap?.[redItem.value]
+                des: redItem.des,
+                value: keys.includes(redItem.value) ? fieldMap?.[redItem.value] : ''
             };
         });
 
@@ -81,11 +83,11 @@ const PlugAnalysis = ({
         >
             <div>
                 <div className="text-[16px] font-bold mb-4">
-                    1.输入需要抓取的小红书链接，最大支持 20 个
+                    1.输入内容
                     <Popover
                         content={
-                            <div className="w-[500px]">
-                                <ChatMarkdown textContent={value2JsonMd(record.inputFormart, 1)} />
+                            <div className="w-[500px] max-h-[300px] overflow-auto">
+                                <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
                             </div>
                         }
                         title="参数示例"
@@ -104,16 +106,16 @@ const PlugAnalysis = ({
                     rows={10}
                 />
                 {!redBookData?.requirement && requirementStatusOpen && (
-                    <span className="text-xs text-[#ff4d4f] ml-[4px]">小红书链接字段内容必填</span>
+                    <span className="text-xs text-[#ff4d4f] ml-[4px]">输入内容必填</span>
                 )}
 
                 <div className="text-[16px] font-bold my-4 flex justify-between">
                     <span>
-                        2.绑定字段
+                        2.输出字段绑定
                         <Popover
                             content={
-                                <div className="w-[500px]">
-                                    <ChatMarkdown textContent={value2JsonMd(record.outputFormart, 1)} />
+                                <div className="w-[500px] max-h-[300px] overflow-auto">
+                                    <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.output))} />
                                 </div>
                             }
                             title="参数示例"
@@ -121,16 +123,6 @@ const PlugAnalysis = ({
                             <QuestionCircleOutlined className="ml-1 cursor-pointer" />
                         </Popover>
                     </span>
-                    <div className="flex items-center justify-center">
-                        <span className="text-sm font-medium mr-2">
-                            OCR内容清洗
-                            <Tooltip title={'开启后，对OCR的内容进行AI清洗，解决直接OCR后的内容错别字混乱等问题。 注意开启后耗时更久。'}>
-                                <QuestionCircleOutlined className="cursor-pointer ml-1" />
-                            </Tooltip>
-                            :
-                        </span>
-                        <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked />
-                    </div>
                 </div>
 
                 <div>
@@ -141,7 +133,7 @@ const PlugAnalysis = ({
                         columns={[
                             {
                                 title: '字段',
-                                dataIndex: 'label',
+                                dataIndex: 'des',
                                 align: 'center'
                             },
                             {

@@ -66,6 +66,8 @@ import { imageOcr } from 'api/redBook/batchIndex';
 import DownMaterial from './components/downMaterial';
 import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
+import { getPlugConfigInfo, getPlugInfo } from 'api/plug';
+import PlugAnalysis from 'views/pages/batchSmallRedBooks/components/components/plug/Analysis';
 
 export enum EditType {
     String = 0,
@@ -282,6 +284,23 @@ export const TableHeader = ({
 
     const [sceneList, setSceneList] = useState<any[]>([]);
     const [wayList, setWayList] = useState<any[]>([]);
+
+    const [plugRecord, setPlugRecord] = useState<any>(null);
+    const [plugConfigOpen, setPlugConfigOpen] = useState(false);
+
+    const handleOpenPlug = async (record: any) => {
+        const data = await getPlugConfigInfo({
+            libraryUid: '140573430966447ca7dfeb422c259128',
+            pluginUid: record.uid
+        });
+        setPlugConfigOpen(record);
+        console.log(data, 'data');
+        setPlugRecord({
+            ...record,
+            ...data
+        });
+    };
+
     const grupList = (list: any) => {
         const groupedByType = list.reduce((acc: any, item: any) => {
             const { scene } = item;
@@ -682,6 +701,7 @@ export const TableHeader = ({
                                                 </div>
                                                 {item.children?.map((el: any) => (
                                                     <CheckCard
+                                                        onClick={() => handleOpenPlug(el)}
                                                         key={el.uid}
                                                         title={el.pluginName}
                                                         description={sceneList?.find((i) => i.value === el.scene)?.label}
@@ -721,6 +741,15 @@ export const TableHeader = ({
                     rows={rows}
                     setRows={setRows}
                     getTablePlugList={getTablePlugList}
+                />
+            )}
+            {plugConfigOpen && (
+                <PlugAnalysis
+                    columns={columns}
+                    handleAnalysis={() => null}
+                    onOpenChange={setPlugConfigOpen}
+                    open={plugConfigOpen}
+                    record={plugRecord}
                 />
             )}
         </div>

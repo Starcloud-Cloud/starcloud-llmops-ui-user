@@ -52,11 +52,6 @@ const PlugAnalysis = ({
             })) || []
         );
     }, [record]);
-    useEffect(() => {
-        return () => {
-            clearInterval(timer.current);
-        };
-    }, []);
 
     useEffect(() => {
         if (!record?.fieldMap) {
@@ -248,14 +243,14 @@ const PlugAnalysis = ({
         }
     }, [materialExecutionOpen]);
     useEffect(() => {
-        if (!open || !execountLoading) {
+        if (!open || !materialExecutionOpen) {
             clearInterval(timer.current);
         }
 
         return () => {
             clearInterval(timer.current);
         };
-    }, [execountLoading, open]);
+    }, [open, materialExecutionOpen]);
     return (
         <ModalForm
             title={

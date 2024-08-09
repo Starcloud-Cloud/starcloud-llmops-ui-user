@@ -132,6 +132,29 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             render: (_: any, row: any) => <div className="line-clamp-3">{row.variableValue}</div>
         }
     ];
+    const outputColumns: any = [
+        {
+            title: '字段名称',
+            dataIndex: 'variableKey',
+            align: 'center',
+            editable: false
+        },
+        {
+            title: '字段描述',
+            dataIndex: 'variableDesc',
+            align: 'center'
+        },
+        {
+            title: '字段类型',
+            dataIndex: 'variableType',
+            align: 'center',
+            valueType: 'select',
+            fieldProps: {
+                options: typeList
+            },
+            editable: false
+        }
+    ];
     const [inputKeys, setinputKeys] = useState<any[]>([]);
     const [outuptKeys, setoutuptKeys] = useState<any[]>([]);
     const [inputTable, setInputTable] = useState<any[]>([]);
@@ -203,6 +226,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             const newList = res.list?.filter((item: any) => item.type === 35);
             setAccountList(newList);
         });
+        return () => {
+            clearInterval(timer.current);
+        };
     }, []);
     useEffect(() => {
         if (rows) {
@@ -447,7 +473,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                         tableAlertRender={false}
                                         rowSelection={false}
                                         toolBarRender={false}
-                                        columns={inputColumns}
+                                        columns={outputColumns}
                                         value={outputTable}
                                         pagination={false}
                                         recordCreatorProps={false}
@@ -471,98 +497,103 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     </Form.Item>
                 )}
             </Form>
-            <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
-                <Form labelCol={{ span: 6 }}>
-                    <Form.Item label="机器人名称">
-                        <div className="font-bold">{botList?.find((item) => item.bot_id)?.bot_name}</div>
-                    </Form.Item>
-                    <Form.Item label="Coze参数验证">
-                        <div className="flex gap-2 items-center">
-                            <TextArea
-                                className="w-full"
-                                placeholder="可输入触发机器人的对话"
-                                rows={4}
-                                value={bindData.content}
-                                onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
-                            />
-                            <Button
-                                loading={bindLoading}
-                                onClick={async () => {
-                                    setBindLoading(true);
-                                    try {
-                                        const res = await plugVerify({
-                                            accessTokenId: form.getFieldValue('accessTokenId'),
-                                            content: bindData.content,
-                                            botId: form.getFieldValue('botId')
-                                        });
-                                        timer.current = setInterval(async () => {
-                                            const result = await plugVerifyResult({
-                                                code: res,
-                                                accessTokenId: form.getFieldValue('accessTokenId')
+            {plugOpen && (
+                <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
+                    <Form labelCol={{ span: 6 }}>
+                        <Form.Item label="机器人名称">
+                            <div className="font-bold">
+                                {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
+                            </div>
+                        </Form.Item>
+                        <Form.Item label="Coze参数验证">
+                            <div className="flex gap-2 items-center">
+                                <TextArea
+                                    className="w-full"
+                                    placeholder="可输入触发机器人的对话"
+                                    rows={4}
+                                    value={bindData.content}
+                                    onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
+                                />
+                                <Button
+                                    loading={bindLoading}
+                                    onClick={async () => {
+                                        setBindLoading(true);
+                                        try {
+                                            const res = await plugVerify({
+                                                accessTokenId: form.getFieldValue('accessTokenId'),
+                                                content: bindData.content,
+                                                botId: form.getFieldValue('botId')
                                             });
-                                            if (result.verifyState) {
-                                                clearInterval(timer.current);
-                                                setverifyStatus('success');
-                                                setBindData({
-                                                    ...bindData,
-                                                    arguments: result.arguments ? JSON.stringify(result.arguments) : '',
-                                                    output: result.output ? JSON.stringify(result.output) : ''
+                                            timer.current = setInterval(async () => {
+                                                const result = await plugVerifyResult({
+                                                    code: res,
+                                                    accessTokenId: form.getFieldValue('accessTokenId')
                                                 });
-                                                setBindLoading(false);
-                                            }
-                                        }, 2000);
-                                    } catch (err: any) {
-                                        setverifyStatus('error');
-                                        setVerErrmessage(err.msg);
-                                        setBindLoading(false);
-                                    }
-                                }}
-                                type="primary"
-                            >
-                                绑定验证
-                            </Button>
-                        </div>
-                    </Form.Item>
-                    <Form.Item label="验证状态">
-                        <Tag color={verifyStatus}>
-                            {verifyStatus === 'success' ? '校验成功' : verifyStatus === 'error' ? '检验失败' : '待校验'}
-                        </Tag>
-                        <span className="text-xs text-[#ff4d4f]">{verErrmessage}</span>
-                    </Form.Item>
-                    <Form.Item label="入参数据示例">
-                        <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
-                        <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
-                    </Form.Item>
-                    <Form.Item label="出参数据示例">
-                        <ChatMarkdown textContent={value2JsonMd(bindData.output)} />
-                        <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
-                    </Form.Item>
-                </Form>
-                <div className="flex justify-center">
-                    <Button
-                        className="w-[100px]"
-                        disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
-                        onClick={() => {
-                            setStatus('success');
-                            setVerErrmessage('');
-                            form.setFieldValue('input', bindData.arguments);
-                            form.setFieldValue('output', bindData.output);
-                            setBindData({
-                                content: '',
-                                arguments: '',
-                                output: ''
-                            });
-                            setverifyStatus('gold');
-                            getTableData(bindData.arguments, setInputTable, setinputKeys);
-                            getTableData(bindData.output, setOutputTable, setoutuptKeys);
-                            setPlugOpen(false);
-                        }}
-                        type="primary"
-                    >
-                        确认
-                    </Button>
-                </div>
-            </Modal>
+                                                if (result.verifyState) {
+                                                    clearInterval(timer.current);
+                                                    setverifyStatus('success');
+                                                    setBindData({
+                                                        ...bindData,
+                                                        arguments: result.arguments ? JSON.stringify(result.arguments) : '',
+                                                        output: result.output ? JSON.stringify(result.output) : ''
+                                                    });
+                                                    setBindLoading(false);
+                                                }
+                                            }, 2000);
+                                        } catch (err: any) {
+                                            clearInterval(timer.current);
+                                            setverifyStatus('error');
+                                            setVerErrmessage(err.msg);
+                                            setBindLoading(false);
+                                        }
+                                    }}
+                                    type="primary"
+                                >
+                                    绑定验证
+                                </Button>
+                            </div>
+                        </Form.Item>
+                        <Form.Item label="验证状态">
+                            <Tag color={verifyStatus}>
+                                {verifyStatus === 'success' ? '校验成功' : verifyStatus === 'error' ? '检验失败' : '待校验'}
+                            </Tag>
+                            <span className="text-xs text-[#ff4d4f]">{verErrmessage}</span>
+                        </Form.Item>
+                        <Form.Item label="入参数据示例">
+                            <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
+                            <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
+                        </Form.Item>
+                        <Form.Item label="出参数据示例">
+                            <ChatMarkdown textContent={value2JsonMd(bindData.output)} />
+                            <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
+                        </Form.Item>
+                    </Form>
+                    <div className="flex justify-center">
+                        <Button
+                            className="w-[100px]"
+                            disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
+                            onClick={() => {
+                                setStatus('success');
+                                setVerErrmessage('');
+                                form.setFieldValue('input', bindData.arguments);
+                                form.setFieldValue('output', bindData.output);
+                                setBindData({
+                                    content: '',
+                                    arguments: '',
+                                    output: ''
+                                });
+                                setverifyStatus('gold');
+                                getTableData(bindData.arguments, setInputTable, setinputKeys);
+                                getTableData(bindData.output, setOutputTable, setoutuptKeys);
+                                setPlugOpen(false);
+                            }}
+                            type="primary"
+                        >
+                            确认
+                        </Button>
+                    </div>
+                </Modal>
+            )}
             <div className="flex justify-center">
                 <Button onClick={handleOk} type="primary" className="w-[100px]">
                     保存

@@ -243,19 +243,24 @@ export const TableHeader = ({
             align: 'center'
         },
         {
-            title: '使用场景',
+            title: '实现方式',
             align: 'center',
-            render: (_, row) => <Tag color="processing">{sceneList?.find((i) => i.value === row.scene)?.label}</Tag>
+            render: (_, row) => <Tag color="processing">{wayList?.find((i) => i.value === row.type)?.label}</Tag>
         },
         {
-            title: '发布到应用市场',
+            title: '使用场景',
             align: 'center',
-            render: (_, row) => <Tag color="processing">{row.published ? '是' : '否'}</Tag>
+            render: (_, row) => <div>{sceneList?.find((i) => i.value === row.scene)?.label}</div>
         },
         {
             title: '创建时间',
             align: 'center',
             render: (_, row) => dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')
+        },
+        {
+            title: '更新时间',
+            align: 'center',
+            render: (_, row) => dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')
         },
         {
             title: '创建人',
@@ -265,7 +270,7 @@ export const TableHeader = ({
         {
             title: '操作',
             align: 'center',
-            width: 150,
+            width: 80,
             render: (_, record, index) => (
                 <Space>
                     <Button
@@ -284,6 +289,7 @@ export const TableHeader = ({
                         onConfirm={async () => {
                             await delOwner(record.uid);
                             getTablePlugList();
+                            getPlugList();
                         }}
                         okText="确定"
                         cancelText="取消"
@@ -345,14 +351,17 @@ export const TableHeader = ({
         setPlugTableData(result);
     };
     useEffect(() => {
-        metadataData().then((res: any) => {
-            setMetaData(res);
-            setSceneList(res.scene);
-            setWayList(res.platform);
-        });
-        getPlugList();
-        getTablePlugList();
-    }, []);
+        if (plugMarketOpen) {
+            metadataData().then((res: any) => {
+                setMetaData(res);
+                setSceneList(res.scene);
+                setWayList(res.platform);
+            });
+            getPlugList();
+            getTablePlugList();
+        }
+    }, [plugMarketOpen]);
+
     return (
         <div>
             <div className="flex  mb-4">
@@ -736,11 +745,9 @@ export const TableHeader = ({
                                                                     ) : (
                                                                         <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
                                                                     )}
-                                                                    <div>
-                                                                        <div className="flex-1 text-[18px] font-bold">{el.pluginName}</div>
-                                                                        <div className="line-clamp-3">
-                                                                            {sceneList?.find((i) => i.value === el.scene)?.label}
-                                                                        </div>
+                                                                    <div className="flex-1">
+                                                                        <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                        <div className="line-clamp-3 h-[66px]">{el.description}</div>
                                                                     </div>
                                                                 </div>
                                                                 <Divider className="my-2" />
@@ -786,7 +793,10 @@ export const TableHeader = ({
                     sceneList={sceneList}
                     rows={rows}
                     setRows={setRows}
-                    getTablePlugList={getTablePlugList}
+                    getTablePlugList={() => {
+                        getTablePlugList();
+                        getPlugList();
+                    }}
                 />
             )}
             {plugConfigOpen && (

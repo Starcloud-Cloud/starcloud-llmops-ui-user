@@ -1,7 +1,7 @@
 import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Divider } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
@@ -9,6 +9,7 @@ import { ModalForm } from '@ant-design/pro-components';
 import { addPlugConfigInfo, updatePlugConfigInfo } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
+import ResultLoading from '../resultLoading';
 
 const value2JsonMd = (value: any) => `
 ~~~json
@@ -52,48 +53,6 @@ const PlugAnalysis = ({
             })) || []
         );
     }, [record]);
-    const timer = useRef<any>(null);
-    const handleExecute = async () => {
-        setExecountLoading(true);
-        try {
-            const code = await plugExecute({
-                uuid: record.pluginUid,
-                inputParams: {
-                    URL: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
-                }
-            });
-            timer.current = setInterval(async () => {
-                const res = await plugexEcuteResult({
-                    code,
-                    uuid: record.pluginUid
-                });
-                if (res.status !== 'in_progress') {
-                    const List = res.output;
-                    const newList = List.map((item: any) => {
-                        const newItem: any = {};
-                        for (let key in item) {
-                            if (redBookData.bindFieldData[key]) {
-                                newItem[redBookData.bindFieldData[key]] = item[key];
-                            } else {
-                                newItem[key] = item[key];
-                            }
-                        }
-                        return newItem;
-                    });
-                    downTableData(newList, 1);
-                    setPlugMarketOpen(false);
-                    onOpenChange(false);
-                    setExecountLoading(false);
-                    clearInterval(timer.current);
-                    console.log(res.output);
-                }
-            }, 2000);
-        } catch (err) {
-            setExecountLoading(false);
-            clearInterval(timer.current);
-        }
-    };
-
     useEffect(() => {
         return () => {
             clearInterval(timer.current);
@@ -160,6 +119,134 @@ const PlugAnalysis = ({
             setData(data);
         }
     }, [columns, record]);
+
+    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
+    //处理过的素材数据
+    const aref = useRef(false);
+    const totalCountRef = useRef(0);
+    const [totalCount, setTotalCount] = useState(0);
+    const executionCountRef = useRef(0);
+    const [executionCount, setExecutionCount] = useState(0);
+    const successCountRef = useRef(0);
+    const [successCount, setSuccessCount] = useState(0);
+    const errorCountRef = useRef(0);
+    const [errorCount, setErrorCount] = useState(0);
+    const errorMessageRef = useRef<any[]>([]);
+    const [errorMessage, setErrorMessage] = useState<any[]>([]);
+
+    const preeNum = useRef(0);
+    const [prenum, setPrenum] = useState(0);
+    const materialPre = useMemo(() => {
+        return ((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current;
+    }, [successCount, totalCount, prenum]);
+
+    const materialzanListRef = useRef<any[]>([]);
+    const [materialzanList, setMaterialzanList] = useState<any[]>([]);
+
+    const timer = useRef<any>(null);
+    const handleExecute = async (retry?: boolean) => {
+        setExecountLoading(true);
+        try {
+            const code = await plugExecute({
+                uuid: record.pluginUid,
+                inputParams: {
+                    URL: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
+                }
+            });
+            setExecountLoading(false);
+            if (!retry) {
+                materialzanListRef.current = [];
+                setMaterialzanList(materialzanListRef.current);
+            }
+            aref.current = false;
+            totalCountRef.current = 1;
+            setTotalCount(totalCountRef.current);
+            executionCountRef.current = 1;
+            setExecutionCount(executionCountRef.current);
+
+            setMaterialExecutionOpen(true);
+            timer.current = setInterval(async () => {
+                const res = await plugexEcuteResult({
+                    code,
+                    uuid: record.pluginUid
+                });
+                if (res.status !== 'in_progress') {
+                    const List = res.output;
+                    const newList = List.map((item: any) => {
+                        const newItem: any = {};
+                        for (let key in item) {
+                            if (redBookData.bindFieldData[key]) {
+                                newItem[redBookData.bindFieldData[key]] = item[key];
+                            } else {
+                                newItem[key] = item[key];
+                            }
+                        }
+                        return newItem;
+                    });
+                    executionCountRef.current = 0;
+                    setExecutionCount(executionCountRef.current);
+                    successCountRef.current = 1;
+                    setSuccessCount(successCountRef.current);
+                    materialzanListRef.current = newList;
+                    setMaterialzanList(materialzanListRef.current);
+                    clearInterval(timer.current);
+                }
+            }, 2000);
+        } catch (err) {
+            executionCountRef.current = 0;
+            setExecutionCount(executionCountRef.current);
+            errorCountRef.current = 1;
+            setErrorCount(successCountRef.current);
+            setExecountLoading(false);
+            clearInterval(timer.current);
+        }
+    };
+    const timeLoading = useRef<any>(null);
+    const grupPre = useRef(0);
+    useEffect(() => {
+        if (materialExecutionOpen) {
+            const newNum = grupPre.current || executionCountRef.current || 1;
+            console.log(newNum, totalCountRef.current);
+
+            const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
+            timeLoading.current = setInterval(() => {
+                console.log(newNum, preeNum.current, newSuccessNum);
+
+                if (preeNum.current < newSuccessNum - 1) {
+                    preeNum.current += 1;
+                    setPrenum(preeNum.current);
+                } else {
+                    clearInterval(timeLoading.current);
+                }
+            }, 800);
+        } else {
+            clearInterval(timeLoading.current);
+        }
+    }, [materialExecutionOpen, executionCount]);
+    useEffect(() => {
+        if (successCount || errorCount) {
+            preeNum.current = 0;
+            setPrenum(preeNum.current);
+            clearInterval(timeLoading.current);
+            console.log(11111, preeNum.current);
+        }
+        return () => {
+            clearInterval(timeLoading.current);
+        };
+    }, [successCount, errorCount]);
+    useEffect(() => {
+        if (!materialExecutionOpen) {
+            errorMessageRef.current = [];
+            setErrorMessage(errorMessageRef.current);
+            executionCountRef.current = 0;
+            setExecutionCount(executionCountRef.current);
+            errorCountRef.current = 0;
+            setErrorCount(errorCountRef.current);
+            successCountRef.current = 0;
+            setSuccessCount(successCountRef.current);
+        }
+    }, [materialExecutionOpen]);
+    console.log(columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex)));
 
     return (
         <ModalForm
@@ -376,6 +463,52 @@ const PlugAnalysis = ({
                     </Button>
                 </div>
             </div>
+            <ResultLoading
+                materialExecutionOpen={materialExecutionOpen}
+                setMaterialExecutionOpen={setMaterialExecutionOpen}
+                materialPre={materialPre}
+                executionCount={executionCount}
+                totalCount={totalCount}
+                successCount={successCount}
+                errorCount={errorCount}
+                materialzanList={materialzanList}
+                errorMessage={errorMessage}
+                columns={[
+                    { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
+                    ...columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))
+                ]}
+                resetExe={() => {
+                    errorCountRef.current = 0;
+                    successCountRef.current = 0;
+                    executionCountRef.current = 0;
+                    errorMessageRef.current = [];
+                    setErrorCount(errorCountRef.current);
+                    setSuccessCount(successCountRef.current);
+                    setExecutionCount(executionCountRef.current);
+                    setErrorMessage(errorMessageRef.current);
+                    handleExecute();
+                }}
+                reTryExe={() => {
+                    errorCountRef.current = 0;
+                    executionCountRef.current = 0;
+                    errorMessageRef.current = [];
+                    setErrorCount(errorCountRef.current);
+                    setExecutionCount(executionCountRef.current);
+                    setErrorMessage(errorMessageRef.current);
+                    handleExecute(true);
+                }}
+                handleSave={() => {
+                    downTableData(materialzanListRef.current, 1);
+                    setPlugMarketOpen(false);
+                    onOpenChange(false);
+                    setMaterialExecutionOpen(false);
+                }}
+                handleCancel={() => {
+                    executionCountRef.current = 0;
+                    setExecutionCount(executionCountRef.current);
+                    aref.current = true;
+                }}
+            />
         </ModalForm>
     );
 };

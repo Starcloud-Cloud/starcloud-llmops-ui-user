@@ -10,6 +10,7 @@ import RedBookAnalysis from './components/redBookAnalysis';
 import ImgOcr from './components/imgOcr';
 import TextExtraction from './components/textExtraction';
 import PlugModal from './components/plugModal';
+import ResultLoading from './components/resultLoading';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { EditType } from 'views/materialLibrary/detail';
@@ -883,195 +884,122 @@ const AiCreate = ({
                 </div>
             </Modal>
             {/* 素材执行 loading */}
-            {/* {materialExecutionOpen && ( */}
-            <Modal width={'80%'} open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>
-                <div className="flex justify-center ">
-                    <Progress percent={materialPre} type="circle" />
-                </div>
-                {executionCount !== 0 && (
-                    <div className="flex justify-center">
-                        <div className="font-bold mt-4 loader"></div>
-                    </div>
-                )}
-                <div className="my-4">
-                    {errorMessage?.length > 0 &&
-                        errorMessage?.map((item, i) => (
-                            <div className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
-                                <span className="font-bold">错误信息 {i + 1}：</span>
-                                {item}
-                            </div>
-                        ))}
-                </div>
-
-                {totalCount === successCount + errorCount && successCount !== 0 && (
-                    <div className="my-4 text-xs flex justify-center">
-                        <span className="font-bold">已经生成完成，点击确认导入素材</span>
-                    </div>
-                )}
-                <div className="flex gap-2 justify-center my-4 text-xs">
-                    <div>
-                        <Tag>全部：{totalCount}</Tag>
-                    </div>
-                    <div>
-                        <Tag color="processing">待执行：{totalCount - successCount - errorCount - executionCount}</Tag>
-                    </div>
-                    <div>
-                        <Tag color="processing">执行中：{executionCount}</Tag>
-                    </div>
-                    <div>
-                        <Tag color="success">执行完成：{successCount}</Tag>
-                    </div>
-                    <div>
-                        <Tag color="error">执行失败：{errorCount}</Tag>
-                    </div>
-                </div>
-                <div className="material-index">
-                    <Table
-                        className=" overflow-auto"
-                        columns={[
-                            { title: '序号', width: 70, render: (_, row, index) => <span>{index + 1}</span> },
-                            ...(selectValue === 'field'
-                                ? imageExe(columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex)))
-                                : selectValue === 'batch'
-                                ? imageExe(columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex)))
-                                : selectValue === 'xhs'
-                                ? xhsCloumns
-                                : selectValue === 'text'
-                                ? textCloumns
-                                : selectValue === 'ocr'
-                                ? imageExe(columns?.filter((item: any) => ocrData.checkedFieldList?.includes(item.dataIndex)))
-                                : selectValue === 'wchat'
-                                ? imageExe(columns.slice(0, columns?.length - 2))
-                                : [])
-                        ]}
-                        virtual={true}
-                        dataSource={materialzanList}
-                    />
-                </div>
-                <div className="flex justify-center gap-2 mt-4">
-                    {executionCount === 0 && (
-                        <>
-                            <Button
-                                className="w-[100px]"
-                                size="small"
-                                onClick={() => {
-                                    errorCountRef.current = 0;
-                                    successCountRef.current = 0;
-                                    executionCountRef.current = 0;
-                                    errorMessageRef.current = [];
-                                    setErrorCount(errorCountRef.current);
-                                    setSuccessCount(successCountRef.current);
-                                    setExecutionCount(executionCountRef.current);
-                                    setErrorMessage(errorMessageRef.current);
-                                    if (selectValue === 'batch') {
-                                        aimaterialCreate();
-                                    } else if (selectValue === 'ocr') {
-                                        handleOCR(ocrNum.current);
-                                    } else if (selectValue === 'field') {
-                                        editMaterial(batchNum.current);
-                                    } else if (selectValue === 'xhs') {
-                                        xhsAnalysis();
-                                    } else if (selectValue === 'text') {
-                                        handleTextData(textNum.current);
-                                    } else if (selectValue === 'wchat') {
-                                        handleWchat(undefined, true);
-                                    }
-                                }}
-                            >
-                                重新执行
-                            </Button>
-                            {errorMessage?.length > 0 && (
-                                <Button
-                                    className="w-[100px]"
-                                    size="small"
-                                    onClick={() => {
-                                        errorCountRef.current = 0;
-                                        executionCountRef.current = 0;
-                                        errorMessageRef.current = [];
-                                        setErrorCount(errorCountRef.current);
-                                        setExecutionCount(executionCountRef.current);
-                                        setErrorMessage(errorMessageRef.current);
-                                        if (selectValue === 'batch') {
-                                            aimaterialCreate(true);
-                                        } else if (selectValue === 'field') {
-                                            editMaterial(batchNum.current, true);
-                                        } else if (selectValue === 'ocr') {
-                                            handleOCR(ocrNum.current, true);
-                                        } else if (selectValue === 'xhs') {
-                                            xhsAnalysis(true);
-                                        } else if (selectValue === 'text') {
-                                            handleTextData(textNum.current, true);
-                                        } else if (selectValue === 'wchat') {
-                                            handleWchat(undefined, true);
-                                        }
-                                    }}
-                                >
-                                    失败重试
-                                </Button>
-                            )}
-                            <Button
-                                onClick={() => {
-                                    if (selectValue === 'batch') {
-                                        downTableData(materialzanListRef.current, 1);
-                                        setMaterialExecutionOpen(false);
-                                        setPlugOpen(false);
-                                        setSelectedRowKeys(uuidListsRef.current);
-                                    } else if (selectValue === 'field') {
-                                        setSelList([]);
-                                        setSelKeyList([]);
-                                        downTableData(materialzanListRef.current, 2);
-                                        setMaterialExecutionOpen(false);
-                                        setPlugOpen(false);
-                                        setSelectedRowKeys(uuidLists);
-                                    } else if (selectValue === 'xhs') {
-                                        downTableData(materialzanListRef.current, 1);
-                                        setMaterialExecutionOpen(false);
-                                        setPlugOpen(false);
-                                        setSelectedRowKeys(uuidListsRef.current);
-                                    } else if (selectValue === 'text') {
-                                        setSelList([]);
-                                        setSelKeyList([]);
-                                        downTableData(materialzanListRef.current, 2);
-                                        setMaterialExecutionOpen(false);
-                                        setPlugOpen(false);
-                                        setSelectedRowKeys(uuidLists);
-                                    } else if (selectValue === 'ocr') {
-                                        setSelList([]);
-                                        setSelKeyList([]);
-                                        downTableData(materialzanListRef.current, 2);
-                                        setMaterialExecutionOpen(false);
-                                        setPlugOpen(false);
-                                        setSelectedRowKeys(uuidLists);
-                                    } else if (selectValue === 'wchat') {
-                                        downTableData(materialzanListRef.current, 1);
-                                        setMaterialExecutionOpen(false);
-                                        setPlugOpen(false);
-                                    }
-                                }}
-                                className="w-[100px]"
-                                size="small"
-                                type="primary"
-                            >
-                                确认
-                            </Button>
-                        </>
-                    )}
-                    {executionCount > 0 && (
-                        <Button
-                            size="small"
-                            type="primary"
-                            onClick={() => {
-                                executionCountRef.current = 0;
-                                setExecutionCount(executionCountRef.current);
-                                aref.current = true;
-                            }}
-                        >
-                            取消执行
-                        </Button>
-                    )}
-                </div>
-            </Modal>
-            {/* )} */}
+            {materialExecutionOpen && (
+                <ResultLoading
+                    materialExecutionOpen={materialExecutionOpen}
+                    setMaterialExecutionOpen={setMaterialExecutionOpen}
+                    materialPre={materialPre}
+                    executionCount={executionCount}
+                    totalCount={totalCount}
+                    successCount={successCount}
+                    errorCount={errorCount}
+                    materialzanList={materialzanList}
+                    errorMessage={errorMessage}
+                    columns={[
+                        { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
+                        ...(selectValue === 'field'
+                            ? imageExe(columns?.filter((item: any) => fieldCompletionData.checkedFieldList?.includes(item.dataIndex)))
+                            : selectValue === 'batch'
+                            ? imageExe(columns?.filter((item: any) => variableData.checkedFieldList?.includes(item.dataIndex)))
+                            : selectValue === 'xhs'
+                            ? xhsCloumns
+                            : selectValue === 'text'
+                            ? textCloumns
+                            : selectValue === 'ocr'
+                            ? imageExe(columns?.filter((item: any) => ocrData.checkedFieldList?.includes(item.dataIndex)))
+                            : selectValue === 'wchat'
+                            ? imageExe(columns.slice(0, columns?.length - 2))
+                            : [])
+                    ]}
+                    resetExe={() => {
+                        errorCountRef.current = 0;
+                        successCountRef.current = 0;
+                        executionCountRef.current = 0;
+                        errorMessageRef.current = [];
+                        setErrorCount(errorCountRef.current);
+                        setSuccessCount(successCountRef.current);
+                        setExecutionCount(executionCountRef.current);
+                        setErrorMessage(errorMessageRef.current);
+                        if (selectValue === 'batch') {
+                            aimaterialCreate();
+                        } else if (selectValue === 'ocr') {
+                            handleOCR(ocrNum.current);
+                        } else if (selectValue === 'field') {
+                            editMaterial(batchNum.current);
+                        } else if (selectValue === 'xhs') {
+                            xhsAnalysis();
+                        } else if (selectValue === 'text') {
+                            handleTextData(textNum.current);
+                        } else if (selectValue === 'wchat') {
+                            handleWchat(undefined, true);
+                        }
+                    }}
+                    reTryExe={() => {
+                        errorCountRef.current = 0;
+                        executionCountRef.current = 0;
+                        errorMessageRef.current = [];
+                        setErrorCount(errorCountRef.current);
+                        setExecutionCount(executionCountRef.current);
+                        setErrorMessage(errorMessageRef.current);
+                        if (selectValue === 'batch') {
+                            aimaterialCreate(true);
+                        } else if (selectValue === 'field') {
+                            editMaterial(batchNum.current, true);
+                        } else if (selectValue === 'ocr') {
+                            handleOCR(ocrNum.current, true);
+                        } else if (selectValue === 'xhs') {
+                            xhsAnalysis(true);
+                        } else if (selectValue === 'text') {
+                            handleTextData(textNum.current, true);
+                        } else if (selectValue === 'wchat') {
+                            handleWchat(undefined, true);
+                        }
+                    }}
+                    handleSave={() => {
+                        if (selectValue === 'batch') {
+                            downTableData(materialzanListRef.current, 1);
+                            setMaterialExecutionOpen(false);
+                            setPlugOpen(false);
+                            setSelectedRowKeys(uuidListsRef.current);
+                        } else if (selectValue === 'field') {
+                            setSelList([]);
+                            setSelKeyList([]);
+                            downTableData(materialzanListRef.current, 2);
+                            setMaterialExecutionOpen(false);
+                            setPlugOpen(false);
+                            setSelectedRowKeys(uuidLists);
+                        } else if (selectValue === 'xhs') {
+                            downTableData(materialzanListRef.current, 1);
+                            setMaterialExecutionOpen(false);
+                            setPlugOpen(false);
+                            setSelectedRowKeys(uuidListsRef.current);
+                        } else if (selectValue === 'text') {
+                            setSelList([]);
+                            setSelKeyList([]);
+                            downTableData(materialzanListRef.current, 2);
+                            setMaterialExecutionOpen(false);
+                            setPlugOpen(false);
+                            setSelectedRowKeys(uuidLists);
+                        } else if (selectValue === 'ocr') {
+                            setSelList([]);
+                            setSelKeyList([]);
+                            downTableData(materialzanListRef.current, 2);
+                            setMaterialExecutionOpen(false);
+                            setPlugOpen(false);
+                            setSelectedRowKeys(uuidLists);
+                        } else if (selectValue === 'wchat') {
+                            downTableData(materialzanListRef.current, 1);
+                            setMaterialExecutionOpen(false);
+                            setPlugOpen(false);
+                        }
+                    }}
+                    handleCancel={() => {
+                        executionCountRef.current = 0;
+                        setExecutionCount(executionCountRef.current);
+                        aref.current = true;
+                    }}
+                />
+            )}
         </div>
     );
 };

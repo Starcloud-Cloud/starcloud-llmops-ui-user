@@ -1,4 +1,4 @@
-import { Input, Select, Button, Table, message, Switch, Popover } from 'antd';
+import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Divider } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
@@ -18,6 +18,7 @@ ${JSON.stringify(value, null, 2)}
 `;
 
 const PlugAnalysis = ({
+    metaData,
     columns,
     handleAnalysis,
     downTableData,
@@ -26,6 +27,7 @@ const PlugAnalysis = ({
     open,
     record
 }: {
+    metaData: any;
     columns: any[];
     handleAnalysis: () => void;
     setPlugMarketOpen: (data: any) => void;
@@ -34,6 +36,7 @@ const PlugAnalysis = ({
     open: any;
     record: any;
 }) => {
+    console.log(record);
     const [execountLoading, setExecountLoading] = useState(false);
     const [redBookData, setRedBookData] = useState<any>({});
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
@@ -253,7 +256,20 @@ const PlugAnalysis = ({
     }, [execountLoading, open]);
     return (
         <ModalForm
-            title={'数据新增'}
+            title={
+                <div className="flex flex-col">
+                    <div className="flex  items-center mb-2">
+                        <span className="text-[26px]">数据新增</span>
+                        <div className="flex justify-between items-center ml-2 ">
+                            <Space>
+                                <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
+                                <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
+                            </Space>
+                        </div>
+                    </div>
+                    <div className="text-xs text-black/50 mt-1">{record.description}</div>
+                </div>
+            }
             open={open}
             onOpenChange={onOpenChange}
             modalProps={{
@@ -401,10 +417,6 @@ const PlugAnalysis = ({
                 <div className="flex justify-center gap-6 mt-6">
                     <Button
                         onClick={async () => {
-                            if (!redBookData.requirement) {
-                                setrequirementStatusOpen(true);
-                                return false;
-                            }
                             if (!record.fieldMap && !record.executeParams) {
                                 const res = await addPlugConfigInfo({
                                     libraryUid: record.libraryUid,
@@ -442,6 +454,28 @@ const PlugAnalysis = ({
                             if (!redBookData.fieldList?.length) {
                                 message.error('请至少绑定一素材字段!');
                                 return;
+                            }
+                            if (!record.fieldMap && !record.executeParams) {
+                                const res = await addPlugConfigInfo({
+                                    libraryUid: record.libraryUid,
+                                    pluginUid: record.pluginUid,
+                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                    executeParams: JSON.stringify({})
+                                });
+                                if (res) {
+                                    message.success('保存成功');
+                                }
+                            } else {
+                                const res = await updatePlugConfigInfo({
+                                    libraryUid: record.libraryUid,
+                                    pluginUid: record.pluginUid,
+                                    uid: record.uid,
+                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                    executeParams: JSON.stringify({})
+                                });
+                                if (res) {
+                                    message.success('保存成功');
+                                }
                             }
                             handleExecute();
                             handleAnalysis();

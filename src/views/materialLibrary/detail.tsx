@@ -311,6 +311,7 @@ export const TableHeader = ({
     const [plugUid, setPlugUid] = useState('');
     const [plugRecord, setPlugRecord] = useState<any>(null);
     const [plugConfigOpen, setPlugConfigOpen] = useState(false);
+    const [metaData, setMetaData] = useState([]);
 
     const handleOpenPlug = async (record: any) => {
         const data = await getPlugConfigInfo({
@@ -352,6 +353,7 @@ export const TableHeader = ({
     useEffect(() => {
         if (plugMarketOpen) {
             metadataData().then((res: any) => {
+                setMetaData(res);
                 setSceneList(res.scene);
                 setWayList(res.platform);
             });
@@ -359,6 +361,7 @@ export const TableHeader = ({
             getTablePlugList();
         }
     }, [plugMarketOpen]);
+
     return (
         <div>
             <div className="flex  mb-4">
@@ -641,45 +644,7 @@ export const TableHeader = ({
                 </div>
             </div>
             <Modal width={800} maskClosable={false} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>
-                <div className="font-bold text-xl mb-8 flex items-center gap-2">
-                    <span> {plugTitle}</span>
-                    <Space>
-                        <div className="flex items-center">
-                            <Tag color="processing">使用场景</Tag>
-                        </div>
-                        <div className="flex items-center">
-                            <Tag color="processing">实现方式</Tag>
-                        </div>
-                        <Popover
-                            content={
-                                <Space direction={'vertical'}>
-                                    <Space>
-                                        <div>使用场景：</div>
-                                        <div>素材新增</div>
-                                    </Space>
-                                    <Space>
-                                        <div>实现方式：</div>
-                                        <div> coze api</div>
-                                    </Space>
-                                    <Space>
-                                        <div>coze bot：</div>
-                                        <div>微信公众号分析</div>
-                                    </Space>
-                                    <Space>
-                                        <div>参数配置：</div>
-                                        <div>配置</div>
-                                    </Space>
-                                    <Space>
-                                        <div>创建时间：</div>
-                                        <div> 2021-10-10 12:13:00</div>
-                                    </Space>
-                                </Space>
-                            }
-                        >
-                            <InfoCircleOutlined className="cursor-pointer" />
-                        </Popover>
-                    </Space>
-                </div>
+                <div className="font-bold text-xl mb-8 flex items-center gap-2">{plugTitle}</div>
                 <AiCreate
                     libraryId={libraryId}
                     bizType={bizType}
@@ -843,6 +808,7 @@ export const TableHeader = ({
                     setPlugMarketOpen={setPlugMarketOpen}
                     open={plugConfigOpen}
                     record={plugRecord}
+                    metaData={metaData}
                 />
             )}
         </div>

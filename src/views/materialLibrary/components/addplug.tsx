@@ -43,7 +43,8 @@ const AddPlug = ({
     const [bindData, setBindData] = useState({
         content: '',
         arguments: '',
-        output: ''
+        output: '',
+        outputType: ''
     });
     const getBotList = async (label: string, value: any) => {
         if (label === 'spaceId') {
@@ -572,7 +573,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     setBindData({
                                                         ...bindData,
                                                         arguments: result.arguments ? JSON.stringify(result.arguments) : '',
-                                                        output: result.output ? JSON.stringify(result.output) : ''
+                                                        output: result.output ? JSON.stringify(result.output) : '',
+                                                        outputType: res.outputType
                                                     });
                                                     setBindLoading(false);
                                                 }
@@ -617,7 +619,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 setBindData({
                                     content: '',
                                     arguments: '',
-                                    output: ''
+                                    output: '',
+                                    outputType: ''
                                 });
                                 setverifyStatus('gold');
                                 getTableData(bindData.arguments, setInputTable, setinputKeys);

@@ -144,11 +144,13 @@ const PlugAnalysis = ({
     const handleExecute = async (retry?: boolean) => {
         setExecountLoading(true);
         try {
+            let newData: any = redBookData.requirement;
+            try {
+                newData = JSON.parse(redBookData.requirement);
+            } catch (err) {}
             const code = await plugExecute({
                 uuid: record.pluginUid,
-                inputParams: {
-                    URL: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
-                }
+                inputParams: newData
             });
             setExecountLoading(false);
             if (!retry) {
@@ -243,8 +245,6 @@ const PlugAnalysis = ({
             setSuccessCount(successCountRef.current);
         }
     }, [materialExecutionOpen]);
-    console.log(columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex)));
-
     return (
         <ModalForm
             title={'数据新增'}
@@ -270,7 +270,6 @@ const PlugAnalysis = ({
                     </Popover>
                 </div>
                 <TextArea
-                    placeholder=" 使用逗号或回车来分割"
                     defaultValue={redBookData?.requirement}
                     status={!redBookData?.requirement && requirementStatusOpen ? 'error' : ''}
                     onBlur={(e) => {
@@ -430,10 +429,10 @@ const PlugAnalysis = ({
                     <Button
                         loading={execountLoading}
                         onClick={async () => {
-                            // if (!redBookData.requirement) {
-                            //     message.error('请输入小红书链接!');
-                            //     return;
-                            // }
+                            if (!redBookData.requirement) {
+                                message.error('请输入小红书链接!');
+                                return;
+                            }
                             if (!redBookData.fieldList?.length) {
                                 message.error('请至少绑定一素材字段!');
                                 return;

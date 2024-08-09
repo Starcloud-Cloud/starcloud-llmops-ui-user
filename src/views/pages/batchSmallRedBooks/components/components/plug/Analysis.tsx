@@ -102,8 +102,8 @@ const PlugAnalysis = ({
             let data: any[] = [];
             redList.forEach((redItem: any) => {
                 const value =
-                    columns.find((item) => item.title === redItem.des)?.dataIndex ||
-                    columns.find((item) => item.dataIndex === redItem.value)?.dataIndex;
+                    columns.filter((item) => !item.isDefault).find((item) => item.titleText === redItem.des)?.dataIndex ||
+                    columns.filter((item) => !item.isDefault).find((item) => item.dataIndex === redItem.value)?.dataIndex;
 
                 data.push({
                     label: redItem.label,
@@ -222,7 +222,8 @@ const PlugAnalysis = ({
                                 title: '字段',
                                 dataIndex: 'des',
                                 align: 'center',
-                                width: '40%'
+                                width: '40%',
+                                render: (_, record) => record.des || record.label
                             },
                             {
                                 title: '绑定到',

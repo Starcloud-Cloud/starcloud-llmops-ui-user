@@ -7,7 +7,9 @@ import {
     SettingOutlined,
     FileImageOutlined,
     FileTextOutlined,
-    ExclamationCircleFilled
+    ExclamationCircleFilled,
+    AntDesignOutlined,
+    AppstoreFilled
 } from '@ant-design/icons';
 import {
     Button,
@@ -723,7 +725,11 @@ export const TableHeader = ({
                                                             key={el.uid}
                                                         >
                                                             <div className="flex gap-4">
-                                                                <div className="w-[64px] h-[64px] rounded-lg border border-solid border-[#d9d9d9]"></div>
+                                                                {!el.avatar ? (
+                                                                    <Avatar shape="square" size={64} src={el.avatar} />
+                                                                ) : (
+                                                                    <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                                )}
                                                                 <div>
                                                                     <div className="flex-1 text-[18px] font-bold">{el.pluginName}</div>
                                                                     <div className="line-clamp-3 h-[66px]">
@@ -852,7 +858,6 @@ const MaterialLibraryDetail = ({
     }, [selectImg]);
 
     useEffect(() => {
-        console.log(123);
         dictData('', 'material_format_type').then((res) => {
             setTypeList(res.list);
         });
@@ -891,6 +896,7 @@ const MaterialLibraryDetail = ({
                                 )}
                             </div>
                         ),
+                        titleText: item.desc,
                         required: !!item.required,
                         width: item.width || 400,
                         dataIndex: item.fieldName,

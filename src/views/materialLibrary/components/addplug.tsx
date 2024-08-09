@@ -1,8 +1,8 @@
-import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio, Tag, Tabs, Table } from 'antd';
+import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio, Tag, Tabs, Table, Upload } from 'antd';
 import { EditableProTable } from '@ant-design/pro-components';
-import type { TableProps } from 'antd';
+import type { TableProps, UploadProps } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
-import { DownOutlined, SisternodeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DownOutlined, SisternodeOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,6 +10,7 @@ import './index.scss';
 import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
 import ChatMarkdown from 'ui-component/Markdown';
+import { getAccessToken } from 'utils/auth';
 const AddPlug = ({
     open,
     setOpen,
@@ -165,6 +166,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             await modifyPlug({
                 ...result,
                 botId: undefined,
+                avatar: imageUrl,
                 accessTokenId: undefined,
                 entityUid: result.botId,
                 cozeTokenId: result.accessTokenId,
@@ -182,6 +184,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             await createPlug({
                 ...result,
                 botId: undefined,
+                avatar: imageUrl,
                 accessTokenId: undefined,
                 entityUid: result.botId,
                 verifyState: status === 'success' ? true : false,
@@ -211,6 +214,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 botId: rows.entityUid,
                 accessTokenId: rows.cozeTokenId
             });
+            if (rows.avatar) {
+                setImageUrl(rows.avatar);
+            }
             if (rows.inputFormart) {
                 const newList = JSON.parse(rows.inputFormart);
                 setInputTable(newList);
@@ -274,6 +280,29 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
 
     const [plugOpen, setPlugOpen] = useState(false);
     const [bindLoading, setBindLoading] = useState(false);
+    const [imageUrl, setImageUrl] = useState('');
+
+    const uploadButton = (
+        <button style={{ border: 0, background: 'none' }} type="button">
+            <PlusOutlined />
+        </button>
+    );
+    const props: UploadProps = {
+        name: 'image',
+        showUploadList: false,
+        listType: 'picture-card',
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 20,
+        onChange(info) {
+            if (info.file.status === 'done') {
+                setImageUrl(info?.file?.response?.data?.url);
+            }
+        }
+    };
+
     return (
         <Modal
             title="插件配置"
@@ -289,6 +318,14 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             <Form form={form} labelCol={{ span: 4 }}>
                 <Form.Item label="插件名称" name="pluginName" rules={[{ required: true, message: '插件名称必填' }]}>
                     <Input />
+                </Form.Item>
+                <Form.Item label="插件图标" name="pluginLogo">
+                    <Upload {...props} className="!w-[auto] cursor-pointer">
+                        {imageUrl ? <img className="rounded-full" src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+                    </Upload>
+                </Form.Item>
+                <Form.Item label="插件描述" name="description">
+                    <Input.TextArea rows={3} />
                 </Form.Item>
                 <Form.Item label="使用场景" name="scene" initialValue={'DATA_ADDED'}>
                     <CheckCard.Group disabled={rows ? true : false} size="small">

@@ -14,41 +14,7 @@ const PlugModal = ({ handleWchat }: { handleWchat: (data: any) => void }) => {
     };
     return (
         <div>
-            <div className="flex justify-between items-center">
-                <Space>
-                    <Tag color="processing">使用场景</Tag>
-                    <Tag color="processing">实现方式</Tag>
-                </Space>
-                <Popover
-                    content={
-                        <Space direction={'vertical'}>
-                            <Space>
-                                <div>使用场景：</div>
-                                <div>素材新增</div>
-                            </Space>
-                            <Space>
-                                <div>实现方式：</div>
-                                <div> coze api</div>
-                            </Space>
-                            <Space>
-                                <div>coze bot：</div>
-                                <div>微信公众号分析</div>
-                            </Space>
-                            <Space>
-                                <div>参数配置：</div>
-                                <div>配置</div>
-                            </Space>
-                            <Space>
-                                <div>创建时间：</div>
-                                <div> 2021-10-10 12:13:00</div>
-                            </Space>
-                        </Space>
-                    }
-                >
-                    <InfoCircleOutlined className="cursor-pointer" />
-                </Popover>
-            </div>
-            <div className="text-xs text-black/50 mt-4">我是描述</div>
+            <div className="text-sm text-black/50 mt-4">我是描述</div>
             <div className="text-[16px] font-bold my-4">1.输入需要抓取的小红书链接，最大支持 20 个</div>
             <TextArea
                 value={value}

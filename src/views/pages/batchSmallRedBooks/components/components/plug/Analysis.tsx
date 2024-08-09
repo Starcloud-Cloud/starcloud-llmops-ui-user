@@ -3,7 +3,6 @@ const { TextArea } = Input;
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Tooltip } from '@mui/material';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
@@ -39,6 +38,7 @@ const PlugAnalysis = ({
     const [redBookData, setRedBookData] = useState<any>({});
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [data, setData] = useState<any[]>([]);
+
     const redList = React.useMemo(() => {
         const outputFormart = JSON.parse(record?.outputFormart) || [];
         return (
@@ -61,8 +61,8 @@ const PlugAnalysis = ({
             let data: any[] = [];
             redList.forEach((redItem: any) => {
                 const value =
-                    columns.find((item) => item.title === redItem.des)?.dataIndex ||
-                    columns.find((item) => item.dataIndex === redItem.value)?.dataIndex;
+                    columns.filter((item) => !item.isDefault).find((item) => item.titleText === redItem.des)?.dataIndex ||
+                    columns.filter((item) => !item.isDefault).find((item) => item.dataIndex === redItem.value)?.dataIndex;
 
                 data.push({
                     label: redItem.label,
@@ -308,11 +308,14 @@ const PlugAnalysis = ({
                             {
                                 title: '字段',
                                 dataIndex: 'des',
-                                align: 'center'
+                                align: 'center',
+                                width: '40%',
+                                render: (_, record) => record.des || record.label
                             },
                             {
                                 title: '绑定到',
                                 align: 'center',
+                                width: '20%',
                                 render: () => (
                                     <svg
                                         viewBox="0 0 1024 1024"
@@ -334,6 +337,7 @@ const PlugAnalysis = ({
                                 title: '素材字段',
                                 dataIndex: 'value',
                                 align: 'center',
+                                width: '40%',
                                 render: (_, record) => {
                                     return (
                                         data.length > 0 && (

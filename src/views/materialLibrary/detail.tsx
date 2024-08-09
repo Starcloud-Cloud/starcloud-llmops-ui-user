@@ -296,6 +296,7 @@ export const TableHeader = ({
     const [sceneList, setSceneList] = useState<any[]>([]);
     const [wayList, setWayList] = useState<any[]>([]);
 
+    const [plugUid, setPlugUid] = useState('');
     const [plugRecord, setPlugRecord] = useState<any>(null);
     const [plugConfigOpen, setPlugConfigOpen] = useState(false);
 
@@ -304,6 +305,7 @@ export const TableHeader = ({
             libraryUid: '140573430966447ca7dfeb422c259128',
             pluginUid: record.uid
         });
+        setPlugUid(record.uid);
         setPlugConfigOpen(record);
         console.log(data, 'data');
         setPlugRecord({
@@ -704,38 +706,33 @@ export const TableHeader = ({
                             key: '1',
                             children: (
                                 <div>
-                                    <CheckCard.Group size="small">
+                                    <CheckCard.Group className="w-full" size="small">
                                         {plugMarketList?.map((item) => (
                                             <div key={item.uid}>
                                                 <div className="my-4 text-[16px] font-bold">
                                                     {sceneList?.find((i) => i.value === item.scene)?.label}
                                                 </div>
-                                                {/* <div className="w-full grid justify-content-center responsive-list-container sm:grid-cols-1 md:grid-cols-2 gap-x-2">
+                                                <div className="w-full grid justify-content-center gap-2 responsive-list-container sm:grid-cols-2 md:grid-cols-3 gap-x-3">
                                                     {item.children?.map((el: any) => (
-                                                        <div className="p-4 border border-solid border-[#d9d9d9] rounded-lg" key={el.uid}>
+                                                        <div
+                                                            onClick={() => handleOpenPlug(el)}
+                                                            className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md"
+                                                            key={el.uid}
+                                                        >
                                                             <div className="flex gap-4">
                                                                 <div className="w-[64px] h-[64px] rounded-lg border border-solid border-[#d9d9d9]"></div>
                                                                 <div>
-                                                                    <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                    <div className="flex-1 text-[18px] font-bold">{el.pluginName}</div>
                                                                     <div className="line-clamp-3 h-[66px]">
                                                                         {sceneList?.find((i) => i.value === el.scene)?.label}
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <Divider />
-                                                            <div className="flex justify-end">{item.creator}</div>
+                                                            <Divider className="my-2" />
+                                                            <div className="flex justify-end">{el.creator}</div>
                                                         </div>
                                                     ))}
-                                                </div> */}
-                                                {item.children?.map((el: any) => (
-                                                    <CheckCard
-                                                        onClick={() => handleOpenPlug(el)}
-                                                        key={el.uid}
-                                                        title={el.pluginName}
-                                                        description={sceneList?.find((i) => i.value === el.scene)?.label}
-                                                        value={el.uid}
-                                                    />
-                                                ))}
+                                                </div>
                                             </div>
                                         ))}
                                     </CheckCard.Group>
@@ -777,6 +774,7 @@ export const TableHeader = ({
                     handleAnalysis={() => null}
                     onOpenChange={setPlugConfigOpen}
                     open={plugConfigOpen}
+                    plugUid={plugUid}
                     record={plugRecord}
                 />
             )}

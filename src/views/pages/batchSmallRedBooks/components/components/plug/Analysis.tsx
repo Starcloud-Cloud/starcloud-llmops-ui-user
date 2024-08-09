@@ -1,13 +1,14 @@
 import { Input, Select, Button, Table, message, Switch, Popover } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Tooltip } from '@mui/material';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
 import { addPlugConfigInfo, updatePlugConfigInfo } from 'api/plug';
+import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 
 const value2JsonMd = (value: any) => `
@@ -21,14 +22,17 @@ const PlugAnalysis = ({
     handleAnalysis,
     onOpenChange,
     open,
+    plugUid,
     record
 }: {
     columns: any[];
     handleAnalysis: () => void;
     onOpenChange: any;
     open: any;
+    plugUid: string;
     record: any;
 }) => {
+    const [execountLoading, setExecountLoading] = useState(false);
     const [redBookData, setRedBookData] = useState<any>({});
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [data, setData] = useState<any[]>([]);
@@ -43,6 +47,31 @@ const PlugAnalysis = ({
             })) || []
         );
     }, [record]);
+    const timer = useRef<any>(null);
+    const handleExecute = async () => {
+        setExecountLoading(true);
+        const code = await plugExecute({
+            uuid: plugUid,
+            inputParams: {
+                URL: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
+            }
+        });
+        try {
+            timer.current = setInterval(async () => {
+                const res = await plugexEcuteResult({
+                    code,
+                    uuid: plugUid
+                });
+                if (res.status !== 'in_progress') {
+                    setExecountLoading(false);
+                    clearInterval(timer.current);
+                    console.log(res);
+                }
+            }, 2000);
+        } catch (err) {
+            clearInterval(timer.current);
+        }
+    };
 
     useEffect(() => {
         let data: any[] = [];
@@ -72,6 +101,9 @@ const PlugAnalysis = ({
             bindFieldData: obj
         }));
         setData(data);
+        return () => {
+            clearInterval(timer.current);
+        };
     }, [columns]);
 
     // useEffect(() => {
@@ -280,15 +312,17 @@ const PlugAnalysis = ({
                         保存配置
                     </Button>
                     <Button
-                        onClick={() => {
-                            if (!redBookData.requirement) {
-                                message.error('请输入小红书链接!');
-                                return;
-                            }
+                        loading={execountLoading}
+                        onClick={async () => {
+                            // if (!redBookData.requirement) {
+                            //     message.error('请输入小红书链接!');
+                            //     return;
+                            // }
                             if (!redBookData.fieldList?.length) {
                                 message.error('请至少绑定一素材字段!');
                                 return;
                             }
+                            handleExecute();
                             handleAnalysis();
                         }}
                         type="primary"

@@ -48,3 +48,11 @@ export const spaceBots = (params: any) => {
 export const plugPublish = (uid: any) => {
     return request.get({ url: '/llm/plugin/definition/publish/' + uid });
 };
+//执行插件
+export const plugExecute = (data: any) => {
+    return request.post({ url: '/llm/creative/plugins/execute', data });
+};
+//获取执行结果
+export const plugexEcuteResult = (data: any) => {
+    return request.post({ url: '/llm/creative/plugins/executeResult', data });
+};

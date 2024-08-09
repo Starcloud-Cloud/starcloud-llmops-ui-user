@@ -784,7 +784,13 @@ export const TableHeader = ({
                     ]}
                 ></Tabs>
             </Modal>
-            <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />
+            <DownMaterial
+                libraryId={libraryId}
+                uploadOpen={uploadOpen}
+                setUploadOpen={setUploadOpen}
+                getList={getList}
+                getTitleList={getTitleList}
+            />
             {addOpen && (
                 <AddPlug
                     open={addOpen}

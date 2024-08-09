@@ -10,7 +10,7 @@ import {
     templateImport
 } from 'api/redBook/material';
 
-const DownMaterial = ({ libraryId, uploadOpen, setUploadOpen, getList }: any) => {
+const DownMaterial = ({ libraryId, uploadOpen, setUploadOpen, getList, getTitleList }: any) => {
     const [uploadLoading, setUploadLoading] = useState(false); //上传文件开启进度条
     const perRef = useRef<number>(0);
     const [percent, setPercent] = useState(0); //模拟进度条数据
@@ -45,6 +45,7 @@ const DownMaterial = ({ libraryId, uploadOpen, setUploadOpen, getList }: any) =>
                 setUploadOpen(false);
                 setUploadLoading(false);
                 getList();
+                getTitleList();
                 return false;
             } catch (error) {
                 console.error('Error uploading file:', error);

@@ -663,7 +663,15 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     )}
                 </ModalForm>
             )}
-            {uploadOpen && <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />}
+            {uploadOpen && (
+                <DownMaterial
+                    libraryId={libraryId}
+                    uploadOpen={uploadOpen}
+                    setUploadOpen={setUploadOpen}
+                    getList={getList}
+                    getTitleList={getTitleList}
+                />
+            )}
         </div>
     );
 };

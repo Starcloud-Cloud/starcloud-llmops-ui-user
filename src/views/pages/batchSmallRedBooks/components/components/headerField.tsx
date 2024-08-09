@@ -296,6 +296,7 @@ const HeaderField = ({
                                     }
                                 })
                             });
+                            getList();
                             headerSave && headerSave();
                             setPattern && setPattern(tableData);
                             // setColOpen(false);

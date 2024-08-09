@@ -258,10 +258,13 @@ const PlugAnalysis = ({
     }, [open, materialExecutionOpen]);
     return (
         <ModalForm
+            modalProps={{
+                maskClosable: false
+            }}
             title={
                 <div className="flex flex-col">
                     <div className="flex  items-center mb-2">
-                        <span className="text-[26px]">数据新增</span>
+                        <span className="text-[26px]">{record.pluginName}</span>
                         <div className="flex justify-between items-center ml-2 ">
                             <Space>
                                 <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
@@ -274,9 +277,6 @@ const PlugAnalysis = ({
             }
             open={open}
             onOpenChange={onOpenChange}
-            modalProps={{
-                destroyOnClose: true
-            }}
             submitter={false}
         >
             <div>

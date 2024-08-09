@@ -89,6 +89,7 @@ export const TableHeader = ({
     selectedRowKeys,
     handleBatchDel,
     libraryId,
+    libraryUid,
     bizUid,
     bizType,
     pluginConfig,
@@ -120,6 +121,7 @@ export const TableHeader = ({
     // 选中的行
     selectedRowKeys: React.Key[];
     libraryId: string;
+    libraryUid: string;
     bizUid: string;
     bizType: string;
     //存储的配置
@@ -301,7 +303,7 @@ export const TableHeader = ({
 
     const handleOpenPlug = async (record: any) => {
         const data = await getPlugConfigInfo({
-            libraryUid: '140573430966447ca7dfeb422c259128',
+            libraryUid,
             pluginUid: record.uid
         });
         setPlugConfigOpen(record);
@@ -1270,6 +1272,7 @@ const MaterialLibraryDetail = ({
                         selectedRowKeys={selectedRowKeys}
                         handleBatchDel={handleBatchDel}
                         libraryId={detail?.id}
+                        libraryUid={detail?.uid}
                         bizType={'MATERIAL_LIBRARY'}
                         bizUid={detail?.uid}
                         pluginConfig={pluginConfig}

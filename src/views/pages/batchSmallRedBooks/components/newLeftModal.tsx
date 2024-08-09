@@ -77,6 +77,8 @@ const LeftModalAdd = ({
                     selectedRowKeys={selectedRowKeys}
                     handleBatchDel={handleDels}
                     libraryId={libraryId}
+                    // TODO @帝豪
+                    libraryUid={''}
                     bizType={bizType}
                     bizUid={bizUid}
                     appUid={appUid}

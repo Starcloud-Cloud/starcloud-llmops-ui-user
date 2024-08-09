@@ -45,15 +45,18 @@ const PlugAnalysis = ({
     }, [record]);
 
     useEffect(() => {
-        const fieldMap = JSON.parse(record.fieldMap || '{}');
-        const keys = redList.map((redItem: any) => redItem.value);
-        const data = redList.map((redItem: any, index: number) => {
-            return {
+        let data: any[] = [];
+        redList.forEach((redItem: any) => {
+            const value =
+                columns.find((item) => item.title === redItem.des)?.dataIndex ||
+                columns.find((item) => item.dataIndex === redItem.value)?.dataIndex;
+
+            data.push({
                 label: redItem.label,
                 label_key: redItem.value,
                 des: redItem.des,
-                value: keys.includes(redItem.value) ? fieldMap?.[redItem.value] : ''
-            };
+                value: value
+            });
         });
 
         const filterData = data.filter((item: any) => item.value);
@@ -62,14 +65,41 @@ const PlugAnalysis = ({
         filterData.forEach((item: any) => {
             obj[item.label_key] = item.value;
         });
+
         setRedBookData((pre: any) => ({
             ...pre,
             fieldList: fieldList,
             bindFieldData: obj
         }));
-
         setData(data);
     }, [columns]);
+
+    // useEffect(() => {
+    //     const fieldMap = JSON.parse(record.fieldMap || '{}');
+
+    //     const data = redList.map((redItem: any, index: number) => {
+    //         return {
+    //             label: redItem.label,
+    //             label_key: redItem.value,
+    //             des: redItem.des,
+    //             value: columns.map((item) => item.dataIndex).includes(fieldMap?.[redItem.value]) ? fieldMap?.[redItem.value] : ''
+    //         };
+    //     });
+
+    //     const filterData = data.filter((item: any) => item.value);
+    //     const fieldList = filterData.map((item: any) => item.label_key);
+    //     const obj: any = {};
+    //     filterData.forEach((item: any) => {
+    //         obj[item.label_key] = item.value;
+    //     });
+    //     setRedBookData((pre: any) => ({
+    //         ...pre,
+    //         fieldList: fieldList,
+    //         bindFieldData: obj
+    //     }));
+
+    //     setData(data);
+    // }, [columns]);
 
     return (
         <ModalForm

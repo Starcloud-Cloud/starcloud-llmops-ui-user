@@ -174,10 +174,10 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 uid: rows.uid
             });
             message.success('编辑成功');
-            if (rows.published) {
-                await plugPublish(rows.uid);
-                message.success('发布成功');
-            }
+            // if (rows.published) {
+            //     await plugPublish(rows.uid);
+            //     message.success('发布成功');
+            // }
         } else {
             await createPlug({
                 ...result,

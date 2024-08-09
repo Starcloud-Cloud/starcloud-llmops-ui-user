@@ -775,7 +775,9 @@ export const TableHeader = ({
                 <PlugAnalysis
                     columns={columns}
                     handleAnalysis={() => null}
+                    downTableData={downTableData}
                     onOpenChange={setPlugConfigOpen}
+                    setPlugMarketOpen={setPlugMarketOpen}
                     open={plugConfigOpen}
                     record={plugRecord}
                 />

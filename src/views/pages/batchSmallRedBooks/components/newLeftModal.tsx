@@ -14,6 +14,7 @@ const LeftModalAdd = ({
     bizUid,
     bizType,
     libraryId,
+    libraryUid,
     libraryName,
     libraryType,
     pluginConfig,
@@ -37,6 +38,7 @@ const LeftModalAdd = ({
     bizUid: string;
     bizType: string;
     libraryId: string;
+    libraryUid: string;
     libraryName: string;
     libraryType: number;
     pluginConfig: string | null;
@@ -77,8 +79,7 @@ const LeftModalAdd = ({
                     selectedRowKeys={selectedRowKeys}
                     handleBatchDel={handleDels}
                     libraryId={libraryId}
-                    // TODO @帝豪
-                    libraryUid={''}
+                    libraryUid={libraryUid}
                     bizType={bizType}
                     bizUid={bizUid}
                     appUid={appUid}

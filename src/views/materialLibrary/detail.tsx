@@ -725,7 +725,7 @@ export const TableHeader = ({
                                                             key={el.uid}
                                                         >
                                                             <div className="flex gap-4">
-                                                                {!el.avatar ? (
+                                                                {el.avatar ? (
                                                                     <Avatar shape="square" size={64} src={el.avatar} />
                                                                 ) : (
                                                                     <Avatar shape="square" size={64} icon={<AppstoreFilled />} />

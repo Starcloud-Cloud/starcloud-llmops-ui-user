@@ -221,11 +221,13 @@ const PlugAnalysis = ({
                             {
                                 title: '字段',
                                 dataIndex: 'des',
-                                align: 'center'
+                                align: 'center',
+                                width: '40%'
                             },
                             {
                                 title: '绑定到',
                                 align: 'center',
+                                width: '20%',
                                 render: () => (
                                     <svg
                                         viewBox="0 0 1024 1024"
@@ -247,6 +249,7 @@ const PlugAnalysis = ({
                                 title: '素材字段',
                                 dataIndex: 'value',
                                 align: 'center',
+                                width: '40%',
                                 render: (_, record) => {
                                     return (
                                         data.length > 0 && (

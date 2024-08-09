@@ -1,4 +1,4 @@
-import { Input, Select, Button, Table, message, Switch, Popover } from 'antd';
+import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Divider } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
 import { useEffect, useRef, useState } from 'react';
@@ -17,6 +17,7 @@ ${JSON.stringify(value, null, 2)}
 `;
 
 const PlugAnalysis = ({
+    metaData,
     columns,
     handleAnalysis,
     downTableData,
@@ -25,6 +26,7 @@ const PlugAnalysis = ({
     open,
     record
 }: {
+    metaData: any;
     columns: any[];
     handleAnalysis: () => void;
     setPlugMarketOpen: (data: any) => void;
@@ -33,6 +35,7 @@ const PlugAnalysis = ({
     open: any;
     record: any;
 }) => {
+    console.log(record);
     const [execountLoading, setExecountLoading] = useState(false);
     const [redBookData, setRedBookData] = useState<any>({});
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
@@ -160,7 +163,20 @@ const PlugAnalysis = ({
 
     return (
         <ModalForm
-            title={'数据新增'}
+            title={
+                <div className="flex flex-col">
+                    <div className="flex  items-center mb-2">
+                        <span className="text-[26px]">数据新增</span>
+                        <div className="flex justify-between items-center ml-2 ">
+                            <Space>
+                                <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
+                                <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
+                            </Space>
+                        </div>
+                    </div>
+                    <div className="text-xs text-black/50 mt-1">{record.description}</div>
+                </div>
+            }
             open={open}
             onOpenChange={onOpenChange}
             modalProps={{

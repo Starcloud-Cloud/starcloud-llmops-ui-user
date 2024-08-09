@@ -289,6 +289,7 @@ export const TableHeader = ({
                         onConfirm={async () => {
                             await delOwner(record.uid);
                             getTablePlugList();
+                            getPlugList();
                         }}
                         okText="确定"
                         cancelText="取消"
@@ -773,7 +774,7 @@ export const TableHeader = ({
                                                                 className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md"
                                                                 key={el.uid}
                                                             >
-                                                                <div className="flex gap-4">
+                                                                <div className="flex gap-4 flex-1">
                                                                     {el.avatar ? (
                                                                         <Avatar shape="square" size={64} src={el.avatar} />
                                                                     ) : (
@@ -781,7 +782,7 @@ export const TableHeader = ({
                                                                     )}
                                                                     <div>
                                                                         <div className="flex-1 text-[18px] font-bold">{el.pluginName}</div>
-                                                                        <div className="line-clamp-3">{el.description}</div>
+                                                                        <div className="line-clamp-3 h-[66px]">{el.description}</div>
                                                                     </div>
                                                                 </div>
                                                                 <Divider className="my-2" />
@@ -827,7 +828,10 @@ export const TableHeader = ({
                     sceneList={sceneList}
                     rows={rows}
                     setRows={setRows}
-                    getTablePlugList={getTablePlugList}
+                    getTablePlugList={() => {
+                        getTablePlugList();
+                        getPlugList();
+                    }}
                 />
             )}
             {plugConfigOpen && (

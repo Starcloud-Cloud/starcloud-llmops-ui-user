@@ -659,11 +659,7 @@ export const TableHeader = ({
                         if (result) {
                             const data = await createMaterialLibraryAppBind({
                                 libraryId: selectSwitchRowKeys[0],
-<<<<<<< HEAD
                                 appUid
-=======
-                                appUid: bizUid
->>>>>>> b30b8028 (feat: update)
                             });
                             if (data) {
                                 message.success('切换成功!');
@@ -1275,10 +1271,7 @@ const MaterialLibraryDetail = ({
                         selectedRowKeys={selectedRowKeys}
                         handleBatchDel={handleBatchDel}
                         libraryId={detail?.id}
-<<<<<<< HEAD
                         libraryUid={detail?.uid}
-=======
->>>>>>> b30b8028 (feat: update)
                         bizType={'MATERIAL_LIBRARY'}
                         bizUid={detail?.uid}
                         pluginConfig={pluginConfig}

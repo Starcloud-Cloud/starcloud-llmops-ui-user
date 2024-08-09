@@ -229,9 +229,6 @@ const PlugAnalysis = ({
             clearInterval(timeLoading.current);
             console.log(11111, preeNum.current);
         }
-        return () => {
-            clearInterval(timeLoading.current);
-        };
     }, [successCount, errorCount]);
     useEffect(() => {
         if (!materialExecutionOpen) {
@@ -245,6 +242,15 @@ const PlugAnalysis = ({
             setSuccessCount(successCountRef.current);
         }
     }, [materialExecutionOpen]);
+    useEffect(() => {
+        if (!open || !execountLoading) {
+            clearInterval(timer.current);
+        }
+
+        return () => {
+            clearInterval(timer.current);
+        };
+    }, [execountLoading, open]);
     return (
         <ModalForm
             title={'数据新增'}

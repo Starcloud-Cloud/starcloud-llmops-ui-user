@@ -36,7 +36,6 @@ const PlugAnalysis = ({
     open: any;
     record: any;
 }) => {
-    console.log(record);
     const [execountLoading, setExecountLoading] = useState(false);
     const [redBookData, setRedBookData] = useState<any>({});
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);

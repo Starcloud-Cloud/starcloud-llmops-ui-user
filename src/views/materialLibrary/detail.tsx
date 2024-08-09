@@ -314,6 +314,7 @@ export const TableHeader = ({
     const [metaData, setMetaData] = useState([]);
 
     const handleOpenPlug = async (record: any) => {
+        const plugInfo = await getPlugInfo(record.uid);
         const data = await getPlugConfigInfo({
             libraryUid,
             pluginUid: record.uid
@@ -321,7 +322,7 @@ export const TableHeader = ({
         setPlugUid(record.uid);
         setPlugConfigOpen(record);
         setPlugRecord({
-            ...record,
+            ...plugInfo,
             ...data,
             libraryUid,
             pluginUid: record.uid
@@ -340,7 +341,6 @@ export const TableHeader = ({
         return Object.values(groupedByType);
     };
     const getPlugList = async () => {
-        // await metadataData();
         const res = await publishedList();
         const newRes = grupList(res);
         console.log(newRes);

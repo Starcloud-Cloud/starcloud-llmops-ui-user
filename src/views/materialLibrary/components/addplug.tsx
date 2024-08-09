@@ -563,26 +563,32 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 botId: form.getFieldValue('botId')
                                             });
                                             timer.current = setInterval(async () => {
-                                                const result = await plugVerifyResult({
-                                                    code: res,
-                                                    accessTokenId: form.getFieldValue('accessTokenId')
-                                                });
-                                                if (result.verifyState) {
-                                                    clearInterval(timer.current);
-                                                    setverifyStatus('success');
-                                                    setBindData({
-                                                        ...bindData,
-                                                        arguments: result.arguments ? JSON.stringify(result.arguments) : '',
-                                                        output: result.output ? JSON.stringify(result.output) : '',
-                                                        outputType: res.outputType
+                                                try {
+                                                    const result = await plugVerifyResult({
+                                                        code: res,
+                                                        accessTokenId: form.getFieldValue('accessTokenId')
                                                     });
+                                                    if (result.verifyState) {
+                                                        clearInterval(timer.current);
+                                                        setverifyStatus('success');
+                                                        setBindData({
+                                                            ...bindData,
+                                                            arguments: result.arguments ? JSON.stringify(result.arguments) : '',
+                                                            output: result.output ? JSON.stringify(result.output) : '',
+                                                            outputType: res.outputType
+                                                        });
+                                                        setBindLoading(false);
+                                                    }
+                                                } catch (err: any) {
+                                                    clearInterval(timer.current);
+                                                    setverifyStatus('error');
+                                                    setVerErrmessage(err.msg);
                                                     setBindLoading(false);
                                                 }
                                             }, 2000);
                                         } catch (err: any) {
                                             clearInterval(timer.current);
-                                            setverifyStatus('error');
-                                            setVerErrmessage(err.msg);
+
                                             setBindLoading(false);
                                         }
                                     }}

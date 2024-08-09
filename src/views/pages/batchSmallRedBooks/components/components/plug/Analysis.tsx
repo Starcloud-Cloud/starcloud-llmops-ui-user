@@ -20,12 +20,16 @@ ${JSON.stringify(value, null, 2)}
 const PlugAnalysis = ({
     columns,
     handleAnalysis,
+    downTableData,
+    setPlugMarketOpen,
     onOpenChange,
     open,
     record
 }: {
     columns: any[];
     handleAnalysis: () => void;
+    setPlugMarketOpen: (data: any) => void;
+    downTableData: (data: any, num: number) => void;
     onOpenChange: any;
     open: any;
     record: any;
@@ -48,25 +52,41 @@ const PlugAnalysis = ({
     const timer = useRef<any>(null);
     const handleExecute = async () => {
         setExecountLoading(true);
-        const code = await plugExecute({
-            uuid: record.uid,
-            inputParams: {
-                URL: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
-            }
-        });
         try {
+            const code = await plugExecute({
+                uuid: record.pluginUid,
+                inputParams: {
+                    URL: 'https://mp.weixin.qq.com/s/_RHcCKx-ZbqqqV7qTWGbTw'
+                }
+            });
             timer.current = setInterval(async () => {
                 const res = await plugexEcuteResult({
                     code,
-                    uuid: record.uid
+                    uuid: record.pluginUid
                 });
                 if (res.status !== 'in_progress') {
+                    const List = res.output;
+                    const newList = List.map((item: any) => {
+                        const newItem: any = {};
+                        for (let key in item) {
+                            if (redBookData.bindFieldData[key]) {
+                                newItem[redBookData.bindFieldData[key]] = item[key];
+                            } else {
+                                newItem[key] = item[key];
+                            }
+                        }
+                        return newItem;
+                    });
+                    downTableData(newList, 1);
+                    setPlugMarketOpen(false);
+                    onOpenChange(false);
                     setExecountLoading(false);
                     clearInterval(timer.current);
-                    console.log(res);
+                    console.log(res.output);
                 }
             }, 2000);
         } catch (err) {
+            setExecountLoading(false);
             clearInterval(timer.current);
         }
     };

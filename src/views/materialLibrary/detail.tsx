@@ -309,7 +309,6 @@ export const TableHeader = ({
         });
         setPlugUid(record.uid);
         setPlugConfigOpen(record);
-        console.log(data, 'data');
         setPlugRecord({
             ...record,
             ...data,

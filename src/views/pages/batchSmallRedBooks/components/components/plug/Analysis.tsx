@@ -3,7 +3,6 @@ const { TextArea } = Input;
 const { Option } = Select;
 import { useEffect, useRef, useState } from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Tooltip } from '@mui/material';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
@@ -34,6 +33,7 @@ const PlugAnalysis = ({
     const [redBookData, setRedBookData] = useState<any>({});
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [data, setData] = useState<any[]>([]);
+
     const redList = React.useMemo(() => {
         const outputFormart = JSON.parse(record?.outputFormart) || [];
         return (
@@ -63,7 +63,6 @@ const PlugAnalysis = ({
                 if (res.status !== 'in_progress') {
                     setExecountLoading(false);
                     clearInterval(timer.current);
-                    console.log(res);
                 }
             }, 2000);
         } catch (err) {

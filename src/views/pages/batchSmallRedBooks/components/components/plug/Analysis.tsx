@@ -411,10 +411,6 @@ const PlugAnalysis = ({
                 <div className="flex justify-center gap-6 mt-6">
                     <Button
                         onClick={async () => {
-                            if (!redBookData.requirement) {
-                                setrequirementStatusOpen(true);
-                                return false;
-                            }
                             if (!record.fieldMap && !record.executeParams) {
                                 const res = await addPlugConfigInfo({
                                     libraryUid: record.libraryUid,
@@ -452,6 +448,28 @@ const PlugAnalysis = ({
                             if (!redBookData.fieldList?.length) {
                                 message.error('请至少绑定一素材字段!');
                                 return;
+                            }
+                            if (!record.fieldMap && !record.executeParams) {
+                                const res = await addPlugConfigInfo({
+                                    libraryUid: record.libraryUid,
+                                    pluginUid: record.pluginUid,
+                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                    executeParams: JSON.stringify({})
+                                });
+                                if (res) {
+                                    message.success('保存成功');
+                                }
+                            } else {
+                                const res = await updatePlugConfigInfo({
+                                    libraryUid: record.libraryUid,
+                                    pluginUid: record.pluginUid,
+                                    uid: record.uid,
+                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                    executeParams: JSON.stringify({})
+                                });
+                                if (res) {
+                                    message.success('保存成功');
+                                }
                             }
                             handleExecute();
                             handleAnalysis();

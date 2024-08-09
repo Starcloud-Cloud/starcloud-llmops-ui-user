@@ -167,39 +167,42 @@ const PlugAnalysis = ({
 
             setMaterialExecutionOpen(true);
             timer.current = setInterval(async () => {
-                const res = await plugexEcuteResult({
-                    code,
-                    uuid: record.pluginUid
-                });
-                if (res.status !== 'in_progress') {
-                    const List = res.output;
-                    const newList = List.map((item: any) => {
-                        const newItem: any = {};
-                        for (let key in item) {
-                            if (redBookData.bindFieldData[key]) {
-                                newItem[redBookData.bindFieldData[key]] = item[key];
-                            } else {
-                                newItem[key] = item[key];
-                            }
-                        }
-                        return newItem;
+                try {
+                    const res = await plugexEcuteResult({
+                        code,
+                        uuid: record.pluginUid
                     });
+                    if (res.status !== 'in_progress') {
+                        const List = res.output;
+                        const newList = List.map((item: any) => {
+                            const newItem: any = {};
+                            for (let key in item) {
+                                if (redBookData.bindFieldData[key]) {
+                                    newItem[redBookData.bindFieldData[key]] = item[key];
+                                } else {
+                                    newItem[key] = item[key];
+                                }
+                            }
+                            return newItem;
+                        });
+                        executionCountRef.current = 0;
+                        setExecutionCount(executionCountRef.current);
+                        successCountRef.current = 1;
+                        setSuccessCount(successCountRef.current);
+                        materialzanListRef.current = newList;
+                        setMaterialzanList(materialzanListRef.current);
+                        clearInterval(timer.current);
+                    }
+                } catch (err) {
+                    clearInterval(timer.current);
                     executionCountRef.current = 0;
                     setExecutionCount(executionCountRef.current);
-                    successCountRef.current = 1;
-                    setSuccessCount(successCountRef.current);
-                    materialzanListRef.current = newList;
-                    setMaterialzanList(materialzanListRef.current);
-                    clearInterval(timer.current);
+                    errorCountRef.current = 1;
+                    setErrorCount(successCountRef.current);
                 }
             }, 2000);
         } catch (err) {
-            executionCountRef.current = 0;
-            setExecutionCount(executionCountRef.current);
-            errorCountRef.current = 1;
-            setErrorCount(successCountRef.current);
             setExecountLoading(false);
-            clearInterval(timer.current);
         }
     };
     const timeLoading = useRef<any>(null);
@@ -231,9 +234,6 @@ const PlugAnalysis = ({
             clearInterval(timeLoading.current);
             console.log(11111, preeNum.current);
         }
-        return () => {
-            clearInterval(timeLoading.current);
-        };
     }, [successCount, errorCount]);
     useEffect(() => {
         if (!materialExecutionOpen) {
@@ -247,6 +247,15 @@ const PlugAnalysis = ({
             setSuccessCount(successCountRef.current);
         }
     }, [materialExecutionOpen]);
+    useEffect(() => {
+        if (!open || !execountLoading) {
+            clearInterval(timer.current);
+        }
+
+        return () => {
+            clearInterval(timer.current);
+        };
+    }, [execountLoading, open]);
     return (
         <ModalForm
             title={
@@ -415,7 +424,8 @@ const PlugAnalysis = ({
                                     libraryUid: record.libraryUid,
                                     pluginUid: record.pluginUid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify({})
+                                    executeParams: redBookData.requirement
+                                    // executeParams: JSON.stringify({})
                                 });
                                 if (res) {
                                     message.success('保存成功');
@@ -426,7 +436,8 @@ const PlugAnalysis = ({
                                     pluginUid: record.pluginUid,
                                     uid: record.uid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify({})
+                                    executeParams: redBookData.requirement
+                                    // executeParams: JSON.stringify({})
                                 });
                                 if (res) {
                                     message.success('保存成功');
@@ -453,7 +464,8 @@ const PlugAnalysis = ({
                                     libraryUid: record.libraryUid,
                                     pluginUid: record.pluginUid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify({})
+                                    executeParams: redBookData.requirement
+                                    // executeParams: JSON.stringify({})
                                 });
                                 if (res) {
                                     message.success('保存成功');
@@ -464,7 +476,8 @@ const PlugAnalysis = ({
                                     pluginUid: record.pluginUid,
                                     uid: record.uid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify({})
+                                    executeParams: redBookData.requirement
+                                    // executeParams: JSON.stringify({})
                                 });
                                 if (res) {
                                     message.success('保存成功');

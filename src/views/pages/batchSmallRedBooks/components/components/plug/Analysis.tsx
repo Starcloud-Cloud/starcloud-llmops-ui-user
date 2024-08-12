@@ -332,11 +332,11 @@ const PlugAnalysis = ({
                         <Form.Item
                             initialValue={item.variableValue}
                             key={item.uuid}
-                            label={item.variableKey}
+                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
                             name={item.variableKey}
                             rules={[{ required: true, message: item.variableKey + '是必填项' }]}
                         >
-                            <Input placeholder={item.variableDesc} />
+                            <Input />
                         </Form.Item>
                     ))}
                 </Form>

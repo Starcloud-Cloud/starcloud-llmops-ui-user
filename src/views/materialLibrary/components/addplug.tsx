@@ -59,6 +59,7 @@ const AddPlug = ({
                     seterrmessage('');
                     setBotList(res.space_bots);
                 } catch (err: any) {
+                    setBotList([]);
                     seterrmessage(err.msg);
                     form.setFieldValue('botId', '');
                     console.log(err);

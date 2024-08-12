@@ -145,3 +145,12 @@ export const copyMaterialLibrary = (data: any) => {
 export const checkMaterialLibrary = (data: any) => {
     return request.post({ url: '/llm/material-library-table-column/validate-switch-bind', data });
 };
+
+/**
+ * 获取素材定义列表
+ * @param data
+ * @returns
+ */
+export const materialDefinitionList = (data: any) => {
+    return request.post({ url: '/llm/plugin/definition/list', data });
+};

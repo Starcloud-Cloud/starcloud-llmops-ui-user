@@ -43,6 +43,7 @@ import {
     getMaterialLibraryDataList,
     getMaterialLibraryDataPage,
     getMaterialLibraryTitleList,
+    materialDefinitionList,
     updateMaterialLibrarySlice,
     updateMaterialLibraryTitle
 } from 'api/material';
@@ -313,6 +314,7 @@ export const TableHeader = ({
     const [plugRecord, setPlugRecord] = useState<any>(null);
     const [plugConfigOpen, setPlugConfigOpen] = useState(false);
     const [metaData, setMetaData] = useState([]);
+    const [definitionList, setDefinitionList] = useState([]);
 
     const handleOpenPlug = async (record: any) => {
         const plugInfo = await getPlugInfo(record.uid);
@@ -353,16 +355,24 @@ export const TableHeader = ({
         setPlugTableData(result);
     };
     useEffect(() => {
-        if (plugMarketOpen) {
-            metadataData().then((res: any) => {
-                setMetaData(res);
-                setSceneList(res.scene);
-                setWayList(res.platform);
-            });
-            getPlugList();
-            getTablePlugList();
-        }
-    }, [plugMarketOpen]);
+        metadataData().then((res: any) => {
+            setMetaData(res);
+            setSceneList(res.scene);
+            setWayList(res.platform);
+        });
+        getPlugList();
+        getTablePlugList();
+    }, []);
+
+    useEffect(() => {
+        materialDefinitionList({
+            libraryUid: libraryUid
+        }).then((res: any) => {
+            setDefinitionList(res);
+        });
+    }, []);
+
+    console.log(definitionList, 'definitionList');
 
     return (
         <div className="relative">
@@ -398,7 +408,7 @@ export const TableHeader = ({
                     </div>
                 </div>
             </div>
-            <div className="bg-white rounded-md border flex justify-between mb-3 ">
+            <div className="bg-white rounded-md border flex justify-between mb-3">
                 <div className="flex items-end w-[210px]">
                     <Space>
                         <Popconfirm title="确认删除?" onConfirm={handleBatchDel}>
@@ -417,8 +427,26 @@ export const TableHeader = ({
                         )}
                     </Space>
                 </div>
-                <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm">
+                <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm max-w-[550px] overflow-x-auto">
                     <Space>
+                        {definitionList.map((item: any) => {
+                            return (
+                                <div
+                                    onClick={() => {
+                                        handleOpenPlug(item);
+                                    }}
+                                    className="flex items-center flex-col cursor-pointer py-2 w-[100px] hover:bg-[#d9d9d9] h-[63px]"
+                                >
+                                    {item.avatar ? (
+                                        <Avatar shape="square" size={20} src={item.avatar} />
+                                    ) : (
+                                        <Avatar shape="square" size={20} icon={<AppstoreFilled />} />
+                                    )}
+                                    <div className="text-[12px] font-bold mt-1">{item.pluginName}</div>
+                                </div>
+                            );
+                        })}
+                        <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
                         <div
                             onClick={() => {
                                 setPlugOpen(true);
@@ -472,7 +500,7 @@ export const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">AI素材生成</div>
                         </div>
-                        <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
+
                         <div
                             onClick={() => {
                                 setPlugOpen(true);
@@ -585,6 +613,7 @@ export const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">微信公众号分析</div>
                         </div>
+                        <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
                         <div
                             onClick={() => {
                                 setPlugMarketOpen(true);

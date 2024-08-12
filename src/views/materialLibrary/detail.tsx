@@ -687,7 +687,7 @@ export const TableHeader = ({
                                                 <div className="my-4 text-[16px] font-bold">
                                                     {sceneList?.find((i) => i.value === item.scene)?.label}
                                                 </div>
-                                                <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3">
+                                                <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
                                                     {item.children?.map((el: any) => {
                                                         console.log(el);
                                                         return (
@@ -759,9 +759,9 @@ export const TableHeader = ({
                                                         </div>
                                                         <Divider className="my-2" />
                                                         <div className="flex justify-between text-xs">
-                                                            <Tooltip title="创建时间">
+                                                            <Tooltip title="更新时间">
                                                                 <div className="flex">
-                                                                    {dayjs(el.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                                    {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                                                 </div>
                                                             </Tooltip>
                                                             <div className="flex">{el.creator}</div>

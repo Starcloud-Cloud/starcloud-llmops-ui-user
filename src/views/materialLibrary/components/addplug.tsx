@@ -18,7 +18,8 @@ const AddPlug = ({
     sceneList,
     rows,
     setRows,
-    getTablePlugList
+    getTablePlugList,
+    getDefinitionList
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
@@ -27,6 +28,7 @@ const AddPlug = ({
     rows: any;
     setRows: (data: any) => void;
     getTablePlugList: () => void;
+    getDefinitionList: () => void;
 }) => {
     const [form] = Form.useForm();
     const { TextArea } = Input;
@@ -224,6 +226,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         setOpen(false);
         form.resetFields();
         getTablePlugList();
+        getDefinitionList();
     };
 
     useEffect(() => {

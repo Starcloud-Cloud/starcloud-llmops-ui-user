@@ -591,6 +591,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 outputType: res.outputType
                                                             });
                                                             setBindLoading(false);
+                                                            setVerErrmessage('');
                                                         }
                                                     } catch (err: any) {
                                                         clearInterval(timer.current);

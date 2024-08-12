@@ -59,8 +59,14 @@ const PlugAnalysis = ({
             let data: any[] = [];
             redList.forEach((redItem: any) => {
                 const value =
-                    columns.filter((item) => !item.isDefault).find((item) => item.titleText === redItem.des)?.dataIndex ||
-                    columns.filter((item) => !item.isDefault).find((item) => item.dataIndex === redItem.value)?.dataIndex;
+                    columns
+                        .filter((item) => !item.isDefault)
+                        .filter((item) => item.type !== 5) // 只有文本
+                        .find((item) => item.titleText === redItem.des)?.dataIndex ||
+                    columns
+                        .filter((item) => !item.isDefault)
+                        .filter((item) => item.type !== 5) // 只有文本
+                        .find((item) => item.dataIndex === redItem.value)?.dataIndex;
 
                 data.push({
                     label: redItem.label,

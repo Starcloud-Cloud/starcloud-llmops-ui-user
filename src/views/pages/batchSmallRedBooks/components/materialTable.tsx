@@ -54,6 +54,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         const newList = list?.map((item: any) => {
             return {
                 title: item.desc,
+                titleText: item.desc,
                 align: 'center',
                 className: 'align-middle',
                 required: !!item.required,
@@ -663,7 +664,15 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     )}
                 </ModalForm>
             )}
-            {uploadOpen && <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />}
+            {uploadOpen && (
+                <DownMaterial
+                    libraryId={libraryId}
+                    uploadOpen={uploadOpen}
+                    setUploadOpen={setUploadOpen}
+                    getList={getList}
+                    getTitleList={getTitleList}
+                />
+            )}
         </div>
     );
 };

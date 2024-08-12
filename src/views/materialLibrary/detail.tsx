@@ -160,6 +160,7 @@ export const TableHeader = ({
     const [selectSwitchRowKeys, setSelectSwitchRowKeys] = React.useState<any[]>([]);
     const [sourceList, setSourceList] = useState<any[]>([]);
     const [addOpen, setAddOpen] = useState(false);
+    const [plugType, setPlugType] = useState('');
 
     useEffect(() => {
         dictData('', 'material_create_source').then((res) => {
@@ -172,12 +173,12 @@ export const TableHeader = ({
             key: '1',
             label: '编辑素材字段',
             onClick: () => setColOpen(true)
-        },
-        {
-            key: '2',
-            label: '导入数据',
-            onClick: async () => setUploadOpen(true)
         }
+        // {
+        //     key: '2',
+        //     label: '导入数据',
+        //     onClick: async () => setUploadOpen(true)
+        // }
     ];
 
     useEffect(() => {
@@ -253,6 +254,7 @@ export const TableHeader = ({
             pluginUid: record.uid
         });
         setPlugUid(record.uid);
+        setPlugType(record.scene);
         setPlugConfigOpen(record);
         setPlugRecord({
             ...plugInfo,
@@ -296,7 +298,7 @@ export const TableHeader = ({
     }, [plugMarketOpen]);
 
     return (
-        <div>
+        <div className="relative">
             <div className="flex  mb-4">
                 <Avatar shape="square" icon={<IconRenderer value={iconUrl || 'AreaChartOutlined'} />} size={48} />
                 <div className="flex flex-col ml-3 justify-between">
@@ -549,11 +551,11 @@ export const TableHeader = ({
                 </div>
                 <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
                     <Space>
-                        {!isShowField && (
-                            <Button type="primary" onClick={() => setUploadOpen(true)}>
-                                批量导入
-                            </Button>
-                        )}
+                        {/* {!isShowField && ( */}
+                        <Button type="primary" onClick={() => setUploadOpen(true)}>
+                            批量导入
+                        </Button>
+                        {/* )} */}
                         <Button
                             type="primary"
                             onClick={() => {
@@ -564,7 +566,7 @@ export const TableHeader = ({
                             新增素材
                         </Button>
                         {isShowField && (
-                            <Dropdown menu={{ items }}>
+                            <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
                                     <Space>
                                         <SettingOutlined className="p-1 cursor-pointer" />
@@ -785,7 +787,13 @@ export const TableHeader = ({
                     ]}
                 ></Tabs>
             </Modal>
-            <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />
+            <DownMaterial
+                libraryId={libraryId}
+                uploadOpen={uploadOpen}
+                setUploadOpen={setUploadOpen}
+                getList={getList}
+                getTitleList={getTitleList}
+            />
             {addOpen && (
                 <AddPlug
                     open={addOpen}
@@ -800,7 +808,7 @@ export const TableHeader = ({
                     }}
                 />
             )}
-            {plugConfigOpen && (
+            {plugConfigOpen && plugType === 'DATA_ADDED' && (
                 <PlugAnalysis
                     columns={columns}
                     handleAnalysis={() => null}

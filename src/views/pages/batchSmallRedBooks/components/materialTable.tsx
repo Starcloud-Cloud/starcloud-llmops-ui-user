@@ -54,6 +54,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         const newList = list?.map((item: any) => {
             return {
                 title: item.desc,
+                titleText: item.desc,
                 align: 'center',
                 className: 'align-middle',
                 required: !!item.required,

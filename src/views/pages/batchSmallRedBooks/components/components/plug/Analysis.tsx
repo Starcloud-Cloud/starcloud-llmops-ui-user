@@ -159,7 +159,6 @@ const PlugAnalysis = ({
             setTotalCount(totalCountRef.current);
             executionCountRef.current = 1;
             setExecutionCount(executionCountRef.current);
-
             setMaterialExecutionOpen(true);
             timer.current = setInterval(async () => {
                 try {
@@ -188,22 +187,28 @@ const PlugAnalysis = ({
                         setMaterialzanList(materialzanListRef.current);
                         clearInterval(timer.current);
                     }
-                } catch (err) {
-                    clearInterval(timer.current);
+                } catch (err: any) {
+                    console.log(err);
                     executionCountRef.current = 0;
                     setExecutionCount(executionCountRef.current);
                     errorCountRef.current = 1;
-                    setErrorCount(successCountRef.current);
+                    setErrorCount(errorCountRef.current);
+                    errorMessageRef.current.push(err.msg);
+                    setErrorMessage(errorMessageRef.current);
+                    clearInterval(timer.current);
+                    clearInterval(timeLoading.current);
                 }
             }, 2000);
         } catch (err) {
+            console.log(111111);
+
             setExecountLoading(false);
         }
     };
     const timeLoading = useRef<any>(null);
     const grupPre = useRef(0);
     useEffect(() => {
-        if (materialExecutionOpen) {
+        if (materialExecutionOpen && executionCountRef.current) {
             const newNum = grupPre.current || executionCountRef.current || 1;
             console.log(newNum, totalCountRef.current);
 
@@ -244,12 +249,12 @@ const PlugAnalysis = ({
     }, [materialExecutionOpen]);
     useEffect(() => {
         if (!open || !materialExecutionOpen) {
+            console.log(1);
+            preeNum.current = 0;
+            setPrenum(preeNum.current);
             clearInterval(timer.current);
+            clearInterval(timeLoading.current);
         }
-
-        return () => {
-            clearInterval(timer.current);
-        };
     }, [open, materialExecutionOpen]);
     return (
         <ModalForm

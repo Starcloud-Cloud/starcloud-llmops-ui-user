@@ -342,309 +342,320 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 form.resetFields();
             }}
         >
-            <Form form={form} labelCol={{ span: 4 }}>
-                <Form.Item label="插件名称" name="pluginName" rules={[{ required: true, message: '插件名称必填' }]}>
-                    <Input />
-                </Form.Item>
-                <Form.Item label="插件图标" name="pluginLogo">
-                    <Upload {...props} className="!w-[auto] cursor-pointer">
-                        {imageUrl ? <img className="rounded-full" src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-                    </Upload>
-                </Form.Item>
-                <Form.Item label="插件描述" name="description">
-                    <Input.TextArea rows={3} />
-                </Form.Item>
-                <Form.Item label="使用场景" name="scene" initialValue={'DATA_ADDED'}>
-                    <CheckCard.Group disabled={rows ? true : false} size="small">
-                        {sceneList.map((item) => (
-                            <CheckCard
-                                title={item.label}
-                                description={<div className="line-clamp-2 h-[44px]">{item.description}</div>}
-                                value={item.value}
-                            />
-                        ))}
-                    </CheckCard.Group>
-                </Form.Item>
-                <Form.Item label="实现方式">
-                    <Form.Item name="type" initialValue={'coze'}>
-                        <Radio.Group size="small" options={wayList} disabled={rows ? true : false} />
+            <div className="h-[80vh] overflow-y-auto">
+                <Form form={form} labelAlign="left" labelCol={{ span: 4 }}>
+                    <Form.Item label="插件名称" name="pluginName" rules={[{ required: true, message: '插件名称必填' }]}>
+                        <Input />
                     </Form.Item>
-                    <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}>
-                        {({ getFieldValue }) => {
-                            const firstInputValue = getFieldValue('type');
-                            return firstInputValue === 'coze' ? (
-                                <>
-                                    <Space wrap={true}>
-                                        <div>
-                                            <Form.Item
-                                                className="w-[400px]"
-                                                label="Coze 绑定的账号"
-                                                name="accessTokenId"
-                                                rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
-                                            >
-                                                <Select onChange={(e) => getBotList('accessTokenId', e)}>
-                                                    {accountList?.map((item) => (
-                                                        <Option key={item.id} value={item.id.toString()}>
-                                                            {item.nickname}
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            </Form.Item>
-                                            {accountList?.length === 0 && (
-                                                <div
-                                                    className="text-xs text-[#673ab7] hover:underline cursor-pointer ml-[137px] mt-[-20px]"
-                                                    onClick={() => navigate('/user/account-profile/profile?type=2')}
-                                                >
-                                                    没有账号？去绑定
-                                                </div>
-                                            )}
-                                        </div>
-                                        <Form.Item
-                                            className="w-[400px]"
-                                            label="空间 ID"
-                                            name="spaceId"
-                                            rules={[{ required: true, message: '空间 ID必填' }]}
-                                        >
-                                            <Input onBlur={async (e) => getBotList('spaceId', e.target.value)} />
-                                        </Form.Item>
-                                        <div>
-                                            <Form.Item
-                                                className="w-[400px]"
-                                                label="选择 Coze 机器人"
-                                                name="botId"
-                                                rules={[{ required: true, message: 'Bot 必填' }]}
-                                            >
-                                                <Select>
-                                                    {botList.map((item) => (
-                                                        <Option key={item.bot_id} value={item.bot_id}>
-                                                            {item.bot_name}
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            </Form.Item>
-                                            {errmessage && (
-                                                <div className="text-xs text-[#ff4d4f]  ml-[137px] mt-[-20px]">{errmessage}</div>
-                                            )}
-                                        </div>
-                                    </Space>
-                                    <Space align="end">
-                                        验证状态：
-                                        <Tag color={status}>
-                                            {status === 'success' ? '校验成功' : status === 'error' ? '检验失败' : '待校验'}
-                                        </Tag>
-                                        <Button
-                                            type="primary"
-                                            onClick={async () => {
-                                                await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
-                                                setPlugOpen(true);
-                                            }}
-                                        >
-                                            验证执行结果
-                                        </Button>
-                                    </Space>
-                                </>
-                            ) : null;
-                        }}
+                    <Form.Item label="插件图标" name="pluginLogo">
+                        <Upload {...props} className="!w-[auto] cursor-pointer">
+                            {imageUrl ? (
+                                <img className="rounded-full" src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                            ) : (
+                                uploadButton
+                            )}
+                        </Upload>
                     </Form.Item>
-                </Form.Item>
-                <Form.Item>
-                    <Tabs
-                        items={[
-                            {
-                                label: '入参数据示例',
-                                key: '1',
-                                children: (
-                                    <Form.Item name="input">
-                                        <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.input !== currentValues.input}>
-                                            <ChatMarkdown textContent={value2JsonMd(form.getFieldValue('input'))} />
-                                        </Form.Item>
-                                    </Form.Item>
-                                )
-                            },
-                            {
-                                label: '入参数据结构',
-                                key: '2',
-                                children: (
-                                    <EditableProTable<any>
-                                        rowKey={'uuid'}
-                                        tableAlertRender={false}
-                                        rowSelection={false}
-                                        toolBarRender={false}
-                                        columns={inputColumns}
-                                        value={inputTable}
-                                        pagination={false}
-                                        recordCreatorProps={false}
-                                        editable={{
-                                            type: 'multiple',
-                                            editableKeys: inputKeys,
-                                            onValuesChange: (record, recordList) => {
-                                                setInputTable(recordList);
-                                            },
-                                            onChange: setinputKeys
-                                        }}
-                                    />
-                                )
-                            }
-                        ]}
-                    />
-                </Form.Item>
-                <Form.Item>
-                    <Tabs
-                        items={[
-                            {
-                                label: '出参数据示例',
-                                key: '1',
-                                children: (
-                                    <Form.Item name="output">
-                                        <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.output !== currentValues.output}>
-                                            <ChatMarkdown textContent={value2JsonMd(form.getFieldValue('output'))} />
-                                        </Form.Item>
-                                    </Form.Item>
-                                )
-                            },
-                            {
-                                label: '出参数据结构',
-                                key: '2',
-                                children: (
-                                    <EditableProTable<any>
-                                        rowKey={'uuid'}
-                                        tableAlertRender={false}
-                                        rowSelection={false}
-                                        toolBarRender={false}
-                                        columns={outputColumns}
-                                        value={outputTable}
-                                        pagination={false}
-                                        recordCreatorProps={false}
-                                        editable={{
-                                            type: 'multiple',
-                                            editableKeys: outuptKeys,
-                                            onValuesChange: (record, recordList) => {
-                                                setOutputTable(recordList);
-                                            },
-                                            onChange: setoutuptKeys
-                                        }}
-                                    />
-                                )
-                            }
-                        ]}
-                    />
-                </Form.Item>
-                {rows && (
-                    <Form.Item label="发布到应用市场" name="published" valuePropName="checked" initialValue={false}>
-                        <Switch />
+                    <Form.Item label="插件描述" name="description">
+                        <Input.TextArea rows={3} />
                     </Form.Item>
-                )}
-            </Form>
-            {plugOpen && (
-                <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
-                    <Form labelCol={{ span: 6 }}>
-                        <Form.Item label="机器人名称">
-                            <div className="font-bold">
-                                {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
-                            </div>
-                        </Form.Item>
-                        <Form.Item label="Coze参数验证">
-                            <div className="flex gap-2 items-center">
-                                <TextArea
-                                    className="w-full"
-                                    placeholder="可输入触发机器人的对话"
-                                    rows={4}
-                                    value={bindData.content}
-                                    onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
+                    <Form.Item label="使用场景" name="scene" initialValue={'DATA_ADDED'}>
+                        <CheckCard.Group disabled={rows ? true : false} size="small">
+                            {sceneList.map((item) => (
+                                <CheckCard
+                                    title={item.label}
+                                    description={<div className="line-clamp-2 h-[44px]">{item.description}</div>}
+                                    value={item.value}
                                 />
-                                <Button
-                                    loading={bindLoading}
-                                    onClick={async () => {
-                                        setBindLoading(true);
-                                        try {
-                                            const res = await plugVerify({
-                                                accessTokenId: form.getFieldValue('accessTokenId'),
-                                                content: bindData.content,
-                                                botId: form.getFieldValue('botId')
-                                            });
-                                            timer.current = setInterval(async () => {
-                                                try {
-                                                    const result = await plugVerifyResult({
-                                                        code: res,
-                                                        accessTokenId: form.getFieldValue('accessTokenId')
-                                                    });
-                                                    if (result.verifyState) {
-                                                        clearInterval(timer.current);
-                                                        setverifyStatus('success');
-                                                        setBindData({
-                                                            ...bindData,
-                                                            arguments: result.arguments ? JSON.stringify(result.arguments) : '',
-                                                            output: result.output ? JSON.stringify(result.output) : '',
-                                                            outputType: res.outputType
+                            ))}
+                        </CheckCard.Group>
+                    </Form.Item>
+                    <Form.Item label="实现方式">
+                        <Form.Item name="type" initialValue={'coze'}>
+                            <Radio.Group size="small" options={wayList} disabled={rows ? true : false} />
+                        </Form.Item>
+                        <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}>
+                            {({ getFieldValue }) => {
+                                const firstInputValue = getFieldValue('type');
+                                return firstInputValue === 'coze' ? (
+                                    <>
+                                        <Space wrap={true}>
+                                            <div>
+                                                <Form.Item
+                                                    className="w-[400px]"
+                                                    label="Coze 绑定的账号"
+                                                    name="accessTokenId"
+                                                    rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
+                                                >
+                                                    <Select onChange={(e) => getBotList('accessTokenId', e)}>
+                                                        {accountList?.map((item) => (
+                                                            <Option key={item.id} value={item.id.toString()}>
+                                                                {item.nickname}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                </Form.Item>
+                                                {accountList?.length === 0 && (
+                                                    <div
+                                                        className="text-xs text-[#673ab7] hover:underline cursor-pointer ml-[137px] mt-[-20px]"
+                                                        onClick={() => navigate('/user/account-profile/profile?type=2')}
+                                                    >
+                                                        没有账号？去绑定
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <Form.Item
+                                                className="w-[400px]"
+                                                label="空间 ID"
+                                                name="spaceId"
+                                                rules={[{ required: true, message: '空间 ID必填' }]}
+                                            >
+                                                <Input onBlur={async (e) => getBotList('spaceId', e.target.value)} />
+                                            </Form.Item>
+                                            <div>
+                                                <Form.Item
+                                                    className="w-[400px]"
+                                                    label="选择 Coze 机器人"
+                                                    name="botId"
+                                                    rules={[{ required: true, message: 'Bot 必填' }]}
+                                                >
+                                                    <Select>
+                                                        {botList.map((item) => (
+                                                            <Option key={item.bot_id} value={item.bot_id}>
+                                                                {item.bot_name}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                </Form.Item>
+                                                {errmessage && (
+                                                    <div className="text-xs text-[#ff4d4f]  ml-[137px] mt-[-20px]">{errmessage}</div>
+                                                )}
+                                            </div>
+                                        </Space>
+                                        <Space align="end">
+                                            验证状态：
+                                            <Tag color={status}>
+                                                {status === 'success' ? '校验成功' : status === 'error' ? '检验失败' : '待校验'}
+                                            </Tag>
+                                            <Button
+                                                type="primary"
+                                                onClick={async () => {
+                                                    await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
+                                                    setPlugOpen(true);
+                                                }}
+                                            >
+                                                验证执行结果
+                                            </Button>
+                                        </Space>
+                                    </>
+                                ) : null;
+                            }}
+                        </Form.Item>
+                    </Form.Item>
+                    <Form.Item>
+                        <Tabs
+                            items={[
+                                {
+                                    label: '入参数据示例',
+                                    key: '1',
+                                    children: (
+                                        <Form.Item name="input">
+                                            <Form.Item
+                                                shouldUpdate={(prevValues, currentValues) => prevValues.input !== currentValues.input}
+                                            >
+                                                <ChatMarkdown textContent={value2JsonMd(form.getFieldValue('input'))} />
+                                            </Form.Item>
+                                        </Form.Item>
+                                    )
+                                },
+                                {
+                                    label: '入参数据结构',
+                                    key: '2',
+                                    children: (
+                                        <EditableProTable<any>
+                                            rowKey={'uuid'}
+                                            tableAlertRender={false}
+                                            rowSelection={false}
+                                            toolBarRender={false}
+                                            columns={inputColumns}
+                                            value={inputTable}
+                                            pagination={false}
+                                            recordCreatorProps={false}
+                                            editable={{
+                                                type: 'multiple',
+                                                editableKeys: inputKeys,
+                                                onValuesChange: (record, recordList) => {
+                                                    setInputTable(recordList);
+                                                },
+                                                onChange: setinputKeys
+                                            }}
+                                        />
+                                    )
+                                }
+                            ]}
+                        />
+                    </Form.Item>
+                    <Form.Item>
+                        <Tabs
+                            items={[
+                                {
+                                    label: '出参数据示例',
+                                    key: '1',
+                                    children: (
+                                        <Form.Item name="output">
+                                            <Form.Item
+                                                shouldUpdate={(prevValues, currentValues) => prevValues.output !== currentValues.output}
+                                            >
+                                                <ChatMarkdown textContent={value2JsonMd(form.getFieldValue('output'))} />
+                                            </Form.Item>
+                                        </Form.Item>
+                                    )
+                                },
+                                {
+                                    label: '出参数据结构',
+                                    key: '2',
+                                    children: (
+                                        <EditableProTable<any>
+                                            rowKey={'uuid'}
+                                            tableAlertRender={false}
+                                            rowSelection={false}
+                                            toolBarRender={false}
+                                            columns={outputColumns}
+                                            value={outputTable}
+                                            pagination={false}
+                                            recordCreatorProps={false}
+                                            editable={{
+                                                type: 'multiple',
+                                                editableKeys: outuptKeys,
+                                                onValuesChange: (record, recordList) => {
+                                                    setOutputTable(recordList);
+                                                },
+                                                onChange: setoutuptKeys
+                                            }}
+                                        />
+                                    )
+                                }
+                            ]}
+                        />
+                    </Form.Item>
+                    {rows && (
+                        <Form.Item label="发布到应用市场" name="published" valuePropName="checked" initialValue={false}>
+                            <Switch />
+                        </Form.Item>
+                    )}
+                </Form>
+                {plugOpen && (
+                    <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
+                        <Form labelCol={{ span: 6 }}>
+                            <Form.Item label="机器人名称">
+                                <div className="font-bold">
+                                    {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
+                                </div>
+                            </Form.Item>
+                            <Form.Item label="Coze参数验证">
+                                <div className="flex gap-2 items-center">
+                                    <TextArea
+                                        className="w-full"
+                                        placeholder="可输入触发机器人的对话"
+                                        rows={4}
+                                        value={bindData.content}
+                                        onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
+                                    />
+                                    <Button
+                                        loading={bindLoading}
+                                        onClick={async () => {
+                                            setBindLoading(true);
+                                            try {
+                                                const res = await plugVerify({
+                                                    accessTokenId: form.getFieldValue('accessTokenId'),
+                                                    content: bindData.content,
+                                                    botId: form.getFieldValue('botId')
+                                                });
+                                                timer.current = setInterval(async () => {
+                                                    try {
+                                                        const result = await plugVerifyResult({
+                                                            code: res,
+                                                            accessTokenId: form.getFieldValue('accessTokenId')
                                                         });
+                                                        if (result.verifyState) {
+                                                            clearInterval(timer.current);
+                                                            setverifyStatus('success');
+                                                            setBindData({
+                                                                ...bindData,
+                                                                arguments: result.arguments ? JSON.stringify(result.arguments) : '',
+                                                                output: result.output ? JSON.stringify(result.output) : '',
+                                                                outputType: res.outputType
+                                                            });
+                                                            setBindLoading(false);
+                                                        }
+                                                    } catch (err: any) {
+                                                        clearInterval(timer.current);
+                                                        setverifyStatus('error');
+                                                        setVerErrmessage(err.msg);
                                                         setBindLoading(false);
                                                     }
-                                                } catch (err: any) {
-                                                    clearInterval(timer.current);
-                                                    setverifyStatus('error');
-                                                    setVerErrmessage(err.msg);
-                                                    setBindLoading(false);
-                                                }
-                                            }, 2000);
-                                        } catch (err: any) {
-                                            clearInterval(timer.current);
+                                                }, 2000);
+                                            } catch (err: any) {
+                                                clearInterval(timer.current);
 
-                                            setBindLoading(false);
-                                        }
-                                    }}
-                                    type="primary"
-                                >
-                                    绑定验证
-                                </Button>
-                            </div>
-                        </Form.Item>
-                        <Form.Item label="验证状态">
-                            <Tag color={verifyStatus}>
-                                {verifyStatus === 'success' ? '校验成功' : verifyStatus === 'error' ? '检验失败' : '待校验'}
-                            </Tag>
-                            <span className="text-xs text-[#ff4d4f]">{verErrmessage}</span>
-                        </Form.Item>
-                        <Form.Item label="入参数据示例">
-                            <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
-                            <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
-                        </Form.Item>
-                        <Form.Item label="出参数据示例">
-                            <ChatMarkdown textContent={value2JsonMd(bindData.output)} />
-                            <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
-                        </Form.Item>
-                    </Form>
-                    <div className="flex justify-center">
-                        <Button
-                            className="w-[100px]"
-                            disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
-                            onClick={() => {
-                                setStatus('success');
-                                setVerErrmessage('');
-                                form.setFieldValue('input', bindData.arguments);
-                                form.setFieldValue('output', bindData.output);
-                                setBindData({
-                                    content: '',
-                                    arguments: '',
-                                    output: '',
-                                    outputType: ''
-                                });
-                                setverifyStatus('gold');
-                                getTableData(bindData.arguments, setInputTable, setinputKeys);
-                                getTableData(bindData.output, setOutputTable, setoutuptKeys);
-                                setPlugOpen(false);
-                            }}
-                            type="primary"
-                        >
-                            确认
-                        </Button>
-                    </div>
-                </Modal>
-            )}
-            <div className="flex justify-center">
-                <Button onClick={handleOk} type="primary" className="w-[100px]">
-                    保存
-                </Button>
+                                                setBindLoading(false);
+                                            }
+                                        }}
+                                        type="primary"
+                                    >
+                                        绑定验证
+                                    </Button>
+                                </div>
+                            </Form.Item>
+                            <Form.Item label="验证状态">
+                                <Tag color={verifyStatus}>
+                                    {verifyStatus === 'success' ? '校验成功' : verifyStatus === 'error' ? '检验失败' : '待校验'}
+                                </Tag>
+                                <span className="text-xs text-[#ff4d4f]">{verErrmessage}</span>
+                            </Form.Item>
+                            <Form.Item label="入参数据示例">
+                                <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
+                                <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
+                            </Form.Item>
+                            <Form.Item label="出参数据示例">
+                                <ChatMarkdown textContent={value2JsonMd(bindData.output)} />
+                                <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
+                            </Form.Item>
+                        </Form>
+                        <div className="flex justify-center">
+                            <Button
+                                className="w-[100px]"
+                                disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
+                                onClick={() => {
+                                    setStatus('success');
+                                    setVerErrmessage('');
+                                    form.setFieldValue('input', bindData.arguments);
+                                    form.setFieldValue('output', bindData.output);
+                                    setBindData({
+                                        content: '',
+                                        arguments: '',
+                                        output: '',
+                                        outputType: ''
+                                    });
+                                    setverifyStatus('gold');
+                                    getTableData(bindData.arguments, setInputTable, setinputKeys);
+                                    getTableData(bindData.output, setOutputTable, setoutuptKeys);
+                                    setPlugOpen(false);
+                                }}
+                                type="primary"
+                            >
+                                确认
+                            </Button>
+                        </div>
+                    </Modal>
+                )}
+                <div className="flex justify-center">
+                    <Button onClick={handleOk} type="primary" className="w-[100px]">
+                        保存
+                    </Button>
+                </div>
             </div>
+
             {/* <div className="tree">
                 <Tree
                     showLine

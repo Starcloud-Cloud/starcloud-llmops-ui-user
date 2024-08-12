@@ -10,7 +10,7 @@ import {
     ExclamationCircleFilled,
     AntDesignOutlined,
     AppstoreFilled,
-    InfoCircleOutlined
+    EllipsisOutlined
 } from '@ant-design/icons';
 import {
     Button,
@@ -235,73 +235,6 @@ export const TableHeader = ({
 
     const [plugMarketList, setPlugMarketList] = useState<any[]>([]);
     const [rows, setRows] = useState<any>(null);
-    const PlugColumns: TableProps<any>['columns'] = [
-        {
-            title: '插件名称',
-            width: 200,
-            dataIndex: 'pluginName',
-            align: 'center'
-        },
-        {
-            title: '实现方式',
-            align: 'center',
-            render: (_, row) => <Tag color="processing">{wayList?.find((i) => i.value === row.type)?.label}</Tag>
-        },
-        {
-            title: '使用场景',
-            align: 'center',
-            render: (_, row) => <div>{sceneList?.find((i) => i.value === row.scene)?.label}</div>
-        },
-        {
-            title: '创建时间',
-            align: 'center',
-            render: (_, row) => dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')
-        },
-        {
-            title: '更新时间',
-            align: 'center',
-            render: (_, row) => dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss')
-        },
-        {
-            title: '创建人',
-            align: 'center',
-            dataIndex: 'creator'
-        },
-        {
-            title: '操作',
-            align: 'center',
-            width: 80,
-            render: (_, record, index) => (
-                <Space>
-                    <Button
-                        onClick={async () => {
-                            const res = await detailPlug(record.uid);
-                            setRows(res);
-                            setAddOpen(true);
-                        }}
-                        type="link"
-                    >
-                        编辑
-                    </Button>
-                    <Popconfirm
-                        title="提示"
-                        description="请再次确认是否删除"
-                        onConfirm={async () => {
-                            await delOwner(record.uid);
-                            getTablePlugList();
-                            getPlugList();
-                        }}
-                        okText="确定"
-                        cancelText="取消"
-                    >
-                        <Button danger type="link">
-                            删除
-                        </Button>
-                    </Popconfirm>
-                </Space>
-            )
-        }
-    ];
     const [plugMarketOpen, setPlugMarketOpen] = useState(false);
     const [plugTableData, setPlugTableData] = useState<any[]>([]);
 
@@ -716,7 +649,7 @@ export const TableHeader = ({
                     </div>
                 </ModalForm>
             )}
-            <Modal width="60%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
+            <Modal width="80%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
                 <Tabs
                     items={[
                         {
@@ -730,7 +663,7 @@ export const TableHeader = ({
                                                 <div className="my-4 text-[16px] font-bold">
                                                     {sceneList?.find((i) => i.value === item.scene)?.label}
                                                 </div>
-                                                <div className="w-full grid justify-content-center gap-2 responsive-list-container sm:grid-cols-2 md:grid-cols-3 gap-x-3">
+                                                <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3">
                                                     {item.children?.map((el: any) => {
                                                         console.log(el);
                                                         return (
@@ -751,7 +684,7 @@ export const TableHeader = ({
                                                                     </div>
                                                                 </div>
                                                                 <Divider className="my-2" />
-                                                                <div className="flex justify-between">
+                                                                <div className="flex justify-between text-xs">
                                                                     <div className="flex">
                                                                         {wayList.find((item) => item.value === el.type).label}
                                                                     </div>
@@ -777,7 +710,75 @@ export const TableHeader = ({
                                             创建插件
                                         </Button>
                                     </div>
-                                    <Table rowKey={'uid'} columns={PlugColumns} dataSource={plugTableData} />
+                                    <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                        {plugTableData?.map((el) => (
+                                            <div
+                                                onClick={() => handleOpenPlug(el)}
+                                                className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                                key={el.uid}
+                                            >
+                                                <div className="flex gap-4">
+                                                    {el.avatar ? (
+                                                        <Avatar shape="square" size={64} src={el.avatar} />
+                                                    ) : (
+                                                        <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                    )}
+                                                    <div className="flex-1">
+                                                        <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                        <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                    </div>
+                                                </div>
+                                                <Divider className="my-2" />
+                                                <div className="flex justify-between text-xs">
+                                                    <div className="flex">{wayList.find((item) => item.value === el.type).label}</div>
+                                                    <Tooltip title="创建时间">
+                                                        <div className="flex">{dayjs(el.createTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+                                                    </Tooltip>
+                                                </div>
+                                                <Dropdown
+                                                    placement="top"
+                                                    menu={{
+                                                        items: [
+                                                            {
+                                                                key: '1',
+                                                                label: '编辑',
+                                                                onClick: (event) => event.domEvent.stopPropagation()
+                                                            },
+                                                            {
+                                                                key: '2',
+                                                                danger: true,
+                                                                label: ' 删除',
+                                                                onClick: (event) => event.domEvent.stopPropagation()
+                                                            }
+                                                        ],
+                                                        onClick: async (e) => {
+                                                            console.log(e);
+
+                                                            if (e.key === '1') {
+                                                                const res = await detailPlug(el.uid);
+                                                                setRows(res);
+                                                                setAddOpen(true);
+                                                            } else {
+                                                                await delOwner(el.uid);
+                                                                getTablePlugList();
+                                                                getPlugList();
+                                                            }
+                                                            e.domEvent.stopPropagation();
+                                                        }
+                                                    }}
+                                                >
+                                                    <Button
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        size="small"
+                                                        shape="circle"
+                                                        className="absolute top-2 right-2"
+                                                    >
+                                                        <EllipsisOutlined />
+                                                    </Button>
+                                                </Dropdown>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )
                         }

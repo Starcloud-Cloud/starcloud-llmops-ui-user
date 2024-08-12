@@ -1,4 +1,4 @@
-import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Divider } from 'antd';
+import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Form } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
@@ -36,10 +36,26 @@ const PlugAnalysis = ({
     open: any;
     record: any;
 }) => {
+    const [form] = Form.useForm();
     const [execountLoading, setExecountLoading] = useState(false);
     const [redBookData, setRedBookData] = useState<any>({});
     const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [data, setData] = useState<any[]>([]);
+
+    //输入内容
+    const getFormItem = () => {
+        if (redBookData.requirement) {
+            return Object.entries(redBookData.requirement)?.map(([key, value]) => (
+                <Form.Item key={key} label={key} name={key} rules={[{ required: true, message: '该选项必填' }]}>
+                    <Input />
+                </Form.Item>
+            ));
+        } else {
+            console.log(redBookData.requirement);
+
+            return null;
+        }
+    };
 
     const redList = React.useMemo(() => {
         const outputFormart = JSON.parse(record?.outputFormart) || [];
@@ -113,6 +129,19 @@ const PlugAnalysis = ({
             setData(data);
         }
     }, [columns, record]);
+    useEffect(() => {
+        if (record.executeParams) {
+            setRedBookData({
+                ...redBookData,
+                requirement: JSON.parse(record.executeParams)
+            });
+        } else {
+            setRedBookData({
+                ...redBookData,
+                requirement: {}
+            });
+        }
+    }, [record]);
 
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
     //处理过的素材数据
@@ -141,13 +170,12 @@ const PlugAnalysis = ({
     const handleExecute = async (retry?: boolean) => {
         setExecountLoading(true);
         try {
-            let newData: any = redBookData.requirement;
-            try {
-                newData = JSON.parse(redBookData.requirement);
-            } catch (err) {}
+            const formRes = await form.validateFields();
+            console.log(formRes);
+            return;
             const code = await plugExecute({
                 uuid: record.pluginUid,
-                inputParams: newData
+                inputParams: formRes
             });
             setExecountLoading(false);
             if (!retry) {
@@ -293,7 +321,7 @@ const PlugAnalysis = ({
                         <QuestionCircleOutlined className="ml-1 cursor-pointer" />
                     </Popover>
                 </div>
-                <TextArea
+                {/* <TextArea
                     defaultValue={redBookData?.requirement}
                     status={!redBookData?.requirement && requirementStatusOpen ? 'error' : ''}
                     onBlur={(e) => {
@@ -301,10 +329,13 @@ const PlugAnalysis = ({
                         setrequirementStatusOpen(true);
                     }}
                     rows={10}
-                />
-                {!redBookData?.requirement && requirementStatusOpen && (
+                /> */}
+                <Form form={form} layout={'vertical'} labelCol={{ span: 6 }}>
+                    {getFormItem()}
+                </Form>
+                {/* {!redBookData?.requirement && requirementStatusOpen && (
                     <span className="text-xs text-[#ff4d4f] ml-[4px]">输入内容必填</span>
-                )}
+                )} */}
 
                 <div className="text-[16px] font-bold my-4 flex justify-between">
                     <span>
@@ -400,7 +431,10 @@ const PlugAnalysis = ({
                                                             <Option
                                                                 key={item.dataIndex}
                                                                 value={item.dataIndex}
-                                                                disabled={Object.values(redBookData.bindFieldData).includes(item.dataIndex)}
+                                                                disabled={
+                                                                    redBookData.bindFieldData &&
+                                                                    Object.values(redBookData.bindFieldData).includes(item.dataIndex)
+                                                                }
                                                             >
                                                                 {item.title}
                                                             </Option>

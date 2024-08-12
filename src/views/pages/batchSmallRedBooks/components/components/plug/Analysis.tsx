@@ -39,23 +39,7 @@ const PlugAnalysis = ({
     const [form] = Form.useForm();
     const [execountLoading, setExecountLoading] = useState(false);
     const [redBookData, setRedBookData] = useState<any>({});
-    const [requirementStatusOpen, setrequirementStatusOpen] = useState(false);
     const [data, setData] = useState<any[]>([]);
-
-    //输入内容
-    const getFormItem = () => {
-        if (redBookData.requirement) {
-            return Object.entries(redBookData.requirement)?.map(([key, value]) => (
-                <Form.Item key={key} label={key} name={key} rules={[{ required: true, message: '该选项必填' }]}>
-                    <Input />
-                </Form.Item>
-            ));
-        } else {
-            console.log(redBookData.requirement);
-
-            return null;
-        }
-    };
 
     const redList = React.useMemo(() => {
         const outputFormart = JSON.parse(record?.outputFormart) || [];
@@ -94,6 +78,13 @@ const PlugAnalysis = ({
 
             setRedBookData((pre: any) => ({
                 ...pre,
+                requirement: JSON.parse(record.inputFormart || '[]')?.map((item: any, index: number) => ({
+                    ...item,
+                    variableDesc:
+                        record.executeParams?.find((i: any) => i.variableKey === item.variableKey).variableDesc || item.variableDesc,
+                    variableValue:
+                        record.executeParams?.find((i: any) => i.variableKey === item.variableKey).variableValue || item.variableValue
+                })),
                 fieldList: fieldList,
                 bindFieldData: obj
             }));
@@ -120,8 +111,17 @@ const PlugAnalysis = ({
             filterData.forEach((item: any) => {
                 obj[item.label_key] = item.value;
             });
+            console.log(record, record.inputFormart);
+
             setRedBookData((pre: any) => ({
                 ...pre,
+                requirement: JSON.parse(record.inputFormart || '[]')?.map((item: any, index: number) => ({
+                    ...item,
+                    variableDesc:
+                        record.executeParams?.find((i: any) => i.variableKey === item.variableKey).variableDesc || item.variableDesc,
+                    variableValue:
+                        record.executeParams?.find((i: any) => i.variableKey === item.variableKey).variableValue || item.variableValue
+                })),
                 fieldList: fieldList,
                 bindFieldData: obj
             }));
@@ -129,19 +129,6 @@ const PlugAnalysis = ({
             setData(data);
         }
     }, [columns, record]);
-    useEffect(() => {
-        if (record.executeParams) {
-            setRedBookData({
-                ...redBookData,
-                requirement: JSON.parse(record.executeParams)
-            });
-        } else {
-            setRedBookData({
-                ...redBookData,
-                requirement: {}
-            });
-        }
-    }, [record]);
 
     const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
     //处理过的素材数据
@@ -171,8 +158,6 @@ const PlugAnalysis = ({
         setExecountLoading(true);
         try {
             const formRes = await form.validateFields();
-            console.log(formRes);
-            return;
             const code = await plugExecute({
                 uuid: record.pluginUid,
                 inputParams: formRes
@@ -331,12 +316,18 @@ const PlugAnalysis = ({
                     rows={10}
                 /> */}
                 <Form form={form} layout={'vertical'} labelCol={{ span: 6 }}>
-                    {getFormItem()}
+                    {redBookData.requirement?.map((item: any) => (
+                        <Form.Item
+                            initialValue={item.variableValue}
+                            key={item.uuid}
+                            label={item.variableKey}
+                            name={item.variableKey}
+                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                        >
+                            <Input placeholder={item.variableDesc} />
+                        </Form.Item>
+                    ))}
                 </Form>
-                {/* {!redBookData?.requirement && requirementStatusOpen && (
-                    <span className="text-xs text-[#ff4d4f] ml-[4px]">输入内容必填</span>
-                )} */}
-
                 <div className="text-[16px] font-bold my-4 flex justify-between">
                     <span>
                         2.输出字段绑定
@@ -400,7 +391,9 @@ const PlugAnalysis = ({
                                                 allowClear
                                                 value={record.value}
                                                 onChange={(value) => {
-                                                    let fieldList = redBookData.fieldList;
+                                                    let fieldList = redBookData.fieldList || [];
+                                                    console.log(fieldList);
+
                                                     let bindFieldData = redBookData.bindFieldData;
                                                     if (value) {
                                                         fieldList = [...fieldList, record.label_key];
@@ -431,10 +424,9 @@ const PlugAnalysis = ({
                                                             <Option
                                                                 key={item.dataIndex}
                                                                 value={item.dataIndex}
-                                                                disabled={
-                                                                    redBookData.bindFieldData &&
-                                                                    Object.values(redBookData.bindFieldData).includes(item.dataIndex)
-                                                                }
+                                                                disabled={Object.values(redBookData.bindFieldData || {}).includes(
+                                                                    item.dataIndex
+                                                                )}
                                                             >
                                                                 {item.title}
                                                             </Option>
@@ -458,8 +450,7 @@ const PlugAnalysis = ({
                                     libraryUid: record.libraryUid,
                                     pluginUid: record.pluginUid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: redBookData.requirement
-                                    // executeParams: JSON.stringify({})
+                                    executeParams: JSON.stringify(redBookData.requirement)
                                 });
                                 if (res) {
                                     message.success('保存成功');
@@ -470,8 +461,7 @@ const PlugAnalysis = ({
                                     pluginUid: record.pluginUid,
                                     uid: record.uid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: redBookData.requirement
-                                    // executeParams: JSON.stringify({})
+                                    executeParams: JSON.stringify(redBookData.requirement)
                                 });
                                 if (res) {
                                     message.success('保存成功');
@@ -485,10 +475,6 @@ const PlugAnalysis = ({
                     <Button
                         loading={execountLoading}
                         onClick={async () => {
-                            if (!redBookData.requirement) {
-                                message.error('请输入小红书链接!');
-                                return;
-                            }
                             if (!redBookData.fieldList?.length) {
                                 message.error('请至少绑定一素材字段!');
                                 return;
@@ -498,24 +484,19 @@ const PlugAnalysis = ({
                                     libraryUid: record.libraryUid,
                                     pluginUid: record.pluginUid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: redBookData.requirement
-                                    // executeParams: JSON.stringify({})
+                                    executeParams: JSON.stringify(redBookData.requirement)
                                 });
                                 if (res) {
                                     message.success('保存成功');
                                 }
                             } else {
-                                const res = await updatePlugConfigInfo({
+                                await updatePlugConfigInfo({
                                     libraryUid: record.libraryUid,
                                     pluginUid: record.pluginUid,
                                     uid: record.uid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: redBookData.requirement
-                                    // executeParams: JSON.stringify({})
+                                    executeParams: JSON.stringify(redBookData.requirement)
                                 });
-                                if (res) {
-                                    message.success('保存成功');
-                                }
                             }
                             handleExecute();
                             handleAnalysis();

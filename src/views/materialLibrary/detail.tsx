@@ -247,7 +247,8 @@ export const TableHeader = ({
     const [plugRecord, setPlugRecord] = useState<any>(null);
     const [plugConfigOpen, setPlugConfigOpen] = useState(false);
     const [metaData, setMetaData] = useState([]);
-    const [definitionList, setDefinitionList] = useState([]);
+    const [definitionList, setDefinitionList] = useState<any[]>([]);
+    const [focusUpdateDefinitionList, setFocusUpdateDefinitionList] = useState(0);
 
     const handleOpenPlug = async (record: any) => {
         const plugInfo = await getPlugInfo(record.uid);
@@ -300,10 +301,10 @@ export const TableHeader = ({
     useEffect(() => {
         materialDefinitionList({
             libraryUid: libraryUid
-        }).then((res: any) => {
-            setDefinitionList(res);
+        }).then((res: any[]) => {
+            setDefinitionList([...res]);
         });
-    }, []);
+    }, [focusUpdateDefinitionList]);
 
     console.log(definitionList, 'definitionList');
 
@@ -833,6 +834,9 @@ export const TableHeader = ({
                     getTablePlugList={() => {
                         getTablePlugList();
                         getPlugList();
+                    }}
+                    getDefinitionList={() => {
+                        setFocusUpdateDefinitionList((pre: any) => pre + 1);
                     }}
                 />
             )}

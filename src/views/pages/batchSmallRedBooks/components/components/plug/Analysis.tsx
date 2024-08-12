@@ -10,6 +10,7 @@ import { addPlugConfigInfo, updatePlugConfigInfo } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 import ResultLoading from '../resultLoading';
+import dayjs from 'dayjs';
 
 const value2JsonMd = (value: any) => `
 ~~~json
@@ -282,6 +283,11 @@ const PlugAnalysis = ({
                             <Space>
                                 <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
                                 <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
+                                {record?.updateTime && (
+                                    <span className="text-xs text-black/50">
+                                        更新时间: {dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                    </span>
+                                )}
                             </Space>
                         </div>
                     </div>

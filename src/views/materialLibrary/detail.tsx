@@ -735,7 +735,7 @@ export const TableHeader = ({
                                             创建插件
                                         </Button>
                                     </div>
-                                    {plugMarketList?.map((item) => (
+                                    {plugTableData?.map((item) => (
                                         <div key={item.uid}>
                                             <div className="my-4 text-[16px] font-bold">
                                                 {sceneList?.find((i) => i.value === item.scene)?.label}

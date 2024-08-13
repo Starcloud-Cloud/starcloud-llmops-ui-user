@@ -731,9 +731,21 @@ export const TableHeader = ({
                             children: (
                                 <div>
                                     <div className="flex justify-end mb-4">
-                                        <Button onClick={() => setAddOpen(true)} type="primary">
-                                            创建插件
-                                        </Button>
+                                        <div className="flex gap-2 items-end">
+                                            <div
+                                                onClick={() =>
+                                                    window.open(
+                                                        'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
+                                                    )
+                                                }
+                                                className="text-[#673ab7] hover:underline cursor-pointer text-xs"
+                                            >
+                                                插件使用手册
+                                            </div>
+                                            <Button onClick={() => setAddOpen(true)} type="primary">
+                                                创建插件
+                                            </Button>
+                                        </div>
                                     </div>
                                     {plugTableData?.map((item) => (
                                         <div key={item.uid}>

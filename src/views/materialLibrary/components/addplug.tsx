@@ -598,6 +598,23 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                             });
                                                             setBindLoading(false);
                                                             setVerErrmessage('');
+                                                        } else if (
+                                                            result.status === 'failed' ||
+                                                            result.status === 'requires_action' ||
+                                                            result.status === 'canceled'
+                                                        ) {
+                                                            clearInterval(timer.current);
+                                                            setverifyStatus('error');
+                                                            setVerErrmessage(
+                                                                result.status === 'failed'
+                                                                    ? '对话失败'
+                                                                    : result.status === 'requires_action'
+                                                                    ? '对话中断，需要进一步处理'
+                                                                    : result.status === 'canceled'
+                                                                    ? '对话已取消'
+                                                                    : ''
+                                                            );
+                                                            setBindLoading(false);
                                                         }
                                                     } catch (err: any) {
                                                         clearInterval(timer.current);

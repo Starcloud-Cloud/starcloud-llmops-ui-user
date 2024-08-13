@@ -193,7 +193,7 @@ const PlugAnalysis = ({
                         code,
                         uuid: record.pluginUid
                     });
-                    if (res.status !== 'in_progress') {
+                    if (res.status === 'completed') {
                         let List;
                         if (Array.isArray(res.output) && record.outputType === 'list') {
                             List = res.output;
@@ -235,6 +235,22 @@ const PlugAnalysis = ({
                         setSuccessCount(successCountRef.current);
                         materialzanListRef.current = newList;
                         setMaterialzanList(materialzanListRef.current);
+                        clearInterval(timer.current);
+                    } else if (res.status === 'failed' || res.status === 'requires_action' || res.status === 'canceled') {
+                        executionCountRef.current = 0;
+                        setExecutionCount(executionCountRef.current);
+                        errorCountRef.current = 1;
+                        setErrorCount(errorCountRef.current);
+                        errorMessageRef.current.push(
+                            res.status === 'failed'
+                                ? '对话失败'
+                                : res.status === 'requires_action'
+                                ? '对话中断，需要进一步处理'
+                                : res.status === 'canceled'
+                                ? '对话已取消'
+                                : ''
+                        );
+                        setErrorMessage(errorMessageRef.current);
                         clearInterval(timer.current);
                     }
                 } catch (err: any) {

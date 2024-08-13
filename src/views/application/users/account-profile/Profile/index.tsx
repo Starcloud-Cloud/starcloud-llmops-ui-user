@@ -25,7 +25,17 @@ import {
 import MuiTooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import infoStore from 'store/entitlementAction';
-import { Avatar as AntAvatar, List as AntList, Button as AntBtn, Tag, Empty, Typography as AntTypography, message, Space } from 'antd';
+import {
+    Avatar as AntAvatar,
+    List as AntList,
+    Button as AntBtn,
+    Tag,
+    Empty,
+    Typography as AntTypography,
+    message,
+    Space,
+    Popconfirm
+} from 'antd';
 
 // project imports
 // import Profile from './Profile';
@@ -363,9 +373,17 @@ const Profilnew = () => {
                                     },
                                     actions: {
                                         render: (text, row) => [
-                                            <AntBtn danger type="text" onClick={() => handleDelete(row)}>
-                                                删除
-                                            </AntBtn>
+                                            <Popconfirm
+                                                title="提示"
+                                                description="确认删除?"
+                                                onConfirm={() => handleDelete(row)}
+                                                okText="是"
+                                                cancelText="否"
+                                            >
+                                                <AntBtn danger type="text">
+                                                    删除
+                                                </AntBtn>
+                                            </Popconfirm>
                                         ],
                                         search: false
                                     }

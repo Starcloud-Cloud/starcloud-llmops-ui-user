@@ -362,14 +362,14 @@ export const TableHeader = ({
                     </Space>
                 </div>
                 <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm">
-                    <Space className="max-w-[560px] overflow-x-auto">
+                    <Space className="max-w-[590px] overflow-x-auto">
                         {definitionList.map((item: any) => {
                             return (
                                 <div
                                     onClick={() => {
                                         handleOpenPlug(item);
                                     }}
-                                    className="flex items-center flex-col cursor-pointer p-2 min-w-[90px] hover:bg-[#d9d9d9] h-[63px]"
+                                    className="flex items-center flex-col cursor-pointer py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                                 >
                                     {item.avatar ? (
                                         <img className="w-[20px] h-[20px]" src={item.avatar} />
@@ -387,7 +387,7 @@ export const TableHeader = ({
                                 setPlugTitle('小红书分析');
                                 setPlugValue('xhsOcr');
                             }}
-                            className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -416,7 +416,7 @@ export const TableHeader = ({
                                 setPlugTitle('AI素材生成');
                                 setPlugValue('generate_material_batch');
                             }}
-                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -441,7 +441,7 @@ export const TableHeader = ({
                                 setPlugTitle('文本智能提取');
                                 setPlugValue('extraction');
                             }}
-                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -468,7 +468,7 @@ export const TableHeader = ({
                                 setPlugTitle('图片OCR提取');
                                 setPlugValue('imageOcr');
                             }}
-                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -491,7 +491,7 @@ export const TableHeader = ({
                                 setPlugTitle('AI字段补齐');
                                 setPlugValue('generate_material_one');
                             }}
-                            className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -522,7 +522,7 @@ export const TableHeader = ({
                                 setPlugTitle('微信公共号分析');
                                 setPlugValue('wchat');
                             }}
-                            className="flex items-center flex-col cursor-pointer py-2 w-[100px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"

@@ -190,6 +190,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     };
     const handleOk = async () => {
         const result = await form.validateFields();
+        console.log(outputType);
+
         if (rows) {
             await modifyPlug({
                 ...result,
@@ -592,10 +594,27 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 ...bindData,
                                                                 arguments: result.arguments ? JSON.stringify(result.arguments) : '',
                                                                 output: result.output ? JSON.stringify(result.output) : '',
-                                                                outputType: res.outputType
+                                                                outputType: result.outputType
                                                             });
                                                             setBindLoading(false);
                                                             setVerErrmessage('');
+                                                        } else if (
+                                                            result.status === 'failed' ||
+                                                            result.status === 'requires_action' ||
+                                                            result.status === 'canceled'
+                                                        ) {
+                                                            clearInterval(timer.current);
+                                                            setverifyStatus('error');
+                                                            setVerErrmessage(
+                                                                result.status === 'failed'
+                                                                    ? '对话失败'
+                                                                    : result.status === 'requires_action'
+                                                                    ? '对话中断，需要进一步处理'
+                                                                    : result.status === 'canceled'
+                                                                    ? '对话已取消'
+                                                                    : ''
+                                                            );
+                                                            setBindLoading(false);
                                                         }
                                                     } catch (err: any) {
                                                         clearInterval(timer.current);
@@ -638,6 +657,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 onClick={() => {
                                     setStatus('success');
                                     setVerErrmessage('');
+                                    console.log(bindData.outputType);
+
                                     setOutputType(bindData.outputType);
                                     form.setFieldValue('input', bindData.arguments);
                                     form.setFieldValue('output', bindData.output);

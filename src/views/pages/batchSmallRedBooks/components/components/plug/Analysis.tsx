@@ -11,6 +11,8 @@ import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 import ResultLoading from '../resultLoading';
 import dayjs from 'dayjs';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const value2JsonMd = (value: any) => `
 ~~~json
@@ -88,9 +90,11 @@ const PlugAnalysis = ({
                 requirement: JSON.parse(record.inputFormart || '[]')?.map((item: any, index: number) => ({
                     ...item,
                     variableDesc:
-                        record.executeParams?.find((i: any) => i.variableKey === item.variableKey).variableDesc || item.variableDesc,
+                        JSON.parse(record.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableDesc ||
+                        item?.variableDesc,
                     variableValue:
-                        record.executeParams?.find((i: any) => i.variableKey === item.variableKey).variableValue || item.variableValue
+                        JSON.parse(record.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableValue ||
+                        item?.variableValue
                 })),
                 fieldList: fieldList,
                 bindFieldData: obj
@@ -125,9 +129,12 @@ const PlugAnalysis = ({
                 requirement: JSON.parse(record.inputFormart || '[]')?.map((item: any, index: number) => ({
                     ...item,
                     variableDesc:
-                        record.executeParams?.find((i: any) => i.variableKey === item.variableKey).variableDesc || item.variableDesc,
+                        JSON.parse(record.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableDesc ||
+                        item?.variableDesc ||
+                        '',
                     variableValue:
-                        record.executeParams?.find((i: any) => i.variableKey === item.variableKey).variableValue || item.variableValue
+                        JSON.parse(record.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableValue ||
+                        item?.variableValue
                 })),
                 fieldList: fieldList,
                 bindFieldData: obj
@@ -186,8 +193,31 @@ const PlugAnalysis = ({
                         code,
                         uuid: record.pluginUid
                     });
-                    if (res.status !== 'in_progress') {
-                        const List = res.output;
+                    if (res.status === 'completed') {
+                        let List;
+                        if (Array.isArray(res.output) && record.outputType === 'list') {
+                            List = res.output;
+                        } else if (typeof res.output === 'object' && res.output !== null && record.outputType === 'obj') {
+                            List = [res.output];
+                        } else {
+                            executionCountRef.current = 0;
+                            setExecutionCount(executionCountRef.current);
+                            errorCountRef.current = 1;
+                            setErrorCount(errorCountRef.current);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '返回数据类型有误，请稍后再试',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    close: false
+                                })
+                            );
+                            return false;
+                        }
                         const newList = List.map((item: any) => {
                             const newItem: any = {};
                             for (let key in item) {
@@ -205,6 +235,22 @@ const PlugAnalysis = ({
                         setSuccessCount(successCountRef.current);
                         materialzanListRef.current = newList;
                         setMaterialzanList(materialzanListRef.current);
+                        clearInterval(timer.current);
+                    } else if (res.status === 'failed' || res.status === 'requires_action' || res.status === 'canceled') {
+                        executionCountRef.current = 0;
+                        setExecutionCount(executionCountRef.current);
+                        errorCountRef.current = 1;
+                        setErrorCount(errorCountRef.current);
+                        errorMessageRef.current.push(
+                            res.status === 'failed'
+                                ? '对话失败'
+                                : res.status === 'requires_action'
+                                ? '对话中断，需要进一步处理'
+                                : res.status === 'canceled'
+                                ? '对话已取消'
+                                : ''
+                        );
+                        setErrorMessage(errorMessageRef.current);
                         clearInterval(timer.current);
                     }
                 } catch (err: any) {
@@ -457,12 +503,17 @@ const PlugAnalysis = ({
                 <div className="flex justify-center gap-6 mt-6">
                     <Button
                         onClick={async () => {
+                            const result = await form.validateFields();
+                            const newList = redBookData.requirement?.map((item: any) => ({
+                                ...item,
+                                variableValue: result[item.variableKey]
+                            }));
                             if (!record.fieldMap && !record.executeParams) {
                                 const res = await addPlugConfigInfo({
                                     libraryUid: record.libraryUid,
                                     pluginUid: record.pluginUid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify(redBookData.requirement)
+                                    executeParams: JSON.stringify(newList)
                                 });
                                 if (res) {
                                     message.success('保存成功');
@@ -473,7 +524,7 @@ const PlugAnalysis = ({
                                     pluginUid: record.pluginUid,
                                     uid: record.uid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify(redBookData.requirement)
+                                    executeParams: JSON.stringify(newList)
                                 });
                                 if (res) {
                                     message.success('保存成功');
@@ -491,12 +542,17 @@ const PlugAnalysis = ({
                                 message.error('请至少绑定一素材字段!');
                                 return;
                             }
+                            const result = await form.validateFields();
+                            const newList = redBookData.requirement?.map((item: any) => ({
+                                ...item,
+                                variableValue: result[item.variableKey]
+                            }));
                             if (!record.fieldMap && !record.executeParams) {
                                 const res = await addPlugConfigInfo({
                                     libraryUid: record.libraryUid,
                                     pluginUid: record.pluginUid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify(redBookData.requirement)
+                                    executeParams: JSON.stringify(newList)
                                 });
                                 if (res) {
                                     message.success('保存成功');
@@ -507,7 +563,7 @@ const PlugAnalysis = ({
                                     pluginUid: record.pluginUid,
                                     uid: record.uid,
                                     fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify(redBookData.requirement)
+                                    executeParams: JSON.stringify(newList)
                                 });
                             }
                             handleExecute();

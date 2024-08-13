@@ -11,6 +11,7 @@ import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish, p
 import _ from 'lodash-es';
 import ChatMarkdown from 'ui-component/Markdown';
 import { getAccessToken } from 'utils/auth';
+import useUserStore from 'store/user';
 const AddPlug = ({
     open,
     setOpen,
@@ -30,6 +31,8 @@ const AddPlug = ({
     getTablePlugList: () => void;
     getDefinitionList: () => void;
 }) => {
+    const permissions = useUserStore((state) => state.permissions);
+
     const [form] = Form.useForm();
     const { TextArea } = Input;
     const { Option } = Select;
@@ -264,10 +267,20 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 setOutputTable(newList);
                 setoutuptKeys(newList?.map((item: any) => item.uuid));
             }
+            // if(accountList?.find(item=>) rows.cozeTokenId)
             setStatus(rows.verifyState ? 'success' : 'error');
             getBotList('spaceId', rows.spaceId);
         }
     }, [rows]);
+    useEffect(() => {
+        if (rows.cozeTokenId && accountList.length > 0) {
+            if (accountList.findIndex((item) => item.id === rows.cozeTokenId) === -1) {
+                form.setFieldsValue({
+                    accessTokenId: ''
+                });
+            }
+        }
+    }, [rows.cozeTokenId, accountList]);
 
     const [treeData, setTreeData] = useState<any[]>([]);
     const removeTree = (key: string | number) => {
@@ -548,7 +561,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             ]}
                         />
                     </Form.Item>
-                    {rows && (
+                    {permissions.includes('plugin_published') && rows && (
                         <Form.Item label="发布到应用市场" name="published" valuePropName="checked" initialValue={false}>
                             <Switch />
                         </Form.Item>

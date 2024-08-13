@@ -42,6 +42,7 @@ const AddPlug = ({
     const [verErrmessage, setVerErrmessage] = useState('');
     const [accountList, setAccountList] = useState<any[]>([]);
     const [botList, setBotList] = useState<any[]>([]);
+    const [outputType, setOutputType] = useState('');
     const [bindData, setBindData] = useState({
         content: '',
         arguments: '',
@@ -200,6 +201,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 verifyState: status === 'success' ? true : false,
                 inputFormart: JSON.stringify(inputTable),
                 outputFormart: JSON.stringify(outputTable),
+                outputType,
                 uid: rows.uid
             });
             message.success('编辑成功');
@@ -217,7 +219,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 verifyState: status === 'success' ? true : false,
                 inputFormart: JSON.stringify(inputTable),
                 outputFormart: JSON.stringify(outputTable),
-                cozeTokenId: result.accessTokenId
+                cozeTokenId: result.accessTokenId,
+                outputType
             });
             message.success('新增成功');
         }
@@ -245,6 +248,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 botId: rows.entityUid,
                 accessTokenId: rows.cozeTokenId
             });
+            setOutputType(rows.outputType);
             if (rows.avatar) {
                 setImageUrl(rows.avatar);
             }
@@ -634,6 +638,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 onClick={() => {
                                     setStatus('success');
                                     setVerErrmessage('');
+                                    setOutputType(bindData.outputType);
                                     form.setFieldValue('input', bindData.arguments);
                                     form.setFieldValue('output', bindData.output);
                                     setBindData({

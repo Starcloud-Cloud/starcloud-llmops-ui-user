@@ -51,7 +51,8 @@ import AvatarUpload from './Avatar';
 import { getUserInfo } from 'api/login';
 import { t } from 'hooks/web/useI18n';
 import dayjs from 'dayjs';
-import { authRedirect } from 'api/auth-coze';
+import { authBind, authRedirect } from 'api/auth-coze';
+import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 
 // ==============================|| PROFILE 1 ||============================== //
 
@@ -85,7 +86,6 @@ const tabsOption = [
         label: '第三方授权',
         icon: <AltRouteIcon sx={{ fontSize: '1.3rem' }} />
     }
-
     // {
     //     label: '社交信息',
     //     icon: <Diversity3TwoTone sx={{ fontSize: '1.3rem' }} />
@@ -103,6 +103,7 @@ const Profilnew = () => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const type = searchParams.get('type') || 0;
+    const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
     useEffect(() => {
         setValue(Number(type));
@@ -278,7 +279,7 @@ const Profilnew = () => {
                         aria-label="simple tabs example"
                         variant="scrollable"
                         sx={{
-                            mb: 3,
+                            mb: 1,
                             '& a': {
                                 minHeight: 'auto',
                                 minWidth: 10,
@@ -314,10 +315,14 @@ const Profilnew = () => {
                         <ChangePassword />
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                        <AntTypography.Text type="secondary" className="mb-2">
-                            扣子授权
-                        </AntTypography.Text>
+                        <div className="mb-2">
+                            <AntTypography.Text type="secondary">扣子授权</AntTypography.Text>
+                            <AntBtn className="mt-2 ml-1" type="primary" size="small" onClick={() => setAuthDialogOpen(true)}>
+                                添加授权
+                            </AntBtn>
+                        </div>
                         <Divider />
+
                         {authList.length ? (
                             <AntList
                                 itemLayout="horizontal"
@@ -333,21 +338,16 @@ const Profilnew = () => {
                                             ]}
                                         >
                                             <AntList.Item.Meta
-                                                avatar={<AntAvatar className="bg-[#673ab7]">{item?.nickname[0]?.toUpperCase()}</AntAvatar>}
+                                                avatar={<AntAvatar className="bg-[#673ab7]">{item?.code[0]?.toUpperCase()}</AntAvatar>}
                                                 title={
                                                     <div>
-                                                        <span>{item.nickname}</span>
+                                                        <span>{item.code}</span>
                                                         <Tag className="ml-2" color="geekblue">
                                                             扣子
                                                         </Tag>
                                                     </div>
                                                 }
-                                                description={
-                                                    <span>
-                                                        到期时间：
-                                                        {dayjs(rawTokenInfo.refreshTokenExpireIn * 1000).format('YYYY-MM-DD HH:mm:ss')}
-                                                    </span>
-                                                }
+                                                description={<span>备注：{item?.nickname || '-'}</span>}
                                             />
                                         </AntList.Item>
                                     );
@@ -361,15 +361,17 @@ const Profilnew = () => {
                             >
                                 <AntBtn
                                     type="primary"
+                                    size="small"
                                     onClick={async () => {
-                                        const url = await authRedirect({
-                                            type: 35,
-                                            redirectUri: `${window.location.origin}/auth-coze`
-                                        });
-                                        window.location.href = url;
+                                        // const url = await authRedirect({
+                                        //     type: 35,
+                                        //     redirectUri: `${window.location.origin}/auth-coze`
+                                        // });
+                                        // window.location.href = url;
+                                        setAuthDialogOpen(true);
                                     }}
                                 >
-                                    去授权
+                                    添加授权
                                 </AntBtn>
                             </Empty>
                         )}
@@ -379,6 +381,30 @@ const Profilnew = () => {
                     </TabPanel> */}
                 </Grid>
             </Grid>
+            {authDialogOpen && (
+                <ModalForm
+                    open={authDialogOpen}
+                    onOpenChange={setAuthDialogOpen}
+                    title="新增授权"
+                    onFinish={async (values) => {
+                        const result = await authBind({
+                            type: 35,
+                            code: values.code,
+                            remark: values.remark,
+                            state: values.code,
+                            auto: false
+                        });
+                        if (result) {
+                            fetchAuthList();
+                            message.success('绑定成功');
+                            setAuthDialogOpen(false);
+                        }
+                    }}
+                >
+                    <ProFormText required name="code" rules={[{ required: true }]} label="授权码" placeholder="请输入授权" />
+                    <ProFormTextArea name="remark" label="备注" placeholder="请输入备注" />
+                </ModalForm>
+            )}
         </MainCard>
     );
 };

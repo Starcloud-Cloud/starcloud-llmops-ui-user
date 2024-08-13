@@ -25,7 +25,17 @@ import {
 import MuiTooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import infoStore from 'store/entitlementAction';
-import { Avatar as AntAvatar, List as AntList, Button as AntBtn, Tag, Empty, Typography as AntTypography, message } from 'antd';
+import {
+    Avatar as AntAvatar,
+    List as AntList,
+    Button as AntBtn,
+    Tag,
+    Empty,
+    Typography as AntTypography,
+    message,
+    Space,
+    Popconfirm
+} from 'antd';
 
 // project imports
 // import Profile from './Profile';
@@ -52,8 +62,7 @@ import { getUserInfo } from 'api/login';
 import { t } from 'hooks/web/useI18n';
 import dayjs from 'dayjs';
 import { authBind, authRedirect } from 'api/auth-coze';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-
+import { ModalForm, ProFormText, ProFormTextArea, ProList } from '@ant-design/pro-components';
 // ==============================|| PROFILE 1 ||============================== //
 
 // tabs panel
@@ -98,12 +107,13 @@ const Profilnew = () => {
     const [userProfile, setUserProfile] = useState<ProfileVO | null>(null);
     const [updateCount, setUpdateCount] = useState(0);
     const { setuse } = infoStore();
-    const [authList, setAuthList] = useState([]);
+    const [authCount, setAuthCount] = useState(0);
     const forceUpdate = () => setUpdateCount((pre) => pre + 1);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const type = searchParams.get('type') || 0;
     const [authDialogOpen, setAuthDialogOpen] = useState(false);
+    const actionRef = useRef<any>();
 
     useEffect(() => {
         setValue(Number(type));
@@ -117,7 +127,7 @@ const Profilnew = () => {
             pageSize: 100,
             type: 35
         });
-        setAuthList(result.list);
+        setAuthCount(result.total);
     };
 
     useEffect(() => {
@@ -182,6 +192,7 @@ const Profilnew = () => {
         if (data) {
             message.success('删除成功');
             fetchAuthList();
+            actionRef.current?.reload();
         }
     };
 
@@ -323,34 +334,59 @@ const Profilnew = () => {
                         </div>
                         <Divider />
 
-                        {authList.length ? (
-                            <AntList
-                                itemLayout="horizontal"
-                                dataSource={authList}
-                                renderItem={(item: any) => {
-                                    const rawTokenInfo = JSON.parse(item.rawTokenInfo);
-                                    return (
-                                        <AntList.Item
-                                            actions={[
-                                                <AntBtn danger type="text" onClick={() => handleDelete(item)}>
+                        {authCount > 0 ? (
+                            <ProList
+                                actionRef={actionRef}
+                                search={false}
+                                request={async (params) => {
+                                    const data = await getAuthList({
+                                        pageNo: params.current,
+                                        pageSize: 5,
+                                        type: 35
+                                    });
+                                    return {
+                                        data: data.list,
+                                        total: data.total
+                                    };
+                                }}
+                                pagination={{
+                                    pageSize: 5
+                                }}
+                                metas={{
+                                    title: {
+                                        dataIndex: 'code',
+                                        title: '用户',
+                                        render: (_, row: any) => {
+                                            return <span className="text-[#000] cursor-default">{row?.code}</span>;
+                                        }
+                                    },
+                                    avatar: {
+                                        dataIndex: 'avatar',
+                                        search: false,
+                                        render: (_, row: any) => {
+                                            return <AntAvatar className="bg-[#673ab7]">{row?.code[0]?.toUpperCase()}</AntAvatar>;
+                                        }
+                                    },
+                                    description: {
+                                        dataIndex: 'nickname',
+                                        search: false
+                                    },
+                                    actions: {
+                                        render: (text, row) => [
+                                            <Popconfirm
+                                                title="提示"
+                                                description="确认删除?"
+                                                onConfirm={() => handleDelete(row)}
+                                                okText="是"
+                                                cancelText="否"
+                                            >
+                                                <AntBtn danger type="text">
                                                     删除
                                                 </AntBtn>
-                                            ]}
-                                        >
-                                            <AntList.Item.Meta
-                                                avatar={<AntAvatar className="bg-[#673ab7]">{item?.code[0]?.toUpperCase()}</AntAvatar>}
-                                                title={
-                                                    <div>
-                                                        <span>{item.code}</span>
-                                                        <Tag className="ml-2" color="geekblue">
-                                                            扣子
-                                                        </Tag>
-                                                    </div>
-                                                }
-                                                description={<span>备注：{item?.nickname || '-'}</span>}
-                                            />
-                                        </AntList.Item>
-                                    );
+                                            </Popconfirm>
+                                        ],
+                                        search: false
+                                    }
                                 }}
                             />
                         ) : (
@@ -395,8 +431,8 @@ const Profilnew = () => {
                             auto: false
                         });
                         if (result) {
-                            fetchAuthList();
                             message.success('绑定成功');
+                            actionRef.current?.reload();
                             setAuthDialogOpen(false);
                         }
                     }}

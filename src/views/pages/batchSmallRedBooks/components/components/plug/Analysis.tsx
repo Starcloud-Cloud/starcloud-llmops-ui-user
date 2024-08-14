@@ -328,7 +328,7 @@ const PlugAnalysis = ({
                 maskClosable: false
             }}
             title={
-                <div className="flex flex-col">
+                <div className=" flex flex-col">
                     <div className="flex  items-center mb-2">
                         <span className="text-[26px]">{record.pluginName}</span>
                         <div className="flex justify-between items-center ml-2 ">

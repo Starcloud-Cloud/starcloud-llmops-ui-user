@@ -635,7 +635,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         setVerErrmessage(err.msg);
                                                         setBindLoading(false);
                                                     }
-                                                }, 4000);
+                                                }, 2000);
                                             } catch (err: any) {
                                                 clearInterval(timer.current);
 

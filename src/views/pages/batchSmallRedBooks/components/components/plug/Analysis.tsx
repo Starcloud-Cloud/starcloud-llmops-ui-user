@@ -264,7 +264,7 @@ const PlugAnalysis = ({
                     clearInterval(timer.current);
                     clearInterval(timeLoading.current);
                 }
-            }, 4000);
+            }, 2000);
         } catch (err) {
             console.log(111111);
 

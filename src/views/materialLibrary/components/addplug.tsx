@@ -274,7 +274,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     }, [rows]);
     useEffect(() => {
         if (rows?.cozeTokenId && accountList.length > 0) {
-            if (accountList.findIndex((item) => item.id === rows.cozeTokenId) === -1) {
+            if (accountList.findIndex((item) => item.id?.toString() === rows.cozeTokenId) === -1) {
                 form.setFieldsValue({
                     accessTokenId: ''
                 });
@@ -635,7 +635,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         setVerErrmessage(err.msg);
                                                         setBindLoading(false);
                                                     }
-                                                }, 2000);
+                                                }, 4000);
                                             } catch (err: any) {
                                                 clearInterval(timer.current);
 

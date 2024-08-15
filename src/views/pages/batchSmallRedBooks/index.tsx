@@ -99,24 +99,39 @@ const BatcSmallRedBooks = forwardRef(
                 clearInterval(item);
             });
             batchOpenRef.current = true;
-            await planExecute({ uid });
-            const res = await batchPages({ batchPage, planUid: uid });
-            setRightPage(rightPage + 1);
-            setBathList(res.list);
-            setBatchTotal(res.total);
-            setPre(pre + 1);
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '执行成功',
-                    variant: 'alert',
-                    alert: {
-                        color: 'success'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    close: false
-                })
-            );
+            const result = await planExecute({ uid });
+            if (!result.warning) {
+                const res = await batchPages({ batchPage, planUid: uid });
+                setRightPage(rightPage + 1);
+                setBathList(res.list);
+                setBatchTotal(res.total);
+                setPre(pre + 1);
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: '执行成功',
+                        variant: 'alert',
+                        alert: {
+                            color: 'success'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        close: false
+                    })
+                );
+            } else {
+                dispatch(
+                    openSnackbar({
+                        open: true,
+                        message: result.warning,
+                        variant: 'alert',
+                        alert: {
+                            color: 'error'
+                        },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                        close: false
+                    })
+                );
+            }
         };
         //页面滚动
         const [exampleList, setExampleList] = useState<any[]>([]);

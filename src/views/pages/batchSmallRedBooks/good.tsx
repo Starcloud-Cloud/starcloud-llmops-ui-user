@@ -337,7 +337,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
             }}
         >
             {item.status !== 'SUCCESS' ? (
-                <>
+                <div className="relative">
                     <div className="p-[16px] aspect-[263/351] flex justify-center items-center relative gu">
                         <Skeleton.Image
                             className="!w-[100%] !h-[100%]"
@@ -370,19 +370,19 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                     </div>
                     <Skeleton
                         paragraph={false}
-                        className="mt-[16px] px-4"
+                        className="px-4"
                         active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
                     />
                     <Skeleton
                         paragraph={false}
-                        className="mt-[8px] px-4"
+                        className="mt-[8px] mb-[16px] px-4"
                         active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
                     />
-                    <div className="absolute right-2 bottom-11">
+                    <div className="absolute right-2 bottom-6">
                         {handleTransfer(item.status, item.errorMessage)}
                         {item.status === 'FAILURE' && <span>({item.retryCount})</span>}
                     </div>
-                </>
+                </div>
             ) : (
                 <>
                     <Swipers item={item} />

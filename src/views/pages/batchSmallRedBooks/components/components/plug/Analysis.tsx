@@ -264,7 +264,7 @@ const PlugAnalysis = ({
                     clearInterval(timer.current);
                     clearInterval(timeLoading.current);
                 }
-            }, 2000);
+            }, 4000);
         } catch (err) {
             console.log(111111);
 
@@ -350,230 +350,211 @@ const PlugAnalysis = ({
             onOpenChange={onOpenChange}
             submitter={false}
         >
-            <div>
-                <div className="text-[16px] font-bold mb-4">
-                    1.输入内容
-                    <Popover
-                        content={
-                            <div className="w-[500px] max-h-[300px] overflow-auto">
-                                <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
-                            </div>
-                        }
-                        title="参数示例"
+            <div className="text-[16px] font-bold mb-4">
+                1.输入内容
+                <Popover
+                    content={
+                        <div className="w-[500px] max-h-[300px] overflow-auto">
+                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
+                        </div>
+                    }
+                    title="参数示例"
+                >
+                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                </Popover>
+            </div>
+            <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
+                {redBookData.requirement?.map((item: any) => (
+                    <Form.Item
+                        initialValue={item.variableValue}
+                        key={item.uuid}
+                        label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                        name={item.variableKey}
+                        rules={[{ required: true, message: item.variableKey + '是必填项' }]}
                     >
-                        <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                    </Popover>
-                </div>
-                {/* <TextArea
-                    defaultValue={redBookData?.requirement}
-                    status={!redBookData?.requirement && requirementStatusOpen ? 'error' : ''}
-                    onBlur={(e) => {
-                        setRedBookData({ ...redBookData, requirement: e.target.value });
-                        setrequirementStatusOpen(true);
-                    }}
-                    rows={10}
-                /> */}
-                <Form form={form} layout={'vertical'} labelCol={{ span: 6 }}>
-                    {redBookData.requirement?.map((item: any) => (
-                        <Form.Item
-                            initialValue={item.variableValue}
-                            key={item.uuid}
-                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                            name={item.variableKey}
-                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                        >
-                            <Input />
-                        </Form.Item>
-                    ))}
-                </Form>
-                <div className="text-[16px] font-bold my-4 flex justify-between">
-                    <span>
-                        2.输出字段绑定
-                        <Popover
-                            content={
-                                <div className="w-[500px] max-h-[300px] overflow-auto">
-                                    <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.output))} />
-                                </div>
-                            }
-                            title="参数示例"
-                        >
-                            <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                        </Popover>
-                    </span>
-                </div>
+                        <Input />
+                    </Form.Item>
+                ))}
+            </Form>
+            <div className="text-[16px] font-bold my-4 flex">
+                2.输出字段绑定
+                <Popover
+                    content={
+                        <div className="w-[500px] max-h-[300px] overflow-auto">
+                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.output))} />
+                        </div>
+                    }
+                    title="参数示例"
+                >
+                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                </Popover>
+            </div>
+            <Table
+                pagination={false}
+                bordered
+                size="small"
+                columns={[
+                    {
+                        title: '字段',
+                        dataIndex: 'des',
+                        align: 'center',
+                        width: '40%',
+                        render: (_, record) => record.des || record.label
+                    },
+                    {
+                        title: '绑定到',
+                        align: 'center',
+                        width: '20%',
+                        render: () => (
+                            <svg
+                                viewBox="0 0 1024 1024"
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                p-id="7263"
+                                width="20"
+                                height="20"
+                            >
+                                <path
+                                    d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
+                                    fill="#8a8a8a"
+                                    p-id="7264"
+                                ></path>
+                            </svg>
+                        )
+                    },
+                    {
+                        title: '素材字段',
+                        dataIndex: 'value',
+                        align: 'center',
+                        width: '40%',
+                        render: (_, record) => {
+                            return (
+                                data.length > 0 && (
+                                    <Select
+                                        style={{ width: 160 }}
+                                        allowClear
+                                        value={record.value}
+                                        onChange={(value) => {
+                                            let fieldList = redBookData.fieldList || [];
+                                            console.log(fieldList);
 
-                <div>
-                    <Table
-                        pagination={false}
-                        bordered
-                        size="small"
-                        columns={[
-                            {
-                                title: '字段',
-                                dataIndex: 'des',
-                                align: 'center',
-                                width: '40%',
-                                render: (_, record) => record.des || record.label
-                            },
-                            {
-                                title: '绑定到',
-                                align: 'center',
-                                width: '20%',
-                                render: () => (
-                                    <svg
-                                        viewBox="0 0 1024 1024"
-                                        version="1.1"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        p-id="7263"
-                                        width="20"
-                                        height="20"
+                                            let bindFieldData = redBookData.bindFieldData;
+                                            if (value) {
+                                                fieldList = [...fieldList, record.label_key];
+                                                bindFieldData[record.label_key] = value;
+                                            } else {
+                                                fieldList = fieldList.filter((item: any) => item !== record.label_key);
+                                                delete bindFieldData[record.label_key];
+                                            }
+
+                                            const copyData = [...data];
+                                            const index = copyData.findIndex((item) => item.label_key === record.label_key);
+                                            copyData[index].value = value;
+                                            setData(copyData);
+
+                                            setRedBookData((pre: any) => {
+                                                return {
+                                                    ...pre,
+                                                    fieldList,
+                                                    bindFieldData
+                                                };
+                                            });
+                                        }}
                                     >
-                                        <path
-                                            d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
-                                            fill="#8a8a8a"
-                                            p-id="7264"
-                                        ></path>
-                                    </svg>
+                                        {columns
+                                            .filter((item) => !item.isDefault)
+                                            ?.map((item) => {
+                                                return (
+                                                    <Option
+                                                        key={item.dataIndex}
+                                                        value={item.dataIndex}
+                                                        disabled={Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex)}
+                                                    >
+                                                        {item.title}
+                                                    </Option>
+                                                );
+                                            })}
+                                    </Select>
                                 )
-                            },
-                            {
-                                title: '素材字段',
-                                dataIndex: 'value',
-                                align: 'center',
-                                width: '40%',
-                                render: (_, record) => {
-                                    return (
-                                        data.length > 0 && (
-                                            <Select
-                                                style={{ width: 160 }}
-                                                allowClear
-                                                value={record.value}
-                                                onChange={(value) => {
-                                                    let fieldList = redBookData.fieldList || [];
-                                                    console.log(fieldList);
-
-                                                    let bindFieldData = redBookData.bindFieldData;
-                                                    if (value) {
-                                                        fieldList = [...fieldList, record.label_key];
-                                                        bindFieldData[record.label_key] = value;
-                                                    } else {
-                                                        fieldList = fieldList.filter((item: any) => item !== record.label_key);
-                                                        delete bindFieldData[record.label_key];
-                                                    }
-
-                                                    const copyData = [...data];
-                                                    const index = copyData.findIndex((item) => item.label_key === record.label_key);
-                                                    copyData[index].value = value;
-                                                    setData(copyData);
-
-                                                    setRedBookData((pre: any) => {
-                                                        return {
-                                                            ...pre,
-                                                            fieldList,
-                                                            bindFieldData
-                                                        };
-                                                    });
-                                                }}
-                                            >
-                                                {columns
-                                                    .filter((item) => !item.isDefault)
-                                                    ?.map((item) => {
-                                                        return (
-                                                            <Option
-                                                                key={item.dataIndex}
-                                                                value={item.dataIndex}
-                                                                disabled={Object.values(redBookData.bindFieldData || {}).includes(
-                                                                    item.dataIndex
-                                                                )}
-                                                            >
-                                                                {item.title}
-                                                            </Option>
-                                                        );
-                                                    })}
-                                            </Select>
-                                        )
-                                    );
-                                }
+                            );
+                        }
+                    }
+                ]}
+                dataSource={data}
+            />
+            <div className="flex justify-center gap-6 mt-6">
+                <Button
+                    onClick={async () => {
+                        const result = await form.validateFields();
+                        const newList = redBookData.requirement?.map((item: any) => ({
+                            ...item,
+                            variableValue: result[item.variableKey]
+                        }));
+                        if (!record.fieldMap && !record.executeParams) {
+                            const res = await addPlugConfigInfo({
+                                libraryUid: record.libraryUid,
+                                pluginUid: record.pluginUid,
+                                fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                executeParams: JSON.stringify(newList)
+                            });
+                            if (res) {
+                                message.success('保存成功');
                             }
-                        ]}
-                        dataSource={data}
-                    />
-                </div>
-
-                <div className="flex justify-center gap-6 mt-6">
-                    <Button
-                        onClick={async () => {
-                            const result = await form.validateFields();
-                            const newList = redBookData.requirement?.map((item: any) => ({
-                                ...item,
-                                variableValue: result[item.variableKey]
-                            }));
-                            if (!record.fieldMap && !record.executeParams) {
-                                const res = await addPlugConfigInfo({
-                                    libraryUid: record.libraryUid,
-                                    pluginUid: record.pluginUid,
-                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify(newList)
-                                });
-                                if (res) {
-                                    message.success('保存成功');
-                                }
-                            } else {
-                                const res = await updatePlugConfigInfo({
-                                    libraryUid: record.libraryUid,
-                                    pluginUid: record.pluginUid,
-                                    uid: record.uid,
-                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify(newList)
-                                });
-                                if (res) {
-                                    message.success('保存成功');
-                                }
+                        } else {
+                            const res = await updatePlugConfigInfo({
+                                libraryUid: record.libraryUid,
+                                pluginUid: record.pluginUid,
+                                uid: record.uid,
+                                fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                executeParams: JSON.stringify(newList)
+                            });
+                            if (res) {
+                                message.success('保存成功');
                             }
-                        }}
-                        type="primary"
-                    >
-                        保存配置
-                    </Button>
-                    <Button
-                        loading={execountLoading}
-                        onClick={async () => {
-                            if (!redBookData.fieldList?.length) {
-                                message.error('请至少绑定一素材字段!');
-                                return;
+                        }
+                    }}
+                    type="primary"
+                >
+                    保存配置
+                </Button>
+                <Button
+                    loading={execountLoading}
+                    onClick={async () => {
+                        if (!redBookData.fieldList?.length) {
+                            message.error('请至少绑定一素材字段!');
+                            return;
+                        }
+                        const result = await form.validateFields();
+                        const newList = redBookData.requirement?.map((item: any) => ({
+                            ...item,
+                            variableValue: result[item.variableKey]
+                        }));
+                        if (!record.fieldMap && !record.executeParams) {
+                            const res = await addPlugConfigInfo({
+                                libraryUid: record.libraryUid,
+                                pluginUid: record.pluginUid,
+                                fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                executeParams: JSON.stringify(newList)
+                            });
+                            if (res) {
+                                message.success('保存成功');
                             }
-                            const result = await form.validateFields();
-                            const newList = redBookData.requirement?.map((item: any) => ({
-                                ...item,
-                                variableValue: result[item.variableKey]
-                            }));
-                            if (!record.fieldMap && !record.executeParams) {
-                                const res = await addPlugConfigInfo({
-                                    libraryUid: record.libraryUid,
-                                    pluginUid: record.pluginUid,
-                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify(newList)
-                                });
-                                if (res) {
-                                    message.success('保存成功');
-                                }
-                            } else {
-                                await updatePlugConfigInfo({
-                                    libraryUid: record.libraryUid,
-                                    pluginUid: record.pluginUid,
-                                    uid: record.uid,
-                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                    executeParams: JSON.stringify(newList)
-                                });
-                            }
-                            handleExecute();
-                            handleAnalysis();
-                        }}
-                        type="primary"
-                    >
-                        执行
-                    </Button>
-                </div>
+                        } else {
+                            await updatePlugConfigInfo({
+                                libraryUid: record.libraryUid,
+                                pluginUid: record.pluginUid,
+                                uid: record.uid,
+                                fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                executeParams: JSON.stringify(newList)
+                            });
+                        }
+                        handleExecute();
+                        handleAnalysis();
+                    }}
+                    type="primary"
+                >
+                    执行
+                </Button>
             </div>
             <ResultLoading
                 materialExecutionOpen={materialExecutionOpen}

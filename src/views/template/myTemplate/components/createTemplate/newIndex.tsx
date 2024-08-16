@@ -542,6 +542,7 @@ function CreateDetail() {
     //判断基础设置
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
+    const planStateRef = useRef(0);
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
     const saveDetail = (flag?: boolean, fieldShow?: boolean, isimgStyle?: boolean) => {
         const newList = _.cloneDeep(detailRef.current);
@@ -615,12 +616,28 @@ function CreateDetail() {
             if (searchParams.get('uid')) {
                 appModify(newList).then((res) => {
                     setViewLoading(false);
+                    console.log(res, createPlanRef.current, flag);
+
                     if (res.data) {
                         if (createPlanRef.current && !flag) {
+                            console.log(fieldShow, planState, planStateRef.current);
+
                             if (fieldShow) {
-                                planState < 0 ? setPlanState(planState - 1) : setPlanState(-1);
+                                if (planStateRef.current < 0) {
+                                    planStateRef.current -= 1;
+                                    setPlanState(planStateRef.current);
+                                } else {
+                                    planStateRef.current = -1;
+                                    setPlanState(planStateRef.current);
+                                }
                             } else {
-                                planState > 0 ? setPlanState(planState + 1) : setPlanState(1);
+                                if (planStateRef.current > 0) {
+                                    planStateRef.current += 1;
+                                    setPlanState(planStateRef.current);
+                                } else {
+                                    planStateRef.current = 1;
+                                    setPlanState(planStateRef.current);
+                                }
                             }
                         }
                         setSaveState(saveState + 1);
@@ -674,7 +691,6 @@ function CreateDetail() {
     };
     const saveDetails = (data: any, flag?: boolean) => {
         const newList = _.cloneDeep(data);
-        console.log(newList);
         detailRef.current = newList;
         setTimeout(() => {
             if (flag) {

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 're
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
-import { Popconfirm, Tabs, Button, Badge, Tag, Tooltip } from 'antd';
+import { Popconfirm, Tabs, Button, Badge, Tag, Tooltip, message } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { getContentPage } from 'api/redBook';
 import { planExecute, batchPages, getListExample } from 'api/redBook/batchIndex';
@@ -99,7 +99,10 @@ const BatcSmallRedBooks = forwardRef(
                 clearInterval(item);
             });
             batchOpenRef.current = true;
-            await planExecute({ uid });
+            const result = await planExecute({ uid });
+            if (result.warning) {
+                message.warning(result.warning);
+            }
             const res = await batchPages({ batchPage, planUid: uid });
             setRightPage(rightPage + 1);
             setBathList(res.list);

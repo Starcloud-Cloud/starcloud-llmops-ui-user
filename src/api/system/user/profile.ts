@@ -76,3 +76,13 @@ export const updateUserPassword = (oldPassword: string, newPassword: string) => 
 export const uploadAvatar = (data: any) => {
     return request.upload({ url: '/system/user/profile/update-avatar', data: data });
 };
+
+// 获取授权列表
+export const getAuthList = (data: any) => {
+    return request.get({ url: '/system/social-user/page', params: data });
+};
+
+// 取消绑定
+export const unBind = (data: any) => {
+    return request.delete({ url: '/system/social-user/unbind', data });
+};

@@ -51,7 +51,9 @@ const ImgOcr = ({
                 value={ocrData.checkedFieldList}
             >
                 {imgCheckedList?.map((item) => (
-                    <Checkbox value={item.dataIndex}>{item.title}</Checkbox>
+                    <Checkbox key={item.dataIndex} value={item.dataIndex}>
+                        {item.title}
+                    </Checkbox>
                 ))}
             </Checkbox.Group>
             <div className="flex items-center pt-2">

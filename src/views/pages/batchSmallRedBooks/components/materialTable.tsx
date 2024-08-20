@@ -54,6 +54,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         const newList = list?.map((item: any) => {
             return {
                 title: item.desc,
+                titleText: item.desc,
                 align: 'center',
                 className: 'align-middle',
                 required: !!item.required,
@@ -368,6 +369,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
     };
     //素材库 libraryId
     const [libraryId, setLibraryId] = useState('');
+    const [libraryUid, setLibraryUid] = useState('');
     //素材库名称
     const [libraryName, setLibraryName] = useState('');
     //素材库的值
@@ -379,6 +381,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             setLibraryName(res.name);
             setpluginConfig(res.pluginConfig);
             setLibraryId(res.id);
+            setLibraryUid(res.uid);
             setColumns(res.tableMeta);
         });
     };
@@ -558,6 +561,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 <LeftModalAdd
                     appUid={appUid}
                     libraryId={libraryId}
+                    libraryUid={libraryUid}
                     libraryType={libraryType}
                     bizUid={bizUid}
                     bizType={bizType}
@@ -660,7 +664,15 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     )}
                 </ModalForm>
             )}
-            {uploadOpen && <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />}
+            {uploadOpen && (
+                <DownMaterial
+                    libraryId={libraryId}
+                    uploadOpen={uploadOpen}
+                    setUploadOpen={setUploadOpen}
+                    getList={getList}
+                    getTitleList={getTitleList}
+                />
+            )}
         </div>
     );
 };

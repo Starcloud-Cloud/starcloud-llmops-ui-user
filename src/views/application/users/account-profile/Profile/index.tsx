@@ -1,6 +1,6 @@
 import { useState, useEffect, SyntheticEvent, useRef } from 'react';
-import { Link } from 'react-router-dom';
-
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import AltRouteIcon from '@mui/icons-material/AltRoute';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
@@ -25,6 +25,17 @@ import {
 import MuiTooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import infoStore from 'store/entitlementAction';
+import {
+    Avatar as AntAvatar,
+    List as AntList,
+    Button as AntBtn,
+    Tag,
+    Empty,
+    Typography as AntTypography,
+    message,
+    Space,
+    Popconfirm
+} from 'antd';
 
 // project imports
 // import Profile from './Profile';
@@ -34,7 +45,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import Avatar from 'ui-component/extended/Avatar';
 import SubCard from 'ui-component/cards/SubCard';
-import { ProfileVO } from 'api/system/user/profile';
+import { getAuthList, ProfileVO, unBind } from 'api/system/user/profile';
 
 // assets
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
@@ -49,7 +60,9 @@ import { TabsProps } from 'types';
 import AvatarUpload from './Avatar';
 import { getUserInfo } from 'api/login';
 import { t } from 'hooks/web/useI18n';
-
+import dayjs from 'dayjs';
+import { authBind, authRedirect } from 'api/auth-coze';
+import { ModalForm, ProFormText, ProFormTextArea, ProList } from '@ant-design/pro-components';
 // ==============================|| PROFILE 1 ||============================== //
 
 // tabs panel
@@ -77,6 +90,10 @@ const tabsOption = [
     {
         label: '2profile.info.resetPwd',
         icon: <LockTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+    },
+    {
+        label: '第三方授权',
+        icon: <AltRouteIcon sx={{ fontSize: '1.3rem' }} />
     }
     // {
     //     label: '社交信息',
@@ -90,7 +107,32 @@ const Profilnew = () => {
     const [userProfile, setUserProfile] = useState<ProfileVO | null>(null);
     const [updateCount, setUpdateCount] = useState(0);
     const { setuse } = infoStore();
+    const [authCount, setAuthCount] = useState(0);
     const forceUpdate = () => setUpdateCount((pre) => pre + 1);
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const type = searchParams.get('type') || 0;
+    const [authDialogOpen, setAuthDialogOpen] = useState(false);
+    const actionRef = useRef<any>();
+
+    useEffect(() => {
+        setValue(Number(type));
+    }, [type]);
+
+    const navigate = useNavigate();
+
+    const fetchAuthList = async () => {
+        const result = await getAuthList({
+            pageNo: 1,
+            pageSize: 100,
+            type: 35
+        });
+        setAuthCount(result.total);
+    };
+
+    useEffect(() => {
+        fetchAuthList();
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -140,6 +182,18 @@ const Profilnew = () => {
     const handleConfirm = () => {
         avatarUploadRef.current?.upload();
         handleClose();
+    };
+
+    const handleDelete = async (item: any) => {
+        const data: any = await unBind({
+            type: item.type,
+            openid: item.openid
+        });
+        if (data) {
+            message.success('删除成功');
+            fetchAuthList();
+            actionRef.current?.reload();
+        }
     };
 
     return (
@@ -236,7 +290,7 @@ const Profilnew = () => {
                         aria-label="simple tabs example"
                         variant="scrollable"
                         sx={{
-                            mb: 3,
+                            mb: 1,
                             '& a': {
                                 minHeight: 'auto',
                                 minWidth: 10,
@@ -271,11 +325,122 @@ const Profilnew = () => {
                     <TabPanel value={value} index={1}>
                         <ChangePassword />
                     </TabPanel>
+                    <TabPanel value={value} index={2}>
+                        <div className="mb-2">
+                            <AntTypography.Text type="secondary">扣子授权</AntTypography.Text>
+                            <AntBtn className="mt-2 ml-1" type="primary" size="small" onClick={() => setAuthDialogOpen(true)}>
+                                添加授权
+                            </AntBtn>
+                        </div>
+                        <Divider />
+
+                        {authCount > 0 ? (
+                            <ProList
+                                actionRef={actionRef}
+                                search={false}
+                                request={async (params) => {
+                                    const data = await getAuthList({
+                                        pageNo: params.current,
+                                        pageSize: 5,
+                                        type: 35
+                                    });
+                                    return {
+                                        data: data.list,
+                                        total: data.total
+                                    };
+                                }}
+                                pagination={{
+                                    pageSize: 5
+                                }}
+                                metas={{
+                                    title: {
+                                        dataIndex: 'code',
+                                        title: '用户',
+                                        render: (_, row: any) => {
+                                            return <span className="text-[#000] cursor-default">{row?.code}</span>;
+                                        }
+                                    },
+                                    avatar: {
+                                        dataIndex: 'avatar',
+                                        search: false,
+                                        render: (_, row: any) => {
+                                            return <AntAvatar className="bg-[#673ab7]">{row?.code[0]?.toUpperCase()}</AntAvatar>;
+                                        }
+                                    },
+                                    description: {
+                                        dataIndex: 'nickname',
+                                        search: false
+                                    },
+                                    actions: {
+                                        render: (text, row) => [
+                                            <Popconfirm
+                                                title="提示"
+                                                description="确认删除?"
+                                                onConfirm={() => handleDelete(row)}
+                                                okText="是"
+                                                cancelText="否"
+                                            >
+                                                <AntBtn danger type="text">
+                                                    删除
+                                                </AntBtn>
+                                            </Popconfirm>
+                                        ],
+                                        search: false
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <Empty
+                                image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                                imageStyle={{ height: 60 }}
+                                description={'暂无授权'}
+                            >
+                                <AntBtn
+                                    type="primary"
+                                    size="small"
+                                    onClick={async () => {
+                                        // const url = await authRedirect({
+                                        //     type: 35,
+                                        //     redirectUri: `${window.location.origin}/auth-coze`
+                                        // });
+                                        // window.location.href = url;
+                                        setAuthDialogOpen(true);
+                                    }}
+                                >
+                                    添加授权
+                                </AntBtn>
+                            </Empty>
+                        )}
+                    </TabPanel>
                     {/* <TabPanel value={value} index={2}>
                         <Profile />
                     </TabPanel> */}
                 </Grid>
             </Grid>
+            {authDialogOpen && (
+                <ModalForm
+                    open={authDialogOpen}
+                    onOpenChange={setAuthDialogOpen}
+                    title="新增授权"
+                    onFinish={async (values) => {
+                        const result = await authBind({
+                            type: 35,
+                            code: values.code,
+                            remark: values.remark,
+                            state: values.code,
+                            auto: false
+                        });
+                        if (result) {
+                            message.success('绑定成功');
+                            actionRef.current?.reload();
+                            setAuthDialogOpen(false);
+                        }
+                    }}
+                >
+                    <ProFormText required name="code" rules={[{ required: true }]} label="授权码" placeholder="请输入授权" />
+                    <ProFormTextArea name="remark" label="备注" placeholder="请输入备注" />
+                </ModalForm>
+            )}
         </MainCard>
     );
 };

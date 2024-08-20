@@ -7,7 +7,10 @@ import {
     SettingOutlined,
     FileImageOutlined,
     FileTextOutlined,
-    ExclamationCircleFilled
+    ExclamationCircleFilled,
+    AntDesignOutlined,
+    AppstoreFilled,
+    MoreOutlined
 } from '@ant-design/icons';
 import {
     Button,
@@ -26,7 +29,9 @@ import {
     Tabs,
     Divider,
     Spin,
-    Table
+    Table,
+    Switch,
+    Popover
 } from 'antd';
 import type { TableProps } from 'antd';
 import {
@@ -38,9 +43,11 @@ import {
     getMaterialLibraryDataList,
     getMaterialLibraryDataPage,
     getMaterialLibraryTitleList,
+    materialDefinitionList,
     updateMaterialLibrarySlice,
     updateMaterialLibraryTitle
 } from 'api/material';
+import { delOwner, publishedList, ownerListList, detailPlug, metadataData } from 'api/redBook/plug';
 import { createBatchMaterial, updateBatchMaterial } from 'api/redBook/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
@@ -64,6 +71,9 @@ import { imageOcr } from 'api/redBook/batchIndex';
 import DownMaterial from './components/downMaterial';
 import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
+import { getPlugConfigInfo, getPlugInfo } from 'api/plug';
+import PlugAnalysis from 'views/pages/batchSmallRedBooks/components/components/plug/Analysis';
+import dayjs from 'dayjs';
 
 export enum EditType {
     String = 0,
@@ -84,6 +94,7 @@ export const TableHeader = ({
     selectedRowKeys,
     handleBatchDel,
     libraryId,
+    libraryUid,
     bizUid,
     bizType,
     pluginConfig,
@@ -115,6 +126,7 @@ export const TableHeader = ({
     // 选中的行
     selectedRowKeys: React.Key[];
     libraryId: string;
+    libraryUid: string;
     bizUid: string;
     bizType: string;
     //存储的配置
@@ -149,6 +161,7 @@ export const TableHeader = ({
     const [selectSwitchRowKeys, setSelectSwitchRowKeys] = React.useState<any[]>([]);
     const [sourceList, setSourceList] = useState<any[]>([]);
     const [addOpen, setAddOpen] = useState(false);
+    const [plugType, setPlugType] = useState('');
 
     useEffect(() => {
         dictData('', 'material_create_source').then((res) => {
@@ -161,12 +174,12 @@ export const TableHeader = ({
             key: '1',
             label: '编辑素材字段',
             onClick: () => setColOpen(true)
-        },
-        {
-            key: '2',
-            label: '导入数据',
-            onClick: async () => setUploadOpen(true)
         }
+        // {
+        //     key: '2',
+        //     label: '导入数据',
+        //     onClick: async () => setUploadOpen(true)
+        // }
     ];
 
     useEffect(() => {
@@ -222,44 +235,81 @@ export const TableHeader = ({
         }
     };
 
-    const PlugColumns: TableProps<any>['columns'] = [
-        {
-            title: 'ID',
-            dataIndex: 'ID',
-            align: 'center'
-        },
-        {
-            title: '插件名称',
-            dataIndex: 'name',
-            align: 'center'
-        },
-        {
-            title: '使用场景',
-            dataIndex: 'secen',
-            align: 'center'
-        },
-        {
-            title: '发布到应用市场',
-            dataIndex: 'matket',
-            align: 'center'
-        },
-        {
-            title: '操作',
-            align: 'center',
-            render: (_, record, index) => (
-                <Space>
-                    <Button type="link">编辑</Button>
-                    <Button danger type="primary">
-                        删除
-                    </Button>
-                </Space>
-            )
-        }
-    ];
+    const [plugMarketList, setPlugMarketList] = useState<any[]>([]);
+    const [rows, setRows] = useState<any>(null);
     const [plugMarketOpen, setPlugMarketOpen] = useState(false);
     const [plugTableData, setPlugTableData] = useState<any[]>([]);
+
+    const [sceneList, setSceneList] = useState<any[]>([]);
+    const [wayList, setWayList] = useState<any[]>([]);
+
+    const [plugUid, setPlugUid] = useState('');
+    const [plugRecord, setPlugRecord] = useState<any>(null);
+    const [plugConfigOpen, setPlugConfigOpen] = useState(false);
+    const [metaData, setMetaData] = useState([]);
+    const [definitionList, setDefinitionList] = useState<any[]>([]);
+    const [focusUpdateDefinitionList, setFocusUpdateDefinitionList] = useState(0);
+
+    const handleOpenPlug = async (record: any) => {
+        const plugInfo = await getPlugInfo(record.uid);
+        const data = await getPlugConfigInfo({
+            libraryUid,
+            pluginUid: record.uid
+        });
+        setPlugUid(record.uid);
+        setPlugType(record.scene);
+        setPlugConfigOpen(record);
+        setPlugRecord({
+            ...plugInfo,
+            ...data,
+            libraryUid,
+            pluginUid: record.uid
+        });
+    };
+
+    const grupList = (list: any) => {
+        const groupedByType = list.reduce((acc: any, item: any) => {
+            const { scene } = item;
+            if (!acc[scene]) {
+                acc[scene] = { scene, children: [] };
+            }
+            acc[scene].children.push(item);
+            return acc;
+        }, {});
+        return Object.values(groupedByType);
+    };
+    const getPlugList = async () => {
+        const res = await publishedList();
+        const newRes = grupList(res);
+        setPlugMarketList(newRes);
+    };
+    const getTablePlugList = async () => {
+        const result = await ownerListList();
+        const newRes = grupList(result);
+        setPlugTableData(newRes);
+    };
+    useEffect(() => {
+        metadataData().then((res: any) => {
+            setMetaData(res);
+            setSceneList(res.scene);
+            setWayList(res.platform);
+        });
+        getPlugList();
+        getTablePlugList();
+    }, []);
+
+    useEffect(() => {
+        materialDefinitionList({
+            libraryUid: libraryUid
+        }).then((res: any[]) => {
+            setDefinitionList([...res]);
+        });
+    }, [focusUpdateDefinitionList]);
+
+    console.log(definitionList, 'definitionList');
+
     return (
-        <div>
+        <div className="relative">
             <div className="flex  mb-4">
                 <Avatar shape="square" icon={<IconRenderer value={iconUrl || 'AreaChartOutlined'} />} size={48} />
                 <div className="flex flex-col ml-3 justify-between">
@@ -292,7 +342,7 @@ export const TableHeader = ({
                     </div>
                 </div>
             </div>
-            <div className="bg-white rounded-md border flex justify-between mb-3 ">
+            <div className="bg-white rounded-md border flex justify-between mb-3">
                 <div className="flex items-end w-[210px]">
                     <Space>
                         <Popconfirm title="确认删除?" onConfirm={handleBatchDel}>
@@ -312,14 +362,32 @@ export const TableHeader = ({
                     </Space>
                 </div>
                 <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm">
-                    <Space>
+                    <Space className="max-w-[590px] overflow-x-auto">
+                        {definitionList.map((item: any) => {
+                            return (
+                                <div
+                                    onClick={() => {
+                                        handleOpenPlug(item);
+                                    }}
+                                    className="flex items-center flex-col cursor-pointer py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
+                                >
+                                    {item.avatar ? (
+                                        <img className="w-[20px] h-[20px]" src={item.avatar} />
+                                    ) : (
+                                        <Avatar shape="square" className="w-[20px] h-[20px]" size={20} icon={<AppstoreFilled />} />
+                                    )}
+                                    <div className="text-[12px] font-bold mt-1 line-clamp-1">{item.pluginName}</div>
+                                </div>
+                            );
+                        })}
+                        <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
                         <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('小红书分析');
                                 setPlugValue('xhsOcr');
                             }}
-                            className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -348,7 +416,7 @@ export const TableHeader = ({
                                 setPlugTitle('AI素材生成');
                                 setPlugValue('generate_material_batch');
                             }}
-                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -366,14 +434,14 @@ export const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">AI素材生成</div>
                         </div>
-                        <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
+
                         <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('文本智能提取');
                                 setPlugValue('extraction');
                             }}
-                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -400,7 +468,7 @@ export const TableHeader = ({
                                 setPlugTitle('图片OCR提取');
                                 setPlugValue('imageOcr');
                             }}
-                            className="flex items-center flex-col cursor-pointer  py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer  py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -423,7 +491,7 @@ export const TableHeader = ({
                                 setPlugTitle('AI字段补齐');
                                 setPlugValue('generate_material_one');
                             }}
-                            className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -454,7 +522,7 @@ export const TableHeader = ({
                                 setPlugTitle('微信公共号分析');
                                 setPlugValue('wchat');
                             }}
-                            className="flex items-center flex-col cursor-pointer py-2 w-[100px] hover:bg-[#d9d9d9] h-[63px]"
+                            className="flex items-center flex-col cursor-pointer py-2 w-[90px] hover:bg-[#d9d9d9] h-[63px]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -479,44 +547,38 @@ export const TableHeader = ({
                             </svg>
                             <div className="text-[12px] font-bold mt-1">微信公众号分析</div>
                         </div>
-                        {/* <div
-                            onClick={() => {
-                                setPlugMarketOpen(true);
-                            }}
-                            className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
-                        >
-                            <svg
-                                viewBox="0 0 1024 1024"
-                                version="1.1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                p-id="12640"
-                                width="20"
-                                height="20"
-                            >
-                                <path
-                                    d="M589.6 364.3c3 5 8.7 7.7 14.5 7l25.2-3.1c9.4-1.1 15.3-10.7 12.3-19.6l-28.4-82.8c-2.1-6-7.7-10.1-14.1-10.1H292.9c-6.2 0-11.7 3.8-13.9 9.5l-32 82.9c-3.5 9.2 2.6 19.2 12.4 20.2l28.8 2.9c5.8 0.6 11.4-2.2 14.4-7.3l1.6-2.8c20.2-34.2 31.2-42.8 35-44.9 3.9-2.2 16.6-7.2 51.7-7.2 3.3 0 6 0 8.3 0.1V574c-1.9 0.2-4.5 0.5-8.3 0.5h-33.5c-8.2 0-14.9 6.7-14.9 14.9v21.8c0 8.2 6.7 14.9 14.9 14.9h173.9c8.2 0 14.9-6.7 14.9-14.9v-21.8c0-8.2-6.7-14.9-14.9-14.9h-33.5c-3.7 0-6.5-0.3-8.3-0.8V310.4v-1c4.3-0.1 10-0.2 17.8-0.2 36.3 0 45.3 5.9 46.2 6.6 3.4 2.5 13.4 12 34.4 45.8l1.7 2.7z"
-                                    p-id="12641"
-                                ></path>
-                                <path
-                                    d="M880 112H144c-17.6 0-32 14.4-32 32v736c0 17.6 14.4 32 32 32h422.1c8.8 0 16-7.2 16-16v-40c0-8.8-7.2-16-16-16H184V184h656v389.6c0 8.8 7.2 16 16 16h40c8.8 0 16-7.2 16-16V144c0-17.6-14.4-32-32-32z"
-                                    p-id="12642"
-                                ></path>
-                                <path
-                                    d="M895.6 703.4h-97.8v-97.8c0-8.8-7.2-16-16-16H722c-8.8 0-16 7.2-16 16v97.8h-97.8c-8.8 0-16 7.2-16 16v59.8c0 8.8 7.2 16 16 16H706V893c0 8.8 7.2 16 16 16h59.8c8.8 0 16-7.2 16-16v-97.8h97.8c8.8 0 16-7.2 16-16v-59.8c0-8.8-7.2-16-16-16z"
-                                    p-id="12643"
-                                ></path>
-                            </svg>
-                            <div className="text-[12px] font-bold mt-1">插件市场</div>
-                        </div> */}
+                        <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
                     </Space>
+                    <div
+                        onClick={() => {
+                            setPlugMarketOpen(true);
+                        }}
+                        className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
+                    >
+                        <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12640" width="20" height="20">
+                            <path
+                                d="M589.6 364.3c3 5 8.7 7.7 14.5 7l25.2-3.1c9.4-1.1 15.3-10.7 12.3-19.6l-28.4-82.8c-2.1-6-7.7-10.1-14.1-10.1H292.9c-6.2 0-11.7 3.8-13.9 9.5l-32 82.9c-3.5 9.2 2.6 19.2 12.4 20.2l28.8 2.9c5.8 0.6 11.4-2.2 14.4-7.3l1.6-2.8c20.2-34.2 31.2-42.8 35-44.9 3.9-2.2 16.6-7.2 51.7-7.2 3.3 0 6 0 8.3 0.1V574c-1.9 0.2-4.5 0.5-8.3 0.5h-33.5c-8.2 0-14.9 6.7-14.9 14.9v21.8c0 8.2 6.7 14.9 14.9 14.9h173.9c8.2 0 14.9-6.7 14.9-14.9v-21.8c0-8.2-6.7-14.9-14.9-14.9h-33.5c-3.7 0-6.5-0.3-8.3-0.8V310.4v-1c4.3-0.1 10-0.2 17.8-0.2 36.3 0 45.3 5.9 46.2 6.6 3.4 2.5 13.4 12 34.4 45.8l1.7 2.7z"
+                                p-id="12641"
+                            ></path>
+                            <path
+                                d="M880 112H144c-17.6 0-32 14.4-32 32v736c0 17.6 14.4 32 32 32h422.1c8.8 0 16-7.2 16-16v-40c0-8.8-7.2-16-16-16H184V184h656v389.6c0 8.8 7.2 16 16 16h40c8.8 0 16-7.2 16-16V144c0-17.6-14.4-32-32-32z"
+                                p-id="12642"
+                            ></path>
+                            <path
+                                d="M895.6 703.4h-97.8v-97.8c0-8.8-7.2-16-16-16H722c-8.8 0-16 7.2-16 16v97.8h-97.8c-8.8 0-16 7.2-16 16v59.8c0 8.8 7.2 16 16 16H706V893c0 8.8 7.2 16 16 16h59.8c8.8 0 16-7.2 16-16v-97.8h97.8c8.8 0 16-7.2 16-16v-59.8c0-8.8-7.2-16-16-16z"
+                                p-id="12643"
+                            ></path>
+                        </svg>
+                        <div className="text-[12px] font-bold mt-1">插件市场</div>
+                    </div>
                 </div>
                 <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
                     <Space>
-                        {!isShowField && (
-                            <Button type="primary" onClick={() => setUploadOpen(true)}>
-                                批量导入
-                            </Button>
-                        )}
+                        {/* {!isShowField && ( */}
+                        <Button type="primary" onClick={() => setUploadOpen(true)}>
+                            批量导入
+                        </Button>
+                        {/* )} */}
                         <Button
                             type="primary"
                             onClick={() => {
@@ -527,7 +589,7 @@ export const TableHeader = ({
                             新增素材
                         </Button>
                         {isShowField && (
-                            <Dropdown menu={{ items }}>
+                            <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
                                     <Space>
                                         <SettingOutlined className="p-1 cursor-pointer" />
@@ -612,7 +674,7 @@ export const TableHeader = ({
                     </div>
                 </ModalForm>
             )}
-            <Modal width="60%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} title="插件市场">
+            <Modal width="80%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
                 <Tabs
                     items={[
                         {
@@ -620,12 +682,45 @@ export const TableHeader = ({
                             key: '1',
                             children: (
                                 <div>
-                                    <div className="text-[16px] font-bold mb-4">1.场景内容一</div>
-                                    <CheckCard.Group size="small">
-                                        <CheckCard title={'插件一'} description={'我是描述'} value={'插件一'} />
-                                        <CheckCard title={'插件二'} description={'我是描述'} value={'插件二'} />
-                                        <CheckCard title={'插件三'} description={'我是描述'} value={'插件三'} />
-                                        <CheckCard title={'插件四'} description={'我是描述'} value={'插件四'} />
+                                    <CheckCard.Group className="w-full" size="small">
+                                        {plugMarketList?.map((item) => (
+                                            <div key={item.uid}>
+                                                <div className="my-4 text-[16px] font-bold">
+                                                    {sceneList?.find((i) => i.value === item.scene)?.label}
+                                                </div>
+                                                <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                                    {item.children?.map((el: any) => {
+                                                        console.log(el);
+                                                        return (
+                                                            <div
+                                                                onClick={() => handleOpenPlug(el)}
+                                                                className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md"
+                                                                key={el.uid}
+                                                            >
+                                                                <div className="flex gap-4">
+                                                                    {el.avatar ? (
+                                                                        <Avatar shape="square" size={64} src={el.avatar} />
+                                                                    ) : (
+                                                                        <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                                    )}
+                                                                    <div className="flex-1">
+                                                                        <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                        <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                                    </div>
+                                                                </div>
+                                                                <Divider className="my-2" />
+                                                                <div className="flex justify-between text-xs">
+                                                                    <div className="flex">
+                                                                        {wayList.find((item) => item.value === el.type).label}
+                                                                    </div>
+                                                                    <div className="flex">{el.creator}</div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </CheckCard.Group>
                                 </div>
                             )
@@ -633,13 +728,142 @@ export const TableHeader = ({
                         {
                             label: '我的插件',
                             key: '2',
-                            children: <Table columns={PlugColumns} dataSource={plugTableData} />
+                            children: (
+                                <div>
+                                    <div className="flex justify-end mb-4">
+                                        <div className="flex gap-2 items-end">
+                                            <div
+                                                onClick={() =>
+                                                    window.open(
+                                                        'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
+                                                    )
+                                                }
+                                                className="text-[#673ab7] hover:underline cursor-pointer text-xs"
+                                            >
+                                                插件使用手册
+                                            </div>
+                                            <Button onClick={() => setAddOpen(true)} type="primary">
+                                                创建插件
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    {plugTableData?.map((item) => (
+                                        <div key={item.uid}>
+                                            <div className="my-4 text-[16px] font-bold">
+                                                {sceneList?.find((i) => i.value === item.scene)?.label}
+                                            </div>
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                                {item?.children?.map((el: any) => (
+                                                    <div
+                                                        onClick={() => handleOpenPlug(el)}
+                                                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                                        key={el.uid}
+                                                    >
+                                                        <div className="flex gap-4">
+                                                            {el.avatar ? (
+                                                                <Avatar shape="square" size={64} src={el.avatar} />
+                                                            ) : (
+                                                                <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                            )}
+                                                            <div className="flex-1">
+                                                                <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                            </div>
+                                                        </div>
+                                                        <Divider className="my-2" />
+                                                        <div className="flex justify-between text-xs">
+                                                            <Tooltip title="更新时间">
+                                                                <div className="flex">
+                                                                    {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                                </div>
+                                                            </Tooltip>
+                                                            <div className="flex">{el.creator}</div>
+                                                        </div>
+                                                        <Dropdown
+                                                            placement="bottom"
+                                                            menu={{
+                                                                items: [
+                                                                    {
+                                                                        key: '1',
+                                                                        label: '编辑',
+                                                                        onClick: (event) => event.domEvent.stopPropagation()
+                                                                    },
+                                                                    {
+                                                                        key: '2',
+                                                                        danger: true,
+                                                                        label: ' 删除',
+                                                                        onClick: (event) => event.domEvent.stopPropagation()
+                                                                    }
+                                                                ],
+                                                                onClick: async (e) => {
+                                                                    console.log(e);
+
+                                                                    if (e.key === '1') {
+                                                                        const res = await detailPlug(el.uid);
+                                                                        setRows(res);
+                                                                        setAddOpen(true);
+                                                                    } else {
+                                                                        await delOwner(el.uid);
+                                                                        getTablePlugList();
+                                                                        getPlugList();
+                                                                    }
+                                                                    e.domEvent.stopPropagation();
+                                                                }
+                                                            }}
+                                                        >
+                                                            <MoreOutlined
+                                                                color="#673ab7"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="absolute top-2 right-2"
+                                                            />
+                                                        </Dropdown>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
                         }
                     ]}
                 ></Tabs>
             </Modal>
-            <DownMaterial libraryId={libraryId} uploadOpen={uploadOpen} setUploadOpen={setUploadOpen} getList={getList} />
-            <AddPlug open={addOpen} setOpen={setAddOpen} />
+            <DownMaterial
+                libraryId={libraryId}
+                uploadOpen={uploadOpen}
+                setUploadOpen={setUploadOpen}
+                getList={getList}
+                getTitleList={getTitleList}
+            />
+            {addOpen && (
+                <AddPlug
+                    open={addOpen}
+                    setOpen={setAddOpen}
+                    wayList={wayList}
+                    sceneList={sceneList}
+                    rows={rows}
+                    setRows={setRows}
+                    getTablePlugList={() => {
+                        getTablePlugList();
+                        getPlugList();
+                    }}
+                    getDefinitionList={() => {
+                        setFocusUpdateDefinitionList((pre: any) => pre + 1);
+                    }}
+                />
+            )}
+            {plugConfigOpen && plugType === 'DATA_ADDED' && (
+                <PlugAnalysis
+                    columns={columns}
+                    handleAnalysis={() => null}
+                    downTableData={downTableData}
+                    onOpenChange={setPlugConfigOpen}
+                    setPlugMarketOpen={setPlugMarketOpen}
+                    open={plugConfigOpen}
+                    record={plugRecord}
+                    metaData={metaData}
+                />
+            )}
         </div>
     );
 };
@@ -710,7 +934,6 @@ const MaterialLibraryDetail = ({
     }, [selectImg]);
 
     useEffect(() => {
-        console.log(123);
         dictData('', 'material_format_type').then((res) => {
             setTypeList(res.list);
         });
@@ -749,6 +972,7 @@ const MaterialLibraryDetail = ({
                                 )}
                             </div>
                         ),
+                        titleText: item.desc,
                         required: !!item.required,
                         width: item.width || 400,
                         dataIndex: item.fieldName,
@@ -1130,6 +1354,7 @@ const MaterialLibraryDetail = ({
                         selectedRowKeys={selectedRowKeys}
                         handleBatchDel={handleBatchDel}
                         libraryId={detail?.id}
+                        libraryUid={detail?.uid}
                         bizType={'MATERIAL_LIBRARY'}
                         bizUid={detail?.uid}
                         pluginConfig={pluginConfig}

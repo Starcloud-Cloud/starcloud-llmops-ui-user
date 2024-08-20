@@ -147,6 +147,8 @@ const BatcSmallRedBooks = forwardRef(
                 pageNo,
                 batchUid: batch || batchUid
             }).then((res) => {
+                console.log(res);
+
                 const result = res?.list?.every((item: any) => {
                     return item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE';
                 });
@@ -158,14 +160,13 @@ const BatcSmallRedBooks = forwardRef(
                         setBatchTotal(res.total);
                     });
                 }
-                const newList = _.cloneDeep(batchDataListRef.current);
                 if (
                     res.list?.every((item: any) => item.progress) ||
                     res.list?.some((item: any) => item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE')
                 ) {
+                    const newList = _.cloneDeep(batchDataListRef.current);
                     newList[collIndexRef.current] = res.list;
                     console.log(newList, collIndexRef.current);
-
                     batchDataListRef.current = newList;
                     setBatchDataList(batchDataListRef.current);
                     setbatchOpen(false);

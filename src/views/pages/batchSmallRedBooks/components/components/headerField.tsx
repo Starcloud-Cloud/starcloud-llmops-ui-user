@@ -224,6 +224,7 @@ const HeaderField = ({
                         columns={materialColumns}
                         value={tableData}
                         pagination={false}
+                        controlled
                         recordCreatorProps={{
                             newRecordType: 'dataSource',
                             record: () => ({

@@ -20,6 +20,7 @@ const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList'
 const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/components/addModal')));
 const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
 const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
+const Fingerprint = Loadable(lazy(() => import('views/fingerprint')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -27,6 +28,7 @@ export default function ThemeRoutes() {
     MainRoutes.children = [...MainRoutes.children, ...useRouteStore((state) => state.addRouters)];
     return useRoutes([
         { path: '/', element: <PagesLanding /> },
+        { path: '/fingerprint', element: <Fingerprint /> },
         // { path: '/subscribe', element: <PagesPrice /> },
         // { path: '/web-view/orderRecord', element: <OrderRecord /> },
         // { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },

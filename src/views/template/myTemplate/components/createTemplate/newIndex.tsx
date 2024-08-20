@@ -616,8 +616,12 @@ function CreateDetail() {
             if (searchParams.get('uid')) {
                 appModify(newList).then((res) => {
                     setViewLoading(false);
+                    console.log(res, createPlanRef.current, flag);
+
                     if (res.data) {
                         if (createPlanRef.current && !flag) {
+                            console.log(fieldShow, planState, planStateRef.current);
+
                             if (fieldShow) {
                                 if (planStateRef.current < 0) {
                                     planStateRef.current -= 1;
@@ -687,7 +691,6 @@ function CreateDetail() {
     };
     const saveDetails = (data: any, flag?: boolean) => {
         const newList = _.cloneDeep(data);
-        console.log(newList);
         detailRef.current = newList;
         setTimeout(() => {
             if (flag) {

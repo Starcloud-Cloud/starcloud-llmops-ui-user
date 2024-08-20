@@ -1,14 +1,17 @@
 .markdown-wrapper {
   img {
     width: 100px;
-    height: 100px; 
+    height: 100px;
     object-fit: contain;
-   } 
-    div {
-      margin: 0!important;;    
-    }
-   & > p {
-    margin: 5px 0; 
-   } 
-  
+  }
+
+  div {
+    margin: 0 !important;
+    scrollbar-width: none
+  }
+
+  &>p {
+    margin: 5px 0;
+  }
+
 }

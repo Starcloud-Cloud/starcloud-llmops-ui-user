@@ -110,7 +110,7 @@ const AiCreate = ({
                 value={variableData.checkedFieldList}
             >
                 {checkedList?.map((item) => (
-                    <Checkbox disabled={item.required} value={item.dataIndex}>
+                    <Checkbox key={item.dataIndex} disabled={item.required} value={item.dataIndex}>
                         {item.title}
                         {item.required ? '*' : ''}
                     </Checkbox>
@@ -150,7 +150,7 @@ const AiCreate = ({
                     }}
                     rows={10}
                 />
-                <div className=" absolute top-1 right-1 flex gap-1 items-end">
+                {/* <div className=" absolute top-1 right-1 flex gap-1 items-end">
                     <div className="text-xs text-black/50">查看历史数据</div>
                     <Button
                         className="group"
@@ -162,7 +162,7 @@ const AiCreate = ({
                         icon={<ClockCircleOutlined className="text-[#673ab7] group-hover:text-[#d9d9d9]" />}
                         shape="circle"
                     />
-                </div>
+                </div> */}
             </div>
             {!variableData.requirement && requirementStatusOpen && (
                 <span className="text-xs text-[#ff4d4f] ml-[4px]">优化字段内容必填</span>

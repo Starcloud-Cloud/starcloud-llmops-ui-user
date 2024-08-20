@@ -136,7 +136,7 @@ export const createMaterialInfoPageByMarketUid = (data: any) => {
     return request.post({ url: `/llm/creative/material/infoPageByMarketUid`, data });
 };
 
-//历史详情
+//小红书分析
 export const pluginsXhsOcr = (data: any) => {
     return request.post({ url: `/llm/creative/plugins/xhsOcr`, data });
 };

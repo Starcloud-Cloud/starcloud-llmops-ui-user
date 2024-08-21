@@ -1348,7 +1348,7 @@ const Lefts = ({
                         renderItem={(item, index) => (
                             <List.Item>
                                 <List.Item.Meta
-                                    title={item.match(/\【([\s\S]+)\】/)[1]}
+                                    title={item.match(/\【([\s\S]+)\】/) && item.match(/\【([\s\S]+)\】/)[1]}
                                     description={<div className="text-xs text-[red]">{item}</div>}
                                 />
                             </List.Item>

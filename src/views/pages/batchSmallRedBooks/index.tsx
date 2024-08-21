@@ -94,7 +94,7 @@ const BatcSmallRedBooks = forwardRef(
         const [rightPage, setRightPage] = useState(0);
         const collIndexRef = useRef(0);
         const [collIndex, setCollIndex] = useState(0);
-        const newSave = async (uid: string) => {
+        const newSave = async ({ uid }: { uid: string }) => {
             timer.current?.map((item: any) => {
                 clearInterval(item);
             });

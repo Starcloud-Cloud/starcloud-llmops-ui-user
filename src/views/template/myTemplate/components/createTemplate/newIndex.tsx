@@ -11,7 +11,7 @@ import {
     MenuItem,
     Typography
 } from '@mui/material';
-import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Spin, Alert } from 'antd';
+import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Spin, Alert, Drawer, List } from 'antd';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline, KeyboardBackspace } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -618,7 +618,7 @@ function CreateDetail() {
                     setViewLoading(false);
                     console.log(res, createPlanRef.current, flag);
 
-                    if (res.data) {
+                    if (res?.data && res?.data?.verificationList?.length === 0) {
                         if (createPlanRef.current && !flag) {
                             console.log(fieldShow, planState, planStateRef.current);
 
@@ -653,6 +653,9 @@ function CreateDetail() {
                                 close: false
                             })
                         );
+                    } else {
+                        setErrList(res?.data?.verificationList);
+                        setErrOpen(true);
                     }
                 });
             } else {
@@ -1004,6 +1007,9 @@ function CreateDetail() {
     const [tableTitle, setTableTitle] = useState(0);
     console.log(1);
 
+    const [errOpen, setErrOpen] = useState(false);
+    const [errList, setErrList] = useState<any[]>([]);
+
     return detail ? (
         <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
@@ -1339,6 +1345,17 @@ function CreateDetail() {
                     sourceList={refersSource}
                 />
             )}
+            <Drawer title="错误信息" placement="right" onClose={() => setErrOpen(false)} open={errOpen} mask={false}>
+                <List
+                    itemLayout="horizontal"
+                    dataSource={errList}
+                    renderItem={(item, index) => (
+                        <List.Item>
+                            <List.Item.Meta title={item.bizCode} description={<div className="text-xs text-[red]">{item.message}</div>} />
+                        </List.Item>
+                    )}
+                />
+            </Drawer>
         </Card>
     ) : (
         <div className="w-full h-full flex justify-center items-center">

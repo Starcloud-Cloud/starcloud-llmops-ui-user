@@ -618,7 +618,8 @@ function CreateDetail() {
                     setViewLoading(false);
                     console.log(res, createPlanRef.current, flag);
 
-                    if (res?.data && res?.data?.verificationList?.length === 0) {
+                    if (res?.data) {
+                        // if (res?.data && res?.data?.verificationList?.length === 0) {
                         if (createPlanRef.current && !flag) {
                             console.log(fieldShow, planState, planStateRef.current);
 
@@ -653,10 +654,11 @@ function CreateDetail() {
                                 close: false
                             })
                         );
-                    } else {
-                        setErrList(res?.data?.verificationList);
-                        setErrOpen(true);
                     }
+                    //  else {
+                    //     setErrList(res?.data?.verificationList);
+                    //     setErrOpen(true);
+                    // }
                 });
             } else {
                 appCreate(newList).then((res) => {

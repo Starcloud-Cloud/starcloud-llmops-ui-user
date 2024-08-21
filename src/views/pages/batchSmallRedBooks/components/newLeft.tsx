@@ -505,6 +505,8 @@ const Lefts = ({
     const [errMessageList, setErrMessageList] = useState<any[]>([]);
     const [errMessageOpen, setMessageOpen] = useState(false);
     const handleVerify = () => {
+        console.log(generRef.current);
+
         const List = generRef.current?.map((item: any) => {
             if (item.flowStep.handler === 'CustomActionHandler') {
                 const GENERATE_MODE = item?.variable?.variables?.find((item: any) => item.field === 'GENERATE_MODE')?.value;
@@ -537,6 +539,8 @@ const Lefts = ({
                 }
             }
         });
+        console.log(List);
+
         const newList = List.filter((item: any) => item);
         if (newList.length > 0) {
             setMessageOpen(true);

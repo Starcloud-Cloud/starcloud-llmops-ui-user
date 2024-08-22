@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 // material-ui
 import { Box, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
@@ -16,6 +16,10 @@ import AuthResetPassword from '../auth-forms/AuthResetPassword';
 
 // assets
 import imgMain from 'assets/images/auth/img-a2-resetpass.svg';
+import { CheckIcon, ErrorIcon } from 'views/announce/authentication/auth-forms/AuthRegisterResult';
+import { useEffect } from 'react';
+import { verificationCode } from 'api/login';
+import React from 'react';
 
 // carousel items
 const items: AuthSliderProps[] = [
@@ -36,9 +40,21 @@ const items: AuthSliderProps[] = [
 // ============================|| AUTH2 - RESET PASSWORD ||============================ //
 
 const ResetPassword = () => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const code = searchParams.get('verificationCode');
+
     const theme = useTheme();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
+    const [isSuccess, setIsSuccess] = React.useState(false);
+    const [isFetch, setIsFetch] = React.useState(undefined);
+
+    useEffect(() => {
+        verificationCode(code).then((res: any) => {
+            setIsSuccess(res.data);
+        });
+    }, []);
 
     return (
         <AuthWrapper2>
@@ -69,23 +85,77 @@ const ResetPassword = () => {
                                 </Box>
                                 <AuthCardWrapper border={matchDownMD}>
                                     <Grid container spacing={2} justifyContent="center">
+                                        {(isSuccess || isFetch) && (
+                                            <Grid item xs={12}>
+                                                <Stack alignItems="center" justifyContent="center" spacing={1}>
+                                                    <Typography
+                                                        color={theme.palette.secondary.main}
+                                                        gutterBottom
+                                                        variant={matchDownSM ? 'h3' : 'h2'}
+                                                    >
+                                                        重置密码
+                                                    </Typography>
+                                                    <Typography variant="caption" fontSize="16px" textAlign="center">
+                                                        请选择你的新密码
+                                                    </Typography>
+                                                </Stack>
+                                            </Grid>
+                                        )}
                                         <Grid item xs={12}>
-                                            <Stack alignItems="center" justifyContent="center" spacing={1}>
-                                                <Typography
-                                                    color={theme.palette.secondary.main}
-                                                    gutterBottom
-                                                    variant={matchDownSM ? 'h3' : 'h2'}
-                                                >
-                                                    重置密码
-                                                </Typography>
-                                                <Typography variant="caption" fontSize="16px" textAlign="center">
-                                                    请选择你的新密码
-                                                </Typography>
-                                            </Stack>
+                                            {isFetch === undefined ? (
+                                                isSuccess ? (
+                                                    <AuthResetPassword setIsFetch={setIsFetch} />
+                                                ) : (
+                                                    <div className="h-[375px] flex justify-center text-center items-center text-base flex-col  gap-6">
+                                                        <div className="bg-red-500 p-4 rounded-full w-[80px] h-[80px] flex justify-center items-center">
+                                                            <ErrorIcon className="h-12 w-12 text-white" />
+                                                        </div>
+                                                        <h1 className="text-3xl font-bold">验证码失效</h1>
+                                                        <p className="text-gray-500 dark:text-gray-400">
+                                                            验证码失效, 请重新发送邮箱获取连接
+                                                        </p>
+                                                    </div>
+                                                )
+                                            ) : isFetch ? (
+                                                <div className="h-[375px] flex justify-center text-center items-center text-base flex-col  gap-6">
+                                                    <div className="bg-green-500 p-4 rounded-full w-[80px] h-[80px]">
+                                                        <CheckIcon className="h-12 w-12 text-white" />
+                                                    </div>
+                                                    <h1 className="text-3xl font-bold">重置成功</h1>
+                                                    <p className="text-gray-500 dark:text-gray-400">3s后跳转至登录页</p>
+                                                </div>
+                                            ) : (
+                                                <div className="h-[375px] flex justify-center text-center items-center text-base flex-col  gap-6">
+                                                    <div className="bg-red-500 p-4 rounded-full w-[80px] h-[80px]">
+                                                        <ErrorIcon className="h-12 w-12 text-white" />
+                                                    </div>
+                                                    <h1 className="text-3xl font-bold">重置失败</h1>
+                                                    <p className="text-gray-500 dark:text-gray-400">验证码失效, 请重新发送邮箱获取连接</p>
+                                                </div>
+                                            )}
                                         </Grid>
-                                        <Grid item xs={12}>
-                                            <AuthResetPassword />
-                                        </Grid>
+                                        {(!isSuccess || isFetch === false) && (
+                                            <Grid item xs={12}>
+                                                <Grid item container alignItems="center" justifyContent={'space-between'} xs={12}>
+                                                    <Typography
+                                                        component={Link}
+                                                        to={'/'}
+                                                        variant="subtitle1"
+                                                        sx={{ textDecoration: 'none' }}
+                                                    >
+                                                        {'首页>'}
+                                                    </Typography>
+                                                    <Typography
+                                                        component={Link}
+                                                        to={'/login'}
+                                                        variant="subtitle1"
+                                                        sx={{ textDecoration: 'none' }}
+                                                    >
+                                                        {'登录>'}
+                                                    </Typography>
+                                                </Grid>
+                                            </Grid>
+                                        )}
                                     </Grid>
                                 </AuthCardWrapper>
                             </Stack>

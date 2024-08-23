@@ -707,14 +707,7 @@ export const TableHeader = ({
                     </div>
                 </ModalForm>
             )}
-            <Modal
-                zIndex={2000}
-                width="80%"
-                open={plugMarketOpen}
-                onCancel={() => setPlugMarketOpen(false)}
-                footer={false}
-                title="插件市场"
-            >
+            <Modal width="80%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
                 <Tabs
                     items={[
                         {

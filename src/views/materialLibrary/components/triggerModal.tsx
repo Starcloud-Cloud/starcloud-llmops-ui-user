@@ -472,7 +472,7 @@ const TriggerModal = ({
         getList();
     }, []);
     return (
-        <Modal width="60%" open={triggerOpen} onCancel={() => setTriggerOpen(false)} footer={false} title="素材库-触发器">
+        <Modal zIndex={900} width="60%" open={triggerOpen} onCancel={() => setTriggerOpen(false)} footer={false} title="素材库-触发器">
             <Tabs
                 items={[
                     {

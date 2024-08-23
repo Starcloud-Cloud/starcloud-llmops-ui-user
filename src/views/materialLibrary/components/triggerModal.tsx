@@ -1,11 +1,13 @@
-import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip } from 'antd';
+import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip, Table, Tag } from 'antd';
 import { AppstoreFilled, DeleteOutlined, RetweetOutlined } from '@ant-design/icons';
+import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata, modifyConfig } from 'api/plug';
+import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata, modifyConfig, pageJob } from 'api/plug';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import PlugAnalysis from './selAnalysis';
+import _ from 'lodash-es';
 const TriggerModal = ({
     triggerOpen,
     setTriggerOpen,
@@ -300,28 +302,28 @@ const TriggerModal = ({
         if (!selValue) {
             return false;
         }
-        const data = await getPlugConfigInfo({
-            libraryUid,
-            pluginUid: selValue?.uid
-        });
         const result = await forms.validateFields();
         const newList = redBookData.requirement?.map((item: any) => ({
             ...item,
             variableValue: result[item.variableKey]
         }));
+        const data = await getPlugConfigInfo({
+            libraryUid,
+            pluginUid: selValue.uid
+        });
         if (rowData) {
             await modifyConfig({
                 ...rowData,
                 ...formRes,
                 foreignKey: libraryUid,
-                timeExpression: formRes.timeExpression?.reverse()?.join(' ')?.trim(),
+                timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
                 businessJobType: 'coze_standalone',
                 config: {
                     businessJobType: 'coze_standalone',
-                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : rowData?.config?.fieldMap,
-                    executeParams: plugRecord ? JSON.stringify(newList) : rowData?.config?.executeParams,
-                    libraryUid: data?.libraryUid,
-                    pluginUid: data?.pluginUid,
+                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : data ? data?.fieldMap : null,
+                    executeParams: plugRecord ? JSON.stringify(newList) : data ? data?.executeParams : null,
+                    libraryUid: libraryUid,
+                    pluginUid: selValue?.uid,
                     pluginName: selValue.pluginName
                 }
             });
@@ -329,19 +331,19 @@ const TriggerModal = ({
             await createConfig({
                 ...formRes,
                 foreignKey: libraryUid,
-                timeExpression: formRes.timeExpression?.reverse()?.join(' ')?.trim(),
+                timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
                 businessJobType: 'coze_standalone',
                 config: {
                     businessJobType: 'coze_standalone',
-                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : data?.fieldMap,
-                    executeParams: plugRecord ? JSON.stringify(newList) : data?.executeParams,
-                    libraryUid: data?.libraryUid,
-                    pluginUid: data?.pluginUid,
+                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : null,
+                    executeParams: plugRecord ? JSON.stringify(newList) : null,
+                    libraryUid: libraryUid,
+                    pluginUid: selValue?.uid,
                     pluginName: selValue.pluginName
                 }
             });
         }
-
+        setTriggerOpen(false);
         dispatch(
             openSnackbar({
                 open: true,
@@ -405,6 +407,53 @@ const TriggerModal = ({
             setSelValue(definitionList?.find((item) => item.uid === rowData?.config?.pluginUid));
         }
     }, [rowData]);
+
+    //触发历史
+    const column: TableColumnsType<any> = [
+        {
+            title: '触发器时间',
+            align: 'center',
+            render: (_, row) => <div>{dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+        },
+        {
+            title: '触发器类型',
+            dataIndex: 'triggerType',
+            align: 'center'
+        },
+        {
+            title: '执行插件',
+            dataIndex: 'name',
+            align: 'center'
+        },
+        {
+            title: '触发结果',
+            dataIndex: 'executeResult',
+            align: 'center'
+        },
+        {
+            title: '耗时',
+            dataIndex: 'executeTime',
+            align: 'center'
+        },
+        {
+            title: '状态',
+            align: 'center',
+            render: (_, row) => <Tag color="processing">{row?.success ? '执行成功' : '执行失败'}</Tag>
+        }
+    ];
+    const [TableData, setTableData] = useState<any[]>([]);
+
+    const getList = async () => {
+        const result = await pageJob({
+            page: 1,
+            size: 10,
+            businessJobUid: rowData?.uid
+        });
+        setTableData(result?.list);
+    };
+    useEffect(() => {
+        getList();
+    }, []);
     return (
         <Modal width="60%" open={triggerOpen} onCancel={() => setTriggerOpen(false)} footer={false} title="素材库-触发器">
             <Tabs
@@ -437,7 +486,7 @@ const TriggerModal = ({
                                     >
                                         <Cascader displayRender={(label) => label.join(' ')} options={timeExpressionList} />
                                     </Form.Item>
-                                    <Form.Item label="插件执行">
+                                    <Form.Item required label="插件执行" name="config">
                                         {!selValue ? (
                                             <div className="flex gap-2 items-center">
                                                 <Button type="primary" onClick={() => setOpen(true)}>
@@ -503,7 +552,8 @@ const TriggerModal = ({
                     {
                         label: '触发历史',
                         key: '2',
-                        children: <div></div>
+                        disabled: rowData ? false : true,
+                        children: <Table columns={column} dataSource={TableData} />
                     }
                 ]}
             ></Tabs>
@@ -513,6 +563,7 @@ const TriggerModal = ({
                         <div
                             onClick={() => {
                                 setSelValue(el);
+                                setPlugRecord(null);
                                 setOpen(false);
                             }}
                             className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"

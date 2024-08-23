@@ -67,3 +67,11 @@ export const modifyConfig = (data: any) => {
 export const createConfig = (data: any) => {
     return request.post({ url: '/llm/job/config/create', data });
 };
+/**
+ * 分页查询任务历史
+ * @param data
+ * @returns
+ */
+export const pageJob = (data: any) => {
+    return request.get({ url: '/llm/job/log/page', params: data });
+};

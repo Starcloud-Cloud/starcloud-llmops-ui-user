@@ -21,6 +21,7 @@ ${JSON.stringify(value, null, 2)}
 `;
 
 const PlugAnalysis = ({
+    setForceUpdate,
     metaData,
     columns,
     handleAnalysis,
@@ -30,6 +31,7 @@ const PlugAnalysis = ({
     open,
     record
 }: {
+    setForceUpdate: any;
     metaData: any;
     columns: any[];
     handleAnalysis: () => void;
@@ -122,7 +124,6 @@ const PlugAnalysis = ({
             filterData.forEach((item: any) => {
                 obj[item.label_key] = item.value;
             });
-            console.log(record, record.inputFormart);
 
             setRedBookData((pre: any) => ({
                 ...pre,
@@ -499,6 +500,7 @@ const PlugAnalysis = ({
                             });
                             if (res) {
                                 message.success('保存成功');
+                                setForceUpdate((pre: any) => pre + 1);
                             }
                         } else {
                             const res = await updatePlugConfigInfo({
@@ -510,6 +512,7 @@ const PlugAnalysis = ({
                             });
                             if (res) {
                                 message.success('保存成功');
+                                setForceUpdate((pre: any) => pre + 1);
                             }
                         }
                     }}
@@ -538,6 +541,7 @@ const PlugAnalysis = ({
                             });
                             if (res) {
                                 message.success('保存成功');
+                                setForceUpdate((pre: any) => pre + 1);
                             }
                         } else {
                             await updatePlugConfigInfo({
@@ -547,6 +551,7 @@ const PlugAnalysis = ({
                                 fieldMap: JSON.stringify(redBookData.bindFieldData),
                                 executeParams: JSON.stringify(newList)
                             });
+                            setForceUpdate((pre: any) => pre + 1);
                         }
                         handleExecute();
                         handleAnalysis();

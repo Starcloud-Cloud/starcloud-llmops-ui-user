@@ -62,10 +62,6 @@ const RegisterResult = () => {
     const matchDownMD = useMediaQuery(theme.breakpoints.down('lg'));
 
     useEffect(() => {
-        getRegisterResult(activationId).then((res) => {});
-    }, []);
-
-    useEffect(() => {
         let timeout: any;
         if (activationId) {
             getRegisterResult(activationId).then((res) => {

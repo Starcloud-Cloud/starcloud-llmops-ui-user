@@ -107,12 +107,14 @@ service.interceptors.request.use(
     }
 );
 
+const ignoreErrorUrls = ['auth/recover/check'];
 // response 拦截器
 service.interceptors.response.use(
     async (response: AxiosResponse<any>) => {
         const { data } = response;
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const config = response.config;
+
         if (!data) {
             // 返回“[HTTP]请求没有返回值”;
             throw new Error();
@@ -129,6 +131,9 @@ service.interceptors.response.use(
         if (ignoreMsgs.indexOf(msg) !== -1) {
             // 如果是忽略的错误码，直接返回 msg 异常
             return Promise.reject(msg);
+        } else if (code !== 200 && config && config.url && ignoreErrorUrls.some((url) => config.url?.includes(url))) {
+            // 如果 URL 在忽略列表中,直接返回 Promise.reject,不显示错误消息
+            return false;
         } else if (code === 401) {
             // 如果未认证，并且未进行刷新令牌，说明可能是访问令牌过期了
             if (!isRefreshToken) {
@@ -201,6 +206,7 @@ service.interceptors.response.use(
         } else if (message.includes('Request failed with status code')) {
             message = t('sys.api.apiRequestFailed') + message.substr(message.length - 3);
         }
+
         dispatch(
             openSnackbar({
                 open: true,

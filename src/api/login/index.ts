@@ -126,3 +126,8 @@ export const validateCode = (data: any) => {
 export const getRegisterResult = (activationId: any) => {
     return request.getOriginal({ url: `llm/auth/activation/${activationId}` });
 };
+
+// 验证验证码
+export const verificationCode = (verificationCode: any) => {
+    return request.getOriginal({ url: `/llm/auth/recover/check/${verificationCode}` });
+};

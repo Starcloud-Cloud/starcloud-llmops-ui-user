@@ -68,11 +68,13 @@ import MaterialLibrary from './index';
 import AiCreate from '../pages/batchSmallRedBooks/components/newAI';
 import React from 'react';
 import { imageOcr } from 'api/redBook/batchIndex';
+import { configDetail } from 'api/plug/index';
 import DownMaterial from './components/downMaterial';
 import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
 import { getPlugConfigInfo, getPlugInfo } from 'api/plug';
 import PlugAnalysis from 'views/pages/batchSmallRedBooks/components/components/plug/Analysis';
+import TriggerModal from './components/triggerModal';
 import dayjs from 'dayjs';
 
 export enum EditType {
@@ -163,6 +165,8 @@ export const TableHeader = ({
     const [addOpen, setAddOpen] = useState(false);
     const [plugType, setPlugType] = useState('');
 
+    const [triggerOpen, setTriggerOpen] = useState(false);
+
     useEffect(() => {
         dictData('', 'material_create_source').then((res) => {
             setSourceList(res.list);
@@ -249,8 +253,17 @@ export const TableHeader = ({
     const [metaData, setMetaData] = useState([]);
     const [definitionList, setDefinitionList] = useState<any[]>([]);
     const [focusUpdateDefinitionList, setFocusUpdateDefinitionList] = useState(0);
+    const [forceUpdate, setForceUpdate] = useState(0);
+    const [clickRecord, setClickRecord] = useState<any>(null);
+
+    useEffect(() => {
+        if (forceUpdate > 0) {
+            handleOpenPlug(clickRecord);
+        }
+    }, [forceUpdate]);
 
     const handleOpenPlug = async (record: any) => {
+        setClickRecord(record);
         const plugInfo = await getPlugInfo(record.uid);
         const data = await getPlugConfigInfo({
             libraryUid,
@@ -308,6 +321,8 @@ export const TableHeader = ({
 
     console.log(definitionList, 'definitionList');
 
+    const [rowData, setRowData] = useState<any>(null);
+
     return (
         <div className="relative">
             <div className="flex  mb-4">
@@ -362,7 +377,7 @@ export const TableHeader = ({
                     </Space>
                 </div>
                 <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm">
-                    <Space className="max-w-[590px] overflow-x-auto">
+                    <Space className="xs:max-w-[220px] md:max-w-[350px] xl:max-w-[490px] 2xl:max-w-[590px] overflow-x-auto">
                         {definitionList.map((item: any) => {
                             return (
                                 <div
@@ -588,6 +603,19 @@ export const TableHeader = ({
                         >
                             新增素材
                         </Button>
+                        {/* <Button
+                            onClick={async () => {
+                                const result = await configDetail(libraryUid);
+                                if (result) {
+                                    setRowData(result);
+                                }
+                                setTriggerOpen(true);
+                            }}
+                            className="absolute right-[82px] top-0"
+                            type="primary"
+                        >
+                            触发器
+                        </Button> */}
                         {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
@@ -828,6 +856,18 @@ export const TableHeader = ({
                     ]}
                 ></Tabs>
             </Modal>
+            {triggerOpen && (
+                <TriggerModal
+                    triggerOpen={triggerOpen}
+                    setTriggerOpen={setTriggerOpen}
+                    definitionList={definitionList}
+                    libraryUid={libraryUid}
+                    name={name}
+                    columns={columns}
+                    metaData={metaData}
+                    rowData={rowData}
+                />
+            )}
             <DownMaterial
                 libraryId={libraryId}
                 uploadOpen={uploadOpen}
@@ -854,6 +894,7 @@ export const TableHeader = ({
             )}
             {plugConfigOpen && plugType === 'DATA_ADDED' && (
                 <PlugAnalysis
+                    setForceUpdate={setForceUpdate}
                     columns={columns}
                     handleAnalysis={() => null}
                     downTableData={downTableData}

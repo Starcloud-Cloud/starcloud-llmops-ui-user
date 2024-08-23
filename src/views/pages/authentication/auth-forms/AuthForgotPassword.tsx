@@ -46,6 +46,7 @@ const AuthForgotPassword = ({ ...others }) => {
                             openSnackbar({
                                 open: true,
                                 message: t('auth.password.confirmsend'),
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 variant: 'alert',
                                 alert: {
                                     color: 'success'

@@ -450,7 +450,7 @@ const TriggerModal = ({
             title: '耗时(s)',
             dataIndex: 'executeTime',
             align: 'center',
-            render: (_, row) => <div>{row.executeTime / 100}</div>
+            render: (_, row) => <div>{row.executeTime / 1000}</div>
         },
         {
             title: '状态',

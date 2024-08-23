@@ -46,7 +46,6 @@ const AuthResetPassword = ({ ...others }) => {
     const [strength, setStrength] = React.useState(0);
     const [level, setLevel] = React.useState<StringColorProps>();
     const { resetPassword } = useAuth();
-
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -83,37 +82,15 @@ const AuthResetPassword = ({ ...others }) => {
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
                     const res = await resetPassword(values.verificationCode, values.confirmPassword);
-                    console.log(res);
-                    if (res && res.code === 0 && scriptedRef.current) {
+                    if (res) {
                         setStatus({ success: true });
                         setSubmitting(false);
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: 'Your registration has been successfully completed.',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                close: false
-                            })
-                        );
-
+                        others.setIsFetch(true);
                         setTimeout(() => {
                             navigate('/login', { replace: true });
-                        }, 1500);
+                        }, 3000);
                     } else {
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: 'Your registration has been successfully completed.',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                close: false
-                            })
-                        );
+                        others.setIsFetch(false);
                     }
                 } catch (err: any) {
                     console.error(err);

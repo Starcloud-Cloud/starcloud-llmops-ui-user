@@ -653,7 +653,7 @@ const Lefts = ({
                     return;
                 }
                 if (handleVerify()) {
-                    newSave(result);
+                    newSave(appRef.current);
                 }
             }
             setExeState(false);

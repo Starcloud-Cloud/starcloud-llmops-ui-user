@@ -1,10 +1,9 @@
-import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Form } from 'antd';
+import { Input, Select, Modal, Table, message, Switch, Popover, Space, Tag, Form } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
-import { ModalForm } from '@ant-design/pro-components';
 import ChatMarkdown from 'ui-component/Markdown';
 import dayjs from 'dayjs';
 
@@ -77,13 +76,13 @@ const PlugAnalysis = ({
 
             setRedBookData((pre: any) => ({
                 ...pre,
-                requirement: JSON.parse(record.inputFormart || '[]')?.map((item: any, index: number) => ({
+                requirement: JSON.parse(record?.inputFormart || '[]')?.map((item: any, index: number) => ({
                     ...item,
                     variableDesc:
-                        JSON.parse(record.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableDesc ||
+                        JSON.parse(record?.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableDesc ||
                         item?.variableDesc,
                     variableValue:
-                        JSON.parse(record.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableValue ||
+                        JSON.parse(record?.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableValue ||
                         item?.variableValue
                 })),
                 fieldList: fieldList,
@@ -94,7 +93,7 @@ const PlugAnalysis = ({
     }, [columns, record]);
 
     useEffect(() => {
-        if (record.fieldMap) {
+        if (record?.fieldMap) {
             const fieldMap = JSON.parse(record.fieldMap || '{}');
 
             const data = redList.map((redItem: any, index: number) => {
@@ -134,18 +133,16 @@ const PlugAnalysis = ({
         }
     }, [columns, record]);
     return (
-        <ModalForm
-            modalProps={{
-                maskClosable: false
-            }}
+        <Modal
+            width="60%"
             title={
                 <div className=" flex flex-col">
                     <div className="flex  items-center mb-2">
                         <span className="text-[26px]">{record?.pluginName}</span>
                         <div className="flex justify-between items-center ml-2 ">
                             <Space>
-                                <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record?.scene).label}</Tag>
-                                <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record?.type).label}</Tag>
+                                <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record?.scene)?.label}</Tag>
+                                <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record?.type)?.label}</Tag>
                                 {record?.updateTime && (
                                     <span className="text-xs text-black/50">
                                         更新时间: {dayjs(record?.updateTime).format('YYYY-MM-DD HH:mm:ss')}
@@ -158,15 +155,15 @@ const PlugAnalysis = ({
                 </div>
             }
             open={open}
-            onOpenChange={onOpenChange}
-            submitter={false}
+            onCancel={() => onOpenChange(false)}
+            footer={false}
         >
             <div className="text-[16px] font-bold mb-4">
                 1.输入内容
                 <Popover
                     content={
                         <div className="w-[500px] max-h-[300px] overflow-auto">
-                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.input))} />
+                            <ChatMarkdown textContent={record?.input && value2JsonMd(JSON.parse(record?.input))} />
                         </div>
                     }
                     title="参数示例"
@@ -192,7 +189,7 @@ const PlugAnalysis = ({
                 <Popover
                     content={
                         <div className="w-[500px] max-h-[300px] overflow-auto">
-                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.output))} />
+                            <ChatMarkdown textContent={record?.output && value2JsonMd(JSON.parse(record?.output))} />
                         </div>
                     }
                     title="参数示例"
@@ -293,7 +290,7 @@ const PlugAnalysis = ({
                 ]}
                 dataSource={data}
             />
-        </ModalForm>
+        </Modal>
     );
 };
 export default PlugAnalysis;

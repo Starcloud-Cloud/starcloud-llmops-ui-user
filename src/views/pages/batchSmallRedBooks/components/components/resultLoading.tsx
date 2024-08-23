@@ -80,9 +80,9 @@ const ResultLoading = ({
             <div className="flex justify-center gap-2 mt-4">
                 {executionCount === 0 && (
                     <>
-                        <Button className="w-[100px]" size="small" onClick={resetExe}>
+                        {/* <Button className="w-[100px]" size="small" onClick={resetExe}>
                             重新执行
-                        </Button>
+                        </Button> */}
                         {errorMessage?.length > 0 && (
                             <Button className="w-[100px]" size="small" onClick={reTryExe}>
                                 失败重试

@@ -1,4 +1,4 @@
-import { Input, Select, Modal, Table, message, Switch, Popover, Space, Tag, Form } from 'antd';
+import { Input, Select, Modal, Table, message, Switch, Popover, Space, Tag, Form, Button } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
@@ -290,6 +290,11 @@ const PlugAnalysis = ({
                 ]}
                 dataSource={data}
             />
+            <div className="mt-4 flex justify-center">
+                <Button className="w-[100px]" type="primary" onClick={() => onOpenChange(false)}>
+                    保存
+                </Button>
+            </div>
         </Modal>
     );
 };

@@ -1,5 +1,5 @@
-import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip, Table, Tag } from 'antd';
-import { AppstoreFilled, DeleteOutlined, RetweetOutlined } from '@ant-design/icons';
+import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip, Table, Tag, Popover } from 'antd';
+import { AppstoreFilled, DeleteOutlined, RetweetOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
@@ -16,7 +16,10 @@ const TriggerModal = ({
     metaData,
     name,
     columns,
-    rowData
+    rowData,
+    selPlug,
+    selValue,
+    setSelValue
 }: {
     triggerOpen: boolean;
     setTriggerOpen: (data: boolean) => void;
@@ -26,6 +29,9 @@ const TriggerModal = ({
     name: string;
     columns: any[];
     rowData: any;
+    selPlug: () => void;
+    selValue: any;
+    setSelValue: (data: any) => void;
 }) => {
     const [form] = Form.useForm();
     const [forms] = Form.useForm();
@@ -311,6 +317,13 @@ const TriggerModal = ({
             libraryUid,
             pluginUid: selValue.uid
         });
+        let params: any = {};
+        if (data?.executeParams) {
+            JSON.parse(data?.executeParams)?.map((item: any) => {
+                params[item.variableKey] = item.variableValue;
+            });
+        }
+
         if (rowData) {
             await modifyConfig({
                 ...rowData,
@@ -321,7 +334,8 @@ const TriggerModal = ({
                 config: {
                     businessJobType: 'coze_standalone',
                     fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : data ? data?.fieldMap : null,
-                    executeParams: plugRecord ? JSON.stringify(newList) : data ? data?.executeParams : null,
+                    executeParams: plugRecord ? JSON.stringify(result) : data ? data?.params : null,
+                    paramsDefine: plugRecord ? JSON.stringify(newList) : data ? data?.executeParams : null,
                     libraryUid: libraryUid,
                     pluginUid: selValue?.uid,
                     pluginName: selValue.pluginName
@@ -336,7 +350,8 @@ const TriggerModal = ({
                 config: {
                     businessJobType: 'coze_standalone',
                     fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : null,
-                    executeParams: plugRecord ? JSON.stringify(newList) : null,
+                    executeParams: plugRecord ? JSON.stringify(result) : null,
+                    paramsDefine: plugRecord ? JSON.stringify(newList) : null,
                     libraryUid: libraryUid,
                     pluginUid: selValue?.uid,
                     pluginName: selValue.pluginName
@@ -373,7 +388,8 @@ const TriggerModal = ({
             ...data,
             libraryUid,
             pluginUid: record.uid,
-            ...(rowData ? rowData?.config : {})
+            ...(rowData ? rowData?.config : {}),
+            executeParams: rowData?.config?.paramsDefine || data?.executeParams || plugInfo?.executeParams
         });
     };
     const getValue = (list: any[], value?: any[]): any => {
@@ -399,7 +415,7 @@ const TriggerModal = ({
     }, []);
 
     const [open, setOpen] = useState(false);
-    const [selValue, setSelValue] = useState<any>(null);
+
     useEffect(() => {
         if (rowData) {
             form.setFieldsValue(rowData);
@@ -417,12 +433,12 @@ const TriggerModal = ({
         },
         {
             title: '触发器类型',
-            dataIndex: 'triggerType',
-            align: 'center'
+            align: 'center',
+            render: (_, row) => <div>{timeExpressionTypeList?.find((item) => item.value === row.triggerType)?.label}</div>
         },
         {
-            title: '执行插件',
-            dataIndex: 'name',
+            title: '执行插件名称',
+            dataIndex: 'pluginName',
             align: 'center'
         },
         {
@@ -431,9 +447,10 @@ const TriggerModal = ({
             align: 'center'
         },
         {
-            title: '耗时',
+            title: '耗时(s)',
             dataIndex: 'executeTime',
-            align: 'center'
+            align: 'center',
+            render: (_, row) => <div>{row.executeTime / 100}</div>
         },
         {
             title: '状态',
@@ -486,10 +503,25 @@ const TriggerModal = ({
                                     >
                                         <Cascader displayRender={(label) => label.join(' ')} options={timeExpressionList} />
                                     </Form.Item>
-                                    <Form.Item required label="插件执行" name="config">
+                                    <Form.Item
+                                        required
+                                        label={
+                                            <div className="flex items-center gap-2">
+                                                任务执行
+                                                <Popover
+                                                    placement="top"
+                                                    title="插件"
+                                                    content="触发时系统将会根据插件设置自动调用插件，插件返回内容将会自动导入到素材库。"
+                                                >
+                                                    <QuestionCircleOutlined className="cursor-pointer" />
+                                                </Popover>
+                                            </div>
+                                        }
+                                        name="config"
+                                    >
                                         {!selValue ? (
                                             <div className="flex gap-2 items-center">
-                                                <Button type="primary" onClick={() => setOpen(true)}>
+                                                <Button type="primary" onClick={() => selPlug()}>
                                                     添加插件
                                                 </Button>
                                                 <div className="text-xs text-[#ff4d4f]">需要添加一个插件</div>
@@ -520,22 +552,26 @@ const TriggerModal = ({
                                                     <div className="flex">{selValue?.creator}</div>
                                                 </div>
                                                 <div className=" absolute top-4 right-4 flex gap-2">
-                                                    <RetweetOutlined
-                                                        onClick={(e) => {
-                                                            setRedBookData({});
-                                                            setOpen(true);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        className="cursor-pointer hover:text-[#673ab7]"
-                                                    />
-                                                    <DeleteOutlined
-                                                        onClick={(e) => {
-                                                            setRedBookData({});
-                                                            setSelValue(null);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        className="cursor-pointer hover:text-[#ff4d4f]"
-                                                    />
+                                                    <Tooltip title="切换插件">
+                                                        <RetweetOutlined
+                                                            onClick={(e) => {
+                                                                setRedBookData({});
+                                                                selPlug();
+                                                                e.stopPropagation();
+                                                            }}
+                                                            className="cursor-pointer hover:text-[#673ab7] text-lg"
+                                                        />
+                                                    </Tooltip>
+                                                    <Tooltip title="删除插件">
+                                                        <DeleteOutlined
+                                                            onClick={(e) => {
+                                                                setRedBookData({});
+                                                                setSelValue(null);
+                                                                e.stopPropagation();
+                                                            }}
+                                                            className="cursor-pointer hover:text-[#ff4d4f] text-lg"
+                                                        />
+                                                    </Tooltip>
                                                 </div>
                                             </div>
                                         )}

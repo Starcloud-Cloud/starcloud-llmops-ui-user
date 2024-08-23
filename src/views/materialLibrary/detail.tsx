@@ -68,11 +68,13 @@ import MaterialLibrary from './index';
 import AiCreate from '../pages/batchSmallRedBooks/components/newAI';
 import React from 'react';
 import { imageOcr } from 'api/redBook/batchIndex';
+import { configDetail } from 'api/plug/index';
 import DownMaterial from './components/downMaterial';
 import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
 import { getPlugConfigInfo, getPlugInfo } from 'api/plug';
 import PlugAnalysis from 'views/pages/batchSmallRedBooks/components/components/plug/Analysis';
+import TriggerModal from './components/triggerModal';
 import dayjs from 'dayjs';
 
 export enum EditType {
@@ -162,6 +164,8 @@ export const TableHeader = ({
     const [sourceList, setSourceList] = useState<any[]>([]);
     const [addOpen, setAddOpen] = useState(false);
     const [plugType, setPlugType] = useState('');
+
+    const [triggerOpen, setTriggerOpen] = useState(false);
 
     useEffect(() => {
         dictData('', 'material_create_source').then((res) => {
@@ -307,6 +311,8 @@ export const TableHeader = ({
     }, [focusUpdateDefinitionList]);
 
     console.log(definitionList, 'definitionList');
+
+    const [rowData, setRowData] = useState<any>(null);
 
     return (
         <div className="relative">
@@ -588,6 +594,19 @@ export const TableHeader = ({
                         >
                             新增素材
                         </Button>
+                        <Button
+                            onClick={async () => {
+                                const result = await configDetail(libraryUid);
+                                if (result) {
+                                    setRowData(result);
+                                }
+                                setTriggerOpen(true);
+                            }}
+                            className="absolute right-[82px] top-0"
+                            type="primary"
+                        >
+                            触发器
+                        </Button>
                         {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
@@ -828,6 +847,17 @@ export const TableHeader = ({
                     ]}
                 ></Tabs>
             </Modal>
+            {triggerOpen && (
+                <TriggerModal
+                    triggerOpen={triggerOpen}
+                    setTriggerOpen={setTriggerOpen}
+                    definitionList={definitionList}
+                    libraryUid={libraryUid}
+                    columns={columns}
+                    metaData={metaData}
+                    rowData={rowData}
+                />
+            )}
             <DownMaterial
                 libraryId={libraryId}
                 uploadOpen={uploadOpen}

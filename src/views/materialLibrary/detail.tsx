@@ -594,7 +594,7 @@ export const TableHeader = ({
                         >
                             新增素材
                         </Button>
-                        <Button
+                        {/* <Button
                             onClick={async () => {
                                 const result = await configDetail(libraryUid);
                                 if (result) {
@@ -606,7 +606,7 @@ export const TableHeader = ({
                             type="primary"
                         >
                             触发器
-                        </Button>
+                        </Button> */}
                         {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
@@ -853,6 +853,7 @@ export const TableHeader = ({
                     setTriggerOpen={setTriggerOpen}
                     definitionList={definitionList}
                     libraryUid={libraryUid}
+                    name={name}
                     columns={columns}
                     metaData={metaData}
                     rowData={rowData}

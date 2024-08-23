@@ -1,8 +1,8 @@
 import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip } from 'antd';
-import { AppstoreFilled } from '@ant-design/icons';
+import { AppstoreFilled, DeleteOutlined, RetweetOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata,modify } from 'api/plug';
+import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata, modifyConfig } from 'api/plug';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import PlugAnalysis from './selAnalysis';
@@ -12,6 +12,7 @@ const TriggerModal = ({
     definitionList,
     libraryUid,
     metaData,
+    name,
     columns,
     rowData
 }: {
@@ -20,6 +21,7 @@ const TriggerModal = ({
     definitionList: any[];
     libraryUid: string;
     metaData: any;
+    name: string;
     columns: any[];
     rowData: any;
 }) => {
@@ -63,7 +65,7 @@ const TriggerModal = ({
             label: '每周触发',
             children: [
                 {
-                    value: '* * 0',
+                    value: '* * 7',
                     label: '周日',
                     children: timeList
                 },
@@ -294,49 +296,52 @@ const TriggerModal = ({
     ];
 
     const handleSave = async () => {
-        const formRes = await form.validateFields();\
+        const formRes = await form.validateFields();
+        if (!selValue) {
+            return false;
+        }
         const data = await getPlugConfigInfo({
             libraryUid,
-            pluginUid: selValue.uid
+            pluginUid: selValue?.uid
         });
         const result = await forms.validateFields();
         const newList = redBookData.requirement?.map((item: any) => ({
             ...item,
             variableValue: result[item.variableKey]
         }));
-        if(rowData){
-            await createConfig({
+        if (rowData) {
+            await modifyConfig({
                 ...rowData,
                 ...formRes,
                 foreignKey: libraryUid,
-                timeExpression: formRes.timeExpression?.reverse()?.join(' '),
+                timeExpression: formRes.timeExpression?.reverse()?.join(' ')?.trim(),
                 businessJobType: 'coze_standalone',
                 config: {
                     businessJobType: 'coze_standalone',
-                    fieldMap: JSON.stringify(redBookData.bindFieldData) || data?.fieldMap,
-                    executeParams: JSON.stringify(newList) || data?.executeParams,
+                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : rowData?.config?.fieldMap,
+                    executeParams: plugRecord ? JSON.stringify(newList) : rowData?.config?.executeParams,
                     libraryUid: data?.libraryUid,
                     pluginUid: data?.pluginUid,
                     pluginName: selValue.pluginName
                 }
             });
-        }else{
-             await createConfig({
-            ...formRes,
-            foreignKey: libraryUid,
-            timeExpression: formRes.timeExpression?.reverse()?.join(' '),
-            businessJobType: 'coze_standalone',
-            config: {
+        } else {
+            await createConfig({
+                ...formRes,
+                foreignKey: libraryUid,
+                timeExpression: formRes.timeExpression?.reverse()?.join(' ')?.trim(),
                 businessJobType: 'coze_standalone',
-                fieldMap: JSON.stringify(redBookData.bindFieldData) || data?.fieldMap,
-                executeParams: JSON.stringify(newList) || data?.executeParams,
-                libraryUid: data?.libraryUid,
-                pluginUid: data?.pluginUid,
-                pluginName: selValue.pluginName
-            }
-        });
+                config: {
+                    businessJobType: 'coze_standalone',
+                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : data?.fieldMap,
+                    executeParams: plugRecord ? JSON.stringify(newList) : data?.executeParams,
+                    libraryUid: data?.libraryUid,
+                    pluginUid: data?.pluginUid,
+                    pluginName: selValue.pluginName
+                }
+            });
         }
-       
+
         dispatch(
             openSnackbar({
                 open: true,
@@ -365,13 +370,14 @@ const TriggerModal = ({
             ...plugInfo,
             ...data,
             libraryUid,
-            pluginUid: record.uid
+            pluginUid: record.uid,
+            ...(rowData ? rowData?.config : {})
         });
     };
     const getValue = (list: any[], value?: any[]): any => {
         const newValue = value || [];
         for (let i = 0; i < list.length; i++) {
-            if ([...newValue, list[i].value].reverse().join(' ') === rowData.timeExpression) {
+            if ([...newValue, list[i].value].reverse().join(' ')?.trim() === rowData.timeExpression) {
                 return [...newValue, list[i].value];
             }
             if (list[i].children) {
@@ -395,9 +401,7 @@ const TriggerModal = ({
     useEffect(() => {
         if (rowData) {
             form.setFieldsValue(rowData);
-            console.log(rowData.timeExpression,getValue(rowData.timeExpression));
-
-            form.setFieldValue('timeExpression', getValue(rowData.timeExpression));
+            form.setFieldValue('timeExpression', getValue(timeExpressionList));
             setSelValue(definitionList?.find((item) => item.uid === rowData?.config?.pluginUid));
         }
     }, [rowData]);
@@ -411,8 +415,13 @@ const TriggerModal = ({
                         children: (
                             <div>
                                 <Form form={form} labelCol={{ span: 4 }}>
-                                    <Form.Item label="触发器名称" name="name" rules={[{ required: true, message: '名称必填' }]}>
-                                        <Input />
+                                    <Form.Item
+                                        initialValue={name + '(触发器)'}
+                                        label="触发器名称"
+                                        name="name"
+                                        rules={[{ required: true, message: '名称必填' }]}
+                                    >
+                                        <Input disabled />
                                     </Form.Item>
                                     <Form.Item
                                         label="触发器类型"
@@ -430,9 +439,12 @@ const TriggerModal = ({
                                     </Form.Item>
                                     <Form.Item label="插件执行">
                                         {!selValue ? (
-                                            <Button type="primary" onClick={() => setOpen(true)}>
-                                                添加插件
-                                            </Button>
+                                            <div className="flex gap-2 items-center">
+                                                <Button type="primary" onClick={() => setOpen(true)}>
+                                                    添加插件
+                                                </Button>
+                                                <div className="text-xs text-[#ff4d4f]">需要添加一个插件</div>
+                                            </div>
                                         ) : (
                                             <div
                                                 onClick={() => handleOpenPlug(selValue)}
@@ -457,6 +469,24 @@ const TriggerModal = ({
                                                         </div>
                                                     </Tooltip>
                                                     <div className="flex">{selValue?.creator}</div>
+                                                </div>
+                                                <div className=" absolute top-4 right-4 flex gap-2">
+                                                    <RetweetOutlined
+                                                        onClick={(e) => {
+                                                            setRedBookData({});
+                                                            setOpen(true);
+                                                            e.stopPropagation();
+                                                        }}
+                                                        className="cursor-pointer hover:text-[#673ab7]"
+                                                    />
+                                                    <DeleteOutlined
+                                                        onClick={(e) => {
+                                                            setRedBookData({});
+                                                            setSelValue(null);
+                                                            e.stopPropagation();
+                                                        }}
+                                                        className="cursor-pointer hover:text-[#ff4d4f]"
+                                                    />
                                                 </div>
                                             </div>
                                         )}
@@ -510,18 +540,16 @@ const TriggerModal = ({
                     ))}
                 </div>
             </Modal>
-            {plugOpen && (
-                <PlugAnalysis
-                    metaData={metaData}
-                    columns={columns}
-                    onOpenChange={setPlugOpen}
-                    open={plugOpen}
-                    record={plugRecord}
-                    redBookData={redBookData}
-                    setRedBookData={setRedBookData}
-                    form={forms}
-                />
-            )}
+            <PlugAnalysis
+                metaData={metaData}
+                columns={columns}
+                onOpenChange={setPlugOpen}
+                open={plugOpen}
+                record={plugRecord}
+                redBookData={redBookData}
+                setRedBookData={setRedBookData}
+                form={forms}
+            />
         </Modal>
     );
 };

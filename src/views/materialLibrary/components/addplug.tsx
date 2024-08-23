@@ -71,11 +71,19 @@ const AddPlug = ({
             }
         } else {
             if (value && form.getFieldValue('spaceId')) {
-                const res = await spaceBots({
-                    accessTokenId: value,
-                    spaceId: form.getFieldValue('spaceId')
-                });
-                setBotList(res.space_bots);
+                try {
+                    const res = await spaceBots({
+                        accessTokenId: value,
+                        spaceId: form.getFieldValue('spaceId')
+                    });
+                    seterrmessage('');
+                    setBotList(res.space_bots);
+                } catch (err: any) {
+                    setBotList([]);
+                    seterrmessage(err.msg);
+                    form.setFieldValue('botId', '');
+                    console.log(err);
+                }
             }
         }
     };

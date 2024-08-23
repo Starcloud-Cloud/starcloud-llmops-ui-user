@@ -2,7 +2,7 @@ import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, To
 import { AppstoreFilled } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata,modify } from 'api/plug';
+import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata, modify } from 'api/plug';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import PlugAnalysis from './selAnalysis';
@@ -294,7 +294,7 @@ const TriggerModal = ({
     ];
 
     const handleSave = async () => {
-        const formRes = await form.validateFields();\
+        const formRes = await form.validateFields();
         const data = await getPlugConfigInfo({
             libraryUid,
             pluginUid: selValue.uid
@@ -304,7 +304,7 @@ const TriggerModal = ({
             ...item,
             variableValue: result[item.variableKey]
         }));
-        if(rowData){
+        if (rowData) {
             await createConfig({
                 ...rowData,
                 ...formRes,
@@ -320,23 +320,23 @@ const TriggerModal = ({
                     pluginName: selValue.pluginName
                 }
             });
-        }else{
-             await createConfig({
-            ...formRes,
-            foreignKey: libraryUid,
-            timeExpression: formRes.timeExpression?.reverse()?.join(' '),
-            businessJobType: 'coze_standalone',
-            config: {
+        } else {
+            await createConfig({
+                ...formRes,
+                foreignKey: libraryUid,
+                timeExpression: formRes.timeExpression?.reverse()?.join(' '),
                 businessJobType: 'coze_standalone',
-                fieldMap: JSON.stringify(redBookData.bindFieldData) || data?.fieldMap,
-                executeParams: JSON.stringify(newList) || data?.executeParams,
-                libraryUid: data?.libraryUid,
-                pluginUid: data?.pluginUid,
-                pluginName: selValue.pluginName
-            }
-        });
+                config: {
+                    businessJobType: 'coze_standalone',
+                    fieldMap: JSON.stringify(redBookData.bindFieldData) || data?.fieldMap,
+                    executeParams: JSON.stringify(newList) || data?.executeParams,
+                    libraryUid: data?.libraryUid,
+                    pluginUid: data?.pluginUid,
+                    pluginName: selValue.pluginName
+                }
+            });
         }
-       
+
         dispatch(
             openSnackbar({
                 open: true,
@@ -395,7 +395,7 @@ const TriggerModal = ({
     useEffect(() => {
         if (rowData) {
             form.setFieldsValue(rowData);
-            console.log(rowData.timeExpression,getValue(rowData.timeExpression));
+            console.log(rowData.timeExpression, getValue(rowData.timeExpression));
 
             form.setFieldValue('timeExpression', getValue(rowData.timeExpression));
             setSelValue(definitionList?.find((item) => item.uid === rowData?.config?.pluginUid));

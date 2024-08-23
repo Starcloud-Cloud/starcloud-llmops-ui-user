@@ -2,7 +2,7 @@ import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, To
 import { AppstoreFilled } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata, modify } from 'api/plug';
+import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata } from 'api/plug';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import PlugAnalysis from './selAnalysis';

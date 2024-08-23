@@ -253,8 +253,17 @@ export const TableHeader = ({
     const [metaData, setMetaData] = useState([]);
     const [definitionList, setDefinitionList] = useState<any[]>([]);
     const [focusUpdateDefinitionList, setFocusUpdateDefinitionList] = useState(0);
+    const [forceUpdate, setForceUpdate] = useState(0);
+    const [clickRecord, setClickRecord] = useState<any>(null);
+
+    useEffect(() => {
+        if (forceUpdate > 0) {
+            handleOpenPlug(clickRecord);
+        }
+    }, [forceUpdate]);
 
     const handleOpenPlug = async (record: any) => {
+        setClickRecord(record);
         const plugInfo = await getPlugInfo(record.uid);
         const data = await getPlugConfigInfo({
             libraryUid,
@@ -884,6 +893,7 @@ export const TableHeader = ({
             )}
             {plugConfigOpen && plugType === 'DATA_ADDED' && (
                 <PlugAnalysis
+                    setForceUpdate={setForceUpdate}
                     columns={columns}
                     handleAnalysis={() => null}
                     downTableData={downTableData}

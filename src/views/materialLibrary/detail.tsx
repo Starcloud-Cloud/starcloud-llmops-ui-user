@@ -368,7 +368,7 @@ export const TableHeader = ({
                     </Space>
                 </div>
                 <div className="flex border border-solid rounded border-[#f4f6f8] shadow-sm">
-                    <Space className="max-w-[590px] overflow-x-auto">
+                    <Space className="xs:max-w-[220px] md:max-w-[350px] xl:max-w-[490px] 2xl:max-w-[590px] overflow-x-auto">
                         {definitionList.map((item: any) => {
                             return (
                                 <div

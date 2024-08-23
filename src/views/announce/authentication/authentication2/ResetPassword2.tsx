@@ -137,22 +137,12 @@ const ResetPassword = () => {
                                         {(!isSuccess || isFetch === false) && (
                                             <Grid item xs={12}>
                                                 <Grid item container alignItems="center" justifyContent={'space-between'} xs={12}>
-                                                    <Typography
-                                                        component={Link}
-                                                        to={'/'}
-                                                        variant="subtitle1"
-                                                        sx={{ textDecoration: 'none' }}
-                                                    >
+                                                    <a href="/" className="text-sm" style={{ textDecoration: 'none' }}>
                                                         {'首页>'}
-                                                    </Typography>
-                                                    <Typography
-                                                        component={Link}
-                                                        to={'/login'}
-                                                        variant="subtitle1"
-                                                        sx={{ textDecoration: 'none' }}
-                                                    >
+                                                    </a>
+                                                    <a href="/login" className="text-sm" style={{ textDecoration: 'none' }}>
                                                         {'登录>'}
-                                                    </Typography>
+                                                    </a>
                                                 </Grid>
                                             </Grid>
                                         )}

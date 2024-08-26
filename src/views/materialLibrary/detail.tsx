@@ -608,19 +608,21 @@ export const TableHeader = ({
                         >
                             新增素材
                         </Button>
-                        <Button
-                            onClick={async () => {
-                                const result = await configDetail(libraryUid);
-                                if (result) {
-                                    setRowData(result);
-                                }
-                                setTriggerOpen(true);
-                            }}
-                            className="absolute right-[82px] top-0"
-                            type="primary"
-                        >
-                            触发器
-                        </Button>
+                        {isShowField && (
+                            <Button
+                                onClick={async () => {
+                                    const result = await configDetail(libraryUid);
+                                    if (result) {
+                                        setRowData(result);
+                                    }
+                                    setTriggerOpen(true);
+                                }}
+                                className="absolute right-[82px] top-0"
+                                type="primary"
+                            >
+                                触发器
+                            </Button>
+                        )}
                         {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>

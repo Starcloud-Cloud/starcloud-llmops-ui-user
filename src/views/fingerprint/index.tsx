@@ -1,81 +1,80 @@
 import { EnvironmentOutlined } from '@ant-design/icons';
-import { Badge, Descriptions, DescriptionsProps } from 'antd';
+import { Descriptions, DescriptionsProps } from 'antd';
 
 const items: DescriptionsProps['items'] = [
     {
         key: 'browserCode',
         label: '内核版本',
-        span: 2,
-        children: ''
+        children: <span id="browserCode"></span>
     },
     {
         key: 'os',
         label: '操作系统',
-        span: 2,
-        children: 'Prepaid'
+        children: <span id="os"></span>
     },
     {
         key: 'userAgent',
         label: 'User Agent',
-        children: 'YES'
+        span: 2,
+        children: <span id="userAgent">{navigator.userAgent}</span>
     },
     {
         key: 'language',
         label: '语言',
-        children: '2018-04-24 18:00:00'
+        children: <span id="language"></span>
     },
     {
-        key: 'timezone',
+        key: 'timeZone',
         label: '时区',
-        children: '2018-04-24 18:00:00'
+        children: <span id="timeZone"></span>
     },
     {
         key: 'canvas',
         label: 'Canvas指纹',
-        children: '2019-04-24 18:00:00',
-        span: 2
+        children: <span id="canvas"></span>
     },
     {
         key: 'webgl',
         label: 'Webgl指纹',
-        children: '',
-        span: 3
+        children: <span id="webgl"></span>
     },
     {
         key: 'plugins',
         label: 'Plugins指纹',
-        children: '$80.00'
+        children: <span id="plugins"></span>
     },
     {
         key: 'audio',
         label: 'Audio指纹',
-        children: '$20.00'
+        children: <span id="audio"></span>
     },
     {
         key: 'screen',
         label: 'Screen指纹',
-        children: '$60.00'
+        children: <span id="screen"></span>
     },
     {
         key: 'font',
         label: 'Font指纹',
-        children: ''
+        children: <span id="font"></span>
     }
 ];
 
 const Fingerprint = () => {
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
+            <iframe className="hidden" src="https://ip77.net/" />
+
             <div>
                 <div>
                     <EnvironmentOutlined />
-                    <span className="text-4xl">125.119.44.163</span>
+                    <span id="ip" className="text-4xl"></span>
                 </div>
-                <div>中国 内地 / zhejiang / hangzhou</div>
+                <div className="ipAddress"></div>
             </div>
             <div className="w-[100%] justify-center">
                 <div className="w-[80%]">
-                    <Descriptions title="指纹" bordered items={items} />
+                    <Descriptions title="指纹" bordered items={items} column={2} />
                 </div>
             </div>
         </div>

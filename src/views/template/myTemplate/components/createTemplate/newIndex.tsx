@@ -616,49 +616,47 @@ function CreateDetail() {
             if (searchParams.get('uid')) {
                 appModify(newList).then((res) => {
                     setViewLoading(false);
-                    console.log(res, createPlanRef.current, flag);
-
                     if (res?.data) {
-                        // if (res?.data && res?.data?.verificationList?.length === 0) {
-                        if (createPlanRef.current && !flag) {
-                            console.log(fieldShow, planState, planStateRef.current);
+                        if (res?.data && res?.data?.verificationList?.length === 0) {
+                            if (createPlanRef.current && !flag) {
+                                console.log(fieldShow, planState, planStateRef.current);
 
-                            if (fieldShow) {
-                                if (planStateRef.current < 0) {
-                                    planStateRef.current -= 1;
-                                    setPlanState(planStateRef.current);
+                                if (fieldShow) {
+                                    if (planStateRef.current < 0) {
+                                        planStateRef.current -= 1;
+                                        setPlanState(planStateRef.current);
+                                    } else {
+                                        planStateRef.current = -1;
+                                        setPlanState(planStateRef.current);
+                                    }
                                 } else {
-                                    planStateRef.current = -1;
-                                    setPlanState(planStateRef.current);
-                                }
-                            } else {
-                                if (planStateRef.current > 0) {
-                                    planStateRef.current += 1;
-                                    setPlanState(planStateRef.current);
-                                } else {
-                                    planStateRef.current = 1;
-                                    setPlanState(planStateRef.current);
+                                    if (planStateRef.current > 0) {
+                                        planStateRef.current += 1;
+                                        setPlanState(planStateRef.current);
+                                    } else {
+                                        planStateRef.current = 1;
+                                        setPlanState(planStateRef.current);
+                                    }
                                 }
                             }
+                            setSaveState(saveState + 1);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '应用保存成功',
+                                    variant: 'alert',
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    close: false
+                                })
+                            );
+                        } else {
+                            setErrList(res?.data?.verificationList);
+                            setErrOpen(true);
                         }
-                        setSaveState(saveState + 1);
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: '应用保存成功',
-                                variant: 'alert',
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                alert: {
-                                    color: 'success'
-                                },
-                                close: false
-                            })
-                        );
                     }
-                    //  else {
-                    //     setErrList(res?.data?.verificationList);
-                    //     setErrOpen(true);
-                    // }
                 });
             } else {
                 appCreate(newList).then((res) => {

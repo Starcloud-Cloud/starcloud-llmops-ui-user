@@ -242,6 +242,7 @@ export const TableHeader = ({
     const [plugMarketList, setPlugMarketList] = useState<any[]>([]);
     const [rows, setRows] = useState<any>(null);
     const [plugMarketOpen, setPlugMarketOpen] = useState(false);
+    const [selType, setSelType] = useState('');
     const [plugTableData, setPlugTableData] = useState<any[]>([]);
 
     const [sceneList, setSceneList] = useState<any[]>([]);
@@ -322,6 +323,9 @@ export const TableHeader = ({
     console.log(definitionList, 'definitionList');
 
     const [rowData, setRowData] = useState<any>(null);
+
+    //选中的值
+    const [selValue, setSelValue] = useState<any>(null);
 
     return (
         <div className="relative">
@@ -567,6 +571,7 @@ export const TableHeader = ({
                     <div
                         onClick={() => {
                             setPlugMarketOpen(true);
+                            setSelType('plug');
                         }}
                         className="flex items-center flex-col cursor-pointer py-2 w-[80px] hover:bg-[#d9d9d9] h-[63px]"
                     >
@@ -603,19 +608,21 @@ export const TableHeader = ({
                         >
                             新增素材
                         </Button>
-                        {/* <Button
-                            onClick={async () => {
-                                const result = await configDetail(libraryUid);
-                                if (result) {
-                                    setRowData(result);
-                                }
-                                setTriggerOpen(true);
-                            }}
-                            className="absolute right-[82px] top-0"
-                            type="primary"
-                        >
-                            触发器
-                        </Button> */}
+                        {isShowField && (
+                            <Button
+                                onClick={async () => {
+                                    const result = await configDetail(libraryUid);
+                                    if (result) {
+                                        setRowData(result);
+                                    }
+                                    setTriggerOpen(true);
+                                }}
+                                className="absolute right-[82px] top-0"
+                                type="primary"
+                            >
+                                触发器
+                            </Button>
+                        )}
                         {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
@@ -718,10 +725,16 @@ export const TableHeader = ({
                                                 </div>
                                                 <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
                                                     {item.children?.map((el: any) => {
-                                                        console.log(el);
                                                         return (
                                                             <div
-                                                                onClick={() => handleOpenPlug(el)}
+                                                                onClick={() => {
+                                                                    if (selType === 'plug') {
+                                                                        handleOpenPlug(el);
+                                                                    } else {
+                                                                        setSelValue(el);
+                                                                        setPlugMarketOpen(false);
+                                                                    }
+                                                                }}
                                                                 className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md"
                                                                 key={el.uid}
                                                             >
@@ -758,23 +771,25 @@ export const TableHeader = ({
                             key: '2',
                             children: (
                                 <div>
-                                    <div className="flex justify-end mb-4">
-                                        <div className="flex gap-2 items-end">
-                                            <div
-                                                onClick={() =>
-                                                    window.open(
-                                                        'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
-                                                    )
-                                                }
-                                                className="text-[#673ab7] hover:underline cursor-pointer text-xs"
-                                            >
-                                                插件使用手册
+                                    {selType === 'plug' && (
+                                        <div className="flex justify-end mb-4">
+                                            <div className="flex gap-2 items-end">
+                                                <div
+                                                    onClick={() =>
+                                                        window.open(
+                                                            'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
+                                                        )
+                                                    }
+                                                    className="text-[#673ab7] hover:underline cursor-pointer text-xs"
+                                                >
+                                                    插件使用手册
+                                                </div>
+                                                <Button onClick={() => setAddOpen(true)} type="primary">
+                                                    创建插件
+                                                </Button>
                                             </div>
-                                            <Button onClick={() => setAddOpen(true)} type="primary">
-                                                创建插件
-                                            </Button>
                                         </div>
-                                    </div>
+                                    )}
                                     {plugTableData?.map((item) => (
                                         <div key={item.uid}>
                                             <div className="my-4 text-[16px] font-bold">
@@ -783,7 +798,14 @@ export const TableHeader = ({
                                             <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
                                                 {item?.children?.map((el: any) => (
                                                     <div
-                                                        onClick={() => handleOpenPlug(el)}
+                                                        onClick={() => {
+                                                            if (selType === 'plug') {
+                                                                handleOpenPlug(el);
+                                                            } else {
+                                                                setSelValue(el);
+                                                                setPlugMarketOpen(false);
+                                                            }
+                                                        }}
                                                         className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
                                                         key={el.uid}
                                                     >
@@ -866,6 +888,12 @@ export const TableHeader = ({
                     columns={columns}
                     metaData={metaData}
                     rowData={rowData}
+                    selValue={selValue}
+                    setSelValue={setSelValue}
+                    selPlug={() => {
+                        setPlugMarketOpen(true);
+                        setSelType('触发器');
+                    }}
                 />
             )}
             <DownMaterial

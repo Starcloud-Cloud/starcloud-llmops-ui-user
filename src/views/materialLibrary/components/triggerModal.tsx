@@ -1,11 +1,13 @@
-import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip } from 'antd';
-import { AppstoreFilled, DeleteOutlined, RetweetOutlined } from '@ant-design/icons';
+import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip, Table, Tag, Popover } from 'antd';
+import { AppstoreFilled, DeleteOutlined, RetweetOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata, modifyConfig } from 'api/plug';
+import { getPlugConfigInfo, createConfig, getPlugInfo, getMetadata, modifyConfig, pageJob } from 'api/plug';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import PlugAnalysis from './selAnalysis';
+import _ from 'lodash-es';
 const TriggerModal = ({
     triggerOpen,
     setTriggerOpen,
@@ -14,7 +16,10 @@ const TriggerModal = ({
     metaData,
     name,
     columns,
-    rowData
+    rowData,
+    selPlug,
+    selValue,
+    setSelValue
 }: {
     triggerOpen: boolean;
     setTriggerOpen: (data: boolean) => void;
@@ -24,6 +29,9 @@ const TriggerModal = ({
     name: string;
     columns: any[];
     rowData: any;
+    selPlug: () => void;
+    selValue: any;
+    setSelValue: (data: any) => void;
 }) => {
     const [form] = Form.useForm();
     const [forms] = Form.useForm();
@@ -300,28 +308,36 @@ const TriggerModal = ({
         if (!selValue) {
             return false;
         }
-        const data = await getPlugConfigInfo({
-            libraryUid,
-            pluginUid: selValue?.uid
-        });
         const result = await forms.validateFields();
         const newList = redBookData.requirement?.map((item: any) => ({
             ...item,
             variableValue: result[item.variableKey]
         }));
+        const data = await getPlugConfigInfo({
+            libraryUid,
+            pluginUid: selValue.uid
+        });
+        let params: any = {};
+        if (data?.executeParams) {
+            JSON.parse(data?.executeParams)?.map((item: any) => {
+                params[item.variableKey] = item.variableValue;
+            });
+        }
+
         if (rowData) {
             await modifyConfig({
                 ...rowData,
                 ...formRes,
                 foreignKey: libraryUid,
-                timeExpression: formRes.timeExpression?.reverse()?.join(' ')?.trim(),
+                timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
                 businessJobType: 'coze_standalone',
                 config: {
                     businessJobType: 'coze_standalone',
-                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : rowData?.config?.fieldMap,
-                    executeParams: plugRecord ? JSON.stringify(newList) : rowData?.config?.executeParams,
-                    libraryUid: data?.libraryUid,
-                    pluginUid: data?.pluginUid,
+                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : data ? data?.fieldMap : null,
+                    executeParams: plugRecord ? JSON.stringify(result) : data ? data?.params : null,
+                    paramsDefine: plugRecord ? JSON.stringify(newList) : data ? data?.executeParams : null,
+                    libraryUid: libraryUid,
+                    pluginUid: selValue?.uid,
                     pluginName: selValue.pluginName
                 }
             });
@@ -329,19 +345,20 @@ const TriggerModal = ({
             await createConfig({
                 ...formRes,
                 foreignKey: libraryUid,
-                timeExpression: formRes.timeExpression?.reverse()?.join(' ')?.trim(),
+                timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
                 businessJobType: 'coze_standalone',
                 config: {
                     businessJobType: 'coze_standalone',
-                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : data?.fieldMap,
-                    executeParams: plugRecord ? JSON.stringify(newList) : data?.executeParams,
-                    libraryUid: data?.libraryUid,
-                    pluginUid: data?.pluginUid,
+                    fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : null,
+                    executeParams: plugRecord ? JSON.stringify(result) : null,
+                    paramsDefine: plugRecord ? JSON.stringify(newList) : null,
+                    libraryUid: libraryUid,
+                    pluginUid: selValue?.uid,
                     pluginName: selValue.pluginName
                 }
             });
         }
-
+        setTriggerOpen(false);
         dispatch(
             openSnackbar({
                 open: true,
@@ -371,7 +388,8 @@ const TriggerModal = ({
             ...data,
             libraryUid,
             pluginUid: record.uid,
-            ...(rowData ? rowData?.config : {})
+            ...(rowData ? rowData?.config : {}),
+            executeParams: rowData?.config?.paramsDefine || data?.executeParams || plugInfo?.executeParams
         });
     };
     const getValue = (list: any[], value?: any[]): any => {
@@ -397,7 +415,7 @@ const TriggerModal = ({
     }, []);
 
     const [open, setOpen] = useState(false);
-    const [selValue, setSelValue] = useState<any>(null);
+
     useEffect(() => {
         if (rowData) {
             form.setFieldsValue(rowData);
@@ -405,8 +423,56 @@ const TriggerModal = ({
             setSelValue(definitionList?.find((item) => item.uid === rowData?.config?.pluginUid));
         }
     }, [rowData]);
+
+    //触发历史
+    const column: TableColumnsType<any> = [
+        {
+            title: '触发器时间',
+            align: 'center',
+            render: (_, row) => <div>{dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+        },
+        {
+            title: '触发器类型',
+            align: 'center',
+            render: (_, row) => <div>{timeExpressionTypeList?.find((item) => item.value === row.triggerType)?.label}</div>
+        },
+        {
+            title: '执行插件名称',
+            dataIndex: 'pluginName',
+            align: 'center'
+        },
+        {
+            title: '触发结果',
+            dataIndex: 'executeResult',
+            align: 'center'
+        },
+        {
+            title: '耗时(s)',
+            dataIndex: 'executeTime',
+            align: 'center',
+            render: (_, row) => <div>{row.executeTime / 1000}</div>
+        },
+        {
+            title: '状态',
+            align: 'center',
+            render: (_, row) => <Tag color="processing">{row?.success ? '执行成功' : '执行失败'}</Tag>
+        }
+    ];
+    const [TableData, setTableData] = useState<any[]>([]);
+
+    const getList = async () => {
+        const result = await pageJob({
+            page: 1,
+            size: 10,
+            businessJobUid: rowData?.uid
+        });
+        setTableData(result?.list);
+    };
+    useEffect(() => {
+        getList();
+    }, []);
     return (
-        <Modal width="60%" open={triggerOpen} onCancel={() => setTriggerOpen(false)} footer={false} title="素材库-触发器">
+        <Modal zIndex={900} width="60%" open={triggerOpen} onCancel={() => setTriggerOpen(false)} footer={false} title="素材库-触发器">
             <Tabs
                 items={[
                     {
@@ -437,10 +503,25 @@ const TriggerModal = ({
                                     >
                                         <Cascader displayRender={(label) => label.join(' ')} options={timeExpressionList} />
                                     </Form.Item>
-                                    <Form.Item label="插件执行">
+                                    <Form.Item
+                                        required
+                                        label={
+                                            <div className="flex items-center gap-2">
+                                                任务执行
+                                                <Popover
+                                                    placement="top"
+                                                    title="插件"
+                                                    content="触发时系统将会根据插件设置自动调用插件，插件返回内容将会自动导入到素材库。"
+                                                >
+                                                    <QuestionCircleOutlined className="cursor-pointer" />
+                                                </Popover>
+                                            </div>
+                                        }
+                                        name="config"
+                                    >
                                         {!selValue ? (
                                             <div className="flex gap-2 items-center">
-                                                <Button type="primary" onClick={() => setOpen(true)}>
+                                                <Button type="primary" onClick={() => selPlug()}>
                                                     添加插件
                                                 </Button>
                                                 <div className="text-xs text-[#ff4d4f]">需要添加一个插件</div>
@@ -471,22 +552,26 @@ const TriggerModal = ({
                                                     <div className="flex">{selValue?.creator}</div>
                                                 </div>
                                                 <div className=" absolute top-4 right-4 flex gap-2">
-                                                    <RetweetOutlined
-                                                        onClick={(e) => {
-                                                            setRedBookData({});
-                                                            setOpen(true);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        className="cursor-pointer hover:text-[#673ab7]"
-                                                    />
-                                                    <DeleteOutlined
-                                                        onClick={(e) => {
-                                                            setRedBookData({});
-                                                            setSelValue(null);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        className="cursor-pointer hover:text-[#ff4d4f]"
-                                                    />
+                                                    <Tooltip title="切换插件">
+                                                        <RetweetOutlined
+                                                            onClick={(e) => {
+                                                                setRedBookData({});
+                                                                selPlug();
+                                                                e.stopPropagation();
+                                                            }}
+                                                            className="cursor-pointer hover:text-[#673ab7] text-lg"
+                                                        />
+                                                    </Tooltip>
+                                                    <Tooltip title="删除插件">
+                                                        <DeleteOutlined
+                                                            onClick={(e) => {
+                                                                setRedBookData({});
+                                                                setSelValue(null);
+                                                                e.stopPropagation();
+                                                            }}
+                                                            className="cursor-pointer hover:text-[#ff4d4f] text-lg"
+                                                        />
+                                                    </Tooltip>
                                                 </div>
                                             </div>
                                         )}
@@ -503,7 +588,8 @@ const TriggerModal = ({
                     {
                         label: '触发历史',
                         key: '2',
-                        children: <div></div>
+                        disabled: rowData ? false : true,
+                        children: <Table columns={column} dataSource={TableData} />
                     }
                 ]}
             ></Tabs>
@@ -513,6 +599,7 @@ const TriggerModal = ({
                         <div
                             onClick={() => {
                                 setSelValue(el);
+                                setPlugRecord(null);
                                 setOpen(false);
                             }}
                             className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"

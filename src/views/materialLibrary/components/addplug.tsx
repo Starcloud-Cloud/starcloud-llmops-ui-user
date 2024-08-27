@@ -479,7 +479,17 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <Button
                                                 type="primary"
                                                 onClick={async () => {
+                                                    console.log(form.getFieldValue('input'));
+
                                                     await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
+                                                    setHandfilData({
+                                                        arguments: form.getFieldValue('input')
+                                                            ? JSON.stringify(JSON.parse(form.getFieldValue('input')), null, 2)
+                                                            : '',
+                                                        output: form.getFieldValue('output')
+                                                            ? JSON.stringify(JSON.parse(form.getFieldValue('output')), null, 2)
+                                                            : ''
+                                                    });
                                                     setPlugOpen(true);
                                                 }}
                                             >
@@ -585,7 +595,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 </Form>
                 {plugOpen && (
                     <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
-                        <Form labelCol={{ span: 6 }}>
+                        <Form labelAlign="left" labelCol={{ span: 4 }}>
                             <Form.Item label="机器人名称">
                                 <div className="font-bold">
                                     {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
@@ -780,7 +790,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         height="300px"
                                                         defaultLanguage="json"
                                                         theme={'vs-dark'}
-                                                        value={bindData.arguments}
+                                                        loading={false}
+                                                        value={handfilData.arguments}
                                                         onChange={(value: any) => {
                                                             setHandfilData({
                                                                 ...handfilData,
@@ -834,6 +845,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         height="300px"
                                                         defaultLanguage="json"
                                                         theme={'vs-dark'}
+                                                        loading={false}
                                                         value={handfilData.output}
                                                         onChange={(value: any) => {
                                                             setHandfilData({

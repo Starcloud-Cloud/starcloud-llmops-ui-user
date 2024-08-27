@@ -480,6 +480,14 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 type="primary"
                                                 onClick={async () => {
                                                     await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
+                                                    setHandfilData({
+                                                        arguments: form.getFieldValue('input')
+                                                            ? JSON.stringify(JSON.parse(form.getFieldValue('input')), null, 2)
+                                                            : '',
+                                                        output: form.getFieldValue('output')
+                                                            ? JSON.stringify(JSON.parse(form.getFieldValue('output')), null, 2)
+                                                            : ''
+                                                    });
                                                     setPlugOpen(true);
                                                 }}
                                             >
@@ -782,7 +790,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         height="300px"
                                                         defaultLanguage="json"
                                                         theme={'vs-dark'}
-                                                        value={bindData.arguments}
+                                                        value={handfilData.arguments}
                                                         onChange={(value: any) => {
                                                             setHandfilData({
                                                                 ...handfilData,

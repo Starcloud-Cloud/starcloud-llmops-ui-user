@@ -10,6 +10,7 @@ import './index.scss';
 import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
 import ChatMarkdown from 'ui-component/Markdown';
+import EditMarkDown from 'ui-component/Markdown/editMarkdown';
 import { getAccessToken } from 'utils/auth';
 import useUserStore from 'store/user';
 const AddPlug = ({
@@ -583,6 +584,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                     {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
                                 </div>
                             </Form.Item>
+                            {/* <EditMarkDown /> */}
                             <Form.Item label="Coze参数验证">
                                 <div className="flex gap-2 items-center">
                                     <TextArea

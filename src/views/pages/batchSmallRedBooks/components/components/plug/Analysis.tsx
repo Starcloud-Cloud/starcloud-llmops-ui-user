@@ -24,6 +24,7 @@ const PlugAnalysis = ({
     setForceUpdate,
     metaData,
     columns,
+    setTriggerOpen,
     handleAnalysis,
     downTableData,
     setPlugMarketOpen,
@@ -34,6 +35,7 @@ const PlugAnalysis = ({
     setForceUpdate: any;
     metaData: any;
     columns: any[];
+    setTriggerOpen?: (data: boolean) => void;
     handleAnalysis: () => void;
     setPlugMarketOpen: (data: any) => void;
     downTableData: (data: any, num: number) => void;
@@ -330,18 +332,30 @@ const PlugAnalysis = ({
             }}
             title={
                 <div className=" flex flex-col">
-                    <div className="flex  items-center mb-2">
-                        <span className="text-[26px]">{record.pluginName}</span>
-                        <div className="flex justify-between items-center ml-2 ">
-                            <Space>
-                                <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
-                                <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
-                                {record?.updateTime && (
-                                    <span className="text-xs text-black/50">
-                                        更新时间: {dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')}
-                                    </span>
-                                )}
-                            </Space>
+                    <div className="flex gap-8 items-center mb-2">
+                        <div className="flex items-center">
+                            <span className="text-[26px]">{record.pluginName}</span>
+                            <div className="flex justify-between items-center ml-2 ">
+                                <Space>
+                                    <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
+                                    <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
+                                    {record?.updateTime && (
+                                        <span className="text-xs text-black/50">
+                                            更新时间: {dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                        </span>
+                                    )}
+                                </Space>
+                            </div>
+                        </div>
+                        <div className="text-base ml-4">
+                            定时执行（
+                            <span
+                                className="text-[#673ab7] hover:underline cursor-pointer"
+                                onClick={() => setTriggerOpen && setTriggerOpen(true)}
+                            >
+                                开启中
+                            </span>
+                            ）
                         </div>
                     </div>
                     <div className="text-xs text-black/50 mt-1">{record.description}</div>

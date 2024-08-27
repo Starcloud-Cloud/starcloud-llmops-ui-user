@@ -12,6 +12,7 @@
         "@floating-ui/react": "^0.26.22",
         "@hookform/resolvers": "^2.9.10",
         "@lexical/react": "^0.16.0",
+        "@monaco-editor/react": "^4.6.0",
         "@mui/icons-material": "^5.11.0",
         "@mui/lab": "^5.0.0-alpha.114",
         "@mui/material": "^5.11.3",

@@ -6,13 +6,14 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
-import { addPlugConfigInfo, updatePlugConfigInfo } from 'api/plug';
+import { addPlugConfigInfo, updatePlugConfigInfo, configDetail } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 import ResultLoading from '../resultLoading';
 import dayjs from 'dayjs';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import TriggerModal from './triggerModal';
 
 const value2JsonMd = (value: any) => `
 ~~~json
@@ -24,24 +25,24 @@ const PlugAnalysis = ({
     setForceUpdate,
     metaData,
     columns,
-    setTriggerOpen,
     handleAnalysis,
     downTableData,
     setPlugMarketOpen,
     onOpenChange,
     open,
-    record
+    record,
+    libraryUid
 }: {
     setForceUpdate: any;
     metaData: any;
     columns: any[];
-    setTriggerOpen?: (data: boolean) => void;
     handleAnalysis: () => void;
     setPlugMarketOpen: (data: any) => void;
     downTableData: (data: any, num: number) => void;
     onOpenChange: any;
     open: any;
     record: any;
+    libraryUid: string;
 }) => {
     const [form] = Form.useForm();
     const [execountLoading, setExecountLoading] = useState(false);
@@ -325,6 +326,14 @@ const PlugAnalysis = ({
             clearInterval(timeLoading.current);
         }
     }, [open, materialExecutionOpen]);
+
+    const [triggerOpen, setTriggerOpen] = useState(false);
+    const [rowData, setRowData] = useState<any>(null);
+    useEffect(() => {
+        if (!triggerOpen) {
+            setRowData(null);
+        }
+    }, [triggerOpen]);
     return (
         <ModalForm
             modalProps={{
@@ -351,7 +360,13 @@ const PlugAnalysis = ({
                             定时执行（
                             <span
                                 className="text-[#673ab7] hover:underline cursor-pointer"
-                                onClick={() => setTriggerOpen && setTriggerOpen(true)}
+                                onClick={async () => {
+                                    const result = await configDetail(libraryUid);
+                                    if (result) {
+                                        setRowData(result);
+                                    }
+                                    setTriggerOpen(true);
+                                }}
                             >
                                 开启中
                             </span>
@@ -621,6 +636,16 @@ const PlugAnalysis = ({
                     aref.current = true;
                 }}
             />
+            {triggerOpen && (
+                <TriggerModal
+                    triggerOpen={triggerOpen}
+                    setTriggerOpen={setTriggerOpen}
+                    libraryUid={record.uid}
+                    rowData={rowData}
+                    columns={columns}
+                    record={record}
+                />
+            )}
         </ModalForm>
     );
 };

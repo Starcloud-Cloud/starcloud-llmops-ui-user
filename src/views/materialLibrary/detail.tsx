@@ -1119,10 +1119,10 @@ export const TableHeader = ({
                     downTableData={downTableData}
                     onOpenChange={setPlugConfigOpen}
                     setPlugMarketOpen={setPlugMarketOpen}
-                    setTriggerOpen={setTriggerOpen}
                     open={plugConfigOpen}
                     record={plugRecord}
                     metaData={metaData}
+                    libraryUid={libraryUid}
                 />
             )}
         </div>

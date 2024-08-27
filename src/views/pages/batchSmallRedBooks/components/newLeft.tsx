@@ -581,9 +581,7 @@ const Lefts = ({
                           (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                       )
             ];
-            if (handleVerify()) {
-                newSave(data);
-            }
+            newSave(data);
         } else {
             const newMem = imageRef.current
                 ? imageRef.current?.record
@@ -629,8 +627,12 @@ const Lefts = ({
 
             if (!fieldShow) {
                 result = await planModify(data);
-                if (result) {
+                if (result && result.verificationList?.length === 0) {
                     getList(false, true);
+                } else {
+                    setErrMessageList(result?.verificationList);
+                    setMessageOpen(true);
+                    return false;
                 }
             } else {
                 result = await planModifyConfig(data);
@@ -652,9 +654,7 @@ const Lefts = ({
                     setBotOpen(true);
                     return;
                 }
-                if (handleVerify()) {
-                    newSave(appRef.current);
-                }
+                newSave(appRef.current);
             }
             setExeState(false);
         }
@@ -924,7 +924,7 @@ const Lefts = ({
                             </div>
 
                             {generateList?.map((item: any, index: number) => (
-                                <div key={index}>
+                                <div key={item.field + index}>
                                     <Accordion defaultExpanded={index === 0} className="before:border-none !m-0">
                                         <AccordionSummary
                                             className="border-b border-solid border-black/20 p-0 !min-h-[0]"
@@ -944,7 +944,7 @@ const Lefts = ({
                                             </div>
                                         </AccordionSummary>
                                         <AccordionDetails>
-                                            <div key={item.field}>
+                                            <div>
                                                 <div className="text-xs text-black/50">{item?.description}</div>
                                                 {item?.flowStep?.handler !== 'VariableActionHandler'
                                                     ? item?.variable?.variables?.map((el: any, i: number) => (
@@ -1180,14 +1180,16 @@ const Lefts = ({
                                                                     )}
                                                           </div>
                                                       ))
-                                                    : item?.variable?.variables?.map((item: any, de: number) => (
+                                                    : item?.variable?.variables?.map((dt: any, de: number) => (
                                                           <Forms
-                                                              key={item.value + de}
-                                                              item={item}
+                                                              key={dt.value + de.toString()}
+                                                              item={dt}
                                                               index={de}
                                                               changeValue={(data: any) => {
                                                                   const newList = _.cloneDeep(generRef.current);
                                                                   newList[index].variable.variables[de].value = data.value;
+                                                                  console.log(newList);
+
                                                                   generRef.current = newList;
                                                                   setGenerateList(generRef.current);
                                                                   setAppDataGen();
@@ -1348,8 +1350,8 @@ const Lefts = ({
                         renderItem={(item, index) => (
                             <List.Item>
                                 <List.Item.Meta
-                                    title={item.match(/\【([\s\S]+)\】/) && item.match(/\【([\s\S]+)\】/)[1]}
-                                    description={<div className="text-xs text-[red]">{item}</div>}
+                                    title={item?.bizCode}
+                                    description={<div className="text-xs text-[red]">{item?.message}</div>}
                                 />
                             </List.Item>
                         )}

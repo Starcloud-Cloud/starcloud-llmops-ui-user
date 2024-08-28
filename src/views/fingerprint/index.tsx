@@ -59,19 +59,19 @@ const items: DescriptionsProps['items'] = [
         children: <span id="font"></span>
     },
     {
-        key: 'font',
-        label: 'Font指纹',
-        children: <span id="font"></span>
-    },
-    {
         key: 'JavascriptStatus',
         label: 'Javascript状态',
         children: <span id="JavascriptStatus"></span>
     },
     {
-        key: 'JavascriptStatus',
-        label: 'Javascript状态',
-        children: <span id="JavascriptStatus"></span>
+        key: 'DNTStatue',
+        label: 'DNT状态',
+        children: <span id="DNTStatus"></span>
+    },
+    {
+        key: 'screenSize',
+        label: '显示器尺寸',
+        children: <span id="screenSize"></span>
     }
 ];
 

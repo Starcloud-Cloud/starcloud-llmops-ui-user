@@ -283,7 +283,7 @@ const PlugAnalysis = ({
             const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
             timeLoading.current = setInterval(() => {
                 if (preeNum.current < newSuccessNum - 1) {
-                    preeNum.current += 100 / ((record?.executeTimeAvg * 1.1) / 800);
+                    preeNum.current += (100 / ((record?.executeTimeAvg * 1.1) / 800)) | 0;
                     setPrenum(preeNum.current);
                 } else {
                     clearInterval(timeLoading.current);
@@ -600,6 +600,7 @@ const PlugAnalysis = ({
                 errorCount={errorCount}
                 materialzanList={materialzanList}
                 errorMessage={errorMessage}
+                timeSpent={((record.executeTimeAvg * 1.1) / 1000) | 0 || 40}
                 columns={[
                     { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
                     ...columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))

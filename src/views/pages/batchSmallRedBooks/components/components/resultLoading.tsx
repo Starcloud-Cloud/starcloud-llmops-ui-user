@@ -5,6 +5,7 @@ import _ from 'lodash-es';
 const ResultLoading = ({
     materialExecutionOpen,
     setMaterialExecutionOpen,
+    timeSpent,
     materialPre,
     executionCount,
     totalCount,
@@ -21,6 +22,7 @@ const ResultLoading = ({
     materialExecutionOpen: boolean;
     setMaterialExecutionOpen: (data: boolean) => void;
     materialPre: number;
+    timeSpent?: number;
     executionCount: number;
     totalCount: number;
     successCount: number;
@@ -44,7 +46,7 @@ const ResultLoading = ({
                         <div className="font-bold mt-4 loader"></div>
                     </div>
                     <div className="flex justify-center gap-2 text-[14px] ">
-                        <HistoryOutlined /> 预计耗时：40s
+                        <HistoryOutlined /> 预计耗时：{timeSpent || 40}s
                     </div>
                 </>
             )}

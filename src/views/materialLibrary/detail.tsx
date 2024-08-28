@@ -48,7 +48,7 @@ import {
     updateMaterialLibraryTitle
 } from 'api/material';
 import { delOwner, publishedList, ownerListList, detailPlug, metadataData } from 'api/redBook/plug';
-import { getMetadata, addPlugConfigInfo } from 'api/plug/index';
+import { getMetadata, addPlugConfigInfo, delPlug } from 'api/plug/index';
 import { createBatchMaterial, updateBatchMaterial } from 'api/redBook/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
@@ -76,6 +76,8 @@ import { CheckCard } from '@ant-design/pro-components';
 import { getPlugConfigInfo, getPlugInfo } from 'api/plug';
 import PlugAnalysis from 'views/pages/batchSmallRedBooks/components/components/plug/Analysis';
 import TriggerModal from './components/triggerModal';
+import { openSnackbar } from 'store/slices/snackbar';
+import { dispatch } from 'store';
 import dayjs from 'dayjs';
 
 export enum EditType {
@@ -948,8 +950,27 @@ export const TableHeader = ({
                                                     <Popconfirm
                                                         title="提示"
                                                         description="请再次确认是否删除？"
-                                                        onConfirm={(e: any) => {
-                                                            console.log(111);
+                                                        onConfirm={async (e: any) => {
+                                                            try {
+                                                                await delPlug(el.uid);
+                                                                dispatch(
+                                                                    openSnackbar({
+                                                                        open: true,
+                                                                        message: '删除成功',
+                                                                        variant: 'alert',
+                                                                        alert: {
+                                                                            color: 'success'
+                                                                        },
+                                                                        close: false,
+                                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                        transition: 'SlideLeft'
+                                                                    })
+                                                                );
+                                                                setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
+                                                                e.stopPropagation();
+                                                            } catch (err) {
+                                                                e.stopPropagation();
+                                                            }
                                                             e.stopPropagation();
                                                         }}
                                                         onCancel={(e) => e?.stopPropagation()}

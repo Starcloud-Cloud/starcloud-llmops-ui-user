@@ -369,6 +369,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         }
     };
 
+    const [typeValue, setTypeValue] = useState<any>('接口验证');
+
     return (
         <Modal
             title="插件配置"
@@ -599,330 +601,310 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                     {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
                                 </div>
                             </Form.Item>
-                            <Tabs
-                                items={[
-                                    {
-                                        label: '接口验证',
-                                        key: '1',
-                                        children: (
-                                            <div>
-                                                <Form.Item label="Coze参数验证">
-                                                    <div className="flex gap-2 items-center">
-                                                        <TextArea
-                                                            className="w-full"
-                                                            placeholder="可输入触发机器人的对话"
-                                                            rows={4}
-                                                            value={bindData.content}
-                                                            onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
-                                                        />
-                                                        <Button
-                                                            loading={bindLoading}
-                                                            onClick={async () => {
-                                                                setBindLoading(true);
-                                                                try {
-                                                                    const res = await plugVerify({
-                                                                        accessTokenId: form.getFieldValue('accessTokenId'),
-                                                                        content: bindData.content,
-                                                                        botId: form.getFieldValue('botId')
-                                                                    });
-                                                                    timer.current = setInterval(async () => {
-                                                                        try {
-                                                                            const result = await plugVerifyResult({
-                                                                                code: res,
-                                                                                accessTokenId: form.getFieldValue('accessTokenId')
-                                                                            });
-                                                                            if (result.verifyState) {
-                                                                                clearInterval(timer.current);
-                                                                                setverifyStatus('success');
-                                                                                setBindData({
-                                                                                    ...bindData,
-                                                                                    arguments: result.arguments
-                                                                                        ? JSON.stringify(result.arguments)
-                                                                                        : '',
-                                                                                    output: result.output
-                                                                                        ? JSON.stringify(result.output)
-                                                                                        : '',
-                                                                                    outputType: result.outputType
-                                                                                });
-                                                                                setBindLoading(false);
-                                                                                setVerErrmessage('');
-                                                                            } else if (
-                                                                                result.status === 'failed' ||
-                                                                                result.status === 'requires_action' ||
-                                                                                result.status === 'canceled'
-                                                                            ) {
-                                                                                clearInterval(timer.current);
-                                                                                setverifyStatus('error');
-                                                                                setVerErrmessage(
-                                                                                    result.status === 'failed'
-                                                                                        ? '对话失败'
-                                                                                        : result.status === 'requires_action'
-                                                                                        ? '对话中断，需要进一步处理'
-                                                                                        : result.status === 'canceled'
-                                                                                        ? '对话已取消'
-                                                                                        : ''
-                                                                                );
-                                                                                setBindLoading(false);
-                                                                            }
-                                                                        } catch (err: any) {
-                                                                            clearInterval(timer.current);
-                                                                            setverifyStatus('error');
-                                                                            setVerErrmessage(err.msg);
-                                                                            setBindLoading(false);
-                                                                        }
-                                                                    }, 4000);
-                                                                } catch (err: any) {
+                            <Radio.Group className="my-4" value={typeValue} onChange={(e) => setTypeValue(e.target.value)}>
+                                <Radio value={'接口验证'}>接口验证</Radio>
+                                <Radio value={'手动填写'}>手动填写</Radio>
+                            </Radio.Group>
+                            {typeValue === '接口验证' ? (
+                                <div>
+                                    <Form.Item label="Coze参数验证">
+                                        <div className="flex gap-2 items-center">
+                                            <TextArea
+                                                className="w-full"
+                                                placeholder="可输入触发机器人的对话"
+                                                rows={4}
+                                                value={bindData.content}
+                                                onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
+                                            />
+                                            <Button
+                                                loading={bindLoading}
+                                                onClick={async () => {
+                                                    setBindLoading(true);
+                                                    try {
+                                                        const res = await plugVerify({
+                                                            accessTokenId: form.getFieldValue('accessTokenId'),
+                                                            content: bindData.content,
+                                                            botId: form.getFieldValue('botId')
+                                                        });
+                                                        timer.current = setInterval(async () => {
+                                                            try {
+                                                                const result = await plugVerifyResult({
+                                                                    code: res,
+                                                                    accessTokenId: form.getFieldValue('accessTokenId')
+                                                                });
+                                                                if (result.verifyState) {
                                                                     clearInterval(timer.current);
-
+                                                                    setverifyStatus('success');
+                                                                    setBindData({
+                                                                        ...bindData,
+                                                                        arguments: result.arguments ? JSON.stringify(result.arguments) : '',
+                                                                        output: result.output ? JSON.stringify(result.output) : '',
+                                                                        outputType: result.outputType
+                                                                    });
+                                                                    setBindLoading(false);
+                                                                    setVerErrmessage('');
+                                                                } else if (
+                                                                    result.status === 'failed' ||
+                                                                    result.status === 'requires_action' ||
+                                                                    result.status === 'canceled'
+                                                                ) {
+                                                                    clearInterval(timer.current);
+                                                                    setverifyStatus('error');
+                                                                    setVerErrmessage(
+                                                                        result.status === 'failed'
+                                                                            ? '对话失败'
+                                                                            : result.status === 'requires_action'
+                                                                            ? '对话中断，需要进一步处理'
+                                                                            : result.status === 'canceled'
+                                                                            ? '对话已取消'
+                                                                            : ''
+                                                                    );
                                                                     setBindLoading(false);
                                                                 }
-                                                            }}
-                                                            type="primary"
-                                                        >
-                                                            绑定验证
-                                                        </Button>
-                                                    </div>
-                                                </Form.Item>
-                                                <Form.Item label="验证状态">
-                                                    <Tag color={verifyStatus}>
-                                                        {verifyStatus === 'success'
-                                                            ? '校验成功'
-                                                            : verifyStatus === 'error'
-                                                            ? '检验失败'
-                                                            : '待校验'}
-                                                    </Tag>
-                                                    <span className="text-xs text-[#ff4d4f]">{verErrmessage}</span>
-                                                </Form.Item>
-                                                <Form.Item label="入参数据示例">
-                                                    <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
-                                                    <div className="text-xs text-black/50 mt-[5px]">
-                                                        验证通过之后会自动更新，无法直接修改
-                                                    </div>
-                                                </Form.Item>
-                                                <Form.Item label="出参数据示例">
-                                                    <ChatMarkdown textContent={value2JsonMd(bindData.output)} />
-                                                    <div className="text-xs text-black/50 mt-[5px]">
-                                                        验证通过之后会自动更新，无法直接修改
-                                                    </div>
-                                                </Form.Item>
-                                                <div className="flex justify-center">
-                                                    <Button
-                                                        className="w-[100px]"
-                                                        disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
-                                                        onClick={() => {
-                                                            setStatus('success');
-                                                            setVerErrmessage('');
-                                                            console.log(bindData.outputType);
+                                                            } catch (err: any) {
+                                                                clearInterval(timer.current);
+                                                                setverifyStatus('error');
+                                                                setVerErrmessage(err.msg);
+                                                                setBindLoading(false);
+                                                            }
+                                                        }, 4000);
+                                                    } catch (err: any) {
+                                                        clearInterval(timer.current);
 
-                                                            setOutputType(bindData.outputType);
-                                                            form.setFieldValue('input', bindData.arguments);
-                                                            form.setFieldValue('output', bindData.output);
-                                                            setBindData({
-                                                                content: '',
-                                                                arguments: '',
-                                                                output: '',
-                                                                outputType: ''
-                                                            });
-                                                            setHandfilData({
-                                                                arguments: '',
-                                                                output: ''
-                                                            });
-                                                            setverifyStatus('gold');
-                                                            getTableData(bindData.arguments, setInputTable, setinputKeys);
-                                                            getTableData(bindData.output, setOutputTable, setoutuptKeys);
-                                                            setPlugOpen(false);
-                                                        }}
-                                                        type="primary"
+                                                        setBindLoading(false);
+                                                    }
+                                                }}
+                                                type="primary"
+                                            >
+                                                绑定验证
+                                            </Button>
+                                        </div>
+                                    </Form.Item>
+                                    <Form.Item label="验证状态">
+                                        <Tag color={verifyStatus}>
+                                            {verifyStatus === 'success' ? '校验成功' : verifyStatus === 'error' ? '检验失败' : '待校验'}
+                                        </Tag>
+                                        <span className="text-xs text-[#ff4d4f]">{verErrmessage}</span>
+                                    </Form.Item>
+                                    <Form.Item label="入参数据示例">
+                                        <ChatMarkdown textContent={value2JsonMd(bindData.arguments)} />
+                                        <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
+                                    </Form.Item>
+                                    <Form.Item label="出参数据示例">
+                                        <ChatMarkdown textContent={value2JsonMd(bindData.output)} />
+                                        <div className="text-xs text-black/50 mt-[5px]">验证通过之后会自动更新，无法直接修改</div>
+                                    </Form.Item>
+                                    <div className="flex justify-center">
+                                        <Button
+                                            className="w-[100px]"
+                                            disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
+                                            onClick={() => {
+                                                setStatus('success');
+                                                setVerErrmessage('');
+                                                console.log(bindData.outputType);
+
+                                                setOutputType(bindData.outputType);
+                                                form.setFieldValue('input', bindData.arguments);
+                                                form.setFieldValue('output', bindData.output);
+                                                setBindData({
+                                                    content: '',
+                                                    arguments: '',
+                                                    output: '',
+                                                    outputType: ''
+                                                });
+                                                setHandfilData({
+                                                    arguments: '',
+                                                    output: ''
+                                                });
+                                                setverifyStatus('gold');
+                                                getTableData(bindData.arguments, setInputTable, setinputKeys);
+                                                getTableData(bindData.output, setOutputTable, setoutuptKeys);
+                                                setPlugOpen(false);
+                                            }}
+                                            type="primary"
+                                        >
+                                            确认
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    <div className="mb-2 text-xs text-black/50">请填写 coze工作流真实执行完后的出入参数</div>
+                                    <Form.Item label="入参数据">
+                                        <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                            <span>json</span>
+                                            <CopyToClipboard
+                                                text={handfilData.arguments}
+                                                onCopy={() =>
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                            transition: 'SlideLeft'
+                                                        })
+                                                    )
+                                                }
+                                            >
+                                                <button className="flex ml-auto gap-2 text-white border-0 bg-transparent cursor-pointer">
+                                                    <svg
+                                                        stroke="currentColor"
+                                                        fill="none"
+                                                        strokeWidth="2"
+                                                        viewBox="0 0 24 24"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        className="h-4 w-4"
+                                                        height="1em"
+                                                        width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg"
                                                     >
-                                                        确认
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )
-                                    },
-                                    {
-                                        label: '手动填写',
-                                        key: '2',
-                                        children: (
-                                            <div>
-                                                <Form.Item label="入参数据">
-                                                    <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
-                                                        <span>json</span>
-                                                        <CopyToClipboard
-                                                            text={handfilData.arguments}
-                                                            onCopy={() =>
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: '复制成功',
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'success'
-                                                                        },
-                                                                        close: false,
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                                                                        transition: 'SlideLeft'
-                                                                    })
-                                                                )
-                                                            }
-                                                        >
-                                                            <button className="flex ml-auto gap-2 text-white border-0 bg-transparent cursor-pointer">
-                                                                <svg
-                                                                    stroke="currentColor"
-                                                                    fill="none"
-                                                                    strokeWidth="2"
-                                                                    viewBox="0 0 24 24"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    className="h-4 w-4"
-                                                                    height="1em"
-                                                                    width="1em"
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                >
-                                                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                                                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                                                                </svg>
-                                                                Copy code
-                                                            </button>
-                                                        </CopyToClipboard>
-                                                    </div>
-                                                    <Editor
-                                                        height="300px"
-                                                        defaultLanguage="json"
-                                                        theme={'vs-dark'}
-                                                        value={handfilData.arguments}
-                                                        onChange={(value: any) => {
-                                                            setHandfilData({
-                                                                ...handfilData,
-                                                                arguments: value
-                                                            });
-                                                        }}
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item label="出参数据">
-                                                    <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
-                                                        <span>json</span>
-                                                        <CopyToClipboard
-                                                            text={handfilData.output}
-                                                            onCopy={() =>
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: '复制成功',
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'success'
-                                                                        },
-                                                                        close: false,
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                                                                        transition: 'SlideLeft'
-                                                                    })
-                                                                )
-                                                            }
-                                                        >
-                                                            <button className="flex ml-auto gap-2 text-white border-0 bg-transparent cursor-pointer">
-                                                                <svg
-                                                                    stroke="currentColor"
-                                                                    fill="none"
-                                                                    strokeWidth="2"
-                                                                    viewBox="0 0 24 24"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    className="h-4 w-4"
-                                                                    height="1em"
-                                                                    width="1em"
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                >
-                                                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                                                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                                                                </svg>
-                                                                Copy code
-                                                            </button>
-                                                        </CopyToClipboard>
-                                                    </div>
-                                                    <Editor
-                                                        height="300px"
-                                                        defaultLanguage="json"
-                                                        theme={'vs-dark'}
-                                                        value={handfilData.output}
-                                                        onChange={(value: any) => {
-                                                            setHandfilData({
-                                                                ...handfilData,
-                                                                output: value
-                                                            });
-                                                        }}
-                                                    />
-                                                </Form.Item>
-                                                <div className="flex justify-center">
-                                                    <Button
-                                                        className="w-[100px]"
-                                                        disabled={!handfilData.output || !handfilData.arguments}
-                                                        onClick={() => {
-                                                            let argument: any = '';
-                                                            let output: any = '';
-                                                            try {
-                                                                argument = JSON.parse(handfilData.arguments);
-                                                                output = JSON.parse(handfilData.output);
-                                                            } catch (err) {
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: '入参数据和出参数据格式需要 JSON',
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'error'
-                                                                        },
-                                                                        close: false,
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' }
-                                                                    })
-                                                                );
-                                                                return false;
-                                                            }
-                                                            if (typeof argument !== 'object' || typeof output !== 'object') {
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: '入参数据和出参数据格式需要 JSON',
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'error'
-                                                                        },
-                                                                        close: false,
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' }
-                                                                    })
-                                                                );
-                                                                return false;
-                                                            }
-                                                            setStatus('success');
-                                                            setVerErrmessage('');
-                                                            setOutputType('success');
-                                                            form.setFieldValue('input', handfilData.arguments);
-                                                            form.setFieldValue('output', handfilData.output);
-                                                            setBindData({
-                                                                content: '',
-                                                                arguments: '',
-                                                                output: '',
-                                                                outputType: ''
-                                                            });
-                                                            setHandfilData({
-                                                                arguments: '',
-                                                                output: ''
-                                                            });
-                                                            setverifyStatus('gold');
-                                                            getTableData(handfilData.arguments, setInputTable, setinputKeys);
-                                                            getTableData(handfilData.output, setOutputTable, setoutuptKeys);
-                                                            setPlugOpen(false);
-                                                        }}
-                                                        type="primary"
+                                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                                    </svg>
+                                                    Copy code
+                                                </button>
+                                            </CopyToClipboard>
+                                        </div>
+                                        <Editor
+                                            height="300px"
+                                            defaultLanguage="json"
+                                            theme={'vs-dark'}
+                                            value={handfilData.arguments}
+                                            onChange={(value: any) => {
+                                                setHandfilData({
+                                                    ...handfilData,
+                                                    arguments: value
+                                                });
+                                            }}
+                                        />
+                                    </Form.Item>
+                                    <Form.Item label="出参数据">
+                                        <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                            <span>json</span>
+                                            <CopyToClipboard
+                                                text={handfilData.output}
+                                                onCopy={() =>
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '复制成功',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'success'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                            transition: 'SlideLeft'
+                                                        })
+                                                    )
+                                                }
+                                            >
+                                                <button className="flex ml-auto gap-2 text-white border-0 bg-transparent cursor-pointer">
+                                                    <svg
+                                                        stroke="currentColor"
+                                                        fill="none"
+                                                        strokeWidth="2"
+                                                        viewBox="0 0 24 24"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        className="h-4 w-4"
+                                                        height="1em"
+                                                        width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg"
                                                     >
-                                                        确认
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                ]}
-                            />
+                                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                                    </svg>
+                                                    Copy code
+                                                </button>
+                                            </CopyToClipboard>
+                                        </div>
+                                        <Editor
+                                            height="300px"
+                                            defaultLanguage="json"
+                                            theme={'vs-dark'}
+                                            value={handfilData.output}
+                                            onChange={(value: any) => {
+                                                setHandfilData({
+                                                    ...handfilData,
+                                                    output: value
+                                                });
+                                            }}
+                                        />
+                                    </Form.Item>
+                                    <div className="flex justify-center">
+                                        <Button
+                                            className="w-[100px]"
+                                            disabled={!handfilData.output || !handfilData.arguments}
+                                            onClick={() => {
+                                                let argument: any = '';
+                                                let output: any = '';
+                                                try {
+                                                    argument = JSON.parse(handfilData.arguments);
+                                                    output = JSON.parse(handfilData.output);
+                                                } catch (err) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '入参数据和出参数据格式需要 JSON',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' }
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                if (typeof argument !== 'object' || typeof output !== 'object') {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '入参数据和出参数据格式需要 JSON',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' }
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                setStatus('success');
+                                                setVerErrmessage('');
+                                                setOutputType('success');
+                                                form.setFieldValue('input', handfilData.arguments);
+                                                form.setFieldValue('output', handfilData.output);
+                                                setBindData({
+                                                    content: '',
+                                                    arguments: '',
+                                                    output: '',
+                                                    outputType: ''
+                                                });
+                                                setHandfilData({
+                                                    arguments: '',
+                                                    output: ''
+                                                });
+                                                setverifyStatus('gold');
+                                                getTableData(handfilData.arguments, setInputTable, setinputKeys);
+                                                getTableData(handfilData.output, setOutputTable, setoutuptKeys);
+                                                setPlugOpen(false);
+                                            }}
+                                            type="primary"
+                                        >
+                                            确认
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                         </Form>
                     </Modal>
                 )}

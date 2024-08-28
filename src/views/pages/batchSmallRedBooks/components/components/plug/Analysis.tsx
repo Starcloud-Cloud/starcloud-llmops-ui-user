@@ -2,7 +2,7 @@ import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, For
 const { TextArea } = Input;
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined, HistoryOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
@@ -280,14 +280,10 @@ const PlugAnalysis = ({
     useEffect(() => {
         if (materialExecutionOpen && executionCountRef.current) {
             const newNum = grupPre.current || executionCountRef.current || 1;
-            console.log(newNum, totalCountRef.current);
-
             const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
             timeLoading.current = setInterval(() => {
-                console.log(newNum, preeNum.current, newSuccessNum);
-
                 if (preeNum.current < newSuccessNum - 1) {
-                    preeNum.current += 1;
+                    preeNum.current += 100 / ((record?.executeTimeAvg * 1.1) / 800);
                     setPrenum(preeNum.current);
                 } else {
                     clearInterval(timeLoading.current);
@@ -319,7 +315,6 @@ const PlugAnalysis = ({
     }, [materialExecutionOpen]);
     useEffect(() => {
         if (!open || !materialExecutionOpen) {
-            console.log(1);
             preeNum.current = 0;
             setPrenum(preeNum.current);
             clearInterval(timer.current);
@@ -343,9 +338,12 @@ const PlugAnalysis = ({
             }}
             title={
                 <div className=" flex flex-col">
-                    <div className="flex gap-8 items-center mb-2">
-                        <div className="flex items-center">
-                            <span className="text-[26px]">{record.pluginName}</span>
+                    <div className="flex gap-4 items-center mb-2">
+                        <div className="flex items-end">
+                            <span className="text-[26px] leading-[30px]">{record.pluginName}</span>
+                            <div className="text-[14px] text-[#673ab7] ml-2">
+                                <HistoryOutlined /> 预计耗时：{((record.executeTimeAvg * 1.1) / 1000) | 0}s
+                            </div>
                             <div className="flex justify-between items-center ml-2 ">
                                 <Space>
                                     <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
@@ -358,7 +356,7 @@ const PlugAnalysis = ({
                                 </Space>
                             </div>
                         </div>
-                        <div className="text-base ml-4">
+                        <div className="text-[14px]">
                             定时执行（
                             <span
                                 className="text-[#673ab7] hover:underline cursor-pointer"

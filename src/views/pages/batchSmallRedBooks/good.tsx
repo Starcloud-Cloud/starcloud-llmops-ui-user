@@ -359,7 +359,10 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         {item.status === 'ULTIMATE_FAILURE' && (
                             <Button
                                 disabled={loading}
-                                onClick={() => failure(item.uid)}
+                                onClick={(e) => {
+                                    failure(item.uid);
+                                    e.stopPropagation();
+                                }}
                                 className="absolute bottom-[100px] left-0 right-0 m-auto w-[80px]"
                                 type="primary"
                                 size="small"

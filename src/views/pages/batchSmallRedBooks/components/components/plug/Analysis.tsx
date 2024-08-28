@@ -573,7 +573,9 @@ const PlugAnalysis = ({
                 errorMessage={errorMessage}
                 columns={[
                     { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
-                    ...columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))
+                    ...columns
+                        ?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))
+                        ?.map((el) => ({ ...el, width: '300px' }))
                 ]}
                 resetExe={() => {
                     errorCountRef.current = 0;

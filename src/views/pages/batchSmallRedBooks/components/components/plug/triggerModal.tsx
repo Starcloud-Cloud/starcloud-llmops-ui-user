@@ -13,6 +13,7 @@ const TriggerModal = ({
     triggerOpen,
     setTriggerOpen,
     libraryUid,
+    foreignKey,
     rowData,
     record,
     columns
@@ -20,6 +21,7 @@ const TriggerModal = ({
     triggerOpen: boolean;
     setTriggerOpen: (data: boolean) => void;
     libraryUid: string;
+    foreignKey: string;
     rowData: any;
     record: any;
     columns: any[];
@@ -298,59 +300,54 @@ ${JSON.stringify(value, null, 2)}
             ]
         }
     ];
-    const [executeParams, setExecuteParams] = useState<any>(null);
-    const [fieldMap, setieldMap] = useState<any>(null);
     const handleSave = async () => {
         const formRes = await form.validateFields();
-        const result = await forms.validateFields();
         const newList = redBookData.requirement?.map((item: any) => ({
             ...item,
-            variableValue: result[item.variableKey]
+            variableValue: formRes[item.variableKey]
         }));
-        const data = await getPlugConfigInfo({
-            libraryUid
-            // pluginUid: selValue.uid
-        });
-        let params: any = {};
-        if (data?.executeParams) {
-            JSON.parse(data?.executeParams)?.map((item: any) => {
-                params[item.variableKey] = item.variableValue;
-            });
-        }
-
         if (rowData) {
-            // await modifyConfig({
-            //     ...rowData,
-            //     ...formRes,
-            //     foreignKey: libraryUid,
-            //     timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
-            //     businessJobType: 'coze_standalone',
-            //     config: {
-            //         businessJobType: 'coze_standalone',
-            //         fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : data ? data?.fieldMap : null,
-            //         executeParams: plugRecord ? JSON.stringify(result) : data ? data?.params : null,
-            //         paramsDefine: plugRecord ? JSON.stringify(newList) : data ? data?.executeParams : null,
-            //         libraryUid: libraryUid,
-            //         pluginUid: selValue?.uid,
-            //         pluginName: selValue.pluginName
-            //     }
-            // });
+            await modifyConfig({
+                ...rowData,
+                timeExpressionType: formRes.timeExpressionType,
+                foreignKey,
+                timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
+                businessJobType: 'coze_standalone',
+                config: {
+                    executeParams: JSON.stringify({
+                        ...formRes,
+                        timeExpressionType: undefined,
+                        timeExpression: undefined
+                    }),
+                    businessJobType: 'coze_standalone',
+                    fieldMap: JSON.stringify(redBookData.bindFieldData) || null,
+                    paramsDefine: JSON.stringify(newList) || null,
+                    libraryUid: libraryUid,
+                    pluginUid: record?.pluginUid,
+                    pluginName: record.pluginName
+                }
+            });
         } else {
-            // await createConfig({
-            //     ...formRes,
-            //     foreignKey: libraryUid,
-            //     timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
-            //     businessJobType: 'coze_standalone',
-            //     config: {
-            //         businessJobType: 'coze_standalone',
-            //         fieldMap: plugRecord ? JSON.stringify(redBookData.bindFieldData) : null,
-            //         executeParams: plugRecord ? JSON.stringify(result) : null,
-            //         paramsDefine: plugRecord ? JSON.stringify(newList) : null,
-            //         libraryUid: libraryUid,
-            //         pluginUid: selValue?.uid,
-            //         pluginName: selValue.pluginName
-            //     }
-            // });
+            await createConfig({
+                name: record.pluginName + '触发器',
+                timeExpressionType: formRes.timeExpressionType,
+                foreignKey,
+                timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
+                businessJobType: 'coze_standalone',
+                config: {
+                    executeParams: JSON.stringify({
+                        ...formRes,
+                        timeExpressionType: undefined,
+                        timeExpression: undefined
+                    }),
+                    businessJobType: 'coze_standalone',
+                    fieldMap: JSON.stringify(redBookData.bindFieldData) || null,
+                    paramsDefine: JSON.stringify(newList) || null,
+                    libraryUid: libraryUid,
+                    pluginUid: record?.pluginUid,
+                    pluginName: record.pluginName
+                }
+            });
         }
         setTriggerOpen(false);
         dispatch(
@@ -734,38 +731,7 @@ ${JSON.stringify(value, null, 2)}
                                     dataSource={data}
                                 />
                                 <div className="flex mt-4 justify-center">
-                                    <Button
-                                        onClick={async () => {
-                                            const formRes = await form.validateFields();
-                                            console.log(formRes);
-
-                                            console.log(redBookData);
-                                            return;
-                                            const newList = redBookData.requirement?.map((item: any) => ({
-                                                ...item,
-                                                variableValue: formRes[item.variableKey]
-                                            }));
-                                            await createConfig({
-                                                timeExpressionType: formRes.timeExpressionType,
-                                                foreignKey: libraryUid,
-                                                timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
-                                                businessJobType: 'coze_standalone',
-                                                config: {
-                                                    executeParams: JSON.stringify({
-                                                        ...formRes,
-                                                        timeExpressionType: undefined,
-                                                        timeExpression: undefined
-                                                    }),
-                                                    businessJobType: 'coze_standalone',
-                                                    fieldMap: JSON.stringify(redBookData.bindFieldData) || null,
-                                                    paramsDefine: JSON.stringify(newList) || null,
-                                                    libraryUid: libraryUid
-                                                }
-                                            });
-                                        }}
-                                        className="w-[100px]"
-                                        type="primary"
-                                    >
+                                    <Button onClick={handleSave} className="w-[100px]" type="primary">
                                         保存
                                     </Button>
                                 </div>

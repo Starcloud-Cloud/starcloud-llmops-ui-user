@@ -330,10 +330,12 @@ const PlugAnalysis = ({
     const [triggerOpen, setTriggerOpen] = useState(false);
     const [rowData, setRowData] = useState<any>(null);
     useEffect(() => {
-        if (!triggerOpen) {
-            setRowData(null);
-        }
-    }, [triggerOpen]);
+        configDetail(record?.uid).then((result) => {
+            if (result) {
+                setRowData(result);
+            }
+        });
+    }, []);
     return (
         <ModalForm
             modalProps={{
@@ -361,14 +363,14 @@ const PlugAnalysis = ({
                             <span
                                 className="text-[#673ab7] hover:underline cursor-pointer"
                                 onClick={async () => {
-                                    const result = await configDetail(libraryUid);
+                                    const result = await configDetail(record?.uid);
                                     if (result) {
                                         setRowData(result);
                                     }
                                     setTriggerOpen(true);
                                 }}
                             >
-                                开启中
+                                {rowData ? '开启中' : '未开启'}
                             </span>
                             ）
                         </div>
@@ -520,7 +522,7 @@ const PlugAnalysis = ({
                             ...item,
                             variableValue: result[item.variableKey]
                         }));
-                        if (!record.fieldMap && !record.executeParams) {
+                        if (!record.uid) {
                             const res = await addPlugConfigInfo({
                                 libraryUid: record.libraryUid,
                                 pluginUid: record.pluginUid,
@@ -640,7 +642,8 @@ const PlugAnalysis = ({
                 <TriggerModal
                     triggerOpen={triggerOpen}
                     setTriggerOpen={setTriggerOpen}
-                    libraryUid={record.uid}
+                    libraryUid={record.libraryUid}
+                    foreignKey={record.uid}
                     rowData={rowData}
                     columns={columns}
                     record={record}

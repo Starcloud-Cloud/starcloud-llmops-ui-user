@@ -65,7 +65,7 @@ export const modifyConfig = (data: any) => {
  * @returns
  */
 export const delPlug = (data: any) => {
-    return request.delete({ url: '/llm/job/config/delete/' + data });
+    return request.delete({ url: '/llm/plugin/config/delete/' + data });
 };
 /**
  * 删除定时任务

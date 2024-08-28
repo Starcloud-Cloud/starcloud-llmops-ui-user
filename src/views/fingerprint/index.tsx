@@ -57,24 +57,47 @@ const items: DescriptionsProps['items'] = [
         key: 'font',
         label: 'Font指纹',
         children: <span id="font"></span>
+    },
+    {
+        key: 'font',
+        label: 'Font指纹',
+        children: <span id="font"></span>
+    },
+    {
+        key: 'JavascriptStatus',
+        label: 'Javascript状态',
+        children: <span id="JavascriptStatus"></span>
+    },
+    {
+        key: 'JavascriptStatus',
+        label: 'Javascript状态',
+        children: <span id="JavascriptStatus"></span>
     }
 ];
 
 const Fingerprint = () => {
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
-            <iframe className="hidden" src="https://ip77.net/" />
-
-            <div>
+            <iframe style={{ display: 'none' }} src="https://ip77.net/" />
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    padding: '30px 0',
+                    background: '#3774a4'
+                }}
+            >
                 <div>
-                    <EnvironmentOutlined />
-                    <span id="ip" className="text-4xl"></span>
+                    <EnvironmentOutlined style={{ fontSize: '40px', color: '#fff' }} />
+                    <span id="ip" style={{ fontSize: '40px', color: '#fff' }}></span>
                 </div>
-                <div className="ipAddress"></div>
+                <div id="ipAddress" style={{ fontSize: '28px', marginTop: '12px', color: '#fff' }}></div>
             </div>
             <div className="w-[100%] justify-center">
                 <div className="w-[80%]">
-                    <Descriptions title="指纹" bordered items={items} column={2} />
+                    <Descriptions bordered items={items} column={2} />
                 </div>
             </div>
         </div>

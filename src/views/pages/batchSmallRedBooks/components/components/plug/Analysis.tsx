@@ -338,22 +338,24 @@ const PlugAnalysis = ({
             }}
             title={
                 <div className=" flex flex-col">
-                    <div className="flex gap-4 items-center mb-2">
+                    <div className="flex gap-4 items-end mb-2">
                         <div className="flex items-end">
                             <span className="text-[26px] leading-[30px]">{record.pluginName}</span>
-                            <div className="text-[14px] text-[#673ab7] ml-2">
-                                <HistoryOutlined /> 预计耗时：{((record.executeTimeAvg * 1.1) / 1000) | 0}s
-                            </div>
-                            <div className="flex justify-between items-center ml-2 ">
+                            <div className="flex gap-2 ml-2 flex-col">
                                 <Space>
                                     <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
                                     <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
+                                </Space>
+                                <div className="flex gap-2">
+                                    <div className="text-xs text-[#673ab7]">
+                                        <HistoryOutlined /> 预计耗时：{((record.executeTimeAvg * 1.1) / 1000) | 0}s
+                                    </div>
                                     {record?.updateTime && (
                                         <span className="text-xs text-black/50">
                                             更新时间: {dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                         </span>
                                     )}
-                                </Space>
+                                </div>
                             </div>
                         </div>
                         <div className="text-[14px]">

@@ -988,6 +988,9 @@ export const TableHeader = ({
                                             );
                                         })}
                                     </div>
+                                    {/* <div className='h-[100px] justify-center items-center'>
+                                        <Button type="primary"></Button>
+                                    </div> */}
                                 </div>
                             )
                         },
@@ -1024,12 +1027,12 @@ export const TableHeader = ({
                                                 {item?.children?.map((el: any) => (
                                                     <div
                                                         onClick={() => {
-                                                            if (selType === 'plug') {
-                                                                handleOpenPlug(el);
-                                                            } else {
-                                                                setSelValue(el);
-                                                                setPlugMarketOpen(false);
-                                                            }
+                                                            // if (selType === 'plug') {
+                                                            //     handleOpenPlug(el);
+                                                            // } else {
+                                                            //     setSelValue(el);
+                                                            //     setPlugMarketOpen(false);
+                                                            // }
                                                         }}
                                                         className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
                                                         key={el.uid}

@@ -64,6 +64,14 @@ export const modifyConfig = (data: any) => {
  * @param data
  * @returns
  */
+export const delPlug = (data: any) => {
+    return request.delete({ url: '/llm/plugin/config/delete/' + data });
+};
+/**
+ * 删除定时任务
+ * @param data
+ * @returns
+ */
 export const createConfig = (data: any) => {
     return request.post({ url: '/llm/job/config/create', data });
 };

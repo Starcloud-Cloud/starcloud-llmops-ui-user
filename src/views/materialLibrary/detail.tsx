@@ -752,7 +752,7 @@ export const TableHeader = ({
                                                                 <Divider className="my-2" />
                                                                 <div className="flex justify-between text-xs">
                                                                     <div className="flex">
-                                                                        {wayList.find((item) => item.value === el.type).label}
+                                                                        {wayList.find((item) => item.value === el.type)?.label}
                                                                     </div>
                                                                     <div className="flex">{el.creator}</div>
                                                                 </div>

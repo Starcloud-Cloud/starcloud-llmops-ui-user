@@ -96,6 +96,7 @@ const HeaderField = ({
             required: true,
             dataIndex: 'columnName',
             formItemProps: {
+                component: <Input />,
                 rules: [
                     {
                         required: true,
@@ -224,7 +225,6 @@ const HeaderField = ({
                         columns={materialColumns}
                         value={tableData}
                         pagination={false}
-                        controlled
                         recordCreatorProps={{
                             newRecordType: 'dataSource',
                             record: () => ({
@@ -251,13 +251,10 @@ const HeaderField = ({
                                     </Button>
                                 ];
                             },
-                            onValuesChange: (record, recordList) => {
+                            onValuesChange: (record: any, recordList: any) => {
                                 setTableData(recordList);
                             },
                             onChange: seteditableKeys
-                        }}
-                        onChange={(data) => {
-                            console.log(data);
                         }}
                     />
                 </SortableContext>

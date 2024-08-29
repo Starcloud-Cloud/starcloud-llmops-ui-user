@@ -76,6 +76,14 @@ export const createConfig = (data: any) => {
     return request.post({ url: '/llm/job/config/create', data });
 };
 /**
+ * 分页查询素材库任务历史
+ * @param data
+ * @returns
+ */
+export const pageLibrary = (data: any) => {
+    return request.get({ url: '/llm/job/log/library/page', params: data });
+};
+/**
  * 分页查询任务历史
  * @param data
  * @returns

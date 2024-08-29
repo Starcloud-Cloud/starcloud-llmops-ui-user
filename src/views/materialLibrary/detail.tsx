@@ -69,7 +69,7 @@ import MaterialLibrary from './index';
 import AiCreate from '../pages/batchSmallRedBooks/components/newAI';
 import React from 'react';
 import { imageOcr } from 'api/redBook/batchIndex';
-import { configDetail } from 'api/plug/index';
+import { configDetail, pageLibrary } from 'api/plug/index';
 import DownMaterial from './components/downMaterial';
 import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
@@ -284,6 +284,17 @@ export const TableHeader = ({
         }
     ];
     const [TableData, setTableData] = useState<any[]>([]);
+    const getTableData = async () => {
+        const result = await pageLibrary({
+            pageNo: 1,
+            pageSize: 100,
+            libraryUid
+        });
+        setTableData(result.list);
+    };
+    useEffect(() => {
+        getTableData();
+    }, []);
     const [timeExpressionTypeList, settimeExpressionTypeList] = useState<any[]>([]);
     useEffect(() => {
         getMetadata().then((res) => {
@@ -951,8 +962,9 @@ export const TableHeader = ({
                                                         title="提示"
                                                         description="请再次确认是否删除？"
                                                         onConfirm={async (e: any) => {
+                                                            e.stopPropagation();
                                                             try {
-                                                                await delPlug(el.uid);
+                                                                await delPlug(el.configUid);
                                                                 dispatch(
                                                                     openSnackbar({
                                                                         open: true,
@@ -967,11 +979,7 @@ export const TableHeader = ({
                                                                     })
                                                                 );
                                                                 setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
-                                                                e.stopPropagation();
-                                                            } catch (err) {
-                                                                e.stopPropagation();
-                                                            }
-                                                            e.stopPropagation();
+                                                            } catch (err) {}
                                                         }}
                                                         onCancel={(e) => e?.stopPropagation()}
                                                         okText="Yes"

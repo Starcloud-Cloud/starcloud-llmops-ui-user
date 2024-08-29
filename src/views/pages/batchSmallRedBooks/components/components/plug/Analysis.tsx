@@ -6,6 +6,7 @@ import { QuestionCircleOutlined, HistoryOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
+import Editor from '@monaco-editor/react';
 import { addPlugConfigInfo, updatePlugConfigInfo, configDetail } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
@@ -331,6 +332,22 @@ const PlugAnalysis = ({
             }
         });
     }, []);
+
+    //form 表单校验
+    const parseInputToArray = (input: any) => {
+        try {
+            const parsed = JSON.parse(input);
+            if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
+                return parsed;
+            }
+        } catch (e) {
+            return input;
+        }
+    };
+    const isArrayString = (value: any) => {
+        return Array.isArray(value) && value.every((item) => typeof item === 'string');
+    };
+
     return (
         <ModalForm
             modalProps={{
@@ -396,17 +413,51 @@ const PlugAnalysis = ({
                 </Popover>
             </div>
             <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
-                {redBookData.requirement?.map((item: any) => (
-                    <Form.Item
-                        initialValue={item.variableValue}
-                        key={item.uuid}
-                        label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                        name={item.variableKey}
-                        rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                ))}
+                {redBookData.requirement?.map((item: any) =>
+                    item.variableType === 'String' ? (
+                        <Form.Item
+                            initialValue={item.variableValue}
+                            key={item.uuid}
+                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                            name={item.variableType === 'String' ? item.variableKey : ''}
+                            rules={item.variableType === 'String' ? [{ required: true, message: item.variableKey + '是必填项' }] : []}
+                        >
+                            <Input />
+                        </Form.Item>
+                    ) : (
+                        <Form.Item required label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}>
+                            <div className="flex items-center relative bg-[#F4F4F6] px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                <span>json</span>
+                            </div>
+                            <Form.Item
+                                initialValue={item.variableValue || '[]'}
+                                name={item.variableKey}
+                                rules={[
+                                    { required: true, message: item.variableKey + '是必填项' },
+                                    {
+                                        validator: (_, value) => {
+                                            if (!value) {
+                                                return Promise.resolve();
+                                            }
+                                            const parsedValue = parseInputToArray(value);
+                                            if (isArrayString(parsedValue)) {
+                                                return Promise.resolve();
+                                            }
+                                            return Promise.reject(new Error('请输入正确的JSON结构'));
+                                        }
+                                    }
+                                ]}
+                            >
+                                <Editor
+                                    className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
+                                    height="200px"
+                                    defaultLanguage="json"
+                                    onChange={(value: any) => {}}
+                                />
+                            </Form.Item>
+                        </Form.Item>
+                    )
+                )}
             </Form>
             <div className="text-[16px] font-bold my-4 flex">
                 2.输出字段绑定

@@ -184,6 +184,17 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     const [outuptKeys, setoutuptKeys] = useState<any[]>([]);
     const [inputTable, setInputTable] = useState<any[]>([]);
     const [outputTable, setOutputTable] = useState<any[]>([]);
+    const getType = (parsed: any) => {
+        try {
+            if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (e) {
+            return false;
+        }
+    };
     const getTableData = (value: any, setTable: (data: any) => void, setUuid: (data: any) => void) => {
         let outputObj: any = {};
         let newoutputObj: any = [];
@@ -201,7 +212,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 variableKey: key,
                 require: true,
                 // variableValue: outputObj[key],
-                variableType: 'String'
+                variableType: getType(outputObj[key]) ? 'Array<String>' : 'String'
             });
         }
         setUuid(newoutputObj?.map((item: any) => item.uuid));
@@ -880,7 +891,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 }
                                                 setStatus('success');
                                                 setVerErrmessage('');
-                                                setOutputType('success');
+                                                setOutputType(Array.isArray(output) ? 'list' : 'obj');
                                                 form.setFieldValue('input', handfilData.arguments);
                                                 form.setFieldValue('output', handfilData.output);
                                                 setBindData({

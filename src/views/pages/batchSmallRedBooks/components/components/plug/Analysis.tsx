@@ -1,4 +1,4 @@
-import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Form } from 'antd';
+import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Form, Image } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
@@ -12,6 +12,7 @@ import ChatMarkdown from 'ui-component/Markdown';
 import ResultLoading from '../resultLoading';
 import dayjs from 'dayjs';
 import { dispatch } from 'store';
+import { EditType } from 'views/materialLibrary/detail';
 import { openSnackbar } from 'store/slices/snackbar';
 
 const value2JsonMd = (value: any) => `
@@ -274,6 +275,29 @@ const PlugAnalysis = ({
     };
     const timeLoading = useRef<any>(null);
     const grupPre = useRef(0);
+    const imageExe = (list: any[]) => {
+        return list?.map((item: any) => {
+            if (item.type === EditType.Image) {
+                return {
+                    ...item,
+                    render: (_: any, row: any) =>
+                        row[item.dataIndex] ? (
+                            <Image
+                                preview={{ src: row[item.dataIndex] }}
+                                width={82}
+                                height={82}
+                                src={row[item.dataIndex] + '?x-oss-process=image/resize,w_100/quality,q_80'}
+                            />
+                        ) : null
+                };
+            } else {
+                return {
+                    ...item,
+                    sorter: false
+                };
+            }
+        });
+    };
     useEffect(() => {
         if (materialExecutionOpen && executionCountRef.current) {
             const newNum = grupPre.current || executionCountRef.current || 1;
@@ -573,9 +597,11 @@ const PlugAnalysis = ({
                 errorMessage={errorMessage}
                 columns={[
                     { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
-                    ...columns
-                        ?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))
-                        ?.map((el) => ({ ...el, width: '300px' }))
+                    ...imageExe(
+                        columns
+                            ?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))
+                            ?.map((el) => ({ ...el, width: '300px' }))
+                    )
                 ]}
                 resetExe={() => {
                     errorCountRef.current = 0;

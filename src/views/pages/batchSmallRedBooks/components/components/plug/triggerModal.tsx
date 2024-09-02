@@ -16,7 +16,8 @@ const TriggerModal = ({
     foreignKey,
     rowData,
     record,
-    columns
+    columns,
+    setRowPre
 }: {
     triggerOpen: boolean;
     setTriggerOpen: (data: boolean) => void;
@@ -25,6 +26,7 @@ const TriggerModal = ({
     rowData: any;
     record: any;
     columns: any[];
+    setRowPre: () => void;
 }) => {
     const value2JsonMd = (value: any) => `
 ~~~json
@@ -348,6 +350,7 @@ ${JSON.stringify(value, null, 2)}
                     pluginName: record.pluginName
                 }
             });
+            setRowPre();
         }
         setTriggerOpen(false);
         dispatch(
@@ -530,32 +533,42 @@ ${JSON.stringify(value, null, 2)}
         {
             title: '触发器时间',
             align: 'center',
+            width: 200,
             render: (_, row) => <div>{dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss')}</div>
         },
         {
             title: '触发器类型',
             align: 'center',
+            width: 200,
             render: (_, row) => <div>{timeExpressionTypeList?.find((item) => item.value === row.triggerType)?.label}</div>
         },
         {
             title: '执行插件名称',
             dataIndex: 'pluginName',
-            align: 'center'
+            align: 'center',
+            width: 200
         },
         {
             title: '触发结果',
-            dataIndex: 'executeResult',
-            align: 'center'
+            align: 'center',
+            width: 400,
+            render: (_, row) => (
+                <Popover content={row.executeResult}>
+                    <div className="line-clamp-4">{row.executeResult}</div>
+                </Popover>
+            )
         },
         {
             title: '耗时(s)',
             dataIndex: 'executeTime',
             align: 'center',
+            width: 100,
             render: (_, row) => <div>{row.executeTime / 1000}</div>
         },
         {
             title: '状态',
             align: 'center',
+            width: 100,
             render: (_, row) => <Tag color="processing">{row?.success ? '执行成功' : '执行失败'}</Tag>
         }
     ];
@@ -742,7 +755,7 @@ ${JSON.stringify(value, null, 2)}
                         label: '触发历史',
                         key: '2',
                         disabled: rowData ? false : true,
-                        children: <Table columns={column} dataSource={TableData} />
+                        children: <Table columns={column} virtual dataSource={TableData} />
                     }
                 ]}
             ></Tabs>

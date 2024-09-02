@@ -324,6 +324,7 @@ const PlugAnalysis = ({
     }, [open, materialExecutionOpen]);
 
     const [triggerOpen, setTriggerOpen] = useState(false);
+    const [rowPre, setRowPre] = useState(0);
     const [rowData, setRowData] = useState<any>(null);
     useEffect(() => {
         configDetail(record?.uid).then((result) => {
@@ -331,7 +332,7 @@ const PlugAnalysis = ({
                 setRowData(result);
             }
         });
-    }, []);
+    }, [rowPre]);
 
     //form 表单校验
     const parseInputToArray = (input: any) => {
@@ -642,6 +643,18 @@ const PlugAnalysis = ({
                 >
                     执行
                 </Button>
+                <Button
+                    type="primary"
+                    onClick={async () => {
+                        const result = await configDetail(record?.uid);
+                        if (result) {
+                            setRowData(result);
+                        }
+                        setTriggerOpen(true);
+                    }}
+                >
+                    定时任务
+                </Button>
             </div>
             <ResultLoading
                 materialExecutionOpen={materialExecutionOpen}
@@ -699,6 +712,9 @@ const PlugAnalysis = ({
                     rowData={rowData}
                     columns={columns}
                     record={record}
+                    setRowPre={() => {
+                        setRowPre(rowPre + 1);
+                    }}
                 />
             )}
         </ModalForm>

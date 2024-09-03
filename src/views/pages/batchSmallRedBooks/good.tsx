@@ -330,6 +330,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
         //     )}
         // </div>
         <div
+            key={item.businessUid}
             className="overflow-hidden border border-solid border-[#CECAD5] rounded-[16px] cursor-pointer relative"
             onClick={() => {
                 setBusinessUid(item.uid);

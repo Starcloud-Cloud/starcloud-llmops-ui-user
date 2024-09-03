@@ -1,6 +1,6 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
 import { Input, Image, Menu, Switch, Button, Divider, Tooltip } from 'antd';
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef, useMemo, Fragment } from 'react';
 import _ from 'lodash-es';
 import { SelectTemplateModal } from './SelectTemplateModal';
 import React from 'react';
@@ -147,6 +147,9 @@ const EditStyle = ({
             })
         );
     };
+    const imageStyleLength = useMemo(() => {
+        return imageStyleData?.variableList?.filter((item: any) => item.type === 'IMAGE')?.length || 0;
+    }, [imageStyleData]);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -242,7 +245,7 @@ const EditStyle = ({
                             <div className="flex-1">
                                 {materialStatus === 'default' && (
                                     <div>
-                                        {imageStyleData?.variableList?.filter((item: any) => item.type === 'IMAGE')?.length > 0 && (
+                                        {imageStyleLength > 0 && (
                                             <>
                                                 <div className="text-lg">图片生成配置</div>
                                                 <div className="text-xs text-black/50">
@@ -281,6 +284,7 @@ const EditStyle = ({
                                                         el.type === 'IMAGE' &&
                                                         el.field && (
                                                             <div
+                                                                key={index}
                                                                 className="w-[50%] p-3"
                                                                 ref={wrapperRef}
                                                                 onClick={() => setCurrentElementId(el.field)}
@@ -379,6 +383,7 @@ const EditStyle = ({
                                                     el.type === 'TEXT' &&
                                                     el.field && (
                                                         <div
+                                                            key={index}
                                                             className="w-[50%] p-3"
                                                             ref={wrapperRef}
                                                             onClick={() => setCurrentElementId(el.field)}

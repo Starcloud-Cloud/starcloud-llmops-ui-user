@@ -33,6 +33,7 @@ const TermTable = ({
     getExtended: (data: number) => void;
     setModPage: any;
 }) => {
+    const { Option } = Select;
     const [upgradeOpen, setUpgradeOpen] = useState(false);
     const tableRef: any = useRef(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -487,6 +488,21 @@ const TermTable = ({
             )
         }
     ];
+    const orderColumnList = [
+        { label: '流量占比', value: 12 },
+        { label: '相关 ASIN', value: 20 },
+        { label: 'ABA 周排名', value: 4 },
+        { label: '月搜索量', value: 5 },
+        { label: '月购买量', value: 6 },
+        { label: '购买率', value: 7 },
+        { label: 'SPR', value: 16 },
+        { label: '标题密度', value: 15 },
+        { label: '商品数', value: 8 },
+        { label: '供需比', value: 9 },
+        { label: '广告竞品数', value: 10 },
+        { label: '点击集中度', value: 19 },
+        { label: 'PPC 竞价', value: 11 }
+    ];
     const getChartsList = (index: number, Axis: string[], rankList: number[], searchList: number[]) => {
         const chartContainer = document.getElementById('chart' + index);
         // @ts-ignore
@@ -594,23 +610,14 @@ const TermTable = ({
                                 orderColumn: data
                             })
                         }
-                        options={[
-                            { label: '流量占比', value: 12 },
-                            { label: '相关ASIN', value: 20 },
-                            { label: 'ABA周排名', value: 4 },
-                            { label: '月搜索量', value: 5 },
-                            { label: '月购买量', value: 6 },
-                            { label: '月购买量', value: 6 },
-                            { label: '购买率', value: 7 },
-                            { label: 'SPR', value: 16 },
-                            { label: '标题密度', value: 15 },
-                            { label: '商品数', value: 8 },
-                            { label: '供需比', value: 9 },
-                            { label: '广告竞品数', value: 10 },
-                            { label: '点击集中度', value: 19 },
-                            { label: 'PPC竞价', value: 11 }
-                        ]}
-                    ></Select>
+                        options={orderColumnList}
+                    >
+                        {orderColumnList.map((item) => (
+                            <Option key={item.value} value={item.value}>
+                                {item.label}
+                            </Option>
+                        ))}
+                    </Select>
                     <Select
                         className="w-[80px] h-[36px] mx-[10px]"
                         value={pageQuery.desc}

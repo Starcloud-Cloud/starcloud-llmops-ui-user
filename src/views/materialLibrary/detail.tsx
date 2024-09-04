@@ -8,7 +8,7 @@ import {
     FileImageOutlined,
     FileTextOutlined,
     ExclamationCircleFilled,
-    AntDesignOutlined,
+    DeleteOutlined,
     AppstoreFilled,
     MoreOutlined
 } from '@ant-design/icons';
@@ -33,7 +33,7 @@ import {
     Switch,
     Popover
 } from 'antd';
-import type { TableProps } from 'antd';
+import type { TableColumnsType } from 'antd';
 import {
     checkMaterialLibrary,
     createMaterialLibraryAppBind,
@@ -48,6 +48,7 @@ import {
     updateMaterialLibraryTitle
 } from 'api/material';
 import { delOwner, publishedList, ownerListList, detailPlug, metadataData } from 'api/redBook/plug';
+import { getMetadata, addPlugConfigInfo, delPlug } from 'api/plug/index';
 import { createBatchMaterial, updateBatchMaterial } from 'api/redBook/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
@@ -68,13 +69,15 @@ import MaterialLibrary from './index';
 import AiCreate from '../pages/batchSmallRedBooks/components/newAI';
 import React from 'react';
 import { imageOcr } from 'api/redBook/batchIndex';
-import { configDetail } from 'api/plug/index';
+import { configDetail, pageLibrary } from 'api/plug/index';
 import DownMaterial from './components/downMaterial';
 import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
 import { getPlugConfigInfo, getPlugInfo } from 'api/plug';
 import PlugAnalysis from 'views/pages/batchSmallRedBooks/components/components/plug/Analysis';
 import TriggerModal from './components/triggerModal';
+import { openSnackbar } from 'store/slices/snackbar';
+import { dispatch } from 'store';
 import dayjs from 'dayjs';
 
 export enum EditType {
@@ -165,6 +168,7 @@ export const TableHeader = ({
     const [addOpen, setAddOpen] = useState(false);
     const [plugType, setPlugType] = useState('');
 
+    //触发器
     const [triggerOpen, setTriggerOpen] = useState(false);
 
     useEffect(() => {
@@ -244,6 +248,73 @@ export const TableHeader = ({
     const [plugMarketOpen, setPlugMarketOpen] = useState(false);
     const [selType, setSelType] = useState('');
     const [plugTableData, setPlugTableData] = useState<any[]>([]);
+
+    //我的插件
+    const column: TableColumnsType<any> = [
+        {
+            title: '触发器时间',
+            align: 'center',
+            width: 200,
+            render: (_, row) => <div>{dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+        },
+        {
+            title: '触发器类型',
+            align: 'center',
+            width: 200,
+            render: (_, row) => <div>{timeExpressionTypeList?.find((item) => item.value === row.triggerType)?.label}</div>
+        },
+        {
+            title: '执行插件名称',
+            dataIndex: 'pluginName',
+            width: 200,
+            align: 'center'
+        },
+        {
+            title: '触发结果',
+            align: 'center',
+            width: 400,
+            render: (_, row) => (
+                <Popover content={row.executeResult}>
+                    <div className="line-clamp-4">{row.executeResult}</div>
+                </Popover>
+            )
+        },
+        {
+            title: '耗时(s)',
+            dataIndex: 'executeTime',
+            align: 'center',
+            width: 100,
+            render: (_, row) => <div>{row.executeTime / 1000}</div>
+        },
+        {
+            title: '状态',
+            align: 'center',
+            width: 100,
+            render: (_, row) => <Tag color="processing">{row?.success ? '执行成功' : '执行失败'}</Tag>
+        }
+    ];
+    const [TableData, setTableData] = useState<any[]>([]);
+    const getTableData = async () => {
+        const result = await pageLibrary({
+            pageNo: 1,
+            pageSize: 100,
+            libraryUid
+        });
+        setTableData(result.list);
+    };
+    useEffect(() => {
+        getTableData();
+    }, []);
+    const [timeExpressionTypeList, settimeExpressionTypeList] = useState<any[]>([]);
+    useEffect(() => {
+        getMetadata().then((res) => {
+            settimeExpressionTypeList(res.triggerType);
+        });
+    }, []);
+
+    //绑定插件
+    const [bindOpen, setBindOpen] = useState(false);
+    const [bindData, setBindData] = useState<any>(null);
 
     const [sceneList, setSceneList] = useState<any[]>([]);
     const [wayList, setWayList] = useState<any[]>([]);
@@ -609,21 +680,6 @@ export const TableHeader = ({
                             新增素材
                         </Button>
                         {isShowField && (
-                            <Button
-                                onClick={async () => {
-                                    const result = await configDetail(libraryUid);
-                                    if (result) {
-                                        setRowData(result);
-                                    }
-                                    setTriggerOpen(true);
-                                }}
-                                className="absolute right-[82px] top-0"
-                                type="primary"
-                            >
-                                触发器
-                            </Button>
-                        )}
-                        {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
                                     <Space>
@@ -709,7 +765,16 @@ export const TableHeader = ({
                     </div>
                 </ModalForm>
             )}
-            <Modal width="80%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
+            <Modal
+                width="80%"
+                open={bindOpen}
+                onCancel={() => {
+                    setBindData(null);
+                    setBindOpen(false);
+                }}
+                footer={false}
+                title="绑定插件"
+            >
                 <Tabs
                     items={[
                         {
@@ -717,52 +782,218 @@ export const TableHeader = ({
                             key: '1',
                             children: (
                                 <div>
-                                    <CheckCard.Group className="w-full" size="small">
-                                        {plugMarketList?.map((item) => (
-                                            <div key={item.uid}>
-                                                <div className="my-4 text-[16px] font-bold">
-                                                    {sceneList?.find((i) => i.value === item.scene)?.label}
-                                                </div>
-                                                <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
-                                                    {item.children?.map((el: any) => {
-                                                        return (
-                                                            <div
-                                                                onClick={() => {
-                                                                    if (selType === 'plug') {
-                                                                        handleOpenPlug(el);
-                                                                    } else {
-                                                                        setSelValue(el);
-                                                                        setPlugMarketOpen(false);
-                                                                    }
-                                                                }}
-                                                                className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md"
-                                                                key={el.uid}
-                                                            >
-                                                                <div className="flex gap-4">
-                                                                    {el.avatar ? (
-                                                                        <Avatar shape="square" size={64} src={el.avatar} />
-                                                                    ) : (
-                                                                        <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
-                                                                    )}
-                                                                    <div className="flex-1">
-                                                                        <div className="text-[18px] font-bold">{el.pluginName}</div>
-                                                                        <div className="line-clamp-3 h-[66px]">{el.description}</div>
-                                                                    </div>
-                                                                </div>
-                                                                <Divider className="my-2" />
-                                                                <div className="flex justify-between text-xs">
-                                                                    <div className="flex">
-                                                                        {wayList.find((item) => item.value === el.type)?.label}
-                                                                    </div>
-                                                                    <div className="flex">{el.creator}</div>
+                                    {plugMarketList?.map((item) => (
+                                        <div key={item.uid}>
+                                            <div className="my-4 text-[16px] font-bold">
+                                                {sceneList?.find((i) => i.value === item.scene)?.label}
+                                            </div>
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                                {item.children?.map((el: any) => {
+                                                    return (
+                                                        <div
+                                                            onClick={() => {
+                                                                setBindData(el);
+                                                            }}
+                                                            className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md"
+                                                            style={{
+                                                                borderColor: el.uid === bindData?.uid ? '#673ab7' : '#d9d9d9'
+                                                            }}
+                                                            key={el.uid}
+                                                        >
+                                                            <div className="flex gap-4">
+                                                                {el.avatar ? (
+                                                                    <Avatar shape="square" size={64} src={el.avatar} />
+                                                                ) : (
+                                                                    <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                                )}
+                                                                <div className="flex-1">
+                                                                    <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                    <div className="line-clamp-3 h-[66px]">{el.description}</div>
                                                                 </div>
                                                             </div>
-                                                        );
-                                                    })}
-                                                </div>
+                                                            <Divider className="my-2" />
+                                                            <div className="flex justify-between text-xs">
+                                                                <div className="flex">
+                                                                    {wayList.find((item) => item.value === el.type)?.label}
+                                                                </div>
+                                                                <div className="flex">{el.creator}</div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
-                                        ))}
-                                    </CheckCard.Group>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                        },
+                        {
+                            label: '我的插件',
+                            key: '2',
+                            children: (
+                                <div>
+                                    {plugTableData?.map((item) => (
+                                        <div key={item.uid}>
+                                            <div className="my-4 text-[16px] font-bold">
+                                                {sceneList?.find((i) => i.value === item.scene)?.label}
+                                            </div>
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                                {item?.children?.map((el: any) => (
+                                                    <div
+                                                        onClick={() => {
+                                                            setBindData(el);
+                                                        }}
+                                                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                                        style={{
+                                                            borderColor: el.uid === bindData?.uid ? '#673ab7' : '#d9d9d9'
+                                                        }}
+                                                        key={el.uid}
+                                                    >
+                                                        <div className="flex gap-4">
+                                                            {el.avatar ? (
+                                                                <Avatar shape="square" size={64} src={el.avatar} />
+                                                            ) : (
+                                                                <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                            )}
+                                                            <div className="flex-1">
+                                                                <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                            </div>
+                                                        </div>
+                                                        <Divider className="my-2" />
+                                                        <div className="flex justify-between text-xs">
+                                                            <Tooltip title="更新时间">
+                                                                <div className="flex">
+                                                                    {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                                </div>
+                                                            </Tooltip>
+                                                            <div className="flex">{el.creator}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                        }
+                    ]}
+                />
+                <div className="mt-4 flex justify-center">
+                    <Button
+                        onClick={async () => {
+                            await addPlugConfigInfo({
+                                libraryUid,
+                                pluginUid: bindData.uid
+                            });
+                            setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
+                            setBindData(null);
+                            setBindOpen(false);
+                        }}
+                        disabled={!bindData}
+                        type="primary"
+                        className="w-[100px]"
+                    >
+                        确认
+                    </Button>
+                </div>
+            </Modal>
+            {triggerOpen && (
+                <TriggerModal
+                    triggerOpen={triggerOpen}
+                    setTriggerOpen={setTriggerOpen}
+                    definitionList={definitionList}
+                    libraryUid={libraryUid}
+                    name={name}
+                    columns={columns}
+                    metaData={metaData}
+                    rowData={rowData}
+                    selValue={selValue}
+                    setSelValue={setSelValue}
+                    selPlug={() => {
+                        setPlugMarketOpen(true);
+                        setSelType('触发器');
+                    }}
+                />
+            )}
+            <Modal width="80%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
+                <Tabs
+                    items={[
+                        {
+                            label: '素材库插件',
+                            key: '0',
+                            children: (
+                                <div>
+                                    <div className="flex justify-end mb-4">
+                                        <Button onClick={() => setBindOpen(true)} type="primary">
+                                            绑定插件
+                                        </Button>
+                                    </div>
+                                    <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                        {definitionList?.map((el: any) => {
+                                            return (
+                                                <div
+                                                    onClick={() => handleOpenPlug(el)}
+                                                    className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                                    key={el.uid}
+                                                >
+                                                    <div className="flex gap-4">
+                                                        {el.avatar ? (
+                                                            <Avatar shape="square" size={64} src={el.avatar} />
+                                                        ) : (
+                                                            <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                        )}
+                                                        <div className="flex-1">
+                                                            <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                            <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                        </div>
+                                                    </div>
+                                                    <Divider className="my-2" />
+                                                    <div className="flex justify-between text-xs">
+                                                        <div className="flex">{wayList.find((item) => item.value === el.type).label}</div>
+                                                        <div className="flex">{el.creator}</div>
+                                                    </div>
+                                                    <Popconfirm
+                                                        title="提示"
+                                                        description="请再次确认是否删除？"
+                                                        onConfirm={async (e: any) => {
+                                                            e.stopPropagation();
+                                                            try {
+                                                                await delPlug(el.configUid);
+                                                                dispatch(
+                                                                    openSnackbar({
+                                                                        open: true,
+                                                                        message: '删除成功',
+                                                                        variant: 'alert',
+                                                                        alert: {
+                                                                            color: 'success'
+                                                                        },
+                                                                        close: false,
+                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                        transition: 'SlideLeft'
+                                                                    })
+                                                                );
+                                                                setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
+                                                            } catch (err) {}
+                                                        }}
+                                                        onCancel={(e) => e?.stopPropagation()}
+                                                        okText="Yes"
+                                                        cancelText="No"
+                                                    >
+                                                        <DeleteOutlined
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                            }}
+                                                            className="absolute top-2 right-2 hover:text-[#ff4d4f]"
+                                                        />
+                                                    </Popconfirm>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    {/* <div className='h-[100px] justify-center items-center'>
+                                        <Button type="primary"></Button>
+                                    </div> */}
                                 </div>
                             )
                         },
@@ -799,12 +1030,12 @@ export const TableHeader = ({
                                                 {item?.children?.map((el: any) => (
                                                     <div
                                                         onClick={() => {
-                                                            if (selType === 'plug') {
-                                                                handleOpenPlug(el);
-                                                            } else {
-                                                                setSelValue(el);
-                                                                setPlugMarketOpen(false);
-                                                            }
+                                                            // if (selType === 'plug') {
+                                                            //     handleOpenPlug(el);
+                                                            // } else {
+                                                            //     setSelValue(el);
+                                                            //     setPlugMarketOpen(false);
+                                                            // }
                                                         }}
                                                         className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
                                                         key={el.uid}
@@ -874,28 +1105,15 @@ export const TableHeader = ({
                                     ))}
                                 </div>
                             )
+                        },
+                        {
+                            label: '触发历史',
+                            key: '3',
+                            children: <Table columns={column} virtual dataSource={TableData} />
                         }
                     ]}
                 ></Tabs>
             </Modal>
-            {triggerOpen && (
-                <TriggerModal
-                    triggerOpen={triggerOpen}
-                    setTriggerOpen={setTriggerOpen}
-                    definitionList={definitionList}
-                    libraryUid={libraryUid}
-                    name={name}
-                    columns={columns}
-                    metaData={metaData}
-                    rowData={rowData}
-                    selValue={selValue}
-                    setSelValue={setSelValue}
-                    selPlug={() => {
-                        setPlugMarketOpen(true);
-                        setSelType('触发器');
-                    }}
-                />
-            )}
             <DownMaterial
                 libraryId={libraryId}
                 uploadOpen={uploadOpen}
@@ -931,6 +1149,7 @@ export const TableHeader = ({
                     open={plugConfigOpen}
                     record={plugRecord}
                     metaData={metaData}
+                    libraryUid={libraryUid}
                 />
             )}
         </div>

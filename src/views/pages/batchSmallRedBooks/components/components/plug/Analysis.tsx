@@ -1,12 +1,12 @@
-import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Form, Image } from 'antd';
-const { TextArea } = Input;
+import { Input, Select, Button, Table, message, Image, Popover, Space, Tag, Form, Avatar } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
-import { addPlugConfigInfo, updatePlugConfigInfo } from 'api/plug';
+import Editor from '@monaco-editor/react';
+import { addPlugConfigInfo, updatePlugConfigInfo, configDetail } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 import ResultLoading from '../resultLoading';
@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import { dispatch } from 'store';
 import { EditType } from 'views/materialLibrary/detail';
 import { openSnackbar } from 'store/slices/snackbar';
+import TriggerModal from './triggerModal';
 
 const value2JsonMd = (value: any) => `
 ~~~json
@@ -30,7 +31,8 @@ const PlugAnalysis = ({
     setPlugMarketOpen,
     onOpenChange,
     open,
-    record
+    record,
+    libraryUid
 }: {
     setForceUpdate: any;
     metaData: any;
@@ -41,6 +43,7 @@ const PlugAnalysis = ({
     onOpenChange: any;
     open: any;
     record: any;
+    libraryUid: string;
 }) => {
     const [form] = Form.useForm();
     const [execountLoading, setExecountLoading] = useState(false);
@@ -301,14 +304,10 @@ const PlugAnalysis = ({
     useEffect(() => {
         if (materialExecutionOpen && executionCountRef.current) {
             const newNum = grupPre.current || executionCountRef.current || 1;
-            console.log(newNum, totalCountRef.current);
-
             const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
             timeLoading.current = setInterval(() => {
-                console.log(newNum, preeNum.current, newSuccessNum);
-
                 if (preeNum.current < newSuccessNum - 1) {
-                    preeNum.current += 1;
+                    preeNum.current += (100 / ((record?.executeTimeAvg * 1.1) / 800)) | 0;
                     setPrenum(preeNum.current);
                 } else {
                     clearInterval(timeLoading.current);
@@ -340,13 +339,39 @@ const PlugAnalysis = ({
     }, [materialExecutionOpen]);
     useEffect(() => {
         if (!open || !materialExecutionOpen) {
-            console.log(1);
             preeNum.current = 0;
             setPrenum(preeNum.current);
             clearInterval(timer.current);
             clearInterval(timeLoading.current);
         }
     }, [open, materialExecutionOpen]);
+
+    const [triggerOpen, setTriggerOpen] = useState(false);
+    const [rowPre, setRowPre] = useState(0);
+    const [rowData, setRowData] = useState<any>(null);
+    useEffect(() => {
+        configDetail(record?.uid).then((result) => {
+            if (result) {
+                setRowData(result);
+            }
+        });
+    }, [rowPre]);
+
+    //form 表单校验
+    const parseInputToArray = (input: any) => {
+        try {
+            const parsed = JSON.parse(input);
+            if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
+                return parsed;
+            }
+        } catch (e) {
+            return input;
+        }
+    };
+    const isArrayString = (value: any) => {
+        return Array.isArray(value) && value.every((item) => typeof item === 'string');
+    };
+
     return (
         <ModalForm
             modalProps={{
@@ -354,18 +379,46 @@ const PlugAnalysis = ({
             }}
             title={
                 <div className=" flex flex-col">
-                    <div className="flex  items-center mb-2">
-                        <span className="text-[26px]">{record.pluginName}</span>
-                        <div className="flex justify-between items-center ml-2 ">
-                            <Space>
-                                <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
-                                <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
-                                {record?.updateTime && (
-                                    <span className="text-xs text-black/50">
-                                        更新时间: {dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')}
-                                    </span>
-                                )}
-                            </Space>
+                    <div className="flex gap-4 items-end mb-2">
+                        <div className="flex items-end">
+                            {record.avatar ? (
+                                <Avatar shape="square" size={50} src={record.avatar} />
+                            ) : (
+                                <Avatar shape="square" size={50} icon={<AppstoreFilled />} />
+                            )}
+                            <div className="flex gap-2 ml-2 flex-col">
+                                <Space align="center">
+                                    <span className="font-bold">{record.pluginName}</span>
+                                    <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
+                                    <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
+                                    <div className="text-[14px]">
+                                        定时执行（
+                                        <span
+                                            className="text-[#673ab7] hover:underline cursor-pointer"
+                                            onClick={async () => {
+                                                const result = await configDetail(record?.uid);
+                                                if (result) {
+                                                    setRowData(result);
+                                                }
+                                                setTriggerOpen(true);
+                                            }}
+                                        >
+                                            {rowData ? '开启中' : '未开启'}
+                                        </span>
+                                        ）
+                                    </div>
+                                </Space>
+                                <div className="flex gap-2">
+                                    <div className="text-xs text-[#673ab7]">
+                                        <HistoryOutlined /> 预计耗时：{((record.executeTimeAvg * 1.1) / 1000) | 0}s
+                                    </div>
+                                    {record?.updateTime && (
+                                        <span className="text-xs text-black/50">
+                                            更新时间: {dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="text-xs text-black/50 mt-1">{record.description}</div>
@@ -389,17 +442,51 @@ const PlugAnalysis = ({
                 </Popover>
             </div>
             <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
-                {redBookData.requirement?.map((item: any) => (
-                    <Form.Item
-                        initialValue={item.variableValue}
-                        key={item.uuid}
-                        label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                        name={item.variableKey}
-                        rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                ))}
+                {redBookData.requirement?.map((item: any) =>
+                    item.variableType === 'String' ? (
+                        <Form.Item
+                            initialValue={item.variableValue}
+                            key={item.uuid}
+                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                            name={item.variableType === 'String' ? item.variableKey : ''}
+                            rules={item.variableType === 'String' ? [{ required: true, message: item.variableKey + '是必填项' }] : []}
+                        >
+                            <Input />
+                        </Form.Item>
+                    ) : (
+                        <Form.Item required label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}>
+                            <div className="flex items-center relative bg-[#F4F4F6] px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                <span>json</span>
+                            </div>
+                            <Form.Item
+                                initialValue={item.variableValue || '[]'}
+                                name={item.variableKey}
+                                rules={[
+                                    { required: true, message: item.variableKey + '是必填项' },
+                                    {
+                                        validator: (_, value) => {
+                                            if (!value) {
+                                                return Promise.resolve();
+                                            }
+                                            const parsedValue = parseInputToArray(value);
+                                            if (isArrayString(parsedValue)) {
+                                                return Promise.resolve();
+                                            }
+                                            return Promise.reject(new Error('请输入正确的JSON结构'));
+                                        }
+                                    }
+                                ]}
+                            >
+                                <Editor
+                                    className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
+                                    height="200px"
+                                    defaultLanguage="json"
+                                    onChange={(value: any) => {}}
+                                />
+                            </Form.Item>
+                        </Form.Item>
+                    )
+                )}
             </Form>
             <div className="text-[16px] font-bold my-4 flex">
                 2.输出字段绑定
@@ -515,7 +602,7 @@ const PlugAnalysis = ({
                             ...item,
                             variableValue: result[item.variableKey]
                         }));
-                        if (!record.fieldMap && !record.executeParams) {
+                        if (!record.uid) {
                             const res = await addPlugConfigInfo({
                                 libraryUid: record.libraryUid,
                                 pluginUid: record.pluginUid,
@@ -556,33 +643,33 @@ const PlugAnalysis = ({
                             ...item,
                             variableValue: result[item.variableKey]
                         }));
-                        if (!record.fieldMap && !record.executeParams) {
-                            const res = await addPlugConfigInfo({
-                                libraryUid: record.libraryUid,
-                                pluginUid: record.pluginUid,
-                                fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                executeParams: JSON.stringify(newList)
-                            });
-                            if (res) {
-                                message.success('保存成功');
-                                setForceUpdate((pre: any) => pre + 1);
-                            }
-                        } else {
-                            await updatePlugConfigInfo({
-                                libraryUid: record.libraryUid,
-                                pluginUid: record.pluginUid,
-                                uid: record.uid,
-                                fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                executeParams: JSON.stringify(newList)
-                            });
-                            setForceUpdate((pre: any) => pre + 1);
-                        }
+                        await updatePlugConfigInfo({
+                            libraryUid: record.libraryUid,
+                            pluginUid: record.pluginUid,
+                            uid: record.uid,
+                            fieldMap: JSON.stringify(redBookData.bindFieldData),
+                            executeParams: JSON.stringify(newList)
+                        });
+                        setForceUpdate((pre: any) => pre + 1);
+
                         handleExecute();
                         handleAnalysis();
                     }}
                     type="primary"
                 >
                     执行
+                </Button>
+                <Button
+                    type="primary"
+                    onClick={async () => {
+                        const result = await configDetail(record?.uid);
+                        if (result) {
+                            setRowData(result);
+                        }
+                        setTriggerOpen(true);
+                    }}
+                >
+                    定时任务
                 </Button>
             </div>
             <ResultLoading
@@ -595,6 +682,7 @@ const PlugAnalysis = ({
                 errorCount={errorCount}
                 materialzanList={materialzanList}
                 errorMessage={errorMessage}
+                timeSpent={((record.executeTimeAvg * 1.1) / 1000) | 0 || 40}
                 columns={[
                     { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
                     ...imageExe(
@@ -635,6 +723,20 @@ const PlugAnalysis = ({
                     aref.current = true;
                 }}
             />
+            {triggerOpen && (
+                <TriggerModal
+                    triggerOpen={triggerOpen}
+                    setTriggerOpen={setTriggerOpen}
+                    libraryUid={record.libraryUid}
+                    foreignKey={record.uid}
+                    rowData={rowData}
+                    columns={columns}
+                    record={record}
+                    setRowPre={() => {
+                        setRowPre(rowPre + 1);
+                    }}
+                />
+            )}
         </ModalForm>
     );
 };

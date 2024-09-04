@@ -13,6 +13,7 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import UpgradeIcon from '@mui/icons-material/Upgrade';
 import ImageIcon from '@mui/icons-material/Image';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import VoicemailIcon from '@mui/icons-material/Voicemail';
 import ChatIcon from '@mui/icons-material/Chat';
 import HdOutlinedIcon from '@mui/icons-material/HdOutlined';
@@ -63,6 +64,7 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         UpgradeIcon,
         ImageIcon,
         SmartToyIcon,
+        AttachFileIcon,
         HdOutlinedIcon,
         ChatIcon,
         Groups2Icon,

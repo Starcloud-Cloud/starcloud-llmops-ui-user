@@ -1,9 +1,11 @@
 import { Modal, Progress, Tag, Table, Button } from 'antd';
+import { HistoryOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 
 const ResultLoading = ({
     materialExecutionOpen,
     setMaterialExecutionOpen,
+    timeSpent,
     materialPre,
     executionCount,
     totalCount,
@@ -20,6 +22,7 @@ const ResultLoading = ({
     materialExecutionOpen: boolean;
     setMaterialExecutionOpen: (data: boolean) => void;
     materialPre: number;
+    timeSpent?: number;
     executionCount: number;
     totalCount: number;
     successCount: number;
@@ -38,9 +41,14 @@ const ResultLoading = ({
                 <Progress percent={materialPre} type="circle" />
             </div>
             {executionCount !== 0 && (
-                <div className="flex justify-center">
-                    <div className="font-bold mt-4 loader"></div>
-                </div>
+                <>
+                    <div className="flex justify-center">
+                        <div className="font-bold mt-4 loader"></div>
+                    </div>
+                    <div className="flex justify-center gap-2 text-[14px] ">
+                        <HistoryOutlined /> 预计耗时：{timeSpent || 40}s
+                    </div>
+                </>
             )}
             <div className="my-4">
                 {errorMessage?.length > 0 &&

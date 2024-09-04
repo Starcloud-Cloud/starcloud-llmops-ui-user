@@ -1,21 +1,21 @@
-import { Modal, Form, Input, Select, Space, Button, Switch, Tree, Checkbox, message, Radio, Tag, Tabs, Table, Upload } from 'antd';
+import { Modal, Form, Input, Select, Space, Button, Switch, message, Radio, Tag, Upload, Tabs } from 'antd';
 import { EditableProTable } from '@ant-design/pro-components';
-import type { TableProps, UploadProps } from 'antd';
+import type { UploadProps } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
-import { DownOutlined, SisternodeOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
-import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugPublish, plugVerifyResult } from 'api/redBook/plug';
+import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
+import Editor from '@monaco-editor/react';
 import ChatMarkdown from 'ui-component/Markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { getAccessToken } from 'utils/auth';
 import useUserStore from 'store/user';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
-import Editor from '@monaco-editor/react';
 const AddPlug = ({
     open,
     setOpen,
@@ -184,6 +184,17 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     const [outuptKeys, setoutuptKeys] = useState<any[]>([]);
     const [inputTable, setInputTable] = useState<any[]>([]);
     const [outputTable, setOutputTable] = useState<any[]>([]);
+    const getType = (parsed: any) => {
+        try {
+            if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (e) {
+            return false;
+        }
+    };
     const getTableData = (value: any, setTable: (data: any) => void, setUuid: (data: any) => void) => {
         let outputObj: any = {};
         let newoutputObj: any = [];
@@ -201,7 +212,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 variableKey: key,
                 require: true,
                 // variableValue: outputObj[key],
-                variableType: 'String'
+                variableType: getType(outputObj[key]) ? 'Array<String>' : 'String'
             });
         }
         setUuid(newoutputObj?.map((item: any) => item.uuid));
@@ -702,6 +713,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             onClick={() => {
                                                 setStatus('success');
                                                 setVerErrmessage('');
+                                                console.log(bindData.outputType);
+
                                                 setOutputType(bindData.outputType);
                                                 form.setFieldValue('input', bindData.arguments);
                                                 form.setFieldValue('output', bindData.output);
@@ -728,6 +741,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 </div>
                             ) : (
                                 <div>
+                                    <div className="mb-2 text-xs text-black/50">请填写 coze工作流真实执行完后的出入参数</div>
                                     <Form.Item label="入参数据">
                                         <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
                                             <span>json</span>
@@ -773,7 +787,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             height="300px"
                                             defaultLanguage="json"
                                             theme={'vs-dark'}
-                                            loading={false}
                                             value={handfilData.arguments}
                                             onChange={(value: any) => {
                                                 setHandfilData({
@@ -828,7 +841,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             height="300px"
                                             defaultLanguage="json"
                                             theme={'vs-dark'}
-                                            loading={false}
                                             value={handfilData.output}
                                             onChange={(value: any) => {
                                                 setHandfilData({
@@ -880,7 +892,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 }
                                                 setStatus('success');
                                                 setVerErrmessage('');
-                                                setOutputType('success');
+                                                setOutputType(Array.isArray(output) ? 'list' : 'obj');
                                                 form.setFieldValue('input', handfilData.arguments);
                                                 form.setFieldValue('output', handfilData.output);
                                                 setBindData({
@@ -893,7 +905,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     arguments: '',
                                                     output: ''
                                                 });
-                                                setOutputType(output instanceof Array ? 'list' : 'obj');
                                                 setverifyStatus('gold');
                                                 getTableData(handfilData.arguments, setInputTable, setinputKeys);
                                                 getTableData(handfilData.output, setOutputTable, setoutuptKeys);

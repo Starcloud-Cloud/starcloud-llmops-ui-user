@@ -822,18 +822,18 @@ const Lefts = ({
             (item: any) => item.field === 'MATERIAL_USAGE_MODEL'
         ).value = data;
         const newQuery = newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
-            (item: any) => item.field === 'LIBRARY_QUERY'
+            (item: any) => item.field === 'SELECT_MATERIAL_QUERY'
         ).value;
         let queryList;
         if (newQuery) {
             queryList = JSON.parse(newQuery);
         } else {
-            queryList = [{ sliceIdList: [] }];
+            queryList = { sliceIdList: [] };
         }
 
-        queryList[0].sliceIdList = arr;
+        queryList.sliceIdList = arr;
         newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
-            (item: any) => item.field === 'LIBRARY_QUERY'
+            (item: any) => item.field === 'SELECT_MATERIAL_QUERY'
         ).value = JSON.stringify(queryList);
         appRef.current = newData;
         setAppData(appRef.current);

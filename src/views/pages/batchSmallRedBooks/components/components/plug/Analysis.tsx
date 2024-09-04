@@ -1,8 +1,7 @@
-import { Input, Select, Button, Table, message, Switch, Popover, Space, Tag, Form } from 'antd';
-const { TextArea } = Input;
+import { Input, Select, Button, Table, message, Image, Popover, Space, Tag, Form, Avatar } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { QuestionCircleOutlined, HistoryOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
@@ -358,11 +357,32 @@ const PlugAnalysis = ({
                 <div className=" flex flex-col">
                     <div className="flex gap-4 items-end mb-2">
                         <div className="flex items-end">
-                            <span className="text-[26px] leading-[30px]">{record.pluginName}</span>
+                            {record.avatar ? (
+                                <Avatar shape="square" size={50} src={record.avatar} />
+                            ) : (
+                                <Avatar shape="square" size={50} icon={<AppstoreFilled />} />
+                            )}
                             <div className="flex gap-2 ml-2 flex-col">
-                                <Space>
+                                <Space align="center">
+                                    <span className="font-bold">{record.pluginName}</span>
                                     <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
                                     <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
+                                    <div className="text-[14px]">
+                                        定时执行（
+                                        <span
+                                            className="text-[#673ab7] hover:underline cursor-pointer"
+                                            onClick={async () => {
+                                                const result = await configDetail(record?.uid);
+                                                if (result) {
+                                                    setRowData(result);
+                                                }
+                                                setTriggerOpen(true);
+                                            }}
+                                        >
+                                            {rowData ? '开启中' : '未开启'}
+                                        </span>
+                                        ）
+                                    </div>
                                 </Space>
                                 <div className="flex gap-2">
                                     <div className="text-xs text-[#673ab7]">
@@ -375,22 +395,6 @@ const PlugAnalysis = ({
                                     )}
                                 </div>
                             </div>
-                        </div>
-                        <div className="text-[14px]">
-                            定时执行（
-                            <span
-                                className="text-[#673ab7] hover:underline cursor-pointer"
-                                onClick={async () => {
-                                    const result = await configDetail(record?.uid);
-                                    if (result) {
-                                        setRowData(result);
-                                    }
-                                    setTriggerOpen(true);
-                                }}
-                            >
-                                {rowData ? '开启中' : '未开启'}
-                            </span>
-                            ）
                         </div>
                     </div>
                     <div className="text-xs text-black/50 mt-1">{record.description}</div>
@@ -615,27 +619,15 @@ const PlugAnalysis = ({
                             ...item,
                             variableValue: result[item.variableKey]
                         }));
-                        if (!record.fieldMap && !record.executeParams) {
-                            const res = await addPlugConfigInfo({
-                                libraryUid: record.libraryUid,
-                                pluginUid: record.pluginUid,
-                                fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                executeParams: JSON.stringify(newList)
-                            });
-                            if (res) {
-                                message.success('保存成功');
-                                setForceUpdate((pre: any) => pre + 1);
-                            }
-                        } else {
-                            await updatePlugConfigInfo({
-                                libraryUid: record.libraryUid,
-                                pluginUid: record.pluginUid,
-                                uid: record.uid,
-                                fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                executeParams: JSON.stringify(newList)
-                            });
-                            setForceUpdate((pre: any) => pre + 1);
-                        }
+                        await updatePlugConfigInfo({
+                            libraryUid: record.libraryUid,
+                            pluginUid: record.pluginUid,
+                            uid: record.uid,
+                            fieldMap: JSON.stringify(redBookData.bindFieldData),
+                            executeParams: JSON.stringify(newList)
+                        });
+                        setForceUpdate((pre: any) => pre + 1);
+
                         handleExecute();
                         handleAnalysis();
                     }}

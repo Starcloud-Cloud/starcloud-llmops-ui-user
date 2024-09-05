@@ -626,6 +626,9 @@ ${JSON.stringify(value, null, 2)}
                         children: (
                             <div>
                                 <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
+                                    <Form.Item required label="是否启用" name="enable" valuePropName="checked">
+                                        <Switch />
+                                    </Form.Item>
                                     <Form.Item
                                         label="触发器类型"
                                         name="timeExpressionType"
@@ -634,9 +637,6 @@ ${JSON.stringify(value, null, 2)}
                                     >
                                         <Select disabled options={timeExpressionTypeList} />
                                     </Form.Item>
-                                    <Form.Item label="是否启用" name="enable" valuePropName="checked">
-                                        <Switch />
-                                    </Form.Item>
                                     <Form.Item
                                         label="触发时间"
                                         name="timeExpression"
@@ -644,34 +644,34 @@ ${JSON.stringify(value, null, 2)}
                                     >
                                         <Cascader displayRender={(label) => label.join(' ')} options={timeExpressionList} />
                                     </Form.Item>
-                                    {/* <div className="flex justify-center">
-                                        <div className="w-[70%]"> */}
-                                    <div className="text-[16px] font-bold mb-4">
-                                        1.输入参数
-                                        <Popover
-                                            content={
-                                                <div className="w-[500px] max-h-[300px] overflow-auto">
-                                                    <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
-                                                </div>
-                                            }
-                                            title="参数示例"
-                                        >
-                                            <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                                        </Popover>
+                                    <div className="flex justify-center">
+                                        <div className="w-[70%]">
+                                            <div className="text-[16px] font-bold mb-4">
+                                                1.输入参数
+                                                <Popover
+                                                    content={
+                                                        <div className="w-[500px] max-h-[300px] overflow-auto">
+                                                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
+                                                        </div>
+                                                    }
+                                                    title="参数示例"
+                                                >
+                                                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                                                </Popover>
+                                            </div>
+                                            {redBookData.requirement?.map((item: any) => (
+                                                <Form.Item
+                                                    initialValue={item.variableValue}
+                                                    key={item.uuid}
+                                                    label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                                                    name={item.variableKey}
+                                                    rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                                                >
+                                                    <Input />
+                                                </Form.Item>
+                                            ))}
+                                        </div>
                                     </div>
-                                    {redBookData.requirement?.map((item: any) => (
-                                        <Form.Item
-                                            initialValue={item.variableValue}
-                                            key={item.uuid}
-                                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                                            name={item.variableKey}
-                                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                                        >
-                                            <Input />
-                                        </Form.Item>
-                                    ))}
-                                    {/* </div>
-                                    </div> */}
                                 </Form>
                                 <div className="flex justify-center">
                                     <div className="w-[70%]">

@@ -10,7 +10,7 @@ import {
     ExclamationCircleFilled,
     DeleteOutlined,
     AppstoreFilled,
-    MoreOutlined
+    HistoryOutlined
 } from '@ant-design/icons';
 import {
     Button,
@@ -1032,7 +1032,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             key: '0',
                             children: (
                                 <div>
-                                    {isShowField && (
+                                    {(isShowField || bizType === 'APP') && (
                                         <div className="flex justify-end mb-4">
                                             <Button onClick={() => setBindOpen(true)} type="primary">
                                                 绑定插件
@@ -1058,20 +1058,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 {el.pluginName}
                                                                 {el.jobEnable && (
                                                                     <Tooltip title="定时执行已开启">
-                                                                        <svg
-                                                                            viewBox="0 0 1024 1024"
-                                                                            fill="#673ab7"
-                                                                            version="1.1"
-                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                            p-id="7916"
-                                                                            width="20"
-                                                                            height="20"
-                                                                        >
-                                                                            <path
-                                                                                d="M509.875519 6.373444C231.797909 6.373444 6.373444 231.797909 6.373444 509.875519S231.797909 1013.377593 509.875519 1013.377593 1013.377593 787.953129 1013.377593 509.875519 787.953129 6.373444 509.875519 6.373444z m-33.524316 184.421975h80.203419v226.643917H476.351203V190.795419z m40.10171 626.424564c-163.381112 0-296.301411-132.924548-296.301411-296.305659a296.365145 296.365145 0 0 1 154.810954-260.406175l38.351137 70.439303a216.221212 216.221212 0 0 0-112.962921 189.966872c0 119.157909 96.944332 216.102241 216.102241 216.10224 119.162158 0 216.10649-96.944332 216.106489-216.10224a216.195718 216.195718 0 0 0-112.958672-189.958374l38.351137-70.443552a296.339651 296.339651 0 0 1 154.810955 260.397677c0 163.385361-132.924548 296.309909-296.309909 296.309908z"
-                                                                                p-id="7917"
-                                                                            ></path>
-                                                                        </svg>
+                                                                        <HistoryOutlined className="text-[#673ab7]" />
                                                                     </Tooltip>
                                                                 )}
                                                             </div>
@@ -1083,7 +1070,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         <div className="flex">{wayList.find((item) => item.value === el.type).label}</div>
                                                         <div className="flex">{el.creator}</div>
                                                     </div>
-                                                    {isShowField && (
+                                                    {(isShowField || bizType === 'APP') && (
                                                         <Popconfirm
                                                             title="提示"
                                                             description="请再次确认是否删除？"
@@ -1129,7 +1116,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 </div>
                             )
                         },
-                        ...(isShowField
+                        ...(isShowField || bizType === 'APP'
                             ? [
                                   {
                                       label: '我的插件',

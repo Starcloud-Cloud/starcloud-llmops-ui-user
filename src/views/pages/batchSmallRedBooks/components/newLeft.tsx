@@ -823,18 +823,20 @@ const Lefts = ({
         ).value = data;
         const newQuery = newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
             (item: any) => item.field === 'SELECT_MATERIAL_QUERY'
-        ).value;
+        )?.value;
         let queryList;
         if (newQuery) {
             queryList = JSON.parse(newQuery);
         } else {
             queryList = { sliceIdList: [] };
         }
+        if (newQuery) {
+            queryList.sliceIdList = arr;
+            newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
+                (item: any) => item.field === 'SELECT_MATERIAL_QUERY'
+            ).value = JSON.stringify(queryList);
+        }
 
-        queryList.sliceIdList = arr;
-        newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
-            (item: any) => item.field === 'SELECT_MATERIAL_QUERY'
-        ).value = JSON.stringify(queryList);
         appRef.current = newData;
         setAppData(appRef.current);
         if (!detail) {

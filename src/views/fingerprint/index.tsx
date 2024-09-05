@@ -95,7 +95,7 @@ const Fingerprint = () => {
                 </div>
                 <div id="ipAddress" style={{ fontSize: '28px', marginTop: '12px', color: '#fff' }}></div>
             </div>
-            <div className="w-[100%] justify-center">
+            <div className="flex w-[100%] justify-center mt-4">
                 <div className="w-[80%]">
                     <Descriptions bordered items={items} column={2} />
                 </div>

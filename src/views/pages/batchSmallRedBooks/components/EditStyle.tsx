@@ -1,5 +1,6 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
 import { Input, Image, Menu, Switch, Button, Divider, Tooltip } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef, useMemo, Fragment } from 'react';
 import _ from 'lodash-es';
 import { SelectTemplateModal } from './SelectTemplateModal';
@@ -181,7 +182,12 @@ const EditStyle = ({
                         </FormControl>
                     </div>
                     <div className="flex items-center gap-2 mt-[7px]">
-                        <div className="text-xs inline-block">是否复制图片</div>
+                        <div className="text-xs inline-block">
+                            是否复制图片{' '}
+                            <Tooltip title="设置分组字段后，需开启此功能，保证一组素材使用相同的模版风格">
+                                <ExclamationCircleOutlined className="cursor-pointer" />
+                            </Tooltip>
+                        </div>
                         <Switch
                             checked={imageStyleData?.isCopy}
                             onChange={(e) => {

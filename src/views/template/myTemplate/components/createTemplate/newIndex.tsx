@@ -545,6 +545,7 @@ function CreateDetail() {
     const planStateRef = useRef(0);
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
     const saveDetail = (flag?: boolean, fieldShow?: boolean, isimgStyle?: boolean) => {
+        setErrOpen(false);
         const newList = _.cloneDeep(detailRef.current);
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {

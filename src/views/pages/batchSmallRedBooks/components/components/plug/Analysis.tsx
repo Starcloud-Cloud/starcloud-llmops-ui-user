@@ -51,7 +51,7 @@ const PlugAnalysis = ({
     const [data, setData] = useState<any[]>([]);
 
     const redList = React.useMemo(() => {
-        const outputFormart = JSON.parse(record?.outputFormart) || [];
+        const outputFormart = JSON.parse(record?.outputFormart || '[]') || [];
         return (
             outputFormart?.map((item: any) => ({
                 label: item.variableKey,
@@ -63,7 +63,7 @@ const PlugAnalysis = ({
     }, [record]);
 
     useEffect(() => {
-        if (!record?.fieldMap) {
+        if (record && !record?.fieldMap) {
             let data: any[] = [];
             redList.forEach((redItem: any) => {
                 const value =
@@ -110,7 +110,7 @@ const PlugAnalysis = ({
     }, [columns, record]);
 
     useEffect(() => {
-        if (record.fieldMap) {
+        if (record?.fieldMap) {
             const fieldMap = JSON.parse(record.fieldMap || '{}');
 
             const data = redList.map((redItem: any, index: number) => {
@@ -327,12 +327,14 @@ const PlugAnalysis = ({
     const [rowPre, setRowPre] = useState(0);
     const [rowData, setRowData] = useState<any>(null);
     useEffect(() => {
-        configDetail(record?.uid).then((result) => {
-            if (result) {
-                setRowData(result);
-            }
-        });
-    }, [rowPre]);
+        if (record) {
+            configDetail(record?.uid).then((result) => {
+                if (result) {
+                    setRowData(result);
+                }
+            });
+        }
+    }, [rowPre, record]);
 
     //form 表单校验
     const parseInputToArray = (input: any) => {
@@ -358,48 +360,50 @@ const PlugAnalysis = ({
                 <div className=" flex flex-col">
                     <div className="flex gap-4 items-end mb-2">
                         <div className="flex items-end">
-                            {record.avatar ? (
+                            {record?.avatar ? (
                                 <Avatar shape="square" size={50} src={record.avatar} />
                             ) : (
                                 <Avatar shape="square" size={50} icon={<AppstoreFilled />} />
                             )}
                             <div className="flex gap-2 ml-2 flex-col">
                                 <Space align="center">
-                                    <span className="font-bold">{record.pluginName}</span>
-                                    <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
-                                    <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
+                                    <span className="font-bold">{record?.pluginName}</span>
+                                    <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record?.scene)?.label}</Tag>
+                                    <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record?.type)?.label}</Tag>
                                     <div className="text-[14px] flex items-center gap-1">
-                                        <svg
-                                            viewBox="0 0 1024 1024"
-                                            fill={rowData?.enable ? '#673ab7' : ''}
-                                            version="1.1"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            p-id="7916"
-                                            width="22"
-                                            height="22"
-                                        >
-                                            <path
-                                                d="M509.875519 6.373444C231.797909 6.373444 6.373444 231.797909 6.373444 509.875519S231.797909 1013.377593 509.875519 1013.377593 1013.377593 787.953129 1013.377593 509.875519 787.953129 6.373444 509.875519 6.373444z m-33.524316 184.421975h80.203419v226.643917H476.351203V190.795419z m40.10171 626.424564c-163.381112 0-296.301411-132.924548-296.301411-296.305659a296.365145 296.365145 0 0 1 154.810954-260.406175l38.351137 70.439303a216.221212 216.221212 0 0 0-112.962921 189.966872c0 119.157909 96.944332 216.102241 216.102241 216.10224 119.162158 0 216.10649-96.944332 216.106489-216.10224a216.195718 216.195718 0 0 0-112.958672-189.958374l38.351137-70.443552a296.339651 296.339651 0 0 1 154.810955 260.397677c0 163.385361-132.924548 296.309909-296.309909 296.309908z"
-                                                p-id="7917"
-                                            ></path>
-                                        </svg>
+                                        {rowData?.enable && (
+                                            <svg
+                                                viewBox="0 0 1024 1024"
+                                                fill={rowData?.enable ? '#673ab7' : ''}
+                                                version="1.1"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                p-id="7916"
+                                                width="22"
+                                                height="22"
+                                            >
+                                                <path
+                                                    d="M509.875519 6.373444C231.797909 6.373444 6.373444 231.797909 6.373444 509.875519S231.797909 1013.377593 509.875519 1013.377593 1013.377593 787.953129 1013.377593 509.875519 787.953129 6.373444 509.875519 6.373444z m-33.524316 184.421975h80.203419v226.643917H476.351203V190.795419z m40.10171 626.424564c-163.381112 0-296.301411-132.924548-296.301411-296.305659a296.365145 296.365145 0 0 1 154.810954-260.406175l38.351137 70.439303a216.221212 216.221212 0 0 0-112.962921 189.966872c0 119.157909 96.944332 216.102241 216.102241 216.10224 119.162158 0 216.10649-96.944332 216.106489-216.10224a216.195718 216.195718 0 0 0-112.958672-189.958374l38.351137-70.443552a296.339651 296.339651 0 0 1 154.810955 260.397677c0 163.385361-132.924548 296.309909-296.309909 296.309908z"
+                                                    p-id="7917"
+                                                ></path>
+                                            </svg>
+                                        )}
                                         定时执行
                                     </div>
                                 </Space>
                                 <div className="flex gap-2">
                                     <div className="text-xs text-[#673ab7]">
-                                        <HistoryOutlined /> 预计耗时：{((record.executeTimeAvg * 1.1) / 1000) | 0}s
+                                        <HistoryOutlined /> 预计耗时：{((record?.executeTimeAvg * 1.1) / 1000) | 0}s
                                     </div>
                                     {record?.updateTime && (
                                         <span className="text-xs text-black/50">
-                                            更新时间: {dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                            更新时间: {dayjs(record?.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                         </span>
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="text-xs text-black/50 mt-1">{record.description}</div>
+                    <div className="text-xs text-black/50 mt-1">{record?.description}</div>
                 </div>
             }
             open={open}
@@ -411,7 +415,7 @@ const PlugAnalysis = ({
                 <Popover
                     content={
                         <div className="w-[500px] max-h-[300px] overflow-auto">
-                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
+                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.input || '{}'))} />
                         </div>
                     }
                     title="参数示例"
@@ -481,7 +485,7 @@ const PlugAnalysis = ({
                                 <Popover
                                     content={
                                         <div className="w-[500px] max-h-[300px] overflow-auto">
-                                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.output))} />
+                                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.output || '{}'))} />
                                         </div>
                                     }
                                     title="参数示例"
@@ -598,7 +602,7 @@ const PlugAnalysis = ({
                             ...item,
                             variableValue: result[item.variableKey]
                         }));
-                        if (!record.uid) {
+                        if (!record?.uid) {
                             const res = await addPlugConfigInfo({
                                 libraryUid: record.libraryUid,
                                 pluginUid: record.pluginUid,
@@ -675,7 +679,7 @@ const PlugAnalysis = ({
                 errorCount={errorCount}
                 materialzanList={materialzanList}
                 errorMessage={errorMessage}
-                timeSpent={((record.executeTimeAvg * 1.1) / 1000) | 0 || 40}
+                timeSpent={((record?.executeTimeAvg * 1.1) / 1000) | 0 || 40}
                 columns={[
                     { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
                     ...columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))
@@ -716,8 +720,8 @@ const PlugAnalysis = ({
                 <TriggerModal
                     triggerOpen={triggerOpen}
                     setTriggerOpen={setTriggerOpen}
-                    libraryUid={record.libraryUid}
-                    foreignKey={record.uid}
+                    libraryUid={record?.libraryUid}
+                    foreignKey={record?.uid}
                     rowData={rowData}
                     columns={columns}
                     record={record}

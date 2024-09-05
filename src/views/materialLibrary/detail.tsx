@@ -252,10 +252,10 @@ export const TableHeader = ({
     //我的插件
     const column: TableColumnsType<any> = [
         {
-            title: '触发器时间',
-            align: 'center',
+            title: '插件名称',
+            dataIndex: 'pluginName',
             width: 200,
-            render: (_, row) => <div>{dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+            align: 'center'
         },
         {
             title: '触发器类型',
@@ -264,13 +264,19 @@ export const TableHeader = ({
             render: (_, row) => <div>{timeExpressionTypeList?.find((item) => item.value === row.triggerType)?.label}</div>
         },
         {
-            title: '执行插件名称',
-            dataIndex: 'pluginName',
-            width: 200,
-            align: 'center'
+            title: '执行状态',
+            align: 'center',
+            width: 100,
+            render: (_, row) => <Tag color={row?.success ? 'success' : 'error'}>{row?.success ? '执行成功' : '执行失败'}</Tag>
         },
         {
-            title: '触发结果',
+            title: '执行数量',
+            align: 'center',
+            width: 100,
+            dataIndex: 'count'
+        },
+        {
+            title: '执行结果',
             align: 'center',
             width: 400,
             render: (_, row) => (
@@ -280,17 +286,17 @@ export const TableHeader = ({
             )
         },
         {
-            title: '耗时(s)',
+            title: '总耗时(s)',
             dataIndex: 'executeTime',
             align: 'center',
             width: 100,
             render: (_, row) => <div>{row.executeTime / 1000}</div>
         },
         {
-            title: '状态',
+            title: '触发时间',
             align: 'center',
-            width: 100,
-            render: (_, row) => <Tag color="processing">{row?.success ? '执行成功' : '执行失败'}</Tag>
+            width: 200,
+            render: (_, row) => <div>{dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss')}</div>
         }
     ];
     const [TableData, setTableData] = useState<any[]>([]);
@@ -336,6 +342,7 @@ export const TableHeader = ({
 
     const handleOpenPlug = async (record: any) => {
         setClickRecord(record);
+        setPlugConfigOpen(record);
         const plugInfo = await getPlugInfo(record.uid);
         const data = await getPlugConfigInfo({
             libraryUid,
@@ -343,7 +350,6 @@ export const TableHeader = ({
         });
         setPlugUid(record.uid);
         setPlugType(record.scene);
-        setPlugConfigOpen(record);
         setPlugRecord({
             ...plugInfo,
             ...data,
@@ -766,7 +772,7 @@ export const TableHeader = ({
                 </ModalForm>
             )}
             <Modal
-                width="80%"
+                width="70%"
                 open={bindOpen}
                 onCancel={() => {
                     setBindData(null);
@@ -924,11 +930,13 @@ export const TableHeader = ({
                             key: '0',
                             children: (
                                 <div>
-                                    <div className="flex justify-end mb-4">
-                                        <Button onClick={() => setBindOpen(true)} type="primary">
-                                            绑定插件
-                                        </Button>
-                                    </div>
+                                    {isShowField && (
+                                        <div className="flex justify-end mb-4">
+                                            <Button onClick={() => setBindOpen(true)} type="primary">
+                                                绑定插件
+                                            </Button>
+                                        </div>
+                                    )}
                                     <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
                                         {definitionList?.map((el: any) => {
                                             return (
@@ -953,40 +961,42 @@ export const TableHeader = ({
                                                         <div className="flex">{wayList.find((item) => item.value === el.type).label}</div>
                                                         <div className="flex">{el.creator}</div>
                                                     </div>
-                                                    <Popconfirm
-                                                        title="提示"
-                                                        description="请再次确认是否删除？"
-                                                        onConfirm={async (e: any) => {
-                                                            e.stopPropagation();
-                                                            try {
-                                                                await delPlug(el.configUid);
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: '删除成功',
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'success'
-                                                                        },
-                                                                        close: false,
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                        transition: 'SlideLeft'
-                                                                    })
-                                                                );
-                                                                setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
-                                                            } catch (err) {}
-                                                        }}
-                                                        onCancel={(e) => e?.stopPropagation()}
-                                                        okText="Yes"
-                                                        cancelText="No"
-                                                    >
-                                                        <DeleteOutlined
-                                                            onClick={(e) => {
+                                                    {isShowField && (
+                                                        <Popconfirm
+                                                            title="提示"
+                                                            description="请再次确认是否删除？"
+                                                            onConfirm={async (e: any) => {
                                                                 e.stopPropagation();
+                                                                try {
+                                                                    await delPlug(el.configUid);
+                                                                    dispatch(
+                                                                        openSnackbar({
+                                                                            open: true,
+                                                                            message: '删除成功',
+                                                                            variant: 'alert',
+                                                                            alert: {
+                                                                                color: 'success'
+                                                                            },
+                                                                            close: false,
+                                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                            transition: 'SlideDown'
+                                                                        })
+                                                                    );
+                                                                    setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
+                                                                } catch (err) {}
                                                             }}
-                                                            className="absolute top-2 right-2 hover:text-[#ff4d4f]"
-                                                        />
-                                                    </Popconfirm>
+                                                            onCancel={(e) => e?.stopPropagation()}
+                                                            okText="Yes"
+                                                            cancelText="No"
+                                                        >
+                                                            <DeleteOutlined
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                }}
+                                                                className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
+                                                            />
+                                                        </Popconfirm>
+                                                    )}
                                                 </div>
                                             );
                                         })}
@@ -997,122 +1007,123 @@ export const TableHeader = ({
                                 </div>
                             )
                         },
-                        {
-                            label: '我的插件',
-                            key: '2',
-                            children: (
-                                <div>
-                                    {selType === 'plug' && (
-                                        <div className="flex justify-end mb-4">
-                                            <div className="flex gap-2 items-end">
-                                                <div
-                                                    onClick={() =>
-                                                        window.open(
-                                                            'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
-                                                        )
-                                                    }
-                                                    className="text-[#673ab7] hover:underline cursor-pointer text-xs"
-                                                >
-                                                    插件使用手册
-                                                </div>
-                                                <Button onClick={() => setAddOpen(true)} type="primary">
-                                                    创建插件
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {plugTableData?.map((item) => (
-                                        <div key={item.uid}>
-                                            <div className="my-4 text-[16px] font-bold">
-                                                {sceneList?.find((i) => i.value === item.scene)?.label}
-                                            </div>
-                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
-                                                {item?.children?.map((el: any) => (
-                                                    <div
-                                                        onClick={() => {
-                                                            // if (selType === 'plug') {
-                                                            //     handleOpenPlug(el);
-                                                            // } else {
-                                                            //     setSelValue(el);
-                                                            //     setPlugMarketOpen(false);
-                                                            // }
-                                                        }}
-                                                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
-                                                        key={el.uid}
-                                                    >
-                                                        <div className="flex gap-4">
-                                                            {el.avatar ? (
-                                                                <Avatar shape="square" size={64} src={el.avatar} />
-                                                            ) : (
-                                                                <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
-                                                            )}
-                                                            <div className="flex-1">
-                                                                <div className="text-[18px] font-bold">{el.pluginName}</div>
-                                                                <div className="line-clamp-3 h-[66px]">{el.description}</div>
-                                                            </div>
-                                                        </div>
-                                                        <Divider className="my-2" />
-                                                        <div className="flex justify-between text-xs">
-                                                            <Tooltip title="更新时间">
-                                                                <div className="flex">
-                                                                    {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
-                                                                </div>
-                                                            </Tooltip>
-                                                            <div className="flex">{el.creator}</div>
-                                                        </div>
-                                                        <Dropdown
-                                                            placement="bottom"
-                                                            menu={{
-                                                                items: [
-                                                                    {
-                                                                        key: '1',
-                                                                        label: '编辑',
-                                                                        onClick: (event) => event.domEvent.stopPropagation()
-                                                                    },
-                                                                    {
-                                                                        key: '2',
-                                                                        danger: true,
-                                                                        label: ' 删除',
-                                                                        onClick: (event) => event.domEvent.stopPropagation()
-                                                                    }
-                                                                ],
-                                                                onClick: async (e) => {
-                                                                    console.log(e);
+                        ...(isShowField
+                            ? [
+                                  {
+                                      label: '我的插件',
+                                      key: '2',
+                                      children: (
+                                          <div>
+                                              {selType === 'plug' && (
+                                                  <div className="flex justify-end mb-4">
+                                                      <div className="flex gap-2 items-end">
+                                                          <div
+                                                              onClick={() =>
+                                                                  window.open(
+                                                                      'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
+                                                                  )
+                                                              }
+                                                              className="text-[#673ab7] hover:underline cursor-pointer text-xs"
+                                                          >
+                                                              插件使用手册
+                                                          </div>
+                                                          <Button onClick={() => setAddOpen(true)} type="primary">
+                                                              创建插件
+                                                          </Button>
+                                                      </div>
+                                                  </div>
+                                              )}
+                                              {plugTableData?.map((item) => (
+                                                  <div key={item.uid}>
+                                                      <div className="my-4 text-[16px] font-bold">
+                                                          {sceneList?.find((i) => i.value === item.scene)?.label}
+                                                      </div>
+                                                      <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                                          {item?.children?.map((el: any) => (
+                                                              <div
+                                                                  onClick={async () => {
+                                                                      const res = await detailPlug(el.uid);
+                                                                      setRows(res);
+                                                                      setAddOpen(true);
+                                                                  }}
+                                                                  className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                                                  key={el.uid}
+                                                              >
+                                                                  <div className="flex gap-4">
+                                                                      {el.avatar ? (
+                                                                          <Avatar shape="square" size={64} src={el.avatar} />
+                                                                      ) : (
+                                                                          <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                                      )}
+                                                                      <div className="flex-1">
+                                                                          <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                          <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                                      </div>
+                                                                  </div>
+                                                                  <Divider className="my-2" />
+                                                                  <div className="flex justify-between text-xs">
+                                                                      <Tooltip title="更新时间">
+                                                                          <div className="flex">
+                                                                              {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                                          </div>
+                                                                      </Tooltip>
+                                                                      <div className="flex">{el.creator}</div>
+                                                                  </div>
+                                                                  <Dropdown
+                                                                      placement="bottom"
+                                                                      menu={{
+                                                                          items: [
+                                                                              //   {
+                                                                              //       key: '1',
+                                                                              //       label: '编辑',
+                                                                              //       onClick: (event) => event.domEvent.stopPropagation()
+                                                                              //   },
+                                                                              {
+                                                                                  key: '2',
+                                                                                  danger: true,
+                                                                                  label: ' 删除',
+                                                                                  onClick: (event) => event.domEvent.stopPropagation()
+                                                                              }
+                                                                          ],
+                                                                          onClick: async (e) => {
+                                                                              console.log(e);
 
-                                                                    if (e.key === '1') {
-                                                                        const res = await detailPlug(el.uid);
-                                                                        setRows(res);
-                                                                        setAddOpen(true);
-                                                                    } else {
-                                                                        await delOwner(el.uid);
-                                                                        getTablePlugList();
-                                                                        getPlugList();
-                                                                    }
-                                                                    e.domEvent.stopPropagation();
-                                                                }
-                                                            }}
-                                                        >
-                                                            <MoreOutlined
-                                                                color="#673ab7"
-                                                                onClick={(e) => e.stopPropagation()}
-                                                                className="absolute top-2 right-2"
-                                                            />
-                                                        </Dropdown>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )
-                        },
+                                                                              //   if (e.key === '1') {
+                                                                              //       const res = await detailPlug(el.uid);
+                                                                              //       setRows(res);
+                                                                              //       setAddOpen(true);
+                                                                              //   } else {
+                                                                              await delOwner(el.uid);
+                                                                              getTablePlugList();
+                                                                              getPlugList();
+                                                                              //   }
+                                                                              e.domEvent.stopPropagation();
+                                                                          }
+                                                                      }}
+                                                                  >
+                                                                      <MoreOutlined
+                                                                          color="#673ab7"
+                                                                          onClick={(e) => e.stopPropagation()}
+                                                                          className="absolute top-2 right-2"
+                                                                      />
+                                                                  </Dropdown>
+                                                              </div>
+                                                          ))}
+                                                      </div>
+                                                  </div>
+                                              ))}
+                                          </div>
+                                      )
+                                  }
+                              ]
+                            : []),
                         {
                             label: '触发历史',
                             key: '3',
                             children: <Table columns={column} virtual dataSource={TableData} />
                         }
                     ]}
-                ></Tabs>
+                />
             </Modal>
             <DownMaterial
                 libraryId={libraryId}

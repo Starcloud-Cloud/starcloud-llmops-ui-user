@@ -306,8 +306,9 @@ const PlugAnalysis = ({
             const newNum = grupPre.current || executionCountRef.current || 1;
             const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
             timeLoading.current = setInterval(() => {
+                console.log(preeNum.current, newSuccessNum, record?.executeTimeAvg);
                 if (preeNum.current < newSuccessNum - 1) {
-                    preeNum.current += (100 / ((record?.executeTimeAvg * 1.1) / 800)) | 0;
+                    preeNum.current += (100 / ((record?.executeTimeAvg * 1.1) / 800)) | 0 || 1;
                     setPrenum(preeNum.current);
                 } else {
                     clearInterval(timeLoading.current);

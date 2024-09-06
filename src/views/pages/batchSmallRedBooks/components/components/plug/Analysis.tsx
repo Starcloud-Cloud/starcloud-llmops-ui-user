@@ -167,7 +167,7 @@ const PlugAnalysis = ({
     const preeNum = useRef(0);
     const [prenum, setPrenum] = useState(0);
     const materialPre = useMemo(() => {
-        return ((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current;
+        return (((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current) | 1;
     }, [successCount, totalCount, prenum]);
 
     const materialzanListRef = useRef<any[]>([]);
@@ -309,7 +309,7 @@ const PlugAnalysis = ({
             timeLoading.current = setInterval(() => {
                 console.log(preeNum.current, newSuccessNum, record?.executeTimeAvg);
                 if (preeNum.current < newSuccessNum - 1) {
-                    preeNum.current += (100 / ((record?.executeTimeAvg * 1.1) / 800)) | 0 || 1;
+                    preeNum.current += 100 / ((record?.executeTimeAvg * 1.1) / 800);
                     setPrenum(preeNum.current);
                 } else {
                     clearInterval(timeLoading.current);

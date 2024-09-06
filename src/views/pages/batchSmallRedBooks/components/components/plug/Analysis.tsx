@@ -166,7 +166,7 @@ const PlugAnalysis = ({
     const preeNum = useRef(0);
     const [prenum, setPrenum] = useState(0);
     const materialPre = useMemo(() => {
-        return ((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current;
+        return (((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current) | 0;
     }, [successCount, totalCount, prenum]);
 
     const materialzanListRef = useRef<any[]>([]);
@@ -280,7 +280,7 @@ const PlugAnalysis = ({
     const grupPre = useRef(0);
     useEffect(() => {
         if (materialExecutionOpen && executionCountRef.current) {
-            const newNum = grupPre.current || executionCountRef.current || 1;
+            const newNum = grupPre.current || executionCountRef.current;
             const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
             timeLoading.current = setInterval(() => {
                 if (preeNum.current < newSuccessNum - 1) {

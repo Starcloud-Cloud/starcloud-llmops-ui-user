@@ -23,6 +23,8 @@ import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 import { appPage } from 'api/template';
 import jsCookie from 'js-cookie';
 import { ENUM_TENANT, getTenant } from 'utils/permission';
+import { ConfigProvider, Row, Col } from 'antd';
+import './index.scss';
 interface MarketList {
     name: string;
     tags: string[];
@@ -379,6 +381,7 @@ function TemplateMarket() {
 
     return (
         <Box
+            className="Rows"
             height={jsCookie.get('isClient') ? '100vh' : '100%'}
             overflow="hidden"
             ref={scrollRef}
@@ -447,6 +450,7 @@ function TemplateMarket() {
                                     </div>
                                     {myAppList.map((el: any, index: number) => (
                                         <MarketTemplate
+                                            type="APP"
                                             key={el?.uid}
                                             handleDetail={({ uid }: { uid: string }) => {
                                                 navigate('/createApp?uid=' + uid + '&source=market');
@@ -488,7 +492,7 @@ function TemplateMarket() {
                                 {newList
                                     ?.find((item) => item.code === 'HOT')
                                     ?.appList.map((el: any, index: number) => (
-                                        <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
+                                        <MarketTemplate type="APP" like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
                                     ))}
                             </div>
                         </Tabs.TabPane>
@@ -503,7 +507,7 @@ function TemplateMarket() {
                                 className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
                             >
                                 {collectList.map((el: any, index: number) => (
-                                    <MarketTemplate key={el?.uid} handleDetail={handleDetail} data={el} />
+                                    <MarketTemplate type="APP" key={el?.uid} handleDetail={handleDetail} data={el} />
                                 ))}
                             </div>
                             {collectList.length > 0 && (
@@ -558,19 +562,25 @@ function TemplateMarket() {
                         </>
                     )}
                     {item.appList.length > 0 && item?.code !== 'HOT' && (
-                        <div
-                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                            style={{
-                                height: queryParams.category === 'ALL' ? '190px' : 'auto',
-                                overflowX: 'visible',
-                                overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible',
-                                paddingBottom: queryParams.category === 'ALL' ? '0px' : '10px'
-                            }}
-                        >
+                        <Row className="overflow-x-hidden pb-[5px] " gutter={[16, 16]} wrap={false}>
                             {item.appList.map((el: any, index: number) => (
-                                <MarketTemplate like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
+                                <Col key={el?.uid} className="xxxl-col aspect-[.75] flex-shrink-0">
+                                    <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
+                                </Col>
                             ))}
-                        </div>
+                        </Row>
+                        // <div
+                        //     className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
+                        //     style={{
+                        //         // height: queryParams.category === 'ALL' ? '190px' : 'auto',
+                        //         overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible',
+                        //         paddingBottom: queryParams.category === 'ALL' ? '0px' : '10px'
+                        //     }}
+                        // >
+                        //     {item.appList.map((el: any, index: number) => (
+                        //         <MarketTemplate like="market" type="MARKET" key={el?.uid} handleDetail={handleDetail} data={el} />
+                        //     ))}
+                        // </div>
                     )}
                 </div>
             ))}

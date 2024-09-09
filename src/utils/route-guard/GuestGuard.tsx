@@ -6,6 +6,7 @@ import { DASHBOARD_PATH } from 'config';
 import { getPermission, ENUM_PERMISSION } from 'utils/permission';
 import { GuardProps } from 'types';
 import { useEffect } from 'react';
+import jsCookie from 'js-cookie';
 
 // ==============================|| GUEST GUARD ||============================== //
 
@@ -20,7 +21,9 @@ const GuestGuard = ({ children }: GuardProps) => {
 
     useEffect(() => {
         if (isLoggedIn) {
-            navigate(DASHBOARD_PATH, { replace: true });
+            if (!jsCookie.get('isClient')) {
+                navigate(DASHBOARD_PATH, { replace: true });
+            }
         }
     }, [isLoggedIn, navigate]);
 

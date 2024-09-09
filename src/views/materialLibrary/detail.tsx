@@ -1032,13 +1032,13 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             key: '0',
                             children: (
                                 <div>
-                                    {(isShowField || bizType === 'APP') && (
-                                        <div className="flex justify-end mb-4">
-                                            <Button onClick={() => setBindOpen(true)} type="primary">
-                                                绑定插件
-                                            </Button>
-                                        </div>
-                                    )}
+                                    {/* {(isShowField || bizType === 'APP') && ( */}
+                                    <div className="flex justify-end mb-4">
+                                        <Button onClick={() => setBindOpen(true)} type="primary">
+                                            绑定插件
+                                        </Button>
+                                    </div>
+                                    {/* // )} */}
                                     <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
                                         {definitionList?.map((el: any) => {
                                             return (
@@ -1070,29 +1070,123 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         <div className="flex">{wayList.find((item) => item.value === el.type).label}</div>
                                                         <div className="flex">{el.creator}</div>
                                                     </div>
-                                                    {(isShowField || bizType === 'APP') && (
+                                                    {/* {(isShowField || bizType === 'APP') && ( */}
+                                                    <Popconfirm
+                                                        title="提示"
+                                                        description="请再次确认是否删除？"
+                                                        onConfirm={async (e: any) => {
+                                                            e.stopPropagation();
+                                                            try {
+                                                                await delPlug(el.configUid);
+                                                                dispatch(
+                                                                    openSnackbar({
+                                                                        open: true,
+                                                                        message: '删除成功',
+                                                                        variant: 'alert',
+                                                                        alert: {
+                                                                            color: 'success'
+                                                                        },
+                                                                        close: false,
+                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                        transition: 'SlideDown'
+                                                                    })
+                                                                );
+                                                                setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
+                                                            } catch (err) {}
+                                                        }}
+                                                        onCancel={(e) => e?.stopPropagation()}
+                                                        okText="Yes"
+                                                        cancelText="No"
+                                                    >
+                                                        <DeleteOutlined
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                            }}
+                                                            className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
+                                                        />
+                                                    </Popconfirm>
+                                                    {/* // )} */}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    {/* <div className='h-[100px] justify-center items-center'>
+                                        <Button type="primary"></Button>
+                                    </div> */}
+                                </div>
+                            )
+                        },
+                        // ...(isShowField || bizType === 'APP'
+                        // ?
+                        //  [
+                        {
+                            label: '我的插件',
+                            key: '2',
+                            children: (
+                                <div>
+                                    {selType === 'plug' && (
+                                        <div className="flex justify-end mb-4">
+                                            <div className="flex gap-2 items-end">
+                                                <div
+                                                    onClick={() =>
+                                                        window.open(
+                                                            'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
+                                                        )
+                                                    }
+                                                    className="text-[#673ab7] hover:underline cursor-pointer text-xs"
+                                                >
+                                                    插件使用手册
+                                                </div>
+                                                <Button onClick={() => setAddOpen(true)} type="primary">
+                                                    创建插件
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {plugTableData?.map((item) => (
+                                        <div key={item.uid}>
+                                            <div className="my-4 text-[16px] font-bold">
+                                                {sceneList?.find((i) => i.value === item.scene)?.label}
+                                            </div>
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                                {item?.children?.map((el: any) => (
+                                                    <div
+                                                        onClick={async () => {
+                                                            const res = await detailPlug(el.uid);
+                                                            setRows(res);
+                                                            setAddOpen(true);
+                                                        }}
+                                                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                                        key={el.uid}
+                                                    >
+                                                        <div className="flex gap-4">
+                                                            {el.avatar ? (
+                                                                <Avatar shape="square" size={64} src={el.avatar} />
+                                                            ) : (
+                                                                <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                            )}
+                                                            <div className="flex-1">
+                                                                <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                            </div>
+                                                        </div>
+                                                        <Divider className="my-2" />
+                                                        <div className="flex justify-between text-xs">
+                                                            <Tooltip title="更新时间">
+                                                                <div className="flex">
+                                                                    {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                                </div>
+                                                            </Tooltip>
+                                                            <div className="flex">{el.creator}</div>
+                                                        </div>
                                                         <Popconfirm
                                                             title="提示"
                                                             description="请再次确认是否删除？"
                                                             onConfirm={async (e: any) => {
                                                                 e.stopPropagation();
-                                                                try {
-                                                                    await delPlug(el.configUid);
-                                                                    dispatch(
-                                                                        openSnackbar({
-                                                                            open: true,
-                                                                            message: '删除成功',
-                                                                            variant: 'alert',
-                                                                            alert: {
-                                                                                color: 'success'
-                                                                            },
-                                                                            close: false,
-                                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                            transition: 'SlideDown'
-                                                                        })
-                                                                    );
-                                                                    setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
-                                                                } catch (err) {}
+                                                                await delOwner(el.uid);
+                                                                getTablePlugList();
+                                                                getPlugList();
                                                             }}
                                                             onCancel={(e) => e?.stopPropagation()}
                                                             okText="Yes"
@@ -1105,109 +1199,16 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
                                                             />
                                                         </Popconfirm>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                    {/* <div className='h-[100px] justify-center items-center'>
-                                        <Button type="primary"></Button>
-                                    </div> */}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )
                         },
-                        ...(isShowField || bizType === 'APP'
-                            ? [
-                                  {
-                                      label: '我的插件',
-                                      key: '2',
-                                      children: (
-                                          <div>
-                                              {selType === 'plug' && (
-                                                  <div className="flex justify-end mb-4">
-                                                      <div className="flex gap-2 items-end">
-                                                          <div
-                                                              onClick={() =>
-                                                                  window.open(
-                                                                      'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
-                                                                  )
-                                                              }
-                                                              className="text-[#673ab7] hover:underline cursor-pointer text-xs"
-                                                          >
-                                                              插件使用手册
-                                                          </div>
-                                                          <Button onClick={() => setAddOpen(true)} type="primary">
-                                                              创建插件
-                                                          </Button>
-                                                      </div>
-                                                  </div>
-                                              )}
-                                              {plugTableData?.map((item) => (
-                                                  <div key={item.uid}>
-                                                      <div className="my-4 text-[16px] font-bold">
-                                                          {sceneList?.find((i) => i.value === item.scene)?.label}
-                                                      </div>
-                                                      <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
-                                                          {item?.children?.map((el: any) => (
-                                                              <div
-                                                                  onClick={async () => {
-                                                                      const res = await detailPlug(el.uid);
-                                                                      setRows(res);
-                                                                      setAddOpen(true);
-                                                                  }}
-                                                                  className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
-                                                                  key={el.uid}
-                                                              >
-                                                                  <div className="flex gap-4">
-                                                                      {el.avatar ? (
-                                                                          <Avatar shape="square" size={64} src={el.avatar} />
-                                                                      ) : (
-                                                                          <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
-                                                                      )}
-                                                                      <div className="flex-1">
-                                                                          <div className="text-[18px] font-bold">{el.pluginName}</div>
-                                                                          <div className="line-clamp-3 h-[66px]">{el.description}</div>
-                                                                      </div>
-                                                                  </div>
-                                                                  <Divider className="my-2" />
-                                                                  <div className="flex justify-between text-xs">
-                                                                      <Tooltip title="更新时间">
-                                                                          <div className="flex">
-                                                                              {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
-                                                                          </div>
-                                                                      </Tooltip>
-                                                                      <div className="flex">{el.creator}</div>
-                                                                  </div>
-                                                                  <Popconfirm
-                                                                      title="提示"
-                                                                      description="请再次确认是否删除？"
-                                                                      onConfirm={async (e: any) => {
-                                                                          e.stopPropagation();
-                                                                          await delOwner(el.uid);
-                                                                          getTablePlugList();
-                                                                          getPlugList();
-                                                                      }}
-                                                                      onCancel={(e) => e?.stopPropagation()}
-                                                                      okText="Yes"
-                                                                      cancelText="No"
-                                                                  >
-                                                                      <DeleteOutlined
-                                                                          onClick={(e) => {
-                                                                              e.stopPropagation();
-                                                                          }}
-                                                                          className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
-                                                                      />
-                                                                  </Popconfirm>
-                                                              </div>
-                                                          ))}
-                                                      </div>
-                                                  </div>
-                                              ))}
-                                          </div>
-                                      )
-                                  }
-                              ]
-                            : []),
+                        //   ]
+                        // : [])
                         {
                             label: '触发历史',
                             key: '3',

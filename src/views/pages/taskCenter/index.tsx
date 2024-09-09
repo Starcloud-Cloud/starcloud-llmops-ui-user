@@ -504,7 +504,7 @@ const TaskCenter: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <div className="text-center w-[150px]">
+                                        <div className="text-left w-[150px]">
                                             <div>
                                                 待领取数：
                                                 {row.stayClaimCount}

@@ -1,4 +1,4 @@
-import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip, Table, Tag, Popover, Switch } from 'antd';
+import { Modal, Tabs, Form, Input, Select, Cascader, Button, Collapse, Table, Tag, Popover, Switch } from 'antd';
 import { AppstoreFilled, DeleteOutlined, RetweetOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
@@ -644,151 +644,169 @@ ${JSON.stringify(value, null, 2)}
                                     >
                                         <Cascader displayRender={(label) => label.join(' ')} options={timeExpressionList} />
                                     </Form.Item>
-                                    <div className="flex justify-center">
-                                        <div className="w-[70%]">
-                                            <div className="text-[16px] font-bold mb-4">
-                                                1.输入参数
-                                                <Popover
-                                                    content={
-                                                        <div className="w-[500px] max-h-[300px] overflow-auto">
-                                                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
-                                                        </div>
-                                                    }
-                                                    title="参数示例"
-                                                >
-                                                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                                                </Popover>
-                                            </div>
-                                            {redBookData.requirement?.map((item: any) => (
-                                                <Form.Item
-                                                    initialValue={item.variableValue}
-                                                    key={item.uuid}
-                                                    label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                                                    name={item.variableKey}
-                                                    rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                                                >
-                                                    <Input />
-                                                </Form.Item>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </Form>
-                                <div className="flex justify-center">
-                                    <div className="w-[70%]">
-                                        <div className="text-[16px] font-bold my-4 flex">
-                                            2.输出字段绑定
-                                            <Popover
-                                                content={
-                                                    <div className="w-[500px] max-h-[300px] overflow-auto">
-                                                        <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.output))} />
-                                                    </div>
-                                                }
-                                                title="参数示例"
-                                            >
-                                                <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                                            </Popover>
-                                        </div>
-                                        <Table
-                                            pagination={false}
-                                            bordered
-                                            size="small"
-                                            columns={[
-                                                {
-                                                    title: '字段',
-                                                    dataIndex: 'des',
-                                                    align: 'center',
-                                                    width: '40%',
-                                                    render: (_, record) => record.des || record.label
-                                                },
-                                                {
-                                                    title: '绑定到',
-                                                    align: 'center',
-                                                    width: '20%',
-                                                    render: () => (
-                                                        <svg
-                                                            viewBox="0 0 1024 1024"
-                                                            version="1.1"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            p-id="7263"
-                                                            width="20"
-                                                            height="20"
-                                                        >
-                                                            <path
-                                                                d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
-                                                                fill="#8a8a8a"
-                                                                p-id="7264"
-                                                            ></path>
-                                                        </svg>
-                                                    )
-                                                },
-                                                {
-                                                    title: '素材字段',
-                                                    dataIndex: 'value',
-                                                    align: 'center',
-                                                    width: '40%',
-                                                    render: (_, record) => {
-                                                        return (
-                                                            data.length > 0 && (
-                                                                <Select
-                                                                    style={{ width: 160 }}
-                                                                    allowClear
-                                                                    value={record.value}
-                                                                    onChange={(value) => {
-                                                                        let fieldList = redBookData.fieldList || [];
-                                                                        console.log(fieldList);
-
-                                                                        let bindFieldData = redBookData.bindFieldData;
-                                                                        if (value) {
-                                                                            fieldList = [...fieldList, record.label_key];
-                                                                            bindFieldData[record.label_key] = value;
-                                                                        } else {
-                                                                            fieldList = fieldList.filter(
-                                                                                (item: any) => item !== record.label_key
-                                                                            );
-                                                                            delete bindFieldData[record.label_key];
-                                                                        }
-
-                                                                        const copyData = [...data];
-                                                                        const index = copyData.findIndex(
-                                                                            (item) => item.label_key === record.label_key
-                                                                        );
-                                                                        copyData[index].value = value;
-                                                                        setData(copyData);
-
-                                                                        setRedBookData((pre: any) => {
-                                                                            return {
-                                                                                ...pre,
-                                                                                fieldList,
-                                                                                bindFieldData
-                                                                            };
-                                                                        });
-                                                                    }}
+                                    <Collapse
+                                        defaultActiveKey={['1']}
+                                        items={[
+                                            {
+                                                key: '1',
+                                                label: '参数设置',
+                                                children: (
+                                                    <div className="flex justify-center">
+                                                        <div className="w-[70%]">
+                                                            <div className="text-[16px] font-bold mb-4">
+                                                                1.输入参数
+                                                                <Popover
+                                                                    content={
+                                                                        <div className="w-[500px] max-h-[300px] overflow-auto">
+                                                                            <ChatMarkdown
+                                                                                textContent={value2JsonMd(JSON.parse(record.input))}
+                                                                            />
+                                                                        </div>
+                                                                    }
+                                                                    title="参数示例"
                                                                 >
-                                                                    {columns
-                                                                        .filter((item) => !item.isDefault)
-                                                                        ?.map((item) => {
+                                                                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                                                                </Popover>
+                                                            </div>
+                                                            {redBookData.requirement?.map((item: any) => (
+                                                                <Form.Item
+                                                                    initialValue={item.variableValue}
+                                                                    key={item.uuid}
+                                                                    label={
+                                                                        item.variableKey +
+                                                                        (item.variableDesc ? `(${item.variableDesc})` : '')
+                                                                    }
+                                                                    name={item.variableKey}
+                                                                    rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                                                                >
+                                                                    <Input />
+                                                                </Form.Item>
+                                                            ))}
+                                                            <div className="text-[16px] font-bold my-4 flex">
+                                                                2.输出字段绑定
+                                                                <Popover
+                                                                    content={
+                                                                        <div className="w-[500px] max-h-[300px] overflow-auto">
+                                                                            <ChatMarkdown
+                                                                                textContent={value2JsonMd(JSON.parse(record.output))}
+                                                                            />
+                                                                        </div>
+                                                                    }
+                                                                    title="参数示例"
+                                                                >
+                                                                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                                                                </Popover>
+                                                            </div>
+                                                            <Table
+                                                                pagination={false}
+                                                                bordered
+                                                                size="small"
+                                                                columns={[
+                                                                    {
+                                                                        title: '字段',
+                                                                        dataIndex: 'des',
+                                                                        align: 'center',
+                                                                        width: '40%',
+                                                                        render: (_, record) => record.des || record.label
+                                                                    },
+                                                                    {
+                                                                        title: '绑定到',
+                                                                        align: 'center',
+                                                                        width: '20%',
+                                                                        render: () => (
+                                                                            <svg
+                                                                                viewBox="0 0 1024 1024"
+                                                                                version="1.1"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                p-id="7263"
+                                                                                width="20"
+                                                                                height="20"
+                                                                            >
+                                                                                <path
+                                                                                    d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
+                                                                                    fill="#8a8a8a"
+                                                                                    p-id="7264"
+                                                                                ></path>
+                                                                            </svg>
+                                                                        )
+                                                                    },
+                                                                    {
+                                                                        title: '素材字段',
+                                                                        dataIndex: 'value',
+                                                                        align: 'center',
+                                                                        width: '40%',
+                                                                        render: (_, record) => {
                                                                             return (
-                                                                                <Option
-                                                                                    key={item.dataIndex}
-                                                                                    value={item.dataIndex}
-                                                                                    disabled={Object.values(
-                                                                                        redBookData.bindFieldData || {}
-                                                                                    ).includes(item.dataIndex)}
-                                                                                >
-                                                                                    {item.title}
-                                                                                </Option>
+                                                                                data.length > 0 && (
+                                                                                    <Select
+                                                                                        style={{ width: 160 }}
+                                                                                        allowClear
+                                                                                        value={record.value}
+                                                                                        onChange={(value) => {
+                                                                                            let fieldList = redBookData.fieldList || [];
+                                                                                            console.log(fieldList);
+
+                                                                                            let bindFieldData = redBookData.bindFieldData;
+                                                                                            if (value) {
+                                                                                                fieldList = [
+                                                                                                    ...fieldList,
+                                                                                                    record.label_key
+                                                                                                ];
+                                                                                                bindFieldData[record.label_key] = value;
+                                                                                            } else {
+                                                                                                fieldList = fieldList.filter(
+                                                                                                    (item: any) => item !== record.label_key
+                                                                                                );
+                                                                                                delete bindFieldData[record.label_key];
+                                                                                            }
+
+                                                                                            const copyData = [...data];
+                                                                                            const index = copyData.findIndex(
+                                                                                                (item) =>
+                                                                                                    item.label_key === record.label_key
+                                                                                            );
+                                                                                            copyData[index].value = value;
+                                                                                            setData(copyData);
+
+                                                                                            setRedBookData((pre: any) => {
+                                                                                                return {
+                                                                                                    ...pre,
+                                                                                                    fieldList,
+                                                                                                    bindFieldData
+                                                                                                };
+                                                                                            });
+                                                                                        }}
+                                                                                    >
+                                                                                        {columns
+                                                                                            .filter((item) => !item.isDefault)
+                                                                                            ?.map((item) => {
+                                                                                                return (
+                                                                                                    <Option
+                                                                                                        key={item.dataIndex}
+                                                                                                        value={item.dataIndex}
+                                                                                                        disabled={Object.values(
+                                                                                                            redBookData.bindFieldData || {}
+                                                                                                        ).includes(item.dataIndex)}
+                                                                                                    >
+                                                                                                        {item.title}
+                                                                                                    </Option>
+                                                                                                );
+                                                                                            })}
+                                                                                    </Select>
+                                                                                )
                                                                             );
-                                                                        })}
-                                                                </Select>
-                                                            )
-                                                        );
-                                                    }
-                                                }
-                                            ]}
-                                            dataSource={data}
-                                        />
-                                    </div>
-                                </div>
+                                                                        }
+                                                                    }
+                                                                ]}
+                                                                dataSource={data}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                        ]}
+                                    />
+                                </Form>
                                 <div className="flex mt-4 justify-center">
                                     <Button onClick={handleSave} className="w-[100px]" type="primary">
                                         保存

@@ -213,10 +213,7 @@ const AddModal = () => {
                         >
                             <KeyboardBackspace fontSize="small" />
                         </IconButton>
-                        <span className="text-[#000c] font-[500]">通告中心</span>&nbsp;
-                        <span className="text-[#673ab7] font-[500]">
-                            - {searchParams.get('notificationUid') ? '编辑通告中心' : '新建通告中心'}
-                        </span>
+                        <span className="text-[#000c] font-[500]">通告中心</span>
                     </div>
                     <div></div>
                 </SubCard>

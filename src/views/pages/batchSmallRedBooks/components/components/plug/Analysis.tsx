@@ -283,11 +283,15 @@ const PlugAnalysis = ({
             const newNum = grupPre.current || executionCountRef.current;
             const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
             timeLoading.current = setInterval(() => {
-                if (preeNum.current < newSuccessNum - 1) {
-                    preeNum.current += (100 / ((record?.executeTimeAvg * 1.1) / 800)) | 0;
-                    setPrenum(preeNum.current);
-                } else {
+                const newPreNum = 100 / ((record?.executeTimeAvg * 1.1) / 800);
+                if (preeNum.current === 99) {
                     clearInterval(timeLoading.current);
+                } else if (preeNum.current + newPreNum >= newSuccessNum - 1) {
+                    preeNum.current = 99;
+                    setPrenum(preeNum.current);
+                } else if (preeNum.current < newSuccessNum - 1) {
+                    preeNum.current += newPreNum;
+                    setPrenum(preeNum.current);
                 }
             }, 800);
         } else {

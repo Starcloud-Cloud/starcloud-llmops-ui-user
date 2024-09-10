@@ -26,6 +26,7 @@ import _ from 'lodash-es';
 import './index.css';
 import { getRecommendApp, appCreate } from 'api/template/index';
 import { ENUM_TENANT, getTenant } from 'utils/permission';
+import jsCookie from 'js-cookie';
 //左右切换的按钮
 const LeftArrow = () => {
     const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
@@ -172,7 +173,13 @@ function MyTemplate() {
     };
     const timeoutRef = useRef<any>();
     return (
-        <Box>
+        <Box
+            style={{
+                padding: jsCookie.get('isClient') ? '16px' : 0,
+                borderRadius: '16px',
+                overflow: 'hidden'
+            }}
+        >
             <Row className="mt-4" gutter={[16, 16]}>
                 <Col span={6}>
                     <TextField

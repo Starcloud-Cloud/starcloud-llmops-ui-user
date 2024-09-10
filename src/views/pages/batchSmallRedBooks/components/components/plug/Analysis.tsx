@@ -167,7 +167,7 @@ const PlugAnalysis = ({
     const preeNum = useRef(0);
     const [prenum, setPrenum] = useState(0);
     const materialPre = useMemo(() => {
-        return (((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current) | 1;
+        return (((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current) | 0;
     }, [successCount, totalCount, prenum]);
 
     const materialzanListRef = useRef<any[]>([]);
@@ -304,15 +304,19 @@ const PlugAnalysis = ({
     };
     useEffect(() => {
         if (materialExecutionOpen && executionCountRef.current) {
-            const newNum = grupPre.current || executionCountRef.current || 1;
+            const newNum = grupPre.current || executionCountRef.current;
             const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
             timeLoading.current = setInterval(() => {
                 console.log(preeNum.current, newSuccessNum, record?.executeTimeAvg);
-                if (preeNum.current < newSuccessNum - 1) {
-                    preeNum.current += 100 / ((record?.executeTimeAvg * 1.1) / 800);
-                    setPrenum(preeNum.current);
-                } else {
+                const newPreNum = 100 / ((record?.executeTimeAvg * 1.1) / 800);
+                if (preeNum.current === 99) {
                     clearInterval(timeLoading.current);
+                } else if (preeNum.current + newPreNum >= newSuccessNum - 1) {
+                    preeNum.current = 99;
+                    setPrenum(preeNum.current);
+                } else if (preeNum.current < newSuccessNum - 1) {
+                    preeNum.current += newPreNum;
+                    setPrenum(preeNum.current);
                 }
             }, 800);
         } else {
@@ -477,6 +481,9 @@ const PlugAnalysis = ({
                                     className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
                                     height="200px"
                                     defaultLanguage="json"
+                                    options={{
+                                        minimap: { enabled: false }
+                                    }}
                                     onChange={(value: any) => {}}
                                 />
                             </Form.Item>

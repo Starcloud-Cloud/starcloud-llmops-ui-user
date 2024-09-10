@@ -872,7 +872,7 @@ const Lefts = ({
                             : 'calc(100% - 14px)',
                         scrollbarGutter: 'stable'
                     }}
-                    className=" box-border overflow-y-auto pb-[72px] pr-1 mr-[-4px]"
+                    className=" box-border overflow-y-auto pr-1 mr-[-4px]"
                 >
                     <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
@@ -1296,12 +1296,7 @@ const Lefts = ({
                         )}
                     </Tabs>
                 </div>
-                <div
-                    style={{
-                        marginBottom: '16px'
-                    }}
-                    className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]"
-                >
+                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <>
                             <Button

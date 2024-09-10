@@ -2,7 +2,6 @@ import {
     Modal,
     IconButton,
     CardContent,
-    Switch,
     FormControl,
     InputLabel,
     Select as Selects,
@@ -11,14 +10,12 @@ import {
     CardActions,
     Grid,
     Divider,
-    InputAdornment,
-    Box,
-    Chip
+    InputAdornment
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import MainCard from 'ui-component/cards/MainCard';
-import { Table, Button, Tag, Row, Col, DatePicker, Steps, Tooltip, Popover, Collapse, InputNumber, Select, Popconfirm } from 'antd';
+import { Switch, Table, Button, Tag, Row, Col, DatePicker, Steps, Tooltip, Popover, Collapse, InputNumber, Select, Popconfirm } from 'antd';
 import { SearchOutlined, ExportOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -30,10 +27,11 @@ import AddAnnounce from './addAnnounce';
 import { DetailModal } from '../../redBookContentList/component/detailModal';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { singleDelete, singleRefresh, singleExport, bathDelete } from 'api/redBook/task';
+import { singleDelete, singleRefresh, singleExport, bathDelete, notificationPublish } from 'api/redBook/task';
 import copy from 'clipboard-copy';
 import './addModal.scss';
 const Announce = ({
+    notificationUid,
     status,
     isPublic,
     setIsPublic,
@@ -43,10 +41,12 @@ const Announce = ({
     setminFansNum,
     setclaimLimit,
     limitSave,
+    changePre,
     address,
     fansNum,
     gender
 }: {
+    notificationUid?: string;
     status?: string;
     isPublic: boolean;
     setIsPublic: (data: boolean) => void;
@@ -56,6 +56,7 @@ const Announce = ({
     minFansNum: any;
     setminFansNum: (data: any) => void;
     limitSave: (data: boolean) => void;
+    changePre: () => void;
     address: any[];
     fansNum: any[];
     gender: any[];
@@ -150,12 +151,6 @@ const Announce = ({
                     {row?.content?.title}
                 </div>
             )
-        },
-        {
-            title: '创作计划',
-            align: 'center',
-            width: 100,
-            dataIndex: 'planName'
         },
         {
             title: '状态',
@@ -299,7 +294,7 @@ const Announce = ({
                         </Tooltip>
                     ) : (
                         <Button
-                            type="primary"
+                            type="link"
                             onClick={() => {
                                 setTime({
                                     publishTime: row.publishTime && dayjs(row.publishTime),
@@ -432,8 +427,42 @@ const Announce = ({
     const [detailOpen, setDetailOpen] = useState<any>(false);
     const [businessUid, setBusinessUid] = useState<string>('');
 
+    const [switchLoading, setSwitchLoading] = useState(false);
+
     return (
         <div>
+            <div className="flex gap-2 items-center mb-4">
+                发布任务：
+                <Switch
+                    loading={switchLoading}
+                    checked={status === 'published' ? true : false}
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                    onChange={async (check) => {
+                        try {
+                            setSwitchLoading(true);
+                            await notificationPublish(notificationUid, check);
+                            changePre();
+                            setSwitchLoading(false);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '操作成功',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
+                        } catch (err) {
+                            setSwitchLoading(false);
+                        }
+                    }}
+                />
+            </div>
             <Collapse
                 items={[
                     {
@@ -444,7 +473,7 @@ const Announce = ({
                                 <div className="font-[500] mb-4">是否公开通告</div>
                                 <div className="flex items-center mb-4">
                                     <span>是否公开</span>
-                                    <Switch color="secondary" checked={isPublic} onChange={() => setIsPublic(!isPublic)} />
+                                    <Switch checked={isPublic} onChange={() => setIsPublic(!isPublic)} />
                                 </div>
                                 <div className="font-[500] mt-5 mb-4">领取人员限制</div>
                                 <div className="flex justify-between items-center">

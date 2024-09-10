@@ -452,6 +452,9 @@ const PlugAnalysis = ({
                                     className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
                                     height="200px"
                                     defaultLanguage="json"
+                                    options={{
+                                        minimap: { enabled: false }
+                                    }}
                                     onChange={(value: any) => {}}
                                 />
                             </Form.Item>

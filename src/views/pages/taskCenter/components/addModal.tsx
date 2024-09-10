@@ -151,6 +151,10 @@ const AddModal = () => {
         if (searchParams.get('view')) {
             setActive('2');
         }
+    }, []);
+    //获取详情
+    const [pre, setPre] = useState(0);
+    useEffect(() => {
         if (searchParams.get('notificationUid')) {
             notificationDetail(searchParams.get('notificationUid')).then((res) => {
                 if (res) {
@@ -176,7 +180,7 @@ const AddModal = () => {
                 notificationBudget: 0
             });
         }
-    }, []);
+    }, [pre]);
     //tabs
     const [active, setActive] = useState('1');
     const changeActive = (e: string) => {
@@ -198,25 +202,25 @@ const AddModal = () => {
         });
     };
     return (
-        <MainCard>
-            <CardContent>
-                <SubCard
-                    sx={{ mb: 3 }}
-                    contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
-                >
-                    <div>
-                        <IconButton
-                            onClick={() => {
-                                navigate('/taskCenter');
-                            }}
-                            color="secondary"
-                        >
-                            <KeyboardBackspace fontSize="small" />
-                        </IconButton>
-                        <span className="text-[#000c] font-[500]">通告中心</span>
-                    </div>
-                    <div></div>
-                </SubCard>
+        <div>
+            <SubCard
+                sx={{ mb: 3 }}
+                contentSX={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '10px !important' }}
+            >
+                <div>
+                    <IconButton
+                        onClick={() => {
+                            navigate('/taskCenter');
+                        }}
+                        color="secondary"
+                    >
+                        <KeyboardBackspace fontSize="small" />
+                    </IconButton>
+                    <span className="text-[#000c] font-[500]">通告中心</span>
+                </div>
+                <div></div>
+            </SubCard>
+            <div className="bg-white p-4 rounded-lg overflow-hidden ">
                 <Tabs
                     activeKey={active}
                     items={[
@@ -587,6 +591,7 @@ const AddModal = () => {
                             disabled: !searchParams.get('notificationUid'),
                             children: (
                                 <Announce
+                                    notificationUid={params?.uid}
                                     singleMissionStatusEnumList={singleMissionStatusEnumList}
                                     status={params.status}
                                     isPublic={params.open}
@@ -610,6 +615,7 @@ const AddModal = () => {
                                         setParams({ ...params, claimLimit: data });
                                     }}
                                     limitSave={handleSave}
+                                    changePre={() => setPre(pre + 1)}
                                     address={address}
                                     fansNum={fansNum}
                                     gender={gender}
@@ -625,8 +631,8 @@ const AddModal = () => {
                     ]}
                     onChange={changeActive}
                 />
-            </CardContent>
-        </MainCard>
+            </div>
+        </div>
     );
 };
 export default AddModal;

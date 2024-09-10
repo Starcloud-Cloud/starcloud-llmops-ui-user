@@ -152,122 +152,124 @@ const MarketTemplate = ({ like, data, handleDetail, type }: any) => {
         </div>
     ) : (
         <div
-            className="group rounded-[12px] shadow-md cursor-pointer bg-white relative p-4 bg-cover bg-[url('https://p8.itc.cn/q_70/images03/20230904/6b9e1ed6da8a434983fdd664d27e0d0a.jpeg')]"
+            className="overflow-hidden group rounded-[12px] shadow-md cursor-pointer bg-white relative p-4 bg-cover bg-[url('https://p8.itc.cn/q_70/images03/20230904/6b9e1ed6da8a434983fdd664d27e0d0a.jpeg')]"
             style={{
                 aspectRatio: '.75'
             }}
             onClick={() => handleDetail(data)}
         >
-            <div className="flex gap-2 justify-start items-center absolute left-[16px] bottom-[40px]">
-                <div className=" p-1 rounded-md border border-solid border-slate-200 flex justify-center items-center">
-                    <img className="w-[16px] h-[16px]" src={getImage(data?.icon)} />
+            <div className="absolute bottom-0 right-0 w-full aspect-[1.5] bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.8))]">
+                <div className="flex gap-2 justify-start items-center absolute left-[16px] bottom-[40px]">
+                    <div className="z-1 p-1 rounded-md border border-solid border-slate-200 flex justify-center items-center">
+                        <img className="w-[16px] h-[16px]" src={getImage(data?.icon)} />
+                    </div>
+                    <div className="text-white text-[16px] font-bold line-clamp-2">{data.name}</div>
                 </div>
-                <div className="text-white text-[16px] font-bold line-clamp-2">{data.name}</div>
-            </div>
-            <div className="absolute left-[16px] bottom-[16px]">
-                {like === 'market' &&
-                    (marketActive ? (
-                        <div
-                            onClick={(e) => {
-                                favoriteCancel({ marketUid: data.uid }).then((res) => {
-                                    if (res) {
-                                        setMarketActive(false);
-                                        dispatch(
-                                            openSnackbar({
-                                                open: true,
-                                                message: '取消收藏成功',
-                                                variant: 'alert',
-                                                alert: {
-                                                    color: 'success'
-                                                },
-                                                close: false
-                                            })
-                                        );
-                                    }
-                                });
-                                e.stopPropagation();
-                            }}
-                        >
-                            <GradeIcon sx={{ color: '#ecc94b99' }} fontSize="small" />
-                        </div>
-                    ) : (
-                        <div
-                            onClick={(e) => {
-                                favoriteCollect({ marketUid: data.uid }).then((res) => {
-                                    if (res) {
-                                        setMarketActive(true);
-                                        dispatch(
-                                            openSnackbar({
-                                                open: true,
-                                                message: '收藏成功',
-                                                variant: 'alert',
-                                                alert: {
-                                                    color: 'success'
-                                                },
-                                                close: false
-                                            })
-                                        );
-                                    }
-                                });
+                <div className="absolute left-[16px] bottom-[8px]">
+                    {like === 'market' &&
+                        (marketActive ? (
+                            <div
+                                onClick={(e) => {
+                                    favoriteCancel({ marketUid: data.uid }).then((res) => {
+                                        if (res) {
+                                            setMarketActive(false);
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '取消收藏成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    close: false
+                                                })
+                                            );
+                                        }
+                                    });
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <GradeIcon sx={{ color: '#ecc94b99' }} fontSize="small" />
+                            </div>
+                        ) : (
+                            <div
+                                onClick={(e) => {
+                                    favoriteCollect({ marketUid: data.uid }).then((res) => {
+                                        if (res) {
+                                            setMarketActive(true);
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '收藏成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    close: false
+                                                })
+                                            );
+                                        }
+                                    });
 
-                                e.stopPropagation();
-                            }}
-                        >
-                            <GradeOutlinedIcon sx={{ color: '#0003' }} fontSize="small" />
-                        </div>
-                    ))}
-                {like === 'collect' &&
-                    (active ? (
-                        <div
-                            onClick={(e) => {
-                                favoriteCollect({ marketUid: data.uid }).then((res) => {
-                                    if (res) {
-                                        dispatch(
-                                            openSnackbar({
-                                                open: true,
-                                                message: '收藏成功',
-                                                variant: 'alert',
-                                                alert: {
-                                                    color: 'success'
-                                                },
-                                                close: false
-                                            })
-                                        );
-                                    }
-                                });
-                                setActive(false);
-                                e.stopPropagation();
-                            }}
-                            className="absolute left-[16px] bottom-[11px]"
-                        >
-                            <GradeOutlinedIcon sx={{ color: '#0003' }} fontSize="small" />
-                        </div>
-                    ) : (
-                        <div
-                            onClick={(e) => {
-                                favoriteCancel({ marketUid: data.uid }).then((res) => {
-                                    if (res) {
-                                        dispatch(
-                                            openSnackbar({
-                                                open: true,
-                                                message: '取消收藏成功',
-                                                variant: 'alert',
-                                                alert: {
-                                                    color: 'success'
-                                                },
-                                                close: false
-                                            })
-                                        );
-                                    }
-                                });
-                                setActive(true);
-                                e.stopPropagation();
-                            }}
-                            className="absolute left-[16px] bottom-[11px]"
-                        >
-                            <GradeIcon sx={{ color: '#ecc94b99' }} fontSize="small" />
-                        </div>
-                    ))}
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <GradeOutlinedIcon sx={{ color: '#fff' }} fontSize="small" />
+                            </div>
+                        ))}
+                    {like === 'collect' &&
+                        (active ? (
+                            <div
+                                onClick={(e) => {
+                                    favoriteCollect({ marketUid: data.uid }).then((res) => {
+                                        if (res) {
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '收藏成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    close: false
+                                                })
+                                            );
+                                        }
+                                    });
+                                    setActive(false);
+                                    e.stopPropagation();
+                                }}
+                                className="absolute left-[16px] bottom-[11px]"
+                            >
+                                <GradeOutlinedIcon sx={{ color: '#0003' }} fontSize="small" />
+                            </div>
+                        ) : (
+                            <div
+                                onClick={(e) => {
+                                    favoriteCancel({ marketUid: data.uid }).then((res) => {
+                                        if (res) {
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '取消收藏成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    close: false
+                                                })
+                                            );
+                                        }
+                                    });
+                                    setActive(true);
+                                    e.stopPropagation();
+                                }}
+                                className="absolute left-[16px] bottom-[11px]"
+                            >
+                                <GradeIcon sx={{ color: '#ecc94b99' }} fontSize="small" />
+                            </div>
+                        ))}
+                </div>
             </div>
             <div className="absolute right-[16px] bottom-[16px] w-7 h-7 rounded-full bg-[#673ab7] hidden group-hover:block">
                 <div className="w-full h-full flex justify-center items-center">

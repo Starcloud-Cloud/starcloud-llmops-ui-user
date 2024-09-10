@@ -1,4 +1,4 @@
-import { Input, Select, Button, Table, message, Image, Popover, Space, Tag, Form, Avatar } from 'antd';
+import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled } from '@ant-design/icons';
@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import TriggerModal from './triggerModal';
+import './analysis.scss';
 
 const value2JsonMd = (value: any) => `
 ~~~json
@@ -50,7 +51,7 @@ const PlugAnalysis = ({
     const [data, setData] = useState<any[]>([]);
 
     const redList = React.useMemo(() => {
-        const outputFormart = JSON.parse(record?.outputFormart) || [];
+        const outputFormart = JSON.parse(record?.outputFormart || '[]') || [];
         return (
             outputFormart?.map((item: any) => ({
                 label: item.variableKey,
@@ -62,7 +63,7 @@ const PlugAnalysis = ({
     }, [record]);
 
     useEffect(() => {
-        if (!record?.fieldMap) {
+        if (record && !record?.fieldMap) {
             let data: any[] = [];
             redList.forEach((redItem: any) => {
                 const value =
@@ -109,7 +110,7 @@ const PlugAnalysis = ({
     }, [columns, record]);
 
     useEffect(() => {
-        if (record.fieldMap) {
+        if (record?.fieldMap) {
             const fieldMap = JSON.parse(record.fieldMap || '{}');
 
             const data = redList.map((redItem: any, index: number) => {
@@ -165,7 +166,7 @@ const PlugAnalysis = ({
     const preeNum = useRef(0);
     const [prenum, setPrenum] = useState(0);
     const materialPre = useMemo(() => {
-        return ((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current;
+        return (((((successCountRef.current + errorCountRef.current) / totalCountRef.current) * 100) | 0) + preeNum.current) | 0;
     }, [successCount, totalCount, prenum]);
 
     const materialzanListRef = useRef<any[]>([]);
@@ -279,14 +280,18 @@ const PlugAnalysis = ({
     const grupPre = useRef(0);
     useEffect(() => {
         if (materialExecutionOpen && executionCountRef.current) {
-            const newNum = grupPre.current || executionCountRef.current || 1;
+            const newNum = grupPre.current || executionCountRef.current;
             const newSuccessNum = ((newNum / totalCountRef.current) * 100) | 0;
             timeLoading.current = setInterval(() => {
-                if (preeNum.current < newSuccessNum - 1) {
-                    preeNum.current += (100 / ((record?.executeTimeAvg * 1.1) / 800)) | 0;
-                    setPrenum(preeNum.current);
-                } else {
+                const newPreNum = 100 / ((record?.executeTimeAvg * 1.1) / 800);
+                if (preeNum.current === 99) {
                     clearInterval(timeLoading.current);
+                } else if (preeNum.current + newPreNum >= newSuccessNum - 1) {
+                    preeNum.current = 99;
+                    setPrenum(preeNum.current);
+                } else if (preeNum.current < newSuccessNum - 1) {
+                    preeNum.current += newPreNum;
+                    setPrenum(preeNum.current);
                 }
             }, 800);
         } else {
@@ -326,12 +331,14 @@ const PlugAnalysis = ({
     const [rowPre, setRowPre] = useState(0);
     const [rowData, setRowData] = useState<any>(null);
     useEffect(() => {
-        configDetail(record?.uid).then((result) => {
-            if (result) {
-                setRowData(result);
-            }
-        });
-    }, [rowPre]);
+        if (record) {
+            configDetail(record?.uid).then((result) => {
+                if (result) {
+                    setRowData(result);
+                }
+            });
+        }
+    }, [rowPre, record]);
 
     //form 表单校验
     const parseInputToArray = (input: any) => {
@@ -357,47 +364,39 @@ const PlugAnalysis = ({
                 <div className=" flex flex-col">
                     <div className="flex gap-4 items-end mb-2">
                         <div className="flex items-end">
-                            {record.avatar ? (
+                            {record?.avatar ? (
                                 <Avatar shape="square" size={50} src={record.avatar} />
                             ) : (
                                 <Avatar shape="square" size={50} icon={<AppstoreFilled />} />
                             )}
                             <div className="flex gap-2 ml-2 flex-col">
                                 <Space align="center">
-                                    <span className="font-bold">{record.pluginName}</span>
-                                    <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record.scene).label}</Tag>
-                                    <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record.type).label}</Tag>
-                                    <div className="text-[14px]">
-                                        定时执行（
-                                        <span
-                                            className="text-[#673ab7] hover:underline cursor-pointer"
-                                            onClick={async () => {
-                                                const result = await configDetail(record?.uid);
-                                                if (result) {
-                                                    setRowData(result);
-                                                }
-                                                setTriggerOpen(true);
+                                    <span className="font-bold">{record?.pluginName}</span>
+                                    <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record?.scene)?.label}</Tag>
+                                    <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record?.type)?.label}</Tag>
+                                    <div className="text-[14px] flex items-center gap-1">
+                                        <HistoryOutlined
+                                            style={{
+                                                color: rowData?.enable ? '#673ab7' : ''
                                             }}
-                                        >
-                                            {rowData ? '开启中' : '未开启'}
-                                        </span>
-                                        ）
+                                        />
+                                        定时执行
                                     </div>
                                 </Space>
                                 <div className="flex gap-2">
                                     <div className="text-xs text-[#673ab7]">
-                                        <HistoryOutlined /> 预计耗时：{((record.executeTimeAvg * 1.1) / 1000) | 0}s
+                                        <HistoryOutlined /> 预计耗时：{((record?.executeTimeAvg * 1.1) / 1000) | 0}s
                                     </div>
                                     {record?.updateTime && (
                                         <span className="text-xs text-black/50">
-                                            更新时间: {dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                            更新时间: {dayjs(record?.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                         </span>
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="text-xs text-black/50 mt-1">{record.description}</div>
+                    <div className="text-xs text-black/50 mt-1">{record?.description}</div>
                 </div>
             }
             open={open}
@@ -409,7 +408,7 @@ const PlugAnalysis = ({
                 <Popover
                     content={
                         <div className="w-[500px] max-h-[300px] overflow-auto">
-                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
+                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.input || '{}'))} />
                         </div>
                     }
                     title="参数示例"
@@ -457,6 +456,9 @@ const PlugAnalysis = ({
                                     className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
                                     height="200px"
                                     defaultLanguage="json"
+                                    options={{
+                                        minimap: { enabled: false }
+                                    }}
                                     onChange={(value: any) => {}}
                                 />
                             </Form.Item>
@@ -464,111 +466,129 @@ const PlugAnalysis = ({
                     )
                 )}
             </Form>
-            <div className="text-[16px] font-bold my-4 flex">
-                2.输出字段绑定
-                <Popover
-                    content={
-                        <div className="w-[500px] max-h-[300px] overflow-auto">
-                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.output))} />
-                        </div>
-                    }
-                    title="参数示例"
-                >
-                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                </Popover>
-            </div>
-            <Table
-                pagination={false}
-                bordered
-                size="small"
-                columns={[
+            <Collapse
+                className="analysis"
+                collapsible="icon"
+                ghost
+                expandIconPosition="end"
+                defaultActiveKey={['1']}
+                items={[
                     {
-                        title: '字段',
-                        dataIndex: 'des',
-                        align: 'center',
-                        width: '40%',
-                        render: (_, record) => record.des || record.label
-                    },
-                    {
-                        title: '绑定到',
-                        align: 'center',
-                        width: '20%',
-                        render: () => (
-                            <svg
-                                viewBox="0 0 1024 1024"
-                                version="1.1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                p-id="7263"
-                                width="20"
-                                height="20"
-                            >
-                                <path
-                                    d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
-                                    fill="#8a8a8a"
-                                    p-id="7264"
-                                ></path>
-                            </svg>
-                        )
-                    },
-                    {
-                        title: '素材字段',
-                        dataIndex: 'value',
-                        align: 'center',
-                        width: '40%',
-                        render: (_, record) => {
-                            return (
-                                data.length > 0 && (
-                                    <Select
-                                        style={{ width: 160 }}
-                                        allowClear
-                                        value={record.value}
-                                        onChange={(value) => {
-                                            let fieldList = redBookData.fieldList || [];
-                                            console.log(fieldList);
+                        key: '1',
+                        label: (
+                            <div className="text-[16px] font-bold flex">
+                                2.输出字段绑定
+                                <Popover
+                                    content={
+                                        <div className="w-[500px] max-h-[300px] overflow-auto">
+                                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.output || '{}'))} />
+                                        </div>
+                                    }
+                                    title="参数示例"
+                                >
+                                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                                </Popover>
+                            </div>
+                        ),
+                        children: (
+                            <Table
+                                pagination={false}
+                                bordered
+                                size="small"
+                                columns={[
+                                    {
+                                        title: '字段',
+                                        dataIndex: 'des',
+                                        align: 'center',
+                                        width: '40%',
+                                        render: (_, record) => record.des || record.label
+                                    },
+                                    {
+                                        title: '绑定到',
+                                        align: 'center',
+                                        width: '20%',
+                                        render: () => (
+                                            <svg
+                                                viewBox="0 0 1024 1024"
+                                                version="1.1"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                p-id="7263"
+                                                width="20"
+                                                height="20"
+                                            >
+                                                <path
+                                                    d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
+                                                    fill="#8a8a8a"
+                                                    p-id="7264"
+                                                ></path>
+                                            </svg>
+                                        )
+                                    },
+                                    {
+                                        title: '素材字段',
+                                        dataIndex: 'value',
+                                        align: 'center',
+                                        width: '40%',
+                                        render: (_, record) => {
+                                            return (
+                                                data.length > 0 && (
+                                                    <Select
+                                                        style={{ width: 160 }}
+                                                        allowClear
+                                                        value={record.value}
+                                                        onChange={(value) => {
+                                                            let fieldList = redBookData.fieldList || [];
+                                                            console.log(fieldList);
 
-                                            let bindFieldData = redBookData.bindFieldData;
-                                            if (value) {
-                                                fieldList = [...fieldList, record.label_key];
-                                                bindFieldData[record.label_key] = value;
-                                            } else {
-                                                fieldList = fieldList.filter((item: any) => item !== record.label_key);
-                                                delete bindFieldData[record.label_key];
-                                            }
+                                                            let bindFieldData = redBookData.bindFieldData;
+                                                            if (value) {
+                                                                fieldList = [...fieldList, record.label_key];
+                                                                bindFieldData[record.label_key] = value;
+                                                            } else {
+                                                                fieldList = fieldList.filter((item: any) => item !== record.label_key);
+                                                                delete bindFieldData[record.label_key];
+                                                            }
 
-                                            const copyData = [...data];
-                                            const index = copyData.findIndex((item) => item.label_key === record.label_key);
-                                            copyData[index].value = value;
-                                            setData(copyData);
+                                                            const copyData = [...data];
+                                                            const index = copyData.findIndex((item) => item.label_key === record.label_key);
+                                                            copyData[index].value = value;
+                                                            setData(copyData);
 
-                                            setRedBookData((pre: any) => {
-                                                return {
-                                                    ...pre,
-                                                    fieldList,
-                                                    bindFieldData
-                                                };
-                                            });
-                                        }}
-                                    >
-                                        {columns
-                                            .filter((item) => !item.isDefault)
-                                            ?.map((item) => {
-                                                return (
-                                                    <Option
-                                                        key={item.dataIndex}
-                                                        value={item.dataIndex}
-                                                        disabled={Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex)}
+                                                            setRedBookData((pre: any) => {
+                                                                return {
+                                                                    ...pre,
+                                                                    fieldList,
+                                                                    bindFieldData
+                                                                };
+                                                            });
+                                                        }}
                                                     >
-                                                        {item.title}
-                                                    </Option>
-                                                );
-                                            })}
-                                    </Select>
-                                )
-                            );
-                        }
+                                                        {columns
+                                                            .filter((item) => !item.isDefault)
+                                                            ?.map((item) => {
+                                                                return (
+                                                                    <Option
+                                                                        key={item.dataIndex}
+                                                                        value={item.dataIndex}
+                                                                        disabled={Object.values(redBookData.bindFieldData || {}).includes(
+                                                                            item.dataIndex
+                                                                        )}
+                                                                    >
+                                                                        {item.title}
+                                                                    </Option>
+                                                                );
+                                                            })}
+                                                    </Select>
+                                                )
+                                            );
+                                        }
+                                    }
+                                ]}
+                                dataSource={data}
+                            />
+                        )
                     }
                 ]}
-                dataSource={data}
             />
             <div className="flex justify-center gap-6 mt-6">
                 <Button
@@ -578,7 +598,7 @@ const PlugAnalysis = ({
                             ...item,
                             variableValue: result[item.variableKey]
                         }));
-                        if (!record.uid) {
+                        if (!record?.uid) {
                             const res = await addPlugConfigInfo({
                                 libraryUid: record.libraryUid,
                                 pluginUid: record.pluginUid,
@@ -637,11 +657,8 @@ const PlugAnalysis = ({
                 </Button>
                 <Button
                     type="primary"
-                    onClick={async () => {
-                        const result = await configDetail(record?.uid);
-                        if (result) {
-                            setRowData(result);
-                        }
+                    onClick={() => {
+                        setRowPre(rowPre + 1);
                         setTriggerOpen(true);
                     }}
                 >
@@ -658,7 +675,7 @@ const PlugAnalysis = ({
                 errorCount={errorCount}
                 materialzanList={materialzanList}
                 errorMessage={errorMessage}
-                timeSpent={((record.executeTimeAvg * 1.1) / 1000) | 0 || 40}
+                timeSpent={((record?.executeTimeAvg * 1.1) / 1000) | 0 || 40}
                 columns={[
                     { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
                     ...columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))
@@ -699,8 +716,8 @@ const PlugAnalysis = ({
                 <TriggerModal
                     triggerOpen={triggerOpen}
                     setTriggerOpen={setTriggerOpen}
-                    libraryUid={record.libraryUid}
-                    foreignKey={record.uid}
+                    libraryUid={record?.libraryUid}
+                    foreignKey={record?.uid}
                     rowData={rowData}
                     columns={columns}
                     record={record}

@@ -393,6 +393,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 setRows(null);
                 form.resetFields();
             }}
+            className="relative"
         >
             <div className="h-[80vh] overflow-y-auto">
                 <Form form={form} labelAlign="left" labelCol={{ span: 4 }}>
@@ -786,6 +787,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             height="300px"
                                             defaultLanguage="json"
                                             theme={'vs-dark'}
+                                            options={{
+                                                minimap: { enabled: false }
+                                            }}
                                             value={handfilData.arguments}
                                             onChange={(value: any) => {
                                                 setHandfilData({
@@ -841,6 +845,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             defaultLanguage="json"
                                             theme={'vs-dark'}
                                             value={handfilData.output}
+                                            options={{
+                                                minimap: { enabled: false }
+                                            }}
                                             onChange={(value: any) => {
                                                 setHandfilData({
                                                     ...handfilData,
@@ -919,7 +926,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         </Form>
                     </Modal>
                 )}
-                <div className="flex justify-center">
+                <div className="h-[25px]"></div>
+                <div className="absolute w-[calc(100%-40px)] bg-white bottom-0 flex justify-center py-4 border-t border-solid border-black/10">
                     <Button onClick={handleOk} type="primary" className="w-[100px]">
                         保存
                     </Button>

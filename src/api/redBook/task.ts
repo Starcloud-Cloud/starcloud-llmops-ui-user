@@ -31,6 +31,10 @@ export const notificationPublish = (data: any, publish: Boolean) => {
 };
 
 //分页查询单条任务
+export const planList = (data: any) => {
+    return request.post({ url: '/llm/creative/plan/query', data });
+};
+//分页查询单条任务
 export const singlePage = (params: any) => {
     return request.get({ url: '/llm/single/page', params });
 };

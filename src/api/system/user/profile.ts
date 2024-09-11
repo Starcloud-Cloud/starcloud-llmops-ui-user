@@ -57,7 +57,7 @@ export const getUserProfile = () => {
 };
 
 // 修改用户个人信息
-export const updateUserProfile = (data: UserProfileUpdateReqVO) => {
+export const updateUserProfile = (data: any) => {
     return request.put({ url: '/llm/auth/user/update', data });
 };
 

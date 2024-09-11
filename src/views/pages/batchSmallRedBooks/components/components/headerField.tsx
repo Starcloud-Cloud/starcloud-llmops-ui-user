@@ -206,6 +206,7 @@ const HeaderField = ({
             getList();
         }
     }, [libraryId]);
+    const timer = useRef<any>(null);
     return (
         <>
             {/* <Modal width={'80%'} open={colOpen} onCancel={() => setColOpen(false)} footer={false} title="素材字段配置"> */}
@@ -252,7 +253,20 @@ const HeaderField = ({
                                 ];
                             },
                             onValuesChange: (record, recordList) => {
-                                setTableData(recordList);
+                                clearTimeout(timer.current);
+                                timer.current = setTimeout(() => {
+                                    let newList = _.cloneDeep(recordList);
+                                    if (record?.isGroupColumn) {
+                                        newList = newList.map((item) => {
+                                            if (item?.id === record?.id) {
+                                                return item;
+                                            } else {
+                                                return { ...item, isGroupColumn: false };
+                                            }
+                                        });
+                                    }
+                                    setTableData(newList);
+                                }, 500);
                             },
                             onChange: seteditableKeys
                         }}

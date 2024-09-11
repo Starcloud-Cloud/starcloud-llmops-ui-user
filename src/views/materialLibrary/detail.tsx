@@ -495,7 +495,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             );
                         })}
                         <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
-                        <div
+                        {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('小红书分析');
@@ -523,7 +523,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">小红书分析</div>
-                        </div>
+                        </div> */}
                         <div
                             onClick={() => {
                                 setPlugOpen(true);
@@ -630,7 +630,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             </svg>
                             <div className="text-[12px] font-bold mt-1">AI字段补齐</div>
                         </div>
-                        <div
+                        {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('微信公共号分析');
@@ -660,7 +660,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">微信公众号分析</div>
-                        </div>
+                        </div> */}
                         <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
                     </Space>
                     <div

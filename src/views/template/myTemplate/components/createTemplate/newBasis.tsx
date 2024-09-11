@@ -7,6 +7,7 @@ import { t } from 'hooks/web/useI18n';
 import useUserStore from 'store/user';
 import _ from 'lodash-es';
 import '../../index.css';
+import './index.scss';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
 import jsCookie from 'js-cookie';
 export interface Anyevent {
@@ -146,7 +147,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                     类目*
                 </span>
             </div>
-            <Stack sx={{ mt: 2 }}>
+            {/* <Stack sx={{ mt: 2 }}>
                 <Autocomplete
                     multiple
                     id="tags-filled"
@@ -164,7 +165,25 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                     }}
                     renderInput={(params: any) => <TextField name="tags" color="secondary" {...params} label={t('myApp.scense')} />}
                 />
-            </Stack>
+            </Stack> */}
+            <div className="relative mt-[16px] tags">
+                <Select
+                    allowClear
+                    value={detail?.tags}
+                    onChange={(value: any) => setValues({ name: 'tags', value: value })}
+                    notFoundContent={false}
+                    dropdownStyle={{ display: 'none' }}
+                    className="w-full"
+                    mode="tags"
+                    size="large"
+                />
+                <span
+                    className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-12px] left-2 text-[12px]"
+                    style={{ color: !detail?.category && categoryOpen ? '#f44336' : '#697586' }}
+                >
+                    标签
+                </span>
+            </div>
             {permissions.includes('app:operate:icon') && (
                 <div>
                     <Divider sx={{ mt: 2 }} />

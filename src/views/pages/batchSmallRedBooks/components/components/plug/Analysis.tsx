@@ -1,4 +1,4 @@
-import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar } from 'antd';
+import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar, Switch } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled } from '@ant-design/icons';
@@ -423,12 +423,12 @@ const PlugAnalysis = ({
                             initialValue={item.variableValue}
                             key={item.uuid}
                             label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                            name={item.variableType === 'String' ? item.variableKey : ''}
-                            rules={item.variableType === 'String' ? [{ required: true, message: item.variableKey + '是必填项' }] : []}
+                            name={item.variableKey}
+                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
                         >
                             <Input />
                         </Form.Item>
-                    ) : (
+                    ) : item.variableType === 'Array<String>' ? (
                         <Form.Item required label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}>
                             <div className="flex items-center relative bg-[#F4F4F6] px-4 py-2 text-xs font-sans justify-between rounded-t-md">
                                 <span>json</span>
@@ -463,7 +463,18 @@ const PlugAnalysis = ({
                                 />
                             </Form.Item>
                         </Form.Item>
-                    )
+                    ) : item.variableType === 'Boolean' ? (
+                        <Form.Item
+                            valuePropName="checked"
+                            initialValue={item.variableValue}
+                            key={item.uuid}
+                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                            name={item.variableKey}
+                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                        >
+                            <Switch />
+                        </Form.Item>
+                    ) : null
                 )}
             </Form>
             <Collapse

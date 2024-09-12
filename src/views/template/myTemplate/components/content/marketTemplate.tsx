@@ -157,7 +157,7 @@ const MarketTemplate = ({ like, data, handleDetail, type }: any) => {
                 aspectRatio: '.75',
                 background:
                     data?.images && data?.images[0]
-                        ? data?.images[0]
+                        ? `url(${data?.images[0]})`
                         : 'url(https://p8.itc.cn/q_70/images03/20230904/6b9e1ed6da8a434983fdd664d27e0d0a.jpeg)'
             }}
             onClick={() => handleDetail(data)}

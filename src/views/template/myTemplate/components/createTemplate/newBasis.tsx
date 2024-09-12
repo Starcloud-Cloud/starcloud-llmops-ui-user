@@ -1,6 +1,9 @@
 import { memo, useEffect, useState } from 'react';
-import { Card, TextField, Autocomplete, Chip, Stack, FormControl, InputLabel, Select as Selects, MenuItem, Divider } from '@mui/material';
-import { Select, Image } from 'antd';
+import { TextField, FormControl, InputLabel, Select as Selects, MenuItem, Divider } from '@mui/material';
+import { Select, Image, Upload } from 'antd';
+import type { UploadProps } from 'antd';
+import { getAccessToken } from 'utils/auth';
+import { PlusOutlined, LoadingOutlined } from '@ant-design/icons';
 import { categoryTree } from 'api/template';
 import { TreeSelect } from 'antd';
 import { t } from 'hooks/web/useI18n';
@@ -21,6 +24,7 @@ export interface Anyevent {
         sort?: string;
         type?: string;
         icon?: string;
+        images?: string;
     };
     appModel: { label: string; value: string }[] | undefined;
     setValues: (data: { name: string; value: any }) => void;
@@ -71,6 +75,27 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
         { icon: 'seo', name: 'SEO写作', code: 'SEO_WRITING' },
         { icon: 'other', name: '其他应用', code: 'OTHER' }
     ];
+    const [loading, setLoading] = useState(false);
+    const props: UploadProps = {
+        name: 'image',
+        showUploadList: false,
+        listType: 'picture-card',
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        onChange(info) {
+            if (info.file.status === 'uploading') {
+                setLoading(true);
+            } else if (info.file.status === 'done') {
+                setValues({ name: 'images', value: [info?.file?.response?.data?.url] });
+                setLoading(false);
+            } else if (info.file.status === 'error') {
+                setLoading(false);
+            }
+        }
+    };
+
     const [appNameOpen, setAppNameOpen] = useState(false);
     const [categoryOpen, setCategoryOpen] = useState(false);
     useEffect(() => {
@@ -119,7 +144,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
             />
             <div className="relative mt-[16px]">
                 <TreeSelect
-                    className="bg-[#f8fafc]  h-[51px] border border-solid rounded-[6px] antdSel"
+                    className="tags !h-[51px]"
                     showSearch
                     style={{ width: '100%', borderColor: !detail?.category && categoryOpen ? '#f44336' : '#697586ad' }}
                     value={detail?.category}
@@ -127,6 +152,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                     allowClear
                     treeCheckable={false}
                     treeDefaultExpandAll
+                    size="large"
                     onChange={(e) => {
                         setCategoryOpen(true);
                         setValues({ name: 'category', value: e });
@@ -141,7 +167,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                     treeData={cateTree}
                 />
                 <span
-                    className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px]"
+                    className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-7px] left-2 text-[12px]"
                     style={{ color: !detail?.category && categoryOpen ? '#f44336' : '#697586' }}
                 >
                     类目*
@@ -173,16 +199,29 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                     onChange={(value: any) => setValues({ name: 'tags', value: value })}
                     notFoundContent={false}
                     dropdownStyle={{ display: 'none' }}
-                    className="w-full"
+                    className="w-full h-[51px]"
                     mode="tags"
                     size="large"
                 />
                 <span
-                    className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-12px] left-2 text-[12px]"
+                    className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-10px] left-2 text-[12px]"
                     style={{ color: !detail?.category && categoryOpen ? '#f44336' : '#697586' }}
                 >
                     标签
                 </span>
+            </div>
+            <div className="flex gap-2 items-center">
+                <div className="text-xs">封面图:</div>
+                <Upload {...props} className="mt-4">
+                    {detail?.images && detail?.images[0] ? (
+                        <img src={detail?.images && detail?.images[0]} alt="avatar" style={{ width: '100%' }} />
+                    ) : (
+                        <button style={{ border: 0, background: 'none' }} type="button">
+                            {loading ? <LoadingOutlined /> : <PlusOutlined />}
+                            <div style={{ marginTop: 8 }}>Upload</div>
+                        </button>
+                    )}
+                </Upload>
             </div>
             {permissions.includes('app:operate:icon') && (
                 <div>
@@ -224,7 +263,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                                 setIcon(e);
                             }}
                             value={icons}
-                            className="h-[51px] mt-[16px] w-[100%] bg-[#f8fafc] border border-solid border-[#697586ad] rounded-[6px] antdSel"
+                            className="h-[51px] mt-[16px] w-[100%] tags"
                         >
                             {categoryIcon.map((item) => (
                                 <Option value={item.icon} label="China">
@@ -233,7 +272,9 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                                 </Option>
                             ))}
                         </Select>
-                        <span className=" block bg-[#fff] px-[5px] absolute top-[8px] left-2 text-[12px] text-[#697586]">图标*</span>
+                        <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[8px] left-2 text-[12px] text-[#697586]">
+                            图标*
+                        </span>
                     </div>
                     <TextField
                         sx={{ mt: 2 }}
@@ -259,7 +300,8 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.basisPre) === JSON.stringify(nextProps?.basisPre) &&
         JSON.stringify(prevProps?.detail) === JSON.stringify(nextProps?.detail) &&
-        JSON.stringify(prevProps?.appModel) === JSON.stringify(nextProps?.appModel)
+        JSON.stringify(prevProps?.appModel) === JSON.stringify(nextProps?.appModel) &&
+        JSON.stringify(prevProps?.images) === JSON.stringify(nextProps?.images)
     );
 };
 export default memo(Basis, arePropsEqual);

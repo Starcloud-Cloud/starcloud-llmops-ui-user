@@ -64,27 +64,23 @@ const Right = ({
     return (
         <>
             {bathList?.length === 0 ? (
-                <div style={{ height: '100%' }} className="flex justify-center items-center">
-                    <div className="text-center">
-                        {exampleList?.length > 0 ? (
-                            <div className="!w-[300px] justify-center flex gap-2">
-                                {exampleList?.map((item: any) => (
-                                    <Good
-                                        key={item?.businessUid}
-                                        item={item}
-                                        setBusinessUid={setBusinessUid}
-                                        setDetailOpen={setDetailOpen}
-                                        show={true}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <img
-                                className="w-[300px]"
-                                src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
-                                alt=""
-                            />
-                        )}
+                <div style={{ height: '100%' }} className="flex flex-col justify-center items-center">
+                    {exampleList?.length > 0 ? (
+                        <div className="!w-[400px] h-[350px] flex gap-2">
+                            {exampleList?.map((item: any) => (
+                                <div className="w-[50%]" key={item?.businessUid}>
+                                    <Good item={item} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} show={true} />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <img
+                            className="w-[300px]"
+                            src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
+                            alt=""
+                        />
+                    )}
+                    <div className="flex flex-col justify-center items-center">
                         <div className="font-[500] text-[20px] text-[#1b2337] my-[8px]">魔法创作计划</div>
                         <div>在左侧输入你的创意，保存并开始生成吧</div>
                     </div>

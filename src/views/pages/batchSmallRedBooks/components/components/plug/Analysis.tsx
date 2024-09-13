@@ -470,7 +470,6 @@ const PlugAnalysis = ({
                             key={item.uuid}
                             label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
                             name={item.variableKey}
-                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
                         >
                             <Switch />
                         </Form.Item>

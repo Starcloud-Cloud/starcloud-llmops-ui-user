@@ -152,13 +152,13 @@ const MarketTemplate = ({ like, data, handleDetail, type }: any) => {
         </div>
     ) : (
         <div
-            className="overflow-hidden group rounded-[12px] shadow-md cursor-pointer bg-white relative p-4 !bg-cover"
+            className="w-full aspect-[.75] overflow-hidden group rounded-[12px] shadow-md cursor-pointer bg-white relative p-4 !bg-cover"
             style={{
                 aspectRatio: '.75',
                 background:
                     data?.images && data?.images[0]
-                        ? `url(${data?.images[0]})`
-                        : 'url(https://p8.itc.cn/q_70/images03/20230904/6b9e1ed6da8a434983fdd664d27e0d0a.jpeg)'
+                        ? `url(${data?.images[0]}),url(https://p8.itc.cn/q_70/images03/20230904/6b9e1ed6da8a434983fdd664d27e0d0a.jpeg?x-oss-process=image/resize,w_150/quality,q_80)`
+                        : 'url(https://p8.itc.cn/q_70/images03/20230904/6b9e1ed6da8a434983fdd664d27e0d0a.jpeg?x-oss-process=image/resize,w_150/quality,q_80)'
             }}
             onClick={() => handleDetail(data)}
         >

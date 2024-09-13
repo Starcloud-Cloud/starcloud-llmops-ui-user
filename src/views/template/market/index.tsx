@@ -383,29 +383,28 @@ function TemplateMarket() {
                                     changeCategory(item, index);
                                 }}
                                 key={item.name}
-                                className="h-[31px] px-3 py-1 cursor-pointer font-[600] bg-white shadow-md rounded-[6px] text-[rgb(75,74,88)] flex items-center gap-1 hover:bg-[#2E2E3814]"
+                                className="h-[31px] px-3 py-1 cursor-pointer font-[600] bg-white shadow-md rounded-[6px] text-[rgb(75,74,88)] flex items-center gap-1 hover:!bg-[#2E2E3814]"
                                 style={{
-                                    background: active === index ? '#673ab7' : '#fff',
-                                    color: active === index ? '#fff' : 'rgb(75,74,88)'
+                                    background: active === index ? '#ede7f6' : '#fff'
                                 }}
                             >
-                                <Image width={20} height={20} preview={false} src={getImage(item.icon)} />
+                                <img className="w-[20px] h-[20px]" src={getImage(item.icon)} />
                                 <span className="whitespace-nowrap">{item.name}</span>
                             </div>
                         ))}
                     </div>
-                    <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-52px)] overflow-x-hidden overflow-y-scroll">
+                    <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-68px)] overflow-x-hidden overflow-y-scroll">
                         {newList?.map((item, index) => (
                             <div key={index}>
                                 {item.appList?.length > 0 && (
                                     <>
-                                        {item?.code !== 'HOT' && (
+                                        {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
                                             <div className="flex justify-between items-center my-[24px]">
-                                                <div className="text-[20px] line-[25px] font-bold flex items-end gap-2">
+                                                <div className="flex items-center gap-2">
                                                     {queryParams.category === 'ALL' && (
                                                         <img height="20px" src={getImage(item.icon)} alt="" />
                                                     )}
-                                                    <span>{item.name}</span>
+                                                    <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
                                                 </div>
                                                 {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
                                                     <div
@@ -432,7 +431,7 @@ function TemplateMarket() {
                                         wrap={queryParams.category === 'ALL' ? false : true}
                                     >
                                         {item.appList.map((el: any, index: number) => (
-                                            <Col key={el?.uid} className={`xxxl-col aspect-[.75] flex-shrink-0`}>
+                                            <Col key={el?.uid} className={`xxxl-col flex-shrink-0`}>
                                                 <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
                                             </Col>
                                         ))}

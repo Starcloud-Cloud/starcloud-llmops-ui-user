@@ -1,9 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import { TextField, FormControl, InputLabel, Select as Selects, MenuItem, Divider } from '@mui/material';
-import { Select, Image, Upload } from 'antd';
-import type { UploadProps } from 'antd';
-import { getAccessToken } from 'utils/auth';
-import { PlusOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Select, Image } from 'antd';
 import { categoryTree } from 'api/template';
 import { TreeSelect } from 'antd';
 import { t } from 'hooks/web/useI18n';
@@ -76,25 +73,6 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
         { icon: 'other', name: '其他应用', code: 'OTHER' }
     ];
     const [loading, setLoading] = useState(false);
-    const props: UploadProps = {
-        name: 'image',
-        showUploadList: false,
-        listType: 'picture-card',
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
-        headers: {
-            Authorization: 'Bearer ' + getAccessToken()
-        },
-        onChange(info) {
-            if (info.file.status === 'uploading') {
-                setLoading(true);
-            } else if (info.file.status === 'done') {
-                setValues({ name: 'images', value: [info?.file?.response?.data?.url] });
-                setLoading(false);
-            } else if (info.file.status === 'error') {
-                setLoading(false);
-            }
-        }
-    };
 
     const [appNameOpen, setAppNameOpen] = useState(false);
     const [categoryOpen, setCategoryOpen] = useState(false);
@@ -209,19 +187,6 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                 >
                     标签
                 </span>
-            </div>
-            <div className="flex gap-2 items-center">
-                <div className="text-xs">封面图:</div>
-                <Upload {...props} className="mt-4">
-                    {detail?.images && detail?.images[0] ? (
-                        <img src={detail?.images && detail?.images[0]} alt="avatar" style={{ width: '100%' }} />
-                    ) : (
-                        <button style={{ border: 0, background: 'none' }} type="button">
-                            {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                            <div style={{ marginTop: 8 }}>Upload</div>
-                        </button>
-                    )}
-                </Upload>
             </div>
             {permissions.includes('app:operate:icon') && (
                 <div>

@@ -68,7 +68,7 @@ const Right = ({
     return (
         <>
             {bathList?.length === 0 || isexample ? (
-                <div style={{ height: '100%' }} className="flex relative flex-col justify-center items-center">
+                <div style={{ height: '100%' }} className="flex gap-2 relative flex-col justify-center items-center">
                     {isexample && (
                         <Button
                             onClick={() => setIsexample(false)}
@@ -80,9 +80,9 @@ const Right = ({
                         ></Button>
                     )}
                     {exampleList?.length > 0 ? (
-                        <div className="!w-[400px] h-[350px] flex gap-2">
+                        <div className="w-full overflow-x-auto flex justify-center gap-2">
                             {exampleList?.map((item: any) => (
-                                <div className="w-[50%]" key={item?.businessUid}>
+                                <div className="w-[380px]" key={item?.businessUid}>
                                     <Good
                                         item={item}
                                         setBusinessUid={(data: any) => {

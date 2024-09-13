@@ -41,6 +41,7 @@ const ThreeStep = ({
     data,
     show,
     pre,
+    isFlag,
     exeDetail,
     dataStatus,
     errMessage,
@@ -49,6 +50,7 @@ const ThreeStep = ({
 }: {
     data: any;
     show?: boolean;
+    isFlag?: boolean;
     pre: number;
     exeDetail: boolean;
     dataStatus: boolean;
@@ -226,7 +228,7 @@ const ThreeStep = ({
             >
                 {/* <Spin spinning={aginLoading}> */}
                 <div className="w-full  h-full relative grid grid-cols-3">
-                    {!show && !exeDetail && (
+                    {!show && !exeDetail && !isFlag && (
                         <div
                             className="flex gap-2"
                             style={{

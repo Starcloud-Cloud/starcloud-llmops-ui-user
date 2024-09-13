@@ -529,6 +529,7 @@ const BatcSmallRedBooks = forwardRef(
                 {detailOpen && (
                     <DetailModal
                         open={detailOpen}
+                        isFlag={bathList?.length === 0 || example}
                         changeList={changeList}
                         handleClose={() => setDetailOpen(false)}
                         businessUid={businessUid}

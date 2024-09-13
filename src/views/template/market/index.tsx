@@ -374,9 +374,9 @@ function TemplateMarket() {
                 borderRadius: '8px'
             }}
         >
-            <Tabs activeKey={value} onChange={setValue} aria-label="basic tabs example" className="h-full">
-                <Tabs.TabPane tab={<div className="!text-[20px] !line-[25px] font-bold">应用市场</div>} key="0">
-                    <div className="mt-4 pb-4 flex gap-3 w-full overflow-x-scroll">
+            <Tabs size="small" activeKey={value} onChange={setValue} aria-label="basic tabs example" className="h-full">
+                <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">应用市场</div>} key="0">
+                    <div className="mt-[-8px] pb-1 flex gap-3 w-full overflow-x-scroll">
                         {menuList?.map((item, index) => (
                             <div
                                 onClick={() => {
@@ -399,7 +399,10 @@ function TemplateMarket() {
                                 {item.appList?.length > 0 && (
                                     <>
                                         {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
-                                            <div className="flex justify-between items-center my-[24px]">
+                                            <div
+                                                style={{ marginTop: index === 1 ? 0 : '16px' }}
+                                                className="flex justify-between items-center mb-4"
+                                            >
                                                 <div className="flex items-center gap-2">
                                                     {queryParams.category === 'ALL' && (
                                                         <img height="20px" src={getImage(item.icon)} alt="" />
@@ -454,7 +457,7 @@ function TemplateMarket() {
                     </div>
                 </Tabs.TabPane>
                 {getTenant() !== ENUM_TENANT.AI && (
-                    <Tabs.TabPane tab={<div className="!text-[20px] !line-[25px] font-bold">我的应用</div>} key="1">
+                    <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">我的应用</div>} key="1">
                         <div className="relative">
                             <div
                                 className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
@@ -498,9 +501,9 @@ function TemplateMarket() {
                 {newList?.some((item) => item?.code === 'HOT') && (
                     <Tabs.TabPane
                         tab={
-                            <div className="!text-[20px] !line-[25px] font-bold flex items-end gap-2">
-                                <img height="20px" src={getImage(newList?.find((item) => item?.code === 'HOT').icon)} alt="" />
-                                <span>{newList?.find((item) => item?.code === 'HOT').name}</span>
+                            <div className="!text-[16px] !line-[25px] font-bold flex items-end gap-2">
+                                <img height="20px" src={getImage(newList?.find((item) => item?.code === 'HOT')?.icon)} alt="" />
+                                <span>{newList?.find((item) => item?.code === 'HOT')?.name}</span>
                             </div>
                         }
                         key="2"
@@ -512,14 +515,14 @@ function TemplateMarket() {
                             className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
                         >
                             {newList
-                                ?.find((item) => item.code === 'HOT')
+                                ?.find((item) => item?.code === 'HOT')
                                 ?.appList.map((el: any, index: number) => (
                                     <MarketTemplate type="APP" like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
                                 ))}
                         </div>
                     </Tabs.TabPane>
                 )}
-                <Tabs.TabPane tab={<div className="!text-[20px] !line-[25px] font-bold">我的收藏</div>} key="3">
+                <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">我的收藏</div>} key="3">
                     <div className="relative">
                         <div
                             style={{

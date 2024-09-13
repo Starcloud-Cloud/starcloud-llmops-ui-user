@@ -394,7 +394,7 @@ function TemplateMarket() {
                             </div>
                         ))}
                     </div>
-                    <div style={{ scrollbarGutter: 'stable' }} className="h-full overflow-x-hidden overflow-y-scroll">
+                    <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-52px)] overflow-x-hidden overflow-y-scroll">
                         {newList?.map((item, index) => (
                             <div key={index}>
                                 {item.appList?.length > 0 && (
@@ -426,7 +426,11 @@ function TemplateMarket() {
                                     </>
                                 )}
                                 {item.appList.length > 0 && item?.code !== 'HOT' && (
-                                    <Row className="overflow-x-hidden pb-[5px] " gutter={[16, 16]} wrap={false}>
+                                    <Row
+                                        className="overflow-x-hidden pb-[5px] "
+                                        gutter={[16, 16]}
+                                        wrap={queryParams.category === 'ALL' ? false : true}
+                                    >
                                         {item.appList.map((el: any, index: number) => (
                                             <Col key={el?.uid} className={`xxxl-col aspect-[.75] flex-shrink-0`}>
                                                 <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />

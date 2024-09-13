@@ -20,6 +20,7 @@ export interface Details {
     icon?: string;
     sort?: string;
     type?: string;
+    images?: string;
     scenes: string[];
     tags: string[];
     example: string;

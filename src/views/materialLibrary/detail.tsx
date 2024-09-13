@@ -75,7 +75,6 @@ import AddPlug from './components/addplug';
 import { CheckCard } from '@ant-design/pro-components';
 import { getPlugConfigInfo, getPlugInfo } from 'api/plug';
 import PlugAnalysis from 'views/pages/batchSmallRedBooks/components/components/plug/Analysis';
-import TriggerModal from './components/triggerModal';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
 import dayjs from 'dayjs';
@@ -168,9 +167,6 @@ export const TableHeader = ({
     const [sourceList, setSourceList] = useState<any[]>([]);
     const [addOpen, setAddOpen] = useState(false);
     const [plugType, setPlugType] = useState('');
-
-    //触发器
-    const [triggerOpen, setTriggerOpen] = useState(false);
 
     useEffect(() => {
         dictData('', 'material_create_source').then((res) => {
@@ -495,7 +491,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             );
                         })}
                         <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
-                        <div
+                        {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('小红书分析');
@@ -523,7 +519,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">小红书分析</div>
-                        </div>
+                        </div> */}
                         <div
                             onClick={() => {
                                 setPlugOpen(true);
@@ -630,7 +626,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             </svg>
                             <div className="text-[12px] font-bold mt-1">AI字段补齐</div>
                         </div>
-                        <div
+                        {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('微信公共号分析');
@@ -660,7 +656,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">微信公众号分析</div>
-                        </div>
+                        </div> */}
                         <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
                     </Space>
                     <div
@@ -1006,24 +1002,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     </Button>
                 </div>
             </Modal>
-            {triggerOpen && (
-                <TriggerModal
-                    triggerOpen={triggerOpen}
-                    setTriggerOpen={setTriggerOpen}
-                    definitionList={definitionList}
-                    libraryUid={libraryUid}
-                    name={name}
-                    columns={columns}
-                    metaData={metaData}
-                    rowData={rowData}
-                    selValue={selValue}
-                    setSelValue={setSelValue}
-                    selPlug={() => {
-                        setPlugMarketOpen(true);
-                        setSelType('触发器');
-                    }}
-                />
-            )}
             <Modal width="80%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
                 <Tabs
                     items={[

@@ -1175,7 +1175,8 @@ function CreateDetail() {
                                         example: detail?.example,
                                         sort: detail?.sort,
                                         type: detail?.type,
-                                        icon: detail?.icon
+                                        icon: detail?.icon,
+                                        images: detail?.images
                                     }}
                                     basisPre={basisPre}
                                     appModel={appModels?.appType}

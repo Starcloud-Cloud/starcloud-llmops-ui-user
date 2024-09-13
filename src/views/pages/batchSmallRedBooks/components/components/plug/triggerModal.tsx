@@ -684,18 +684,6 @@ ${JSON.stringify(value, null, 2)}
                                                                 </Popover>
                                                             </div>
                                                             {redBookData.requirement?.map((item: any) =>
-                                                                // <Form.Item
-                                                                //     initialValue={item.variableValue}
-                                                                //     key={item.uuid}
-                                                                //     label={
-                                                                //         item.variableKey +
-                                                                //         (item.variableDesc ? `(${item.variableDesc})` : '')
-                                                                //     }
-                                                                //     name={item.variableKey}
-                                                                //     rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                                                                // >
-                                                                //     <Input />
-                                                                // </Form.Item>
                                                                 item.variableType === 'String' ? (
                                                                     <Form.Item
                                                                         initialValue={item.variableValue}
@@ -704,21 +692,17 @@ ${JSON.stringify(value, null, 2)}
                                                                             item.variableKey +
                                                                             (item.variableDesc ? `(${item.variableDesc})` : '')
                                                                         }
-                                                                        name={item.variableType === 'String' ? item.variableKey : ''}
-                                                                        rules={
-                                                                            item.variableType === 'String'
-                                                                                ? [
-                                                                                      {
-                                                                                          required: true,
-                                                                                          message: item.variableKey + '是必填项'
-                                                                                      }
-                                                                                  ]
-                                                                                : []
-                                                                        }
+                                                                        name={item.variableKey}
+                                                                        rules={[
+                                                                            {
+                                                                                required: true,
+                                                                                message: item.variableKey + '是必填项'
+                                                                            }
+                                                                        ]}
                                                                     >
                                                                         <Input />
                                                                     </Form.Item>
-                                                                ) : (
+                                                                ) : item.variableType === 'Array<String>' ? (
                                                                     <Form.Item
                                                                         required
                                                                         label={
@@ -761,7 +745,21 @@ ${JSON.stringify(value, null, 2)}
                                                                             />
                                                                         </Form.Item>
                                                                     </Form.Item>
-                                                                )
+                                                                ) : item.variableType === 'Boolean' ? (
+                                                                    <Form.Item
+                                                                        valuePropName="checked"
+                                                                        initialValue={item.variableValue}
+                                                                        key={item.uuid}
+                                                                        label={
+                                                                            item.variableKey +
+                                                                            (item.variableDesc ? `(${item.variableDesc})` : '')
+                                                                        }
+                                                                        name={item.variableKey}
+                                                                        rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                                                                    >
+                                                                        <Switch />
+                                                                    </Form.Item>
+                                                                ) : null
                                                             )}
                                                             <div className="text-[16px] font-bold my-4 flex">
                                                                 2.输出字段绑定

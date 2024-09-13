@@ -212,7 +212,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 variableKey: key,
                 require: true,
                 // variableValue: outputObj[key],
-                variableType: getType(outputObj[key]) ? 'Array<String>' : 'String'
+                variableType: getType(outputObj[key]) ? 'Array<String>' : typeof outputObj[key] === 'boolean' ? 'Boolean' : 'String'
             });
         }
         setUuid(newoutputObj?.map((item: any) => item.uuid));

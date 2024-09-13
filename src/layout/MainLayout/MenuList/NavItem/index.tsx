@@ -22,6 +22,7 @@ import FormatShapesIcon from '@mui/icons-material/FormatShapes';
 import GradingIcon from '@mui/icons-material/Grading';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import AbcIcon from '@mui/icons-material/Abc';
+import PermMediaIcon from '@mui/icons-material/PermMedia';
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -64,6 +65,7 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         UpgradeIcon,
         ImageIcon,
         SmartToyIcon,
+        PermMediaIcon,
         AttachFileIcon,
         HdOutlinedIcon,
         ChatIcon,

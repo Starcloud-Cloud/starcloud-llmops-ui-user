@@ -34,7 +34,9 @@ import {
     Typography as AntTypography,
     message,
     Space,
-    Popconfirm
+    Popconfirm,
+    Upload,
+    UploadProps
 } from 'antd';
 
 // project imports
@@ -45,7 +47,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import Avatar from 'ui-component/extended/Avatar';
 import SubCard from 'ui-component/cards/SubCard';
-import { getAuthList, ProfileVO, unBind } from 'api/system/user/profile';
+import { getAuthList, ProfileVO, unBind, updateUserProfile } from 'api/system/user/profile';
 
 // assets
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
@@ -63,6 +65,8 @@ import { t } from 'hooks/web/useI18n';
 import dayjs from 'dayjs';
 import { authBind, authRedirect } from 'api/auth-coze';
 import { ModalForm, ProFormText, ProFormTextArea, ProList } from '@ant-design/pro-components';
+import { getAccessToken } from 'utils/auth';
+import { PlusOutlined } from '@ant-design/icons';
 // ==============================|| PROFILE 1 ||============================== //
 
 // tabs panel
@@ -196,26 +200,56 @@ const Profilnew = () => {
         }
     };
 
+    const props: UploadProps = {
+        name: 'image',
+        showUploadList: false,
+        listType: 'picture-circle',
+        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        headers: {
+            Authorization: 'Bearer ' + getAccessToken()
+        },
+        maxCount: 20,
+        onChange: (info) => {
+            if (info.file.status === 'done') {
+                // setUserProfile({ ...userProfile, avatar: info?.file?.response?.data?.url } as any);
+                updateUserProfile({
+                    avatar: info?.file?.response?.data?.url,
+                    username: userProfile?.username,
+                    nickname: userProfile?.nickname
+                }).then((res) => {
+                    if (res) {
+                        forceUpdate();
+                        message.success('上传成功');
+                    }
+                });
+            }
+        }
+    };
+
+    const uploadButton =
+        // <button style={{ border: 0, background: 'none' }} type="button">
+        {
+            /* <PlusOutlined /> */
+        };
+    // <Avatar alt={userProfile?.nickname} src={userProfile?.avatar} size="xl" />
+    // </button>
+
     return (
         <MainCard>
             <Grid container spacing={gridSpacing}>
                 <Grid item lg={4} xs={12}>
                     <SubCard
                         title={
-                            <Grid container spacing={2} alignItems="center" justifyContent="center" onClick={handleClickOpen}>
-                                {userProfile?.avatar ? (
-                                    <Grid item>
-                                        <MuiTooltip title="Add" aria-label="add">
-                                            <Fab color="secondary" sx={{ m: 2 }}>
-                                                <AddIcon />
-                                            </Fab>
-                                        </MuiTooltip>
-                                    </Grid>
-                                ) : (
-                                    <Grid item>
-                                        <Avatar alt={userProfile?.nickname} src={userProfile?.avatar} size="xl" />
-                                    </Grid>
-                                )}
+                            <Grid container spacing={2} alignItems="center" justifyContent="center">
+                                <Grid item>
+                                    <Upload {...props} className="cursor-pointer !w-[82px] !h-[82px]">
+                                        {userProfile?.avatar ? (
+                                            <img className="rounded-full w-full h-full" src={userProfile?.avatar} alt="avatar" />
+                                        ) : (
+                                            <Avatar alt={userProfile?.nickname} src={userProfile?.avatar} size="xl" />
+                                        )}
+                                    </Upload>
+                                </Grid>
                             </Grid>
                         }
                     >

@@ -823,18 +823,20 @@ const Lefts = ({
         ).value = data;
         const newQuery = newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
             (item: any) => item.field === 'SELECT_MATERIAL_QUERY'
-        ).value;
+        )?.value;
         let queryList;
         if (newQuery) {
             queryList = JSON.parse(newQuery);
         } else {
             queryList = { sliceIdList: [] };
         }
+        if (newQuery) {
+            queryList.sliceIdList = arr;
+            newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
+                (item: any) => item.field === 'SELECT_MATERIAL_QUERY'
+            ).value = JSON.stringify(queryList);
+        }
 
-        queryList.sliceIdList = arr;
-        newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
-            (item: any) => item.field === 'SELECT_MATERIAL_QUERY'
-        ).value = JSON.stringify(queryList);
         appRef.current = newData;
         setAppData(appRef.current);
         if (!detail) {
@@ -870,7 +872,7 @@ const Lefts = ({
                             : 'calc(100% - 14px)',
                         scrollbarGutter: 'stable'
                     }}
-                    className=" box-border overflow-y-auto pb-[72px] pr-1 mr-[-4px]"
+                    className=" box-border overflow-y-auto pr-1 mr-[-4px]"
                 >
                     <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
@@ -1294,12 +1296,7 @@ const Lefts = ({
                         )}
                     </Tabs>
                 </div>
-                <div
-                    style={{
-                        marginBottom: '16px'
-                    }}
-                    className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]"
-                >
+                <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <>
                             <Button

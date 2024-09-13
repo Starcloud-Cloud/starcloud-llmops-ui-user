@@ -25,7 +25,7 @@ import formatDate from 'hooks/useDate';
 import { Popconfirm, Button } from 'antd';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { t } from 'hooks/web/useI18n';
+import jsCookie from 'js-cookie';
 
 interface Row {
     uid: string;
@@ -121,7 +121,11 @@ function Form() {
         );
     };
     return (
-        <Box>
+        <Box
+            style={{
+                padding: jsCookie.get('isClient') ? '16px' : 0
+            }}
+        >
             <Grid container spacing={2} alignItems="center">
                 <Grid item xs={3}>
                     <TextField label="名称" fullWidth name="name" value={pageQuery.name} onChange={handleChange} />

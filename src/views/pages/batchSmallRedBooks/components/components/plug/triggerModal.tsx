@@ -1,4 +1,4 @@
-import { Modal, Tabs, Form, Input, Select, Cascader, Button, Avatar, Divider, Tooltip, Table, Tag, Popover } from 'antd';
+import { Modal, Tabs, Form, Input, Select, Cascader, Button, Collapse, Table, Tag, Popover, Switch } from 'antd';
 import { AppstoreFilled, DeleteOutlined, RetweetOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
@@ -8,6 +8,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import ChatMarkdown from 'ui-component/Markdown';
+import Editor from '@monaco-editor/react';
 const { Option } = Select;
 const TriggerModal = ({
     triggerOpen,
@@ -34,33 +35,56 @@ ${JSON.stringify(value, null, 2)}
 ~~~
 `;
     const [form] = Form.useForm();
-    const [forms] = Form.useForm();
     const [timeExpressionTypeList, settimeExpressionTypeList] = useState<any[]>([]);
     const timeList = [
         { value: '0 0 0', label: '00:00' },
+        { value: '0 30 0', label: '00:30' },
         { value: '0 0 1', label: '01:00' },
+        { value: '0 30 1', label: '01:30' },
         { value: '0 0 2', label: '02:00' },
+        { value: '0 30 2', label: '02:30' },
         { value: '0 0 3', label: '03:00' },
+        { value: '0 30 3', label: '03:30' },
         { value: '0 0 4', label: '04:00' },
+        { value: '0 30 4', label: '04:30' },
         { value: '0 0 5', label: '05:00' },
+        { value: '0 30 5', label: '05:30' },
         { value: '0 0 6', label: '06:00' },
+        { value: '0 30 6', label: '06:30' },
         { value: '0 0 7', label: '07:00' },
+        { value: '0 30 7', label: '07:30' },
         { value: '0 0 8', label: '08:00' },
+        { value: '0 30 8', label: '08:30' },
         { value: '0 0 9', label: '09:00' },
+        { value: '0 30 9', label: '09:30' },
         { value: '0 0 10', label: '10:00' },
+        { value: '0 30 10', label: '10:30' },
         { value: '0 0 11', label: '11:00' },
+        { value: '0 30 11', label: '11:30' },
         { value: '0 0 12', label: '12:00' },
+        { value: '0 30 12', label: '12:30' },
         { value: '0 0 13', label: '13:00' },
+        { value: '0 30 13', label: '13:30' },
         { value: '0 0 14', label: '14:00' },
+        { value: '0 30 14', label: '14:30' },
         { value: '0 0 15', label: '15:00' },
+        { value: '0 30 15', label: '15:30' },
         { value: '0 0 16', label: '16:00' },
+        { value: '0 30 16', label: '16:30' },
         { value: '0 0 17', label: '17:00' },
+        { value: '0 30 17', label: '17:30' },
         { value: '0 0 18', label: '18:00' },
+        { value: '0 30 18', label: '18:30' },
         { value: '0 0 19', label: '19:00' },
+        { value: '0 30 19', label: '19:30' },
         { value: '0 0 20', label: '20:00' },
+        { value: '0 30 20', label: '20:30' },
         { value: '0 0 21', label: '21:00' },
+        { value: '0 30 21', label: '21:30' },
         { value: '0 0 22', label: '22:00' },
-        { value: '0 0 23', label: '23:00' }
+        { value: '0 30 22', label: '22:30' },
+        { value: '0 0 23', label: '23:00' },
+        { value: '0 30 23', label: '23:30' }
     ];
     const timeExpressionList = [
         {
@@ -313,6 +337,7 @@ ${JSON.stringify(value, null, 2)}
                 ...rowData,
                 timeExpressionType: formRes.timeExpressionType,
                 foreignKey,
+                enable: formRes.enable,
                 timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
                 businessJobType: 'coze_standalone',
                 config: {
@@ -334,6 +359,7 @@ ${JSON.stringify(value, null, 2)}
                 name: record.pluginName + '触发器',
                 timeExpressionType: formRes.timeExpressionType,
                 foreignKey,
+                enable: formRes.enable,
                 timeExpression: _.cloneDeep(formRes.timeExpression)?.reverse()?.join(' ')?.trim(),
                 businessJobType: 'coze_standalone',
                 config: {
@@ -350,8 +376,8 @@ ${JSON.stringify(value, null, 2)}
                     pluginName: record.pluginName
                 }
             });
-            setRowPre();
         }
+        setRowPre();
         setTriggerOpen(false);
         dispatch(
             openSnackbar({
@@ -421,6 +447,7 @@ ${JSON.stringify(value, null, 2)}
             setData(data);
             form.setFieldsValue({
                 timeExpressionType: rowData?.timeExpressionType,
+                enable: rowData?.enable,
                 timeExpression: getValue(timeExpressionList),
                 ...obj
             });
@@ -531,10 +558,10 @@ ${JSON.stringify(value, null, 2)}
     //触发历史
     const column: TableColumnsType<any> = [
         {
-            title: '触发器时间',
-            align: 'center',
+            title: '插件名称',
+            dataIndex: 'pluginName',
             width: 200,
-            render: (_, row) => <div>{dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+            align: 'center'
         },
         {
             title: '触发器类型',
@@ -543,13 +570,19 @@ ${JSON.stringify(value, null, 2)}
             render: (_, row) => <div>{timeExpressionTypeList?.find((item) => item.value === row.triggerType)?.label}</div>
         },
         {
-            title: '执行插件名称',
-            dataIndex: 'pluginName',
+            title: '执行状态',
             align: 'center',
-            width: 200
+            width: 100,
+            render: (_, row) => <Tag color={row?.success ? 'success' : 'error'}>{row?.success ? '执行成功' : '执行失败'}</Tag>
         },
         {
-            title: '触发结果',
+            title: '执行数量',
+            align: 'center',
+            width: 100,
+            dataIndex: 'count'
+        },
+        {
+            title: '执行结果',
             align: 'center',
             width: 400,
             render: (_, row) => (
@@ -559,17 +592,17 @@ ${JSON.stringify(value, null, 2)}
             )
         },
         {
-            title: '耗时(s)',
+            title: '总耗时(s)',
             dataIndex: 'executeTime',
             align: 'center',
             width: 100,
             render: (_, row) => <div>{row.executeTime / 1000}</div>
         },
         {
-            title: '状态',
+            title: '触发时间',
             align: 'center',
-            width: 100,
-            render: (_, row) => <Tag color="processing">{row?.success ? '执行成功' : '执行失败'}</Tag>
+            width: 200,
+            render: (_, row) => <div>{dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss')}</div>
         }
     ];
     const [TableData, setTableData] = useState<any[]>([]);
@@ -580,6 +613,20 @@ ${JSON.stringify(value, null, 2)}
             businessJobUid: rowData?.uid
         });
         setTableData(result?.list);
+    };
+    //form 表单校验
+    const parseInputToArray = (input: any) => {
+        try {
+            const parsed = JSON.parse(input);
+            if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
+                return parsed;
+            }
+        } catch (e) {
+            return input;
+        }
+    };
+    const isArrayString = (value: any) => {
+        return Array.isArray(value) && value.every((item) => typeof item === 'string');
     };
     useEffect(() => {
         getList();
@@ -594,12 +641,16 @@ ${JSON.stringify(value, null, 2)}
                         children: (
                             <div>
                                 <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
+                                    <Form.Item required label="是否启用" name="enable" valuePropName="checked">
+                                        <Switch />
+                                    </Form.Item>
                                     <Form.Item
                                         label="触发器类型"
                                         name="timeExpressionType"
+                                        initialValue={2}
                                         rules={[{ required: true, message: '触发器类型必填' }]}
                                     >
-                                        <Select options={timeExpressionTypeList} />
+                                        <Select disabled options={timeExpressionTypeList} />
                                     </Form.Item>
                                     <Form.Item
                                         label="触发时间"
@@ -608,141 +659,235 @@ ${JSON.stringify(value, null, 2)}
                                     >
                                         <Cascader displayRender={(label) => label.join(' ')} options={timeExpressionList} />
                                     </Form.Item>
-                                    <div className="text-[16px] font-bold mb-4">
-                                        1.输入内容
-                                        <Popover
-                                            content={
-                                                <div className="w-[500px] max-h-[300px] overflow-auto">
-                                                    <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.input))} />
-                                                </div>
-                                            }
-                                            title="参数示例"
-                                        >
-                                            <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                                        </Popover>
-                                    </div>
-                                    {redBookData.requirement?.map((item: any) => (
-                                        <Form.Item
-                                            initialValue={item.variableValue}
-                                            key={item.uuid}
-                                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                                            name={item.variableKey}
-                                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                                        >
-                                            <Input />
-                                        </Form.Item>
-                                    ))}
-                                </Form>
-                                <div className="text-[16px] font-bold my-4 flex">
-                                    2.输出字段绑定
-                                    <Popover
-                                        content={
-                                            <div className="w-[500px] max-h-[300px] overflow-auto">
-                                                <ChatMarkdown textContent={value2JsonMd(JSON.parse(record.output))} />
-                                            </div>
-                                        }
-                                        title="参数示例"
-                                    >
-                                        <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                                    </Popover>
-                                </div>
-                                <Table
-                                    pagination={false}
-                                    bordered
-                                    size="small"
-                                    columns={[
-                                        {
-                                            title: '字段',
-                                            dataIndex: 'des',
-                                            align: 'center',
-                                            width: '40%',
-                                            render: (_, record) => record.des || record.label
-                                        },
-                                        {
-                                            title: '绑定到',
-                                            align: 'center',
-                                            width: '20%',
-                                            render: () => (
-                                                <svg
-                                                    viewBox="0 0 1024 1024"
-                                                    version="1.1"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    p-id="7263"
-                                                    width="20"
-                                                    height="20"
-                                                >
-                                                    <path
-                                                        d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
-                                                        fill="#8a8a8a"
-                                                        p-id="7264"
-                                                    ></path>
-                                                </svg>
-                                            )
-                                        },
-                                        {
-                                            title: '素材字段',
-                                            dataIndex: 'value',
-                                            align: 'center',
-                                            width: '40%',
-                                            render: (_, record) => {
-                                                return (
-                                                    data.length > 0 && (
-                                                        <Select
-                                                            style={{ width: 160 }}
-                                                            allowClear
-                                                            value={record.value}
-                                                            onChange={(value) => {
-                                                                let fieldList = redBookData.fieldList || [];
-                                                                console.log(fieldList);
-
-                                                                let bindFieldData = redBookData.bindFieldData;
-                                                                if (value) {
-                                                                    fieldList = [...fieldList, record.label_key];
-                                                                    bindFieldData[record.label_key] = value;
-                                                                } else {
-                                                                    fieldList = fieldList.filter((item: any) => item !== record.label_key);
-                                                                    delete bindFieldData[record.label_key];
-                                                                }
-
-                                                                const copyData = [...data];
-                                                                const index = copyData.findIndex(
-                                                                    (item) => item.label_key === record.label_key
-                                                                );
-                                                                copyData[index].value = value;
-                                                                setData(copyData);
-
-                                                                setRedBookData((pre: any) => {
-                                                                    return {
-                                                                        ...pre,
-                                                                        fieldList,
-                                                                        bindFieldData
-                                                                    };
-                                                                });
-                                                            }}
-                                                        >
-                                                            {columns
-                                                                .filter((item) => !item.isDefault)
-                                                                ?.map((item) => {
-                                                                    return (
-                                                                        <Option
-                                                                            key={item.dataIndex}
-                                                                            value={item.dataIndex}
-                                                                            disabled={Object.values(
-                                                                                redBookData.bindFieldData || {}
-                                                                            ).includes(item.dataIndex)}
+                                    <Collapse
+                                        defaultActiveKey={['1']}
+                                        items={[
+                                            {
+                                                key: '1',
+                                                label: '参数设置',
+                                                children: (
+                                                    <div className="flex justify-center">
+                                                        <div className="w-[70%]">
+                                                            <div className="text-[16px] font-bold mb-4">
+                                                                1.输入参数
+                                                                <Popover
+                                                                    content={
+                                                                        <div className="w-[500px] max-h-[300px] overflow-auto">
+                                                                            <ChatMarkdown
+                                                                                textContent={value2JsonMd(JSON.parse(record.input))}
+                                                                            />
+                                                                        </div>
+                                                                    }
+                                                                    title="参数示例"
+                                                                >
+                                                                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                                                                </Popover>
+                                                            </div>
+                                                            {redBookData.requirement?.map((item: any) =>
+                                                                // <Form.Item
+                                                                //     initialValue={item.variableValue}
+                                                                //     key={item.uuid}
+                                                                //     label={
+                                                                //         item.variableKey +
+                                                                //         (item.variableDesc ? `(${item.variableDesc})` : '')
+                                                                //     }
+                                                                //     name={item.variableKey}
+                                                                //     rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                                                                // >
+                                                                //     <Input />
+                                                                // </Form.Item>
+                                                                item.variableType === 'String' ? (
+                                                                    <Form.Item
+                                                                        initialValue={item.variableValue}
+                                                                        key={item.uuid}
+                                                                        label={
+                                                                            item.variableKey +
+                                                                            (item.variableDesc ? `(${item.variableDesc})` : '')
+                                                                        }
+                                                                        name={item.variableType === 'String' ? item.variableKey : ''}
+                                                                        rules={
+                                                                            item.variableType === 'String'
+                                                                                ? [
+                                                                                      {
+                                                                                          required: true,
+                                                                                          message: item.variableKey + '是必填项'
+                                                                                      }
+                                                                                  ]
+                                                                                : []
+                                                                        }
+                                                                    >
+                                                                        <Input />
+                                                                    </Form.Item>
+                                                                ) : (
+                                                                    <Form.Item
+                                                                        required
+                                                                        label={
+                                                                            item.variableKey +
+                                                                            (item.variableDesc ? `(${item.variableDesc})` : '')
+                                                                        }
+                                                                    >
+                                                                        <div className="flex items-center relative bg-[#F4F4F6] px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                                                            <span>json</span>
+                                                                        </div>
+                                                                        <Form.Item
+                                                                            initialValue={item.variableValue || '[]'}
+                                                                            name={item.variableKey}
+                                                                            rules={[
+                                                                                { required: true, message: item.variableKey + '是必填项' },
+                                                                                {
+                                                                                    validator: (_, value) => {
+                                                                                        if (!value) {
+                                                                                            return Promise.resolve();
+                                                                                        }
+                                                                                        const parsedValue = parseInputToArray(value);
+                                                                                        if (isArrayString(parsedValue)) {
+                                                                                            return Promise.resolve();
+                                                                                        }
+                                                                                        return Promise.reject(
+                                                                                            new Error('请输入正确的JSON结构')
+                                                                                        );
+                                                                                    }
+                                                                                }
+                                                                            ]}
                                                                         >
-                                                                            {item.title}
-                                                                        </Option>
-                                                                    );
-                                                                })}
-                                                        </Select>
-                                                    )
-                                                );
+                                                                            <Editor
+                                                                                className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
+                                                                                height="200px"
+                                                                                defaultLanguage="json"
+                                                                                options={{
+                                                                                    minimap: { enabled: false }
+                                                                                }}
+                                                                                onChange={(value: any) => {}}
+                                                                            />
+                                                                        </Form.Item>
+                                                                    </Form.Item>
+                                                                )
+                                                            )}
+                                                            <div className="text-[16px] font-bold my-4 flex">
+                                                                2.输出字段绑定
+                                                                <Popover
+                                                                    content={
+                                                                        <div className="w-[500px] max-h-[300px] overflow-auto">
+                                                                            <ChatMarkdown
+                                                                                textContent={value2JsonMd(JSON.parse(record.output))}
+                                                                            />
+                                                                        </div>
+                                                                    }
+                                                                    title="参数示例"
+                                                                >
+                                                                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                                                                </Popover>
+                                                            </div>
+                                                            <Table
+                                                                pagination={false}
+                                                                bordered
+                                                                size="small"
+                                                                columns={[
+                                                                    {
+                                                                        title: '字段',
+                                                                        dataIndex: 'des',
+                                                                        align: 'center',
+                                                                        width: '40%',
+                                                                        render: (_, record) => record.des || record.label
+                                                                    },
+                                                                    {
+                                                                        title: '绑定到',
+                                                                        align: 'center',
+                                                                        width: '20%',
+                                                                        render: () => (
+                                                                            <svg
+                                                                                viewBox="0 0 1024 1024"
+                                                                                version="1.1"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                p-id="7263"
+                                                                                width="20"
+                                                                                height="20"
+                                                                            >
+                                                                                <path
+                                                                                    d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
+                                                                                    fill="#8a8a8a"
+                                                                                    p-id="7264"
+                                                                                ></path>
+                                                                            </svg>
+                                                                        )
+                                                                    },
+                                                                    {
+                                                                        title: '素材字段',
+                                                                        dataIndex: 'value',
+                                                                        align: 'center',
+                                                                        width: '40%',
+                                                                        render: (_, record) => {
+                                                                            return (
+                                                                                data.length > 0 && (
+                                                                                    <Select
+                                                                                        style={{ width: 160 }}
+                                                                                        allowClear
+                                                                                        value={record.value}
+                                                                                        onChange={(value) => {
+                                                                                            let fieldList = redBookData.fieldList || [];
+                                                                                            console.log(fieldList);
+
+                                                                                            let bindFieldData = redBookData.bindFieldData;
+                                                                                            if (value) {
+                                                                                                fieldList = [
+                                                                                                    ...fieldList,
+                                                                                                    record.label_key
+                                                                                                ];
+                                                                                                bindFieldData[record.label_key] = value;
+                                                                                            } else {
+                                                                                                fieldList = fieldList.filter(
+                                                                                                    (item: any) => item !== record.label_key
+                                                                                                );
+                                                                                                delete bindFieldData[record.label_key];
+                                                                                            }
+
+                                                                                            const copyData = [...data];
+                                                                                            const index = copyData.findIndex(
+                                                                                                (item) =>
+                                                                                                    item.label_key === record.label_key
+                                                                                            );
+                                                                                            copyData[index].value = value;
+                                                                                            setData(copyData);
+
+                                                                                            setRedBookData((pre: any) => {
+                                                                                                return {
+                                                                                                    ...pre,
+                                                                                                    fieldList,
+                                                                                                    bindFieldData
+                                                                                                };
+                                                                                            });
+                                                                                        }}
+                                                                                    >
+                                                                                        {columns
+                                                                                            .filter((item) => !item.isDefault)
+                                                                                            ?.map((item) => {
+                                                                                                return (
+                                                                                                    <Option
+                                                                                                        key={item.dataIndex}
+                                                                                                        value={item.dataIndex}
+                                                                                                        disabled={Object.values(
+                                                                                                            redBookData.bindFieldData || {}
+                                                                                                        ).includes(item.dataIndex)}
+                                                                                                    >
+                                                                                                        {item.title}
+                                                                                                    </Option>
+                                                                                                );
+                                                                                            })}
+                                                                                    </Select>
+                                                                                )
+                                                                            );
+                                                                        }
+                                                                    }
+                                                                ]}
+                                                                dataSource={data}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )
                                             }
-                                        }
-                                    ]}
-                                    dataSource={data}
-                                />
+                                        ]}
+                                    />
+                                </Form>
                                 <div className="flex mt-4 justify-center">
                                     <Button onClick={handleSave} className="w-[100px]" type="primary">
                                         保存

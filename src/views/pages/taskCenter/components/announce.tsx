@@ -1,9 +1,7 @@
 import {
-    Button as Buttons,
     Modal,
     IconButton,
     CardContent,
-    Switch,
     FormControl,
     InputLabel,
     Select as Selects,
@@ -12,14 +10,12 @@ import {
     CardActions,
     Grid,
     Divider,
-    InputAdornment,
-    Box,
-    Chip
+    InputAdornment
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import MainCard from 'ui-component/cards/MainCard';
-import { Table, Button, Tag, Row, Col, DatePicker, Steps, Tooltip, Popover, Collapse, InputNumber, Select, Form } from 'antd';
+import { Switch, Table, Button, Tag, Row, Col, DatePicker, Steps, Tooltip, Popover, Collapse, InputNumber, Select, Popconfirm } from 'antd';
 import { SearchOutlined, ExportOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -29,13 +25,13 @@ import { singlePage, singleModify } from 'api/redBook/task';
 import { useLocation } from 'react-router-dom';
 import AddAnnounce from './addAnnounce';
 import { DetailModal } from '../../redBookContentList/component/detailModal';
-import { Confirm } from 'ui-component/Confirm';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { singleDelete, singleRefresh, singleExport, bathDelete } from 'api/redBook/task';
+import { singleDelete, singleRefresh, singleExport, bathDelete, notificationPublish } from 'api/redBook/task';
 import copy from 'clipboard-copy';
 import './addModal.scss';
 const Announce = ({
+    notificationUid,
     status,
     isPublic,
     setIsPublic,
@@ -45,10 +41,12 @@ const Announce = ({
     setminFansNum,
     setclaimLimit,
     limitSave,
+    changePre,
     address,
     fansNum,
     gender
 }: {
+    notificationUid?: string;
     status?: string;
     isPublic: boolean;
     setIsPublic: (data: boolean) => void;
@@ -58,6 +56,7 @@ const Announce = ({
     minFansNum: any;
     setminFansNum: (data: any) => void;
     limitSave: (data: boolean) => void;
+    changePre: () => void;
     address: any[];
     fansNum: any[];
     gender: any[];
@@ -138,10 +137,12 @@ const Announce = ({
     const columns: ColumnsType<any> = [
         {
             title: '发帖标题',
+            align: 'center',
+            width: 400,
             dataIndex: 'copywriting',
             render: (_, row) => (
                 <div
-                    className="cursor-pointer hover:text-[#673ab7]"
+                    className="cursor-pointer hover:text-[#673ab7] line-clamp-4"
                     onClick={() => {
                         setBusinessUid(row.creativeUid);
                         setDetailOpen(true);
@@ -152,11 +153,9 @@ const Announce = ({
             )
         },
         {
-            title: '创作计划',
-            dataIndex: 'planName'
-        },
-        {
             title: '状态',
+            align: 'center',
+            width: 150,
             dataIndex: 'status',
             render: (_, row) => (
                 <div>
@@ -175,19 +174,26 @@ const Announce = ({
         },
         {
             title: '认领人',
+            align: 'center',
+            width: 150,
             dataIndex: 'claimUsername'
         },
         {
             title: '认领时间',
+            align: 'center',
+            width: 200,
             render: (_, row) => <div>{row.claimTime && formatDate(row.claimTime)}</div>
         },
         {
             title: '发布时间',
+            align: 'center',
+            width: 200,
             render: (_, row) => <div>{row.publishTime && formatDate(row.publishTime)}</div>
         },
         {
             title: '互动数据',
-            width: 110,
+            align: 'center',
+            width: 130,
             render: (_, row) => (
                 <div>
                     <div>点赞数：{row?.likedCount || 0}</div>
@@ -197,22 +203,32 @@ const Announce = ({
         },
         {
             title: '预估花费',
+            align: 'center',
+            width: 100,
             dataIndex: 'estimatedAmount'
         },
         {
             title: '预结算时间',
+            align: 'center',
+            width: 200,
             render: (_, row) => <div>{row.preSettlementTime && formatDate(row.preSettlementTime)}</div>
         },
         {
             title: '结算金额',
+            align: 'center',
+            width: 100,
             dataIndex: 'settlementAmount'
         },
         {
             title: '结算时间',
+            align: 'center',
+            width: 200,
             render: (_, row) => <div>{row.settlementTime && formatDate(row.settlementTime)}</div>
         },
         {
             title: '发布链接',
+            align: 'center',
+            width: 200,
             render: (_, row) => (
                 <Popover content={'点击跳转'}>
                     <div onClick={() => window.open(row.publishUrl)} className="w-[150px] cursor-pointer hover:text-[#673ab7]">
@@ -223,6 +239,8 @@ const Announce = ({
         },
         {
             title: '认领链接',
+            align: 'center',
+            width: 310,
             render: (_, row) => (
                 <Popover content={'点击复制'}>
                     <div
@@ -242,7 +260,7 @@ const Announce = ({
                                 })
                             );
                         }}
-                        className="w-[150px] cursor-pointer hover:text-[#673ab7]"
+                        className="cursor-pointer hover:text-[#673ab7]"
                     >
                         {row.claimUrl}
                     </div>
@@ -251,28 +269,32 @@ const Announce = ({
         },
         {
             title: '创建时间',
+            align: 'center',
+            width: 200,
             render: (_, row) => <div>{row.createTime && formatDate(row.createTime)}</div>
         },
         {
             title: '更新时间',
+            align: 'center',
+            width: 200,
             render: (_, row) => <div>{row.updateTime && formatDate(row.updateTime)}</div>
         },
         {
             title: '操作',
-            width: 140,
+            width: 150,
+            fixed: 'right',
             align: 'center',
             render: (_, row, index) => (
                 <div className="whitespace-nowrap">
                     {status !== 'published' ? (
-                        <Tooltip title={<span className="text-[#000]">只有通告发布后才能编辑</span>} color={'#fff'}>
+                        <Tooltip title="只有通告发布后才能编辑">
                             <div className="text-[#000]/[0.26] w-[64px] h-[30.75px] inline-block text-center leading-[30.75px] items-center cursor-pointer">
                                 编辑
                             </div>
                         </Tooltip>
                     ) : (
-                        <Buttons
-                            size="small"
-                            color="secondary"
+                        <Button
+                            type="link"
                             onClick={() => {
                                 setTime({
                                     publishTime: row.publishTime && dayjs(row.publishTime),
@@ -285,18 +307,33 @@ const Announce = ({
                             }}
                         >
                             编辑
-                        </Buttons>
+                        </Button>
                     )}
-                    <Buttons
-                        onClick={() => {
-                            setUid(row.uid);
-                            setExecuteOpen(true);
+                    <Popconfirm
+                        title="提示"
+                        description="请再次确认是否删除"
+                        onConfirm={async () => {
+                            const result = await singleDelete(row.uid);
+                            getList();
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '删除成功',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
                         }}
-                        size="small"
-                        color="error"
                     >
-                        删除
-                    </Buttons>
+                        <Button type="link" danger>
+                            删除
+                        </Button>
+                    </Popconfirm>
                 </div>
             )
         }
@@ -353,50 +390,6 @@ const Announce = ({
             setUids(selectedRowKeys);
         }
     };
-    const [delsOpen, setDelsOpen] = useState(false);
-    const handleDels = async () => {
-        const res = await bathDelete(uids);
-        if (res) {
-            setDelsOpen(false);
-            getList();
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '删除成功',
-                    variant: 'alert',
-                    alert: {
-                        color: 'success'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-        }
-    };
-    //删除
-    const [uid, setUid] = useState('');
-    const [executeOpen, setExecuteOpen] = useState(false);
-    const Execute = async () => {
-        const result = await singleDelete(uid);
-        if (result) {
-            setExecuteOpen(false);
-            getList();
-            dispatch(
-                openSnackbar({
-                    open: true,
-                    message: '删除成功',
-                    variant: 'alert',
-                    alert: {
-                        color: 'success'
-                    },
-                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                    transition: 'SlideDown',
-                    close: false
-                })
-            );
-        }
-    };
     //编辑
     const [time, setTime] = useState<any>({});
     const [editData, setEditData] = useState<any>({});
@@ -434,8 +427,42 @@ const Announce = ({
     const [detailOpen, setDetailOpen] = useState<any>(false);
     const [businessUid, setBusinessUid] = useState<string>('');
 
+    const [switchLoading, setSwitchLoading] = useState(false);
+
     return (
         <div>
+            <div className="flex gap-2 items-center mb-4">
+                发布任务：
+                <Switch
+                    loading={switchLoading}
+                    checked={status === 'published' ? true : false}
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                    onChange={async (check) => {
+                        try {
+                            setSwitchLoading(true);
+                            await notificationPublish(notificationUid, check);
+                            changePre();
+                            setSwitchLoading(false);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '操作成功',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
+                        } catch (err) {
+                            setSwitchLoading(false);
+                        }
+                    }}
+                />
+            </div>
             <Collapse
                 items={[
                     {
@@ -443,171 +470,127 @@ const Announce = ({
                         label: '通告发布配置',
                         children: (
                             <div>
-                                <div className="font-[500] mb-[20px]">是否公开通告</div>
-                                <div className="flex items-center mb-[20px]">
+                                <div className="font-[500] mb-4">是否公开通告</div>
+                                <div className="flex items-center mb-4">
                                     <span>是否公开</span>
-                                    <Switch color="secondary" checked={isPublic} onChange={() => setIsPublic(!isPublic)} />
+                                    <Switch checked={isPublic} onChange={() => setIsPublic(!isPublic)} />
                                 </div>
-                                <div className="font-[500] mt-[40px] mb-[20px]">领取人员限制</div>
+                                <div className="font-[500] mt-5 mb-4">领取人员限制</div>
                                 <div className="flex justify-between items-center">
                                     <Row className="flex-1" gutter={20}>
                                         <Col className="mb-[20px] flex items-center" lg={12}>
                                             <div className="font-[500] whitespace-nowrap w-[100px]">地区限制</div>
-                                            <FormControl
-                                                className="w-[300px] 2xl:w-[400px] ml-[10px]"
-                                                fullWidth
-                                                key={claimLimit?.address}
-                                                color="secondary"
-                                                size="small"
-                                            >
-                                                <Selects
-                                                    size="small"
-                                                    labelId="addres"
-                                                    name="address"
-                                                    multiple
-                                                    endAdornment={
-                                                        claimLimit?.address &&
-                                                        claimLimit?.address !== 'unlimited' && (
-                                                            <InputAdornment className="mr-[10px]" position="end">
-                                                                <IconButton
-                                                                    size="small"
-                                                                    onClick={() => {
-                                                                        handleRes({ name: 'address', value: ['unlimited'] });
-                                                                    }}
-                                                                >
-                                                                    <ClearIcon />
-                                                                </IconButton>
-                                                            </InputAdornment>
-                                                        )
-                                                    }
-                                                    renderValue={(selected) => (
-                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                            {selected.map((value: any) => (
-                                                                <Chip
-                                                                    size="small"
-                                                                    key={value}
-                                                                    label={address?.filter((item) => item.value === value)[0]?.label}
-                                                                />
-                                                            ))}
-                                                        </Box>
-                                                    )}
+                                            <div className="relative group">
+                                                <Select
+                                                    className="w-[300px]"
                                                     value={claimLimit?.address}
-                                                    onChange={(e: any) => {
-                                                        console.log(e.target.value);
-                                                        if (e.target.value?.length > 1) {
-                                                            handleRes({
-                                                                name: 'address',
-                                                                value: e.target.value?.filter((value: any) => value !== 'unlimited')
-                                                            });
-                                                        } else {
-                                                            handleRes(e.target);
+                                                    mode="multiple"
+                                                    onChange={(value: any) => {
+                                                        const valueLength = value?.length || 0;
+                                                        if (valueLength > 1) {
+                                                            if (value[valueLength - 1] !== 'unlimited') {
+                                                                handleRes({
+                                                                    name: 'address',
+                                                                    value: value?.filter((item: any) => item !== 'unlimited')
+                                                                });
+                                                            } else if (value[valueLength - 1] === 'unlimited') {
+                                                                handleRes({ name: 'address', value: ['unlimited'] });
+                                                            }
                                                         }
                                                     }}
                                                 >
-                                                    {address?.map(
-                                                        (item) =>
-                                                            item.label !== '不限' && (
-                                                                <MenuItem key={item.value} value={item.value}>
-                                                                    {item.label}
-                                                                </MenuItem>
-                                                            )
-                                                    )}
-                                                </Selects>
-                                            </FormControl>
+                                                    {address?.map((item) => (
+                                                        <Option key={item.value} value={item.value}>
+                                                            {item.label}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                                <svg
+                                                    className="bg-white absolute right-[10px] top-[10px] cursor-pointer hidden group-hover:block"
+                                                    fill="#00000040"
+                                                    onClick={() => handleRes({ name: 'address', value: ['unlimited'] })}
+                                                    viewBox="0 0 1024 1024"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    p-id="6677"
+                                                    width="12"
+                                                    height="12"
+                                                >
+                                                    <path
+                                                        d="M512 32C246.4 32 32 246.4 32 512s214.4 480 480 480 480-214.4 480-480S777.6 32 512 32z m140.8 579.2c12.8 12.8 12.8 32 0 41.6-12.8 12.8-32 12.8-41.6 0L512 553.6l-99.2 99.2c-12.8 12.8-32 12.8-41.6 0s-12.8-32 0-41.6l99.2-99.2-99.2-99.2c-12.8-12.8-12.8-32 0-41.6 12.8-12.8 32-12.8 41.6 0l99.2 99.2 99.2-99.2c12.8-12.8 32-12.8 41.6 0 12.8 12.8 12.8 32 0 41.6L553.6 512l99.2 99.2z"
+                                                        p-id="6678"
+                                                    ></path>
+                                                </svg>
+                                            </div>
                                         </Col>
                                         <Col className="mb-[20px] flex items-center" lg={12}>
                                             <div className="font-[500] whitespace-nowrap w-[100px]">粉丝</div>
-                                            <div className="relative">
-                                                <FormControl
-                                                    fullWidth
-                                                    className="w-[300px]  xl:w-[400px] ml-[10px]"
-                                                    key={minFansNum}
-                                                    color="secondary"
-                                                    size="small"
+                                            <div className="relative group">
+                                                <Select
+                                                    className="w-[300px]"
+                                                    value={minFansNum}
+                                                    onChange={(value: any) => setminFansNum(value)}
                                                 >
-                                                    <Selects
-                                                        size="small"
-                                                        name="address"
-                                                        endAdornment={
-                                                            minFansNum && (
-                                                                <InputAdornment className="mr-[10px]" position="end">
-                                                                    <IconButton
-                                                                        size="small"
-                                                                        onClick={() => {
-                                                                            setminFansNum(0);
-                                                                        }}
-                                                                    >
-                                                                        <ClearIcon />
-                                                                    </IconButton>
-                                                                </InputAdornment>
-                                                            )
-                                                        }
-                                                        value={minFansNum}
-                                                        onChange={(e: any) => {
-                                                            setminFansNum(e.target.value);
-                                                        }}
-                                                    >
-                                                        {fansNum?.map((item) => (
-                                                            <MenuItem
-                                                                style={{ display: item.label !== '不限' ? 'block' : 'none' }}
-                                                                key={item.value}
-                                                                value={item.value}
-                                                            >
-                                                                {item.label}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Selects>
-                                                </FormControl>
-                                                <div className="bg-[#f8fafc] w-[10px] h-[10px] absolute right-[1px] top-[15px]"></div>
+                                                    {fansNum?.map((item) => (
+                                                        <Option key={item.value} value={item.value}>
+                                                            {item.label}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                                <svg
+                                                    className="bg-white absolute right-[10px] top-[10px] cursor-pointer hidden group-hover:block"
+                                                    fill="#00000040"
+                                                    onClick={() => setminFansNum(0)}
+                                                    viewBox="0 0 1024 1024"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    p-id="6677"
+                                                    width="12"
+                                                    height="12"
+                                                >
+                                                    <path
+                                                        d="M512 32C246.4 32 32 246.4 32 512s214.4 480 480 480 480-214.4 480-480S777.6 32 512 32z m140.8 579.2c12.8 12.8 12.8 32 0 41.6-12.8 12.8-32 12.8-41.6 0L512 553.6l-99.2 99.2c-12.8 12.8-32 12.8-41.6 0s-12.8-32 0-41.6l99.2-99.2-99.2-99.2c-12.8-12.8-12.8-32 0-41.6 12.8-12.8 32-12.8 41.6 0l99.2 99.2 99.2-99.2c12.8-12.8 32-12.8 41.6 0 12.8 12.8 12.8 32 0 41.6L553.6 512l99.2 99.2z"
+                                                        p-id="6678"
+                                                    ></path>
+                                                </svg>
                                             </div>
                                         </Col>
                                         <Col className="flex items-center" lg={12}>
                                             <div className="font-[500] whitespace-nowrap w-[100px]">性别</div>
-                                            <FormControl
-                                                className="w-[300px]  xl:w-[400px] ml-[10px]"
-                                                key={claimLimit?.gender}
-                                                color="secondary"
-                                                size="small"
-                                                fullWidth
-                                            >
-                                                <Selects
-                                                    defaultValue={'不限'}
-                                                    name="gender"
-                                                    endAdornment={
-                                                        claimLimit?.gender &&
-                                                        claimLimit?.gender !== 'unlimited' && (
-                                                            <InputAdornment className="mr-[10px]" position="end">
-                                                                <IconButton
-                                                                    size="small"
-                                                                    onClick={() => {
-                                                                        handleRes({ name: 'gender', value: 'unlimited' });
-                                                                    }}
-                                                                >
-                                                                    <ClearIcon />
-                                                                </IconButton>
-                                                            </InputAdornment>
-                                                        )
-                                                    }
+                                            <div className="relative group">
+                                                <Select
+                                                    className="w-[300px]"
                                                     value={claimLimit?.gender}
-                                                    onChange={(e: any) => handleRes(e.target)}
+                                                    onChange={(value: any) => handleRes({ name: 'gender', value })}
                                                 >
                                                     {gender?.map((item) => (
-                                                        <MenuItem
-                                                            style={{ display: item.label !== '不限' ? 'block' : 'none' }}
-                                                            key={item.value}
-                                                            value={item.value}
-                                                        >
+                                                        <Option key={item.value} value={item.value}>
                                                             {item.label}
-                                                        </MenuItem>
+                                                        </Option>
                                                     ))}
-                                                </Selects>
-                                            </FormControl>
+                                                </Select>
+                                                <svg
+                                                    className="bg-white absolute right-[10px] top-[10px] cursor-pointer hidden group-hover:block"
+                                                    fill="#00000040"
+                                                    onClick={() => handleRes({ name: 'gender', value: 'unlimited' })}
+                                                    viewBox="0 0 1024 1024"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    p-id="6677"
+                                                    width="12"
+                                                    height="12"
+                                                >
+                                                    <path
+                                                        d="M512 32C246.4 32 32 246.4 32 512s214.4 480 480 480 480-214.4 480-480S777.6 32 512 32z m140.8 579.2c12.8 12.8 12.8 32 0 41.6-12.8 12.8-32 12.8-41.6 0L512 553.6l-99.2 99.2c-12.8 12.8-32 12.8-41.6 0s-12.8-32 0-41.6l99.2-99.2-99.2-99.2c-12.8-12.8-12.8-32 0-41.6 12.8-12.8 32-12.8 41.6 0l99.2 99.2 99.2-99.2c12.8-12.8 32-12.8 41.6 0 12.8 12.8 12.8 32 0 41.6L553.6 512l99.2 99.2z"
+                                                        p-id="6678"
+                                                    ></path>
+                                                </svg>
+                                            </div>
                                         </Col>
                                         <Col className="flex items-center" lg={12}>
                                             <div className="font-[500] whitespace-nowrap w-[100px]">每人领取数量</div>
                                             <InputNumber
-                                                className="w-[300px]  xl:w-[400px] ml-[10px] bg-[#f8fafc]"
-                                                size="large"
+                                                className="w-[300px]"
                                                 min={1}
                                                 value={claimLimit?.claimNum}
                                                 onChange={(e) => {
@@ -706,9 +689,31 @@ const Announce = ({
                     </Row>
                 </div>
                 <div className="flex items-end gap-2">
-                    <Button disabled={uids?.length === 0} onClick={() => setDelsOpen(true)} danger icon={<DeleteOutlined />} type="primary">
-                        批量删除
-                    </Button>
+                    <Popconfirm
+                        title="提示"
+                        description="请再次确认是否删除"
+                        onConfirm={async () => {
+                            const res = await bathDelete(uids);
+                            getList();
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '删除成功',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    transition: 'SlideDown',
+                                    close: false
+                                })
+                            );
+                        }}
+                    >
+                        <Button disabled={uids?.length === 0} danger icon={<DeleteOutlined />} type="primary">
+                            批量删除
+                        </Button>
+                    </Popconfirm>
                     <Tooltip
                         title={
                             !searchParams.get('notificationUid') || status === 'published' ? (
@@ -746,31 +751,17 @@ const Announce = ({
                     >
                         导出
                     </Button>
-                    {/* <Button
-                        disabled={tableData.length === 0}
-                        onClick={async () => {
-                            const res = await singleExport({ ...query, notificationUid: searchParams.get('notificationUid') });
-                            if (res) {
-                                console.log(res);
-                                const link = document.createElement('a');
-                                link.href = window.URL.createObjectURL(res);
-                                link.download = '绑定通告任务列表.xls';
-                                link.click();
-                            }
-                        }}
-                        type="primary"
-                        icon={<ImportOutlined   />}
-                    >
-                        导入
-                    </Button> */}
                 </div>
             </div>
             <Table
                 rowKey={'uid'}
-                size="small"
                 rowSelection={{
+                    fixed: true,
+                    columnWidth: 50,
+                    type: 'checkbox',
                     ...rowSelection
                 }}
+                virtual
                 columns={columns}
                 dataSource={tableData}
                 pagination={{
@@ -1151,8 +1142,6 @@ const Announce = ({
             </Modal>
             {detailOpen && <DetailModal open={detailOpen} handleClose={() => setDetailOpen(false)} businessUid={businessUid} />}
             {addOpen && <AddAnnounce addOpen={addOpen} setAddOpen={setAddOpen} />}
-            <Confirm open={executeOpen} handleClose={() => setExecuteOpen(false)} handleOk={Execute} />
-            <Confirm open={delsOpen} handleClose={() => setDelsOpen(false)} handleOk={handleDels} />
         </div>
     );
 };

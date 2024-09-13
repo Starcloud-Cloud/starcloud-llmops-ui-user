@@ -475,7 +475,7 @@ const BatcSmallRedBooks = forwardRef(
                             setPlanUid={setPlanUid}
                         />
                     </div>
-                    <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
+                    <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-scroll">
                         <Right
                             rightPage={rightPage}
                             batchTotal={batchTotal}

@@ -107,9 +107,9 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
     return (
         <div
             style={{
-                height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 325px)'
+                height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 216px)'
             }}
-            className="overflow-y-auto mt-[-16px] pt-4"
+            className="overflow-y-auto mt-[-16px] pt-4 pb-4"
         >
             <TextField
                 color="secondary"
@@ -133,7 +133,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 multiline
-                minRows={6}
+                minRows={3}
                 label={t('myApp.appDesc')}
                 name="description"
                 value={detail?.description}

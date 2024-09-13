@@ -162,7 +162,7 @@ const MarketTemplate = ({ like, data, handleDetail, type }: any) => {
             }}
             onClick={() => handleDetail(data)}
         >
-            <div className="absolute bottom-0 right-0 w-full aspect-[1.5] bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.8))]">
+            <div className="absolute bottom-0 right-0 w-full aspect-[2] bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.8))]">
                 <div className="flex gap-2 justify-start items-center absolute left-[16px] bottom-[40px]">
                     <div className="z-1 p-1 rounded-md border border-solid border-slate-200 flex justify-center items-center">
                         <img className="w-[16px] h-[16px]" src={getImage(data?.icon)} />

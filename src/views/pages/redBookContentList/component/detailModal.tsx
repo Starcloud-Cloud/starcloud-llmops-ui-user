@@ -81,7 +81,7 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
             title={
                 <div className="flex">
                     <span>详情</span>
-                    <div className="flex justify-around items-center ml-2">
+                    <div className="flex gap-2 justify-around items-center ml-2">
                         <div className="cursor-pointer">
                             {detail?.liked ? (
                                 <Tooltip title="取消点赞">
@@ -145,6 +145,9 @@ export const DetailModal = ({ open, handleClose, changeList, businessUid, show, 
                                 }}
                             />
                         </div> */}
+                        <Tooltip title="笔记ID">
+                            <div className="text-xs text-black/50 cursor-pointer">{detail?.uid}</div>
+                        </Tooltip>
                     </div>
                 </div>
             }

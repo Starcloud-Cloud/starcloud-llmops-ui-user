@@ -1,5 +1,5 @@
 import { Collapse, Spin, Tag, Popover, Button } from 'antd';
-import { CopyrightOutlined } from '@ant-design/icons';
+import { CopyrightOutlined, CloseOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -8,6 +8,8 @@ import Good from '../good';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const Right = ({
+    isexample,
+    setIsexample,
     rightPage,
     batchTotal,
     bathList,
@@ -21,6 +23,8 @@ const Right = ({
     timeFailure,
     getbatchPages
 }: {
+    isexample: boolean;
+    setIsexample: (data: any) => void;
     rightPage: number;
     batchTotal: number;
     bathList: any[];
@@ -63,13 +67,30 @@ const Right = ({
     }, [rightPage]);
     return (
         <>
-            {bathList?.length === 0 ? (
-                <div style={{ height: '100%' }} className="flex flex-col justify-center items-center">
+            {bathList?.length === 0 || isexample ? (
+                <div style={{ height: '100%' }} className="flex relative flex-col justify-center items-center">
+                    {isexample && (
+                        <Button
+                            onClick={() => setIsexample(false)}
+                            className="absolute top-2 right-2"
+                            size="small"
+                            type="primary"
+                            shape="circle"
+                            icon={<CloseOutlined />}
+                        ></Button>
+                    )}
                     {exampleList?.length > 0 ? (
                         <div className="!w-[400px] h-[350px] flex gap-2">
                             {exampleList?.map((item: any) => (
                                 <div className="w-[50%]" key={item?.businessUid}>
-                                    <Good item={item} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} show={true} />
+                                    <Good
+                                        item={item}
+                                        setBusinessUid={(data: any) => {
+                                            setBusinessUid({ uid: data, index: 0 });
+                                        }}
+                                        setDetailOpen={setDetailOpen}
+                                        show={true}
+                                    />
                                 </div>
                             ))}
                         </div>
@@ -174,6 +195,7 @@ const Right = ({
 };
 const RightMemo = (prevProps: any, nextProps: any) => {
     return (
+        JSON.stringify(prevProps?.isexample) === JSON.stringify(nextProps?.isexample) &&
         JSON.stringify(prevProps?.bathList) === JSON.stringify(nextProps?.bathList) &&
         JSON.stringify(prevProps?.collapseActive) === JSON.stringify(nextProps?.collapseActive) &&
         JSON.stringify(prevProps?.batchOpen) === JSON.stringify(nextProps?.batchOpen) &&

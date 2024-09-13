@@ -331,6 +331,7 @@ const BatcSmallRedBooks = forwardRef(
             }
         };
         console.log(1231);
+        const [example, setIsexample] = useState(false);
         return (
             <div
                 style={{
@@ -408,6 +409,9 @@ const BatcSmallRedBooks = forwardRef(
                                     <div className=" text-black/50">
                                         最后修改时间：{dayjs(appInfo.updateTime).format('YYYY-MM-DD HH:mm:ss')}
                                     </div>
+                                    <Button onClick={() => setIsexample(true)} size="small" type="primary">
+                                        查看示例
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -483,6 +487,8 @@ const BatcSmallRedBooks = forwardRef(
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-auto">
                         <Right
                             rightPage={rightPage}
+                            isexample={example}
+                            setIsexample={setIsexample}
                             batchTotal={batchTotal}
                             bathList={bathList}
                             exampleList={exampleList}

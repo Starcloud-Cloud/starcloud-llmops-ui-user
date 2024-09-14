@@ -188,12 +188,7 @@ const Cards = ({ flag = false }) => {
     }, [allDetail?.preInvite]);
     //切换部门
     return (
-        <CardStyle
-            sx={{ width: flag ? '240px' : '100%', marginLeft: flag ? '-16px' : 0, marginRight: flag ? '-16px' : 0 }}
-            level={vipSwitch(allDetail?.allDetail?.levels[0]?.levelId)}
-            theme={theme}
-            className="w-[200px]"
-        >
+        <CardStyle sx={{ width: flag ? '184px' : '100%' }} level={vipSwitch(allDetail?.allDetail?.levels[0]?.levelId)} theme={theme}>
             <CardContent sx={{ p: '16px !important' }}>
                 <List sx={{ p: 0, m: 0 }}>
                     <ListItem alignItems="center" disableGutters sx={{ p: 0 }}>

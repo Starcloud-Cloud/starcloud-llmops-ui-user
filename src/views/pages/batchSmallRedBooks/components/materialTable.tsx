@@ -15,6 +15,7 @@ import DownMaterial from 'views/materialLibrary/components/downMaterial';
 import { imageOcr } from 'api/redBook/batchIndex';
 import { getAccessToken } from 'utils/auth';
 import { v4 as uuidv4 } from 'uuid';
+import { updateMaterialLibraryTitle } from 'api/material';
 
 const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
@@ -24,11 +25,11 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         pageSize: 20
     });
     const [total, setTotal] = useState(0);
+    const columnsRef = useRef<any[]>([]);
     const [columns, setColumns] = useState<any[]>([]);
     const tableRef = useRef<any[]>([]);
     const [tableLoading, setTableLoading] = useState(false);
     const [tableData, setTableData] = useState<any[]>([]);
-    const handleUpdateColumn = () => {};
     const [previewOpen, setPreviewOpen] = useState(false);
     const actionRef = useRef<ActionType>();
     const actionRefs = useRef<ActionType>();
@@ -326,6 +327,21 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             }
         }
     };
+    const handleUpdateColumn = async (index: number, size: any) => {
+        const list = columnsRef.current[index - 1];
+        console.log(columnsRef.current, index, list);
+
+        await updateMaterialLibraryTitle({
+            columnType: list.columnType,
+            columnWidth: size.width,
+            libraryId: libraryIdRef.current,
+            id: list.id,
+            isRequired: list.isRequired,
+            sequence: list.sequence,
+            columnName: list.columnName,
+            description: list.description
+        });
+    };
     const handleDel = async (id: string) => {
         await delMaterial({ id });
         message.success('删除成功');
@@ -368,6 +384,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         });
     };
     //素材库 libraryId
+    const libraryIdRef = useRef('');
     const [libraryId, setLibraryId] = useState('');
     const [libraryUid, setLibraryUid] = useState('');
     //素材库名称
@@ -380,8 +397,10 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             setLibraryType(res.createSource);
             setLibraryName(res.name);
             setpluginConfig(res.pluginConfig);
+            libraryIdRef.current = res.id;
             setLibraryId(res.id);
             setLibraryUid(res.uid);
+            columnsRef.current = res.tableMeta;
             setColumns(res.tableMeta);
         });
     };
@@ -584,6 +603,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     getList={getList}
                     getTitleList={getTitleList}
                     handleEditColumn={handleEditColumn}
+                    handleUpdateColumn={handleUpdateColumn}
                     handleExecute={(data: number[]) => {
                         handleExecute(data);
                         setZoomOpen(false);

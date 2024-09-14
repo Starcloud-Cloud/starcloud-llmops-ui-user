@@ -466,7 +466,7 @@ const PlugAnalysis = ({
                     ) : item.variableType === 'Boolean' ? (
                         <Form.Item
                             valuePropName="checked"
-                            initialValue={item.variableValue}
+                            initialValue={item.variableValue || false}
                             key={item.uuid}
                             label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
                             name={item.variableKey}

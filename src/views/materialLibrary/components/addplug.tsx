@@ -5,13 +5,13 @@ import { CheckCard } from '@ant-design/pro-components';
 import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
 import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
 import Editor from '@monaco-editor/react';
 import ChatMarkdown from 'ui-component/Markdown';
+import CopyToClipboard from 'react-copy-to-clipboard';
 import { getAccessToken } from 'utils/auth';
 import useUserStore from 'store/user';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -379,7 +379,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             }
         }
     };
-
     const [typeValue, setTypeValue] = useState<any>('接口验证');
 
     return (
@@ -493,6 +492,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <Button
                                                 type="primary"
                                                 onClick={async () => {
+                                                    console.log(form.getFieldValue('input'));
+
                                                     await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
                                                     setHandfilData({
                                                         arguments: form.getFieldValue('input')

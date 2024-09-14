@@ -544,7 +544,7 @@ function CreateDetail() {
     //保存更改
     const planStateRef = useRef(0);
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
-    const saveDetail = (flag?: boolean, fieldShow?: boolean, isimgStyle?: boolean) => {
+    const saveDetail = (flag?: boolean, fieldShow?: boolean, isAppSave?: boolean) => {
         setErrOpen(false);
         const newList = _.cloneDeep(detailRef.current);
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
@@ -575,6 +575,9 @@ function CreateDetail() {
                     JSON.stringify(newMokeAI);
 
                 a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value = JSON.stringify(newFieldHead);
+                if (isAppSave) {
+                    a.variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = 'FILTER_USAGE';
+                }
             }
             const newImageMoke = _.cloneDeep(createPlanRef?.current?.imageMoke);
             const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
@@ -617,46 +620,46 @@ function CreateDetail() {
             if (searchParams.get('uid')) {
                 appModify(newList).then((res) => {
                     setViewLoading(false);
-                    console.log(res, createPlanRef.current, flag);
+                    if (res?.data) {
+                        if (res?.data && res?.data?.verificationList?.length === 0) {
+                            if (createPlanRef.current && !flag) {
+                                console.log(fieldShow, planState, planStateRef.current);
 
-                    if (res?.data && res?.data?.verificationList?.length === 0) {
-                        if (createPlanRef.current && !flag) {
-                            console.log(fieldShow, planState, planStateRef.current);
-
-                            if (fieldShow) {
-                                if (planStateRef.current < 0) {
-                                    planStateRef.current -= 1;
-                                    setPlanState(planStateRef.current);
+                                if (fieldShow) {
+                                    if (planStateRef.current < 0) {
+                                        planStateRef.current -= 1;
+                                        setPlanState(planStateRef.current);
+                                    } else {
+                                        planStateRef.current = -1;
+                                        setPlanState(planStateRef.current);
+                                    }
                                 } else {
-                                    planStateRef.current = -1;
-                                    setPlanState(planStateRef.current);
-                                }
-                            } else {
-                                if (planStateRef.current > 0) {
-                                    planStateRef.current += 1;
-                                    setPlanState(planStateRef.current);
-                                } else {
-                                    planStateRef.current = 1;
-                                    setPlanState(planStateRef.current);
+                                    if (planStateRef.current > 0) {
+                                        planStateRef.current += 1;
+                                        setPlanState(planStateRef.current);
+                                    } else {
+                                        planStateRef.current = 1;
+                                        setPlanState(planStateRef.current);
+                                    }
                                 }
                             }
+                            setSaveState(saveState + 1);
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '应用保存成功',
+                                    variant: 'alert',
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    close: false
+                                })
+                            );
+                        } else {
+                            setErrList(res?.data?.verificationList);
+                            setErrOpen(true);
                         }
-                        setSaveState(saveState + 1);
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: '应用保存成功',
-                                variant: 'alert',
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                alert: {
-                                    color: 'success'
-                                },
-                                close: false
-                            })
-                        );
-                    } else {
-                        setErrList(res?.data?.verificationList);
-                        setErrOpen(true);
                     }
                 });
             } else {
@@ -1105,7 +1108,13 @@ function CreateDetail() {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                        <Buttons sx={{ zIndex: 9 }} variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
+                        <Buttons
+                            sx={{ zIndex: 9 }}
+                            variant="contained"
+                            color="secondary"
+                            autoFocus
+                            onClick={() => saveDetail(false, false, true)}
+                        >
                             {t('myApp.save')}
                         </Buttons>
                     </>
@@ -1175,7 +1184,8 @@ function CreateDetail() {
                                         example: detail?.example,
                                         sort: detail?.sort,
                                         type: detail?.type,
-                                        icon: detail?.icon
+                                        icon: detail?.icon,
+                                        images: detail?.images
                                     }}
                                     basisPre={basisPre}
                                     appModel={appModels?.appType}

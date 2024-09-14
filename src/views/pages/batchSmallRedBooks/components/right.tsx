@@ -1,5 +1,5 @@
 import { Collapse, Spin, Tag, Popover, Button } from 'antd';
-import { CopyrightOutlined } from '@ant-design/icons';
+import { CopyrightOutlined, CloseOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -8,6 +8,8 @@ import Good from '../good';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const Right = ({
+    isexample,
+    setIsexample,
     rightPage,
     batchTotal,
     bathList,
@@ -21,6 +23,8 @@ const Right = ({
     timeFailure,
     getbatchPages
 }: {
+    isexample: boolean;
+    setIsexample: (data: any) => void;
     rightPage: number;
     batchTotal: number;
     bathList: any[];
@@ -63,28 +67,41 @@ const Right = ({
     }, [rightPage]);
     return (
         <>
-            {bathList?.length === 0 ? (
-                <div style={{ height: '100%' }} className="flex justify-center items-center">
-                    <div className="text-center">
-                        {exampleList?.length > 0 ? (
-                            <div className="!w-[300px] justify-center flex gap-2">
-                                {exampleList?.map((item: any) => (
+            {bathList?.length === 0 || isexample ? (
+                <div style={{ height: '100%' }} className="flex gap-2 relative flex-col justify-center items-center">
+                    {isexample && (
+                        <Button
+                            onClick={() => setIsexample(false)}
+                            className="absolute top-2 right-2"
+                            size="small"
+                            type="primary"
+                            shape="circle"
+                            icon={<CloseOutlined />}
+                        ></Button>
+                    )}
+                    {exampleList?.length > 0 ? (
+                        <div className="w-full overflow-x-auto flex justify-center gap-2">
+                            {exampleList?.map((item: any) => (
+                                <div className="w-[380px]" key={item?.businessUid}>
                                     <Good
-                                        key={item?.businessUid}
                                         item={item}
-                                        setBusinessUid={setBusinessUid}
+                                        setBusinessUid={(data: any) => {
+                                            setBusinessUid({ uid: data, index: 0 });
+                                        }}
                                         setDetailOpen={setDetailOpen}
                                         show={true}
                                     />
-                                ))}
-                            </div>
-                        ) : (
-                            <img
-                                className="w-[300px]"
-                                src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
-                                alt=""
-                            />
-                        )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <img
+                            className="w-[300px]"
+                            src="https://www.chuangkit.com/ai-design/assets/right-panel-editor-47905452.png"
+                            alt=""
+                        />
+                    )}
+                    <div className="flex flex-col justify-center items-center">
                         <div className="font-[500] text-[20px] text-[#1b2337] my-[8px]">魔法创作计划</div>
                         <div>在左侧输入你的创意，保存并开始生成吧</div>
                     </div>
@@ -178,6 +195,7 @@ const Right = ({
 };
 const RightMemo = (prevProps: any, nextProps: any) => {
     return (
+        JSON.stringify(prevProps?.isexample) === JSON.stringify(nextProps?.isexample) &&
         JSON.stringify(prevProps?.bathList) === JSON.stringify(nextProps?.bathList) &&
         JSON.stringify(prevProps?.collapseActive) === JSON.stringify(nextProps?.collapseActive) &&
         JSON.stringify(prevProps?.batchOpen) === JSON.stringify(nextProps?.batchOpen) &&

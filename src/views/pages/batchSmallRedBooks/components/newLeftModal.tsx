@@ -32,6 +32,7 @@ const LeftModalAdd = ({
     getList,
     getTitleList,
     handleEditColumn,
+    handleUpdateColumn,
     handleExecute
 }: {
     appUid: string;
@@ -56,10 +57,9 @@ const LeftModalAdd = ({
     getList: (data?: any) => void;
     getTitleList: () => void;
     handleEditColumn: (data: any) => void;
+    handleUpdateColumn: (index: number, size: any) => void;
     handleExecute: any;
 }) => {
-    console.log(appUid);
-
     const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
     const handleDels = async () => {
         await delsMaterial(selectedRowKeys);
@@ -108,6 +108,7 @@ const LeftModalAdd = ({
                         setPage={setPage}
                         setTableData={setTableData}
                         handleEditColumn={handleEditColumn}
+                        onUpdateColumn={handleUpdateColumn}
                         getList={getList}
                     />
                 </div>

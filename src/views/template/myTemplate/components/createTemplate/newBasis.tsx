@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react';
-import { Card, TextField, Autocomplete, Chip, Stack, FormControl, InputLabel, Select as Selects, MenuItem, Divider } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select as Selects, MenuItem, Divider } from '@mui/material';
 import { Select, Image } from 'antd';
 import { categoryTree } from 'api/template';
 import { TreeSelect } from 'antd';
@@ -21,6 +21,7 @@ export interface Anyevent {
         sort?: string;
         type?: string;
         icon?: string;
+        images?: string;
     };
     appModel: { label: string; value: string }[] | undefined;
     setValues: (data: { name: string; value: any }) => void;
@@ -71,6 +72,8 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
         { icon: 'seo', name: 'SEO写作', code: 'SEO_WRITING' },
         { icon: 'other', name: '其他应用', code: 'OTHER' }
     ];
+    const [loading, setLoading] = useState(false);
+
     const [appNameOpen, setAppNameOpen] = useState(false);
     const [categoryOpen, setCategoryOpen] = useState(false);
     useEffect(() => {
@@ -82,9 +85,9 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
     return (
         <div
             style={{
-                height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 325px)'
+                height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 216px)'
             }}
-            className="overflow-y-auto mt-[-16px] pt-4"
+            className="overflow-y-auto mt-[-16px] pt-4 pb-4"
         >
             <TextField
                 color="secondary"
@@ -108,7 +111,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 multiline
-                minRows={6}
+                minRows={3}
                 label={t('myApp.appDesc')}
                 name="description"
                 value={detail?.description}
@@ -119,7 +122,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
             />
             <div className="relative mt-[16px]">
                 <TreeSelect
-                    className="bg-[#f8fafc]  h-[51px] border border-solid rounded-[6px] antdSel"
+                    className="tags !h-[51px]"
                     showSearch
                     style={{ width: '100%', borderColor: !detail?.category && categoryOpen ? '#f44336' : '#697586ad' }}
                     value={detail?.category}
@@ -127,6 +130,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                     allowClear
                     treeCheckable={false}
                     treeDefaultExpandAll
+                    size="large"
                     onChange={(e) => {
                         setCategoryOpen(true);
                         setValues({ name: 'category', value: e });
@@ -141,7 +145,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                     treeData={cateTree}
                 />
                 <span
-                    className=" block bg-[#fff] px-[5px] absolute top-[-7px] left-2 text-[12px]"
+                    className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-7px] left-2 text-[12px]"
                     style={{ color: !detail?.category && categoryOpen ? '#f44336' : '#697586' }}
                 >
                     类目*
@@ -173,12 +177,12 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                     onChange={(value: any) => setValues({ name: 'tags', value: value })}
                     notFoundContent={false}
                     dropdownStyle={{ display: 'none' }}
-                    className="w-full"
+                    className="w-full h-[51px]"
                     mode="tags"
                     size="large"
                 />
                 <span
-                    className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-12px] left-2 text-[12px]"
+                    className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-10px] left-2 text-[12px]"
                     style={{ color: !detail?.category && categoryOpen ? '#f44336' : '#697586' }}
                 >
                     标签
@@ -224,7 +228,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                                 setIcon(e);
                             }}
                             value={icons}
-                            className="h-[51px] mt-[16px] w-[100%] bg-[#f8fafc] border border-solid border-[#697586ad] rounded-[6px] antdSel"
+                            className="h-[51px] mt-[16px] w-[100%] tags"
                         >
                             {categoryIcon.map((item) => (
                                 <Option value={item.icon} label="China">
@@ -233,7 +237,9 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                                 </Option>
                             ))}
                         </Select>
-                        <span className=" block bg-[#fff] px-[5px] absolute top-[8px] left-2 text-[12px] text-[#697586]">图标*</span>
+                        <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[8px] left-2 text-[12px] text-[#697586]">
+                            图标*
+                        </span>
                     </div>
                     <TextField
                         sx={{ mt: 2 }}
@@ -259,7 +265,8 @@ const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
         JSON.stringify(prevProps?.basisPre) === JSON.stringify(nextProps?.basisPre) &&
         JSON.stringify(prevProps?.detail) === JSON.stringify(nextProps?.detail) &&
-        JSON.stringify(prevProps?.appModel) === JSON.stringify(nextProps?.appModel)
+        JSON.stringify(prevProps?.appModel) === JSON.stringify(nextProps?.appModel) &&
+        JSON.stringify(prevProps?.images) === JSON.stringify(nextProps?.images)
     );
 };
 export default memo(Basis, arePropsEqual);

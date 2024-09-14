@@ -838,7 +838,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 </div>
                                                                 <div className="flex">{el.creator}</div>
                                                             </div>
-                                                            {(el.input || el.output) && (
+                                                            {/* {(el.input || el.output) && (
                                                                 <Popover
                                                                     content={
                                                                         <>
@@ -879,7 +879,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                         ></path>
                                                                     </svg>
                                                                 </Popover>
-                                                            )}
+                                                            )} */}
                                                         </div>
                                                     );
                                                 })}
@@ -931,7 +931,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                             </Tooltip>
                                                             <div className="flex">{el.creator}</div>
                                                         </div>
-                                                        {(el.input || el.output) && (
+                                                        {/* {(el.input || el.output) && (
                                                             <Popover
                                                                 content={
                                                                     <>
@@ -972,7 +972,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                     ></path>
                                                                 </svg>
                                                             </Popover>
-                                                        )}
+                                                        )} */}
                                                     </div>
                                                 ))}
                                             </div>
@@ -1016,7 +1016,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             绑定插件
                                         </Button>
                                     </div>
-                                    {/* // )} */}
+                                    {/* )} */}
                                     <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
                                         {definitionList?.map((el: any) => {
                                             return (
@@ -1045,7 +1045,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     </div>
                                                     <Divider className="my-2" />
                                                     <div className="flex justify-between text-xs">
-                                                        <div className="flex">{wayList.find((item) => item.value === el.type).label}</div>
+                                                        <div className="flex">{wayList.find((item) => item.value === el.type)?.label}</div>
                                                         <div className="flex">{el.creator}</div>
                                                     </div>
                                                     {/* {(isShowField || bizType === 'APP') && ( */}
@@ -1083,7 +1083,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                             className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
                                                         />
                                                     </Popconfirm>
-                                                    {/* // )} */}
+                                                    {/* )} */}
                                                 </div>
                                             );
                                         })}
@@ -1094,9 +1094,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 </div>
                             )
                         },
-                        // ...(isShowField || bizType === 'APP'
-                        // ?
-                        //  [
                         {
                             label: '我的插件',
                             key: '2',
@@ -1185,8 +1182,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 </div>
                             )
                         },
-                        //   ]
-                        // : [])
                         {
                             label: '触发历史',
                             key: '3',

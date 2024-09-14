@@ -6,7 +6,7 @@ import formatDate from 'hooks/useDate';
 import { contentLike, contentUnlike } from 'api/redBook/batchIndex';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { failureRetry } from 'api/redBook/batchIndex';
 import './index.scss';
@@ -360,7 +360,10 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                         {item.status === 'ULTIMATE_FAILURE' && (
                             <Button
                                 disabled={loading}
-                                onClick={() => failure(item.uid)}
+                                onClick={(e) => {
+                                    failure(item.uid);
+                                    e.stopPropagation();
+                                }}
                                 className="absolute bottom-[100px] left-0 right-0 m-auto w-[80px]"
                                 type="primary"
                                 size="small"
@@ -390,6 +393,28 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                     <div className="p-[12px]">
                         <div className="h-[48px] mb-[8px] text-base font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
                     </div>
+                    {/* <Button
+                        onClick={(e) => {
+                            console.log(1111111111111211231);
+                            console.log(window.require);
+
+                            if (window.require) {
+                                const { ipcRenderer } = window.require('electron');
+                                console.log(ipcRenderer);
+
+                                ipcRenderer.sendToHost('print'); // 向原生发送信息
+                                ipcRenderer.on('ping', (event: any, message: any) => {
+                                    // 接收electron原生返回的信息
+                                    console.log('接收electron原生返回的信息', event, message);
+                                });
+                            }
+
+                            // window.postMessage({ type: 'messageFromView', text: 'Hello from Vue!' }, '*');
+                            e.stopPropagation();
+                        }}
+                    >
+                        aaa
+                    </Button> */}
                 </>
             )}
         </div>

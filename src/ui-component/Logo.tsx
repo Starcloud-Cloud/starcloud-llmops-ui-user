@@ -44,8 +44,8 @@ const Logo = ({ ...others }) => {
                     xmlnsXlink="http://www.w3.org/1999/xlink"
                     x="0px"
                     y="0px"
-                    width="48px"
-                    height="48px"
+                    width="40px"
+                    height="40px"
                     viewBox="0 0 48 48"
                     enableBackground="new 0 0 48 48"
                     xmlSpace="preserve"
@@ -226,7 +226,9 @@ const Logo = ({ ...others }) => {
                     <Typography
                         variant="body1"
                         sx={{
-                            fontSize: '2em',
+                            marginLeft: '2px',
+                            fontWeight: 500,
+                            fontSize: '1.6em',
                             lineHeight: '1em',
                             textAlign: 'center',
                             overflow: 'hidden',
@@ -236,7 +238,7 @@ const Logo = ({ ...others }) => {
                     >
                         {getPermission(ENUM_PERMISSION.APP_NAME)}
                     </Typography>
-                    <Typography
+                    {/* <Typography
                         variant="body1"
                         sx={{
                             fontSize: '12px',
@@ -248,7 +250,7 @@ const Logo = ({ ...others }) => {
                         }}
                     >
                         {getPermission(ENUM_PERMISSION.APP_DES)}
-                    </Typography>
+                    </Typography> */}
                 </Box>
             </Typography>
         </ElevationScroll>

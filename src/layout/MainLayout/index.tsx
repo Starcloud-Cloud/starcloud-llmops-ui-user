@@ -535,6 +535,7 @@ const MainLayout = () => {
                                 color="inherit"
                                 elevation={0}
                                 sx={{ bgcolor: theme.palette.background.default, zIndex: 10 }}
+                                className="!h-[56px] !px-[12px]"
                             >
                                 {header}
                             </AppBar>
@@ -546,7 +547,7 @@ const MainLayout = () => {
                             {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
 
                             {/* main content */}
-                            <Main theme={theme} open={drawerOpen} layout={layout}>
+                            <Main theme={theme} open={drawerOpen} layout={layout} className="!mt-[56px]">
                                 {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                                 {!isLarge ? (
                                     <Container

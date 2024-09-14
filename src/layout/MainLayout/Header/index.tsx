@@ -198,7 +198,7 @@ const Header = () => {
                                 borderBottom: 0
                             },
                             '.MuiTab-textColorSecondary': {
-                                padding: '32px 18px',
+                                padding: '16px 18px',
                                 minWidth: 0
                             }
                         }}

@@ -36,7 +36,7 @@ const Sidebar = () => {
 
     const logo = useMemo(
         () => (
-            <Box sx={{ display: 'flex', p: 2 }}>
+            <Box sx={{ display: 'flex' }}>
                 <LogoSection />
             </Box>
         ),
@@ -51,9 +51,9 @@ const Sidebar = () => {
     );
 
     const drawerSX = {
-        paddingLeft: drawerOpen ? '16px' : 0,
-        paddingRight: drawerOpen ? '16px' : 0,
-        marginTop: drawerOpen ? 0 : '20px'
+        paddingLeft: drawerOpen ? '8px' : 0,
+        paddingRight: drawerOpen ? '8px' : 0,
+        marginTop: drawerOpen ? 0 : '10px'
     };
 
     const drawer = useMemo(

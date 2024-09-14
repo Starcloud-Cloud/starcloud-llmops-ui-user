@@ -886,7 +886,7 @@ const Lefts = ({
                             : 'calc(100% - 14px)',
                         scrollbarGutter: 'stable'
                     }}
-                    className=" box-border overflow-y-auto pr-1 mr-[-4px]"
+                    className=" box-border overflow-y-auto pr-2 mr-[-4px]"
                 >
                     <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
                         {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
@@ -1317,7 +1317,7 @@ const Lefts = ({
                 <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <>
-                            <Button
+                            {/* <Button
                                 className="w-full"
                                 icon={<SaveOutlined />}
                                 onClick={() => {
@@ -1343,7 +1343,7 @@ const Lefts = ({
                                 type="primary"
                             >
                                 保存配置
-                            </Button>
+                            </Button> */}
                             <Button
                                 className="w-full"
                                 type="primary"
@@ -1351,7 +1351,7 @@ const Lefts = ({
                                     seleSave('FILTER_USAGE', null);
                                 }}
                             >
-                                保存并开始生成
+                                立即生成
                             </Button>
                         </>
                     )}

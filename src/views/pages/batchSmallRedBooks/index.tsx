@@ -454,7 +454,7 @@ const BatcSmallRedBooks = forwardRef(
                         style={{
                             width: leftWidth ? leftWidth : ''
                         }}
-                        className={`duration-700 2xl:w-[500px] xl:w-[410px] lg:w-[370px] w-[370px] bg-white rounded-lg pl-2 pr-0`}
+                        className={`duration-700 w-[350px] bg-white rounded-lg pl-2 pr-0`}
                     >
                         <Left
                             pre={pre}
@@ -472,7 +472,7 @@ const BatcSmallRedBooks = forwardRef(
                                 if (leftWidth) {
                                     setLeftWidth('');
                                 } else {
-                                    setLeftWidth('50%');
+                                    setLeftWidth('30%');
                                 }
                             }}
                             setAppInfo={setAppInfo}

@@ -1066,7 +1066,10 @@ const AddStyleApp = React.forwardRef(
         return (
             <div className="addStyle">
                 <div className="flex justify-between items-center">
-                    <div className="text-base font-semibold">笔记模版</div>
+                    <div className="flex items-end gap-1">
+                        <div className="text-base font-semibold leading-[20px]">模版风格</div>
+                        <div className="text-xs text-black/50">系统按顺序使用配置的模版进行生成</div>
+                    </div>
                     {mode === 1 && (
                         <div className="pb-3 flex justify-between items-center">
                             <div className="flex">

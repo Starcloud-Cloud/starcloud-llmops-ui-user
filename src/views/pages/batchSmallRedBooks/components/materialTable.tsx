@@ -547,7 +547,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             ) : (
                 <>
                     <div className="flex items-end gap-1 mb-2">
-                        <div className="text-base font-semibold">素材库</div>
+                        <div className="text-base font-semibold leading-[20px]">素材库</div>
                         <div className="text-xs text-black/50">可上传自己的图片和内容等，进行笔记生成</div>
                     </div>
                     <div
@@ -659,7 +659,6 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 footer={null}
                 onCancel={() => {
                     setZoomOpen(false);
-                    setMaterialflag(false);
                 }}
             >
                 <LeftModalAdd
@@ -670,6 +669,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     bizUid={bizUid}
                     bizType={bizType}
                     materialflag={materialflag}
+                    setMaterialflag={setMaterialflag}
                     libraryName={libraryName}
                     pluginConfig={pluginConfig}
                     tableLoading={tableLoading}
@@ -693,7 +693,6 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     handleExecute={(data: number[]) => {
                         handleExecute(data);
                         setZoomOpen(false);
-                        setMaterialflag(false);
                     }}
                 />
             </Modal>

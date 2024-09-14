@@ -391,7 +391,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                 <>
                     <Swipers item={item} />
                     <div className="p-[12px]">
-                        <div className="h-[48px] mb-[8px] text-base font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
+                        <div className="h-[48px] text-base font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
                     </div>
                     {/* <Button
                         onClick={(e) => {

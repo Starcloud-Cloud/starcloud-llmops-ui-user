@@ -97,6 +97,7 @@ export const TableHeader = ({
     setColOpen,
     setTitle,
     materialflag,
+    setMaterialflag,
     selectedRowKeys,
     handleBatchDel,
     libraryId,
@@ -124,6 +125,7 @@ export const TableHeader = ({
     //编辑|新增素材名称
     setTitle: (title: string) => void;
     materialflag?: boolean;
+    setMaterialflag?: (data: boolean) => void;
     // 编辑|新增素材
     setEditOpen: (open: boolean) => void;
     // 编辑素材字段
@@ -1010,7 +1012,16 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     </Button>
                 </div>
             </Modal>
-            <Modal width="80%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
+            <Modal
+                width="80%"
+                open={plugMarketOpen}
+                onCancel={() => {
+                    setPlugMarketOpen(false);
+                    setMaterialflag && setMaterialflag(false);
+                }}
+                footer={false}
+                title="插件市场"
+            >
                 <Tabs
                     items={[
                         {
@@ -1239,7 +1250,10 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     handleAnalysis={() => null}
                     downTableData={downTableData}
                     onOpenChange={setPlugConfigOpen}
-                    setPlugMarketOpen={setPlugMarketOpen}
+                    setPlugMarketOpen={() => {
+                        setPlugMarketOpen(false);
+                        setMaterialflag && setMaterialflag(false);
+                    }}
                     open={plugConfigOpen}
                     record={plugRecord}
                     metaData={metaData}

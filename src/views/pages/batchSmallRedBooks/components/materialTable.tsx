@@ -281,6 +281,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         }));
     }, [getClumns]);
     const [editOpen, setEditOpen] = useState(false);
+    const [materialflag, setMaterialflag] = useState(false);
     const formOk = async (values: any) => {
         if (currentRecord) {
             handleEditColumn({ libraryId: currentRecord.libraryId, id: currentRecord.id, ...values }, 1);
@@ -545,7 +546,10 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 </>
             ) : (
                 <>
-                    <div className="text-base font-semibold mb-2">素材库</div>
+                    <div className="flex items-end gap-1 mb-2">
+                        <div className="text-base font-semibold">素材库</div>
+                        <div className="text-xs text-black/50">可上传自己的图片和内容等，进行笔记生成</div>
+                    </div>
                     <div
                         onClick={() => setZoomOpen(true)}
                         className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
@@ -556,8 +560,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                                 <div className="text-[18px] line-clamp-2 font-bold">{libraryName}</div>
                             </div>
                         </div>
-                        <Divider className="my-2" />
-                        <div className="flex justify-between items-center text-xs">
+                        <div className="mt-4 flex justify-between items-center text-xs">
                             <div className="flex gap-2">
                                 <Button
                                     onClick={(e) => {
@@ -583,7 +586,15 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                                 >
                                     文件导入
                                 </Button>
-                                <Button size="small" type="primary">
+                                <Button
+                                    onClick={(e) => {
+                                        setZoomOpen(true);
+                                        setMaterialflag(true);
+                                        e.stopPropagation();
+                                    }}
+                                    size="small"
+                                    type="primary"
+                                >
                                     智能生成
                                 </Button>
                             </div>
@@ -641,7 +652,16 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     row={currentRecord}
                 />
             )}
-            <Modal maskClosable={false} width={'80%'} open={zoomOpen} footer={null} onCancel={() => setZoomOpen(false)}>
+            <Modal
+                maskClosable={false}
+                width={'80%'}
+                open={zoomOpen}
+                footer={null}
+                onCancel={() => {
+                    setZoomOpen(false);
+                    setMaterialflag(false);
+                }}
+            >
                 <LeftModalAdd
                     appUid={appUid}
                     libraryId={libraryId}
@@ -649,6 +669,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     libraryType={libraryType}
                     bizUid={bizUid}
                     bizType={bizType}
+                    materialflag={materialflag}
                     libraryName={libraryName}
                     pluginConfig={pluginConfig}
                     tableLoading={tableLoading}
@@ -672,6 +693,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     handleExecute={(data: number[]) => {
                         handleExecute(data);
                         setZoomOpen(false);
+                        setMaterialflag(false);
                     }}
                 />
             </Modal>

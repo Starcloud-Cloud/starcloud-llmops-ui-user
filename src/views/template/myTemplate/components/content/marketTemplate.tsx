@@ -6,6 +6,7 @@ import './textnoWarp.scss';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useEffect, useState } from 'react';
+import bgImg from 'assets/images/picture/bgImg.png';
 const MarketTemplate = ({ like, data, handleDetail, type }: any) => {
     const getImage = (active: string) => {
         let image;
@@ -157,8 +158,8 @@ const MarketTemplate = ({ like, data, handleDetail, type }: any) => {
                 aspectRatio: '.75',
                 background:
                     data?.images && data?.images[0]
-                        ? `url(${data?.images[0]}?x-oss-process=image/resize,w_150/quality,q_80),url(https://p8.itc.cn/q_70/images03/20230904/6b9e1ed6da8a434983fdd664d27e0d0a.jpeg?x-oss-process=image/resize,w_150/quality,q_80)`
-                        : 'url(https://p8.itc.cn/q_70/images03/20230904/6b9e1ed6da8a434983fdd664d27e0d0a.jpeg?x-oss-process=image/resize,w_150/quality,q_80)'
+                        ? `url(${data?.images[0]}?x-oss-process=image/resize,w_340/quality,q_80),url(${bgImg}?x-oss-process=image/resize,w_340/quality,q_80)`
+                        : `url(${bgImg}?x-oss-process=image/resize,w_340/quality,q_80)`
             }}
             onClick={() => handleDetail(data)}
         >

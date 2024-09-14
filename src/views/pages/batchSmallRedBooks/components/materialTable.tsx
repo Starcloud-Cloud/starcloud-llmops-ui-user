@@ -4,8 +4,25 @@ import { ActionType, ModalForm, ProFormTextArea, ProFormSelect } from '@ant-desi
 import TablePro from './components/antdProTable';
 import { getMaterialTitle, getMaterialPage, createMaterial, updateMaterial, delMaterial, delsMaterial } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
-import { Upload, Image, Tooltip, Popconfirm, Button, Form, message, Modal, Radio, Progress, UploadProps, Tag, Space, Spin } from 'antd';
-import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, ZoomInOutlined } from '@ant-design/icons';
+import {
+    Upload,
+    Image,
+    Tooltip,
+    Popconfirm,
+    Button,
+    Form,
+    message,
+    Modal,
+    Radio,
+    Progress,
+    UploadProps,
+    Tag,
+    Space,
+    Spin,
+    Avatar,
+    Divider
+} from 'antd';
+import { EyeOutlined, CloudUploadOutlined, SearchOutlined, PlusOutlined, AppstoreFilled, SettingOutlined } from '@ant-design/icons';
 import { propShow } from 'views/pages/batchSmallRedBooks/components/formModal';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import FormModal from 'views/materialLibrary/components/formModal';
@@ -528,37 +545,85 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 </>
             ) : (
                 <>
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
-                                批量导入
-                            </Button>
+                    <div className="text-base font-semibold mb-2">素材库</div>
+                    <div
+                        onClick={() => setZoomOpen(true)}
+                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                    >
+                        <div className="flex gap-4">
+                            <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                            <div className="flex-1">
+                                <div className="text-[18px] line-clamp-2 font-bold">{libraryName}</div>
+                            </div>
                         </div>
-                        <div className="flex gap-2 items-end">
-                            <div className="text-xs text-black/50">点击放大编辑</div>
-                            <Button onClick={() => setZoomOpen(true)} type="primary" shape="circle" icon={<ZoomInOutlined />}></Button>
+                        <Divider className="my-2" />
+                        <div className="flex justify-between items-center text-xs">
+                            <div className="flex gap-2">
+                                <Button
+                                    onClick={(e) => {
+                                        setZoomOpen(true);
+                                        setTimeout(() => {
+                                            setTitle('新增素材');
+                                            setEditOpen(true);
+                                        }, 0);
+                                        e.stopPropagation();
+                                    }}
+                                    size="small"
+                                    type="primary"
+                                >
+                                    新增素材
+                                </Button>
+                                <Button
+                                    onClick={(e) => {
+                                        setUploadOpen(true);
+                                        e.stopPropagation();
+                                    }}
+                                    size="small"
+                                    type="primary"
+                                >
+                                    文件导入
+                                </Button>
+                                <Button size="small" type="primary">
+                                    智能生成
+                                </Button>
+                            </div>
+                            <div className="flex">数据量：{total}</div>
                         </div>
-                    </div>
-                    <div className="material-index material-detail-table">
-                        <TablePro
-                            isSelection={true}
-                            actionRef={actionRef}
-                            columns={getClumn}
-                            tableData={tableData}
-                            tableLoading={tableLoading}
-                            page={page}
-                            setPage={setPage}
-                            total={total}
-                            setTableData={(data: any) => {
-                                tableRef.current = data;
-                                setTableData(data);
-                            }}
-                            getList={getList}
-                            handleEditColumn={handleEditColumn}
-                            onUpdateColumn={handleUpdateColumn}
-                        />
+                        <SettingOutlined className="absolute top-4 right-4 cursor-pointer" />
                     </div>
                 </>
+                // <>
+                //     <div className="flex items-center justify-between mb-4">
+                //         <div>
+                //             <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
+                //                 批量导入
+                //             </Button>
+                //         </div>
+                //         <div className="flex gap-2 items-end">
+                //             <div className="text-xs text-black/50">点击放大编辑</div>
+                //             <Button onClick={() => setZoomOpen(true)} type="primary" shape="circle" icon={<ZoomInOutlined />}></Button>
+                //         </div>
+                //     </div>
+                //     <div className="material-index material-detail-table">
+                //         <TablePro
+                //             isSelection={true}
+                //             actionRef={actionRef}
+                //             columns={getClumn}
+                //             tableData={tableData}
+                //             tableLoading={tableLoading}
+                //             page={page}
+                //             setPage={setPage}
+                //             total={total}
+                //             setTableData={(data: any) => {
+                //                 tableRef.current = data;
+                //                 setTableData(data);
+                //             }}
+                //             getList={getList}
+                //             handleEditColumn={handleEditColumn}
+                //             onUpdateColumn={handleUpdateColumn}
+                //         />
+                //     </div>
+                // </>
             )}
             {editOpen && (
                 <FormModal

@@ -896,27 +896,85 @@ const Lefts = ({
                                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                             )) && (
                             <Tabs.TabPane key={'1'} tab="素材上传">
-                                <div className="flex justify-between items-center mb-2">
+                                {/* <div className="flex justify-between items-center mb-2">
                                     <div>
                                         <InfoCircleOutlined />
                                         <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
                                     </div>
-                                </div>
-                                <div>
-                                    <MaterialTable
-                                        materialStatus={materialStatus}
-                                        updataTable={updataTable}
-                                        appUid={detail ? appData.appUid : appData.uid}
-                                        bizUid={appData.appUid}
-                                        bizType={detail ? 'APP' : 'APP_MARKET'}
-                                        uid={appData.uid}
-                                        tableTitle={tableTitle}
-                                        handleExecute={(data: number[]) => {
-                                            seleSave('SELECT', data);
-                                        }}
-                                    />
-                                    {/* // )} */}
-                                </div>
+                                </div> */}
+                                <MaterialTable
+                                    materialStatus={materialStatus}
+                                    updataTable={updataTable}
+                                    appUid={detail ? appData.appUid : appData.uid}
+                                    bizUid={appData.appUid}
+                                    bizType={detail ? 'APP' : 'APP_MARKET'}
+                                    uid={appData.uid}
+                                    tableTitle={tableTitle}
+                                    handleExecute={(data: number[]) => {
+                                        seleSave('SELECT', data);
+                                    }}
+                                />
+                                {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                                    (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                                ) && (
+                                    <div className="mt-4">
+                                        {detail ? (
+                                            <AddStyle
+                                                selectImgLoading={selectImgLoading}
+                                                materialStatus={materialStatus}
+                                                saveTemplate={saveTemplate}
+                                                details={appData?.configuration?.appInformation}
+                                                hasAddStyle={detail || !detailShow ? false : true}
+                                                setImageVar={setImageVar}
+                                                appUid={appData?.appUid}
+                                                ref={imageRef}
+                                                record={imageMater}
+                                                getList={() => getList(true)}
+                                                materialType={materialType}
+                                            />
+                                        ) : (
+                                            <AddStyleApp
+                                                selectImgLoading={selectImgLoading}
+                                                allData={appData}
+                                                materialStatus={materialStatus}
+                                                details={appData?.configuration?.appInformation}
+                                                hasAddStyle={detail || !detailShow ? false : true}
+                                                setImageVar={setImageVar}
+                                                getList={() => getList(true)}
+                                                appUid={appData?.appUid}
+                                                ref={imageRef}
+                                                record={imageMater}
+                                                materialType={materialType}
+                                            />
+                                        )}
+                                    </div>
+                                )}
+                                {detailShow && (
+                                    <div className="mt-[16px] flex gap-2 items-center">
+                                        <div className="relative max-w-[300px]">
+                                            <InputNumber
+                                                className="bg-[#f8fafc] w-full"
+                                                size="large"
+                                                value={totalCount}
+                                                onChange={(e: any) => {
+                                                    if (
+                                                        e > all_detail?.rights?.find((item: any) => item?.type === 'MATRIX_BEAN')?.remaining
+                                                    ) {
+                                                        setBotOpen(true);
+                                                        return;
+                                                    }
+                                                    setTotalCount(e);
+                                                }}
+                                                min={1}
+                                                max={all_detail?.levels[0]?.levelConfigDTO?.aiCreationCount || 8}
+                                            />
+                                            <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
+                                                生成数量
+                                            </span>
+                                        </div>
+                                        <div className="text-xs text-slate-500">想要生成更多，请升级</div>
+                                    </div>
+                                )}
                             </Tabs.TabPane>
                         )}
                         <Tabs.TabPane
@@ -1219,7 +1277,7 @@ const Lefts = ({
                                 </div>
                             ))}
                         </Tabs.TabPane>
-                        {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                        {/* {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                             (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                         ) && (
                             <Tabs.TabPane key={'3'} tab="图片生成">
@@ -1253,61 +1311,7 @@ const Lefts = ({
                                     />
                                 )}
                             </Tabs.TabPane>
-                        )}
-                        {appData?.executeParam?.appInformation?.workflowConfig?.steps?.find(
-                            (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
-                        ) && (
-                            <Tabs.TabPane key={'3'} tab="图片生成">
-                                <div className="flex items-center mb-2">
-                                    <Tooltip title="生成图片时会按照风格模板的顺序去使用">
-                                        <InfoCircleOutlined className="cursor-pointer" />
-                                    </Tooltip>
-                                    <span className="text-sm ml-1 text-stone-600">
-                                        配置笔记图片生成的风格模版，支持不同风格模版组合生成
-                                    </span>
-                                </div>
-                                <AddStyle
-                                    canAddCustomStyle={false}
-                                    details={appData?.configuration?.appInformation}
-                                    materialStatus={materialStatus}
-                                    // hasAddStyle={true}
-                                    hasAddStyle={false}
-                                    setImageVar={setImageVar}
-                                    appUid={appData?.appUid}
-                                    ref={imageRef}
-                                    record={imageMater}
-                                    mode={2}
-                                    getList={() => getList(true)}
-                                    materialType={materialType}
-                                />
-                            </Tabs.TabPane>
-                        )}
-                        {detailShow && (
-                            <Tabs.TabPane key={'4'} tab="批量生成参数">
-                                <div className="mt-[16px] flex gap-2 items-center">
-                                    <div className="relative max-w-[300px]">
-                                        <InputNumber
-                                            className="bg-[#f8fafc] w-full"
-                                            size="large"
-                                            value={totalCount}
-                                            onChange={(e: any) => {
-                                                if (e > all_detail?.rights?.find((item: any) => item?.type === 'MATRIX_BEAN')?.remaining) {
-                                                    setBotOpen(true);
-                                                    return;
-                                                }
-                                                setTotalCount(e);
-                                            }}
-                                            min={1}
-                                            max={all_detail?.levels[0]?.levelConfigDTO?.aiCreationCount || 8}
-                                        />
-                                        <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
-                                            生成数量
-                                        </span>
-                                    </div>
-                                    <div className="text-xs text-slate-500">想要生成更多，请升级</div>
-                                </div>
-                            </Tabs.TabPane>
-                        )}
+                        )} */}
                     </Tabs>
                 </div>
                 <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">

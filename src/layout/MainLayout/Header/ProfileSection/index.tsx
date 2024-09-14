@@ -129,7 +129,7 @@ const ProfileSection = () => {
         <>
             <Chip
                 sx={{
-                    height: '48px',
+                    height: '42px',
                     alignItems: 'center',
                     borderRadius: '27px',
                     transition: 'all .2s ease-in-out',
@@ -151,6 +151,7 @@ const ProfileSection = () => {
                     <Avatar
                         src={User1}
                         alt="user-images"
+                        className="w-8 h-8"
                         sx={{
                             ...theme.typography.mediumAvatar,
                             margin: '8px 0 8px 8px !important',

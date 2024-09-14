@@ -192,6 +192,7 @@ const Cards = ({ flag = false }) => {
             sx={{ width: flag ? '240px' : '100%', marginLeft: flag ? '-16px' : 0, marginRight: flag ? '-16px' : 0 }}
             level={vipSwitch(allDetail?.allDetail?.levels[0]?.levelId)}
             theme={theme}
+            className="w-[200px]"
         >
             <CardContent sx={{ p: '16px !important' }}>
                 <List sx={{ p: 0, m: 0 }}>
@@ -351,11 +352,13 @@ const Cards = ({ flag = false }) => {
                                 sx={{
                                     whiteSpace: 'normal',
                                     textDecoration: 'underline',
+                                    textAlign: 'center',
                                     cursor: 'pointer',
                                     '&:hover': { color: '#673ab7' }
                                 }}
                             >
-                                {window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
+                                {/* {window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode} */}
+                                邀请链接
                             </Typography>
                         </Tooltip>
                         <Box marginTop={3} textAlign="center">

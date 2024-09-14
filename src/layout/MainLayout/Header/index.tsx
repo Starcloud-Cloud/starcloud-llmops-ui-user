@@ -204,7 +204,11 @@ const Header = () => {
                         }}
                     >
                         {firstMenu?.map((item: any, index: number) => (
-                            <Tab key={index} label={<span className="text-lg font-semibold"> {item.name} </span>} {...a11yProps(index)} />
+                            <Tab
+                                key={index}
+                                label={<span className="text-base  font-semibold"> {item.name} </span>}
+                                {...a11yProps(index)}
+                            />
                         ))}
                     </Tabs>
                     {getPermission(ENUM_PERMISSION.LAYOUT_SHOW_SUBSCRIBE_BUTTON) && (
@@ -367,9 +371,9 @@ const Header = () => {
             </Box> */}
 
             {/* live customization & localization */}
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <LocalizationSection />
-            </Box>
+            </Box> */}
 
             {/* notification & profile */}
             {/* <NotificationSection /> */}

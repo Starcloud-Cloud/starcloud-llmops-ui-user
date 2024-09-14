@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 
 // project imports
-import Logo from 'ui-component/Logo';
+import Logo, { LogoOriginal } from 'ui-component/Logo';
 
 // assets
 import { IconDashboard, IconHome2 } from '@tabler/icons';
@@ -81,7 +81,7 @@ const AppBar = ({ ...others }) => {
                 )}
                 <Container>
                     <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', py: 2.5, px: `0 !important` }}>
-                        <Logo />
+                        <LogoOriginal />
                         <Stack direction="row" sx={{ display: { xs: 'block', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
                             <Button
                                 onClick={() => {

@@ -15,6 +15,7 @@ const LeftModalAdd = ({
     bizType,
     libraryId,
     libraryUid,
+    materialflag,
     libraryName,
     libraryType,
     pluginConfig,
@@ -40,6 +41,7 @@ const LeftModalAdd = ({
     bizType: string;
     libraryId: string;
     libraryUid: string;
+    materialflag: boolean;
     libraryName: string;
     libraryType: number;
     pluginConfig: string | null;
@@ -77,6 +79,7 @@ const LeftModalAdd = ({
                     setEditOpen={setEditOpen}
                     setColOpen={setColOpen}
                     selectedRowKeys={selectedRowKeys}
+                    materialflag={materialflag}
                     handleBatchDel={handleDels}
                     libraryId={libraryId}
                     libraryUid={libraryUid}
@@ -123,6 +126,7 @@ const memoLeftModal = (pre: any, next: any) => {
         _.isEqual(pre.libraryId, next.libraryId) &&
         _.isEqual(pre.bizType, next.bizType) &&
         _.isEqual(pre.bizUid, next.bizUid) &&
+        _.isEqual(pre.materialflag, next.materialflag) &&
         _.isEqual(pre.libraryName, next.libraryName) &&
         _.isEqual(pre.pluginConfig, next.pluginConfig) &&
         _.isEqual(pre.tableLoading, next.tableLoading) &&

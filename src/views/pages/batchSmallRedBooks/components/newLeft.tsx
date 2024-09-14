@@ -917,7 +917,7 @@ const Lefts = ({
                                 {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                                     (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                                 ) && (
-                                    <div className="mt-4">
+                                    <div className="mt-6">
                                         {detail ? (
                                             <AddStyle
                                                 selectImgLoading={selectImgLoading}
@@ -950,7 +950,7 @@ const Lefts = ({
                                     </div>
                                 )}
                                 {detailShow && (
-                                    <div className="mt-[16px] flex gap-2 items-center">
+                                    <div className="mt-8 flex gap-2 items-center">
                                         <div className="relative max-w-[300px]">
                                             <InputNumber
                                                 className="bg-[#f8fafc] w-full"

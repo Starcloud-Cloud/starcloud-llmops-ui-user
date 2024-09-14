@@ -96,6 +96,7 @@ export const TableHeader = ({
     setEditOpen,
     setColOpen,
     setTitle,
+    materialflag,
     selectedRowKeys,
     handleBatchDel,
     libraryId,
@@ -122,6 +123,7 @@ export const TableHeader = ({
     name: string;
     //编辑|新增素材名称
     setTitle: (title: string) => void;
+    materialflag?: boolean;
     // 编辑|新增素材
     setEditOpen: (open: boolean) => void;
     // 编辑素材字段
@@ -245,6 +247,11 @@ export const TableHeader = ({
     const [plugMarketOpen, setPlugMarketOpen] = useState(false);
     const [selType, setSelType] = useState('');
     const [plugTableData, setPlugTableData] = useState<any[]>([]);
+    useEffect(() => {
+        if (materialflag) {
+            setPlugMarketOpen(true);
+        }
+    }, [materialflag]);
 
     //我的插件
     const column: TableColumnsType<any> = [
@@ -417,6 +424,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             `;
         }
     };
+    console.log(materialflag);
 
     return (
         <div className="relative">
@@ -1011,16 +1019,26 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             children: (
                                 <div>
                                     {/* {(isShowField || bizType === 'APP') && ( */}
-                                    <div className="flex justify-end mb-4">
-                                        <Button onClick={() => setBindOpen(true)} type="primary">
-                                            绑定插件
-                                        </Button>
-                                    </div>
+                                    {!materialflag && (
+                                        <div className="flex justify-end mb-4">
+                                            <Button onClick={() => setBindOpen(true)} type="primary">
+                                                绑定插件
+                                            </Button>
+                                        </div>
+                                    )}
                                     {/* )} */}
                                     <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
                                         {definitionList?.map((el: any) => {
                                             return (
                                                 <div
+                                                    style={{
+                                                        display:
+                                                            materialflag && el.scene === 'DATA_ADDED'
+                                                                ? 'block'
+                                                                : !materialflag
+                                                                ? 'block'
+                                                                : 'none'
+                                                    }}
                                                     onClick={() => handleOpenPlug(el)}
                                                     className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
                                                     key={el.uid}

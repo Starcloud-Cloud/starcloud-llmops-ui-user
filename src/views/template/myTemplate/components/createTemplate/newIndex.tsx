@@ -544,7 +544,7 @@ function CreateDetail() {
     //保存更改
     const planStateRef = useRef(0);
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
-    const saveDetail = (flag?: boolean, fieldShow?: boolean, isimgStyle?: boolean) => {
+    const saveDetail = (flag?: boolean, fieldShow?: boolean, isAppSave?: boolean) => {
         setErrOpen(false);
         const newList = _.cloneDeep(detailRef.current);
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
@@ -575,6 +575,9 @@ function CreateDetail() {
                     JSON.stringify(newMokeAI);
 
                 a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value = JSON.stringify(newFieldHead);
+                if (isAppSave) {
+                    a.variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = 'FILTER_USAGE';
+                }
             }
             const newImageMoke = _.cloneDeep(createPlanRef?.current?.imageMoke);
             const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
@@ -1105,7 +1108,13 @@ function CreateDetail() {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                        <Buttons sx={{ zIndex: 9 }} variant="contained" color="secondary" autoFocus onClick={() => saveDetail()}>
+                        <Buttons
+                            sx={{ zIndex: 9 }}
+                            variant="contained"
+                            color="secondary"
+                            autoFocus
+                            onClick={() => saveDetail(false, false, true)}
+                        >
                             {t('myApp.save')}
                         </Buttons>
                     </>

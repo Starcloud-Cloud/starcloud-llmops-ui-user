@@ -492,10 +492,17 @@ const Lefts = ({
             getStatus();
         }
     }, [pre]);
+    const planAppRef = useRef<any>(0);
     useEffect(() => {
-        console.log(4);
-
+        console.log(planState);
         if (planState && planState > 0) {
+            if (planAppRef.current === 0) {
+                const newData = _.cloneDeep(appRef.current);
+                newData.configuration.appInformation.workflowConfig.steps
+                    .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
+                    .variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = 'FILTER_USAGE';
+                appRef.current = newData;
+            }
             handleSaveClick(exeState);
         } else if (planState && planState < 0) {
             handleSaveClick(exeState, false, true);
@@ -552,6 +559,7 @@ const Lefts = ({
     };
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
+        planAppRef.current = 0;
         // verifyList();
         // return;
         const newList = _.cloneDeep(generRef.current);
@@ -749,8 +757,11 @@ const Lefts = ({
     };
 
     //素材字段配置弹框
-    const gessaveApp = () => {
+    const gessaveApp = (data: string) => {
         let arr = headerSaveAll();
+        arr
+            .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
+            .variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = data;
         setExeState(true);
         setDetail &&
             setDetail({
@@ -839,10 +850,13 @@ const Lefts = ({
 
         appRef.current = newData;
         setAppData(appRef.current);
+        if (data === 'SELECT') {
+            planAppRef.current = 1;
+        }
         if (!detail) {
             handleSaveClick(true);
         } else {
-            gessaveApp();
+            gessaveApp(data);
         }
     };
     console.log(1111111);
@@ -1309,6 +1323,10 @@ const Lefts = ({
                                         // 我的应用
                                         setExeState(false);
                                         const arr = headerSaveAll();
+                                        arr
+                                            .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
+                                            .variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value =
+                                            'FILTER_USAGE';
                                         setDetail &&
                                             setDetail({
                                                 ...detail,

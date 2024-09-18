@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useMemo, memo } from 'react';
-import { useLocation } from 'react-router-dom';
 import { ActionType, ModalForm, ProFormTextArea, ProFormSelect } from '@ant-design/pro-components';
-import TablePro from './components/antdProTable';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { getMaterialTitle, getMaterialPage, createMaterial, updateMaterial, delMaterial, delsMaterial } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
 import {
@@ -546,21 +545,24 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 </>
             ) : (
                 <>
-                    <div className="flex items-end gap-1 mb-2">
-                        <div className="text-base font-semibold leading-[20px]">素材库</div>
-                        <div className="text-xs text-black/50">可上传自己的图片和内容等，进行笔记生成</div>
-                    </div>
+                    <div className="text-base font-semibold leading-[20px]">素材库</div>
+                    <div className="mt-1 mb-2 text-xs text-black/50">可上传自己的图片和内容等，进行笔记生成</div>
                     <div
                         onClick={() => setZoomOpen(true)}
                         className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
                     >
-                        <div className="flex gap-4">
-                            <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
-                            <div className="flex-1">
-                                <div className="text-[18px] line-clamp-2 font-bold">{libraryName}</div>
-                            </div>
+                        <div className="flex gap-1 items-center">
+                            <AttachFileIcon />
+                            <div className="flex-1 text-[18px] line-clamp-1 font-bold">{libraryName}</div>
                         </div>
-                        <div className="mt-4 flex justify-between items-center text-xs">
+                        <div className="line-clamp-2">
+                            {columns?.map((item) => (
+                                <Tag key={item?.columnName} className="mt-1" color="processing">
+                                    {item?.columnName}
+                                </Tag>
+                            ))}
+                        </div>
+                        <div className="mt-2 flex justify-between items-center text-xs">
                             <div className="flex gap-2">
                                 <Button
                                     onClick={(e) => {

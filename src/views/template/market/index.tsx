@@ -104,7 +104,7 @@ function TemplateMarket() {
                 newData1?.push({
                     sort: 9999,
                     children: [],
-                    name: '其他',
+                    name: menuList?.find((item: any, index) => index === active)?.name,
                     appList: [...changeList],
                     code: 'OTHER',
                     parentCode: 'AMAZON',
@@ -173,7 +173,7 @@ function TemplateMarket() {
             newData1?.push({
                 sort: 9999,
                 children: [],
-                name: '其他',
+                name: menuList?.find((item: any, index) => index === active)?.name,
                 appList: [...changeList],
                 code: 'OTHER',
                 parentCode: 'AMAZON',
@@ -398,33 +398,31 @@ function TemplateMarket() {
                             <div key={index}>
                                 {item.appList?.length > 0 && (
                                     <>
-                                        {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
-                                            <div
-                                                style={{ marginTop: index === 1 ? 0 : '16px' }}
-                                                className="flex justify-between items-center mb-4"
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    {queryParams.category === 'ALL' && (
-                                                        <img height="20px" src={getImage(item.icon)} alt="" />
-                                                    )}
-                                                    <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
-                                                </div>
-                                                {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
-                                                    <div
-                                                        onClick={() => {
-                                                            changeCategory(
-                                                                item,
-                                                                menuList.findIndex((value) => value.code === item.code)
-                                                            );
-                                                        }}
-                                                        className="text-[#673ab7] cursor-pointer"
-                                                    >
-                                                        更多应用
-                                                        <RightOutlined />
-                                                    </div>
-                                                )}
+                                        {/* {queryParams.category === 'ALL' && item?.code !== 'HOT' && ( */}
+                                        <div
+                                            style={{ marginTop: index === 0 ? 0 : '16px' }}
+                                            className="flex justify-between items-center mb-4"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                {queryParams.category === 'ALL' && <img height="20px" src={getImage(item.icon)} alt="" />}
+                                                <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
                                             </div>
-                                        )}
+                                            {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
+                                                <div
+                                                    onClick={() => {
+                                                        changeCategory(
+                                                            item,
+                                                            menuList.findIndex((value) => value.code === item.code)
+                                                        );
+                                                    }}
+                                                    className="text-[#673ab7] cursor-pointer"
+                                                >
+                                                    更多应用
+                                                    <RightOutlined />
+                                                </div>
+                                            )}
+                                        </div>
+                                        {/* )} */}
                                     </>
                                 )}
                                 {item.appList.length > 0 && item?.code !== 'HOT' && (

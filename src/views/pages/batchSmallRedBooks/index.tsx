@@ -345,16 +345,16 @@ const BatcSmallRedBooks = forwardRef(
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            p: '10px !important'
+                            p: '8px !important'
                         }}
                     >
                         <div className="flex items-center gap-2">
                             <IconButton onClick={() => navigate('/appMarket')} color="secondary">
                                 <KeyboardBackspace fontSize="small" />
                             </IconButton>
-                            <div className="flex flex-col">
+                            <div className="flex items-end gap-2">
                                 <div className="text-[#000c] text-lg font-[500]">{appInfo.name}</div>
-                                <div className="flex items-center gap-2 !text-xs">
+                                <div className="flex items-end gap-2 !text-xs">
                                     <div>状态：{getStatus(appInfo.status)}</div>
                                     <div>
                                         <Popconfirm
@@ -433,6 +433,7 @@ const BatcSmallRedBooks = forwardRef(
                                             navigate('/createApp?uid=' + result);
                                             setCreateAppStatus(false);
                                         }}
+                                        size="small"
                                         type="primary"
                                         className="mr-1"
                                     >
@@ -444,10 +445,10 @@ const BatcSmallRedBooks = forwardRef(
                     </SubCard>
                 )}
                 <div
-                    className="flex gap-[20px]"
+                    className="flex gap-4"
                     style={{
-                        height: detail ? '100%' : 'calc(100% - 86px)',
-                        marginTop: detail ? 0 : '16px'
+                        height: detail ? '100%' : 'calc(100% - 60px)',
+                        marginTop: detail ? 0 : '8px'
                     }}
                 >
                     <div

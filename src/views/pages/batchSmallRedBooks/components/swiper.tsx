@@ -14,7 +14,7 @@ const Swipers = ({ item }: { item: any }) => {
             style={{
                 aspectRatio: item?.executeResult?.imageList?.length === 0 ? '263 / 351' : 'auto'
             }}
-            className="relative swiperImages "
+            className="relative swiperImages rounded-[16px] overflow-hidden"
         >
             <Swiper
                 onSwiper={(swiper) => {

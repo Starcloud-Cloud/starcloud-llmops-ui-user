@@ -661,13 +661,13 @@ const AddStyle = React.forwardRef(
 
         return (
             <div className="addStyle">
-                <div className="flex items-center mb-2">
+                {/* <div className="flex items-center mb-2">
                     <Tooltip title="生成图片时会按照风格模板的顺序去使用">
                         <InfoCircleOutlined className="cursor-pointer" />
                     </Tooltip>
                     <div className="w-full flex gap-2 justify-between">
                         <span className="text-sm ml-1 text-stone-600">配置笔记图片生成的风格模版，支持不同风格模版组合生成</span>
-                        {/* <Tooltip title="风格模版配置">
+                        <Tooltip title="风格模版配置">
                             <Button
                                 icon={<SettingOutlined />}
                                 shape="circle"
@@ -685,25 +685,18 @@ const AddStyle = React.forwardRef(
                                     setSystemOPen(true);
                                 }}
                             />
-                        </Tooltip> */}
+                        </Tooltip>
                     </div>
-                </div>
-                <div className="flex justify-between items-center">
-                    <div className="flex items-end gap-1">
-                        <div className="text-base font-semibold leading-[20px]">模版风格</div>
-                        <div className="text-xs text-black/50">系统按顺序使用配置的模版进行生成</div>
-                    </div>
-
+                </div> */}
+                <div className="flex justify-between items-end">
+                    <div className="text-base font-semibold leading-[20px]">模版风格</div>
                     {mode === 1 && (
-                        <div className="pb-3 flex justify-between items-center">
-                            <div className="flex">
-                                <Button size="small" type="primary" onClick={() => handleAdd()}>
-                                    增加风格
-                                </Button>
-                            </div>
-                        </div>
+                        <Button size="small" type="primary" onClick={() => handleAdd()}>
+                            增加风格
+                        </Button>
                     )}
                 </div>
+                <div className="text-xs text-black/50">配置笔记图片生成的风格模版，支持不同风格模版组合生成</div>
                 {/* <Collapse items={collapseList} defaultActiveKey={[0]} /> */}
                 <div className="flex overflow-x-auto p-1">
                     {styleData?.map((item: any, index: number) => {

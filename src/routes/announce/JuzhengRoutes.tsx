@@ -17,7 +17,7 @@ const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedB
 const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
 const PagesLanding = Loadable(lazy(() => import('views/announce/landing')));
 const Redemption = Loadable(lazy(() => import('views/rewards/redemption')));
-const Market = Loadable(lazy(() => import('views/template/market')));
+const Market = Loadable(lazy(() => import('views/template/market/index')));
 const ManageMarket = Loadable(lazy(() => import('views/manageMarket')));
 const MyTemplate = Loadable(lazy(() => import('views/template/myTemplate')));
 const Demo = Loadable(lazy(() => import('views/pages/batchSmallRedBooks/newIndex')));

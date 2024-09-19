@@ -74,7 +74,7 @@ const LeftModalAdd = ({
     const [colOpen, setColOpen] = useState(false);
     return (
         <div>
-            <div className="overflow-y-auto mt-6">
+            <div className="overflow-y-auto">
                 <TableHeader
                     name={libraryName}
                     setTitle={setTitle}

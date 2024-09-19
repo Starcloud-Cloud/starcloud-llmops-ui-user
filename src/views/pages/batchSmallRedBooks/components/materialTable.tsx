@@ -549,20 +549,25 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     <div className="mt-1 mb-2 text-xs text-black/50">可上传自己的图片和内容等，进行笔记生成</div>
                     <div
                         onClick={() => setZoomOpen(true)}
-                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                        className="p-2 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
                     >
-                        <div className="flex gap-1 items-center">
+                        <div className="flex gap-1 items-center mb-[10px]">
                             <AttachFileIcon />
                             <div className="flex-1 text-[18px] line-clamp-1 font-bold">{libraryName}</div>
                         </div>
                         <div className="line-clamp-2">
                             {columns?.map((item) => (
-                                <Tag key={item?.columnName} className="mt-1" color="processing">
+                                <Tag
+                                    key={item?.columnName}
+                                    bordered={false}
+                                    className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[88px] mt-1 !text-black/[87] rounded-xl"
+                                    color="#00000014"
+                                >
                                     {item?.columnName}
                                 </Tag>
                             ))}
                         </div>
-                        <div className="mt-2 flex justify-between items-center text-xs">
+                        <div className="mt-[10px] flex justify-between items-center text-xs">
                             <div className="flex gap-2">
                                 <Button
                                     onClick={(e) => {

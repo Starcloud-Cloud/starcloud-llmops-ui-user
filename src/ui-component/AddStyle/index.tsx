@@ -689,14 +689,14 @@ const AddStyle = React.forwardRef(
                     </div>
                 </div> */}
                 <div className="flex justify-between items-end">
-                    <div className="text-base font-semibold leading-[20px]">模版风格</div>
+                    <div className="text-base font-semibold">模版风格</div>
                     {mode === 1 && (
                         <Button size="small" type="primary" onClick={() => handleAdd()}>
                             增加风格
                         </Button>
                     )}
                 </div>
-                <div className="text-xs text-black/50">配置笔记图片生成的风格模版，支持不同风格模版组合生成</div>
+                <div className="text-xs text-black/50 mt-1 mb-2">配置笔记图片生成的风格模版，支持不同风格模版组合生成</div>
                 {/* <Collapse items={collapseList} defaultActiveKey={[0]} /> */}
                 <div className="flex overflow-x-auto p-1">
                     {styleData?.map((item: any, index: number) => {

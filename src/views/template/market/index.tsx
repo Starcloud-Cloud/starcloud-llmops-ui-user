@@ -108,7 +108,7 @@ function TemplateMarket() {
                     appList: [...changeList],
                     code: 'OTHER',
                     parentCode: 'AMAZON',
-                    icon: 'amazon',
+                    icon: menuList?.find((item: any, index) => index === active)?.icon,
                     image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
                 });
                 scrollRef.current.scrollTop = 0;
@@ -177,7 +177,7 @@ function TemplateMarket() {
                 appList: [...changeList],
                 code: 'OTHER',
                 parentCode: 'AMAZON',
-                icon: 'amazon',
+                icon: menuList?.find((item: any, index) => index === active)?.icon,
                 image: 'https://download.hotsalecloud.com/mofaai/images/category/amazon.jpg'
             });
             const filterData = newData1?.map((item: any) => {
@@ -393,7 +393,7 @@ function TemplateMarket() {
                             </div>
                         ))}
                     </div>
-                    <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-68px)] overflow-x-hidden overflow-y-scroll">
+                    <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-36px)] overflow-x-hidden overflow-y-scroll">
                         {newList?.map((item, index) => (
                             <div key={index}>
                                 {item.appList?.length > 0 && (
@@ -404,7 +404,7 @@ function TemplateMarket() {
                                             className="flex justify-between items-center mb-4"
                                         >
                                             <div className="flex items-center gap-2">
-                                                {queryParams.category === 'ALL' && <img height="20px" src={getImage(item.icon)} alt="" />}
+                                                <img height="20px" src={getImage(item.icon)} alt="" />
                                                 <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
                                             </div>
                                             {queryParams.category === 'ALL' && item?.code !== 'HOT' && (

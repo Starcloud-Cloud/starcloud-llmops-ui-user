@@ -430,7 +430,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
 
     return (
         <div className="relative">
-            <div className="flex  mb-4">
+            <div className="flex">
                 <Avatar shape="square" icon={<IconRenderer value={iconUrl || 'AreaChartOutlined'} />} size={48} />
                 <div className="flex flex-col ml-3 justify-between">
                     <div className="cursor-pointer flex items-center ">
@@ -817,7 +817,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <div className="my-4 text-[16px] font-bold">
                                                 {sceneList?.find((i) => i.value === item.scene)?.label}
                                             </div>
-                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                                 {item.children?.map((el: any) => {
                                                     return (
                                                         <div
@@ -909,7 +909,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <div className="my-4 text-[16px] font-bold">
                                                 {sceneList?.find((i) => i.value === item.scene)?.label}
                                             </div>
-                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                                 {item?.children?.map((el: any) => (
                                                     <div
                                                         onClick={() => {
@@ -1038,7 +1038,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                         </div>
                                     )}
                                     {/* )} */}
-                                    <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                    <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                         {definitionList?.map((el: any) => {
                                             return (
                                                 <div
@@ -1152,7 +1152,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <div className="my-4 text-[16px] font-bold">
                                                 {sceneList?.find((i) => i.value === item.scene)?.label}
                                             </div>
-                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                                 {item?.children?.map((el: any) => (
                                                     <div
                                                         onClick={async () => {
@@ -1170,7 +1170,12 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
                                                             )}
                                                             <div className="flex-1">
-                                                                <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                <div className="text-[18px] font-bold flex items-start">
+                                                                    <div className="flex-1">{el.pluginName}</div>
+                                                                    <Tooltip title="扣子账号名称">
+                                                                        <Tag color="processing">{item?.accountName || '沈么鬼'}</Tag>
+                                                                    </Tooltip>
+                                                                </div>
                                                                 <div className="line-clamp-3 h-[66px]">{el.description}</div>
                                                             </div>
                                                         </div>
@@ -1200,7 +1205,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
                                                                 }}
-                                                                className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
+                                                                className="absolute top-[16px] right-[8px] hover:text-[#ff4d4f]"
                                                             />
                                                         </Popconfirm>
                                                     </div>

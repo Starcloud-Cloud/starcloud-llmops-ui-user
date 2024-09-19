@@ -1071,7 +1071,7 @@ const Lefts = ({
                                                         {item.name}
                                                     </div>
                                                 </AccordionSummary>
-                                                <AccordionDetails>
+                                                <AccordionDetails className="!px-0">
                                                     <div className="text-xs text-black/50">{item?.description}</div>
                                                     {item?.variable?.variables?.map((el: any, i: number) => (
                                                         <div key={el.field}>

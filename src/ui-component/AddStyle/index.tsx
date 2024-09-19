@@ -521,7 +521,7 @@ const AddStyle = React.forwardRef(
                 copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
                     if (item.flowStep.handler === 'PosterActionHandler') {
                         // 将该步骤的属性值更改为 copyRecord 的值
-                        Object.assign(item, copyRecord);
+                        item && copyRecord && Object.assign(item, copyRecord);
                     }
                 });
 
@@ -613,7 +613,7 @@ const AddStyle = React.forwardRef(
             copyDetails?.workflowConfig?.steps?.forEach((item: any) => {
                 if (item.flowStep.handler === 'PosterActionHandler') {
                     // 将该步骤的属性值更改为 copyRecord 的值
-                    Object.assign(item, copyRecord);
+                    item && copyRecord && Object.assign(item, copyRecord);
                 }
             });
 

@@ -16,6 +16,7 @@ const LeftModalAdd = ({
     libraryId,
     libraryUid,
     materialflag,
+    setMaterialflag,
     libraryName,
     libraryType,
     pluginConfig,
@@ -42,6 +43,7 @@ const LeftModalAdd = ({
     libraryId: string;
     libraryUid: string;
     materialflag: boolean;
+    setMaterialflag: (data: boolean) => void;
     libraryName: string;
     libraryType: number;
     pluginConfig: string | null;
@@ -72,7 +74,7 @@ const LeftModalAdd = ({
     const [colOpen, setColOpen] = useState(false);
     return (
         <div>
-            <div className="overflow-y-auto mt-6">
+            <div className="overflow-y-auto">
                 <TableHeader
                     name={libraryName}
                     setTitle={setTitle}
@@ -80,6 +82,7 @@ const LeftModalAdd = ({
                     setColOpen={setColOpen}
                     selectedRowKeys={selectedRowKeys}
                     materialflag={materialflag}
+                    setMaterialflag={setMaterialflag}
                     handleBatchDel={handleDels}
                     libraryId={libraryId}
                     libraryUid={libraryUid}

@@ -8,7 +8,7 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
 import ChatMarkdown from 'ui-component/Markdown';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
 const { Option } = Select;
 const TriggerModal = ({
     triggerOpen,
@@ -630,6 +630,13 @@ ${JSON.stringify(value, null, 2)}
     };
     useEffect(() => {
         getList();
+    }, []);
+    useEffect(() => {
+        loader.config({
+            paths: {
+                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs'
+            }
+        });
     }, []);
     return (
         <Modal width="60%" open={triggerOpen} onCancel={() => setTriggerOpen(false)} footer={false} title="素材库-触发器">

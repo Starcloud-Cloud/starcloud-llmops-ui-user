@@ -14,7 +14,7 @@ const Swipers = ({ item }: { item: any }) => {
             style={{
                 aspectRatio: item?.executeResult?.imageList?.length === 0 ? '263 / 351' : 'auto'
             }}
-            className="relative swiperImages "
+            className="relative swiperImages overflow-hidden"
         >
             <Swiper
                 onSwiper={(swiper) => {
@@ -34,7 +34,12 @@ const Swipers = ({ item }: { item: any }) => {
             >
                 {item?.executeResult?.imageList?.map((el: any, index: number) => (
                     <SwiperSlide key={el?.url}>
-                        <Image width={'100%'} height={'100%'} preview={false} src={el?.url} />
+                        <Image
+                            width={'100%'}
+                            height={'100%'}
+                            preview={false}
+                            src={`${el?.url}?x-oss-process=image/resize,w_215/quality,q_80`}
+                        />
                     </SwiperSlide>
                 ))}
             </Swiper>

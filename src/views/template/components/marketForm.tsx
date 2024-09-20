@@ -364,7 +364,6 @@ function FormExecute({
                     <div className="mt-4">
                         <FormControl key={item?.value} color="secondary" size="small" fullWidth>
                             <Autocomplete
-                                sx={{ mt: 2 }}
                                 multiple
                                 size="small"
                                 id="tags-filled"

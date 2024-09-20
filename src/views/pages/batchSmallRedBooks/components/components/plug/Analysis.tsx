@@ -5,7 +5,7 @@ import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled } from '@ant-de
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
 import { addPlugConfigInfo, updatePlugConfigInfo, configDetail } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
@@ -339,7 +339,13 @@ const PlugAnalysis = ({
             });
         }
     }, [rowPre, record]);
-
+    useEffect(() => {
+        loader.config({
+            paths: {
+                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs'
+            }
+        });
+    }, []);
     //form 表单校验
     const parseInputToArray = (input: any) => {
         try {

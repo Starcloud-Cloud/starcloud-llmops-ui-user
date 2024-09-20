@@ -547,7 +547,7 @@ const MainLayout = () => {
                             {(layout === LAYOUT_CONST.VERTICAL_LAYOUT || matchDownMd) && <Sidebar />}
 
                             {/* main content */}
-                            <Main theme={theme} open={drawerOpen} layout={layout} className="!mt-[56px]">
+                            <Main theme={theme} open={drawerOpen} layout={layout} className="!mt-[56px] !p-4 !pr-[11px]">
                                 {/*<Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>*/}
                                 {!isLarge ? (
                                     <Container
@@ -555,7 +555,7 @@ const MainLayout = () => {
                                             // `${isMobile && '!p-0'}
                                             `!p-0 max-w-[1300px] overflow-y-auto`
                                         }
-                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'})` }}
+                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '88px'})` }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         {/* breadcrumb */}
@@ -569,7 +569,7 @@ const MainLayout = () => {
                                             // `${isMobile && '!p-0'}
                                             `!p-0 overflow-y-scroll`
                                         }
-                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '134px'})` }}
+                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '176px' : '88px'})` }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />

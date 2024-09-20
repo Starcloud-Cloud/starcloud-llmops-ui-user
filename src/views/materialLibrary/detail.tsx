@@ -97,6 +97,7 @@ export const TableHeader = ({
     setColOpen,
     setTitle,
     materialflag,
+    setMaterialflag,
     selectedRowKeys,
     handleBatchDel,
     libraryId,
@@ -124,6 +125,7 @@ export const TableHeader = ({
     //编辑|新增素材名称
     setTitle: (title: string) => void;
     materialflag?: boolean;
+    setMaterialflag?: (data: boolean) => void;
     // 编辑|新增素材
     setEditOpen: (open: boolean) => void;
     // 编辑素材字段
@@ -428,9 +430,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
 
     return (
         <div className="relative">
-            <div className="flex  mb-4">
-                <Avatar shape="square" icon={<IconRenderer value={iconUrl || 'AreaChartOutlined'} />} size={48} />
-                <div className="flex flex-col ml-3 justify-between">
+            <div className="flex items-center">
+                <Avatar shape="square" icon={<IconRenderer value={iconUrl || 'AreaChartOutlined'} />} size={24} />
+                <div className="flex flex-col ml-2 justify-between">
                     <div className="cursor-pointer flex items-center ">
                         <span className="text-[20px] font-semibold mr-1">{name}</span>
                         {canSwitch && (
@@ -452,11 +454,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 </svg>
                             </Tooltip>
                         )}
-                    </div>
-                    <div>
-                        <Space size={4}>
-                            <Tag bordered={false}>{sourceList?.find((v) => +v.value === libraryType)?.label || '未知'}</Tag>
-                        </Space>
                     </div>
                 </div>
             </div>
@@ -815,7 +812,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <div className="my-4 text-[16px] font-bold">
                                                 {sceneList?.find((i) => i.value === item.scene)?.label}
                                             </div>
-                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                                 {item.children?.map((el: any) => {
                                                     return (
                                                         <div
@@ -836,7 +833,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 )}
                                                                 <div className="flex-1">
                                                                     <div className="text-[18px] font-bold">{el.pluginName}</div>
-                                                                    <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                                    <div className="line-clamp-2 h-[44px]">{el.description}</div>
                                                                 </div>
                                                             </div>
                                                             <Divider className="my-2" />
@@ -907,7 +904,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <div className="my-4 text-[16px] font-bold">
                                                 {sceneList?.find((i) => i.value === item.scene)?.label}
                                             </div>
-                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                                 {item?.children?.map((el: any) => (
                                                     <div
                                                         onClick={() => {
@@ -927,7 +924,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                             )}
                                                             <div className="flex-1">
                                                                 <div className="text-[18px] font-bold">{el.pluginName}</div>
-                                                                <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                                <div className="line-clamp-2 h-[44px]">{el.description}</div>
                                                             </div>
                                                         </div>
                                                         <Divider className="my-2" />
@@ -1010,7 +1007,16 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     </Button>
                 </div>
             </Modal>
-            <Modal width="80%" open={plugMarketOpen} onCancel={() => setPlugMarketOpen(false)} footer={false} title="插件市场">
+            <Modal
+                width="80%"
+                open={plugMarketOpen}
+                onCancel={() => {
+                    setPlugMarketOpen(false);
+                    setMaterialflag && setMaterialflag(false);
+                }}
+                footer={false}
+                title="插件市场"
+            >
                 <Tabs
                     items={[
                         {
@@ -1027,7 +1033,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                         </div>
                                     )}
                                     {/* )} */}
-                                    <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                    <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                         {definitionList?.map((el: any) => {
                                             return (
                                                 <div
@@ -1058,7 +1064,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                     </Tooltip>
                                                                 )}
                                                             </div>
-                                                            <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                            <div className="line-clamp-2 h-[44px]">{el.description}</div>
                                                         </div>
                                                     </div>
                                                     <Divider className="my-2" />
@@ -1141,7 +1147,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <div className="my-4 text-[16px] font-bold">
                                                 {sceneList?.find((i) => i.value === item.scene)?.label}
                                             </div>
-                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                                 {item?.children?.map((el: any) => (
                                                     <div
                                                         onClick={async () => {
@@ -1152,7 +1158,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
                                                         key={el.uid}
                                                     >
-                                                        <div className="flex gap-4">
+                                                        <div className="flex items-center gap-4">
                                                             {el.avatar ? (
                                                                 <Avatar shape="square" size={64} src={el.avatar} />
                                                             ) : (
@@ -1160,9 +1166,10 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                             )}
                                                             <div className="flex-1">
                                                                 <div className="text-[18px] font-bold">{el.pluginName}</div>
-                                                                <div className="line-clamp-3 h-[66px]">{el.description}</div>
+                                                                <div className="line-clamp-2 h-[44px]">{el.description}</div>
                                                             </div>
                                                         </div>
+                                                        <Tag color="processing">扣子机器人：{el?.accountName}</Tag>
                                                         <Divider className="my-2" />
                                                         <div className="flex justify-between text-xs">
                                                             <Tooltip title="更新时间">
@@ -1189,7 +1196,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
                                                                 }}
-                                                                className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
+                                                                className="absolute top-[16px] right-[8px] hover:text-[#ff4d4f]"
                                                             />
                                                         </Popconfirm>
                                                     </div>
@@ -1239,7 +1246,10 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     handleAnalysis={() => null}
                     downTableData={downTableData}
                     onOpenChange={setPlugConfigOpen}
-                    setPlugMarketOpen={setPlugMarketOpen}
+                    setPlugMarketOpen={() => {
+                        setPlugMarketOpen(false);
+                        setMaterialflag && setMaterialflag(false);
+                    }}
                     open={plugConfigOpen}
                     record={plugRecord}
                     metaData={metaData}

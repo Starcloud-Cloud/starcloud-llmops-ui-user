@@ -488,7 +488,6 @@ const PlugAnalysis = ({
                 collapsible="icon"
                 ghost
                 expandIconPosition="end"
-                defaultActiveKey={['1']}
                 items={[
                     {
                         key: '1',

@@ -91,7 +91,7 @@ const AddStyleApp = React.forwardRef(
                         // 风格产生===2 -> POSTER_STYLE
                         if (mode === 1) {
                             if (item.field === 'POSTER_STYLE_CONFIG') {
-                                item.value = styleData;
+                                item.value = JSON.stringify(styleData);
                             }
                         } else {
                             if (item.field === 'POSTER_STYLE') {

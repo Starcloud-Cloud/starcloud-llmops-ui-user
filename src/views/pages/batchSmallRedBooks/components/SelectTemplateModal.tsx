@@ -51,6 +51,7 @@ export const SelectTemplateModal = ({
                 handleOk(temp);
             }}
             width="70%"
+            className="top-[40px]"
             title="选择图片模版"
         >
             <Spin spinning={spinLoading}>
@@ -100,11 +101,11 @@ export const SelectTemplateModal = ({
                     ]}
                 /> */}
                 <div className="flex">
-                    <div className="w-[145px] overflow-y-auto h-[70vh]">
+                    <div className="w-[145px] overflow-y-auto h-[85vh]">
                         <Menu onClick={onClick} style={{ width: 140 }} selectedKeys={type} mode="inline" items={menuList} />
                     </div>
                     {templateList?.length ? (
-                        <div className="h-[70vh] flex-1">
+                        <div className="h-[85vh] overflow-auto flex-1">
                             <div className="grid grid-cols-5 grid-rows-[auto] gap-2 overflow-y-auto p-1">
                                 {templateList.map((v: any, i) => (
                                     <div key={i} className="relative">

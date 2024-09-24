@@ -30,6 +30,7 @@ export interface Details {
     uid: string;
     version: number;
     installStatus: any;
+    publishUid?: string;
     workflowConfig: { steps: any[] };
 }
 export interface Anyevent {

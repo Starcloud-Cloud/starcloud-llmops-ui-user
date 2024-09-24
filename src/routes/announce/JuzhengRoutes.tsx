@@ -11,6 +11,7 @@ const PagesPrice = Loadable(lazy(() => import('views/announce/pricing/member')))
 const AppUserAccountProfile = Loadable(lazy(() => import('views/application/users/account-profile/Profile')));
 const OrderRecord = Loadable(lazy(() => import('views/pages/pricing/orderRecord')));
 const Copywriting = Loadable(lazy(() => import('views/pages/copywriting')));
+const AAA = Loadable(lazy(() => import('views/aaa')));
 const RedBookTaskList = Loadable(lazy(() => import('views/pages/redBookTaskList')));
 const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/components/addModal')));
 const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
@@ -40,6 +41,7 @@ const JuzhengRoutes = {
             element: <Market />
         },
         { path: '/copywriting', element: <Copywriting /> },
+        { path: '/aaa', element: <AAA /> },
         { path: '/redBookTaskList', element: <RedBookTaskList /> },
         { path: '/copywritingModal', element: <CopywritingModal /> },
         { path: '/batchSmallRedBook', element: <BatchSmallRedBook /> },

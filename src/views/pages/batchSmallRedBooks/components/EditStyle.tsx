@@ -5,14 +5,15 @@ import { useEffect, useState, useRef, useMemo, Fragment } from 'react';
 import _ from 'lodash-es';
 import { SelectTemplateModal } from './SelectTemplateModal';
 import React from 'react';
-import { getImageTemplateTypes } from 'api/template';
+import { getImageTemplateTypes, materialGroup_page } from 'api/template';
 import VariableInput from './variableInput';
 import { getImageTemplateJSON } from '../../../../api/template/index';
 import { v4 as uuidv4 } from 'uuid';
 import copy from 'clipboard-copy';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-const { SubMenu } = Menu;
+import { useCache, CACHE_KEY } from 'hooks/web/useCache';
+const { wsCache } = useCache();
 const EditStyle = ({
     schemaList,
     typeList,
@@ -71,6 +72,14 @@ const EditStyle = ({
         setOpen(false);
     };
     useEffect(() => {
+        // const groupList = wsCache
+        //     .get(CACHE_KEY.INFO)
+        //     ?.menus?.find((item: any) => item.name === 'poster')
+        //     ?.children?.find((item: any) => item.path === 'template')?.children;
+
+        // materialGroup_page().then((res) => {
+        //     console.log(res);
+        // });
         setSpinLoading(true);
         getImageTemplateTypes().then((res) => {
             setImageTypeList(res);

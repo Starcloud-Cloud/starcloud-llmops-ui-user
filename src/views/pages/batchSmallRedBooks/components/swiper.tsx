@@ -7,7 +7,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useState } from 'react';
 import { Pagination } from 'swiper';
 
-const Swipers = ({ item }: { item: any }) => {
+const Swipers = ({ item, show }: { item: any; show?: boolean }) => {
     const [swiperRef, setSwiperRef] = useState<any>(null);
     return (
         <div
@@ -38,7 +38,7 @@ const Swipers = ({ item }: { item: any }) => {
                             width={'100%'}
                             height={'100%'}
                             preview={false}
-                            src={`${el?.url}?x-oss-process=image/resize,w_215/quality,q_80`}
+                            src={`${el?.url}?x-oss-process=image/resize,w_${show ? 380 : 215}/quality,q_80`}
                         />
                     </SwiperSlide>
                 ))}

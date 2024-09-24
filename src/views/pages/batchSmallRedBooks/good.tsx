@@ -389,7 +389,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                 </div>
             ) : (
                 <>
-                    <Swipers item={item} />
+                    <Swipers show={show} item={item} />
                     <div className="p-[12px]">
                         <div className="h-[40px] text-sm font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
                     </div>

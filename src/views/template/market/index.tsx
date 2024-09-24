@@ -117,10 +117,11 @@ function TemplateMarket() {
                 const newData = _.cloneDeep(res);
                 newData.forEach((item: any) => {
                     if (item.code !== 'HOT') {
-                        item.appList = item.appList?.splice(0, 8);
+                        item.appList = item.appList?.splice(0, 16);
                     }
                 });
                 setNewList(newData);
+                setColflag(true);
             }
         });
         //类别
@@ -202,7 +203,7 @@ function TemplateMarket() {
             });
             filterData.forEach((item: any) => {
                 if (item.code !== 'HOT') {
-                    item.appList = item.appList?.splice(0, 8);
+                    item.appList = item.appList?.splice(0, 16);
                 }
             });
             setNewList(filterData);
@@ -358,6 +359,25 @@ function TemplateMarket() {
         }
         return image;
     };
+    const [colflag, setColflag] = useState(false);
+    const colRef = useRef<any>(null);
+    const [boxHeight, setBoxHeight] = useState(200);
+    const updateBoxHeight = () => {
+        if (colRef.current) {
+            console.log(colRef.current.offsetHeight);
+
+            setBoxHeight(colRef.current.offsetHeight);
+        }
+    };
+    useEffect(() => {
+        if (colflag) {
+            updateBoxHeight();
+            window.addEventListener('resize', updateBoxHeight);
+        }
+        return () => {
+            window.removeEventListener('resize', updateBoxHeight);
+        };
+    }, [colflag]);
 
     return (
         <Box
@@ -396,57 +416,60 @@ function TemplateMarket() {
                     <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-36px)] overflow-x-hidden overflow-y-scroll">
                         {newList?.map((item, index) => (
                             <div key={index}>
-                                {item.appList?.length > 0 && (
-                                    <>
-                                        {/* {queryParams.category === 'ALL' && item?.code !== 'HOT' && ( */}
-                                        <div
-                                            style={{ marginTop: index === 0 ? 0 : '16px' }}
-                                            className="flex justify-between items-center mb-4"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <img height="20px" src={getImage(item.icon)} alt="" />
-                                                <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
-                                            </div>
-                                            {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
-                                                <div
-                                                    onClick={() => {
-                                                        changeCategory(
-                                                            item,
-                                                            menuList.findIndex((value) => value.code === item.code)
-                                                        );
-                                                    }}
-                                                    className="text-[#673ab7] cursor-pointer"
-                                                >
-                                                    更多应用
-                                                    <RightOutlined />
-                                                </div>
-                                            )}
+                                {item.appList?.length > 0 && item?.code !== 'HOT' && (
+                                    <div style={{ marginTop: index === 0 ? 0 : '16px' }} className="flex justify-between items-center mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <img height="20px" src={getImage(item.icon)} alt="" />
+                                            <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
                                         </div>
-                                        {/* )} */}
-                                    </>
+                                        {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
+                                            <div
+                                                onClick={() => {
+                                                    changeCategory(
+                                                        item,
+                                                        menuList.findIndex((value) => value.code === item.code)
+                                                    );
+                                                }}
+                                                className="text-[#673ab7] cursor-pointer"
+                                            >
+                                                更多应用
+                                                <RightOutlined />
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                                 {item.appList.length > 0 && item?.code !== 'HOT' && (
                                     <Row
-                                        className="overflow-x-hidden pb-[5px] "
+                                        className="overflow-x-hidden pb-[5px]"
+                                        style={{
+                                            maxHeight: queryParams.category === 'ALL' ? boxHeight * 2 + 20 + 'px' : 'auto',
+                                            overflowY: queryParams.category === 'ALL' ? 'hidden' : 'auto'
+                                        }}
                                         gutter={[16, 16]}
-                                        wrap={queryParams.category === 'ALL' ? false : true}
+                                        // wrap={queryParams.category === 'ALL' ? false : true}
                                     >
                                         {item.appList.map((el: any, index: number) => (
-                                            <Col key={el?.uid} className={`xxxl-col flex-shrink-0`}>
+                                            <Col key={el?.uid} ref={colRef} className={`xxxl-col flex-shrink-0`}>
                                                 <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
                                             </Col>
                                         ))}
                                     </Row>
                                     // <div
-                                    //     className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                                    //     style={{
-                                    //         // height: queryParams.category === 'ALL' ? '190px' : 'auto',
-                                    //         overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible',
-                                    //         paddingBottom: queryParams.category === 'ALL' ? '0px' : '10px'
-                                    //     }}
+                                    //     className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 grid-rows-2"
+                                    //     // style={{
+                                    //     //     height: queryParams.category === 'ALL' ? '190px' : 'auto',
+                                    //     //     overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible',
+                                    //     //     paddingBottom: queryParams.category === 'ALL' ? '0px' : '10px'
+                                    //     // }}
                                     // >
                                     //     {item.appList.map((el: any, index: number) => (
-                                    //         <MarketTemplate like="market" type="MARKET" key={el?.uid} handleDetail={handleDetail} data={el} />
+                                    //         <MarketTemplate
+                                    //             like="market"
+                                    //             type="MARKET"
+                                    //             key={el?.uid}
+                                    //             handleDetail={handleDetail}
+                                    //             data={el}
+                                    //         />
                                     //     ))}
                                     // </div>
                                 )}

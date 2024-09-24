@@ -147,20 +147,34 @@ const Right = ({
                                             </Popover>
                                             <span className="font-[600]">生成时间：</span>
                                             {dayjs(item?.createTime)?.format('YYYY-MM-DD HH:mm:ss')}
-                                            <div className="w-[71px] inline-block whitespace-nowrap">
+                                            <div className="w-[71px] inline-block whitespace-nowrap ml-1">
                                                 <span className="font-[600]">版本号：</span>
                                                 {item?.version}
                                             </div>
                                         </div>
-                                        <div className="flex gap-1 flex-wrap">
-                                            <span className="font-[600]">执行人:</span>
-                                            <div className="!w-[50px] line-clamp-1">{item?.creator}</div>
-                                            <span className="font-[600]">生成成功数:</span>
-                                            <span className="w-[17px]">{item?.successCount}</span>
-                                            <span className="font-[600]">生成失败数:</span>
-                                            <span className="w-[17px]">{item?.failureCount}</span>
-                                            <span className="font-[600]">生成总数:</span>
-                                            <span className="w-[17px]">{item?.totalCount}</span>
+                                        <div className="hidden xl:hidden 2xl:block">
+                                            <div className="flex gap-1 flex-wrap">
+                                                <span className="font-[600]">执行人:</span>
+                                                <div className="!w-[50px] line-clamp-1">{item?.creator}</div>
+                                                <span className="font-[600]">生成成功数:</span>
+                                                <span className="w-[17px]">{item?.successCount}</span>
+                                                <span className="font-[600]">生成失败数:</span>
+                                                <span className="w-[17px]">{item?.failureCount}</span>
+                                                <span className="font-[600]">生成总数:</span>
+                                                <span className="w-[17px]">{item?.totalCount}</span>
+                                            </div>
+                                        </div>
+                                        <div className="hidden 2xl:hidden xl:block lg:block md:block sm:block xs:block">
+                                            <div className="flex gap-1 flex-wrap">
+                                                <span className="font-[600]">执行人:</span>
+                                                <div className="!w-[50px] line-clamp-1">{item?.creator}</div>
+                                                <span className="font-[600]">成功数:</span>
+                                                <span className="w-[17px]">{item?.successCount}</span>
+                                                <span className="font-[600]">失败数:</span>
+                                                <span className="w-[17px]">{item?.failureCount}</span>
+                                                <span className="font-[600]">总数:</span>
+                                                <span className="w-[17px]">{item?.totalCount}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 ),

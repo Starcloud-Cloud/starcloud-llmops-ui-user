@@ -202,6 +202,10 @@ export const xhsApp = (uid: any) => {
 export const getImageTemplateTypes = () => {
     return request.get({ url: `/llm/creative/scheme/listPosterTemplateType` });
 };
+// 获取图片模版内容
+export const materialGroup_page = () => {
+    return request.get({ url: `/poster/material-group/u/page` });
+};
 
 // 获取template json
 export const getImageTemplateJSON = (templateId: string) => {

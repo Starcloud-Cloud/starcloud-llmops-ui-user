@@ -394,7 +394,7 @@ function TemplateMarket() {
             <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-68px)] overflow-x-hidden overflow-y-scroll">
                 {queryParams.category === 'ALL' && (
                     <Tabs size="small" activeKey={value} onChange={setValue} aria-label="basic tabs example">
-                        {getTenant() !== ENUM_TENANT.AI && (
+                        {/* {getTenant() !== ENUM_TENANT.AI && (
                             <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">我的应用</div>} key="1">
                                 <div className="relative">
                                     <div
@@ -435,7 +435,7 @@ function TemplateMarket() {
                                     )}
                                 </div>
                             </Tabs.TabPane>
-                        )}
+                        )} */}
                         {newList?.some((item) => item?.code === 'HOT') && (
                             <Tabs.TabPane
                                 tab={

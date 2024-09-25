@@ -364,8 +364,6 @@ function TemplateMarket() {
     const [boxHeight, setBoxHeight] = useState(200);
     const updateBoxHeight = () => {
         if (colRef.current) {
-            console.log(colRef.current.offsetHeight);
-
             setBoxHeight(colRef.current.offsetHeight);
         }
     };
@@ -376,6 +374,20 @@ function TemplateMarket() {
         }
         return () => {
             window.removeEventListener('resize', updateBoxHeight);
+        };
+    }, [colflag]);
+    useEffect(() => {
+        const div = document.getElementById('MenuBar');
+        const resizeObserver = new ResizeObserver((entries) => {
+            setBoxHeight(colRef.current.offsetHeight);
+        });
+        if (div) {
+            resizeObserver.observe(div);
+        }
+        return () => {
+            if (div) {
+                resizeObserver.unobserve(div);
+            }
         };
     }, [colflag]);
 

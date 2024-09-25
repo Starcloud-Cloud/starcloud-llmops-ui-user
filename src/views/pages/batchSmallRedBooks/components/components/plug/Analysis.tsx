@@ -1,7 +1,7 @@
 import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar, Switch } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled } from '@ant-design/icons';
+import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled, CaretRightOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
@@ -485,9 +485,7 @@ const PlugAnalysis = ({
             </Form>
             <Collapse
                 className="analysis"
-                collapsible="icon"
-                ghost
-                expandIconPosition="end"
+                expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                 items={[
                     {
                         key: '1',

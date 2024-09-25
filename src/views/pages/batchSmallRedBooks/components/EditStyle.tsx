@@ -72,14 +72,14 @@ const EditStyle = ({
         setOpen(false);
     };
     useEffect(() => {
-        // const groupList = wsCache
-        //     .get(CACHE_KEY.INFO)
-        //     ?.menus?.find((item: any) => item.name === 'poster')
-        //     ?.children?.find((item: any) => item.path === 'template')?.children;
+        const groupList = wsCache
+            .get(CACHE_KEY.INFO)
+            ?.menus?.find((item: any) => item.name === 'poster')
+            ?.children?.find((item: any) => item.path === 'template')?.children;
 
-        // materialGroup_page().then((res) => {
-        //     console.log(res);
-        // });
+        materialGroup_page().then((res) => {
+            console.log(res);
+        });
         setSpinLoading(true);
         getImageTemplateTypes().then((res) => {
             setImageTypeList(res);

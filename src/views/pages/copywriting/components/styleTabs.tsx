@@ -55,6 +55,7 @@ const StyleTabs = ({
         );
     };
     const add = (data?: any) => {
+        const arr = [1, 2, 3];
         const newPanes = _.cloneDeep(imageStyleData);
         const uuid = uuidv4()?.split('-')?.join('');
         newPanes.push({
@@ -125,10 +126,20 @@ const StyleTabs = ({
                         closable: canEdit ? false : i === 0 ? false : true,
                         children: (
                             <EditStyle
+                                activeKey={activeKey}
                                 appData={appData}
                                 materialStatus={materialStatus}
                                 schemaList={schemaList}
                                 imageStyleData={item}
+                                setImageStyleDataList={(data: any) => {
+                                    const newList = _.cloneDeep(imageStyleData);
+                                    newList.splice(i, 1, ...data);
+                                    const newData = newList?.map((item, index) => ({
+                                        ...item,
+                                        name: index === 0 ? '首图' : '图片 ' + index
+                                    }));
+                                    setDetailData(newData);
+                                }}
                                 canEdit={canEdit}
                                 selModal={selModal}
                                 setData={(data: any) => {

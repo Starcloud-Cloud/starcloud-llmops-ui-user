@@ -122,7 +122,7 @@ export const SelectTemplateModal = ({
                                         />
                                         <div className="text-sm font-bold text-center">{v?.name}</div>
                                         <div className="absolute top-2 right-2 text-xs rounded-md bg-black/50 text-white w-[20px] h-[20px] flex justify-center items-center">
-                                            {v?.totalImageCount}
+                                            {v?.materialCount}
                                         </div>
                                     </div>
                                 ))}

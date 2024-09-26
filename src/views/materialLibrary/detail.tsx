@@ -1049,7 +1049,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
                                                     key={el.uid}
                                                 >
-                                                    <div className="flex gap-4">
+                                                    <div className="flex items-center gap-4">
                                                         {el.avatar ? (
                                                             <Avatar shape="square" size={64} src={el.avatar} />
                                                         ) : (
@@ -1067,47 +1067,48 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                             <div className="line-clamp-2 h-[44px]">{el.description}</div>
                                                         </div>
                                                     </div>
+                                                    {el?.systemPlugin && <Tag color="processing">官方插件</Tag>}
                                                     <Divider className="my-2" />
                                                     <div className="flex justify-between text-xs">
                                                         <div className="flex">{wayList.find((item) => item.value === el.type)?.label}</div>
                                                         <div className="flex">{el.creator}</div>
                                                     </div>
-                                                    {/* {(isShowField || bizType === 'APP') && ( */}
-                                                    <Popconfirm
-                                                        title="提示"
-                                                        description="请再次确认是否删除？"
-                                                        onConfirm={async (e: any) => {
-                                                            e.stopPropagation();
-                                                            try {
-                                                                await delPlug(el.configUid);
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: '删除成功',
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'success'
-                                                                        },
-                                                                        close: false,
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                        transition: 'SlideDown'
-                                                                    })
-                                                                );
-                                                                setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
-                                                            } catch (err) {}
-                                                        }}
-                                                        onCancel={(e) => e?.stopPropagation()}
-                                                        okText="Yes"
-                                                        cancelText="No"
-                                                    >
-                                                        <DeleteOutlined
-                                                            onClick={(e) => {
+                                                    {!el?.systemPlugin && (
+                                                        <Popconfirm
+                                                            title="提示"
+                                                            description="请再次确认是否删除？"
+                                                            onConfirm={async (e: any) => {
                                                                 e.stopPropagation();
+                                                                try {
+                                                                    await delPlug(el.configUid);
+                                                                    dispatch(
+                                                                        openSnackbar({
+                                                                            open: true,
+                                                                            message: '删除成功',
+                                                                            variant: 'alert',
+                                                                            alert: {
+                                                                                color: 'success'
+                                                                            },
+                                                                            close: false,
+                                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                            transition: 'SlideDown'
+                                                                        })
+                                                                    );
+                                                                    setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
+                                                                } catch (err) {}
                                                             }}
-                                                            className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
-                                                        />
-                                                    </Popconfirm>
-                                                    {/* )} */}
+                                                            onCancel={(e) => e?.stopPropagation()}
+                                                            okText="Yes"
+                                                            cancelText="No"
+                                                        >
+                                                            <DeleteOutlined
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                }}
+                                                                className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
+                                                            />
+                                                        </Popconfirm>
+                                                    )}
                                                 </div>
                                             );
                                         })}

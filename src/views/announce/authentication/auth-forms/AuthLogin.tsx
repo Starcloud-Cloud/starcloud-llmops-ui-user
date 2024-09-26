@@ -169,7 +169,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
             const expires = (res.data.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
             jsCookie.set('token', res.data.accessToken, {
                 expires,
-                domain: 'mofaai.com.cn'
+                domain: '.mofaai.com.cn'
             });
             authUtil.setToken(res?.data);
             await login();
@@ -256,7 +256,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 const expires = (res.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
                                 jsCookie.set('token', res.accessToken, {
                                     expires,
-                                    domain: 'mofaai.com.cn'
+                                    domain: '.mofaai.com.cn'
                                 });
                                 setLoginData((prevState) => ({
                                     ...prevState,

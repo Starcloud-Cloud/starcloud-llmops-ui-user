@@ -148,7 +148,7 @@ service.interceptors.response.use(
                     const expires = (refreshTokenRes.data.data.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
                     jsCookie.set('token', refreshTokenRes.data.data.accessToken, {
                         expires,
-                        domain: 'mofaai.com.cn'
+                        domain: '.mofaai.com.cn'
                     });
                     // 2.1 刷新成功，则回放队列的请求 + 当前请求
                     setToken((await refreshTokenRes).data.data);

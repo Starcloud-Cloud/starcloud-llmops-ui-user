@@ -1,11 +1,11 @@
 import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar, Switch } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled } from '@ant-design/icons';
+import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled, CaretRightOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
 import { addPlugConfigInfo, updatePlugConfigInfo, configDetail } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
@@ -339,7 +339,13 @@ const PlugAnalysis = ({
             });
         }
     }, [rowPre, record]);
-
+    useEffect(() => {
+        loader.config({
+            paths: {
+                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs'
+            }
+        });
+    }, []);
     //form 表单校验
     const parseInputToArray = (input: any) => {
         try {
@@ -479,10 +485,7 @@ const PlugAnalysis = ({
             </Form>
             <Collapse
                 className="analysis"
-                collapsible="icon"
-                ghost
-                expandIconPosition="end"
-                defaultActiveKey={['1']}
+                expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                 items={[
                     {
                         key: '1',

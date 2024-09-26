@@ -11,7 +11,9 @@ import {
     MenuItem,
     Typography
 } from '@mui/material';
-import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Spin, Alert, Drawer, List } from 'antd';
+import { Tabs, Image, Select, Popover, Form, Popconfirm, Button, Spin, Alert, Drawer, List, Dropdown, Modal } from 'antd';
+import type { MenuProps } from 'antd';
+import { DeleteOutlined, CopyrightOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import { ArrowBack, ContentPaste, Delete, MoreVert, ErrorOutline, KeyboardBackspace } from '@mui/icons-material';
 import { metadata } from 'api/template';
 import { useAllDetail } from 'contexts/JWTContext';
@@ -38,6 +40,7 @@ import { schemeMetadata } from 'api/redBook/copywriting';
 import CreatePlan from 'views/pages/batchSmallRedBooks';
 import useUserStore from 'store/user';
 import jsCookie from 'js-cookie';
+const { confirm } = Modal;
 interface Items {
     label: string;
     value: string;
@@ -568,9 +571,7 @@ function CreateDetail() {
             const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
             if (a) {
                 const newMokeAI = _.cloneDeep(createPlanRef?.current?.mokeAI);
-                const newMoke = _.cloneDeep(createPlanRef?.current?.moke);
                 const newFieldHead = _.cloneDeep(createPlanRef?.current?.fieldHead);
-                a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = JSON.stringify(newMoke);
                 a.variable.variables.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value =
                     JSON.stringify(newMokeAI);
 
@@ -1013,7 +1014,64 @@ function CreateDetail() {
 
     const [errOpen, setErrOpen] = useState(false);
     const [errList, setErrList] = useState<any[]>([]);
-
+    const items: MenuProps['items'] = [
+        {
+            key: '1',
+            label: '删除应用',
+            danger: true,
+            icon: <DeleteOutlined />,
+            onClick: () => {
+                if (detail?.publishUid) {
+                    confirm({
+                        title: '提示',
+                        icon: <ExclamationCircleFilled />,
+                        content: '应用已发布应用市场，请再次确认是否删除？',
+                        onOk() {
+                            del(searchParams.get('uid') as string).then((res) => {
+                                if (res) {
+                                    setDelAnchorEl(null);
+                                    navigate('/my-app');
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    del(searchParams.get('uid') as string).then((res) => {
+                        if (res) {
+                            setDelAnchorEl(null);
+                            navigate('/my-app');
+                        }
+                    });
+                }
+            }
+        },
+        {
+            key: '2',
+            label: '复制应用',
+            icon: <CopyrightOutlined />,
+            onClick: () => {
+                copy({ uid: searchParams.get('uid') }).then((res) => {
+                    if (res) {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '复制成功',
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                transition: 'SlideDown',
+                                close: false
+                            })
+                        );
+                        setDelAnchorEl(null);
+                        navigate('/my-app');
+                    }
+                });
+            }
+        }
+    ];
     return detail ? (
         <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
@@ -1035,79 +1093,12 @@ function CreateDetail() {
                 action={
                     <>
                         {searchParams.get('uid') && (
-                            <IconButton
-                                aria-label="more"
-                                id="long-button"
-                                aria-controls={delOpen ? 'long-menu' : undefined}
-                                aria-expanded={delOpen ? 'true' : undefined}
-                                aria-haspopup="true"
-                                sx={{ zIndex: 9 }}
-                                onClick={(e) => {
-                                    setDelAnchorEl(e.currentTarget);
-                                }}
-                            >
-                                <MoreVert />
-                            </IconButton>
+                            <Dropdown menu={{ items }}>
+                                <IconButton sx={{ zIndex: 9 }}>
+                                    <MoreVert />
+                                </IconButton>
+                            </Dropdown>
                         )}
-                        <Menu
-                            id="del-menu"
-                            MenuListProps={{
-                                'aria-labelledby': 'del-button'
-                            }}
-                            anchorEl={delAnchorEl}
-                            open={delOpen}
-                            onClose={() => {
-                                setDelAnchorEl(null);
-                            }}
-                        >
-                            <MenuItem
-                                onClick={() => {
-                                    del(searchParams.get('uid') as string).then((res) => {
-                                        if (res) {
-                                            setDelAnchorEl(null);
-                                            navigate('/my-app');
-                                        }
-                                    });
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <Delete color="error" />
-                                </ListItemIcon>
-                                <Typography variant="inherit" noWrap>
-                                    {t('myApp.delApp')}
-                                </Typography>
-                            </MenuItem>
-                            <MenuItem
-                                onClick={() => {
-                                    copy({ uid: searchParams.get('uid') }).then((res) => {
-                                        if (res) {
-                                            dispatch(
-                                                openSnackbar({
-                                                    open: true,
-                                                    message: '复制成功',
-                                                    variant: 'alert',
-                                                    alert: {
-                                                        color: 'success'
-                                                    },
-                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                    transition: 'SlideDown',
-                                                    close: false
-                                                })
-                                            );
-                                            setDelAnchorEl(null);
-                                            navigate('/my-app');
-                                        }
-                                    });
-                                }}
-                            >
-                                <ListItemIcon>
-                                    <ContentPaste color="secondary" />
-                                </ListItemIcon>
-                                <Typography variant="inherit" noWrap>
-                                    复制应用
-                                </Typography>
-                            </MenuItem>
-                        </Menu>
                         <Buttons
                             sx={{ zIndex: 9 }}
                             variant="contained"
@@ -1134,10 +1125,6 @@ function CreateDetail() {
                                 const newData = _.cloneDeep(detailRef.current);
                                 let arr = newData?.workflowConfig?.steps;
                                 const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
-                                if (a) {
-                                    a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                                        createPlanRef?.current?.moke;
-                                }
                                 const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
                                 if (index !== -1) {
                                     arr[index] =

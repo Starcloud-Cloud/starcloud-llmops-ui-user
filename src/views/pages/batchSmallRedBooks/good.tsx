@@ -331,7 +331,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
         // </div>
         <div
             key={item.businessUid}
-            className="overflow-hidden border border-solid border-[#CECAD5] rounded-[16px] cursor-pointer relative"
+            className="overflow-hidden cursor-pointer relative border border-solid border-[#CECAD5] rounded-[16px]"
             onClick={() => {
                 setBusinessUid(item.uid);
                 setDetailOpen(true);
@@ -389,9 +389,9 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                 </div>
             ) : (
                 <>
-                    <Swipers item={item} />
+                    <Swipers show={show} item={item} />
                     <div className="p-[12px]">
-                        <div className="h-[48px] mb-[8px] text-base font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
+                        <div className="h-[40px] text-sm font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
                     </div>
                     {/* <Button
                         onClick={(e) => {

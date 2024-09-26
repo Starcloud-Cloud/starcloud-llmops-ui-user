@@ -64,6 +64,7 @@ const Sidebar = () => {
                 ) : (
                     <PerfectScrollbar
                         component="div"
+                        id="MenuBar"
                         style={{
                             height: !matchUpMd ? 'calc(100vh - 56px)' : 'calc(100vh - 88px)',
                             ...drawerSX

@@ -1083,7 +1083,7 @@ function CreateDetail() {
                         startIcon={<ArrowBack />}
                         color="secondary"
                         onClick={() => {
-                            searchParams.get('source') === 'market' ? navigate('/appMarket') : navigate('/template/createCenter');
+                            searchParams.get('source') === 'market' ? navigate('/appMarket') : navigate('/my-app');
                         }}
                     >
                         {t('myApp.back')}

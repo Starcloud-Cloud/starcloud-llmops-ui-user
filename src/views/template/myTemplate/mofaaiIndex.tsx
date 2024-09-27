@@ -1,6 +1,6 @@
 import { Box, Pagination, TextField, Typography, Button } from '@mui/material';
 import { TreeSelect, Row, Col, Modal } from 'antd';
-import MarketTemplate from './components/content/marketTemplate';
+import Template from './components/content/template';
 import MyselfTemplate from './components/content/mySelfTemplate';
 import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
 
@@ -250,11 +250,15 @@ function MyTemplate() {
                     {t('apply.AppDesc')}
                 </Typography>
             </Box>
-            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
-                {recommendList.map((el: any, index: number) => (
-                    <MarketTemplate type="APP" key={el?.uid} handleDetail={handleDetail} data={el} />
-                ))}
-            </div>
+            <Box sx={{ position: 'relative' }}>
+                <ScrollMenu LeftArrow={LeftArrow} RightArrow={RightArrow}>
+                    {recommendList.map((item: Item, index) => (
+                        <Box key={index} style={{ marginLeft: index === 0 ? 0 : '16px', width: '203.33px' }}>
+                            <Template data={item} handleDetail={handleDetail} />
+                        </Box>
+                    ))}
+                </ScrollMenu>
+            </Box>
             {botOpen && (
                 <UpgradeModel
                     open={botOpen}
@@ -268,18 +272,10 @@ function MyTemplate() {
                     <Typography variant="h3" mt={4} mb={2}>
                         {t('apply.self')}
                     </Typography>
-                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
-                        {appList.map((el: any, index: number) => (
-                            <MarketTemplate
-                                type="APP"
-                                key={el?.uid}
-                                handleDetail={({ uid }: { uid: string }) => {
-                                    navigate('/createApp?uid=' + uid);
-                                }}
-                                data={el}
-                            />
-                        ))}
-                    </div>
+                    <MyselfTemplate appList={newAppList} />
+                    <Box my={2}>
+                        <Pagination page={pageQuery.pageNo} count={Math.ceil(totals / pageQuery.pageSize)} onChange={paginationChange} />
+                    </Box>
                 </Box>
             )}
             <Modal

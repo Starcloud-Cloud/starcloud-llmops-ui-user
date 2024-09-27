@@ -1,4 +1,4 @@
-import { Menu, MenuProps, Empty, Spin, Modal, Checkbox } from 'antd';
+import { Menu, MenuProps, Empty, Spin, Modal, Checkbox, Tag, Image } from 'antd';
 import { materialGroup_detail } from 'api/template';
 import React, { useState, useEffect } from 'react';
 
@@ -105,8 +105,9 @@ export const SelectTemplateModal = ({
                             <div className="grid grid-cols-5 grid-rows-[auto] gap-2 overflow-y-auto p-1">
                                 {templateList.map((v: any, i) => (
                                     <div key={i} className="relative">
-                                        <img
-                                            className={`h-auto w-full rounded-lg cursor-pointer`}
+                                        <Image
+                                            className={`rounded-lg cursor-pointer aspect-[199/265] object-cover`}
+                                            preview={false}
                                             src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
                                             onClick={async () => {
                                                 setGroupLoading(true);
@@ -121,9 +122,9 @@ export const SelectTemplateModal = ({
                                             }}
                                         />
                                         <div className="text-sm font-bold text-center">{v?.name}</div>
-                                        <div className="absolute top-2 right-2 text-xs rounded-md bg-black/50 text-white w-[20px] h-[20px] flex justify-center items-center">
-                                            {v?.materialCount}
-                                        </div>
+                                        <Tag color="processing" className="absolute top-0 left-0">
+                                            组合 {v?.materialCount}
+                                        </Tag>
                                     </div>
                                 ))}
                             </div>
@@ -151,9 +152,21 @@ export const SelectTemplateModal = ({
                             <div className="grid grid-cols-5 grid-rows-[auto] gap-2 overflow-y-auto p-1">
                                 {groupList.map((v: any, i) => (
                                     <div key={i} className="relative">
-                                        <img
-                                            className={`h-auto w-full rounded-lg`}
+                                        <Image
+                                            className={`rounded-lg cursor-pointer aspect-[199/265] object-cover`}
+                                            preview={false}
                                             src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
+                                            onClick={async () => {
+                                                setGroupLoading(true);
+                                                const result = await materialGroup_detail({ group: v.id });
+                                                setGroupLoading(false);
+                                                if (result?.length === 1) {
+                                                    handleOk(result);
+                                                } else {
+                                                    setGroupList(result);
+                                                    setGroupOpen(true);
+                                                }
+                                            }}
                                         />
                                         <div className="text-sm font-bold text-center">{v?.name}</div>
                                         <Checkbox className="absolute top-2 right-2" value={v?.code} />

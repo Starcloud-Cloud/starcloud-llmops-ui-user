@@ -72,7 +72,7 @@ const AppBar = ({ ...others }) => {
             <MuiAppBar>
                 {getPermission(ENUM_PERMISSION.SPRING_SALE) && (
                     <img
-                        src={require('../../assets/images/header/present.jpeg')}
+                        src={require('../../assets/images/header/presents.jpg')}
                         className="cursor-pointer w-full"
                         onClick={() => {
                             navigate('/subscribe');

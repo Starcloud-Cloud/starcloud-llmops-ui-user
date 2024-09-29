@@ -15,9 +15,11 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { useCache, CACHE_KEY } from 'hooks/web/useCache';
 const { wsCache } = useCache();
 const EditStyle = ({
+    activeKey,
     schemaList,
     typeList,
     imageStyleData,
+    setImageStyleDataList,
     setData,
     setCopyData,
     appData = {},
@@ -25,9 +27,11 @@ const EditStyle = ({
     materialStatus,
     canEdit = false
 }: {
+    activeKey?: string;
     schemaList?: any[];
     typeList: any[];
     imageStyleData: any;
+    setImageStyleDataList?: (data: any) => void;
     setData: (data: any) => void;
     setCopyData: (data: any) => void;
     appData?: any;
@@ -57,50 +61,84 @@ const EditStyle = ({
         };
     }, []);
 
-    const handleOk = (temp: any) => {
-        setCurrentTemp(temp);
-        const newData = _.cloneDeep(imageStyleData);
-        newData.example = temp.example;
-        newData.code = temp.code;
-        newData.variableList = temp.variableList?.map((item: any) => ({
+    // const handleOk = (temp: any) => {
+    //     setCurrentTemp(temp);
+    //     const newData = _.cloneDeep(imageStyleData);
+    //     newData.example = temp.example;
+    //     newData.code = temp.code;
+    //     newData.variableList = temp.variableList?.map((item: any) => ({
+    //         ...item,
+    //         value: '',
+    //         uuid: uuidv4()?.split('-')?.join('')
+    //     }));
+    //     setPre(pre + 1);
+    //     setData(newData);
+    //     setOpen(false);
+    // };
+    const handleOk = (tempList: any[]) => {
+        setCurrentTemp(tempList[0]);
+        const newList = tempList?.map((item, index) => ({
             ...item,
-            value: '',
-            uuid: uuidv4()?.split('-')?.join('')
+            variableList: item?.variableList?.map((el: any) => ({
+                ...el,
+                value: '',
+                uuid: uuidv4()?.split('-')?.join('')
+            }))
         }));
+        setImageStyleDataList && setImageStyleDataList(newList);
         setPre(pre + 1);
-        setData(newData);
         setOpen(false);
     };
     useEffect(() => {
+        setSpinLoading(true);
         const groupList = wsCache
             .get(CACHE_KEY.INFO)
             ?.menus?.find((item: any) => item.name === 'poster')
             ?.children?.find((item: any) => item.path === 'template')?.children;
-
         materialGroup_page().then((res) => {
-            console.log(res);
-        });
-        setSpinLoading(true);
-        getImageTemplateTypes().then((res) => {
-            setImageTypeList(res);
-            const list = res.map((element: any) => {
+            const newGroupList = groupList?.map((item: any) => ({
+                ...item,
+                list: res.list?.filter((el: any) => el.categoryId === item.id)
+            }));
+            setImageTypeList([
+                {
+                    name: '所有',
+                    id: '0',
+                    key: '0',
+                    list: res.list
+                },
+                ...newGroupList
+            ]);
+            const list = newGroupList.map((element: any) => {
                 return element.list;
             });
             setTempList(list.flat());
             setSpinLoading(false);
         });
+        // getImageTemplateTypes().then((res) => {
+        //     setImageTypeList(res);
+        //     const list = res.map((element: any) => {
+        //         return element.list;
+        //     });
+        //     setTempList(list.flat());
+        //     setSpinLoading(false);
+        // });
     }, []);
-    useEffect(() => {
-        if (imageStyleData.code && tempList) {
-            const data = tempList.find((v: any) => v.code === imageStyleData?.code);
-            if (imageStyleData?.example !== data?.example) {
-                const newData = _.cloneDeep(imageStyleData);
-                newData.example = data?.example;
-                setData(newData);
-            }
-            setCurrentTemp({ ...data });
-        }
-    }, [imageStyleData, tempList]);
+    // useEffect(() => {
+    //     if (imageStyleData.code && tempList) {
+    //         console.log(tempList, imageStyleData);
+
+    //         const data = tempList.find((v: any) => v.code === imageStyleData?.code);
+    //         console.log(data);
+
+    //         if (imageStyleData?.example !== data?.example) {
+    //             const newData = _.cloneDeep(imageStyleData);
+    //             newData.example = data?.example;
+    //             setData(newData);
+    //         }
+    //         setCurrentTemp({ ...data });
+    //     }
+    // }, [imageStyleData, tempList]);
     const [perOpen, setPerOpen] = useState<any[]>([]);
     const [items, setItem] = useState<any[]>([]);
     const handleCopy = () => {
@@ -123,13 +161,18 @@ const EditStyle = ({
     }, [wrapperRef]);
 
     useEffect(() => {
-        if (currentTemp && currentTemp.code) {
-            getImageTemplateJSON(currentTemp.code).then((res) => {
+        if (imageStyleData && imageStyleData.code) {
+            getImageTemplateJSON(imageStyleData.code).then((res) => {
+                setCurrentTemp({
+                    ...currentTemp,
+                    name: res?.name,
+                    example: res?.example
+                });
                 const json = JSON.parse(res.json);
                 setCurrentJson({ ...json });
             });
         }
-    }, [currentTemp?.code]);
+    }, [imageStyleData?.code]);
 
     const scale = useMemo(() => {
         return imgRef?.current && currentJson ? imgRef?.current?.offsetWidth / currentJson?.clipPath?.width : 1;

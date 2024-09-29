@@ -360,7 +360,14 @@ const PlugAnalysis = ({
     const isArrayString = (value: any) => {
         return Array.isArray(value) && value.every((item) => typeof item === 'string');
     };
-
+    const [activeKey, setActiveKey] = useState<any>([]);
+    useEffect(() => {
+        if (!record?.fieldMap) {
+            setActiveKey(['1']);
+        } else {
+            setActiveKey([]);
+        }
+    }, [record]);
     return (
         <ModalForm
             modalProps={{
@@ -485,6 +492,8 @@ const PlugAnalysis = ({
             </Form>
             <Collapse
                 className="analysis"
+                activeKey={activeKey}
+                onChange={setActiveKey}
                 expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                 items={[
                     {

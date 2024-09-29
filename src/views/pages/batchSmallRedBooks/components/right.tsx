@@ -82,7 +82,7 @@ const Right = ({
                     {exampleList?.length > 0 ? (
                         <div className="w-full overflow-x-auto flex justify-center gap-2">
                             {exampleList?.map((item: any) => (
-                                <div className="w-[380px]" key={item?.businessUid}>
+                                <div className="xs:w-[200px] xl:w-[200px] 2xl:w-[380px]" key={item?.businessUid}>
                                     <Good
                                         item={item}
                                         setBusinessUid={(data: any) => {

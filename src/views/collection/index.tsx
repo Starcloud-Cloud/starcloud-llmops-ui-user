@@ -2,9 +2,11 @@ import { InputAdornment, FormControl, OutlinedInput, IconButton } from '@mui/mat
 import { Search } from '@mui/icons-material';
 import MarketTemplate from 'views/template/myTemplate/components/content/marketTemplate';
 import { useEffect, useState, useRef } from 'react';
+import { Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { favoriteList } from 'api/template/collect';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
+import '../template/market/index.scss';
 const Collection = () => {
     const navigate = useNavigate();
     const [collectList, setCollectList] = useState<any[]>([]);
@@ -39,7 +41,7 @@ const Collection = () => {
         });
     }, []);
     return (
-        <div>
+        <div className="Rows">
             <FormControl color="secondary" size="small" sx={{ width: '300px' }} variant="outlined">
                 <OutlinedInput
                     name="name"
@@ -55,11 +57,21 @@ const Collection = () => {
                     placeholder="搜索收藏的AI应用"
                 />
             </FormControl>
-            <div className="mt-4 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
-                {newList.map((el: any, index: number) => (
-                    <MarketTemplate like="collect" key={el?.uid} handleDetail={handleDetail} data={el} />
-                ))}
-            </div>
+            {getTenant() !== ENUM_TENANT.AI ? (
+                <Row className="mt-4" gutter={[16, 16]}>
+                    {newList.map((el: any, index: number) => (
+                        <Col className={`xxxl-col flex-shrink-0`} key={el?.uid}>
+                            <MarketTemplate like="collect" key={el?.uid} handleDetail={handleDetail} data={el} />
+                        </Col>
+                    ))}
+                </Row>
+            ) : (
+                <div className="mt-4 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                    {newList.map((el: any, index: number) => (
+                        <MarketTemplate like="collect" type="APP" key={el?.uid} handleDetail={handleDetail} data={el} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

@@ -206,10 +206,14 @@ export const getImageTemplateTypes = () => {
 export const materialGroup_page = () => {
     return request.get({ url: `/poster/material-group/u/page` });
 };
+// 获取图片模版内容详情
+export const materialGroup_detail = (data: any) => {
+    return request.get({ url: `/llm/poster/material/u/listPosterTemplateByGroup`, params: data });
+};
 
 // 获取template json
 export const getImageTemplateJSON = (templateId: string) => {
-    return request.get({ url: `/llm/creative/scheme/posterTemplate?templateId=${templateId}` });
+    return request.get({ url: `/llm/poster/material/u/posterTemplate?templateId=${templateId}` });
 };
 // 获取template json
 export const dictData = (label = '', type = 'prompt_template') => {

@@ -571,9 +571,7 @@ function CreateDetail() {
             const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
             if (a) {
                 const newMokeAI = _.cloneDeep(createPlanRef?.current?.mokeAI);
-                const newMoke = _.cloneDeep(createPlanRef?.current?.moke);
                 const newFieldHead = _.cloneDeep(createPlanRef?.current?.fieldHead);
-                a.variable.variables.find((item: any) => item.style === 'MATERIAL').value = JSON.stringify(newMoke);
                 a.variable.variables.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value =
                     JSON.stringify(newMokeAI);
 
@@ -1085,7 +1083,7 @@ function CreateDetail() {
                         startIcon={<ArrowBack />}
                         color="secondary"
                         onClick={() => {
-                            searchParams.get('source') === 'market' ? navigate('/appMarket') : navigate('/template/createCenter');
+                            searchParams.get('source') === 'market' ? navigate('/appMarket') : navigate('/my-app');
                         }}
                     >
                         {t('myApp.back')}
@@ -1127,10 +1125,6 @@ function CreateDetail() {
                                 const newData = _.cloneDeep(detailRef.current);
                                 let arr = newData?.workflowConfig?.steps;
                                 const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
-                                if (a) {
-                                    a.variable.variables.find((item: any) => item.style === 'MATERIAL').value =
-                                        createPlanRef?.current?.moke;
-                                }
                                 const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
                                 if (index !== -1) {
                                     arr[index] =

@@ -99,6 +99,10 @@ const StyleTabs = ({
                         children: (
                             <EditStyle
                                 imageStyleData={item}
+                                setImageStyleDataList={(data: any) => {
+                                    console.log(data);
+                                    console.log(imageStyleData);
+                                }}
                                 setData={(data: any) => {
                                     const newData = _.cloneDeep(imageStyleData);
                                     newData[i] = data;

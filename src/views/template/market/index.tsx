@@ -489,7 +489,7 @@ function TemplateMarket() {
                         ))}
                     </div>
                 </Tabs.TabPane>
-                {getTenant() !== ENUM_TENANT.AI && (
+                {/* {getTenant() !== ENUM_TENANT.AI && (
                     <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">我的应用</div>} key="1">
                         <div className="relative">
                             <div
@@ -530,7 +530,7 @@ function TemplateMarket() {
                             )}
                         </div>
                     </Tabs.TabPane>
-                )}
+                )} */}
                 {newList?.some((item) => item?.code === 'HOT') && (
                     <Tabs.TabPane
                         tab={

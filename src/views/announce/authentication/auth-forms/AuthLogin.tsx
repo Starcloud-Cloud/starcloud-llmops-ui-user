@@ -40,6 +40,7 @@ import * as authUtil from 'utils/auth';
 import { Divider, Stack, useMediaQuery } from '@mui/material';
 import MuiTooltip from '@mui/material/Tooltip';
 import jsCookie from 'js-cookie';
+import { tokenSwitch } from 'utils/tokenSwith';
 
 // ===============================|| JWT LOGIN ||=============================== //
 
@@ -167,9 +168,8 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                 return;
             }
             const expires = (res.data.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
-            jsCookie.set('token', res.data.accessToken, {
-                expires
-            });
+
+            tokenSwitch(res.data.accessToken, expires);
             authUtil.setToken(res?.data);
             await login();
             setIsLoggedIn(true);
@@ -253,9 +253,7 @@ const JWTLogin = ({ loginProp, ...others }: { loginProp?: number }) => {
                                 }
                                 console.log(res);
                                 const expires = (res.expiresTime - new Date().getTime()) / (1000 * 60 * 60 * 24);
-                                jsCookie.set('token', res.accessToken, {
-                                    expires
-                                });
+                                tokenSwitch(res.accessToken, expires);
                                 setLoginData((prevState) => ({
                                     ...prevState,
                                     loginForm: updatedLoginForm

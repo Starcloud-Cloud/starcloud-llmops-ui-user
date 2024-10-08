@@ -24,8 +24,8 @@ export const SelectTemplateModal = ({
         if (imageTypeList.length) {
             const menus = imageTypeList?.map((item: any) => ({
                 label: `${item.name}(${item.list.length})`,
-                value: item.id,
-                key: item.id,
+                value: item.id?.toString(),
+                key: item.id?.toString(),
                 // list: item.list,
                 list: item.list?.map((i: any) => ({ ...i, example: i.thumbnail, code: i.uid }))
             }));
@@ -39,6 +39,7 @@ export const SelectTemplateModal = ({
     const onClick: MenuProps['onClick'] = ({ item }: { item: any }) => {
         console.log('🚀 ~ item:', item);
         const templates = item?.props.list;
+        console.log(templates, menuList, [item?.props?.value]);
         setType([item?.props?.value]);
         setTemplateList(templates);
     };
@@ -104,10 +105,11 @@ export const SelectTemplateModal = ({
                         <div className="h-[85vh] overflow-auto flex-1">
                             <div className="grid grid-cols-5 grid-rows-[auto] gap-2 overflow-y-auto p-1">
                                 {templateList.map((v: any, i) => (
-                                    <div key={i} className="relative">
-                                        <Image
-                                            className={`rounded-lg cursor-pointer aspect-[199/265] object-cover`}
-                                            preview={false}
+                                    <div key={i} className="relative group">
+                                        <img
+                                            className={`w-full rounded-lg cursor-pointer aspect-[199/265] object-cover`}
+                                            // preview={false}
+                                            loading="lazy"
                                             src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
                                             onClick={async () => {
                                                 setGroupLoading(true);
@@ -122,7 +124,7 @@ export const SelectTemplateModal = ({
                                             }}
                                         />
                                         <div className="text-sm font-bold text-center">{v?.name}</div>
-                                        <Tag color="processing" className="absolute top-0 left-0">
+                                        <Tag color="processing" className="group-hover:block hidden absolute top-0 left-0">
                                             组合 {v?.materialCount}
                                         </Tag>
                                     </div>

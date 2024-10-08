@@ -207,6 +207,11 @@ const ThreeStep = ({
     const [saveLoading, setSaveLoading] = useState(false);
     const [aginLoading, setAginLoading] = useState(false);
     const timer = useRef<any>(null);
+
+    //下载图片
+    const downLoadImage = () => {
+        console.log(imageList);
+    };
     return (
         <div
             className="h-full"
@@ -242,9 +247,14 @@ const ThreeStep = ({
                             } */}
                             {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
-                                <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
-                                    编辑
-                                </Button>
+                                <Space>
+                                    {/* <Button type="primary" onClick={downLoadImage}>
+                                        打包下载
+                                    </Button> */}
+                                    <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
+                                        编辑
+                                    </Button>
+                                </Space>
                             ) : (
                                 <Space>
                                     <Button type="primary" onClick={handleModify}>

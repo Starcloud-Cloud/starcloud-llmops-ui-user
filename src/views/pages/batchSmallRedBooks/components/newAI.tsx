@@ -712,6 +712,8 @@ const AiCreate = ({
     });
 
     const imageExe = (list: any[]) => {
+        console.log(list);
+
         return list?.map((item: any) => {
             if (item.type === EditType.Image) {
                 return {

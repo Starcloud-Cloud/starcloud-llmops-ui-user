@@ -632,15 +632,15 @@ const Lefts = ({
                 source: detail ? 'APP' : 'MARKET'
             };
 
-            const values =
-                data?.configuration?.appInformation?.workflowConfig?.steps
-                    ?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
-                    ?.flowStep?.variable?.variables?.find((item: any) => item?.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
+            // const values =
+            //     data?.configuration?.appInformation?.workflowConfig?.step
+            //         ?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
+            //         ?.flowStep?.variable?.variables?.find((item: any) => item?.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value || [];
 
-            data.configuration.appInformation.workflowConfig.steps
-                .find((item: any) => item.flowStep.handler === 'PosterActionHandler')
-                .flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG').value =
-                JSON.stringify(values);
+            // data.configuration.appInformation.workflowConfig.steps
+            //     .find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+            //     .flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG').value =
+            //     JSON.stringify(values);
 
             let result;
 

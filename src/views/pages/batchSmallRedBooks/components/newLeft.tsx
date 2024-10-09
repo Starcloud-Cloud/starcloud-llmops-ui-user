@@ -718,11 +718,6 @@ const Lefts = ({
             (item: any) => item.flowStep.handler === 'MaterialActionHandler'
         );
         if (a) {
-            a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value =
-                data ||
-                appRef.current.configuration?.appInformation?.workflowConfig?.steps
-                    ?.find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
-                    .variable?.variables?.find((item: any) => item.field === 'MATERIAL_DEFINE').value;
             arr[
                 appRef.current.configuration?.appInformation?.workflowConfig?.steps?.findIndex(
                     (item: any) => item.flowStep.handler === 'MaterialActionHandler'

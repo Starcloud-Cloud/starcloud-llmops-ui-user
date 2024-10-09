@@ -461,7 +461,7 @@ const MainLayout = () => {
                     <Header />
                 </Toolbar>
             ) : (
-                <Toolbar sx={{ p: 0 }}>
+                <Toolbar sx={{ p: 0, px: '0 !important' }}>
                     <Header />
                 </Toolbar>
             ),
@@ -536,7 +536,7 @@ const MainLayout = () => {
                                 color="inherit"
                                 elevation={0}
                                 sx={{ bgcolor: theme.palette.background.default, zIndex: 10 }}
-                                className="!h-[56px] !px-[12px]"
+                                className="!h-[56px] !pl-[12px] !pr-[20px]"
                             >
                                 {header}
                             </AppBar>

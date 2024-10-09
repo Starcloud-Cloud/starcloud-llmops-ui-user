@@ -570,12 +570,6 @@ function CreateDetail() {
             let arr = _.cloneDeep(newList?.workflowConfig?.steps);
             const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
             if (a) {
-                const newMokeAI = _.cloneDeep(createPlanRef?.current?.mokeAI);
-                const newFieldHead = _.cloneDeep(createPlanRef?.current?.fieldHead);
-                a.variable.variables.find((item: any) => item.field === 'CUSTOM_MATERIAL_GENERATE_CONFIG').value =
-                    JSON.stringify(newMokeAI);
-
-                a.variable.variables.find((item: any) => item.field === 'MATERIAL_DEFINE').value = JSON.stringify(newFieldHead);
                 if (isAppSave) {
                     a.variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = 'FILTER_USAGE';
                 }

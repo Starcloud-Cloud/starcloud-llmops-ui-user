@@ -36,6 +36,7 @@ import Left from '../../batchSmallRedBooks/components/newLeft';
 import { useAllDetail } from 'contexts/JWTContext';
 import jsCookie from 'js-cookie';
 import copy from 'clipboard-copy';
+import JSZip from 'jszip';
 
 const ThreeStep = ({
     data,
@@ -207,6 +208,31 @@ const ThreeStep = ({
     const [saveLoading, setSaveLoading] = useState(false);
     const [aginLoading, setAginLoading] = useState(false);
     const timer = useRef<any>(null);
+
+    //下载图片
+    const downLoadImage = () => {
+        console.log(imageList);
+        const zip = new JSZip();
+        const promises = imageList.map(async (imageUrl: any) => {
+            const response = await fetch(imageUrl.url);
+            const arrayBuffer = await response.arrayBuffer();
+            zip.file('image' + `.${imageUrl?.split('/')?.pop()?.split('.')?.pop()?.toLowerCase()}`, arrayBuffer);
+        });
+        Promise.all(promises)
+            .then(() => {
+                zip.generateAsync({ type: 'blob' }).then((content: any) => {
+                    const url = window.URL.createObjectURL(content);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = title + '.zip'; // 设置下载的文件名
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                });
+            })
+            .catch((error) => {
+                console.error('Error downloading images:', error);
+            });
+    };
     return (
         <div
             className="h-full"
@@ -242,9 +268,14 @@ const ThreeStep = ({
                             } */}
                             {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
-                                <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
-                                    编辑
-                                </Button>
+                                <Space>
+                                    <Button type="primary" onClick={downLoadImage}>
+                                        打包下载
+                                    </Button>
+                                    <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
+                                        编辑
+                                    </Button>
+                                </Space>
                             ) : (
                                 <Space>
                                     <Button type="primary" onClick={handleModify}>

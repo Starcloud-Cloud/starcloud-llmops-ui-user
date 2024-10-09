@@ -83,7 +83,7 @@ const ResultLoading = ({
                 </div>
             </div>
             <div className="material-index">
-                <Table className=" overflow-auto" columns={columns} virtual={true} dataSource={materialzanList} />
+                <Table columns={columns} virtual={true} dataSource={materialzanList} />
             </div>
             <div className="flex justify-center gap-2 mt-4">
                 {executionCount === 0 && (

@@ -632,8 +632,6 @@ const Lefts = ({
                 source: detail ? 'APP' : 'MARKET'
             };
 
-            console.log(data, 'data');
-
             const values = data?.configuration?.appInformation?.workflowConfig?.steps
                 ?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
                 ?.flowStep?.variable?.variables?.find((item: any) => item?.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value;

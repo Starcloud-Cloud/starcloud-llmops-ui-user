@@ -113,7 +113,7 @@ export const SelectTemplateModal = ({
                                             src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
                                             onClick={async () => {
                                                 setGroupLoading(true);
-                                                const result = await materialGroup_detail({ group: v.id });
+                                                const result = await materialGroup_detail({ uid: v.uid });
                                                 setGroupLoading(false);
                                                 if (result?.length === 1) {
                                                     handleOk(result);
@@ -160,7 +160,7 @@ export const SelectTemplateModal = ({
                                             src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
                                             onClick={async () => {
                                                 setGroupLoading(true);
-                                                const result = await materialGroup_detail({ group: v.id });
+                                                const result = await materialGroup_detail({ uid: v.uid });
                                                 setGroupLoading(false);
                                                 if (result?.length === 1) {
                                                     handleOk(result);

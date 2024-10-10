@@ -98,6 +98,7 @@ export const TableHeader = ({
     setTitle,
     materialflag,
     setMaterialflag,
+    setTableLoading,
     selectedRowKeys,
     handleBatchDel,
     libraryId,
@@ -126,6 +127,7 @@ export const TableHeader = ({
     setTitle: (title: string) => void;
     materialflag?: boolean;
     setMaterialflag?: (data: boolean) => void;
+    setTableLoading?: (data: boolean) => void;
     // 编辑|新增素材
     setEditOpen: (open: boolean) => void;
     // 编辑素材字段
@@ -199,10 +201,9 @@ export const TableHeader = ({
     }, [plugOpen]);
 
     const downTableData = async (data: any[], num: number) => {
+        setTableLoading && setTableLoading(true);
         const tableMetaList = _.cloneDeep(tableMeta);
-
         const newData = data.map((record) => {
-            console.log(record);
             const recordKeys = Object.keys(record);
             const content = tableMetaList.map((item) => {
                 // if (recordKeys.includes(item.columnCode)) {
@@ -227,8 +228,6 @@ export const TableHeader = ({
                 }
                 // }
             });
-            console.log(content);
-
             return {
                 libraryId: record.libraryId || libraryId,
                 id: record.id,

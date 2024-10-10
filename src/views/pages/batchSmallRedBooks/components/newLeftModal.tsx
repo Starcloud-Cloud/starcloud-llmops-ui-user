@@ -21,6 +21,7 @@ const LeftModalAdd = ({
     libraryType,
     pluginConfig,
     tableLoading,
+    setTableLoading,
     actionRefs,
     page,
     total,
@@ -48,6 +49,7 @@ const LeftModalAdd = ({
     libraryType: number;
     pluginConfig: string | null;
     tableLoading: boolean;
+    setTableLoading: (data: boolean) => void;
     actionRefs: any;
     page: any;
     total: number;
@@ -83,6 +85,7 @@ const LeftModalAdd = ({
                     selectedRowKeys={selectedRowKeys}
                     materialflag={materialflag}
                     setMaterialflag={setMaterialflag}
+                    setTableLoading={setTableLoading}
                     handleBatchDel={handleDels}
                     libraryId={libraryId}
                     libraryUid={libraryUid}

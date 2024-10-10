@@ -1,4 +1,4 @@
-import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar, Switch } from 'antd';
+import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar, Switch, Image } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled, CaretRightOutlined } from '@ant-design/icons';
@@ -10,6 +10,7 @@ import { addPlugConfigInfo, updatePlugConfigInfo, configDetail } from 'api/plug'
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 import ResultLoading from '../resultLoading';
+import { EditType } from 'views/materialLibrary/detail';
 import dayjs from 'dayjs';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -360,6 +361,30 @@ const PlugAnalysis = ({
     const isArrayString = (value: any) => {
         return Array.isArray(value) && value.every((item) => typeof item === 'string');
     };
+    const imageExe = (list: any[]) => {
+        console.log(list);
+        return list?.map((item: any) => {
+            if (item.type === EditType.Image) {
+                return {
+                    ...item,
+                    render: (_: any, row: any) =>
+                        row[item.dataIndex] ? (
+                            <Image
+                                preview={{ src: row[item.dataIndex] }}
+                                width={82}
+                                height={82}
+                                src={row[item.dataIndex] + '?x-oss-process=image/resize,w_100/quality,q_80'}
+                            />
+                        ) : null
+                };
+            } else {
+                return {
+                    ...item,
+                    sorter: false
+                };
+            }
+        });
+    };
     const [activeKey, setActiveKey] = useState<any>([]);
     useEffect(() => {
         if (!record?.fieldMap) {
@@ -701,7 +726,7 @@ const PlugAnalysis = ({
                 timeSpent={((record?.executeTimeAvg * 1.1) / 1000) | 0 || 40}
                 columns={[
                     { title: '序号', width: 70, render: (_: any, row: any, index: number) => <span>{index + 1}</span> },
-                    ...columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex))
+                    ...imageExe(columns?.filter((item: any) => Object.values(redBookData.bindFieldData || {}).includes(item.dataIndex)))
                 ]}
                 resetExe={() => {
                     errorCountRef.current = 0;

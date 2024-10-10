@@ -62,7 +62,7 @@ const list: IList = {
 
 const announceList: IList = {
     [ENUM_PERMISSION.APP_HOME]: false,
-    [ENUM_PERMISSION.APP_NAME]: '魔法矩阵',
+    [ENUM_PERMISSION.APP_NAME]: '魔法笔记',
     [ENUM_PERMISSION.APP_DES]: 'AI内容创作运营工具',
     [ENUM_PERMISSION.App_DOWNLOAD]: '免费使用',
     [ENUM_PERMISSION.LAYOUT_SHOW_QRCODE]: false,
@@ -71,7 +71,7 @@ const announceList: IList = {
     [ENUM_PERMISSION.EQUITY]: false,
     [ENUM_PERMISSION.LOGINDESC]: false,
     [ENUM_PERMISSION.EXCHANGE_SHOW_COUNT]: '5矩阵豆',
-    [ENUM_PERMISSION.EXCHANGE_SHOW_LABEL]: '兑换魔法矩阵权益',
+    [ENUM_PERMISSION.EXCHANGE_SHOW_LABEL]: '兑换魔法笔记权益',
     [ENUM_PERMISSION.NEW_USER_ACTIVITY]: false,
     [ENUM_PERMISSION.COLLECT]: false,
     [ENUM_PERMISSION.PHONE_CHECK]: false,

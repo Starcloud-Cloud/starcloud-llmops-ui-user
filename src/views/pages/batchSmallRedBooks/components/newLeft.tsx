@@ -631,6 +631,17 @@ const Lefts = ({
                 },
                 source: detail ? 'APP' : 'MARKET'
             };
+
+            const values = data?.configuration?.appInformation?.workflowConfig?.steps
+                ?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
+                ?.flowStep?.variable?.variables?.find((item: any) => item?.field === 'SYSTEM_POSTER_STYLE_CONFIG')?.value;
+            if (typeof values !== 'string') {
+                data.configuration.appInformation.workflowConfig.steps
+                    .find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                    .flowStep.variable.variables.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG').value =
+                    JSON.stringify(values);
+            }
+
             let result;
 
             if (!fieldShow) {
@@ -822,7 +833,6 @@ const Lefts = ({
     }, [imageStylePre]);
     //选中保存
     const seleSave = (data: string, arr: any) => {
-        console.log(arr, appRef.current, detail, 'detail');
         const newData = _.cloneDeep(appRef.current);
         newData.configuration.appInformation.workflowConfig.steps[0].variable.variables.find(
             (item: any) => item.field === 'MATERIAL_USAGE_MODEL'

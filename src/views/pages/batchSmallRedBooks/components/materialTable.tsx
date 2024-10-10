@@ -696,6 +696,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     libraryName={libraryName}
                     pluginConfig={pluginConfig}
                     tableLoading={tableLoading}
+                    setTableLoading={setTableLoading}
                     actionRefs={actionRefs}
                     columns={getClumns}
                     tableMeta={columns}

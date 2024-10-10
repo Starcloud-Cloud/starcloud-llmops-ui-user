@@ -91,7 +91,7 @@ const AddStyleApp = React.forwardRef(
                         // 风格产生===2 -> POSTER_STYLE
                         if (mode === 1) {
                             if (item.field === 'POSTER_STYLE_CONFIG') {
-                                item.value = styleData;
+                                item.value = JSON.stringify(styleData);
                             }
                         } else {
                             if (item.field === 'POSTER_STYLE') {
@@ -1201,7 +1201,7 @@ const AddStyleApp = React.forwardRef(
                                         {item?.templateList?.map((v: any, vi: number) => (
                                             <SwiperSlide>
                                                 <Image.PreviewGroup
-                                                    items={styleData?.[index]?.templateList?.map((item: any) => item.example)}
+                                                    items={styleData?.[index]?.templateList?.map((item: any) => item.example || '')}
                                                 >
                                                     <Image
                                                         style={{
@@ -1350,7 +1350,7 @@ const AddStyleApp = React.forwardRef(
                                                             <SwiperSlide>
                                                                 <Image.PreviewGroup
                                                                     items={templateList?.[index]?.templateList?.map(
-                                                                        (item: any) => item.example
+                                                                        (item: any) => item.example || ''
                                                                     )}
                                                                 >
                                                                     <Image
@@ -1470,7 +1470,7 @@ const AddStyleApp = React.forwardRef(
                                                                     <SwiperSlide>
                                                                         <Image.PreviewGroup
                                                                             items={customList?.[index]?.templateList?.map(
-                                                                                (item: any) => item.example
+                                                                                (item: any) => item.example || ''
                                                                             )}
                                                                         >
                                                                             <Image

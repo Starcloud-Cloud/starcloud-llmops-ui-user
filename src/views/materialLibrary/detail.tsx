@@ -98,6 +98,7 @@ export const TableHeader = ({
     setTitle,
     materialflag,
     setMaterialflag,
+    setTableLoading,
     selectedRowKeys,
     handleBatchDel,
     libraryId,
@@ -126,6 +127,7 @@ export const TableHeader = ({
     setTitle: (title: string) => void;
     materialflag?: boolean;
     setMaterialflag?: (data: boolean) => void;
+    setTableLoading?: (data: boolean) => void;
     // 编辑|新增素材
     setEditOpen: (open: boolean) => void;
     // 编辑素材字段
@@ -199,10 +201,9 @@ export const TableHeader = ({
     }, [plugOpen]);
 
     const downTableData = async (data: any[], num: number) => {
+        setTableLoading && setTableLoading(true);
         const tableMetaList = _.cloneDeep(tableMeta);
-
         const newData = data.map((record) => {
-            console.log(record);
             const recordKeys = Object.keys(record);
             const content = tableMetaList.map((item) => {
                 // if (recordKeys.includes(item.columnCode)) {
@@ -227,8 +228,6 @@ export const TableHeader = ({
                 }
                 // }
             });
-            console.log(content);
-
             return {
                 libraryId: record.libraryId || libraryId,
                 id: record.id,
@@ -408,7 +407,12 @@ export const TableHeader = ({
         });
     }, [focusUpdateDefinitionList]);
 
-    console.log(definitionList, 'definitionList');
+    const [accessKey, setAccessKey] = useState('0');
+    useEffect(() => {
+        if (!plugMarketOpen) {
+            setAccessKey('0');
+        }
+    }, [plugMarketOpen]);
 
     const [rowData, setRowData] = useState<any>(null);
 
@@ -426,7 +430,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             `;
         }
     };
-    console.log(materialflag);
 
     return (
         <div className="relative">
@@ -1018,21 +1021,19 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 title="插件市场"
             >
                 <Tabs
+                    activeKey={accessKey}
+                    onChange={setAccessKey}
                     items={[
                         {
                             label: '素材库插件',
                             key: '0',
                             children: (
                                 <div>
-                                    {/* {(isShowField || bizType === 'APP') && ( */}
-                                    {!materialflag && (
-                                        <div className="flex justify-end mb-4">
-                                            <Button onClick={() => setBindOpen(true)} type="primary">
-                                                绑定插件
-                                            </Button>
-                                        </div>
-                                    )}
-                                    {/* )} */}
+                                    <div className="flex justify-end mb-4">
+                                        <Button onClick={() => setBindOpen(true)} type="primary">
+                                            绑定插件
+                                        </Button>
+                                    </div>
                                     <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
                                         {definitionList?.map((el: any) => {
                                             return (

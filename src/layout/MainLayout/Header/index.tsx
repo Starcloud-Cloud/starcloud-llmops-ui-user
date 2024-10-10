@@ -323,7 +323,7 @@ const Header = () => {
                     >
                         <QrCode2Icon />
                         <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
-                            魔法矩阵AI工具群
+                            魔法笔记AI工具群
                         </Typography>
                         <KeyboardArrowDownIcon />
                     </Box>

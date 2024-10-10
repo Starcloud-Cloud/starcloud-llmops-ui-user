@@ -23,6 +23,7 @@ import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { v4 as uuidv4 } from 'uuid';
 const ResizeableTitle = (props: any) => {
     const { onResize, width, ...restProps } = props;
 
@@ -257,9 +258,9 @@ const StepEdit = ({
         {
             title: '字段名称',
             align: 'center',
-            width: 400,
+            width: 200,
             required: true,
-            dataIndex: 'columnName',
+            dataIndex: 'name',
             formItemProps: {
                 component: <Input />,
                 rules: [
@@ -279,7 +280,7 @@ const StepEdit = ({
             align: 'center',
             width: 400,
             required: true,
-            dataIndex: 'columnDesc',
+            dataIndex: 'description',
             formItemProps: {
                 component: <Input />
             }
@@ -288,9 +289,9 @@ const StepEdit = ({
             title: '字段类型',
             width: 200,
             required: true,
-            dataIndex: 'columnType',
             align: 'center',
             valueType: 'select',
+            dataIndex: 'type',
             fieldProps: {
                 options: materialFieldTypeList
             },
@@ -301,8 +302,7 @@ const StepEdit = ({
                         message: '请选择字段类型'
                     }
                 ]
-            },
-            render: (_: any, row: any) => materialFieldTypeList?.find((item) => item.value === row.type)?.label
+            }
         },
         {
             title: '操作',
@@ -339,7 +339,11 @@ const StepEdit = ({
         if (detail) {
             const newList = detail?.workflowConfig?.steps
                 ?.filter((item: any) => item?.flowStep?.handler === 'CustomActionHandler')
-                ?.map((item: any) => ({ ...item, uuid: Date.now() }));
+                ?.map((item: any, index: number) => ({
+                    ...item,
+                    uuid: uuidv4(),
+                    type: item?.variable?.variables?.find((el: any) => el.field === 'GENERATE_MODE')?.value
+                }));
             setEditTableData(newList || []);
             setEditableKeys(newList?.map((item: any) => item.uuid) || []);
         }
@@ -423,7 +427,7 @@ const StepEdit = ({
                         />
                     </Tabs.TabPane>
                 )}
-                {/* {handler === 'AssembleActionHandler' && (
+                {handler === 'AssembleActionHandler' && (
                     <Tabs.TabPane tab="内容生成节点" key="7">
                         <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
                             <SortableContext items={editTableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
@@ -475,7 +479,7 @@ const StepEdit = ({
                             </SortableContext>
                         </DndContext>
                     </Tabs.TabPane>
-                )} */}
+                )}
                 {handler !== 'VariableActionHandler' &&
                     // && handler !== 'AssembleActionHandler'
                     handler !== 'PosterActionHandler' && (

@@ -90,7 +90,7 @@ const CreateTab = ({
                     设计自己的海报风格
                 </div>
             </div>
-            <div className="max-h-[60vh] overflow-y-auto">
+            <div>
                 <Tabs
                     tabPosition="left"
                     activeKey={checkStyle}

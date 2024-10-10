@@ -7,12 +7,70 @@ import FormExecute from 'views/template/components/newValidaForm';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
 import CreateVariable from 'views/pages/copywriting/components/spliceCmponents/variable';
 import NewPrompt from './newPrompt';
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useContext } from 'react';
 import _ from 'lodash-es';
 import useUserStore from 'store/user';
 import HeaderField from 'views/pages/batchSmallRedBooks/components/components/headerField';
 import { getMaterialTitle } from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
+
+import { HolderOutlined } from '@ant-design/icons';
+import { Resizable } from 'react-resizable';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { EditableProTable } from '@ant-design/pro-components';
+import { DndContext } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+const ResizeableTitle = (props: any) => {
+    const { onResize, width, ...restProps } = props;
+
+    if (!width) {
+        return <th {...restProps} />;
+    }
+
+    return (
+        <Resizable width={width} height={0} onResize={onResize} draggableOpts={{ enableUserSelectHack: false }}>
+            <th {...restProps} />
+        </Resizable>
+    );
+};
+
+interface RowContextProps {
+    setActivatorNodeRef?: (element: HTMLElement | null) => void;
+    listeners?: SyntheticListenerMap;
+}
+const RowContext = React.createContext<RowContextProps>({});
+const DragHandle: React.FC = () => {
+    const { setActivatorNodeRef, listeners } = useContext(RowContext);
+    return (
+        <Button type="text" size="small" icon={<HolderOutlined />} style={{ cursor: 'move' }} ref={setActivatorNodeRef} {...listeners} />
+    );
+};
+interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+    'data-row-key': string;
+}
+const Row: React.FC<RowProps> = (props) => {
+    const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+        id: props['data-row-key']
+    });
+
+    const style: React.CSSProperties = {
+        ...props.style,
+        transform: CSS.Translate.toString(transform),
+        transition,
+        ...(isDragging ? { position: 'relative', zIndex: 9999 } : {})
+    };
+
+    const contextValue = useMemo<RowContextProps>(() => ({ setActivatorNodeRef, listeners }), [setActivatorNodeRef, listeners]);
+
+    return (
+        <RowContext.Provider value={contextValue}>
+            <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+        </RowContext.Provider>
+    );
+};
 const StepEdit = ({
     detail,
     appUid,
@@ -50,7 +108,6 @@ const StepEdit = ({
     saveImageStyle: () => void;
     setTableTitle: () => void;
 }) => {
-    const permissions = useUserStore((state) => state.permissions);
     const { TextArea } = Input;
     const groupList = [
         { label: '系统变量', value: 'SYSTEM' },
@@ -181,6 +238,112 @@ const StepEdit = ({
             });
         }
     }, [appUid]);
+
+    //表格
+    const components = {
+        header: {
+            cell: ResizeableTitle
+        },
+        body: { row: Row }
+    };
+    const actionRef = useRef<any>();
+    const materialFieldTypeList = [
+        { label: 'AI 生成', value: 'AI_CUSTOM' },
+        { label: 'AI 仿写', value: 'AI_PARODY' },
+        { label: '随机获取', value: 'RANDOM' }
+    ];
+    const editColumns: any = [
+        { key: 'sort', align: 'center', width: 80, render: () => <DragHandle />, editable: false },
+        {
+            title: '字段名称',
+            align: 'center',
+            width: 400,
+            required: true,
+            dataIndex: 'columnName',
+            formItemProps: {
+                component: <Input />,
+                rules: [
+                    {
+                        required: true,
+                        message: '请输入字段名称'
+                    },
+                    {
+                        max: 20,
+                        message: '字段名称不能超过 20 个字'
+                    }
+                ]
+            }
+        },
+        {
+            title: '字段描述',
+            align: 'center',
+            width: 400,
+            required: true,
+            dataIndex: 'columnDesc',
+            formItemProps: {
+                component: <Input />
+            }
+        },
+        {
+            title: '字段类型',
+            width: 200,
+            required: true,
+            dataIndex: 'columnType',
+            align: 'center',
+            valueType: 'select',
+            fieldProps: {
+                options: materialFieldTypeList
+            },
+            formItemProps: {
+                rules: [
+                    {
+                        required: true,
+                        message: '请选择字段类型'
+                    }
+                ]
+            },
+            render: (_: any, row: any) => materialFieldTypeList?.find((item) => item.value === row.type)?.label
+        },
+        {
+            title: '操作',
+            align: 'center',
+            valueType: 'option',
+            width: 60,
+            fixed: 'right',
+            render: (text: any, row: any, index: any) => (
+                <div className="w-full flex justify-center gap-2">
+                    <Popconfirm title="提示" description="请再次确认是否要删除" onConfirm={async () => {}} okText="Yes" cancelText="No">
+                        <Button type="link" danger>
+                            删除
+                        </Button>
+                    </Popconfirm>
+                </div>
+            )
+        }
+    ];
+    const timer = useRef<any>(null);
+    const [editableKeys, setEditableKeys] = useState<any[]>([]);
+    const [editTableData, setEditTableData] = useState<any[]>([]);
+    const onDragEnd = ({ active, over }: DragEndEvent) => {
+        if (active.id !== over?.id) {
+            const newList = (prevState: any) => {
+                const activeIndex = prevState.findIndex((record: any) => record.uuid === active?.id);
+                const overIndex = prevState.findIndex((record: any) => record.uuid === over?.id);
+                return arrayMove(prevState, activeIndex, overIndex);
+            };
+            setEditTableData(newList(editTableData));
+        }
+    };
+
+    useEffect(() => {
+        if (detail) {
+            const newList = detail?.workflowConfig?.steps
+                ?.filter((item: any) => item?.flowStep?.handler === 'CustomActionHandler')
+                ?.map((item: any) => ({ ...item, uuid: Date.now() }));
+            setEditTableData(newList || []);
+            setEditableKeys(newList?.map((item: any) => item.uuid) || []);
+        }
+    }, [detail]);
     return (
         <div>
             <Tabs>
@@ -260,30 +423,85 @@ const StepEdit = ({
                         />
                     </Tabs.TabPane>
                 )}
-                {handler !== 'VariableActionHandler' && handler !== 'PosterActionHandler' && (
-                    <Tabs.TabPane tab="变量" key="3">
-                        {handler === 'OpenAIChatActionHandler' && (
-                            <div className="flex justify-end items-center mb-4">
-                                <div className="flex gap-2">
-                                    <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
-                                        <InfoCircleOutlined className="cursor-pointer" />
-                                    </Tooltip>
-                                    <Button
-                                        size="small"
-                                        type="primary"
-                                        onClick={() => {
-                                            setOpen(true);
-                                            setTitle('新增');
-                                        }}
-                                    >
-                                        新增
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-                        <Table rowKey={(record: any) => record.field} columns={columns} dataSource={variable} pagination={false} />
+                {/* {handler === 'AssembleActionHandler' && (
+                    <Tabs.TabPane tab="内容生成节点" key="7">
+                        <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+                            <SortableContext items={editTableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
+                                <EditableProTable<any>
+                                    className="edit-table"
+                                    rowKey={'uuid'}
+                                    maxLength={30}
+                                    tableAlertRender={false}
+                                    components={components}
+                                    rowSelection={false}
+                                    editableFormRef={actionRef}
+                                    toolBarRender={false}
+                                    columns={editColumns}
+                                    value={editTableData}
+                                    pagination={false}
+                                    recordCreatorProps={{
+                                        newRecordType: 'dataSource',
+                                        record: () => ({
+                                            uuid: Date.now(),
+                                            columnType: 'RANDOM'
+                                        })
+                                    }}
+                                    editable={{
+                                        type: 'multiple',
+                                        editableKeys: editableKeys,
+                                        actionRender: (row, config, defaultDoms) => {
+                                            return [
+                                                <Button
+                                                    onClick={() => {
+                                                        setEditTableData(editTableData.filter((item, index) => index !== row.index));
+                                                    }}
+                                                    type="link"
+                                                    danger
+                                                >
+                                                    删除
+                                                </Button>
+                                            ];
+                                        },
+                                        onValuesChange: (record, recordList) => {
+                                            clearTimeout(timer.current);
+                                            timer.current = setTimeout(() => {
+                                                let newList = _.cloneDeep(recordList);
+                                                setEditTableData(newList);
+                                            }, 500);
+                                        },
+                                        onChange: setEditableKeys
+                                    }}
+                                />
+                            </SortableContext>
+                        </DndContext>
                     </Tabs.TabPane>
-                )}
+                )} */}
+                {handler !== 'VariableActionHandler' &&
+                    // && handler !== 'AssembleActionHandler'
+                    handler !== 'PosterActionHandler' && (
+                        <Tabs.TabPane tab="变量" key="3">
+                            {handler === 'OpenAIChatActionHandler' && (
+                                <div className="flex justify-end items-center mb-4">
+                                    <div className="flex gap-2">
+                                        <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
+                                            <InfoCircleOutlined className="cursor-pointer" />
+                                        </Tooltip>
+                                        <Button
+                                            size="small"
+                                            type="primary"
+                                            onClick={() => {
+                                                setOpen(true);
+                                                setTitle('新增');
+                                            }}
+                                        >
+                                            新增
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                            <Table rowKey={(record: any) => record.field} columns={columns} dataSource={variable} pagination={false} />
+                        </Tabs.TabPane>
+                    )}
                 {handler !== 'MaterialActionHandler' &&
                     handler !== 'VariableActionHandler' &&
                     handler !== 'AssembleActionHandler' &&
@@ -326,40 +544,42 @@ const StepEdit = ({
                             )}
                         </Tabs.TabPane>
                     )}
-                {handler !== 'VariableActionHandler' && handler !== 'MaterialActionHandler' && (
-                    <Tabs.TabPane tab="返回结果" key="6">
-                        <FormControl fullWidth>
-                            <InputLabel color="secondary" id="responent">
-                                响应类型
-                            </InputLabel>
-                            <Select
-                                disabled={resReadOnly}
-                                color="secondary"
-                                onChange={(e) => {
-                                    basisChange({ e: e.target, index, i: 0, flag: false });
-                                }}
-                                name="type"
-                                labelId="responent"
-                                value={resType}
-                                label="响应类型"
-                            >
-                                <MenuItem value={'TEXT'}>文本类型</MenuItem>
-                                <MenuItem value={'JSON'}>JSON 类型</MenuItem>
-                            </Select>
-                        </FormControl>
-                        {resType === 'JSON' && (
-                            <TextArea
-                                disabled={resReadOnly}
-                                defaultValue={resJsonSchema}
-                                className="mt-[16px]"
-                                style={{ height: '200px' }}
-                                onBlur={(e) => {
-                                    basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
-                                }}
-                            />
-                        )}
-                    </Tabs.TabPane>
-                )}
+                {handler !== 'VariableActionHandler' &&
+                    //  && handler !== 'AssembleActionHandler'
+                    handler !== 'MaterialActionHandler' && (
+                        <Tabs.TabPane tab="返回结果" key="6">
+                            <FormControl fullWidth>
+                                <InputLabel color="secondary" id="responent">
+                                    响应类型
+                                </InputLabel>
+                                <Select
+                                    disabled={resReadOnly}
+                                    color="secondary"
+                                    onChange={(e) => {
+                                        basisChange({ e: e.target, index, i: 0, flag: false });
+                                    }}
+                                    name="type"
+                                    labelId="responent"
+                                    value={resType}
+                                    label="响应类型"
+                                >
+                                    <MenuItem value={'TEXT'}>文本类型</MenuItem>
+                                    <MenuItem value={'JSON'}>JSON 类型</MenuItem>
+                                </Select>
+                            </FormControl>
+                            {resType === 'JSON' && (
+                                <TextArea
+                                    disabled={resReadOnly}
+                                    defaultValue={resJsonSchema}
+                                    className="mt-[16px]"
+                                    style={{ height: '200px' }}
+                                    onBlur={(e) => {
+                                        basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
+                                    }}
+                                />
+                            )}
+                        </Tabs.TabPane>
+                    )}
             </Tabs>
             {open && (
                 <ArrangeModal

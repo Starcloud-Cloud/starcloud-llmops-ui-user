@@ -21,6 +21,7 @@ const CopywritingModal = Loadable(lazy(() => import('views/pages/copywriting/com
 const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedBooks')));
 const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
 const Fingerprint = Loadable(lazy(() => import('views/fingerprint')));
+const Invite = Loadable(lazy(() => import('views/invite')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -29,6 +30,7 @@ export default function ThemeRoutes() {
     return useRoutes([
         { path: '/', element: <PagesLanding /> },
         { path: '/fingerprint', element: <Fingerprint /> },
+        { path: '/invite', element: <Invite /> },
         // { path: '/subscribe', element: <PagesPrice /> },
         // { path: '/web-view/orderRecord', element: <OrderRecord /> },
         // { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },

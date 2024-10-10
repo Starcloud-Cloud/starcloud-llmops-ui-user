@@ -74,7 +74,7 @@ export const PermissionUpgradeModal = ({
                                 {getTenant() === ENUM_TENANT.AI ? (
                                     <div className="text-2xl py-2 text-[#6E48AA] mb-5">升级魔法AI，解锁更多权益</div>
                                 ) : (
-                                    <div className="text-2xl py-2 text-[#6E48AA] mb-5">升级魔法矩阵，解锁更多权益</div>
+                                    <div className="text-2xl py-2 text-[#6E48AA] mb-5">升级魔法笔记，解锁更多权益</div>
                                 )}
                                 {getTenant() === ENUM_TENANT.AI ? renderList(list) : renderList(juzhenList)}
                                 <Button

@@ -1,4 +1,21 @@
-import { Select, Input, Row, Col, Tabs, Space, Button, Modal, Form, message, Popconfirm, Dropdown, Avatar, Switch, Empty } from 'antd';
+import {
+    Select,
+    Input,
+    Row,
+    Col,
+    Tabs,
+    Space,
+    Button,
+    Modal,
+    Form,
+    message,
+    Popconfirm,
+    Dropdown,
+    Avatar,
+    Switch,
+    Empty,
+    Tooltip
+} from 'antd';
 import type { MenuProps, TabsProps } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import IconSelect, { allIcons } from 'ui-component/IconSelect';
@@ -159,22 +176,26 @@ const MaterialLibrary = ({
                 return (
                     <div className="flex items-center">
                         <div className="w-[56px]">
-                            <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
+                            <Tooltip title="预览数据">
+                                <Avatar shape="square" icon={<IconRenderer value={record.iconUrl || 'AreaChartOutlined'} />} size={54} />
+                            </Tooltip>
                         </div>
                         <div className="ml-2 flex flex-col">
-                            <span
-                                onClick={
-                                    mode === 'select'
-                                        ? (e) => {
-                                              e.stopPropagation();
-                                              window.open(`/material/detail?id=${record.id}`);
-                                          }
-                                        : () => null
-                                }
-                                className="font-extrabold cursor-pointer"
-                            >
-                                {record.name}
-                            </span>
+                            <Tooltip title="查看素材库">
+                                <span
+                                    onClick={
+                                        mode === 'select'
+                                            ? (e) => {
+                                                  e.stopPropagation();
+                                                  window.open(`/material/detail?id=${record.id}`);
+                                              }
+                                            : () => null
+                                    }
+                                    className="font-extrabold cursor-pointer"
+                                >
+                                    {record.name}
+                                </span>
+                            </Tooltip>
 
                             <div className="text-[12px] h-[18px] text-[#06070980] line-clamp-1">{record.description}</div>
                         </div>
@@ -301,9 +322,14 @@ const MaterialLibrary = ({
         const values = await form.validateFields();
         const data = record ? await updateMaterial({ ...values, id: record.id, status: 1 }) : await addMaterial({ ...values, status: 1 });
         if (data) {
-            record ? message.success('修改成功!') : message.success('添加成功!');
-            setIsModalOpen(false);
-            actionRef.current?.reload();
+            // 修改
+            if (record) {
+                message.success('修改成功!');
+                setIsModalOpen(false);
+                actionRef.current?.reload();
+            } else {
+                navigate(`/material/detail?id=${data}`);
+            }
         }
     };
 
@@ -468,7 +494,7 @@ const MaterialLibrary = ({
                 ]}
             />
             {isModalOpen && (
-                <Modal width={580} title={record ? '修改知识库' : '新增知识库'} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                <Modal width={580} title={record ? '修改素材库' : '新增素材库'} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                     <Form layout="vertical" form={form}>
                         <Form.Item label="名称" name="name" rules={[{ required: true }]}>
                             <Input placeholder="填写名称" maxLength={100} showCount />
@@ -495,8 +521,7 @@ const MaterialLibrary = ({
                                 value={selectIcon}
                             />
                         </Form.Item> */}
-                        <Form.Item name="importType" className="w-full" label="导入类型">
-                            {/* <CheckCard.Group style={{ width: '100%' }}> */}
+                        {/* <Form.Item name="importType" className="w-full" label="导入类型">
                             <Row gutter={16}>
                                 <Col span={12}>
                                     <CheckCard
@@ -517,8 +542,7 @@ const MaterialLibrary = ({
                                     />
                                 </Col>
                             </Row>
-                            {/* </CheckCard.Group> */}
-                        </Form.Item>
+                        </Form.Item> */}
                         {/* <Form.Item label="是否系统库" rules={[{ required: true }]}>
                         <Switch />
                     </Form.Item>

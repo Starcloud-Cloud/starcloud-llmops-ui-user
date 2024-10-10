@@ -228,6 +228,7 @@ const HeaderField = ({
                         pagination={false}
                         recordCreatorProps={{
                             newRecordType: 'dataSource',
+                            creatorButtonText: '添加字段',
                             record: () => ({
                                 id: Date.now(),
                                 uuid: Date.now(),

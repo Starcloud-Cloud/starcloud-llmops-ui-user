@@ -215,14 +215,9 @@ const ThreeStep = ({
         const zip = new JSZip();
         const promises = imageList.map(async (imageUrl: any, index: number) => {
             const response = await fetch(imageUrl.url);
-            console.log(response);
-
             const arrayBuffer = await response.arrayBuffer();
-            console.log(imageUrl?.url?.split('.')[imageUrl?.url?.split('.')?.length - 1]);
-
             zip.file('image' + (index + 1) + `.${imageUrl?.url?.split('.')[imageUrl?.url?.split('.')?.length - 1]}`, arrayBuffer);
         });
-        console.log(promises);
         Promise.all(promises)
             .then(() => {
                 console.log(promises);

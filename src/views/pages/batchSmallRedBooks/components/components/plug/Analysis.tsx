@@ -414,7 +414,11 @@ const PlugAnalysis = ({
                                     <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record?.type)?.label}</Tag>
                                     {rowData?.enable && (
                                         <div className="text-[14px] flex items-center gap-1">
-                                            <HistoryOutlined style={{ color: '#673ab7' }} />
+                                            <HistoryOutlined
+                                                style={{
+                                                    color: '#673ab7'
+                                                }}
+                                            />
                                             定时执行
                                         </div>
                                     )}

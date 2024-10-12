@@ -326,6 +326,7 @@ ${JSON.stringify(value, null, 2)}
             ]
         }
     ];
+    const [active, setActive] = useState<any>([]);
     const handleSave = async () => {
         let formRes: any;
         try {
@@ -333,7 +334,6 @@ ${JSON.stringify(value, null, 2)}
         } catch (err) {
             setActive([1]);
         }
-
         const newList = redBookData.requirement?.map((item: any) => ({
             ...item,
             variableValue: formRes[item.variableKey]
@@ -644,7 +644,6 @@ ${JSON.stringify(value, null, 2)}
             }
         });
     }, []);
-    const [active, setActive] = useState<any>([]);
     return (
         <Modal width="60%" open={triggerOpen} onCancel={() => setTriggerOpen(false)} footer={false} title="素材库-触发器">
             <Tabs

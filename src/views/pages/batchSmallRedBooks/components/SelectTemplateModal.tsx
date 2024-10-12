@@ -124,7 +124,7 @@ export const SelectTemplateModal = ({
                                                         />
                                                         <div className="text-sm font-bold text-center">{v?.name}</div>
                                                         {v?.materialCount > 1 && (
-                                                            <Tag color="processing" className=" absolute top-0 left-0">
+                                                            <Tag color="processing" className="absolute top-0 left-0">
                                                                 组合
                                                             </Tag>
                                                         )}
@@ -178,9 +178,11 @@ export const SelectTemplateModal = ({
                                                             }}
                                                         />
                                                         <div className="text-sm font-bold text-center">{v?.name}</div>
-                                                        <Tag color="processing" className="group-hover:block hidden absolute top-0 left-0">
-                                                            组合 {v?.materialCount}
-                                                        </Tag>
+                                                        {v?.materialCount > 1 && (
+                                                            <Tag color="processing" className="absolute top-0 left-0">
+                                                                组合
+                                                            </Tag>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>

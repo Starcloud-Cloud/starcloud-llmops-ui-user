@@ -75,6 +75,7 @@ const Row: React.FC<RowProps> = (props) => {
 const StepEdit = ({
     detail,
     appUid,
+    stepLists,
     variableStyle, //变量类型
     index, //步骤几
     variable, //变量
@@ -93,6 +94,7 @@ const StepEdit = ({
 }: {
     detail: any;
     appUid: string;
+    stepLists: any[];
     variableStyle: any[];
     index: number;
     variable: any[];
@@ -336,7 +338,7 @@ const StepEdit = ({
     };
 
     useEffect(() => {
-        if (detail) {
+        if (detail && handler === 'AssembleActionHandler') {
             const newList = detail?.workflowConfig?.steps
                 ?.filter((item: any) => item?.flowStep?.handler === 'CustomActionHandler')
                 ?.map((item: any, index: number) => ({
@@ -446,8 +448,9 @@ const StepEdit = ({
                                     recordCreatorProps={{
                                         newRecordType: 'dataSource',
                                         record: () => ({
-                                            uuid: Date.now(),
-                                            columnType: 'RANDOM'
+                                            uuid: uuidv4(),
+                                            type: 'RANDOM',
+                                            ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')
                                         })
                                     }}
                                     editable={{

@@ -83,7 +83,7 @@ const CreateTab = ({
                 </Button>
                 <div
                     onClick={() => {
-                        window.open('http://cn-test.poster-ui.hotsalestar.com/#/');
+                        window.open('https://cn-test-poster.mofaai.com.cn/#/');
                     }}
                     className="ml-[10px] font-[600] cursor-pointer text-[12px] text-[#673ab7] border-b border-solid border-[#673ab7]"
                 >

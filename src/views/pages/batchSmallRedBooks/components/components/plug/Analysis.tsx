@@ -412,14 +412,16 @@ const PlugAnalysis = ({
                                     <span className="font-bold">{record?.pluginName}</span>
                                     <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record?.scene)?.label}</Tag>
                                     <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record?.type)?.label}</Tag>
-                                    <div className="text-[14px] flex items-center gap-1">
-                                        <HistoryOutlined
-                                            style={{
-                                                color: rowData?.enable ? '#673ab7' : ''
-                                            }}
-                                        />
-                                        定时执行
-                                    </div>
+                                    {rowData?.enable && (
+                                        <div className="text-[14px] flex items-center gap-1">
+                                            <HistoryOutlined
+                                                style={{
+                                                    color: '#673ab7'
+                                                }}
+                                            />
+                                            定时执行
+                                        </div>
+                                    )}
                                 </Space>
                                 <div className="flex gap-2">
                                     <div className="text-xs text-[#673ab7]">

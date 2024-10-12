@@ -210,41 +210,40 @@ const SpaceEquity = () => {
         {
             title: '角色',
             align: 'center',
-            render: (_, row) => (
-                // row.userId !== all_detail?.allDetail?.id && user?.adminUserId === all_detail?.allDetail?.id ? (
-                //     <Select
-                //         className="w-[200px]"
-                //         value={row.deptRole && Number(row.deptRole)}
-                //         onChange={async (e) => {
-                //             const result = await spaceRole(row.userDeptId, e);
-                //             if (result) {
-                //                 dispatch(
-                //                     openSnackbar({
-                //                         open: true,
-                //                         message: '更新成功',
-                //                         variant: 'alert',
-                //                         alert: {
-                //                             color: 'success'
-                //                         },
-                //                         anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                //                         transition: 'SlideDown',
-                //                         close: false
-                //                     })
-                //                 );
-                //                 getTableList();
-                //             }
-                //         }}
-                //     >
-                //         {roleList?.map((item: any) => (
-                //             <Option key={item.value} value={item.value}>
-                //                 {item.label}
-                //             </Option>
-                //         ))}
-                //     </Select>
-                // ) : (
-                <span>{roleList?.find((item: any) => item.value == row.deptRole)?.label}</span>
-            )
-            // )
+            render: (_, row) =>
+                row.userId !== all_detail?.allDetail?.id && user?.adminUserId === all_detail?.allDetail?.id ? (
+                    <Select
+                        className="w-[200px]"
+                        value={row.deptRole && Number(row.deptRole)}
+                        onChange={async (e) => {
+                            const result = await spaceRole(row.userDeptId, e);
+                            if (result) {
+                                dispatch(
+                                    openSnackbar({
+                                        open: true,
+                                        message: '更新成功',
+                                        variant: 'alert',
+                                        alert: {
+                                            color: 'success'
+                                        },
+                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                        transition: 'SlideDown',
+                                        close: false
+                                    })
+                                );
+                                getTableList();
+                            }
+                        }}
+                    >
+                        {roleList?.map((item: any) => (
+                            <Option key={item.value} value={item.value}>
+                                {item.label}
+                            </Option>
+                        ))}
+                    </Select>
+                ) : (
+                    <span>{roleList?.find((item: any) => item.value == row.deptRole)?.label}</span>
+                )
         },
         {
             title: '操作',

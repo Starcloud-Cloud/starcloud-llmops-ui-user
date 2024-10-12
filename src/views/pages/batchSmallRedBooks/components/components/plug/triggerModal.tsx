@@ -326,8 +326,14 @@ ${JSON.stringify(value, null, 2)}
             ]
         }
     ];
+    const [active,setActive] = useState<any>([])
     const handleSave = async () => {
-        const formRes = await form.validateFields();
+        let formRes: any;
+        try {
+            formRes = await form.validateFields();
+        } catch (err) {
+            setActive([1]);
+        }
         const newList = redBookData.requirement?.map((item: any) => ({
             ...item,
             variableValue: formRes[item.variableKey]
@@ -667,7 +673,8 @@ ${JSON.stringify(value, null, 2)}
                                         <Cascader displayRender={(label) => label.join(' ')} options={timeExpressionList} />
                                     </Form.Item>
                                     <Collapse
-                                        defaultActiveKey={['1']}
+                                        activeKey={active}
+                                        onChange={setActive}
                                         items={[
                                             {
                                                 key: '1',

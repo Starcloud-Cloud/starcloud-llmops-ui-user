@@ -277,6 +277,14 @@ const StepEdit = ({
                     {
                         max: 20,
                         message: '字段名称不能超过 20 个字'
+                    },
+                    {
+                        validator: (rule: any, value: any) => {
+                            if (value && editTableData.some((el) => el.name === value)) {
+                                return Promise.reject('字段名称重复');
+                            }
+                            return Promise.resolve();
+                        }
                     }
                 ]
             }
@@ -338,6 +346,14 @@ const StepEdit = ({
                 return arrayMove(prevState, activeIndex, overIndex);
             };
             setEditTableData(newList(editTableData));
+        }
+    };
+
+    const stepEtch = (index: number, name: string): string => {
+        if (editTableData.some((item: { name: string }) => item.name === name + index)) {
+            return stepEtch(index + 1, name);
+        } else {
+            return name + index;
         }
     };
 
@@ -460,7 +476,11 @@ const StepEdit = ({
                                         record: () => ({
                                             uuid: uuidv4(),
                                             type: 'AI_CUSTOM',
-                                            ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')
+                                            ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler'),
+                                            name: stepEtch(
+                                                1,
+                                                stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')?.name
+                                            )
                                         })
                                     }}
                                     editable={{

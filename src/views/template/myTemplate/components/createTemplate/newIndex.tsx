@@ -440,19 +440,25 @@ function CreateDetail() {
             setTableData(type, steps);
         }
         if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
-            const num = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REQUIREMENT');
-            const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+            const num = newValue.workflowConfig.steps[steps].variable.variables?.findIndex(
+                (item: any) => item.field === 'CUSTOM_REQUIREMENT'
+            ); //AI 自定义
+            const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL'); //表格
+            const num2 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex(
+                (item: any) => item.field === 'PARODY_REQUIREMENT'
+            ); //AI 仿写
             if (e.value === 'RANDOM') {
-                newValue.workflowConfig.steps[steps].variable.variables[num].value = '';
                 newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = false;
             } else if (e.value === 'AI_PARODY') {
-                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = true;
             } else {
-                newValue.workflowConfig.steps[steps].variable.variables[num1].value = [];
+                newValue.workflowConfig.steps[steps].variable.variables[num].value = true;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = false;
-                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = false;
             }
         }
         detailRef.current = _.cloneDeep(newValue);
@@ -550,6 +556,32 @@ function CreateDetail() {
     const saveDetail = (flag?: boolean, fieldShow?: boolean, isAppSave?: boolean) => {
         setErrOpen(false);
         const newList = _.cloneDeep(detailRef.current);
+        const num = newList?.workflowConfig?.steps?.findIndex((item: any) => item.flowStep.handler === 'CustomActionHandler');
+        const newData = newList?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
+        newData?.splice(num, 0, ...flowDataRef.current);
+        newData?.forEach((item: any) => {
+            if (item?.flowStep?.handler === 'CustomActionHandler') {
+                item.variable.variables.find((el: any) => el.field === 'GENERATE_MODE').value = item.type;
+
+                const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
+                const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
+                if (item.type === 'RANDOM') {
+                    item.variable.variables[num].isShow = false;
+                    item.variable.variables[num1].isShow = true;
+                    item.variable.variables[num2].isShow = false;
+                } else if (item.type === 'AI_PARODY') {
+                    item.variable.variables[num].isShow = false;
+                    item.variable.variables[num1].isShow = true;
+                    item.variable.variables[num2].isShow = true;
+                } else {
+                    item.variable.variables[num].isShow = true;
+                    item.variable.variables[num1].isShow = false;
+                    item.variable.variables[num2].isShow = false;
+                }
+            }
+        });
+        newList.workflowConfig.steps = newData;
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {
             newList.workflowConfig.steps[index] = addStyle?.current?.record || newList.workflowConfig.steps[index];
@@ -1066,6 +1098,10 @@ function CreateDetail() {
             }
         }
     ];
+    //暂存流程编排的数据
+    const arrangeRef = useRef<any>(null);
+    const flowDataRef = useRef<any[]>([]);
+    const [flowData, setFlowData] = useState<any[]>([]);
     return detail ? (
         <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
@@ -1143,6 +1179,45 @@ function CreateDetail() {
                                 setDetail(detailRef?.current);
                                 setValue(key);
                             } else if (key === '4') {
+                                if (arrangeRef.current) {
+                                    const newData = _.cloneDeep(detailRef.current);
+                                    const num = newData?.workflowConfig?.steps?.findIndex(
+                                        (item: any) => item.flowStep.handler === 'CustomActionHandler'
+                                    );
+                                    const newList = newData?.workflowConfig?.steps?.filter(
+                                        (item: any) => item.flowStep.handler !== 'CustomActionHandler'
+                                    );
+                                    newList?.splice(num, 0, ...flowDataRef.current);
+                                    newList?.forEach((item: any) => {
+                                        if (item?.flowStep?.handler === 'CustomActionHandler') {
+                                            item.variable.variables.find((el: any) => el.field === 'GENERATE_MODE').value = item.type;
+                                            const num = item.variable.variables?.findIndex(
+                                                (item: any) => item.field === 'CUSTOM_REQUIREMENT'
+                                            );
+                                            const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                                            const num2 = item.variable.variables?.findIndex(
+                                                (item: any) => item.field === 'PARODY_REQUIREMENT'
+                                            );
+                                            if (item.type === 'RANDOM') {
+                                                item.variable.variables[num].isShow = false;
+                                                item.variable.variables[num1].isShow = true;
+                                                item.variable.variables[num2].isShow = false;
+                                            } else if (item.type === 'AI_PARODY') {
+                                                item.variable.variables[num].isShow = false;
+                                                item.variable.variables[num1].isShow = true;
+                                                item.variable.variables[num2].isShow = true;
+                                            } else {
+                                                item.variable.variables[num].isShow = true;
+                                                item.variable.variables[num1].isShow = false;
+                                                item.variable.variables[num2].isShow = false;
+                                            }
+                                        }
+                                    });
+                                    newData.workflowConfig.steps = newList;
+                                    detailRef.current = newData;
+                                    setDetail(detailRef?.current);
+                                }
+
                                 setChangePre(changePre + 1);
                                 setValue(key);
                             } else {
@@ -1196,7 +1271,12 @@ function CreateDetail() {
                                 <div className="flex justify-center">
                                     <div className={`xl:w-[80%] lg:w-full pb-4`}>
                                         <Arrange
+                                            ref={arrangeRef}
                                             detail={detail}
+                                            setdetail={(data: any) => {
+                                                flowDataRef.current = data;
+                                                setFlowData(flowDataRef.current);
+                                            }}
                                             config={detail?.workflowConfig}
                                             variableStyle={appModels?.variableStyle}
                                             editChange={editChange}

@@ -11,6 +11,7 @@ import { useState, useEffect, memo, useMemo } from 'react';
 import _ from 'lodash-es';
 function Arrange({
     detail,
+    setdetail,
     config,
     variableStyle,
     editChange,
@@ -343,6 +344,7 @@ function Arrange({
                                 <AccordionDetails>
                                     <StepEdit
                                         detail={detail}
+                                        setdetail={setdetail}
                                         stepLists={stepLists}
                                         appUid={detail?.uid}
                                         variableStyle={variableStyle}

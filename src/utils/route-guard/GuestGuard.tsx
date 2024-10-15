@@ -21,6 +21,9 @@ const GuestGuard = ({ children }: GuardProps) => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const redirect_url = query.get('redirect_url');
+    if (redirect_url) {
+        jsCookie.remove('token');
+    }
 
     useEffect(() => {
         if (isLoggedIn) {

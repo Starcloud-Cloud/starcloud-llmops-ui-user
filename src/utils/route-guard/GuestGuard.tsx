@@ -23,6 +23,7 @@ const GuestGuard = ({ children }: GuardProps) => {
     const redirect_url = query.get('redirect_url');
     if (redirect_url) {
         jsCookie.remove('token');
+        localStorage.removeItem('ACCESS_TOKEN');
     }
 
     useEffect(() => {

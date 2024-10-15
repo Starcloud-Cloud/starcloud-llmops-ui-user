@@ -511,52 +511,7 @@ const Lefts = ({
     const [exeState, setExeState] = useState(false);
     const [errMessageList, setErrMessageList] = useState<any[]>([]);
     const [errMessageOpen, setMessageOpen] = useState(false);
-    const handleVerify = () => {
-        console.log(generRef.current);
 
-        const List = generRef.current?.map((item: any) => {
-            if (item.flowStep.handler === 'CustomActionHandler') {
-                const GENERATE_MODE = item?.variable?.variables?.find((item: any) => item.field === 'GENERATE_MODE')?.value;
-                const REFERS = item?.variable?.variables?.find((item: any) => item.field === 'REFERS')?.value;
-                const REQUIREMENT = item?.variable?.variables?.find((item: any) => item.field === 'REQUIREMENT')?.value;
-                if (GENERATE_MODE === 'AI_PARODY' && !REFERS) {
-                    return `【${item.name}】中的参考数据最少有一个`;
-                } else if (GENERATE_MODE === 'AI_CUSTOM' && !REQUIREMENT) {
-                    return `【${item.name}】中文案生成要求必填`;
-                } else {
-                    return undefined;
-                }
-            } else if (item.flowStep.handler === 'AssembleActionHandler') {
-                const TITLE = item?.variable?.variables?.find((item: any) => item.field === 'TITLE')?.value;
-                const CONTENT = item?.variable?.variables?.find((item: any) => item.field === 'CONTENT')?.value;
-                if (!TITLE) {
-                    return `【${item.name}】中的标题必填`;
-                } else if (!CONTENT) {
-                    return `【${item.name}】中的内容必填`;
-                } else {
-                    return undefined;
-                }
-            } else if (item.flowStep.handler === 'VariableActionHandler') {
-                if (item?.variable?.variables?.length === 0) {
-                    return `【${item.name}】中的变量最少一个`;
-                } else if (!item?.variable?.variables?.every((i: any) => i.value)) {
-                    return `【${item.name}】中的值必填`;
-                } else {
-                    return undefined;
-                }
-            }
-        });
-        console.log(List);
-
-        const newList = List.filter((item: any) => item);
-        if (newList.length > 0) {
-            setMessageOpen(true);
-            setErrMessageList(newList);
-            return false;
-        } else {
-            return true;
-        }
-    };
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
         planAppRef.current = 0;
@@ -1081,8 +1036,12 @@ const Lefts = ({
                                                     {item?.variable?.variables?.map((el: any, i: number) => (
                                                         <div key={el.field}>
                                                             {el.field === 'REFERS'
-                                                                ? item?.variable?.variables?.find((dt: any) => dt.field === 'GENERATE_MODE')
-                                                                      .value === 'AI_PARODY' && (
+                                                                ? (item?.variable?.variables?.find(
+                                                                      (dt: any) => dt.field === 'GENERATE_MODE'
+                                                                  ).value === 'AI_PARODY' ||
+                                                                      item?.variable?.variables?.find(
+                                                                          (dt: any) => dt.field === 'GENERATE_MODE'
+                                                                      ).value === 'RANDOM') && (
                                                                       <MarketForm
                                                                           item={el}
                                                                           materialType={''}
@@ -1165,21 +1124,29 @@ const Lefts = ({
                                                                                   e.name === 'GENERATE_MODE'
                                                                               ) {
                                                                                   const num = item.variable.variables?.findIndex(
-                                                                                      (item: any) => item.field === 'REQUIREMENT'
+                                                                                      (item: any) => item.field === 'CUSTOM_REQUIREMENT'
                                                                                   );
                                                                                   const num1 = item.variable.variables?.findIndex(
                                                                                       (item: any) => item.style === 'MATERIAL'
                                                                                   );
+                                                                                  const num2 = item.variable.variables?.findIndex(
+                                                                                      (item: any) => item.field === 'PARODY_REQUIREMENT'
+                                                                                  );
                                                                                   if (e.value === 'RANDOM') {
                                                                                       newList[index].variable.variables[num].isShow = false;
                                                                                       newList[index].variable.variables[num1].isShow = true;
+                                                                                      newList[index].variable.variables[num2].isShow =
+                                                                                          false;
                                                                                   } else if (e.value === 'AI_PARODY') {
-                                                                                      newList[index].variable.variables[num].isShow = true;
+                                                                                      newList[index].variable.variables[num].isShow = false;
                                                                                       newList[index].variable.variables[num1].isShow = true;
+                                                                                      newList[index].variable.variables[num2].isShow = true;
                                                                                   } else {
+                                                                                      newList[index].variable.variables[num].isShow = true;
                                                                                       newList[index].variable.variables[num1].isShow =
                                                                                           false;
-                                                                                      newList[index].variable.variables[num].isShow = true;
+                                                                                      newList[index].variable.variables[num2].isShow =
+                                                                                          false;
                                                                                   }
                                                                               }
                                                                               generRef.current = newList;
@@ -1272,21 +1239,29 @@ const Lefts = ({
                                                                                   e.name === 'GENERATE_MODE'
                                                                               ) {
                                                                                   const num = item.variable.variables?.findIndex(
-                                                                                      (item: any) => item.field === 'REQUIREMENT'
+                                                                                      (item: any) => item.field === 'CUSTOM_REQUIREMENT'
                                                                                   );
                                                                                   const num1 = item.variable.variables?.findIndex(
                                                                                       (item: any) => item.style === 'MATERIAL'
                                                                                   );
+                                                                                  const num2 = item.variable.variables?.findIndex(
+                                                                                      (item: any) => item.field === 'PARODY_REQUIREMENT'
+                                                                                  );
                                                                                   if (e.value === 'RANDOM') {
                                                                                       newList[index].variable.variables[num].isShow = false;
                                                                                       newList[index].variable.variables[num1].isShow = true;
+                                                                                      newList[index].variable.variables[num2].isShow =
+                                                                                          false;
                                                                                   } else if (e.value === 'AI_PARODY') {
-                                                                                      newList[index].variable.variables[num].isShow = true;
+                                                                                      newList[index].variable.variables[num].isShow = false;
                                                                                       newList[index].variable.variables[num1].isShow = true;
+                                                                                      newList[index].variable.variables[num2].isShow = true;
                                                                                   } else {
+                                                                                      newList[index].variable.variables[num].isShow = true;
                                                                                       newList[index].variable.variables[num1].isShow =
                                                                                           false;
-                                                                                      newList[index].variable.variables[num].isShow = true;
+                                                                                      newList[index].variable.variables[num2].isShow =
+                                                                                          false;
                                                                                   }
                                                                               }
                                                                               generRef.current = newList;

@@ -74,6 +74,7 @@ const Row: React.FC<RowProps> = (props) => {
 };
 const StepEdit = ({
     detail,
+    setdetail,
     appUid,
     stepLists,
     variableStyle, //变量类型
@@ -93,6 +94,7 @@ const StepEdit = ({
     setTableTitle
 }: {
     detail: any;
+    setdetail: (data: any) => void;
     appUid: string;
     stepLists: any[];
     variableStyle: any[];
@@ -111,6 +113,8 @@ const StepEdit = ({
     saveImageStyle: () => void;
     setTableTitle: () => void;
 }) => {
+    console.log(syszanVariable);
+
     const { TextArea } = Input;
     const groupList = [
         { label: '系统变量', value: 'SYSTEM' },
@@ -350,6 +354,26 @@ const StepEdit = ({
             setEditableKeys(newList?.map((item: any) => item.uuid) || []);
         }
     }, [detail]);
+    useEffect(() => {
+        if (editTableData) {
+            console.log(editTableData);
+
+            setdetail(editTableData);
+            return;
+            const newData = _.cloneDeep(detail);
+            const num = newData?.workflowConfig?.steps?.findIndex((item: any) => item.flowStep.handler === 'CustomActionHandler');
+            const newList = newData?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
+            newList?.splice(num, 0, ...editTableData);
+            newList?.forEach((item: any) => {
+                if (item?.flowStep?.handler === 'CustomActionHandler') {
+                    item.variable.variables.find((el: any) => el.field === 'GENERATE_MODE').value = item.type;
+                }
+            });
+            console.log(newList);
+
+            setdetail(newList);
+        }
+    }, [editTableData]);
     return (
         <div>
             <Tabs>
@@ -449,7 +473,7 @@ const StepEdit = ({
                                         newRecordType: 'dataSource',
                                         record: () => ({
                                             uuid: uuidv4(),
-                                            type: 'RANDOM',
+                                            type: 'AI_CUSTOM',
                                             ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')
                                         })
                                     }}

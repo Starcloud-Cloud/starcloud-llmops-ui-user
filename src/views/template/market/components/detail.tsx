@@ -229,19 +229,25 @@ function Deatail() {
             setTableData(type, steps);
         }
         if (code === 'CustomActionHandler' && e.name === 'GENERATE_MODE') {
-            const num = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'REQUIREMENT');
-            const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+            const num = newValue.workflowConfig.steps[steps].variable.variables?.findIndex(
+                (item: any) => item.field === 'CUSTOM_REQUIREMENT'
+            ); //AI 自定义
+            const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL'); //表格
+            const num2 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex(
+                (item: any) => item.field === 'PARODY_REQUIREMENT'
+            ); //AI 仿写
             if (e.value === 'RANDOM') {
-                newValue.workflowConfig.steps[steps].variable.variables[num].value = '';
                 newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = false;
             } else if (e.value === 'AI_PARODY') {
-                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = true;
             } else {
-                newValue.workflowConfig.steps[steps].variable.variables[num1].value = [];
+                newValue.workflowConfig.steps[steps].variable.variables[num].value = true;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = false;
-                newValue.workflowConfig.steps[steps].variable.variables[num].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = false;
             }
         }
         detailRef.current = newValue;

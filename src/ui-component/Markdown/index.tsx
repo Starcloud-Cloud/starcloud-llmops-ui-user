@@ -15,7 +15,6 @@ type tProps = {
 
 const ChatMarkdown = (props: tProps) => {
     const { textContent } = props;
-
     // 处理文档类型
     // const replacedText = textContent.replace(
     //     /\{(\d+)\}/g,
@@ -50,7 +49,7 @@ const ChatMarkdown = (props: tProps) => {
                                     <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
                                         <span>{match[1]}</span>
                                         <CopyToClipboard
-                                            text={textContent}
+                                            text={textContent?.replace(/~~~json/, '')}
                                             onCopy={() =>
                                                 dispatch(
                                                     openSnackbar({

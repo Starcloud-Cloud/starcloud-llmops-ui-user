@@ -1013,7 +1013,7 @@ const Lefts = ({
                                 (item: any, index: number) =>
                                     item?.flowStep?.handler !== 'VariableActionHandler' && (
                                         <div key={item.field + index}>
-                                            <Accordion defaultExpanded={index === 1} className="before:border-none !m-0">
+                                            <Accordion defaultExpanded={true} className="before:border-none !m-0">
                                                 <AccordionSummary
                                                     className="border-b border-solid border-black/20 p-0 !min-h-[0]"
                                                     sx={{

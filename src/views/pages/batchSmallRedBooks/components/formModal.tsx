@@ -124,6 +124,7 @@ const FormModal = ({
                                 key={index}
                                 label={item.title}
                                 name={item.dataIndex}
+                                initialValue={item.title === '参考来源' ? 'SMALL_RED_BOOK' : undefined}
                                 rules={[{ required: item.required, message: `${item.title}是必填的` }]}
                             >
                                 {item.type === 'image' ? (

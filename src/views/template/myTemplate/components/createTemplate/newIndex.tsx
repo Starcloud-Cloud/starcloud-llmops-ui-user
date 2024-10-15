@@ -556,7 +556,7 @@ function CreateDetail() {
     const saveDetail = (flag?: boolean, fieldShow?: boolean, isAppSave?: boolean) => {
         setErrOpen(false);
         const newList = _.cloneDeep(detailRef.current);
-        const num = newList?.workflowConfig?.steps?.findIndex((item: any) => item.flowStep.handler === 'CustomActionHandler');
+        const num = getCustomIndex(newList);
         const newData = newList?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
         newData?.splice(num, 0, ...flowDataRef.current);
         newData?.forEach((item: any) => {
@@ -1101,6 +1101,18 @@ function CreateDetail() {
     const arrangeRef = useRef<any>(null);
     const flowDataRef = useRef<any[]>([]);
     const [flowData, setFlowData] = useState<any[]>([]);
+    //获取下标
+    const getCustomIndex = (newData: any) => {
+        const customIndex = newData?.workflowConfig?.steps?.findIndex((item: any) => item.flowStep.handler === 'CustomActionHandler');
+        const variableIndex = newData?.workflowConfig?.steps?.findIndex((item: any) => item.flowStep.handler === 'VariableActionHandler');
+        if (customIndex !== -1) {
+            return customIndex;
+        } else if (customIndex === -1 && variableIndex !== -1) {
+            return variableIndex + 1;
+        } else {
+            return 1;
+        }
+    };
     return detail ? (
         <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
@@ -1180,9 +1192,7 @@ function CreateDetail() {
                             } else if (key === '4') {
                                 if (arrangeRef.current) {
                                     const newData = _.cloneDeep(detailRef.current);
-                                    const num = newData?.workflowConfig?.steps?.findIndex(
-                                        (item: any) => item.flowStep.handler === 'CustomActionHandler'
-                                    );
+                                    const num = getCustomIndex(newData);
                                     const newList = newData?.workflowConfig?.steps?.filter(
                                         (item: any) => item.flowStep.handler !== 'CustomActionHandler'
                                     );

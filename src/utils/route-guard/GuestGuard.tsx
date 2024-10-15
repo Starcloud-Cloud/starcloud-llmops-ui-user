@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // project imports
 import useAuth from 'hooks/useAuth';
@@ -18,11 +18,18 @@ import jsCookie from 'js-cookie';
 const GuestGuard = ({ children }: GuardProps) => {
     const { isLoggedIn } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const redirect_url = query.get('redirect_url');
 
     useEffect(() => {
         if (isLoggedIn) {
             if (!jsCookie.get('isClient')) {
-                navigate(DASHBOARD_PATH, { replace: true });
+                if (redirect_url) {
+                    window.location.href = redirect_url;
+                } else {
+                    navigate(DASHBOARD_PATH, { replace: true });
+                }
             }
         }
     }, [isLoggedIn, navigate]);

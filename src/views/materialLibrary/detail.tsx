@@ -254,6 +254,7 @@ export const TableHeader = ({
         }
     }, [materialflag]);
 
+    const navigate = useNavigate();
     //我的插件
     const column: TableColumnsType<any> = [
         {
@@ -261,6 +262,16 @@ export const TableHeader = ({
             dataIndex: 'pluginName',
             width: 200,
             align: 'center'
+        },
+        {
+            title: '素材库名称',
+            width: 200,
+            align: 'center',
+            render: (_, row) => (
+                <Button type="link" onClick={() => navigate('/material')}>
+                    {row?.libraryName}
+                </Button>
+            )
         },
         {
             title: '触发器类型',
@@ -1271,6 +1282,7 @@ const MaterialLibraryDetail = ({
     mode: 'preview' | 'page';
     isSelection: boolean;
 }) => {
+    const navigate = useNavigate();
     const [columns, setColumns] = useState<any>([]);
     const [tableData, setTableData] = useState<any>([]);
     const [pluginConfig, setPluginConfig] = useState<any>(null);
@@ -1308,7 +1320,6 @@ const MaterialLibraryDetail = ({
 
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const el = document.querySelector('.MuiContainer-root');

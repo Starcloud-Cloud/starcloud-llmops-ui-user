@@ -750,7 +750,6 @@ function CreateDetail() {
     const permissions = useUserStore((state) => state.permissions);
 
     //检测 model
-    console.log(detail?.workflowConfig);
 
     useEffect(() => {
         if (detail?.workflowConfig?.steps?.length === 1) {
@@ -1216,6 +1215,37 @@ function CreateDetail() {
                                     newData.workflowConfig.steps = newList;
                                     detailRef.current = newData;
                                     setDetail(detailRef?.current);
+                                } else {
+                                    const newData = _.cloneDeep(detailRef.current);
+                                    newData.workflowConfig.steps.forEach((item: any) => {
+                                        if (item?.flowStep?.handler === 'CustomActionHandler') {
+                                            const num = item.variable.variables?.findIndex(
+                                                (item: any) => item.field === 'CUSTOM_REQUIREMENT'
+                                            );
+                                            const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                                            const num2 = item.variable.variables?.findIndex(
+                                                (item: any) => item.field === 'PARODY_REQUIREMENT'
+                                            );
+                                            const type = item?.variable?.variables?.find(
+                                                (item: any) => item?.field === 'GENERATE_MODE'
+                                            )?.value;
+                                            if (type === 'RANDOM') {
+                                                item.variable.variables[num].isShow = false;
+                                                item.variable.variables[num1].isShow = true;
+                                                item.variable.variables[num2].isShow = false;
+                                            } else if (type === 'AI_PARODY') {
+                                                item.variable.variables[num].isShow = false;
+                                                item.variable.variables[num1].isShow = true;
+                                                item.variable.variables[num2].isShow = true;
+                                            } else {
+                                                item.variable.variables[num].isShow = true;
+                                                item.variable.variables[num1].isShow = false;
+                                                item.variable.variables[num2].isShow = false;
+                                            }
+                                        }
+                                    });
+                                    detailRef.current = newData;
+                                    setDetail(detailRef?.current);
                                 }
 
                                 setChangePre(changePre + 1);
@@ -1253,6 +1283,7 @@ function CreateDetail() {
                     {permissions.includes('app:flow') && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
+                                ref={arrangeRef}
                                 className="overflow-y-auto mt-[-16px]"
                                 style={{
                                     height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 210px)',
@@ -1271,7 +1302,6 @@ function CreateDetail() {
                                 <div className="flex justify-center">
                                     <div className={`xl:w-[80%] lg:w-full pb-4`}>
                                         <Arrange
-                                            ref={arrangeRef}
                                             detail={detail}
                                             setdetail={(data: any) => {
                                                 flowDataRef.current = data;

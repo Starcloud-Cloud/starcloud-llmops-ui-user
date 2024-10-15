@@ -507,32 +507,30 @@ const StepEdit = ({
                         </DndContext>
                     </Tabs.TabPane>
                 )}
-                {handler !== 'VariableActionHandler' &&
-                    // && handler !== 'AssembleActionHandler'
-                    handler !== 'PosterActionHandler' && (
-                        <Tabs.TabPane tab="变量" key="3">
-                            {handler === 'OpenAIChatActionHandler' && (
-                                <div className="flex justify-end items-center mb-4">
-                                    <div className="flex gap-2">
-                                        <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
-                                            <InfoCircleOutlined className="cursor-pointer" />
-                                        </Tooltip>
-                                        <Button
-                                            size="small"
-                                            type="primary"
-                                            onClick={() => {
-                                                setOpen(true);
-                                                setTitle('新增');
-                                            }}
-                                        >
-                                            新增
-                                        </Button>
-                                    </div>
+                {handler !== 'VariableActionHandler' && handler !== 'AssembleActionHandler' && handler !== 'PosterActionHandler' && (
+                    <Tabs.TabPane tab="变量" key="3">
+                        {handler === 'OpenAIChatActionHandler' && (
+                            <div className="flex justify-end items-center mb-4">
+                                <div className="flex gap-2">
+                                    <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量'}>
+                                        <InfoCircleOutlined className="cursor-pointer" />
+                                    </Tooltip>
+                                    <Button
+                                        size="small"
+                                        type="primary"
+                                        onClick={() => {
+                                            setOpen(true);
+                                            setTitle('新增');
+                                        }}
+                                    >
+                                        新增
+                                    </Button>
                                 </div>
-                            )}
-                            <Table rowKey={(record: any) => record.field} columns={columns} dataSource={variable} pagination={false} />
-                        </Tabs.TabPane>
-                    )}
+                            </div>
+                        )}
+                        <Table rowKey={(record: any) => record.field} columns={columns} dataSource={variable} pagination={false} />
+                    </Tabs.TabPane>
+                )}
                 {handler !== 'MaterialActionHandler' &&
                     handler !== 'VariableActionHandler' &&
                     handler !== 'AssembleActionHandler' &&
@@ -575,42 +573,40 @@ const StepEdit = ({
                             )}
                         </Tabs.TabPane>
                     )}
-                {handler !== 'VariableActionHandler' &&
-                    //  && handler !== 'AssembleActionHandler'
-                    handler !== 'MaterialActionHandler' && (
-                        <Tabs.TabPane tab="返回结果" key="6">
-                            <FormControl fullWidth>
-                                <InputLabel color="secondary" id="responent">
-                                    响应类型
-                                </InputLabel>
-                                <Select
-                                    disabled={resReadOnly}
-                                    color="secondary"
-                                    onChange={(e) => {
-                                        basisChange({ e: e.target, index, i: 0, flag: false });
-                                    }}
-                                    name="type"
-                                    labelId="responent"
-                                    value={resType}
-                                    label="响应类型"
-                                >
-                                    <MenuItem value={'TEXT'}>文本类型</MenuItem>
-                                    <MenuItem value={'JSON'}>JSON 类型</MenuItem>
-                                </Select>
-                            </FormControl>
-                            {resType === 'JSON' && (
-                                <TextArea
-                                    disabled={resReadOnly}
-                                    defaultValue={resJsonSchema}
-                                    className="mt-[16px]"
-                                    style={{ height: '200px' }}
-                                    onBlur={(e) => {
-                                        basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
-                                    }}
-                                />
-                            )}
-                        </Tabs.TabPane>
-                    )}
+                {handler !== 'VariableActionHandler' && handler !== 'AssembleActionHandler' && handler !== 'MaterialActionHandler' && (
+                    <Tabs.TabPane tab="返回结果" key="6">
+                        <FormControl fullWidth>
+                            <InputLabel color="secondary" id="responent">
+                                响应类型
+                            </InputLabel>
+                            <Select
+                                disabled={resReadOnly}
+                                color="secondary"
+                                onChange={(e) => {
+                                    basisChange({ e: e.target, index, i: 0, flag: false });
+                                }}
+                                name="type"
+                                labelId="responent"
+                                value={resType}
+                                label="响应类型"
+                            >
+                                <MenuItem value={'TEXT'}>文本类型</MenuItem>
+                                <MenuItem value={'JSON'}>JSON 类型</MenuItem>
+                            </Select>
+                        </FormControl>
+                        {resType === 'JSON' && (
+                            <TextArea
+                                disabled={resReadOnly}
+                                defaultValue={resJsonSchema}
+                                className="mt-[16px]"
+                                style={{ height: '200px' }}
+                                onBlur={(e) => {
+                                    basisChange({ e: { name: 'output', value: e.target.value }, index, i: 0, flag: false });
+                                }}
+                            />
+                        )}
+                    </Tabs.TabPane>
+                )}
             </Tabs>
             {open && (
                 <ArrangeModal

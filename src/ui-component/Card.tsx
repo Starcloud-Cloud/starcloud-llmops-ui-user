@@ -195,7 +195,7 @@ const Cards = ({ flag = false }) => {
                         <ListItemText sx={{ mt: 0 }}>
                             <Box display="inline-block" padding="4px 10px" border="1px solid #bdbdbd" borderRadius="5px">
                                 {/* {userInfo?.userLevel ? t('user.' + userInfo?.userLevel) : t('user.free')} */}
-                                {allDetail?.allDetail?.levels[0]?.levelName}
+                                {allDetail?.allDetail?.levels[0]?.levelName || '免费版'}
                             </Box>
                         </ListItemText>
                         <ListItemText sx={{ mt: 0 }}>

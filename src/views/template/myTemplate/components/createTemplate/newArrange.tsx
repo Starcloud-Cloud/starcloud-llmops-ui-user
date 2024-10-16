@@ -11,6 +11,7 @@ import { useState, useEffect, memo, useMemo } from 'react';
 import _ from 'lodash-es';
 function Arrange({
     detail,
+    setdetail,
     config,
     variableStyle,
     editChange,
@@ -144,114 +145,76 @@ function Arrange({
     }
     return (
         <Box>
-            {config?.steps?.map((item: any, index: number) => (
-                <div key={item?.field}>
-                    {index !== 0 && (
-                        <div className="flex justify-center my-4">
-                            <South />
-                        </div>
-                    )}
-                    <Accordion
-                        key={item?.flowStep?.handler}
-                        className="before:border-none !m-0 border border-solid border-black/20 rounded-lg"
-                    >
-                        <AccordionSummary
-                            className="p-0 !min-h-0 !h-[70px] bg-black/10"
-                            sx={{
-                                '& .Mui-expanded': {
-                                    m: '0 !important'
-                                },
-                                '& .MuiAccordionSummary-content': {
-                                    m: '0 !important'
-                                },
-                                '& .Mui-expanded .aaa': {
-                                    transition: 'transform 0.4s',
-                                    transform: 'rotate(0deg)'
-                                }
-                            }}
-                        >
-                            <div className="w-full flex justify-between items-center">
-                                <div className="flex gap-2 items-center flex-1">
-                                    <div className="w-[24px]">
-                                        <ExpandMore className="aaa -rotate-90" />
-                                    </div>
-                                    <Image preview={false} style={{ width: '25px', height: '25px' }} src={getImage(item.flowStep.icon)} />
-                                    <div className="w-full flex flex-col justify-center">
-                                        {editStatus[index] ? (
-                                            <TextField
-                                                color="secondary"
-                                                onBlur={(e) => {
-                                                    const newValue = _.cloneDeep(editStatus);
-                                                    newValue[index] = false;
-                                                    setEditStatus(newValue);
-                                                    if (e.target.value) {
-                                                        editChange({
-                                                            num: index,
-                                                            label: 'name',
-                                                            value: e.target.value,
-                                                            flag: true
-                                                        });
-                                                    }
-                                                }}
-                                                name="name"
-                                                className="w-[200px]"
-                                                autoFocus
-                                                defaultValue={item?.name}
-                                                variant="standard"
-                                            />
-                                        ) : (
-                                            <div className="flex items-center">
-                                                <div className="font-bold text-[16px] whitespace-nowrap">{item.name}</div>
-                                                <Tooltip placement="top" title={t('market.editName')}>
-                                                    <IconButton
-                                                        onClick={(e) => {
-                                                            const newList = _.cloneDeep(editStatus);
-                                                            newList[index] = true;
-                                                            setEditStatus(newList);
-                                                            e.stopPropagation();
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        <BorderColor fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
+            {config?.steps?.map(
+                (item: any, index: number) =>
+                    item?.flowStep?.handler !== 'CustomActionHandler' && (
+                        <div key={item?.field}>
+                            {index !== 0 && (
+                                <div className="flex justify-center my-4">
+                                    <South />
+                                </div>
+                            )}
+                            <Accordion
+                                key={item?.flowStep?.handler}
+                                className="before:border-none !m-0 border border-solid border-black/20 rounded-lg"
+                            >
+                                <AccordionSummary
+                                    className="p-0 !min-h-0 !h-[70px] bg-black/10"
+                                    sx={{
+                                        '& .Mui-expanded': {
+                                            m: '0 !important'
+                                        },
+                                        '& .MuiAccordionSummary-content': {
+                                            m: '0 !important'
+                                        },
+                                        '& .Mui-expanded .aaa': {
+                                            transition: 'transform 0.4s',
+                                            transform: 'rotate(0deg)'
+                                        }
+                                    }}
+                                >
+                                    <div className="w-full flex justify-between items-center">
+                                        <div className="flex gap-2 items-center flex-1">
+                                            <div className="w-[24px]">
+                                                <ExpandMore className="aaa -rotate-90" />
                                             </div>
-                                        )}
-                                        {descStatus[index] ? (
-                                            <TextField
-                                                className="h-[30px]"
-                                                color="secondary"
-                                                onBlur={(e) => {
-                                                    const newValue = _.cloneDeep(descStatus);
-                                                    newValue[index] = false;
-                                                    setDescStatus(newValue);
-                                                    if (e.target.value) {
-                                                        editChange({
-                                                            num: index,
-                                                            label: e.target.name,
-                                                            value: e.target.value
-                                                        });
-                                                    }
-                                                }}
-                                                autoFocus
-                                                name="description"
-                                                fullWidth
-                                                defaultValue={item.description}
-                                                variant="standard"
+                                            <Image
+                                                preview={false}
+                                                style={{ width: '25px', height: '25px' }}
+                                                src={getImage(item.flowStep.icon)}
                                             />
-                                        ) : (
-                                            <div className="flex items-center">
-                                                <div className="max-w-[500px] text-xs text-black/50 line-clamp-1">{item.description}</div>
-                                                {item?.flowStep?.handler !== 'MaterialActionHandler' &&
-                                                    item?.flowStep?.handler !== 'VariableActionHandler' &&
-                                                    item?.flowStep?.handler !== 'AssembleActionHandler' &&
-                                                    item?.flowStep?.handler !== 'PosterActionHandler' && (
-                                                        <Tooltip placement="top" title={'编辑步骤描述'}>
+                                            <div className="w-full flex flex-col justify-center">
+                                                {editStatus[index] ? (
+                                                    <TextField
+                                                        color="secondary"
+                                                        onBlur={(e) => {
+                                                            const newValue = _.cloneDeep(editStatus);
+                                                            newValue[index] = false;
+                                                            setEditStatus(newValue);
+                                                            if (e.target.value) {
+                                                                editChange({
+                                                                    num: index,
+                                                                    label: 'name',
+                                                                    value: e.target.value,
+                                                                    flag: true
+                                                                });
+                                                            }
+                                                        }}
+                                                        name="name"
+                                                        className="w-[200px]"
+                                                        autoFocus
+                                                        defaultValue={item?.name}
+                                                        variant="standard"
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center">
+                                                        <div className="font-bold text-[16px] whitespace-nowrap">{item.name}</div>
+                                                        <Tooltip placement="top" title={t('market.editName')}>
                                                             <IconButton
                                                                 onClick={(e) => {
-                                                                    const newList = _.cloneDeep(descStatus);
+                                                                    const newList = _.cloneDeep(editStatus);
                                                                     newList[index] = true;
-                                                                    setDescStatus(newList);
+                                                                    setEditStatus(newList);
                                                                     e.stopPropagation();
                                                                 }}
                                                                 size="small"
@@ -259,209 +222,273 @@ function Arrange({
                                                                 <BorderColor fontSize="small" />
                                                             </IconButton>
                                                         </Tooltip>
-                                                    )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                {item?.flowStep?.handler !== 'MaterialActionHandler' &&
-                                    item?.flowStep?.handler !== 'PosterActionHandler' &&
-                                    item?.flowStep?.handler !== 'AssembleActionHandler' && (
-                                        <Dropdown
-                                            placement="bottom"
-                                            menu={{
-                                                items: [
-                                                    {
-                                                        key: '1',
-                                                        label: ' 向上',
-                                                        disabled:
-                                                            index === 0 ||
-                                                            item?.flowStep.handler === 'VariableActionHandler' ||
-                                                            config?.steps[index - 1]?.flowStep.handler === 'MaterialActionHandler' ||
-                                                            config?.steps[index - 1]?.flowStep.handler === 'VariableActionHandler',
-                                                        icon: <VerticalAlignTopOutlined />
-                                                    },
-                                                    {
-                                                        key: '2',
-                                                        label: ' 向下',
-                                                        disabled:
-                                                            config?.steps?.length - 1 === index ||
-                                                            config?.steps[index + 1]?.flowStep.handler === 'AssembleActionHandler' ||
-                                                            item.flowStep.handler === 'VariableActionHandler',
-
-                                                        icon: <VerticalAlignBottomOutlined />
-                                                    },
-                                                    {
-                                                        key: '3',
-                                                        label: ' 复制',
-                                                        disabled: item.flowStep.handler === 'VariableActionHandler',
-                                                        icon: <CopyOutlined />
-                                                    },
-                                                    {
-                                                        key: '4',
-                                                        label: '删除',
-                                                        icon: <DeleteOutlined />
-                                                    }
-                                                ],
-                                                onClick: (e: any) => {
-                                                    switch (e.key) {
-                                                        case '1':
-                                                            stepMove(index, -1);
-                                                            break;
-                                                        case '2':
-                                                            stepMove(index, 1);
-                                                            break;
-                                                        case '3':
-                                                            copyStep(item, index);
-                                                            break;
-                                                        case '4':
-                                                            delStep(index);
-                                                            break;
-                                                    }
-                                                    e.domEvent.stopPropagation();
-                                                }
-                                            }}
-                                            trigger={['click']}
-                                        >
-                                            <IconButton size="small" onClick={(e) => e.stopPropagation()}>
-                                                <MoreVert />
-                                            </IconButton>
-                                        </Dropdown>
-                                    )}
-                            </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <StepEdit
-                                detail={detail}
-                                appUid={detail?.uid}
-                                variableStyle={variableStyle}
-                                index={index}
-                                variable={item?.variable?.variables}
-                                upHandler={upHandler}
-                                syszanVariable={
-                                    item?.flowStep?.variable?.variables?.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')
-                                        ?.value
-                                }
-                                setVariable={(data: any, flag?: boolean) => {
-                                    const newData = _.cloneDeep(config);
-                                    if (flag) {
-                                        newData.steps.find(
-                                            (i: any) => i.flowStep.handler === 'PosterActionHandler'
-                                        ).flowStep.variable.variables = data;
-                                        console.log(newData);
-                                    } else {
-                                        newData.steps[index].variable.variables = data;
-                                    }
-                                    changeConfigs(newData);
-                                }}
-                                variables={item?.flowStep?.variable?.variables}
-                                fields={item?.fields}
-                                handler={item?.flowStep?.handler}
-                                basisChange={basisChange}
-                                resReadOnly={item?.flowStep?.response?.readOnly}
-                                resType={item?.flowStep?.response?.type}
-                                resJsonSchema={item?.flowStep?.response?.output?.jsonSchema}
-                                saveImageStyle={saveImageStyle}
-                                setTableTitle={setTableTitle}
-                            />
-                        </AccordionDetails>
-                    </Accordion>
-                    {(item?.flowStep.handler === 'OpenAIChatActionHandler' ||
-                        index !== 0 ||
-                        config?.steps[1]?.flowStep.handler !== 'VariableActionHandler') &&
-                        item?.flowStep.handler !== 'AssembleActionHandler' &&
-                        item?.flowStep.handler !== 'PosterActionHandler' && (
-                            <>
-                                <div className="flex justify-center my-4">
-                                    <div className="h-[20px] w-[2px] bg-black/80"></div>
-                                </div>
-                                <Popover
-                                    open={stepOpen[index]}
-                                    placement="bottom"
-                                    trigger={'click'}
-                                    onOpenChange={(open: boolean) => {
-                                        const newList = _.cloneDeep(stepOpen);
-                                        newList[index] = open;
-                                        setStepOpen(newList);
-                                    }}
-                                    content={
-                                        <div className="lg:w-[700px] md:w-[80%] flex gap-2 flex-wrap">
-                                            {stepLists
-                                                ?.filter((item) => {
-                                                    if (index === 0) {
-                                                        return (
-                                                            item.flowStep.handler !== 'MaterialActionHandler' &&
-                                                            item.flowStep.handler !== 'PosterActionHandler' &&
-                                                            item.flowStep.handler !== 'AssembleActionHandler'
-                                                        );
-                                                    } else {
-                                                        return (
-                                                            item.flowStep.handler !== 'MaterialActionHandler' &&
-                                                            item.flowStep.handler !== 'PosterActionHandler' &&
-                                                            item.flowStep.handler !== 'AssembleActionHandler' &&
-                                                            item.flowStep.handler !== 'VariableActionHandler'
-                                                        );
-                                                    }
-                                                })
-                                                ?.map((el) => (
-                                                    <div
-                                                        key={el?.field}
-                                                        onClick={() => {
-                                                            if (
-                                                                index === 0 &&
-                                                                el.flowStep.handler === 'VariableActionHandler' &&
-                                                                config?.steps?.find(
-                                                                    (i: any) => i.flowStep.handler === 'VariableActionHandler'
-                                                                )
-                                                            ) {
-                                                                dispatch(
-                                                                    openSnackbar({
-                                                                        open: true,
-                                                                        message: '全局变量已经存在',
-                                                                        variant: 'alert',
-                                                                        alert: {
-                                                                            color: 'error'
-                                                                        },
-                                                                        anchorOrigin: {
-                                                                            vertical: 'top',
-                                                                            horizontal: 'center'
-                                                                        },
-                                                                        close: false
-                                                                    })
-                                                                );
-                                                            } else {
-                                                                addStep(el, index);
+                                                    </div>
+                                                )}
+                                                {descStatus[index] ? (
+                                                    <TextField
+                                                        className="h-[30px]"
+                                                        color="secondary"
+                                                        onBlur={(e) => {
+                                                            const newValue = _.cloneDeep(descStatus);
+                                                            newValue[index] = false;
+                                                            setDescStatus(newValue);
+                                                            if (e.target.value) {
+                                                                editChange({
+                                                                    num: index,
+                                                                    label: e.target.name,
+                                                                    value: e.target.value
+                                                                });
                                                             }
                                                         }}
-                                                        className="!w-[calc(50%-0.25rem)] flex gap-2 items-center hover:shadow-md cursor-pointer p-2 rounded-md"
-                                                    >
-                                                        <div className="border border-solid border-[rgba(76,76,102,.1)] rounded-lg p-2 ">
-                                                            <Image
-                                                                preview={false}
-                                                                width={40}
-                                                                height={40}
-                                                                src={getImage(el?.flowStep?.icon)}
-                                                            />
+                                                        autoFocus
+                                                        name="description"
+                                                        fullWidth
+                                                        defaultValue={item.description}
+                                                        variant="standard"
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center">
+                                                        <div className="max-w-[500px] text-xs text-black/50 line-clamp-1">
+                                                            {item.description}
                                                         </div>
-                                                        <div className="flex justify-between gap-2 flex-col">
-                                                            <div className="text-[16px] font-bold">{el?.name}</div>
-                                                            <div className="h-[48px] text-xs text-black/50 line-clamp-3">
-                                                                {el.description}
-                                                            </div>
-                                                        </div>
+                                                        {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                                            item?.flowStep?.handler !== 'VariableActionHandler' &&
+                                                            item?.flowStep?.handler !== 'AssembleActionHandler' &&
+                                                            item?.flowStep?.handler !== 'PosterActionHandler' && (
+                                                                <Tooltip placement="top" title={'编辑步骤描述'}>
+                                                                    <IconButton
+                                                                        onClick={(e) => {
+                                                                            const newList = _.cloneDeep(descStatus);
+                                                                            newList[index] = true;
+                                                                            setDescStatus(newList);
+                                                                            e.stopPropagation();
+                                                                        }}
+                                                                        size="small"
+                                                                    >
+                                                                        <BorderColor fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            )}
                                                     </div>
-                                                ))}
+                                                )}
+                                            </div>
                                         </div>
-                                    }
-                                >
-                                    <div className="flex justify-center cursor-pointer">
-                                        <AddCircleSharp color="secondary" />
+                                        {item?.flowStep?.handler !== 'MaterialActionHandler' &&
+                                            item?.flowStep?.handler !== 'PosterActionHandler' &&
+                                            item?.flowStep?.handler !== 'AssembleActionHandler' && (
+                                                <Dropdown
+                                                    placement="bottom"
+                                                    menu={{
+                                                        items: [
+                                                            {
+                                                                key: '1',
+                                                                label: ' 向上',
+                                                                disabled:
+                                                                    index === 0 ||
+                                                                    item?.flowStep.handler === 'VariableActionHandler' ||
+                                                                    config?.steps[index - 1]?.flowStep.handler ===
+                                                                        'MaterialActionHandler' ||
+                                                                    config?.steps[index - 1]?.flowStep.handler === 'VariableActionHandler',
+                                                                icon: <VerticalAlignTopOutlined />
+                                                            },
+                                                            {
+                                                                key: '2',
+                                                                label: ' 向下',
+                                                                disabled:
+                                                                    config?.steps?.length - 1 === index ||
+                                                                    config?.steps[index + 1]?.flowStep.handler ===
+                                                                        'AssembleActionHandler' ||
+                                                                    item.flowStep.handler === 'VariableActionHandler',
+
+                                                                icon: <VerticalAlignBottomOutlined />
+                                                            },
+                                                            {
+                                                                key: '3',
+                                                                label: ' 复制',
+                                                                disabled: item.flowStep.handler === 'VariableActionHandler',
+                                                                icon: <CopyOutlined />
+                                                            },
+                                                            {
+                                                                key: '4',
+                                                                label: '删除',
+                                                                icon: <DeleteOutlined />
+                                                            }
+                                                        ],
+                                                        onClick: (e: any) => {
+                                                            switch (e.key) {
+                                                                case '1':
+                                                                    stepMove(index, -1);
+                                                                    break;
+                                                                case '2':
+                                                                    stepMove(index, 1);
+                                                                    break;
+                                                                case '3':
+                                                                    copyStep(item, index);
+                                                                    break;
+                                                                case '4':
+                                                                    delStep(index);
+                                                                    break;
+                                                            }
+                                                            e.domEvent.stopPropagation();
+                                                        }
+                                                    }}
+                                                    trigger={['click']}
+                                                >
+                                                    <IconButton size="small" onClick={(e) => e.stopPropagation()}>
+                                                        <MoreVert />
+                                                    </IconButton>
+                                                </Dropdown>
+                                            )}
                                     </div>
-                                </Popover>
-                            </>
-                        )}
-                </div>
-            ))}
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <StepEdit
+                                        detail={detail}
+                                        setdetail={setdetail}
+                                        stepLists={stepLists}
+                                        appUid={detail?.uid}
+                                        variableStyle={variableStyle}
+                                        index={index}
+                                        variable={item?.variable?.variables}
+                                        upHandler={upHandler}
+                                        syszanVariable={
+                                            item?.flowStep?.variable?.variables?.find(
+                                                (item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG'
+                                            )?.value
+                                        }
+                                        setVariable={(data: any, flag?: boolean) => {
+                                            const newData = _.cloneDeep(config);
+                                            if (flag) {
+                                                newData.steps.find(
+                                                    (i: any) => i.flowStep.handler === 'PosterActionHandler'
+                                                ).flowStep.variable.variables = data;
+                                                console.log(newData);
+                                            } else {
+                                                newData.steps[index].variable.variables = data;
+                                            }
+                                            changeConfigs(newData);
+                                        }}
+                                        variables={item?.flowStep?.variable?.variables}
+                                        fields={item?.fields}
+                                        handler={item?.flowStep?.handler}
+                                        basisChange={basisChange}
+                                        resReadOnly={item?.flowStep?.response?.readOnly}
+                                        resType={item?.flowStep?.response?.type}
+                                        resJsonSchema={item?.flowStep?.response?.output?.jsonSchema}
+                                        saveImageStyle={saveImageStyle}
+                                        setTableTitle={setTableTitle}
+                                    />
+                                </AccordionDetails>
+                            </Accordion>
+                            {
+                                // (item?.flowStep.handler === 'OpenAIChatActionHandler' ||
+                                // index !== 0 ||
+                                // config?.steps[1]?.flowStep.handler !== 'VariableActionHandler') &&
+                                // item?.flowStep.handler !== 'AssembleActionHandler' &&
+                                // item?.flowStep.handler !== 'PosterActionHandler' &&
+
+                                (item?.flowStep.handler === 'OpenAIChatActionHandler' ||
+                                    index !== 0 ||
+                                    config?.steps[1]?.flowStep.handler !== 'VariableActionHandler') &&
+                                    item?.flowStep.handler !== 'VariableActionHandler' &&
+                                    item?.flowStep.handler !== 'AssembleActionHandler' &&
+                                    item?.flowStep.handler !== 'AssembleActionHandler' &&
+                                    item?.flowStep.handler !== 'PosterActionHandler' && (
+                                        <>
+                                            <div className="flex justify-center my-4">
+                                                <div className="h-[20px] w-[2px] bg-black/80"></div>
+                                            </div>
+                                            <Popover
+                                                open={stepOpen[index]}
+                                                placement="bottom"
+                                                trigger={'click'}
+                                                onOpenChange={(open: boolean) => {
+                                                    const newList = _.cloneDeep(stepOpen);
+                                                    newList[index] = open;
+                                                    setStepOpen(newList);
+                                                }}
+                                                content={
+                                                    <div className="lg:w-[700px] md:w-[80%] flex gap-2 flex-wrap">
+                                                        {stepLists
+                                                            ?.filter((item) => {
+                                                                if (index === 0) {
+                                                                    return (
+                                                                        item.flowStep.handler !== 'MaterialActionHandler' &&
+                                                                        item.flowStep.handler !== 'PosterActionHandler' &&
+                                                                        item.flowStep.handler !== 'CustomActionHandler' &&
+                                                                        item.flowStep.handler !== 'AssembleActionHandler'
+                                                                    );
+                                                                } else {
+                                                                    return (
+                                                                        item.flowStep.handler !== 'MaterialActionHandler' &&
+                                                                        item.flowStep.handler !== 'PosterActionHandler' &&
+                                                                        item.flowStep.handler !== 'CustomActionHandler' &&
+                                                                        item.flowStep.handler !== 'AssembleActionHandler' &&
+                                                                        item.flowStep.handler !== 'VariableActionHandler'
+                                                                    );
+                                                                }
+                                                            })
+                                                            ?.map((el) => (
+                                                                <div
+                                                                    key={el?.field}
+                                                                    onClick={() => {
+                                                                        if (
+                                                                            index === 0 &&
+                                                                            el.flowStep.handler === 'VariableActionHandler' &&
+                                                                            config?.steps?.find(
+                                                                                (i: any) => i.flowStep.handler === 'VariableActionHandler'
+                                                                            )
+                                                                        ) {
+                                                                            dispatch(
+                                                                                openSnackbar({
+                                                                                    open: true,
+                                                                                    message: '全局变量已经存在',
+                                                                                    variant: 'alert',
+                                                                                    alert: {
+                                                                                        color: 'error'
+                                                                                    },
+                                                                                    anchorOrigin: {
+                                                                                        vertical: 'top',
+                                                                                        horizontal: 'center'
+                                                                                    },
+                                                                                    close: false
+                                                                                })
+                                                                            );
+                                                                        } else {
+                                                                            addStep(el, index);
+                                                                        }
+                                                                    }}
+                                                                    className="!w-[calc(50%-0.25rem)] flex gap-2 items-center hover:shadow-md cursor-pointer p-2 rounded-md"
+                                                                >
+                                                                    <div className="border border-solid border-[rgba(76,76,102,.1)] rounded-lg p-2 ">
+                                                                        <Image
+                                                                            preview={false}
+                                                                            width={40}
+                                                                            height={40}
+                                                                            src={getImage(el?.flowStep?.icon)}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex justify-between gap-2 flex-col">
+                                                                        <div className="text-[16px] font-bold">{el?.name}</div>
+                                                                        <div className="h-[48px] text-xs text-black/50 line-clamp-3">
+                                                                            {el.description}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                    </div>
+                                                }
+                                            >
+                                                <div className="flex justify-center cursor-pointer">
+                                                    <AddCircleSharp color="secondary" />
+                                                </div>
+                                            </Popover>
+                                        </>
+                                    )
+                            }
+                        </div>
+                    )
+            )}
         </Box>
     );
 }

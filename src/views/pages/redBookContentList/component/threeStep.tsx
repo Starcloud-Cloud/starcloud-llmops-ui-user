@@ -210,22 +210,19 @@ const ThreeStep = ({
     const timer = useRef<any>(null);
 
     //下载图片
+    const [downLoading, setDownLoading] = useState(false);
     const downLoadImage = () => {
-        console.log(imageList);
+        setDownLoading(true);
         const zip = new JSZip();
         const promises = imageList.map(async (imageUrl: any, index: number) => {
             const response = await fetch(imageUrl.url);
-            console.log(response);
-
             const arrayBuffer = await response.arrayBuffer();
-            console.log(imageUrl?.url?.split('.')[imageUrl?.url?.split('.')?.length - 1]);
-
             zip.file('image' + (index + 1) + `.${imageUrl?.url?.split('.')[imageUrl?.url?.split('.')?.length - 1]}`, arrayBuffer);
+            zip.file(title + '.txt', text);
         });
-        console.log(promises);
         Promise.all(promises)
             .then(() => {
-                console.log(promises);
+                setDownLoading(false);
                 zip.generateAsync({ type: 'blob' }).then((content: any) => {
                     const url = window.URL.createObjectURL(content);
                     const a = document.createElement('a');
@@ -236,6 +233,7 @@ const ThreeStep = ({
                 });
             })
             .catch((error) => {
+                setDownLoading(false);
                 console.error('Error downloading images:', error);
             });
     };
@@ -275,7 +273,7 @@ const ThreeStep = ({
                             {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
                                 <Space>
-                                    <Button type="primary" onClick={downLoadImage}>
+                                    <Button type="primary" loading={downLoading} onClick={downLoadImage}>
                                         打包下载
                                     </Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>

@@ -1,6 +1,6 @@
-import { Menu, MenuProps, Empty, Spin, Modal, Checkbox, Tag, Image, Tabs } from 'antd';
+import { Menu, MenuProps, Empty, Spin, Modal, Checkbox, Tag, Image, Tabs, Button } from 'antd';
 import { materialGroup_detail } from 'api/template';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash-es';
 
 export const SelectTemplateModal = ({
@@ -54,6 +54,10 @@ export const SelectTemplateModal = ({
             });
             setMyMenuList(myMenus);
             setSystermMenuList(systerMenus);
+            setTimeout(() => {
+                setMenuHeight(MenuRef?.current?.offsetHeight);
+            }, 1);
+
             setSysterType([systerMenus?.[0]?.value]);
             setMyType([myMenus?.[0]?.value]);
             setMyTemplateList(myMenus?.[0]?.list);
@@ -80,123 +84,145 @@ export const SelectTemplateModal = ({
     const [groupLoading, setGroupLoading] = useState(false);
     const [boxValue, setBoxValue] = useState<any[]>([]);
     const [groupList, setGroupList] = useState<any[]>([]);
+    const MenuRef = useRef<any>(null);
+    const [menuHeight, setMenuHeight] = useState(0);
     return (
         <Modal open={open} onCancel={handleClose} footer={false} width="70%" className="top-[40px]" title="选择图片模版组">
             <Spin spinning={spinLoading}>
-                <Tabs
-                    items={[
-                        {
-                            label: '系统模版',
-                            key: '1',
-                            children: (
-                                <div className="flex">
-                                    <div className="w-[145px] overflow-y-auto h-[85vh]">
-                                        <Menu
-                                            onClick={onClick1}
-                                            style={{ width: 140 }}
-                                            selectedKeys={systerType}
-                                            mode="inline"
-                                            items={systermMenuList}
-                                        />
-                                    </div>
-                                    {systerTemplateList?.length ? (
-                                        <div className="h-[85vh] overflow-auto flex-1">
-                                            <div className="grid grid-cols-5 grid-rows-[auto] gap-2 overflow-y-auto p-1">
-                                                {systerTemplateList.map((v: any, i) => (
-                                                    <div key={i} className="relative group">
-                                                        <img
-                                                            className={`w-full rounded-lg cursor-pointer aspect-[199/265] object-cover`}
-                                                            // preview={false}
-                                                            loading="lazy"
-                                                            src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
-                                                            onClick={async () => {
-                                                                setGroupLoading(true);
-                                                                const result = await materialGroup_detail({ uid: v.uid });
-                                                                setGroupLoading(false);
-                                                                if (result?.length === 1) {
-                                                                    handleOk(result);
-                                                                } else {
-                                                                    setGroupList(result);
-                                                                    setBoxValue(result?.map((item: any) => item.code));
-                                                                    setGroupOpen(true);
-                                                                }
-                                                            }}
-                                                        />
-                                                        <div className="text-sm font-bold text-center">{v?.name}</div>
-                                                        {v?.materialCount > 1 && (
-                                                            <Tag color="processing" className="absolute top-0 left-0">
-                                                                组合
-                                                            </Tag>
-                                                        )}
-                                                    </div>
-                                                ))}
+                <div className="relactive">
+                    <Tabs
+                        items={[
+                            {
+                                label: '系统模版',
+                                key: '1',
+                                children: (
+                                    <div className="flex">
+                                        <div ref={MenuRef} className="w-[145px] overflow-y-auto max-h-[85vh]">
+                                            <Menu
+                                                onClick={onClick1}
+                                                style={{ width: 140 }}
+                                                selectedKeys={systerType}
+                                                mode="inline"
+                                                items={systermMenuList}
+                                            />
+                                        </div>
+                                        {systerTemplateList?.length ? (
+                                            <div
+                                                style={{
+                                                    height: menuHeight + 'px'
+                                                }}
+                                                className="overflow-auto flex-1"
+                                            >
+                                                <div className="grid grid-cols-5 grid-rows-[auto] gap-2 overflow-y-auto p-1">
+                                                    {systerTemplateList.map((v: any, i) => (
+                                                        <div key={i} className="relative group">
+                                                            <img
+                                                                className={`w-full rounded-lg cursor-pointer aspect-[199/265] object-cover`}
+                                                                // preview={false}
+                                                                loading="lazy"
+                                                                src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
+                                                                onClick={async () => {
+                                                                    setGroupLoading(true);
+                                                                    const result = await materialGroup_detail({ uid: v.uid });
+                                                                    setGroupLoading(false);
+                                                                    if (result?.length === 1) {
+                                                                        handleOk(result);
+                                                                    } else {
+                                                                        setGroupList(result);
+                                                                        setBoxValue(result?.map((item: any) => item.code));
+                                                                        setGroupOpen(true);
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <div className="text-sm font-bold text-center">{v?.name}</div>
+                                                            {v?.materialCount > 1 && (
+                                                                <Tag color="processing" className="absolute top-0 left-0">
+                                                                    组合
+                                                                </Tag>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex justify-center items-center flex-1">
-                                            <Empty />
-                                        </div>
-                                    )}
-                                </div>
-                            )
-                        },
-                        {
-                            label: '我的模版',
-                            key: '2',
-                            children: (
-                                <div className="flex">
-                                    <div className="w-[145px] overflow-y-auto h-[85vh]">
-                                        <Menu
-                                            onClick={onClick2}
-                                            style={{ width: 140 }}
-                                            selectedKeys={myType}
-                                            mode="inline"
-                                            items={myMenuList}
-                                        />
-                                    </div>
-                                    {myTemplateList?.length ? (
-                                        <div className="h-[85vh] overflow-auto flex-1">
-                                            <div className="grid grid-cols-5 grid-rows-[auto] gap-2 overflow-y-auto p-1">
-                                                {myTemplateList.map((v: any, i) => (
-                                                    <div key={i} className="relative group">
-                                                        <img
-                                                            className={`w-full rounded-lg cursor-pointer aspect-[199/265] object-cover`}
-                                                            // preview={false}
-                                                            loading="lazy"
-                                                            src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
-                                                            onClick={async () => {
-                                                                setGroupLoading(true);
-                                                                const result = await materialGroup_detail({ uid: v.uid });
-                                                                setGroupLoading(false);
-                                                                if (result?.length === 1) {
-                                                                    handleOk(result);
-                                                                } else {
-                                                                    setGroupList(result);
-                                                                    setBoxValue(result?.map((item: any) => item.code));
-                                                                    setGroupOpen(true);
-                                                                }
-                                                            }}
-                                                        />
-                                                        <div className="text-sm font-bold text-center">{v?.name}</div>
-                                                        {v?.materialCount > 1 && (
-                                                            <Tag color="processing" className="absolute top-0 left-0">
-                                                                组合
-                                                            </Tag>
-                                                        )}
-                                                    </div>
-                                                ))}
+                                        ) : (
+                                            <div className="flex justify-center items-center flex-1">
+                                                <Empty />
                                             </div>
+                                        )}
+                                    </div>
+                                )
+                            },
+                            {
+                                label: '我的模版',
+                                key: '2',
+                                children: (
+                                    <div className="flex">
+                                        <div className="w-[145px] overflow-y-auto max-h-[85vh]">
+                                            <Menu
+                                                onClick={onClick2}
+                                                style={{ width: 140 }}
+                                                selectedKeys={myType}
+                                                mode="inline"
+                                                items={myMenuList}
+                                            />
                                         </div>
-                                    ) : (
-                                        <div className="flex justify-center items-center flex-1">
-                                            <Empty />
-                                        </div>
-                                    )}
-                                </div>
-                            )
-                        }
-                    ]}
-                />
+                                        {myTemplateList?.length ? (
+                                            <div
+                                                style={{
+                                                    height: menuHeight + 'px'
+                                                }}
+                                                className="overflow-auto flex-1"
+                                            >
+                                                <div className="grid grid-cols-5 grid-rows-[auto] gap-2 overflow-y-auto p-1">
+                                                    {myTemplateList.map((v: any, i) => (
+                                                        <div key={i} className="relative group">
+                                                            <img
+                                                                className={`w-full rounded-lg cursor-pointer aspect-[199/265] object-cover`}
+                                                                // preview={false}
+                                                                loading="lazy"
+                                                                src={v.example + '?x-oss-process=image/resize,w_280/quality,q_60'}
+                                                                onClick={async () => {
+                                                                    setGroupLoading(true);
+                                                                    const result = await materialGroup_detail({ uid: v.uid });
+                                                                    setGroupLoading(false);
+                                                                    if (result?.length === 1) {
+                                                                        handleOk(result);
+                                                                    } else {
+                                                                        setGroupList(result);
+                                                                        setBoxValue(result?.map((item: any) => item.code));
+                                                                        setGroupOpen(true);
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <div className="text-sm font-bold text-center">{v?.name}</div>
+                                                            {v?.materialCount > 1 && (
+                                                                <Tag color="processing" className="absolute top-0 left-0">
+                                                                    组合
+                                                                </Tag>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex justify-center items-center flex-1">
+                                                <Empty />
+                                            </div>
+                                        )}
+                                    </div>
+                                )
+                            }
+                        ]}
+                    />
+                    <div
+                        className="absolute right-2 top-3 font-[600] cursor-pointer text-[12px] text-[#673ab7] border-b border-solid border-[#673ab7]"
+                        onClick={() => {
+                            window.open('https://poster.mofaai.com.cn/#/');
+                        }}
+                    >
+                        设计自己的图片模版
+                    </div>
+                </div>
             </Spin>
             <Modal
                 open={groupOpen}

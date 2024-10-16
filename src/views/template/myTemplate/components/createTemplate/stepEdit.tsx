@@ -23,6 +23,7 @@ import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { v4 as uuidv4 } from 'uuid';
 const ResizeableTitle = (props: any) => {
     const { onResize, width, ...restProps } = props;
 
@@ -73,7 +74,9 @@ const Row: React.FC<RowProps> = (props) => {
 };
 const StepEdit = ({
     detail,
+    setdetail,
     appUid,
+    stepLists,
     variableStyle, //变量类型
     index, //步骤几
     variable, //变量
@@ -91,7 +94,9 @@ const StepEdit = ({
     setTableTitle
 }: {
     detail: any;
+    setdetail: (data: any) => void;
     appUid: string;
+    stepLists: any[];
     variableStyle: any[];
     index: number;
     variable: any[];
@@ -108,6 +113,8 @@ const StepEdit = ({
     saveImageStyle: () => void;
     setTableTitle: () => void;
 }) => {
+    console.log(syszanVariable);
+
     const { TextArea } = Input;
     const groupList = [
         { label: '系统变量', value: 'SYSTEM' },
@@ -257,9 +264,9 @@ const StepEdit = ({
         {
             title: '字段名称',
             align: 'center',
-            width: 400,
+            width: 200,
             required: true,
-            dataIndex: 'columnName',
+            dataIndex: 'name',
             formItemProps: {
                 component: <Input />,
                 rules: [
@@ -270,6 +277,14 @@ const StepEdit = ({
                     {
                         max: 20,
                         message: '字段名称不能超过 20 个字'
+                    },
+                    {
+                        validator: (rule: any, value: any) => {
+                            if (value && editTableData.some((el) => el.name === value)) {
+                                return Promise.reject('字段名称重复');
+                            }
+                            return Promise.resolve();
+                        }
                     }
                 ]
             }
@@ -279,7 +294,7 @@ const StepEdit = ({
             align: 'center',
             width: 400,
             required: true,
-            dataIndex: 'columnDesc',
+            dataIndex: 'description',
             formItemProps: {
                 component: <Input />
             }
@@ -288,9 +303,9 @@ const StepEdit = ({
             title: '字段类型',
             width: 200,
             required: true,
-            dataIndex: 'columnType',
             align: 'center',
             valueType: 'select',
+            dataIndex: 'type',
             fieldProps: {
                 options: materialFieldTypeList
             },
@@ -301,8 +316,7 @@ const StepEdit = ({
                         message: '请选择字段类型'
                     }
                 ]
-            },
-            render: (_: any, row: any) => materialFieldTypeList?.find((item) => item.value === row.type)?.label
+            }
         },
         {
             title: '操作',
@@ -335,15 +349,32 @@ const StepEdit = ({
         }
     };
 
+    const stepEtch = (index: number, name: string): string => {
+        if (editTableData.some((item: { name: string }) => item.name === name + index)) {
+            return stepEtch(index + 1, name);
+        } else {
+            return name + index;
+        }
+    };
+
     useEffect(() => {
-        if (detail) {
+        if (detail && handler === 'AssembleActionHandler') {
             const newList = detail?.workflowConfig?.steps
                 ?.filter((item: any) => item?.flowStep?.handler === 'CustomActionHandler')
-                ?.map((item: any) => ({ ...item, uuid: Date.now() }));
+                ?.map((item: any, index: number) => ({
+                    ...item,
+                    uuid: uuidv4(),
+                    type: item?.variable?.variables?.find((el: any) => el.field === 'GENERATE_MODE')?.value
+                }));
             setEditTableData(newList || []);
             setEditableKeys(newList?.map((item: any) => item.uuid) || []);
         }
     }, [detail]);
+    useEffect(() => {
+        if (editTableData) {
+            setdetail(editTableData);
+        }
+    }, [editTableData]);
     return (
         <div>
             <Tabs>
@@ -423,8 +454,8 @@ const StepEdit = ({
                         />
                     </Tabs.TabPane>
                 )}
-                {/* {handler === 'AssembleActionHandler' && (
-                    <Tabs.TabPane tab="内容生成节点" key="7">
+                {handler === 'AssembleActionHandler' && (
+                    <Tabs.TabPane tab="内容生成字段" key="7">
                         <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
                             <SortableContext items={editTableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
                                 <EditableProTable<any>
@@ -441,9 +472,15 @@ const StepEdit = ({
                                     pagination={false}
                                     recordCreatorProps={{
                                         newRecordType: 'dataSource',
+                                        creatorButtonText: '增加字段',
                                         record: () => ({
-                                            uuid: Date.now(),
-                                            columnType: 'RANDOM'
+                                            uuid: uuidv4(),
+                                            type: 'AI_CUSTOM',
+                                            ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler'),
+                                            name: stepEtch(
+                                                1,
+                                                stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')?.name
+                                            )
                                         })
                                     }}
                                     editable={{
@@ -475,9 +512,10 @@ const StepEdit = ({
                             </SortableContext>
                         </DndContext>
                     </Tabs.TabPane>
-                )} */}
-                {handler !== 'VariableActionHandler' &&
-                    // && handler !== 'AssembleActionHandler'
+                )}
+                {handler !== 'MaterialActionHandler' &&
+                    handler !== 'VariableActionHandler' &&
+                    handler !== 'AssembleActionHandler' &&
                     handler !== 'PosterActionHandler' && (
                         <Tabs.TabPane tab="变量" key="3">
                             {handler === 'OpenAIChatActionHandler' && (
@@ -505,6 +543,7 @@ const StepEdit = ({
                 {handler !== 'MaterialActionHandler' &&
                     handler !== 'VariableActionHandler' &&
                     handler !== 'AssembleActionHandler' &&
+                    handler !== 'PosterActionHandler' &&
                     handler !== 'XhsParseActionHandler' && (
                         <Tabs.TabPane tab="提示词" key="4">
                             {variables?.map(
@@ -528,6 +567,7 @@ const StepEdit = ({
                 {handler !== 'MaterialActionHandler' &&
                     handler !== 'VariableActionHandler' &&
                     handler !== 'AssembleActionHandler' &&
+                    handler !== 'PosterActionHandler' &&
                     handler !== 'XhsParseActionHandler' && (
                         <Tabs.TabPane tab="大模型" key="5">
                             {variables?.map(
@@ -545,7 +585,8 @@ const StepEdit = ({
                         </Tabs.TabPane>
                     )}
                 {handler !== 'VariableActionHandler' &&
-                    //  && handler !== 'AssembleActionHandler'
+                    handler !== 'AssembleActionHandler' &&
+                    handler !== 'PosterActionHandler' &&
                     handler !== 'MaterialActionHandler' && (
                         <Tabs.TabPane tab="返回结果" key="6">
                             <FormControl fullWidth>

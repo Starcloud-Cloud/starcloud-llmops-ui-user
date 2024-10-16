@@ -80,77 +80,72 @@ export const DetailModal = ({ open, isFlag, handleClose, changeList, businessUid
             onCancel={handleClose}
             wrapClassName="wrap-three-step"
             title={
-                <div className="flex">
+                <div className="flex items-start">
                     <span>详情</span>
-                    <div className="flex gap-2 justify-around items-center ml-2">
+                    <div className="ml-2">
                         {!isFlag && (
                             <>
-                                <div className="cursor-pointer">
-                                    {detail?.liked ? (
-                                        <Tooltip title="取消点赞">
-                                            <GradeIcon
-                                                onClick={async (e: any) => {
-                                                    e.stopPropagation();
-                                                    const result = await contentUnlike({ uid: detail.uid });
-                                                    if (result) {
-                                                        setCount((pre) => pre + 1);
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '取消点赞成功',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'success'
-                                                                },
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                transition: 'SlideDown',
-                                                                close: false
-                                                            })
-                                                        );
-                                                    }
-                                                }}
-                                                sx={{ color: '#ecc94b99' }}
-                                            />
-                                        </Tooltip>
-                                    ) : (
-                                        <Tooltip title="点赞">
-                                            <GradeOutlinedIcon
-                                                onClick={async (e: any) => {
-                                                    e.stopPropagation();
-                                                    const result = await contentLike({ uid: detail.uid });
-                                                    if (result) {
-                                                        setCount((pre) => pre + 1);
-                                                        dispatch(
-                                                            openSnackbar({
-                                                                open: true,
-                                                                message: '点赞成功',
-                                                                variant: 'alert',
-                                                                alert: {
-                                                                    color: 'success'
-                                                                },
-                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                                transition: 'SlideDown',
-                                                                close: false
-                                                            })
-                                                        );
-                                                    }
-                                                }}
-                                                sx={{ color: '#0003' }}
-                                            />
-                                        </Tooltip>
-                                    )}
+                                <div className="flex items-center gap-2">
+                                    <div className="cursor-pointer">
+                                        {detail?.liked ? (
+                                            <Tooltip title="取消点赞">
+                                                <GradeIcon
+                                                    onClick={async (e: any) => {
+                                                        e.stopPropagation();
+                                                        const result = await contentUnlike({ uid: detail.uid });
+                                                        if (result) {
+                                                            setCount((pre) => pre + 1);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '取消点赞成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideDown',
+                                                                    close: false
+                                                                })
+                                                            );
+                                                        }
+                                                    }}
+                                                    sx={{ color: '#ecc94b99' }}
+                                                />
+                                            </Tooltip>
+                                        ) : (
+                                            <Tooltip title="点赞">
+                                                <GradeOutlinedIcon
+                                                    onClick={async (e: any) => {
+                                                        e.stopPropagation();
+                                                        const result = await contentLike({ uid: detail.uid });
+                                                        if (result) {
+                                                            setCount((pre) => pre + 1);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '点赞成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideDown',
+                                                                    close: false
+                                                                })
+                                                            );
+                                                        }
+                                                    }}
+                                                    sx={{ color: '#0003' }}
+                                                />
+                                            </Tooltip>
+                                        )}
+                                    </div>
+                                    <Tooltip title="笔记ID">
+                                        <div className="text-xs text-black/50 cursor-pointer">{detail?.uid}</div>
+                                    </Tooltip>
                                 </div>
-                                {/* <div>
-                             <BackupIcon
-                                className="text-gray-500"
-                                onClick={async (e: any) => {
-                                    e.stopPropagation();
-                                }}
-                            />
-                        </div>  */}
-                                <Tooltip title="笔记ID">
-                                    <div className="text-xs text-black/50 cursor-pointer">{detail?.uid}</div>
-                                </Tooltip>
+                                <div className="text-xs font-[400]">耗时 {(detail?.elapsed / 1000)?.toFixed(1)} s</div>
                             </>
                         )}
                     </div>

@@ -10,7 +10,8 @@ import {
     ExclamationCircleFilled,
     DeleteOutlined,
     AppstoreFilled,
-    HistoryOutlined
+    HistoryOutlined,
+    ExclamationCircleOutlined
 } from '@ant-design/icons';
 import {
     Button,
@@ -254,6 +255,7 @@ export const TableHeader = ({
         }
     }, [materialflag]);
 
+    const navigate = useNavigate();
     //我的插件
     const column: TableColumnsType<any> = [
         {
@@ -261,6 +263,16 @@ export const TableHeader = ({
             dataIndex: 'pluginName',
             width: 200,
             align: 'center'
+        },
+        {
+            title: '素材库名称',
+            width: 200,
+            align: 'center',
+            render: (_, row) => (
+                <Button type="link" onClick={() => navigate('/material')}>
+                    {row?.libraryName}
+                </Button>
+            )
         },
         {
             title: '触发器类型',
@@ -469,13 +481,18 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             </Button>
                         </Popconfirm>
                         {canExecute && (
-                            <Button
-                                disabled={selectedRowKeys.length === 0}
-                                type="primary"
-                                onClick={() => handleExecute && handleExecute(selectedRowKeys)}
-                            >
-                                选择执行({selectedRowKeys.length})
-                            </Button>
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    disabled={selectedRowKeys.length === 0 || selectedRowKeys.length > 32}
+                                    type="primary"
+                                    onClick={() => handleExecute && handleExecute(selectedRowKeys)}
+                                >
+                                    选择执行({selectedRowKeys.length})
+                                </Button>
+                                <Tooltip className="cursor-pointer" title="单次最多32条，如需更多可分批执行">
+                                    <ExclamationCircleOutlined />
+                                </Tooltip>
+                            </div>
                         )}
                     </Space>
                 </div>
@@ -1271,6 +1288,7 @@ const MaterialLibraryDetail = ({
     mode: 'preview' | 'page';
     isSelection: boolean;
 }) => {
+    const navigate = useNavigate();
     const [columns, setColumns] = useState<any>([]);
     const [tableData, setTableData] = useState<any>([]);
     const [pluginConfig, setPluginConfig] = useState<any>(null);
@@ -1308,7 +1326,6 @@ const MaterialLibraryDetail = ({
 
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const el = document.querySelector('.MuiContainer-root');

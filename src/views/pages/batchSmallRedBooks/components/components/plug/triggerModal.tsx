@@ -326,7 +326,7 @@ ${JSON.stringify(value, null, 2)}
             ]
         }
     ];
-    const [active,setActive] = useState<any>([])
+    const [active, setActive] = useState<any>([]);
     const handleSave = async () => {
         let formRes: any;
         try {

@@ -716,6 +716,7 @@ const PlugAnalysis = ({
                 </Button>
             </div>
             <ResultLoading
+                tagFlag={true}
                 materialExecutionOpen={materialExecutionOpen}
                 setMaterialExecutionOpen={setMaterialExecutionOpen}
                 materialPre={materialPre}

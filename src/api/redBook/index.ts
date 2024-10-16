@@ -12,8 +12,11 @@ export const getContentPage = (data: any) => {
     return request.get({ url: '/llm/xhs/content/page', params: data });
 };
 
+// export const getContentDetail = (businessUid: string) => {
+//     return request.get({ url: `/llm/xhs/content/detail/${businessUid}` });
+// };
 export const getContentDetail = (businessUid: string) => {
-    return request.get({ url: `/llm/xhs/content/detail/${businessUid}` });
+    return request.get({ url: `/llm/xhs/content/getExample?uid=${businessUid}` });
 };
 export const getContentDetail1 = (businessUid: string) => {
     return request.get({ url: `/llm/xhs/content/exampleDetail/${businessUid}` });

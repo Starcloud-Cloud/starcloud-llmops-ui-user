@@ -10,7 +10,8 @@ import {
     ExclamationCircleFilled,
     DeleteOutlined,
     AppstoreFilled,
-    HistoryOutlined
+    HistoryOutlined,
+    ExclamationCircleOutlined
 } from '@ant-design/icons';
 import {
     Button,
@@ -480,13 +481,18 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             </Button>
                         </Popconfirm>
                         {canExecute && (
-                            <Button
-                                disabled={selectedRowKeys.length === 0}
-                                type="primary"
-                                onClick={() => handleExecute && handleExecute(selectedRowKeys)}
-                            >
-                                选择执行({selectedRowKeys.length})
-                            </Button>
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    disabled={selectedRowKeys.length === 0 || selectedRowKeys.length > 32}
+                                    type="primary"
+                                    onClick={() => handleExecute && handleExecute(selectedRowKeys)}
+                                >
+                                    选择执行({selectedRowKeys.length})
+                                </Button>
+                                <Tooltip className="cursor-pointer" title="单次最多32条，如需更多可分批执行">
+                                    <ExclamationCircleOutlined />
+                                </Tooltip>
+                            </div>
                         )}
                     </Space>
                 </div>

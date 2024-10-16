@@ -1,5 +1,6 @@
 import { getTenant, ENUM_TENANT } from 'utils/permission';
 import { Button, Image, Popconfirm, Form, Tabs, InputNumber, Tag, Row, Col, List, Drawer, Tooltip } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { AccordionDetails, AccordionSummary, Accordion } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
 import { SaveOutlined, InfoCircleOutlined, RightOutlined } from '@ant-design/icons';
@@ -983,7 +984,9 @@ const Lefts = ({
                                                 生成数量
                                             </span> */}
                                             </div>
-                                            <div className="text-xs text-slate-500">想要生成更多，请升级</div>
+                                            <Tooltip title="单次最多 32 条，如需更多可分批执行">
+                                                <ExclamationCircleOutlined className="cursor-pointer" />
+                                            </Tooltip>
                                         </div>
                                     </div>
                                 )}

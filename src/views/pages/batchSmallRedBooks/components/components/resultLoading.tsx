@@ -3,6 +3,7 @@ import { HistoryOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 
 const ResultLoading = ({
+    tagFlag,
     materialExecutionOpen,
     setMaterialExecutionOpen,
     timeSpent,
@@ -19,6 +20,7 @@ const ResultLoading = ({
     handleSave,
     handleCancel
 }: {
+    tagFlag?: boolean;
     materialExecutionOpen: boolean;
     setMaterialExecutionOpen: (data: boolean) => void;
     materialPre: number;
@@ -65,24 +67,26 @@ const ResultLoading = ({
                     <span className="font-bold">已经生成完成，点击确认导入素材</span>
                 </div>
             )}
-            <div className="flex gap-2 justify-center my-4 text-xs">
-                <div>
-                    <Tag>全部：{totalCount}</Tag>
+            {!tagFlag && (
+                <div className="flex gap-2 justify-center mt-4 text-xs">
+                    <div>
+                        <Tag>全部：{totalCount}</Tag>
+                    </div>
+                    <div>
+                        <Tag color="processing">待执行：{totalCount - successCount - errorCount - executionCount}</Tag>
+                    </div>
+                    <div>
+                        <Tag color="processing">执行中：{executionCount}</Tag>
+                    </div>
+                    <div>
+                        <Tag color="success">执行完成：{successCount}</Tag>
+                    </div>
+                    <div>
+                        <Tag color="error">执行失败：{errorCount}</Tag>
+                    </div>
                 </div>
-                <div>
-                    <Tag color="processing">待执行：{totalCount - successCount - errorCount - executionCount}</Tag>
-                </div>
-                <div>
-                    <Tag color="processing">执行中：{executionCount}</Tag>
-                </div>
-                <div>
-                    <Tag color="success">执行完成：{successCount}</Tag>
-                </div>
-                <div>
-                    <Tag color="error">执行失败：{errorCount}</Tag>
-                </div>
-            </div>
-            <div className="material-index">
+            )}
+            <div className="material-index mt-4">
                 <Table columns={columns} virtual={true} dataSource={materialzanList} />
             </div>
             <div className="flex justify-center gap-2 mt-4">

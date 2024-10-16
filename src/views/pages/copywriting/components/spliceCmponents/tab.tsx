@@ -79,7 +79,7 @@ const CreateTab = ({
         <div className="min-h-[800px] ">
             <div className="flex items-end mb-[20px]">
                 <Button onClick={() => handleAdd()} type="primary" icon={<PlusOutlined />}>
-                    增加风格
+                    增加模版
                 </Button>
                 <div
                     onClick={() => {
@@ -87,7 +87,7 @@ const CreateTab = ({
                     }}
                     className="ml-[10px] font-[600] cursor-pointer text-[12px] text-[#673ab7] border-b border-solid border-[#673ab7]"
                 >
-                    设计自己的海报风格
+                    设计自己的图片模版
                 </div>
             </div>
             <div>

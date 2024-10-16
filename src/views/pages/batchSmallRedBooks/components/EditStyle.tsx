@@ -166,6 +166,7 @@ const EditStyle = ({
                 setCurrentTemp({
                     ...currentTemp,
                     name: res?.name,
+                    groupName: res?.groupName,
                     example: res?.example
                 });
                 const json = JSON.parse(res.json);
@@ -219,18 +220,19 @@ const EditStyle = ({
                     <div className="!w-[40%]">
                         <FormControl fullWidth error={!imageStyleData?.code} sx={{ flex: 1 }} color="secondary">
                             <TextField
+                                size="small"
                                 color="secondary"
                                 className="!cursor-pointer"
                                 id="outlined-basic"
                                 label="图片模版"
                                 variant="outlined"
                                 InputLabelProps={{ shrink: true }}
-                                value={currentTemp?.name}
+                                value={currentTemp?.groupName}
                                 onClick={() => setOpen(true)}
                                 error={!imageStyleData?.code}
                                 disabled={canEdit}
                             />
-                            <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : ' '}</FormHelperText>
+                            <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : '点击可切换图片'}</FormHelperText>
                         </FormControl>
                     </div>
                     <div className="flex items-center gap-2 mt-[7px]">

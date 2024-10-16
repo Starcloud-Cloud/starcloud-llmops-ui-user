@@ -978,7 +978,7 @@ const Lefts = ({
                                                         setTotalCount(e);
                                                     }}
                                                     min={1}
-                                                    max={all_detail?.levels[0]?.levelConfigDTO?.aiCreationCount || 8}
+                                                    max={32}
                                                 />
                                                 {/* <span className="text-[#697586] block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-9px] left-2 text-[12px]">
                                                 生成数量

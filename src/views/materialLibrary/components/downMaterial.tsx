@@ -18,7 +18,7 @@ const DownMaterial = ({ libraryId, uploadOpen, setUploadOpen, getList, getTitleL
     useEffect(() => {
         if (uploadLoading) {
             timer1.current = setInterval(() => {
-                if (percent < 100) {
+                if (percent < 70) {
                     perRef.current += 30;
                     setPercent(perRef.current);
                 }

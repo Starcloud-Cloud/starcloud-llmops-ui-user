@@ -47,19 +47,19 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
     useEffect(() => {
         setValues({ name: 'icon', value: icons });
     }, [icons]);
-    useEffect(() => {
-        if (detail?.category) {
-            const data = categoryIcon.find((item) => {
-                const newData = detail?.category?.slice(0, detail.category?.lastIndexOf('_'));
-                if (getTenant() === ENUM_TENANT.AI) {
-                    return item.code === newData;
-                } else {
-                    return item.icon === detail?.icon;
-                }
-            })?.icon;
-            setIcon(data);
-        }
-    }, [detail?.category]);
+    // useEffect(() => {
+    //     if (detail?.category) {
+    //         const data = categoryIcon.find((item) => {
+    //             const newData = detail?.category?.slice(0, detail.category?.lastIndexOf('_'));
+    //             if (getTenant() === ENUM_TENANT.AI) {
+    //                 return item.code === newData;
+    //             } else {
+    //                 return item.icon === detail?.icon;
+    //             }
+    //         })?.icon;
+    //         setIcon(data);
+    //     }
+    // }, [detail?.category]);
     const categoryIcon = [
         { icon: 'hot', name: '热门', code: 'HOT' },
         { icon: 'amazon', name: '亚马逊', code: 'AMAZON' },
@@ -222,7 +222,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                         }}
                         variant="outlined"
                     />
-                    <div className="relative">
+                    {/* <div className="relative">
                         <Select
                             onChange={(e) => {
                                 setIcon(e);
@@ -240,7 +240,7 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
                         <span className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[8px] left-2 text-[12px] text-[#697586]">
                             图标*
                         </span>
-                    </div>
+                    </div> */}
                     <TextField
                         sx={{ mt: 2 }}
                         color="secondary"

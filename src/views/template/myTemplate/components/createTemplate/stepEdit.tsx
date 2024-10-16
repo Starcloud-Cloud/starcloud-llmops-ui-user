@@ -349,9 +349,9 @@ const StepEdit = ({
         }
     };
 
-    const stepEtch = (index: number, name: string): string => {
-        if (editTableData.some((item: { name: string }) => item.name === name + index)) {
-            return stepEtch(index + 1, name);
+    const stepEtch = (index: number, name: string, field: string): string => {
+        if (editTableData.some((item: any) => item[field] === name + index)) {
+            return stepEtch(index + 1, name, field);
         } else {
             return name + index;
         }
@@ -479,7 +479,13 @@ const StepEdit = ({
                                             ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler'),
                                             name: stepEtch(
                                                 1,
-                                                stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')?.name
+                                                stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')?.name,
+                                                'name'
+                                            ),
+                                            field: stepEtch(
+                                                1,
+                                                stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')?.field,
+                                                'field'
                                             )
                                         })
                                     }}

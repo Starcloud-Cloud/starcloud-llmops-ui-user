@@ -1036,7 +1036,7 @@ function Upload({
                                         placement="bottom"
                                         content={
                                             <Button onClick={delTemplate} color="error" variant="outlined">
-                                                删除模板
+                                                应用下架
                                             </Button>
                                         }
                                         trigger="click"

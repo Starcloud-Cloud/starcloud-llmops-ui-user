@@ -362,7 +362,6 @@ const PlugAnalysis = ({
         return Array.isArray(value) && value.every((item) => typeof item === 'string');
     };
     const imageExe = (list: any[]) => {
-        console.log(list);
         return list?.map((item: any) => {
             if (item.type === EditType.Image) {
                 return {
@@ -380,6 +379,12 @@ const PlugAnalysis = ({
             } else {
                 return {
                     ...item,
+                    render: (_: any, row: any) =>
+                        typeof row[item.dataIndex] === 'object' ? (
+                            <span className="text-[#ff4d4f]">字段结果类型错误，只支持返回字符串类型</span>
+                        ) : (
+                            row[item.dataIndex]
+                        ),
                     sorter: false
                 };
             }
@@ -411,7 +416,9 @@ const PlugAnalysis = ({
                                 <Space align="center">
                                     <span className="font-bold">{record?.pluginName}</span>
                                     <Tag color="processing">{metaData.scene?.find((item: any) => item.value === record?.scene)?.label}</Tag>
-                                    <Tag color="purple">{metaData.platform?.find((item: any) => item.value === record?.type)?.label}</Tag>
+                                    {metaData.type && (
+                                        <Tag color="purple">{metaData.type?.find((item: any) => item.value === record?.type)?.label}</Tag>
+                                    )}
                                     {rowData?.enable && (
                                         <div className="text-[14px] flex items-center gap-1">
                                             <HistoryOutlined
@@ -506,7 +513,7 @@ const PlugAnalysis = ({
                     ) : item.variableType === 'Boolean' ? (
                         <Form.Item
                             valuePropName="checked"
-                            initialValue={item.variableValue || false}
+                            initialValue={item.variableValue ? true : false}
                             key={item.uuid}
                             label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
                             name={item.variableKey}

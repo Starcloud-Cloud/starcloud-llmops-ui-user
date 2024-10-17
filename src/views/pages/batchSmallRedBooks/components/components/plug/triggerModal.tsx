@@ -1,5 +1,5 @@
-import { Modal, Tabs, Form, Input, Select, Cascader, Button, Collapse, Table, Tag, Popover, Switch } from 'antd';
-import { AppstoreFilled, DeleteOutlined, RetweetOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Modal, Tabs, Form, Input, Select, Cascader, Button, Collapse, Table, Tag, Popover, Switch, Tooltip } from 'antd';
+import { ExclamationCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState, useMemo } from 'react';
@@ -666,7 +666,14 @@ ${JSON.stringify(value, null, 2)}
                                         <Select disabled options={timeExpressionTypeList} />
                                     </Form.Item>
                                     <Form.Item
-                                        label="触发时间"
+                                        label={
+                                            <div>
+                                                触发时间{' '}
+                                                <Tooltip title="定时任务最多执行 14 次后，会自动关闭">
+                                                    <ExclamationCircleOutlined className="cursor-pointer" />
+                                                </Tooltip>
+                                            </div>
+                                        }
                                         name="timeExpression"
                                         rules={[{ type: 'array', required: true, message: '触发时间必填' }]}
                                     >

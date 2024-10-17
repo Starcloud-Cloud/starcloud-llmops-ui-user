@@ -154,7 +154,34 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             width: 200,
             dataIndex: 'variableValue',
             align: 'center',
-            render: (_: any, row: any) => <div className="line-clamp-3">{row.variableValue}</div>
+            editable: false,
+            render: (a: any, row: any, index: number) => (
+                <div className="line-clamp-3">
+                    {row?.variableType === 'Boolean' ? (
+                        <Select
+                            defaultValue={row?.variableValue}
+                            onChange={(e) => {
+                                const newList = _.cloneDeep(inputTable);
+                                newList[index].variableValue = e;
+                                setInputTable(newList);
+                            }}
+                            options={[
+                                { label: 'true', value: true },
+                                { label: 'false', value: false }
+                            ]}
+                        />
+                    ) : (
+                        <Input
+                            defaultValue={row?.variableValue}
+                            onChange={(e) => {
+                                const newList = _.cloneDeep(inputTable);
+                                newList[index].variableValue = e.target.value;
+                                setInputTable(newList);
+                            }}
+                        />
+                    )}
+                </div>
+            )
         }
     ];
     const outputColumns: any = [
@@ -220,8 +247,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     };
     const handleOk = async () => {
         const result = await form.validateFields();
-        console.log(outputType);
-
         if (rows) {
             await modifyPlug({
                 ...result,
@@ -712,6 +737,41 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             className="w-[100px]"
                                             disabled={!bindData.output && !bindData.arguments && verifyStatus ? true : false}
                                             onClick={() => {
+                                                let newoutputObj: any = {};
+                                                let newoutputflag: boolean = false;
+                                                try {
+                                                    newoutputObj = JSON.parse(bindData.output);
+                                                } catch (err) {}
+                                                if (Array.isArray(newoutputObj)) {
+                                                    newoutputObj.map((item) => {
+                                                        for (let key in item) {
+                                                            if (typeof item[key] === 'object') {
+                                                                newoutputflag = true;
+                                                            }
+                                                        }
+                                                    });
+                                                } else {
+                                                    for (let key in newoutputObj) {
+                                                        if (typeof newoutputObj[key] === 'object') {
+                                                            newoutputflag = true;
+                                                        }
+                                                    }
+                                                }
+                                                if (newoutputflag) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '出参示例中字段类型不能为对象或数组结构',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' }
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
                                                 setStatus('success');
                                                 setVerErrmessage('');
                                                 console.log(bindData.outputType);
@@ -887,6 +947,41 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         openSnackbar({
                                                             open: true,
                                                             message: '入参数据和出参数据格式需要 JSON',
+                                                            variant: 'alert',
+                                                            alert: {
+                                                                color: 'error'
+                                                            },
+                                                            close: false,
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' }
+                                                        })
+                                                    );
+                                                    return false;
+                                                }
+                                                let newoutputObj: any = {};
+                                                let newoutputflag: boolean = false;
+                                                try {
+                                                    newoutputObj = JSON.parse(handfilData.output);
+                                                } catch (err) {}
+                                                if (Array.isArray(newoutputObj)) {
+                                                    newoutputObj.map((item) => {
+                                                        for (let key in item) {
+                                                            if (typeof item[key] === 'object') {
+                                                                newoutputflag = true;
+                                                            }
+                                                        }
+                                                    });
+                                                } else {
+                                                    for (let key in newoutputObj) {
+                                                        if (typeof newoutputObj[key] === 'object') {
+                                                            newoutputflag = true;
+                                                        }
+                                                    }
+                                                }
+                                                if (newoutputflag) {
+                                                    dispatch(
+                                                        openSnackbar({
+                                                            open: true,
+                                                            message: '出参示例中字段类型不能为对象或数组结构',
                                                             variant: 'alert',
                                                             alert: {
                                                                 color: 'error'

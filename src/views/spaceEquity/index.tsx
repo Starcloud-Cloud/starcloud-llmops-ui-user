@@ -46,6 +46,7 @@ import { useAllDetail } from 'contexts/JWTContext';
 import _ from 'lodash-es';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { spaceDetail, spaceUserList, spaceUpdate, spaceMetadata, spaceRole, spaceRemove } from 'api/section';
+import { origin_url } from 'utils/axios/config';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -138,7 +139,7 @@ const SpaceEquity = () => {
         name: 'image',
         showUploadList: false,
         listType: 'picture-circle',
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

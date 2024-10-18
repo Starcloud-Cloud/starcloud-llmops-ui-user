@@ -16,6 +16,7 @@ import { getAccessToken } from 'utils/auth';
 import useUserStore from 'store/user';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dispatch } from 'store';
+import { origin_url } from 'utils/axios/config';
 const AddPlug = ({
     open,
     setOpen,
@@ -368,7 +369,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         name: 'image',
         showUploadList: false,
         listType: 'picture-card',
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

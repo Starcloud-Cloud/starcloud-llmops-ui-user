@@ -23,6 +23,7 @@ import Form from '../../smallRedBook/components/form';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import _ from 'lodash-es';
+import { origin_url } from 'utils/axios/config';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetailOpen: (data: boolean) => void }) => {
     // 1.模板名称
@@ -38,7 +39,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
         multiple: true,
         listType: 'picture-card',
         fileList: imageList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/image/upload`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

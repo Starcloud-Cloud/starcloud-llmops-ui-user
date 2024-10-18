@@ -6,6 +6,7 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import { Upload, Tooltip, Image } from 'antd';
 import type { UploadProps } from 'antd';
 import { getAccessToken } from 'utils/auth';
+import { origin_url } from 'utils/axios/config';
 const Form = ({ item, index, changeValue, flag }: { item: any; index: number; changeValue: any; flag?: boolean }) => {
     const mt = {
         marginTop: 2
@@ -19,7 +20,7 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
         multiple: true,
         listType: 'picture-card',
         showUploadList: false,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

@@ -32,7 +32,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import MainCard from 'ui-component/cards/MainCard';
 import AppModal from 'views/picture/create/Menu/appModal';
 import { getAccessToken } from 'utils/auth';
-import { config } from 'utils/axios/config';
+import { config, origin_url } from 'utils/axios/config';
 import { v4 as uuidv4 } from 'uuid';
 import { IChatInfo } from '../index';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
@@ -458,7 +458,7 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                     <div className="text-sm mt-2">图片（最多上传9张）</div>
                     <Upload
                         maxCount={1}
-                        action={`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/infra/file/upload`}
+                        action={`${origin_url}${process.env.REACT_APP_API_URL}/infra/file/upload`}
                         headers={{
                             Authorization: 'Bearer ' + getAccessToken()
                         }}
@@ -624,9 +624,7 @@ export const FashionStyling = ({
                         <div className={'pt-2 flex items-center overflow-x-auto'}>
                             <Upload
                                 maxCount={1}
-                                action={`${process.env.REACT_APP_BASE_URL}${
-                                    process.env.REACT_APP_API_URL
-                                }/llm/chat/avatar/${searchParams.get('appId')}`}
+                                action={`${origin_url}${process.env.REACT_APP_API_URL}/llm/chat/avatar/${searchParams.get('appId')}`}
                                 headers={{
                                     Authorization: 'Bearer ' + getAccessToken()
                                 }}

@@ -77,6 +77,7 @@ import {
 import { getAccessToken } from '../../../../../utils/auth';
 import AddRuleModal from './modal/addRule';
 import useUserStore from 'store/user';
+import { origin_url } from 'utils/axios/config';
 
 function TabPanel({ children, value, index, ...other }: TabsProps) {
     return (
@@ -300,7 +301,7 @@ const DocumentModal = ({
     const props: UploadProps = {
         name: 'file',
         multiple: true,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/dataset-source-data/uploadFiles`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/dataset-source-data/uploadFiles`,
         data: {
             appId: datasetId,
             batch: uuidv4()

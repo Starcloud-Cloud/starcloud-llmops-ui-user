@@ -30,6 +30,7 @@ import { PermissionUpgradeModal } from 'views/template/myChat/createChat/compone
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { origin_url } from 'utils/axios/config';
 
 const { Dragger } = Upload;
 
@@ -266,7 +267,7 @@ export const PictureCreateMenu = ({
     const props: UploadProps = {
         name: 'image',
         showUploadList: false,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/image/upload`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

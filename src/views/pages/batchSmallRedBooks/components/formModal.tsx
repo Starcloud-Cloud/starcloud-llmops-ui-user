@@ -9,10 +9,11 @@ import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash-es';
 import '../index.scss';
 import { PicImagePick } from '../../../../ui-component/PicImagePick/index';
+import { origin_url } from 'utils/axios/config';
 
 export const propShow: UploadProps = {
     name: 'image',
-    action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+    action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
     headers: {
         Authorization: 'Bearer ' + getAccessToken()
     }

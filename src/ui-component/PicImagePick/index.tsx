@@ -11,6 +11,7 @@ import { getAccessToken } from 'utils/auth';
 import { planModifyConfig } from 'api/redBook/batchIndex';
 import _ from 'lodash';
 import { templateUpdate } from 'api/redBook/material';
+import { origin_url } from 'utils/axios/config';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -60,7 +61,6 @@ export const PicImagePick = ({
     const scrollRef = React.useRef(null);
     const totalHitsRef = React.useRef(totalHits);
     const currentPageRef = React.useRef(currentPage);
-
 
     useEffect(() => {
         totalHitsRef.current = totalHits;
@@ -159,15 +159,11 @@ export const PicImagePick = ({
             value: 66
         });
         // Step 3: 上传到服务器
-        const uploadResponse = await axios.post(
-            `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
-            formData,
-            {
-                headers: {
-                    Authorization: 'Bearer ' + getAccessToken()
-                }
+        const uploadResponse = await axios.post(`${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`, formData, {
+            headers: {
+                Authorization: 'Bearer ' + getAccessToken()
             }
-        );
+        });
 
         const url = uploadResponse.data.data.url;
 
@@ -247,9 +243,9 @@ export const PicImagePick = ({
             id: libraryId,
             pluginConfig: JSON.stringify(jsonPluginConfig)
         });
-        if(res){
-            getList()
-            message.success('保存成功!')
+        if (res) {
+            getList();
+            message.success('保存成功!');
         }
     };
 

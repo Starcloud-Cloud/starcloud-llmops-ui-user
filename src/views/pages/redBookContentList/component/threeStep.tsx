@@ -37,6 +37,7 @@ import { useAllDetail } from 'contexts/JWTContext';
 import jsCookie from 'js-cookie';
 import copy from 'clipboard-copy';
 import JSZip from 'jszip';
+import { origin_url } from 'utils/axios/config';
 
 const ThreeStep = ({
     data,
@@ -176,7 +177,7 @@ const ThreeStep = ({
         showUploadList: {
             showPreviewIcon: false
         },
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/image/upload`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

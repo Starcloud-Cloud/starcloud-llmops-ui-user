@@ -7,7 +7,7 @@ export const getTenant = () => {
     const hostname = window.location.hostname;
     if (hostname === 'cn-test.mofaai.com.cn' || hostname === 'www.mofaai.com.cn') {
         return ENUM_TENANT.AI;
-    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn' || hostname.includes('mofabang')) {
+    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn' || hostname.includes('mofabiji')) {
         return ENUM_TENANT.ANNOUNCE;
     } else {
         return ENUM_TENANT.ANNOUNCE;
@@ -85,7 +85,7 @@ export const getPermission = (key: ENUM_PERMISSION) => {
     const hostname = window.location.hostname;
     if (hostname === 'cn-test.mofaai.com.cn' || hostname === 'www.mofaai.com.cn') {
         return list[key];
-    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn' || hostname.includes('mofabang')) {
+    } else if (hostname === 'cn-test-juzhen.mofaai.com.cn' || hostname === 'juzhen.mofaai.com.cn' || hostname.includes('mofabiji')) {
         return announceList[key];
     } else {
         return announceList[key];

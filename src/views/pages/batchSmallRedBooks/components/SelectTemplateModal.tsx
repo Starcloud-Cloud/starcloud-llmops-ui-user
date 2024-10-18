@@ -217,7 +217,7 @@ export const SelectTemplateModal = ({
                     <div
                         className="absolute right-2 top-3 font-[600] cursor-pointer text-[12px] text-[#673ab7] border-b border-solid border-[#673ab7]"
                         onClick={() => {
-                            window.open('https://poster.mofaai.com.cn/#/');
+                            window.open('https://poster.mofabiji.com/#/');
                         }}
                     >
                         设计自己的图片模版

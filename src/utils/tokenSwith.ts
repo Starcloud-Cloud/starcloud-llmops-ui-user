@@ -4,7 +4,7 @@ export const tokenSwitch = (token: string, expires: number) => {
     const name = process.env.REACT_APP_ENV === 'cn-test' ? 'test-token' : `prod-token`;
     jsCookie.set(name, token, {
         expires,
-        domain: '.mofaai.com.cn'
+        domain: '.mofabiji.com'
     });
     jsCookie.set('token', token, {
         expires

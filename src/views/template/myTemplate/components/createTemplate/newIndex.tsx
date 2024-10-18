@@ -714,6 +714,176 @@ function CreateDetail() {
             setValue('0');
         }
     };
+
+    //保存 app
+    const planUidRef = useRef('');
+    const totalCountRef = useRef(1);
+    const imageStyleListRef = useRef<any[]>([]);
+    const saveApp = () => {
+        setErrOpen(false);
+        const newList = _.cloneDeep(detailRef.current);
+        const num = getCustomIndex(newList);
+        const newData = newList?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
+        newData?.splice(num, 0, ...flowDataRef.current);
+        newData?.forEach((item: any) => {
+            if (item?.flowStep?.handler === 'CustomActionHandler') {
+                item.variable.variables.find((el: any) => el.field === 'GENERATE_MODE').value = item.type;
+                const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
+                const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
+                if (item.type === 'RANDOM') {
+                    item.variable.variables[num].isShow = false;
+                    item.variable.variables[num1].isShow = true;
+                    item.variable.variables[num2].isShow = false;
+                } else if (item.type === 'AI_PARODY') {
+                    item.variable.variables[num].isShow = false;
+                    item.variable.variables[num1].isShow = true;
+                    item.variable.variables[num2].isShow = true;
+                } else {
+                    item.variable.variables[num].isShow = true;
+                    item.variable.variables[num1].isShow = false;
+                    item.variable.variables[num2].isShow = false;
+                }
+            }
+        });
+        newList.workflowConfig.steps = newData;
+        const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
+        if (index !== -1) {
+            newList.workflowConfig.steps[index] = addStyle?.current?.record || newList.workflowConfig.steps[index];
+        }
+        newList?.workflowConfig?.steps?.forEach((item: any) => {
+            item?.variable?.variables?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+            item?.flowStep?.variable?.variables?.forEach((el: any) => {
+                if (el.value && typeof el.value === 'object') {
+                    el.value = JSON.stringify(el.value);
+                }
+            });
+        });
+        if (createPlanRef.current) {
+            let arr = _.cloneDeep(newList?.workflowConfig?.steps);
+            const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
+            if (a) {
+                a.variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = 'FILTER_USAGE';
+            }
+            const newImageMoke = _.cloneDeep(createPlanRef?.current?.imageMoke);
+            const index = arr.findIndex((item: any) => item.flowStep.handler === 'PosterActionHandler');
+            if (index !== -1) {
+                if (newImageMoke) {
+                    newImageMoke?.variable?.variables?.forEach((item: any) => {
+                        if (typeof item.value === 'object') {
+                            item.value = JSON.stringify(item.value);
+                        }
+                    });
+                    newImageMoke?.flowStep.variable?.variables?.forEach((item: any) => {
+                        if (typeof item.value === 'object') {
+                            item.value = JSON.stringify(item.value);
+                        }
+                    });
+                }
+                arr[index] = newImageMoke || arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler');
+            }
+            const newData = _.cloneDeep(createPlanRef.current.getDetail);
+            newData?.forEach((item: any) => {
+                item?.variable?.variables?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+                item?.flowStep?.variable?.variables?.forEach((el: any) => {
+                    if (el.value && typeof el.value === 'object') {
+                        el.value = JSON.stringify(el.value);
+                    }
+                });
+            });
+            arr = [
+                arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
+                ...newData,
+                arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+            ];
+            newList.workflowConfig.steps = arr?.filter((item: any) => item);
+        }
+        if (newList.name && newList.category) {
+            if (searchParams.get('uid')) {
+                appModify({
+                    ...newList,
+                    planRequest: createPlanRef.current
+                        ? {
+                              uid: planUidRef.current,
+                              source: 'APP',
+                              totalCount: totalCountRef.current,
+                              configuration: {
+                                  imageStyleList: JSON.parse(
+                                      createPlanRef?.current?.imageMoke?.variable?.variables?.find(
+                                          (item: any) => item.field === 'POSTER_STYLE_CONFIG'
+                                      )?.value || '[]'
+                                  )
+                              }
+                          }
+                        : null
+                }).then((res) => {
+                    setViewLoading(false);
+                    if (res?.data && res?.data?.verificationList?.length === 0) {
+                        setSaveState(saveState + 1);
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: '应用保存成功',
+                                variant: 'alert',
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                alert: {
+                                    color: 'success'
+                                },
+                                close: false
+                            })
+                        );
+                    } else {
+                        setErrList(res?.data?.verificationList);
+                        setErrOpen(true);
+                    }
+                });
+            } else {
+                appCreate({
+                    ...newList,
+                    planRequest: createPlanRef.current
+                        ? {
+                              uid: planUidRef.current,
+                              source: 'APP',
+                              totalCount: totalCountRef.current,
+                              configuration: {
+                                  imageStyleList: JSON.parse(
+                                      createPlanRef?.current?.imageMoke?.variable?.variables?.find(
+                                          (item: any) => item.field === 'POSTER_STYLE_CONFIG'
+                                      )?.value || '[]'
+                                  )
+                              }
+                          }
+                        : null
+                }).then((res) => {
+                    setViewLoading(false);
+                    navigate('/createApp?uid=' + res.data.uid);
+                    getList(res.data.uid);
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: t('market.create'),
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            close: false
+                        })
+                    );
+                });
+            }
+        } else {
+            setBasisPre(basisPre + 1);
+            setValue('0');
+        }
+    };
     //风格模板配置
     const [imageStylePre, setImageStylePre] = useState(0);
     const saveImageStyle = () => {
@@ -1145,7 +1315,8 @@ function CreateDetail() {
                             variant="contained"
                             color="secondary"
                             autoFocus
-                            onClick={() => saveDetail(false, false, true)}
+                            // onClick={() => saveDetail(false, false, true)}
+                            onClick={saveApp}
                         >
                             {t('myApp.save')}
                         </Buttons>
@@ -1348,6 +1519,9 @@ function CreateDetail() {
                                         >
                                             <CreatePlan
                                                 ref={createPlanRef}
+                                                setPlanUidRef={(data: string) => (planUidRef.current = data)}
+                                                setTotalCount={(data: number) => (totalCountRef.current = data)}
+                                                setImageStyleList={(data: any[]) => (imageStyleListRef.current = data)}
                                                 imageStylePre={imageStylePre}
                                                 tableTitle={tableTitle}
                                                 getAppList={getList}

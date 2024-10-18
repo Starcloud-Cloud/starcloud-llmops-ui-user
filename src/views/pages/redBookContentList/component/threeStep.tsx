@@ -559,7 +559,7 @@ const ThreeStep = ({
                 getContainer={false}
                 onClose={() => setOpen(false)}
             >
-                <div className="mt-[-24px] h-[calc(100%+24px)]">
+                {/* <div className="mt-[-24px] h-[calc(100%+24px)]">
                     <Left
                         detailShow={false}
                         data={data}
@@ -583,7 +583,7 @@ const ThreeStep = ({
                             console.log(uid);
                         }}
                     />
-                </div>
+                </div> */}
             </Drawer>
         </div>
     );

@@ -29,7 +29,10 @@ const BatcSmallRedBooks = forwardRef(
             detail,
             isMyApp,
             isblack,
-            setDetail
+            setDetail,
+            setPlanUidRef,
+            setTotalCount,
+            setImageStyleList
         }: {
             planState: number;
             imageStylePre?: number;
@@ -40,6 +43,9 @@ const BatcSmallRedBooks = forwardRef(
             isMyApp?: boolean;
             isblack?: boolean;
             setDetail: (data: any, fieldShow?: boolean) => void;
+            setPlanUidRef: (data: string) => void;
+            setTotalCount: (data: number) => void;
+            setImageStyleList: (data: any[]) => void;
         },
         ref
     ) => {
@@ -330,7 +336,6 @@ const BatcSmallRedBooks = forwardRef(
                     return <Tag>待执行</Tag>;
             }
         };
-        console.log(1231);
         const [example, setIsexample] = useState(false);
         return (
             <div
@@ -483,6 +488,9 @@ const BatcSmallRedBooks = forwardRef(
                             newSave={newSave}
                             setDetail={setDetail}
                             setPlanUid={setPlanUid}
+                            setPlanUidRef={setPlanUidRef}
+                            setTotalCountRef={setTotalCount}
+                            setImageStyleList={setImageStyleList}
                         />
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-scroll">

@@ -20,6 +20,7 @@ import { PermissionUpgradeModal } from 'views/template/myChat/createChat/compone
 import { useNavigate } from 'react-router-dom';
 import './newLeft.scss';
 import MaterialTable from './materialTable';
+import { appModify } from 'api/template/index';
 
 const Lefts = ({
     detailShow = true,
@@ -43,7 +44,10 @@ const Lefts = ({
     leftWidth,
     setWidth,
     setAppInfo,
-    getAppList
+    getAppList,
+    setPlanUidRef,
+    setTotalCountRef,
+    setImageStyleList
 }: {
     detailShow?: boolean;
     planState?: number;
@@ -67,6 +71,9 @@ const Lefts = ({
     setWidth?: () => void;
     setAppInfo?: (data: any) => void;
     getAppList?: () => void;
+    setPlanUidRef: (data: string) => void;
+    setTotalCountRef: (data: number) => void;
+    setImageStyleList: (data: any[]) => void;
 }) => {
     const navigate = useNavigate();
     const { allDetail: all_detail }: any = useAllDetail();
@@ -101,8 +108,6 @@ const Lefts = ({
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
     const [selectImgLoading, setSelectImgLoading] = useState(false);
     const getList = async (flag?: boolean, appUpdate?: boolean, isimgStyle?: boolean) => {
-        console.log(1112132);
-
         let result;
         let newList: any;
         if (data) {
@@ -112,17 +117,23 @@ const Lefts = ({
             if (searchParams.get('appUid')) {
                 setSelectImgLoading(true);
                 result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
+                setPlanUidRef(result?.uid);
+                setTotalCountRef(result?.totalCount);
                 setSelectImgLoading(false);
                 newList = _.cloneDeep(result?.configuration?.appInformation);
             } else {
                 setSelectImgLoading(true);
                 result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+                setPlanUidRef(result?.uid);
+                setTotalCountRef(result?.totalCount);
                 setSelectImgLoading(false);
                 newList = _.cloneDeep(result?.configuration?.appInformation);
             }
         } else if (detail) {
             setSelectImgLoading(true);
             result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
+            setPlanUidRef(result?.uid);
+            setTotalCountRef(result?.totalCount);
             setSelectImgLoading(false);
             newList = _.cloneDeep(detail);
             newList?.workflowConfig?.steps?.forEach((item: any) => {
@@ -516,8 +527,6 @@ const Lefts = ({
     //保存
     const handleSaveClick = async (flag: boolean, detailShow?: boolean, fieldShow?: boolean) => {
         planAppRef.current = 0;
-        // verifyList();
-        // return;
         const newList = _.cloneDeep(generRef.current);
         newList?.forEach((item: any) => {
             item?.variable?.variables?.forEach((el: any) => {
@@ -668,7 +677,6 @@ const Lefts = ({
     //token 不足弹框
     const [botOpen, setBotOpen] = useState(false);
     useEffect(() => {
-        console.log(5);
         if (generateList?.length > 0) {
             setGetData && setGetData(generateList);
         }
@@ -718,20 +726,51 @@ const Lefts = ({
             });
     };
 
+    //新的应用保存
+
     //素材字段配置弹框
-    const gessaveApp = (data: string) => {
+    const gessaveApp = async (data: string) => {
         let arr = headerSaveAll();
         arr
             .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
             .variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = data;
-        setExeState(true);
-        setDetail &&
-            setDetail({
-                ...detail,
-                workflowConfig: {
-                    steps: arr?.filter((item: any) => item)
+        const newData =
+            imageRef.current?.record?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value || '[]';
+        await appModify({
+            ...detail,
+            workflowConfig: {
+                steps: arr?.filter((item: any) => item)
+            },
+            planRequest: {
+                uid: appRef.current?.uid,
+                source: 'APP',
+                totalCount,
+                configuration: {
+                    imageStyleList: JSON.parse(newData)
                 }
-            });
+            }
+        });
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '创作计划保存成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                close: false
+            })
+        );
+        newSave(appRef.current);
+        // setExeState(true);
+        // setDetail &&
+        //     setDetail({
+        //         ...detail,
+        //         workflowConfig: {
+        //             steps: arr?.filter((item: any) => item)
+        //         }
+        //     });
     };
     const addName: any = (name: string) => {
         const nameList = appRef.current.configuration?.appInformation?.workflowConfig?.steps?.map((item: any) => item.name);
@@ -820,7 +859,6 @@ const Lefts = ({
             gessaveApp(data);
         }
     };
-    console.log(1111111);
 
     return (
         <>
@@ -976,6 +1014,7 @@ const Lefts = ({
                                                             return;
                                                         }
                                                         setTotalCount(e);
+                                                        setTotalCountRef(e);
                                                     }}
                                                     min={1}
                                                     max={32}
@@ -1282,83 +1321,19 @@ const Lefts = ({
                                     )
                             )}
                         </Tabs.TabPane>
-                        {/* {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
-                            (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
-                        ) && (
-                            <Tabs.TabPane key={'3'} tab="图片生成">
-                                {detail ? (
-                                    <AddStyle
-                                        selectImgLoading={selectImgLoading}
-                                        materialStatus={materialStatus}
-                                        saveTemplate={saveTemplate}
-                                        details={appData?.configuration?.appInformation}
-                                        hasAddStyle={detail || !detailShow ? false : true}
-                                        setImageVar={setImageVar}
-                                        appUid={appData?.appUid}
-                                        ref={imageRef}
-                                        record={imageMater}
-                                        getList={() => getList(true)}
-                                        materialType={materialType}
-                                    />
-                                ) : (
-                                    <AddStyleApp
-                                        selectImgLoading={selectImgLoading}
-                                        allData={appData}
-                                        materialStatus={materialStatus}
-                                        details={appData?.configuration?.appInformation}
-                                        hasAddStyle={detail || !detailShow ? false : true}
-                                        setImageVar={setImageVar}
-                                        getList={() => getList(true)}
-                                        appUid={appData?.appUid}
-                                        ref={imageRef}
-                                        record={imageMater}
-                                        materialType={materialType}
-                                    />
-                                )}
-                            </Tabs.TabPane>
-                        )} */}
                     </Tabs>
                 </div>
                 <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">
                     {detailShow && (
-                        <>
-                            {/* <Button
-                                className="w-full"
-                                icon={<SaveOutlined />}
-                                onClick={() => {
-                                    if (!detail) {
-                                        handleSaveClick(false);
-                                    } else {
-                                        // 我的应用
-                                        setExeState(false);
-                                        const arr = headerSaveAll();
-                                        arr
-                                            .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
-                                            .variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value =
-                                            'FILTER_USAGE';
-                                        setDetail &&
-                                            setDetail({
-                                                ...detail,
-                                                workflowConfig: {
-                                                    steps: arr?.filter((item: any) => item)
-                                                }
-                                            });
-                                    }
-                                }}
-                                type="primary"
-                            >
-                                保存配置
-                            </Button> */}
-                            <Button
-                                className="w-full"
-                                type="primary"
-                                onClick={() => {
-                                    seleSave('FILTER_USAGE', null);
-                                }}
-                            >
-                                立即生成
-                            </Button>
-                        </>
+                        <Button
+                            className="w-full"
+                            type="primary"
+                            onClick={() => {
+                                seleSave('FILTER_USAGE', null);
+                            }}
+                        >
+                            立即生成
+                        </Button>
                     )}
                     {!detailShow && (
                         <Button loading={saveLoading} className="w-full" onClick={() => handleSaveClick(false, true)} type="primary">

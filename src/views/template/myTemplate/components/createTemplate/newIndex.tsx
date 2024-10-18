@@ -779,7 +779,13 @@ function CreateDetail() {
                         }
                     });
                     newImageMoke?.flowStep.variable?.variables?.forEach((item: any) => {
-                        if (typeof item.value === 'object') {
+                        if (item.field === 'SYSTEM_POSTER_STYLE_CONFIG') {
+                            item.value =
+                                arr
+                                    ?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
+                                    ?.flowStep?.variable?.variables?.find((item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG')
+                                    ?.value || '{}';
+                        } else if (typeof item.value === 'object') {
                             item.value = JSON.stringify(item.value);
                         }
                     });
@@ -840,6 +846,10 @@ function CreateDetail() {
                                 close: false
                             })
                         );
+                        if (createPlanRef.current) {
+                            console.log(createPlanRef.current, imageStylePre);
+                            setImageStylePre(imageStylePre + 1);
+                        }
                     } else {
                         setErrList(res?.data?.verificationList);
                         setErrOpen(true);
@@ -887,11 +897,12 @@ function CreateDetail() {
     //风格模板配置
     const [imageStylePre, setImageStylePre] = useState(0);
     const saveImageStyle = () => {
-        if (createPlanRef.current) {
-            setImageStylePre(imageStylePre + 1);
-        } else {
-            saveDetail();
-        }
+        console.log(1111);
+
+        saveApp();
+        // else {
+        //     saveDetail();
+        // }
     };
     const saveDetails = (data: any, flag?: boolean) => {
         const newList = _.cloneDeep(data);

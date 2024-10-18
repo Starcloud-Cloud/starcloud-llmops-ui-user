@@ -107,7 +107,7 @@ const Lefts = ({
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
     const [selectImgLoading, setSelectImgLoading] = useState(false);
-    const getList = async (flag?: boolean, appUpdate?: boolean, isimgStyle?: boolean) => {
+    const getList = async (flag?: boolean, appUpdate?: boolean) => {
         let result;
         let newList: any;
         if (data) {
@@ -256,9 +256,6 @@ const Lefts = ({
                 newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
         }
         setImagMater(newImage);
-        if (isimgStyle) {
-            saveTemplate();
-        }
     };
     const getStepMater = async () => {
         const arr: any[] = [];
@@ -823,7 +820,7 @@ const Lefts = ({
     }, [detail]);
     useEffect(() => {
         if (imageStylePre) {
-            getList(true, false, true);
+            getList(true);
         }
     }, [imageStylePre]);
     //选中保存

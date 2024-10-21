@@ -223,7 +223,7 @@ const Header = () => {
                 display="flex"
                 alignItems="center"
                 sx={{ cursor: 'pointer', marginRight: '2px' }}
-                onClick={() => window.open('https://support.qq.com/products/646091')}
+                onClick={() => window.open('https://alidocs.dingtalk.com/i/nodes/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')}
                 className="sm:ml-[47px] xs:ml-[20px]"
             >
                 <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7564" width="24" height="24">

@@ -149,7 +149,7 @@ const ProfileSection = () => {
                 }}
                 icon={
                     <Avatar
-                        src={User1}
+                        src={all_detail?.allDetail?.avatar || User1}
                         alt="user-images"
                         className="w-8 h-8"
                         sx={{

@@ -68,6 +68,7 @@ import { ModalForm, ProFormText, ProFormTextArea, ProList } from '@ant-design/pr
 import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
 import { origin_url } from 'utils/axios/config';
+import { useAllDetail } from 'contexts/JWTContext';
 // ==============================|| PROFILE 1 ||============================== //
 
 // tabs panel
@@ -119,6 +120,7 @@ const Profilnew = () => {
     const type = searchParams.get('type') || 0;
     const [authDialogOpen, setAuthDialogOpen] = useState(false);
     const actionRef = useRef<any>();
+    const all_detail = useAllDetail();
 
     useEffect(() => {
         setValue(Number(type));
@@ -219,6 +221,7 @@ const Profilnew = () => {
                     nickname: userProfile?.nickname
                 }).then((res) => {
                     if (res) {
+                        all_detail?.setPre(all_detail?.pre + 1);
                         forceUpdate();
                         message.success('上传成功');
                     }

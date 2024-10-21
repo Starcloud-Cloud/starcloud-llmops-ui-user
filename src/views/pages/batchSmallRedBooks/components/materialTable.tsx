@@ -32,6 +32,7 @@ import { imageOcr } from 'api/redBook/batchIndex';
 import { getAccessToken } from 'utils/auth';
 import { v4 as uuidv4 } from 'uuid';
 import { updateMaterialLibraryTitle } from 'api/material';
+import { origin_url } from 'utils/axios/config';
 
 const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
     const [form] = Form.useForm();
@@ -457,7 +458,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         multiple: true,
         listType: 'picture-card',
         fileList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

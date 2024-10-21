@@ -11,6 +11,7 @@ import { listMarketAppOption, xhsApp, imageTemplates } from 'api/template';
 import { ThreeStep } from './components/threeStep';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { origin_url } from 'utils/axios/config';
 const SmallRedBook = () => {
     const { TabPane } = Tabs;
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -28,7 +29,7 @@ const SmallRedBook = () => {
             )
         },
         fileList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/image/upload`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

@@ -20,6 +20,7 @@ import { useAllDetail } from 'contexts/JWTContext';
 import { downAllImages } from 'hooks/useDownLoadImage';
 import { formatNumber } from 'hooks/useDate';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
+import { origin_url } from 'utils/axios/config';
 const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: string; scene: string; appUid: string; save: any }) => {
     const [color, setColor] = useState<Color | string>('#fff');
     const [value, setValue] = useState(0);
@@ -43,7 +44,7 @@ const EditBackgroundImage = ({ subTitle, scene, appUid, save }: { subTitle: stri
     const imageprops: UploadProps = {
         name: 'image',
         showUploadList: false,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/upload`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/image/upload`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

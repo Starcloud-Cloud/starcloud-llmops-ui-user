@@ -216,13 +216,6 @@ const HeaderSection = () => {
         'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150554_006.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150554_013.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150554_028.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/.DM_20241020122257_013.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/.DM_20241020122257_017.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/.DM_20241020122336_013.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/.DM_20241020122336_018.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/.DM_20241020122336_024.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/.DM_20241020122336_028.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/.DM_20241020122337_062.png',
         'https://service-oss-juzhen.mofaai.com.cn/web/cyms/DM_20241020122257_002.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/cyms/DM_20241020122257_009.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/cyms/DM_20241020122257_015.png',
@@ -390,9 +383,6 @@ const HeaderSection = () => {
         'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_059.jpg'
     ];
     const educationList = [
-        'https://service-oss-juzhen.mofaai.com.cn/web/lycx/.DM_20241020121227_064.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/lycx/.DM_20241020121310_071.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/lycx/.DM_20241020121349_045.png',
         'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121226_001.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121226_002.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121226_003.jpg',

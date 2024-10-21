@@ -59,8 +59,6 @@ const ThreeStep = ({
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
 }) => {
-    console.log(data);
-
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     const [tags, setTags] = React.useState<any>([]);
@@ -195,6 +193,7 @@ const ThreeStep = ({
                     return item;
                 }
             });
+            console.log(list?.map((item: any) => item?.url));
 
             setImageList(list);
         },

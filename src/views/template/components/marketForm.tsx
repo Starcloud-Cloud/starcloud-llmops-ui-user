@@ -11,6 +11,7 @@ import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInp
 import { materialImport, materialResilt, materialExport } from 'api/redBook/batchIndex';
 import { useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { origin_url } from 'utils/axios/config';
 
 function FormExecute({
     item,
@@ -49,7 +50,7 @@ function FormExecute({
         multiple: true,
         listType: 'picture-card',
         fileList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

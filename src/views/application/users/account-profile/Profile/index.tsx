@@ -67,6 +67,7 @@ import { authBind, authRedirect } from 'api/auth-coze';
 import { ModalForm, ProFormText, ProFormTextArea, ProList } from '@ant-design/pro-components';
 import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
+import { origin_url } from 'utils/axios/config';
 // ==============================|| PROFILE 1 ||============================== //
 
 // tabs panel
@@ -204,7 +205,7 @@ const Profilnew = () => {
         name: 'image',
         showUploadList: false,
         listType: 'picture-circle',
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

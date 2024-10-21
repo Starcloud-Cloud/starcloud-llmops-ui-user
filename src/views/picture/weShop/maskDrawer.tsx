@@ -5,6 +5,7 @@ import type { UploadProps } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { getAccessToken } from 'utils/auth';
 import avatar from 'assets/images/pay/people1.png';
+import { origin_url } from 'utils/axios/config';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -39,7 +40,7 @@ const MaskDrawer = ({ open, setOpen }: { open: boolean; setOpen: (data: boolean)
     const props: UploadProps = {
         name: 'file',
         showUploadList: false,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/dataset-source-data/uploadFiles`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/dataset-source-data/uploadFiles`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

@@ -24,6 +24,7 @@ import { formatNumber } from 'hooks/useDate';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { PermissionUpgradeModal } from '../../../template/myChat/createChat/components/modal/permissionUpgradeModal';
+import { origin_url } from 'utils/axios/config';
 const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const navigate = useNavigate();
     const allDetail = useAllDetail();
@@ -44,7 +45,7 @@ const EditBackgroundImage = ({ subTitle }: { subTitle: string }) => {
     const imageprops: UploadProps = {
         name: 'image',
         showUploadList: false,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/image/uploadLimitPixel`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/image/uploadLimitPixel`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

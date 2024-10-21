@@ -1,3 +1,5 @@
+export const origin_url = window.location.origin.includes('localhost') ? process.env.REACT_APP_BASE_URL : window.location.origin;
+
 const config: {
     base_url: string;
     share_base_url: string;
@@ -8,12 +10,12 @@ const config: {
     /**
      * api请求基础路径
      */
-    base_url: process.env.REACT_APP_BASE_URL! + process.env.REACT_APP_API_URL!,
+    base_url: origin_url + process.env.REACT_APP_API_URL!,
 
     /**
      * 分享页url
      */
-    share_base_url: process.env.REACT_APP_BASE_URL! + process.env.REACT_APP_SHARE_API_URL!,
+    share_base_url: origin_url + process.env.REACT_APP_SHARE_API_URL!,
     /**
      * 接口成功返回状态码
      */

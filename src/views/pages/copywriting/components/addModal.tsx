@@ -47,6 +47,7 @@ import SelectApp from './selectApp';
 import { DetailModal } from '../../redBookContentList/component/detailModal';
 import Form from '../../smallRedBook/components/form';
 import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
+import { origin_url } from 'utils/axios/config';
 const AddModal = () => {
     const { Panel } = Collapse;
     const permissions = useUserStore((state) => state.permissions);
@@ -122,7 +123,7 @@ const AddModal = () => {
         listType: 'picture-card',
         multiple: true,
         fileList: testImageList,
-        action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+        action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
         headers: {
             Authorization: 'Bearer ' + getAccessToken()
         },

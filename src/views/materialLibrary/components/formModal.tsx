@@ -12,10 +12,11 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import { EditType } from '../detail';
 import { ModalForm, ProFormSelect, ProFormTextArea } from '@ant-design/pro-components';
 import { imageOcr } from 'api/redBook/batchIndex';
+import { origin_url } from 'utils/axios/config';
 
 export const propShow: UploadProps = {
     name: 'image',
-    action: `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
+    action: `${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`,
     headers: {
         Authorization: 'Bearer ' + getAccessToken()
     }

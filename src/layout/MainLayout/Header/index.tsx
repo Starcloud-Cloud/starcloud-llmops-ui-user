@@ -35,7 +35,7 @@ import useRouteStore, { routerName } from 'store/router';
 import { isMobile } from 'react-device-detect';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
-import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+import { ENUM_PERMISSION, ENUM_TENANT, getPermission, getTenant } from 'utils/permission';
 import { useAllDetail } from '../../../contexts/JWTContext';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
@@ -223,7 +223,13 @@ const Header = () => {
                 display="flex"
                 alignItems="center"
                 sx={{ cursor: 'pointer', marginRight: '2px' }}
-                onClick={() => window.open('https://alidocs.dingtalk.com/i/nodes/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')}
+                onClick={() =>
+                    window.open(
+                        getTenant() === ENUM_TENANT.AI
+                            ? 'https://support.qq.com/products/646091'
+                            : 'https://alidocs.dingtalk.com/i/nodes/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb'
+                    )
+                }
                 className="sm:ml-[47px] xs:ml-[20px]"
             >
                 <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7564" width="24" height="24">

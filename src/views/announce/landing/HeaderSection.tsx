@@ -712,7 +712,7 @@ const HeaderSection = () => {
                 <div className="flex gap-4 items-center marquee-track">
                     <div className="flex items-center gap-4">
                         {foodList.map((item) => (
-                            <Image width={150} src={item} preview={false} key={item} />
+                            <Image width={150} src={item + '?x-oss-process=image/resize,w_150/quality,q_80'} preview={false} key={item} />
                         ))}
                     </div>
                     {/* <div className="flex items-center gap-4">
@@ -726,7 +726,7 @@ const HeaderSection = () => {
                 <div className="flex gap-4 items-center marquee-track-right">
                     <div className="flex items-center gap-4">
                         {furnitureList.map((item) => (
-                            <Image width={150} src={item} preview={false} key={item} />
+                            <Image width={150} src={item + '?x-oss-process=image/resize,w_150/quality,q_80'} preview={false} key={item} />
                         ))}
                     </div>
                     {/* <div className="flex items-center gap-4">
@@ -740,7 +740,7 @@ const HeaderSection = () => {
                 <div className="flex gap-4 items-center marquee-track">
                     <div className="flex items-center gap-4">
                         {educationList.map((item) => (
-                            <Image width={150} src={item} preview={false} key={item} />
+                            <Image width={150} src={item + '?x-oss-process=image/resize,w_150/quality,q_80'} preview={false} key={item} />
                         ))}
                     </div>
                     {/* <div className="flex items-center gap-4">

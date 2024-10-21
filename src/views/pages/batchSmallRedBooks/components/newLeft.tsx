@@ -710,23 +710,24 @@ const Lefts = ({
 
     // 我的应用保存
     const saveTemplate = () => {
-        setExeState(false);
-        const arr = headerSaveAll();
-        console.log(arr);
+        // setExeState(false);
+        // const arr = headerSaveAll();
+        // console.log(arr);
 
-        setDetail &&
-            setDetail({
-                ...detail,
-                workflowConfig: {
-                    steps: arr?.filter((item: any) => item)
-                }
-            });
+        // setDetail &&
+        //     setDetail({
+        //         ...detail,
+        //         workflowConfig: {
+        //             steps: arr?.filter((item: any) => item)
+        //         }
+        //     });
+        gessaveApp('FILTER_USAGE', false);
     };
 
     //新的应用保存
 
     //素材字段配置弹框
-    const gessaveApp = async (data: string) => {
+    const gessaveApp = async (data: string, execute = true) => {
         let arr = headerSaveAll();
         arr
             .find((item: any) => item.flowStep.handler === 'MaterialActionHandler')
@@ -759,7 +760,9 @@ const Lefts = ({
                 close: false
             })
         );
-        newSave(appRef.current);
+        if (execute) {
+            newSave(appRef.current);
+        }
         // setExeState(true);
         // setDetail &&
         //     setDetail({

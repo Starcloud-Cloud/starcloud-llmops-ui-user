@@ -23,6 +23,7 @@ const ManageMarket = Loadable(lazy(() => import('views/manageMarket')));
 const MyTemplate = Loadable(lazy(() => import('views/template/myTemplate')));
 const Demo = Loadable(lazy(() => import('views/pages/batchSmallRedBooks/newIndex')));
 const AuthCoze = Loadable(lazy(() => import('views/coze-auth')));
+const MaterialPlugin = Loadable(lazy(() => import('views/materialPlugin')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -39,6 +40,10 @@ const JuzhengRoutes = {
         {
             path: '/appMarket',
             element: <Market />
+        },
+        {
+            path: '/materialPlugin',
+            element: <MaterialPlugin />
         },
         { path: '/copywriting', element: <Copywriting /> },
         { path: '/aaa', element: <AAA /> },

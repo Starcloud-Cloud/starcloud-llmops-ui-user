@@ -696,8 +696,8 @@ const HeaderSection = () => {
         //     </Grid>
         // </Container>
         <Box className="flex items-center flex-col" sx={{ mt: { xs: 15, sm: 11, md: 16, lg: 25 }, mb: { xs: 2.5, md: 10 } }}>
-            <div className="2xl:text-8xl text-6xl font-[600]">小红书图文笔记智能创作平台</div>
-            <div className="text-[#5b5b66] text-[20px] 2xl:my-[40px] my-[30px]">
+            <div className="2xl:text-8xl text-6xl text-center font-[600]">小红书图文笔记智能创作平台</div>
+            <div className="text-[#5b5b66] text-[20px] text-center 2xl:my-[40px] my-[30px]">
                 利用AI帮助品牌和创作者快速建立自动化和智能化的营销内容生产能力
             </div>
             <div

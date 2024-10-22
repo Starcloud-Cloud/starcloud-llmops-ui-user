@@ -21,6 +21,7 @@ import { openDrawer } from 'store/slices/menu';
 
 import wechat1 from 'assets/images/landing/wechat.png';
 import wechat2 from 'assets/images/landing/wechat_2.png';
+import mofabijiwechat from 'assets/images/landing/mofabijiwechat.png';
 import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
 // assets
 import { IconMenu2 } from '@tabler/icons';
@@ -313,7 +314,12 @@ const Header = () => {
                                     魔法AI矩阵交流群
                                 </Typography>
                                 <Box display="flex" justifyContent="center">
-                                    <CardMedia component="img" image={wechat2} alt="img1" sx={{ width: '100%' }} />
+                                    <CardMedia
+                                        component="img"
+                                        image={getTenant() === ENUM_TENANT.AI ? wechat2 : mofabijiwechat}
+                                        alt="img1"
+                                        sx={{ width: '100%' }}
+                                    />
                                 </Box>
                             </Box>
                         </Box>

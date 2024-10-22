@@ -8,6 +8,8 @@ import wechat2 from 'assets/images/landing/wechattube.jpg';
 import wechat3 from 'assets/images/landing/wechatpublic.jpg';
 import tiktok from 'assets/images/landing/douyin.png';
 import qiwei from 'assets/images/landing/qiwei.png';
+import mofabijiwechat from 'assets/images/landing/mofabijiwechat.png';
+import { ENUM_TENANT, getTenant } from 'utils/permission';
 import { t } from 'hooks/web/useI18n';
 
 // Link - custom style
@@ -86,7 +88,7 @@ const FooterSection = () => {
                                         <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
                                             <CardMedia
                                                 component="img"
-                                                image={qiwei}
+                                                image={getTenant() === ENUM_TENANT.AI ? qiwei : mofabijiwechat}
                                                 alt="img1"
                                                 sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
                                             />

@@ -1,0 +1,27 @@
+.marquee-track {
+    animation: scroll-left 1800s linear infinite
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-60%);
+    }
+}
+
+.marquee-track-right {
+    animation: scroll-right 1800s linear infinite
+}
+
+@keyframes scroll-right {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(60%);
+    }
+}

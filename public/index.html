@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>魔法AI - 跨境营销创意大师</title>
+        <title></title>
         <link rel="icon" href="%PUBLIC_URL%/favicon.svg" />
         <!-- Meta Tags-->
         <meta charset="utf-8" />
@@ -11,6 +11,7 @@
         <meta name="description" content="魔法AI - 跨境营销创意大师" />
         <meta name="keywords" content="魔法AI - 跨境营销创意大师" />
         <meta name="author" content="魔法AI - 跨境营销创意大师" />
+        <meta name="baidu-site-verification" content="codeva-wSwv7knZFv" />
 
         <meta http-equiv="pragma" content="no-cache" />
         <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
@@ -87,5 +88,14 @@
         gtag('js', new Date());
 
         gtag('config', 'G-CNXL8WVKS3');
+    </script>
+    <script>
+        let title = document.querySelector('title')
+        console.log('title',window.location.host);
+        if(window.location.host === 'https://cn-test-juzhen.mofaai.com.cn/login'||window.location.host === 'https://juzhen.mofaai.com.cn/'||window.location.host === 'localhost:3000'){
+            title.innerHTML = '魔法笔记｜小红书智能创作_小红书AI创作_小红书爆款笔记'
+        }else{
+            title.innerHTML = '魔法AI - 跨境营销创意大师'
+        }
     </script>
 </html>

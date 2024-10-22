@@ -252,7 +252,21 @@ const HeaderSection = () => {
         'https://service-oss-juzhen.mofaai.com.cn/web/cyms/DM_20241020122354_023.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/cyms/DM_20241020122354_025.png',
         'https://service-oss-juzhen.mofaai.com.cn/web/cyms/DM_20241020122354_026.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/DM_20241020122354_028.jpg'
+        'https://service-oss-juzhen.mofaai.com.cn/web/cyms/DM_20241020122354_028.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_085.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_088.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_089.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_102.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_103.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_108.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_109.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_121.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122632_007.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122632_035.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122632_056.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122632_100.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122652_025.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122709_047.jpg'
     ];
     const furnitureList = [
         'https://service-oss-juzhen.mofaai.com.cn/web/myqz/DM_20241020150657_003.jpg',
@@ -355,32 +369,7 @@ const HeaderSection = () => {
         'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_075.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_076.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_081.png',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_082.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_085.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_088.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_089.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_102.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_103.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_108.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_109.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_121.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122632_007.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122632_035.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122632_056.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122632_100.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122652_025.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122709_047.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122709_071.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122709_074.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_019.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_020.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_021.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_023.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_024.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_025.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_026.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_027.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_059.jpg'
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122613_082.jpg'
     ];
     const educationList = [
         'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121226_001.jpg',
@@ -472,7 +461,18 @@ const HeaderSection = () => {
         'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121349_042.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121349_043.jpg',
         'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121349_054.jpg',
-        'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121349_062.jpg'
+        'https://service-oss-juzhen.mofaai.com.cn/web/lycx/DM_20241020121349_062.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122709_071.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122709_074.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_019.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_020.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_021.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_023.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_024.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_025.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_026.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_027.jpg',
+        'https://service-oss-juzhen.mofaai.com.cn/web/jypx/DM_20241020122730_059.jpg'
     ];
 
     return (
@@ -696,15 +696,17 @@ const HeaderSection = () => {
         //     </Grid>
         // </Container>
         <Box className="flex items-center flex-col" sx={{ mt: { xs: 15, sm: 11, md: 16, lg: 25 }, mb: { xs: 2.5, md: 10 } }}>
-            <div className="2xl:text-8xl text-6xl text-center font-[600]">小红书图文笔记智能创作平台</div>
-            <div className="text-[#5b5b66] text-[20px] text-center 2xl:my-[40px] my-[30px]">
+            <div className="px-4 2xl:text-8xl xs:text-2xl sm:text-4xl md:text-6xl text-6xl text-center font-[600]">
+                小红书图文笔记智能创作平台
+            </div>
+            <div className="px-4 text-[#5b5b66] text-xl xs:text-sm sm:text-base md:text-xl text-center 2xl:my-[40px] my-[30px] sm:my-[20px] xs:my-[20px] md:my-[30px]">
                 利用AI帮助品牌和创作者快速建立自动化和智能化的营销内容生产能力
             </div>
             <div
                 onClick={() => {
                     navigate('/appMarket');
                 }}
-                className="flex justify-center items-center  cursor-pointer text-white bg-[#673ab7] px-4 py-2 rounded-md font-[600] leading-[150%] text-[20px] w-[150px]"
+                className="flex justify-center items-center  cursor-pointer text-white bg-[#673ab7] px-4 py-2 rounded-md font-[600] leading-[150%] text-[20px] w-[150px] xs:w-[auto] xs:text-sm sm:text-[10px] sm:text-base md:w-[150px] md:text-lg"
             >
                 开启创作
             </div>

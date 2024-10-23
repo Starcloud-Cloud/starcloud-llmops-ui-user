@@ -108,7 +108,7 @@ const Landing = () => {
             </SectionWrapper> */}
 
             {/* footer section */}
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
+            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0, pt: 2 }}>
                 <FooterSection />
             </SectionWrapper>
             {/*<Customization />*/}

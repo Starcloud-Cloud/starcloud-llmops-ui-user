@@ -441,6 +441,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         <CheckCard.Group disabled={rows ? true : false} size="small">
                             {sceneList.map((item) => (
                                 <CheckCard
+                                    key={item.value}
                                     title={item.label}
                                     description={<div className="line-clamp-2 h-[44px]">{item.description}</div>}
                                     value={item.value}

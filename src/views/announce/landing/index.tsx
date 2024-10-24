@@ -65,9 +65,9 @@ const Landing = () => {
             )}
 
             {/* 2. card section */}
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
+            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <CardSection />
-            </SectionWrapper>
+            </SectionWrapper> */}
 
             {/* 4. Developer Experience section */}
 

@@ -65,9 +65,9 @@ const Landing = () => {
             )}
 
             {/* 2. card section */}
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
+            {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <CardSection />
-            </SectionWrapper>
+            </SectionWrapper> */}
 
             {/* 4. Developer Experience section */}
 
@@ -108,7 +108,7 @@ const Landing = () => {
             </SectionWrapper> */}
 
             {/* footer section */}
-            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>
+            <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', py: 0 }}>
                 <FooterSection />
             </SectionWrapper>
             {/*<Customization />*/}

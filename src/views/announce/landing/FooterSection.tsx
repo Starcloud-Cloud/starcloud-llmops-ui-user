@@ -37,112 +37,7 @@ const FooterSection = () => {
 
     return (
         <>
-            <Container sx={{ mb: 15 }}>
-                <Grid container spacing={6}>
-                    {/* <Grid item xs={12}>
-                        <Stack spacing={4.25}>
-                            <Divider sx={dividerSX} />
-                            <Stack
-                                direction="row"
-                                justifyContent="center"
-                                spacing={{ xs: 1.5, sm: 6, md: 10, lg: 12 }}
-                                sx={{ overflow: 'hidden' }}
-                            >
-                                <img src={Dribble} alt="dribble" />
-                                <img src={Freepik} alt="freepik" />
-                                <img src={Awards} alt="awards" />
-                            </Stack>
-                            <Divider sx={dividerSX} />
-                        </Stack>
-                    </Grid> */}
-                    <Grid item xs={12}>
-                        <Grid container spacing={8}>
-                            <Grid item xs={12} md={4}>
-                                <Stack spacing={{ xs: 2, md: 5 }}>
-                                    <Typography variant="h4" color={textColor} sx={{ fontWeight: 500 }}>
-                                        {t('homepage.foot.about')}
-                                    </Typography>
-                                    <Typography variant="body2" color={textColor}>
-                                        {t('homepage.foot.desc')}
-                                    </Typography>
-                                </Stack>
-                            </Grid>
-                            <Grid item xs={12} md={8}>
-                                <Grid container spacing={{ xs: 5, md: 2 }}>
-                                    <Grid item xs={12} sm={4}>
-                                        <Stack spacing={{ xs: 3, md: 5 }} textAlign="center">
-                                            <Typography variant="h4" color={textColor} sx={{ fontWeight: 500 }}>
-                                                {t('homepage.foot.help')}
-                                            </Typography>
-                                            <Stack spacing={{ xs: 1.5, md: 2.5 }}>
-                                                <FooterLink href="/" target="_blank" underline="none">
-                                                    {t('homepage.foot.documentation')}
-                                                </FooterLink>
-                                                <FooterLink href="/" target="_blank" underline="none">
-                                                    {t('homepage.foot.support')}
-                                                </FooterLink>
-                                            </Stack>
-                                        </Stack>
-                                    </Grid>
-                                    <Grid item xs={3} sm={2}>
-                                        <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
-                                            <CardMedia
-                                                component="img"
-                                                image={getTenant() === ENUM_TENANT.AI ? qiwei : mofabijiwechat}
-                                                alt="img1"
-                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
-                                            />
-                                            <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
-                                                企业微信群
-                                            </Typography>
-                                        </Stack>
-                                    </Grid>
-                                    {/* <Grid item xs={3} sm={2}>
-                                        <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
-                                            <CardMedia
-                                                component="img"
-                                                image={wechat2}
-                                                alt="img2"
-                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
-                                            />
-                                            <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
-                                                视频号
-                                            </Typography>
-                                        </Stack>
-                                    </Grid>
-                                    <Grid item xs={3} sm={2}>
-                                        <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
-                                            <CardMedia
-                                                component="img"
-                                                image={tiktok}
-                                                alt="img1"
-                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
-                                            />
-                                            <Typography variant="h4" color={textColor} align="center" sx={{ pt: 0, fontWeight: 500 }}>
-                                                抖音
-                                            </Typography>
-                                        </Stack>
-                                    </Grid>
-                                    <Grid item xs={3} sm={2}>
-                                        <Stack spacing={{ xs: 3, md: 5 }} alignItems="center">
-                                            <CardMedia
-                                                component="img"
-                                                image={wechat3}
-                                                alt="img3"
-                                                sx={{ width: { xs: '100%', sm: '100%', md: '100%' } }}
-                                            />
-                                            <Typography variant="h4" color={textColor} align="center" sx={{ fontWeight: 500 }}>
-                                                公众号
-                                            </Typography>
-                                        </Stack>
-                                    </Grid> */}
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </Container>
-            <div className="flex justify-center">
+            {/* <div className="flex justify-center">
                 <div className="flex pb-3 max-w-[1200px] px-[24px] w-full">
                     <span className="mr-2 text-white">友情链接:</span>
                     <a target="_blank" className="text-[#2196f3]" href="https://www.amz123.com">
@@ -179,7 +74,7 @@ const FooterSection = () => {
                         见远导航
                     </a>
                 </div>
-            </div>
+            </div> */}
             <Box sx={{ bgcolor: 'dark.dark', py: { xs: 3, sm: 1.5 } }}>
                 <Container>
                     <Stack
@@ -188,17 +83,18 @@ const FooterSection = () => {
                         justifyContent="space-between"
                         spacing={{ xs: 1.5, sm: 1, md: 3 }}
                     >
-                        <Typography color="text.secondary">
-                            版权所有 © 星河云海(杭州)网络技术有限公司{' '}
+                        <Typography color="text.secondary" className="flex items-center gap-2">
+                            版权所有 © 星河云海(杭州)网络技术有限公司
+                            <img className="w-[15px]" src={'https://beian.mps.gov.cn/web/assets/logo01.6189a29f.png'} />
                             <Link href="https://beian.miit.gov.cn" target="_blank" underline="hover">
-                                浙ICP备2022002996号
-                            </Link>{' '}
+                                浙ICP备2022033524号
+                            </Link>
                             <Link
-                                href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33011002017175"
+                                href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33011002017908"
                                 target="_blank"
                                 underline="hover"
                             >
-                                浙公网安备 33011002017175号
+                                浙公网安备33011002017908号
                             </Link>
                         </Typography>
                     </Stack>

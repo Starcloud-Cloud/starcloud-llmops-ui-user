@@ -236,11 +236,14 @@ const SpaceEquity = () => {
                             }
                         }}
                     >
-                        {roleList?.map((item: any) => (
-                            <Option key={item.value} value={item.value}>
-                                {item.label}
-                            </Option>
-                        ))}
+                        {roleList?.map(
+                            (item: any) =>
+                                item.value !== 1000 && (
+                                    <Option key={item.value} value={item.value}>
+                                        {item.label}
+                                    </Option>
+                                )
+                        )}
                     </Select>
                 ) : (
                     <span>{roleList?.find((item: any) => item.value == row.deptRole)?.label}</span>
@@ -689,7 +692,7 @@ const SpaceEquity = () => {
                                     {/* <Radio disabled value="a">
                                         管理者
                                     </Radio> */}
-                                    <Radio value="b">使用者</Radio>
+                                    <Radio value="b">普通用户</Radio>
                                 </Radio.Group>
                             </div>
                             <div className="flex items-center mb-[20px]">

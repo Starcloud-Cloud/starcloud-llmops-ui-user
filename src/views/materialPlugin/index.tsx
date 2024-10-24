@@ -1,15 +1,16 @@
-import { Tabs, Avatar, Tag, Popconfirm, Divider, Tooltip, Popover, Table, Button } from 'antd';
+import { Tabs, Avatar, Tag, Popconfirm, Divider, Tooltip, Popover, Table, Button, Spin } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { AppstoreFilled, DeleteOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { detailPlug, delOwner, ownerListList, metadataData } from 'api/redBook/plug';
-import { pageLibrary } from 'api/plug/index';
+import { pageLibrary, pluginPage } from 'api/plug/index';
 import { getMetadata } from 'api/plug/index';
 import AddPlug from 'views/materialLibrary/components/addplug';
 import dayjs from 'dayjs';
 const MaterialPlugin = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [accessKey, setAccessKey] = useState('1');
 
     //我的插件数据
@@ -28,9 +29,15 @@ const MaterialPlugin = () => {
         return Object.values(groupedByType);
     };
     const getTablePlugList = async () => {
-        const result = await ownerListList();
-        const newRes = grupList(result);
-        setPlugTableData(newRes);
+        setLoading(true);
+        try {
+            const result = await ownerListList();
+            setLoading(false);
+            const newRes = grupList(result);
+            setPlugTableData(newRes);
+        } catch (err) {
+            setLoading(false);
+        }
     };
 
     //触发历史数据
@@ -96,10 +103,9 @@ const MaterialPlugin = () => {
     ];
     const [TableData, setTableData] = useState<any[]>([]);
     const getTableData = async () => {
-        const result = await pageLibrary({
+        const result = await pluginPage({
             pageNo: 1,
             pageSize: 100
-            // libraryUid
         });
         setTableData(result.list);
     };
@@ -123,7 +129,7 @@ const MaterialPlugin = () => {
     const [addOpen, setAddOpen] = useState(false);
     const [wayList, setWayList] = useState<any[]>([]);
     return (
-        <div>
+        <div className="h-full bg-white p-4">
             <Tabs
                 activeKey={accessKey}
                 onChange={setAccessKey}
@@ -132,84 +138,88 @@ const MaterialPlugin = () => {
                         label: '我的插件',
                         key: '1',
                         children: (
-                            <div>
-                                <div className="flex justify-end mb-4">
-                                    <div className="flex gap-2 items-end">
-                                        <div
-                                            onClick={() =>
-                                                window.open(
-                                                    'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
-                                                )
-                                            }
-                                            className="text-[#673ab7] hover:underline cursor-pointer text-xs"
-                                        >
-                                            插件使用手册
+                            <Spin className="h-full" spinning={loading}>
+                                <div className="relative">
+                                    <div className="absolute right-0 top-0 flex justify-end mb-4">
+                                        <div className="flex gap-2 items-end">
+                                            <div
+                                                onClick={() =>
+                                                    window.open(
+                                                        'https://alidocs.dingtalk.com/i/nodes/N7dx2rn0JbnvRDXjfKqqejY0JMGjLRb3?cid=1295141077%3A2819738279&iframeQuery=utm_medium%3Dim_card%26utm_source%3Dim&utm_medium=im_card&utm_source=im&utm_scene=team_space&corpId=ding788f55f6087ac568f2c783f7214b6d69'
+                                                    )
+                                                }
+                                                className="text-[#673ab7] hover:underline cursor-pointer text-xs"
+                                            >
+                                                插件使用手册
+                                            </div>
+                                            <Button onClick={() => setAddOpen(true)} type="primary">
+                                                创建插件
+                                            </Button>
                                         </div>
-                                        <Button onClick={() => setAddOpen(true)} type="primary">
-                                            创建插件
-                                        </Button>
                                     </div>
-                                </div>
-                                {plugTableData?.map((item) => (
-                                    <div key={item.uid}>
-                                        <div className="my-4 text-[16px] font-bold">
-                                            {sceneList?.find((i) => i.value === item.scene)?.label}
-                                        </div>
-                                        <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
-                                            {item?.children?.map((el: any) => (
-                                                <div
-                                                    onClick={async () => {
-                                                        const res = await detailPlug(el.uid);
-                                                        setRows(res);
-                                                        setAddOpen(true);
-                                                    }}
-                                                    className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
-                                                    key={el.uid}
-                                                >
-                                                    <div className="flex items-center gap-4">
-                                                        {el.avatar ? (
-                                                            <Avatar shape="square" size={64} src={el.avatar} />
-                                                        ) : (
-                                                            <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
-                                                        )}
-                                                        <div className="flex-1">
-                                                            <div className="text-[18px] font-bold">{el.pluginName}</div>
-                                                            <div className="line-clamp-2 h-[44px]">{el.description}</div>
-                                                        </div>
-                                                    </div>
-                                                    <Tag color="processing">扣子机器人：{el?.accountName}</Tag>
-                                                    <Divider className="my-2" />
-                                                    <div className="flex justify-between text-xs">
-                                                        <Tooltip title="更新时间">
-                                                            <div className="flex">{dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}</div>
-                                                        </Tooltip>
-                                                        <div className="flex">{el.creator}</div>
-                                                    </div>
-                                                    <Popconfirm
-                                                        title="提示"
-                                                        description="请再次确认是否删除？"
-                                                        onConfirm={async (e: any) => {
-                                                            e.stopPropagation();
-                                                            await delOwner(el.uid);
-                                                            getTablePlugList();
+                                    {plugTableData?.map((item, index) => (
+                                        <div key={item.uid}>
+                                            <div className="mb-4 text-[16px] font-bold" style={{ marginTop: index === 0 ? 0 : '16px' }}>
+                                                {sceneList?.find((i) => i.value === item.scene)?.label}
+                                            </div>
+                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4">
+                                                {item?.children?.map((el: any) => (
+                                                    <div
+                                                        onClick={async () => {
+                                                            const res = await detailPlug(el.uid);
+                                                            setRows(res);
+                                                            setAddOpen(true);
                                                         }}
-                                                        onCancel={(e) => e?.stopPropagation()}
-                                                        okText="Yes"
-                                                        cancelText="No"
+                                                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                                        key={el.uid}
                                                     >
-                                                        <DeleteOutlined
-                                                            onClick={(e) => {
+                                                        <div className="flex items-center gap-4">
+                                                            {el.avatar ? (
+                                                                <Avatar shape="square" size={64} src={el.avatar} />
+                                                            ) : (
+                                                                <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                            )}
+                                                            <div className="flex-1">
+                                                                <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                <div className="line-clamp-2 h-[44px]">{el.description}</div>
+                                                            </div>
+                                                        </div>
+                                                        <Tag color="processing">扣子机器人：{el?.accountName}</Tag>
+                                                        <Divider className="my-2" />
+                                                        <div className="flex justify-between text-xs">
+                                                            <Tooltip title="更新时间">
+                                                                <div className="flex">
+                                                                    {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                                </div>
+                                                            </Tooltip>
+                                                            <div className="flex">{el.creator}</div>
+                                                        </div>
+                                                        <Popconfirm
+                                                            title="提示"
+                                                            description="请再次确认是否删除？"
+                                                            onConfirm={async (e: any) => {
                                                                 e.stopPropagation();
+                                                                await delOwner(el.uid);
+                                                                getTablePlugList();
                                                             }}
-                                                            className="absolute top-[16px] right-[8px] hover:text-[#ff4d4f]"
-                                                        />
-                                                    </Popconfirm>
-                                                </div>
-                                            ))}
+                                                            onCancel={(e) => e?.stopPropagation()}
+                                                            okText="Yes"
+                                                            cancelText="No"
+                                                        >
+                                                            <DeleteOutlined
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                }}
+                                                                className="absolute top-[16px] right-[8px] hover:text-[#ff4d4f]"
+                                                            />
+                                                        </Popconfirm>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            </Spin>
                         )
                     },
                     {

@@ -37,7 +37,7 @@ const FooterSection = () => {
 
     return (
         <>
-            <div className="flex justify-center">
+            {/* <div className="flex justify-center">
                 <div className="flex pb-3 max-w-[1200px] px-[24px] w-full">
                     <span className="mr-2 text-white">友情链接:</span>
                     <a target="_blank" className="text-[#2196f3]" href="https://www.amz123.com">
@@ -74,7 +74,7 @@ const FooterSection = () => {
                         见远导航
                     </a>
                 </div>
-            </div>
+            </div> */}
             <Box sx={{ bgcolor: 'dark.dark', py: { xs: 3, sm: 1.5 } }}>
                 <Container>
                     <Stack

@@ -7,7 +7,6 @@ import HeaderField from './components/headerField';
 import '../../../materialLibrary/index.scss';
 import '../../../materialLibrary/edit-table.css';
 import { delsMaterial } from 'api/redBook/material';
-import AiCreate from './newAI';
 import { TableHeader } from '../../../materialLibrary/detail';
 const LeftModalAdd = ({
     appUid,

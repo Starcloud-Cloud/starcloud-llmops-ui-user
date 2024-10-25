@@ -89,7 +89,7 @@ export const pageLibrary = (data: any) => {
  * @returns
  */
 export const pluginPage = (data: any) => {
-    return request.get({ url: '/lm/job/log/plugin/page', params: data });
+    return request.get({ url: '/llm/job/log/plugin/page', params: data });
 };
 /**
  * 分页查询任务历史

@@ -4,6 +4,7 @@ import _ from 'lodash-es';
 
 const ResultLoading = ({
     tagFlag,
+    canExecute,
     materialExecutionOpen,
     setMaterialExecutionOpen,
     timeSpent,
@@ -21,6 +22,7 @@ const ResultLoading = ({
     handleCancel
 }: {
     tagFlag?: boolean;
+    canExecute?: boolean;
     materialExecutionOpen: boolean;
     setMaterialExecutionOpen: (data: boolean) => void;
     materialPre: number;
@@ -34,7 +36,7 @@ const ResultLoading = ({
     resetExe: () => void;
     errorMessage: any[];
     reTryExe: () => void;
-    handleSave: () => void;
+    handleSave: (flag?: boolean) => void;
     handleCancel: () => void;
 }) => {
     return (
@@ -100,9 +102,14 @@ const ResultLoading = ({
                                 失败重试
                             </Button>
                         )}
-                        <Button onClick={handleSave} className="w-[100px]" size="small" type="primary">
+                        <Button onClick={() => handleSave()} className="w-[100px]" size="small" type="primary">
                             确认
                         </Button>
+                        {canExecute && successCount > 0 && (
+                            <Button onClick={() => handleSave(true)} className="w-[100px]" size="small" type="primary">
+                                直接生成
+                            </Button>
+                        )}
                     </>
                 )}
                 {executionCount > 0 && (

@@ -33,18 +33,20 @@ const PlugAnalysis = ({
     onOpenChange,
     open,
     record,
-    libraryUid
+    libraryUid,
+    canExecute
 }: {
     setForceUpdate: any;
     metaData: any;
     columns: any[];
     handleAnalysis: () => void;
     setPlugMarketOpen: (data: any) => void;
-    downTableData: (data: any, num: number) => void;
+    downTableData: (data: any, num: number, flag?: boolean) => void;
     onOpenChange: any;
     open: any;
     record: any;
     libraryUid: string;
+    canExecute: boolean;
 }) => {
     const [form] = Form.useForm();
     const [execountLoading, setExecountLoading] = useState(false);
@@ -129,18 +131,13 @@ const PlugAnalysis = ({
             filterData.forEach((item: any) => {
                 obj[item.label_key] = item.value;
             });
-
+            const newArr = record.executeParams && Array.isArray(JSON.parse(record.executeParams)) ? JSON.parse(record.executeParams) : [];
             setRedBookData((pre: any) => ({
                 ...pre,
                 requirement: JSON.parse(record.inputFormart || '[]')?.map((item: any, index: number) => ({
                     ...item,
-                    variableDesc:
-                        JSON.parse(record.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableDesc ||
-                        item?.variableDesc ||
-                        '',
-                    variableValue:
-                        JSON.parse(record.executeParams || '[]')?.find((i: any) => i.variableKey === item.variableKey)?.variableValue ||
-                        item?.variableValue
+                    variableDesc: newArr?.find((i: any) => i.variableKey === item.variableKey)?.variableDesc || item?.variableDesc || '',
+                    variableValue: newArr?.find((i: any) => i.variableKey === item.variableKey)?.variableValue || item?.variableValue
                 })),
                 fieldList: fieldList,
                 bindFieldData: obj
@@ -724,6 +721,7 @@ const PlugAnalysis = ({
             </div>
             <ResultLoading
                 tagFlag={true}
+                canExecute={canExecute}
                 materialExecutionOpen={materialExecutionOpen}
                 setMaterialExecutionOpen={setMaterialExecutionOpen}
                 materialPre={materialPre}
@@ -758,8 +756,8 @@ const PlugAnalysis = ({
                     setErrorMessage(errorMessageRef.current);
                     handleExecute(true);
                 }}
-                handleSave={() => {
-                    downTableData(materialzanListRef.current, 1);
+                handleSave={(flag?: boolean) => {
+                    downTableData(materialzanListRef.current, 1, flag);
                     setPlugMarketOpen(false);
                     onOpenChange(false);
                     setMaterialExecutionOpen(false);

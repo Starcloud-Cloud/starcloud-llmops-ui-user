@@ -201,7 +201,7 @@ export const TableHeader = ({
         }
     }, [plugOpen]);
 
-    const downTableData = async (data: any[], num: number) => {
+    const downTableData = async (data: any[], num: number, flag?: boolean) => {
         setTableLoading && setTableLoading(true);
         const tableMetaList = _.cloneDeep(tableMeta);
         const newData = data.map((record) => {
@@ -236,8 +236,12 @@ export const TableHeader = ({
             };
         });
         if (num === 1) {
-            await createBatchMaterial({ saveReqVOS: newData });
-            getList();
+            const result = await createBatchMaterial({ saveReqVOS: newData });
+            if (flag) {
+                handleExecute && handleExecute(result);
+            } else {
+                getList();
+            }
         } else {
             await updateBatchMaterial({ saveReqVOS: newData });
             getList();
@@ -1185,6 +1189,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     record={plugRecord}
                     metaData={metaData}
                     libraryUid={libraryUid}
+                    canExecute={canExecute}
                 />
             )}
         </div>

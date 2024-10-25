@@ -239,11 +239,13 @@ export const TableHeader = ({
             const result = await createBatchMaterial({ saveReqVOS: newData });
             if (flag) {
                 handleExecute && handleExecute(result);
-            } else {
-                getList();
             }
+            getList();
         } else {
-            await updateBatchMaterial({ saveReqVOS: newData });
+            const result = await updateBatchMaterial({ saveReqVOS: newData });
+            if (flag) {
+                handleExecute && handleExecute(result);
+            }
             getList();
         }
     };

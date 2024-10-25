@@ -1611,7 +1611,7 @@ function CreateDetail() {
                                 <Upload
                                     appUid={searchParams.get('uid') as string}
                                     saveState={saveState}
-                                    saveDetail={saveDetail}
+                                    saveDetail={saveApp}
                                     getStatus={getStatus}
                                 />
                             </div>

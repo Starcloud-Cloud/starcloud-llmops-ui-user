@@ -155,6 +155,26 @@ const Lefts = ({
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
             setSelectImgLoading(false);
             newList = _.cloneDeep(result?.configuration?.appInformation);
+            newList?.workflowConfig?.steps?.forEach((item: any) => {
+                if (item?.flowStep?.handler === 'CustomActionHandler') {
+                    const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
+                    const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                    const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
+                    if (item.type === 'RANDOM') {
+                        item.variable.variables[num].isShow = false;
+                        item.variable.variables[num1].isShow = true;
+                        item.variable.variables[num2].isShow = false;
+                    } else if (item.type === 'AI_PARODY') {
+                        item.variable.variables[num].isShow = false;
+                        item.variable.variables[num1].isShow = true;
+                        item.variable.variables[num2].isShow = true;
+                    } else {
+                        item.variable.variables[num].isShow = true;
+                        item.variable.variables[num1].isShow = false;
+                        item.variable.variables[num2].isShow = false;
+                    }
+                }
+            });
             const collData: any = result?.configuration?.appInformation?.example;
             if (collData) {
                 setCollData && setCollData(collData.split(','));

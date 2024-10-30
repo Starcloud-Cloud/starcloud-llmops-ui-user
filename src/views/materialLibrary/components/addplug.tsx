@@ -711,16 +711,53 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 <div>
                                     <Form.Item label="Coze参数验证">
                                         <div className="flex gap-2 items-center">
-                                            <TextArea
-                                                className="w-full"
-                                                placeholder="可输入触发机器人的对话"
-                                                rows={4}
-                                                value={bindData.content}
-                                                onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
-                                            />
+                                            {!typeDisable ? (
+                                                <TextArea
+                                                    className="w-full"
+                                                    placeholder="可输入触发机器人的对话"
+                                                    rows={4}
+                                                    value={bindData.content}
+                                                    onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
+                                                />
+                                            ) : (
+                                                <div className="w-full">
+                                                    <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                                        <span>json</span>
+                                                    </div>
+                                                    <Editor
+                                                        height="100px"
+                                                        defaultLanguage="json"
+                                                        theme={'vs-dark'}
+                                                        options={{
+                                                            minimap: { enabled: false }
+                                                        }}
+                                                        value={bindData.content}
+                                                        onChange={(value: any) => setBindData({ ...bindData, content: value })}
+                                                    />
+                                                </div>
+                                            )}
                                             <Button
                                                 loading={bindLoading}
                                                 onClick={async () => {
+                                                    let data = undefined;
+                                                    try {
+                                                        data = JSON.parse(bindData.content);
+                                                    } catch (err) {}
+                                                    if (typeDisable && !data) {
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: 'Coze参数验证必须为 JSON',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'error'
+                                                                },
+                                                                close: false,
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' }
+                                                            })
+                                                        );
+                                                        return false;
+                                                    }
                                                     setBindLoading(true);
                                                     try {
                                                         const res = await plugVerify({

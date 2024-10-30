@@ -25,8 +25,8 @@ export const plugVerify = (data: any) => {
     return request.post({ url: '/llm/plugin/definition/verify', data });
 };
 //验证执行结果
-export const plugVerifyResult = (params: any) => {
-    return request.post({ url: '/llm/plugin/definition/verifyResult', params });
+export const plugVerifyResult = (data: any) => {
+    return request.post({ url: '/llm/plugin/definition/verifyResult', data });
 };
 //新增
 export const createPlug = (data: any) => {

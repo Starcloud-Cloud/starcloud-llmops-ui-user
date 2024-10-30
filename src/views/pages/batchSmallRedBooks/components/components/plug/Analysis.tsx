@@ -668,6 +668,7 @@ const PlugAnalysis = ({
                                 libraryUid: record.libraryUid,
                                 pluginUid: record.pluginUid,
                                 uid: record.uid,
+                                bindName: record.bindName,
                                 fieldMap: JSON.stringify(redBookData.bindFieldData),
                                 executeParams: JSON.stringify(newList)
                             });
@@ -697,6 +698,7 @@ const PlugAnalysis = ({
                             libraryUid: record.libraryUid,
                             pluginUid: record.pluginUid,
                             uid: record.uid,
+                            bindName: record.bindName,
                             fieldMap: JSON.stringify(redBookData.bindFieldData),
                             executeParams: JSON.stringify(newList)
                         });

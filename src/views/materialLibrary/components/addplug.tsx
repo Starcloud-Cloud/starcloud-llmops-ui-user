@@ -549,9 +549,13 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     ) : (
                                                         <Form.Item
                                                             className="w-[400px]"
-                                                            label="Coze 工作流"
+                                                            label="Coze 工作流 ID"
                                                             name="botId"
-                                                            rules={[{ required: true, message: 'Coze 工作流必填' }]}
+                                                            rules={[
+                                                                { required: true, message: 'Coze 工作流 ID 必填' },
+                                                                { pattern: /^\d+$/, message: 'Coze 工作流 ID 必须为数字' },
+                                                                { len: 19, message: 'Coze 工作流 ID 长度必须为 19 位' }
+                                                            ]}
                                                         >
                                                             <Input />
                                                         </Form.Item>
@@ -570,10 +574,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
                                                     if (form.getFieldValue('type') === 'coze_workflow') {
                                                         setTypeDisable(true);
-                                                        setTypeValue('手动填写');
                                                     } else {
                                                         setTypeDisable(false);
-                                                        setTypeValue('接口验证');
                                                     }
                                                     setHandfilData({
                                                         arguments: form.getFieldValue('input')
@@ -689,17 +691,19 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 {plugOpen && (
                     <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
                         <Form labelAlign="left" labelCol={{ span: 4 }}>
-                            <Form.Item label="机器人名称">
-                                <div className="font-bold">
-                                    {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
-                                </div>
+                            <Form.Item label="实现方式">
+                                <div className="font-bold">{wayList?.find((item) => item.value === form.getFieldValue('type'))?.label}</div>
                             </Form.Item>
-                            <Radio.Group
-                                disabled={typeDisable}
-                                className="my-4"
-                                value={typeValue}
-                                onChange={(e) => setTypeValue(e.target.value)}
-                            >
+                            {!typeDisable ? (
+                                <Form.Item label="机器人名称">
+                                    <div className="font-bold">
+                                        {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
+                                    </div>
+                                </Form.Item>
+                            ) : (
+                                <Form.Item label="工作流ID">{form.getFieldValue('botId')}</Form.Item>
+                            )}
+                            <Radio.Group className="my-4" value={typeValue} onChange={(e) => setTypeValue(e.target.value)}>
                                 <Radio value={'接口验证'}>接口验证</Radio>
                                 <Radio value={'手动填写'}>手动填写</Radio>
                             </Radio.Group>
@@ -720,13 +724,15 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     setBindLoading(true);
                                                     try {
                                                         const res = await plugVerify({
+                                                            type: form.getFieldValue('type'),
                                                             accessTokenId: form.getFieldValue('accessTokenId'),
                                                             content: bindData.content,
-                                                            botId: form.getFieldValue('botId')
+                                                            entityUid: form.getFieldValue('botId')
                                                         });
                                                         timer.current = setInterval(async () => {
                                                             try {
                                                                 const result = await plugVerifyResult({
+                                                                    type: form.getFieldValue('type'),
                                                                     code: res,
                                                                     accessTokenId: form.getFieldValue('accessTokenId')
                                                                 });

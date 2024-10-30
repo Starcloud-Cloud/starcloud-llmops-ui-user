@@ -521,7 +521,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                     ) : (
                                         <Avatar shape="square" className="w-[20px] h-[20px]" size={20} icon={<AppstoreFilled />} />
                                     )}
-                                    <div className="text-[12px] font-bold mt-1 line-clamp-1">{item.pluginName}</div>
+                                    <div className="text-[12px] font-bold mt-1 line-clamp-1">{item.bindName}</div>
                                 </div>
                             );
                         })}
@@ -1087,7 +1087,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                         )}
                                         <div className="flex-1">
                                             <div className="text-[18px] font-bold flex items-center gap-2">
-                                                {el.pluginName}
+                                                {el.bindName}
                                                 {el.jobEnable && (
                                                     <Tooltip title="定时执行已开启">
                                                         <HistoryOutlined className="text-[#673ab7]" />

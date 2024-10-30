@@ -32,7 +32,8 @@ import {
     Spin,
     Table,
     Switch,
-    Popover
+    Popover,
+    Input
 } from 'antd';
 import type { TableColumnsType } from 'antd';
 import {
@@ -449,6 +450,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         }
     };
 
+    const [bindName, setBindName] = useState('');
+    const [bindNameOpen, setBindNameOpen] = useState(false);
+
     return (
         <div className="relative">
             <div className="flex items-center">
@@ -480,14 +484,17 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             </div>
             <div className="bg-white rounded-md border flex justify-between mb-3">
                 <div className="flex items-end w-[210px]">
-                    <Space>
+                    <Space align="end">
                         <Popconfirm title="确认删除?" onConfirm={handleBatchDel}>
                             <Button disabled={selectedRowKeys.length === 0} danger>
                                 批量删除({selectedRowKeys.length})
                             </Button>
                         </Popconfirm>
                         {canExecute && (
-                            <div className="flex items-center gap-1">
+                            <div className="flex flex-col items-start gap-1">
+                                {selectedRowKeys.length > 32 && (
+                                    <div className="text-xs text-[#ff4d4f] whitespace-nowrap">选择大于 32 条，建议分批执行</div>
+                                )}
                                 <Button
                                     disabled={selectedRowKeys.length === 0 || selectedRowKeys.length > 32}
                                     type="primary"
@@ -495,9 +502,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 >
                                     选择执行({selectedRowKeys.length})
                                 </Button>
-                                <Tooltip className="cursor-pointer" title="单次最多32条，如需更多可分批执行">
-                                    <ExclamationCircleOutlined />
-                                </Tooltip>
                             </div>
                         )}
                     </Space>
@@ -1016,14 +1020,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 />
                 <div className="mt-4 flex justify-center">
                     <Button
-                        onClick={async () => {
-                            await addPlugConfigInfo({
-                                libraryUid,
-                                pluginUid: bindData.uid
-                            });
-                            setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
-                            setBindData(null);
-                            setBindOpen(false);
+                        onClick={() => {
+                            setBindNameOpen(true);
+                            setBindName(bindData.pluginName);
                         }}
                         disabled={!bindData}
                         type="primary"
@@ -1032,6 +1031,26 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         确认
                     </Button>
                 </div>
+            </Modal>
+            <Modal
+                title="输入绑定名称"
+                open={bindNameOpen}
+                onCancel={() => {
+                    setBindNameOpen(false);
+                }}
+                onOk={async () => {
+                    await addPlugConfigInfo({
+                        libraryUid,
+                        pluginUid: bindData.uid,
+                        bindName: bindName
+                    });
+                    setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
+                    setBindNameOpen(false);
+                    setBindData(null);
+                    setBindOpen(false);
+                }}
+            >
+                <Input value={bindName} onChange={(e) => setBindName(e.target.value)} />
             </Modal>
             <Modal
                 width="80%"

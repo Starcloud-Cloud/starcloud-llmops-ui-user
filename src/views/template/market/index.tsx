@@ -349,6 +349,9 @@ function TemplateMarket() {
             }
         }
     }, [allDetail]);
+    useEffect(() => {
+        allDetail?.setPre(allDetail?.pre + 1);
+    }, []);
     const getImage = (active: string) => {
         let image;
         try {

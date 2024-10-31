@@ -54,7 +54,7 @@ const MaterialPlugin = () => {
             width: 200,
             align: 'center',
             render: (_, row) => (
-                <Button type="link" onClick={() => navigate('material/detail?id=' + row.library_uid)}>
+                <Button type="link" onClick={() => navigate('material/detail?id=' + row.library_id)}>
                     {row?.libraryName}
                 </Button>
             )

@@ -1,4 +1,9 @@
-export const origin_url = window.location.origin.includes('localhost') ? process.env.REACT_APP_BASE_URL : window.location.origin;
+export const origin_url =
+    window.location.origin.includes('localhost') ||
+    window.location.origin.includes('192.168') ||
+    window.location.origin.includes('127.0.0.1')
+        ? process.env.REACT_APP_BASE_URL
+        : window.location.origin;
 
 const config: {
     base_url: string;

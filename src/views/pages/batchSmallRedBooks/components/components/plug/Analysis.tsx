@@ -219,6 +219,7 @@ const PlugAnalysis = ({
                                     close: false
                                 })
                             );
+                            clearInterval(timer.current);
                             return false;
                         }
                         const newList = List.map((item: any) => {

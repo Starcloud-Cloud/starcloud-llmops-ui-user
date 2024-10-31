@@ -18,7 +18,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
     const handleTransfer = (key: string, errMessage: string, count?: number) => {
         switch (key) {
             case 'INIT':
-                return <Tag>初始化</Tag>;
+                return <Tag>等待执行</Tag>;
             case 'EXECUTING':
                 return <Tag color="processing">生成中</Tag>;
             case 'SUCCESS':

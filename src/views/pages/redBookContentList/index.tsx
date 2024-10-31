@@ -260,7 +260,7 @@ const RedBookContentList: React.FC = () => {
             case 'init':
                 return (
                     <Tag className="!mr-0" color="blue">
-                        初始化
+                        等待执行
                     </Tag>
                 );
             case 'executing':

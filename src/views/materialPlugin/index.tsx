@@ -54,7 +54,7 @@ const MaterialPlugin = () => {
             width: 200,
             align: 'center',
             render: (_, row) => (
-                <Button type="link" onClick={() => navigate('/material')}>
+                <Button type="link" onClick={() => navigate('material/detail?id=' + row.library_uid)}>
                     {row?.libraryName}
                 </Button>
             )
@@ -129,7 +129,7 @@ const MaterialPlugin = () => {
     const [addOpen, setAddOpen] = useState(false);
     const [wayList, setWayList] = useState<any[]>([]);
     return (
-        <div className="h-full bg-white p-4">
+        <div className="bg-white p-4">
             <Tabs
                 activeKey={accessKey}
                 onChange={setAccessKey}

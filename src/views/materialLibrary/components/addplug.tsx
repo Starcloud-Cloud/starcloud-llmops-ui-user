@@ -104,6 +104,7 @@ const AddPlug = ({
             pageSize: 50
         });
         form.setFieldValue('spaceId', result.workspaces[0].id);
+        getBotList('spaceId', result.workspaces[0].id);
         setSpaceList(result.workspaces);
     };
     const value2JsonMd = (value: any) => {

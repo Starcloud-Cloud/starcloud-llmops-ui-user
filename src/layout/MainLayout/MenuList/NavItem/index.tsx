@@ -6,6 +6,7 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import StarsIcon from '@mui/icons-material/Stars';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import ExtensionIcon from '@mui/icons-material/Extension';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import BrushIcon from '@mui/icons-material/Brush';
 import FourKIcon from '@mui/icons-material/FourK';
@@ -77,7 +78,8 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         ManageAccountsIcon,
         AutoGraphIcon,
         GradingIcon,
-        AbcIcon
+        AbcIcon,
+        ExtensionIcon
     };
     const Icon = item?.icon ? obj[item.icon] || FiberManualRecordIcon : FiberManualRecordIcon;
 

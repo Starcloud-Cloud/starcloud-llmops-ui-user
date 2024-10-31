@@ -16,13 +16,17 @@ export const ownerListList = () => {
 export const delOwner = (uid: string) => {
     return request.delete({ url: '/llm/plugin/definition/delete/' + uid });
 };
+//空间列表
+export const getSpaceList = (params: any) => {
+    return request.get({ url: '/llm/plugin/definition/spaceList', params });
+};
 //验证
 export const plugVerify = (data: any) => {
     return request.post({ url: '/llm/plugin/definition/verify', data });
 };
 //验证执行结果
-export const plugVerifyResult = (params: any) => {
-    return request.post({ url: '/llm/plugin/definition/verifyResult', params });
+export const plugVerifyResult = (data: any) => {
+    return request.post({ url: '/llm/plugin/definition/verifyResult', data });
 };
 //新增
 export const createPlug = (data: any) => {

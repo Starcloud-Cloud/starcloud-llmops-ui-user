@@ -4,6 +4,10 @@ import request from 'utils/axios';
 export const imageStyles = () => {
     return request.get({ url: '/llm/creative/plan/imageStyles' });
 };
+//全部取消
+export const planCancel = (data: any) => {
+    return request.post({ url: '/llm/creative/plan/cancel', data });
+};
 
 //文案模板应用列表
 export const copyWritingTemplates = () => {

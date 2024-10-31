@@ -117,23 +117,23 @@ const Lefts = ({
             if (searchParams.get('appUid')) {
                 setSelectImgLoading(true);
                 result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
-                setPlanUidRef(result?.uid);
-                setTotalCountRef(result?.totalCount);
+                setPlanUidRef && setPlanUidRef(result?.uid);
+                setTotalCountRef && setTotalCountRef(result?.totalCount);
                 setSelectImgLoading(false);
                 newList = _.cloneDeep(result?.configuration?.appInformation);
             } else {
                 setSelectImgLoading(true);
                 result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
-                setPlanUidRef(result?.uid);
-                setTotalCountRef(result?.totalCount);
+                setPlanUidRef && setPlanUidRef(result?.uid);
+                setTotalCountRef && setTotalCountRef(result?.totalCount);
                 setSelectImgLoading(false);
                 newList = _.cloneDeep(result?.configuration?.appInformation);
             }
         } else if (detail) {
             setSelectImgLoading(true);
             result = await getPlan({ appUid: searchParams.get('uid'), source: 'APP' });
-            setPlanUidRef(result?.uid);
-            setTotalCountRef(result?.totalCount);
+            setPlanUidRef && setPlanUidRef(result?.uid);
+            setTotalCountRef && setTotalCountRef(result?.totalCount);
             setSelectImgLoading(false);
             newList = _.cloneDeep(detail);
             newList?.workflowConfig?.steps?.forEach((item: any) => {
@@ -1034,7 +1034,7 @@ const Lefts = ({
                                                             return;
                                                         }
                                                         setTotalCount(e);
-                                                        setTotalCountRef(e);
+                                                        setTotalCountRef && setTotalCountRef(e);
                                                     }}
                                                     min={1}
                                                     max={32}

@@ -2,11 +2,12 @@ import { Collapse, Spin, Tag, Popover, Button } from 'antd';
 import { CopyrightOutlined, CloseOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import PlanList from './PlanList';
 import Good from '../good';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { planCancel } from 'api/redBook/batchIndex';
 const Right = ({
     isexample,
     setIsexample,
@@ -116,7 +117,33 @@ const Right = ({
                                 key: item.uid,
                                 label: (
                                     <div className="w-full flex justify-between items-center text-sm pr-[20px]">
-                                        <div>
+                                        <div className="flex items-center">
+                                            {item.status === 'RUNNING' && (
+                                                <Button
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        const result = await planCancel({ batchUid: item.uid });
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '取消成功',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'success'
+                                                                },
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                close: false
+                                                            })
+                                                        );
+                                                    }}
+                                                    className="mr-1"
+                                                    size="small"
+                                                    danger
+                                                    type="primary"
+                                                >
+                                                    全部取消
+                                                </Button>
+                                            )}
                                             <Popover
                                                 content={
                                                     <div className="flex items-center gap-2">

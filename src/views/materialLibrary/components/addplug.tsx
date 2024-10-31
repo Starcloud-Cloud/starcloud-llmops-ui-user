@@ -7,7 +7,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
-import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, plugVerifyResult } from 'api/redBook/plug';
+import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, getSpaceList, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
 import Editor from '@monaco-editor/react';
 import ChatMarkdown from 'ui-component/Markdown';
@@ -95,6 +95,16 @@ const AddPlug = ({
                 }
             }
         }
+    };
+    const [spaceList, setSpaceList] = useState<any[]>([]);
+    const getSpaceLists = async (accessTokenId: string) => {
+        const result = await getSpaceList({
+            accessTokenId,
+            pageIndex: 1,
+            pageSize: 50
+        });
+        form.setFieldValue('spaceId', result.workspaces[0].id);
+        setSpaceList(result.workspaces);
     };
     const value2JsonMd = (value: any) => {
         if (value) {
@@ -289,7 +299,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         getTablePlugList();
         getDefinitionList();
     };
-
     useEffect(() => {
         cozePage({ pageNo: 1, pageSize: 100 }).then((res) => {
             const newList = res.list?.filter((item: any) => item.type === 35);
@@ -405,6 +414,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             }
         }
     };
+    const [typeDisable, setTypeDisable] = useState<boolean>(false);
     const [typeValue, setTypeValue] = useState<any>('接口验证');
 
     return (
@@ -451,12 +461,17 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     </Form.Item>
                     <Form.Item label="实现方式">
                         <Form.Item name="type" initialValue={'coze'}>
-                            <Radio.Group size="small" options={wayList} disabled={rows ? true : false} />
+                            <Radio.Group
+                                onChange={() => form.setFieldValue('botId', undefined)}
+                                size="small"
+                                options={wayList}
+                                disabled={rows ? true : false}
+                            />
                         </Form.Item>
                         <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}>
                             {({ getFieldValue }) => {
                                 const firstInputValue = getFieldValue('type');
-                                return firstInputValue === 'coze' ? (
+                                return firstInputValue === 'coze' || firstInputValue === 'coze_workflow' ? (
                                     <>
                                         <Space wrap={true}>
                                             <div>
@@ -466,7 +481,13 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     name="accessTokenId"
                                                     rules={[{ required: true, message: 'Coze 绑定的账号必填' }]}
                                                 >
-                                                    <Select onChange={(e) => getBotList('accessTokenId', e)}>
+                                                    <Select
+                                                        onChange={(e) => {
+                                                            getBotList('accessTokenId', e);
+                                                            form.setFieldValue('spaceId', undefined);
+                                                            getSpaceLists(e);
+                                                        }}
+                                                    >
                                                         {accountList?.map((item) => (
                                                             <Option key={item.id} value={item.id.toString()}>
                                                                 {item.nickname}
@@ -483,33 +504,64 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     </div>
                                                 )}
                                             </div>
-                                            <Form.Item
-                                                className="w-[400px]"
-                                                label="空间 ID"
-                                                name="spaceId"
-                                                rules={[{ required: true, message: '空间 ID必填' }]}
-                                            >
-                                                <Input onBlur={async (e) => getBotList('spaceId', e.target.value)} />
-                                            </Form.Item>
-                                            <div>
+                                            {firstInputValue === 'coze' && (
                                                 <Form.Item
                                                     className="w-[400px]"
-                                                    label="选择 Coze 机器人"
-                                                    name="botId"
-                                                    rules={[{ required: true, message: 'Bot 必填' }]}
+                                                    label="空间 ID"
+                                                    name="spaceId"
+                                                    rules={[{ required: true, message: '空间 ID必填' }]}
                                                 >
-                                                    <Select>
-                                                        {botList.map((item) => (
-                                                            <Option key={item.bot_id} value={item.bot_id}>
-                                                                {item.bot_name}
-                                                            </Option>
+                                                    <Select onChange={(e) => getBotList('spaceId', e)}>
+                                                        {spaceList?.map((item) => (
+                                                            <Option value={item.id}>{item.name}</Option>
                                                         ))}
                                                     </Select>
                                                 </Form.Item>
-                                                {errmessage && (
-                                                    <div className="text-xs text-[#ff4d4f]  ml-[137px] mt-[-20px]">{errmessage}</div>
-                                                )}
-                                            </div>
+                                            )}
+                                            <Form.Item
+                                                className="!mb-0"
+                                                shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}
+                                            >
+                                                {({ getFieldValue }) => {
+                                                    const type = getFieldValue('type');
+                                                    return type === 'coze' ? (
+                                                        <div>
+                                                            <Form.Item
+                                                                className="w-[400px]"
+                                                                label="选择 Coze 机器人"
+                                                                name="botId"
+                                                                rules={[{ required: true, message: 'Bot 必填' }]}
+                                                            >
+                                                                <Select>
+                                                                    {botList.map((item) => (
+                                                                        <Option key={item.bot_id} value={item.bot_id}>
+                                                                            {item.bot_name}
+                                                                        </Option>
+                                                                    ))}
+                                                                </Select>
+                                                            </Form.Item>
+                                                            {errmessage && (
+                                                                <div className="text-xs text-[#ff4d4f]  ml-[137px] mt-[-20px]">
+                                                                    {errmessage}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <Form.Item
+                                                            className="w-[400px]"
+                                                            label="Coze 工作流 ID"
+                                                            name="botId"
+                                                            rules={[
+                                                                { required: true, message: 'Coze 工作流 ID 必填' },
+                                                                { pattern: /^\d+$/, message: 'Coze 工作流 ID 必须为数字' },
+                                                                { len: 19, message: 'Coze 工作流 ID 长度必须为 19 位' }
+                                                            ]}
+                                                        >
+                                                            <Input />
+                                                        </Form.Item>
+                                                    );
+                                                }}
+                                            </Form.Item>
                                         </Space>
                                         <Space align="end">
                                             验证状态：
@@ -519,9 +571,12 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <Button
                                                 type="primary"
                                                 onClick={async () => {
-                                                    console.log(form.getFieldValue('input'));
-
                                                     await form.validateFields(['accessTokenId', 'spaceId', 'botId']);
+                                                    if (form.getFieldValue('type') === 'coze_workflow') {
+                                                        setTypeDisable(true);
+                                                    } else {
+                                                        setTypeDisable(false);
+                                                    }
                                                     setHandfilData({
                                                         arguments: form.getFieldValue('input')
                                                             ? JSON.stringify(JSON.parse(form.getFieldValue('input')), null, 2)
@@ -636,11 +691,18 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 {plugOpen && (
                     <Modal width="60%" title="绑定验证" open={plugOpen} footer={null} onCancel={() => setPlugOpen(false)}>
                         <Form labelAlign="left" labelCol={{ span: 4 }}>
-                            <Form.Item label="机器人名称">
-                                <div className="font-bold">
-                                    {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
-                                </div>
+                            <Form.Item label="实现方式">
+                                <div className="font-bold">{wayList?.find((item) => item.value === form.getFieldValue('type'))?.label}</div>
                             </Form.Item>
+                            {!typeDisable ? (
+                                <Form.Item label="机器人名称">
+                                    <div className="font-bold">
+                                        {botList?.find((item) => item.bot_id === form.getFieldValue('botId'))?.bot_name}
+                                    </div>
+                                </Form.Item>
+                            ) : (
+                                <Form.Item label="工作流ID">{form.getFieldValue('botId')}</Form.Item>
+                            )}
                             <Radio.Group className="my-4" value={typeValue} onChange={(e) => setTypeValue(e.target.value)}>
                                 <Radio value={'接口验证'}>接口验证</Radio>
                                 <Radio value={'手动填写'}>手动填写</Radio>
@@ -649,26 +711,65 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 <div>
                                     <Form.Item label="Coze参数验证">
                                         <div className="flex gap-2 items-center">
-                                            <TextArea
-                                                className="w-full"
-                                                placeholder="可输入触发机器人的对话"
-                                                rows={4}
-                                                value={bindData.content}
-                                                onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
-                                            />
+                                            {!typeDisable ? (
+                                                <TextArea
+                                                    className="w-full"
+                                                    placeholder="可输入触发机器人的对话"
+                                                    rows={4}
+                                                    value={bindData.content}
+                                                    onChange={(e) => setBindData({ ...bindData, content: e.target.value })}
+                                                />
+                                            ) : (
+                                                <div className="w-full">
+                                                    <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                                        <span>json</span>
+                                                    </div>
+                                                    <Editor
+                                                        height="100px"
+                                                        defaultLanguage="json"
+                                                        theme={'vs-dark'}
+                                                        options={{
+                                                            minimap: { enabled: false }
+                                                        }}
+                                                        value={bindData.content}
+                                                        onChange={(value: any) => setBindData({ ...bindData, content: value })}
+                                                    />
+                                                </div>
+                                            )}
                                             <Button
                                                 loading={bindLoading}
                                                 onClick={async () => {
+                                                    let data = undefined;
+                                                    try {
+                                                        data = JSON.parse(bindData.content);
+                                                    } catch (err) {}
+                                                    if (typeDisable && !data) {
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: 'Coze参数验证必须为 JSON',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'error'
+                                                                },
+                                                                close: false,
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' }
+                                                            })
+                                                        );
+                                                        return false;
+                                                    }
                                                     setBindLoading(true);
                                                     try {
                                                         const res = await plugVerify({
+                                                            type: form.getFieldValue('type'),
                                                             accessTokenId: form.getFieldValue('accessTokenId'),
                                                             content: bindData.content,
-                                                            botId: form.getFieldValue('botId')
+                                                            entityUid: form.getFieldValue('botId')
                                                         });
                                                         timer.current = setInterval(async () => {
                                                             try {
                                                                 const result = await plugVerifyResult({
+                                                                    type: form.getFieldValue('type'),
                                                                     code: res,
                                                                     accessTokenId: form.getFieldValue('accessTokenId')
                                                                 });

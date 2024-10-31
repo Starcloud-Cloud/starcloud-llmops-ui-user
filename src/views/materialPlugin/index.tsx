@@ -178,7 +178,7 @@ const MaterialPlugin = () => {
                                                                 <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
                                                             )}
                                                             <div className="flex-1">
-                                                                <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                <div className="text-[18px] line-clamp-1 font-bold">{el.pluginName}</div>
                                                                 <div className="line-clamp-2 h-[44px]">{el.description}</div>
                                                             </div>
                                                         </div>

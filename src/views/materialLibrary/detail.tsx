@@ -862,7 +862,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                     <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
                                                                 )}
                                                                 <div className="flex-1">
-                                                                    <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                    <div className="text-[18px] line-clamp-1 font-bold">
+                                                                        {el.pluginName}
+                                                                    </div>
                                                                     <div className="line-clamp-2 h-[44px]">{el.description}</div>
                                                                 </div>
                                                             </div>
@@ -953,7 +955,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
                                                             )}
                                                             <div className="flex-1">
-                                                                <div className="text-[18px] font-bold">{el.pluginName}</div>
+                                                                <div className="text-[18px] line-clamp-1 font-bold">{el.pluginName}</div>
                                                                 <div className="line-clamp-2 h-[44px]">{el.description}</div>
                                                             </div>
                                                         </div>
@@ -1086,7 +1088,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
                                         )}
                                         <div className="flex-1">
-                                            <div className="text-[18px] font-bold flex items-center gap-2">
+                                            <div className="text-[18px]  line-clamp-1 font-bold flex items-center gap-2">
                                                 {el.bindName}
                                                 {el.jobEnable && (
                                                     <Tooltip title="定时执行已开启">

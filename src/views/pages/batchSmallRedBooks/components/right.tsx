@@ -1,4 +1,4 @@
-import { Collapse, Spin, Tag, Popover, Button } from 'antd';
+import { Collapse, Spin, Tag, Popover, Button, Popconfirm } from 'antd';
 import { CopyrightOutlined, CloseOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
@@ -119,9 +119,11 @@ const Right = ({
                                     <div className="w-full flex justify-between items-center text-sm pr-[20px]">
                                         <div className="flex items-center">
                                             {item.status === 'RUNNING' && (
-                                                <Button
-                                                    onClick={async (e) => {
-                                                        e.stopPropagation();
+                                                <Popconfirm
+                                                    title="提示"
+                                                    description="请再次确认是否全部取消?"
+                                                    onConfirm={async (e) => {
+                                                        e?.stopPropagation();
                                                         const result = await planCancel({ batchUid: item.uid });
                                                         dispatch(
                                                             openSnackbar({
@@ -136,13 +138,22 @@ const Right = ({
                                                             })
                                                         );
                                                     }}
-                                                    className="mr-1"
-                                                    size="small"
-                                                    danger
-                                                    type="primary"
+                                                    onCancel={(e) => {
+                                                        e?.stopPropagation();
+                                                    }}
+                                                    okText="确认"
+                                                    cancelText="取消"
                                                 >
-                                                    全部取消
-                                                </Button>
+                                                    <Button
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="mr-1"
+                                                        size="small"
+                                                        danger
+                                                        type="primary"
+                                                    >
+                                                        全部取消
+                                                    </Button>
+                                                </Popconfirm>
                                             )}
                                             <Popover
                                                 content={

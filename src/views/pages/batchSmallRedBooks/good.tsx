@@ -329,14 +329,7 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
         //         </>
         //     )}
         // </div>
-        <div
-            key={item.businessUid}
-            className="overflow-hidden cursor-pointer relative border border-solid border-[#CECAD5] rounded-[16px]"
-            onClick={() => {
-                setBusinessUid(item.uid);
-                setDetailOpen(true);
-            }}
-        >
+        <div key={item.businessUid} className="overflow-hidden cursor-pointer relative border border-solid border-[#CECAD5] rounded-[16px]">
             {item.status !== 'SUCCESS' ? (
                 <div className="relative">
                     <div className="p-[16px] aspect-[263/351] flex justify-center items-center relative gu">
@@ -388,34 +381,17 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                     </div>
                 </div>
             ) : (
-                <>
+                <div
+                    onClick={() => {
+                        setBusinessUid(item.uid);
+                        setDetailOpen(true);
+                    }}
+                >
                     <Swipers show={show} item={item} />
                     <div className="p-[12px]">
                         <div className="h-[40px] text-sm font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
                     </div>
-                    {/* <Button
-                        onClick={(e) => {
-                            console.log(1111111111111211231);
-                            console.log(window.require);
-
-                            if (window.require) {
-                                const { ipcRenderer } = window.require('electron');
-                                console.log(ipcRenderer);
-
-                                ipcRenderer.sendToHost('print'); // 向原生发送信息
-                                ipcRenderer.on('ping', (event: any, message: any) => {
-                                    // 接收electron原生返回的信息
-                                    console.log('接收electron原生返回的信息', event, message);
-                                });
-                            }
-
-                            // window.postMessage({ type: 'messageFromView', text: 'Hello from Vue!' }, '*');
-                            e.stopPropagation();
-                        }}
-                    >
-                        aaa
-                    </Button> */}
-                </>
+                </div>
             )}
         </div>
     );

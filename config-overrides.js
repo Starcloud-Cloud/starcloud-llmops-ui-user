@@ -39,7 +39,9 @@ module.exports = function override(config) {
         new webpack.ProvidePlugin({
             process: 'process/browser.js',
             Buffer: ['buffer', 'Buffer']
-        })
+        }),
+        // new BundleAnalyzerPlugin(),
+
     ];
 
     return config;

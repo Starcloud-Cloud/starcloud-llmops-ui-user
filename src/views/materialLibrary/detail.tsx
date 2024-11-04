@@ -370,8 +370,10 @@ export const TableHeader = ({
     }, [forceUpdate]);
 
     const handleOpenPlug = async (record: any) => {
+        console.log(record);
+
         setClickRecord(record);
-        setPlugConfigOpen(record);
+        setPlugConfigOpen(true);
         const plugInfo = await getPlugInfo(record.uid);
         const data = await getPlugConfigInfo({
             libraryUid,

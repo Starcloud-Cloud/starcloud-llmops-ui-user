@@ -847,7 +847,6 @@ function CreateDetail() {
                             })
                         );
                         if (createPlanRef.current) {
-                            console.log(createPlanRef.current, imageStylePre);
                             setImageStylePre(imageStylePre + 1);
                         }
                     } else {

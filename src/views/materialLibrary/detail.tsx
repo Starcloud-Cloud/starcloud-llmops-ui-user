@@ -370,8 +370,6 @@ export const TableHeader = ({
     }, [forceUpdate]);
 
     const handleOpenPlug = async (record: any) => {
-        console.log(record);
-
         setClickRecord(record);
         setPlugConfigOpen(true);
         const plugInfo = await getPlugInfo(record.uid);
@@ -1064,7 +1062,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     setMaterialflag && setMaterialflag(false);
                 }}
                 footer={false}
-                title="插件市场"
+                title="绑定插件"
             >
                 <div className="flex justify-end mb-4">
                     <Button onClick={() => setBindOpen(true)} type="primary">
@@ -1171,7 +1169,12 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 p-id="11743"
                             ></path>
                         </svg>
-                        <div className="text-xs underline cursor-pointer text-black/50 hover:text-[#673ab7]">暂无插件 去绑定</div>
+                        <div
+                            onClick={() => setBindOpen(true)}
+                            className="text-xs underline cursor-pointer text-black/50 hover:text-[#673ab7]"
+                        >
+                            暂无插件 去绑定
+                        </div>
                     </div>
                 )}
             </Modal>

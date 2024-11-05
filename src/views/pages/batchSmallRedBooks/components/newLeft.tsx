@@ -107,7 +107,7 @@ const Lefts = ({
     const imageRef = useRef<any>(null);
     const [imageMater, setImagMater] = useState<any>(null); //图片上传
     const [selectImgLoading, setSelectImgLoading] = useState(false);
-    const getList = async (flag?: boolean, appUpdate?: boolean) => {
+    const getList = async (flag?: boolean, appUpdate?: boolean, saveUpdate?: boolean) => {
         let result;
         let newList: any;
         if (data) {
@@ -135,7 +135,11 @@ const Lefts = ({
             setPlanUidRef && setPlanUidRef(result?.uid);
             setTotalCountRef && setTotalCountRef(result?.totalCount);
             setSelectImgLoading(false);
-            newList = _.cloneDeep(detail);
+            if (saveUpdate) {
+                newList = result?.configuration?.appInformation;
+            } else {
+                newList = _.cloneDeep(detail);
+            }
             newList?.workflowConfig?.steps?.forEach((item: any) => {
                 const arr = item?.variable?.variables;
                 const arr1 = item?.flowStep?.variable?.variables;
@@ -262,6 +266,7 @@ const Lefts = ({
                 (item: any) => item?.flowStep?.handler !== 'MaterialActionHandler' && item?.flowStep?.handler !== 'PosterActionHandler'
             )
         );
+        console.log(generRef.current);
         setGenerateList(generRef.current);
         getStepMater();
         const newImage = newList?.workflowConfig?.steps?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
@@ -843,7 +848,7 @@ const Lefts = ({
     }, [detail]);
     useEffect(() => {
         if (imageStylePre) {
-            getList(true);
+            getList(true, false, true);
         }
     }, [imageStylePre]);
     //选中保存

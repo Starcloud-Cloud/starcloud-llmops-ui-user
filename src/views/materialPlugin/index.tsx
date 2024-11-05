@@ -67,7 +67,7 @@ const MaterialPlugin = () => {
                         }
                     }}
                 >
-                    {row?.libraryName}
+                    {row?.appName}
                 </Button>
             )
         },
@@ -157,7 +157,7 @@ const MaterialPlugin = () => {
     const [searchList, setSearchList] = useState<any[]>([]);
     const timer = useRef<any>(null);
     useEffect(() => {
-        if (plugTableData) {
+        if (plugTableData?.length > 0) {
             clearTimeout(timer.current);
             timer.current = setTimeout(() => {
                 const newList = plugTableData?.filter((item) => item.pluginName.toLowerCase().includes(searchValue.toLowerCase()));

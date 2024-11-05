@@ -405,8 +405,9 @@ export const TableHeader = ({
     };
     const getTablePlugList = async () => {
         const result = await ownerListList();
-        const newRes = grupList(result);
-        setPlugTableData(newRes);
+        // const newRes = grupList(result);
+        setSearchList(result);
+        setPlugTableData(result);
     };
     useEffect(() => {
         metadataData().then((res: any) => {
@@ -452,6 +453,20 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
 
     const [bindName, setBindName] = useState('');
     const [bindNameOpen, setBindNameOpen] = useState(false);
+
+    //搜索绑定插件
+    const [searchValue, setSearchValue] = useState('');
+    const [searchList, setSearchList] = useState<any[]>([]);
+    const timer = useRef<any>(null);
+    useEffect(() => {
+        if (plugTableData?.length > 0) {
+            clearTimeout(timer.current);
+            timer.current = setTimeout(() => {
+                const newList = plugTableData?.filter((item) => item.pluginName.toLowerCase().includes(searchValue.toLowerCase()));
+                setSearchList(newList);
+            }, 500);
+        }
+    }, [searchValue]);
 
     return (
         <div className="relative">
@@ -826,6 +841,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 onCancel={() => {
                     setBindData(null);
                     setBindOpen(false);
+                    setSearchValue('');
                 }}
                 footer={false}
                 title="绑定插件"
@@ -931,44 +947,48 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             key: '2',
                             children: (
                                 <div>
-                                    {plugTableData?.map((item) => (
+                                    {/* {plugTableData?.map((item) => (
                                         <div key={item.uid}>
                                             <div className="my-4 text-[16px] font-bold">
                                                 {sceneList?.find((i) => i.value === item.scene)?.label}
-                                            </div>
-                                            <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
-                                                {item?.children?.map((el: any) => (
-                                                    <div
-                                                        onClick={() => {
-                                                            setBindData(el);
-                                                        }}
-                                                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
-                                                        style={{
-                                                            borderColor: el.uid === bindData?.uid ? '#673ab7' : '#d9d9d9'
-                                                        }}
-                                                        key={el.uid}
-                                                    >
-                                                        <div className="flex gap-4">
-                                                            {el.avatar ? (
-                                                                <Avatar shape="square" size={64} src={el.avatar} />
-                                                            ) : (
-                                                                <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
-                                                            )}
-                                                            <div className="flex-1">
-                                                                <div className="text-[18px] line-clamp-1 font-bold">{el.pluginName}</div>
-                                                                <div className="line-clamp-2 h-[44px]">{el.description}</div>
-                                                            </div>
-                                                        </div>
-                                                        <Divider className="my-2" />
-                                                        <div className="flex justify-between text-xs">
-                                                            <Tooltip title="更新时间">
-                                                                <div className="flex">
-                                                                    {dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}
-                                                                </div>
-                                                            </Tooltip>
-                                                            <div className="flex">{el.creator}</div>
-                                                        </div>
-                                                        {/* {(el.input || el.output) && (
+                                            </div> */}
+                                    <Input
+                                        className="w-[300px] mb-4"
+                                        placeholder="请输入插件名称进行搜索"
+                                        value={searchValue}
+                                        onChange={(e) => setSearchValue(e.target.value)}
+                                    />
+                                    <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
+                                        {searchList?.map((el: any) => (
+                                            <div
+                                                onClick={() => {
+                                                    setBindData(el);
+                                                }}
+                                                className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                                style={{
+                                                    borderColor: el.uid === bindData?.uid ? '#673ab7' : '#d9d9d9'
+                                                }}
+                                                key={el.uid}
+                                            >
+                                                <div className="flex gap-4">
+                                                    {el.avatar ? (
+                                                        <Avatar shape="square" size={64} src={el.avatar} />
+                                                    ) : (
+                                                        <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
+                                                    )}
+                                                    <div className="flex-1">
+                                                        <div className="text-[18px] line-clamp-1 font-bold">{el.pluginName}</div>
+                                                        <div className="line-clamp-2 h-[44px]">{el.description}</div>
+                                                    </div>
+                                                </div>
+                                                <Divider className="my-2" />
+                                                <div className="flex justify-between text-xs">
+                                                    <Tooltip title="更新时间">
+                                                        <div className="flex">{dayjs(el.updateTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+                                                    </Tooltip>
+                                                    <div className="flex">{el.creator}</div>
+                                                </div>
+                                                {/* {(el.input || el.output) && (
                                                             <Popover
                                                                 content={
                                                                     <>
@@ -1010,11 +1030,11 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 </svg>
                                                             </Popover>
                                                         )} */}
-                                                    </div>
-                                                ))}
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
+                                    {/* </div>
+                                    ))} */}
                                 </div>
                             )
                         }
@@ -1065,7 +1085,14 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 title="绑定插件"
             >
                 <div className="flex justify-end mb-4">
-                    <Button onClick={() => setBindOpen(true)} type="primary">
+                    <Button
+                        onClick={() => {
+                            getTablePlugList();
+                            getPlugList();
+                            setBindOpen(true);
+                        }}
+                        type="primary"
+                    >
                         绑定插件
                     </Button>
                 </div>

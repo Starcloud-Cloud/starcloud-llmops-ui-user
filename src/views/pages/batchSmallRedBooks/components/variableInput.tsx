@@ -326,7 +326,6 @@ const VariableInput = ({
                                 : []
                         }))
                         ?.filter((item: any) => item?.children?.length > 0);
-                    console.log(newList);
 
                     setSchemaList(newList);
                 }

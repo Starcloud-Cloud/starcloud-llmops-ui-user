@@ -1293,6 +1293,9 @@ function CreateDetail() {
             return 1;
         }
     };
+    const detailPreRef = useRef(0);
+    const [detailPre, setDetailPre] = useState(0);
+
     return detail ? (
         <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
@@ -1344,6 +1347,7 @@ function CreateDetail() {
                         }
                         if (detailRef?.current?.type === 'MEDIA_MATRIX') {
                             if (value === '4') {
+                                setDetailPre(0);
                                 const newData = _.cloneDeep(detailRef.current);
                                 let arr = newData?.workflowConfig?.steps;
                                 const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
@@ -1510,6 +1514,11 @@ function CreateDetail() {
                                             tableDataMove={tableDataMove}
                                             saveImageStyle={saveImageStyle}
                                             setTableTitle={() => setTableTitle(new Date().getTime())}
+                                            detailPre={detailPre}
+                                            setDetailPre={(data: any) => {
+                                                detailPreRef.current = data;
+                                                setDetailPre(detailPreRef.current);
+                                            }}
                                         />
                                     </div>
                                 </div>

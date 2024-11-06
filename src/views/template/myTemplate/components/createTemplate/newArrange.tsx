@@ -23,7 +23,9 @@ function Arrange({
     tableDataDel,
     tableDataMove,
     saveImageStyle,
-    setTableTitle
+    setTableTitle,
+    detailPre,
+    setDetailPre
 }: any) {
     //增加节点
     const [expanded, setExpanded] = useState<any[]>([]);
@@ -136,6 +138,31 @@ function Arrange({
             setLoading(false);
         }, 300);
     }, []);
+
+    //获取下标
+    const getCustomIndex = (newData: any) => {
+        const customIndex = newData?.workflowConfig?.steps?.findIndex((item: any) => item.flowStep.handler === 'CustomActionHandler');
+        const variableIndex = newData?.workflowConfig?.steps?.findIndex((item: any) => item.flowStep.handler === 'VariableActionHandler');
+        if (customIndex !== -1) {
+            return customIndex;
+        } else if (customIndex === -1 && variableIndex !== -1) {
+            return variableIndex + 1;
+        } else {
+            return 1;
+        }
+    };
+
+    const [newDetail, setNewDetail] = useState<any>(null);
+    const getSteps = (editTableData: any[]) => {
+        const newData = _.cloneDeep(detail);
+        const num = getCustomIndex(newData);
+        const newList = newData?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
+        newList?.splice(num, 0, ...editTableData);
+        newData.workflowConfig.steps = newList?.filter((item: any) => item);
+        console.log(newData);
+        setNewDetail(newData);
+    };
+
     if (loading) {
         return (
             <div className="w-full h-[calc(100vh-300px)] flex justify-center items-center">
@@ -343,8 +370,11 @@ function Arrange({
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <StepEdit
-                                        detail={detail}
-                                        setdetail={setdetail}
+                                        detail={newDetail || detail}
+                                        setdetail={(data: any) => {
+                                            getSteps(data);
+                                            setdetail(data);
+                                        }}
                                         stepLists={stepLists}
                                         appUid={detail?.uid}
                                         variableStyle={variableStyle}
@@ -377,6 +407,8 @@ function Arrange({
                                         resJsonSchema={item?.flowStep?.response?.output?.jsonSchema}
                                         saveImageStyle={saveImageStyle}
                                         setTableTitle={setTableTitle}
+                                        detailPre={detailPre}
+                                        setDetailPre={setDetailPre}
                                     />
                                 </AccordionDetails>
                             </Accordion>
@@ -494,6 +526,7 @@ function Arrange({
 }
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
+        JSON.stringify(prevProps?.detailPre) === JSON.stringify(nextProps?.detailPre) &&
         JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
         JSON.stringify(prevProps?.detail?.type) === JSON.stringify(nextProps?.detail?.type)
     );

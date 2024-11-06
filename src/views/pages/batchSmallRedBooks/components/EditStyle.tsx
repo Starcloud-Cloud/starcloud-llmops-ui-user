@@ -39,6 +39,7 @@ const EditStyle = ({
     materialStatus?: string;
     canEdit?: boolean;
 }) => {
+    console.log(appData);
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
     const [tempList, setTempList] = React.useState<any>([]);

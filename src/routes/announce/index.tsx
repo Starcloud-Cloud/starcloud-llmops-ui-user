@@ -22,6 +22,7 @@ const BatchSmallRedBook = Loadable(lazy(() => import('views/pages/batchSmallRedB
 const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookContentList')));
 const Fingerprint = Loadable(lazy(() => import('views/fingerprint')));
 const Invite = Loadable(lazy(() => import('views/invite')));
+const Share = Loadable(lazy(() => import('views/share')));
 
 // ==============================|| ROUTING RENDER ||============================== //
 
@@ -31,6 +32,7 @@ export default function ThemeRoutes() {
         { path: '/', element: <PagesLanding /> },
         { path: '/fingerprint', element: <Fingerprint /> },
         { path: '/invite', element: <Invite /> },
+        { path: '/share', element: <Share /> },
         // { path: '/subscribe', element: <PagesPrice /> },
         // { path: '/web-view/orderRecord', element: <OrderRecord /> },
         // { path: '/web-view/account-profile', element: <AppUserAccountProfile /> },

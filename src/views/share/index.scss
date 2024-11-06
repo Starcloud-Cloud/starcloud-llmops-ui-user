@@ -1,0 +1,15 @@
+.share {
+    .ant-tabs-nav {
+        margin-bottom: 0;
+    }
+
+    .ant-tabs-nav::before {
+        border: none;
+    }
+
+    .uls {
+        button::before {
+            display: none;
+        }
+    }
+}

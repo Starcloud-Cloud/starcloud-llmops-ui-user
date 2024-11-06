@@ -91,7 +91,9 @@ const StepEdit = ({
     resType, //响应类型
     resJsonSchema, //响应数据
     saveImageStyle, //保存图片风格
-    setTableTitle
+    setTableTitle,
+    detailPre,
+    setDetailPre
 }: {
     detail: any;
     setdetail: (data: any) => void;
@@ -112,9 +114,9 @@ const StepEdit = ({
     resJsonSchema: string;
     saveImageStyle: () => void;
     setTableTitle: () => void;
+    detailPre: number;
+    setDetailPre: (data: number) => void;
 }) => {
-    console.log(syszanVariable);
-
     const { TextArea } = Input;
     const groupList = [
         { label: '系统变量', value: 'SYSTEM' },
@@ -358,18 +360,19 @@ const StepEdit = ({
     };
 
     useEffect(() => {
-        if (detail && handler === 'AssembleActionHandler') {
+        if (detail && handler === 'AssembleActionHandler' && !detailPre) {
+            setDetailPre(1);
             const newList = detail?.workflowConfig?.steps
                 ?.filter((item: any) => item?.flowStep?.handler === 'CustomActionHandler')
                 ?.map((item: any, index: number) => ({
                     ...item,
-                    uuid: uuidv4(),
+                    uuid: item.uuid || uuidv4(),
                     type: item?.variable?.variables?.find((el: any) => el.field === 'GENERATE_MODE')?.value
                 }));
             setEditTableData(newList || []);
             setEditableKeys(newList?.map((item: any) => item.uuid) || []);
         }
-    }, [detail]);
+    }, [detail, detailPre]);
     useEffect(() => {
         if (editTableData) {
             setdetail(editTableData);
@@ -473,21 +476,20 @@ const StepEdit = ({
                                     recordCreatorProps={{
                                         newRecordType: 'dataSource',
                                         creatorButtonText: '增加字段',
-                                        record: () => ({
-                                            uuid: uuidv4(),
-                                            type: 'AI_CUSTOM',
-                                            ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler'),
-                                            name: stepEtch(
+                                        record: () => {
+                                            const field = stepEtch(
                                                 1,
                                                 stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')?.name,
                                                 'name'
-                                            ),
-                                            field: stepEtch(
-                                                1,
-                                                stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler')?.field,
-                                                'field'
-                                            )
-                                        })
+                                            );
+                                            return {
+                                                uuid: uuidv4(),
+                                                type: 'AI_CUSTOM',
+                                                ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler'),
+                                                name: field,
+                                                field
+                                            };
+                                        }
                                     }}
                                     editable={{
                                         type: 'multiple',
@@ -509,6 +511,9 @@ const StepEdit = ({
                                             clearTimeout(timer.current);
                                             timer.current = setTimeout(() => {
                                                 let newList = _.cloneDeep(recordList);
+                                                newList.forEach((item, index) => {
+                                                    item.field = item.name;
+                                                });
                                                 setEditTableData(newList);
                                             }, 500);
                                         },

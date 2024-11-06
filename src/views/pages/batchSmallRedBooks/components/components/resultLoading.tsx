@@ -102,9 +102,11 @@ const ResultLoading = ({
                                 失败重试
                             </Button>
                         )}
-                        <Button onClick={() => handleSave()} className="w-[100px]" size="small" type="primary">
-                            确认
-                        </Button>
+                        {materialzanList?.length > 0 && (
+                            <Button onClick={() => handleSave()} className="w-[100px]" size="small" type="primary">
+                                确认
+                            </Button>
+                        )}
                         {canExecute && successCount > 0 && (
                             <Button onClick={() => handleSave(true)} className="w-[100px]" size="small" type="primary">
                                 直接生成

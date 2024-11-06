@@ -45,6 +45,10 @@ export const planCopy = (data: any) => {
 export const planGet = (data: any) => {
     return request.get({ url: '/llm/creative/plan/get/' + data });
 };
+//获取详情 不需要 token
+export const contentShare = (data: any) => {
+    return request.get({ url: '/llm/xhs/content/share?uid=' + data });
+};
 //编辑
 export const planModify = (data: any) => {
     return request.post({ url: '/llm/creative/plan/modify', data });

@@ -560,7 +560,9 @@ const ThreeStep = ({
             </Modal>
             <Modal open={publishOpen} title={'小红书发布'} footer={null} onCancel={() => setPublishOpen(false)} closable={false}>
                 <div className="w-full flex justify-center items-center flex-col gap-2">
-                    <QRCode value={`${process.env.REACT_APP_BASE_URL}/share?uid=` + data?.uid} />
+                    <QRCode value={`${process.env.REACREACT_APP_SHARE_URLT_APP_BASE_URL}/share?uid=` + data?.uid} />
+                    <div className="text-md text-black/50">安卓：仅支持手机浏览器扫码</div>
+                    <div className="text-md text-black/50">苹果：支持微信/手机浏览器扫码</div>
                     <div className="text-md text-black/50">注意：小红书需更新到最新版本</div>
                 </div>
             </Modal>

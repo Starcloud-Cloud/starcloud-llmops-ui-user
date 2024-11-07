@@ -1,4 +1,4 @@
-import { Tabs, Carousel, Image, Button, Modal, QRCode } from 'antd';
+import { Tabs, Carousel, Image, Button, Modal, QRCode, Spin } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -12,10 +12,18 @@ const Share = () => {
     const [open, setOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>(null);
     const [redBookData, setRedBookData] = useState<any>(null);
+
+    const [loading, setLoading] = useState(false);
     const getDetail = async () => {
-        const result = await contentShare(query.get('uid'));
-        setDetailData(result.data.executeResult);
-        setRedBookData(result.verifyConfig);
+        setLoading(true);
+        try {
+            const result = await contentShare(query.get('uid'));
+            setLoading(false);
+            setDetailData(result.data.executeResult);
+            setRedBookData(result.verifyConfig);
+        } catch (err) {
+            setLoading(false);
+        }
     };
     useEffect(() => {
         getDetail();
@@ -55,90 +63,93 @@ const Share = () => {
     };
     return (
         <div className="share w-full h-[100vh] flex justify-center">
-            <div className="w-full max-w-[500px] shadow-lg">
-                <Tabs
-                    centered
-                    items={[
-                        {
-                            label: '详情页',
-                            key: '1',
-                            children: (
-                                <div className="h-[calc(100vh-46px)] relative">
-                                    <div className="h-full overflow-y-scroll">
-                                        <div className="relative max-h-[666px]">
-                                            <Carousel
-                                                afterChange={setCarouselValue}
-                                                draggable={true}
-                                                adaptiveHeight
-                                                dots={{ className: 'uls' }}
-                                            >
-                                                {detailData?.imageList?.map((item: any) => (
-                                                    <Image preview={false} src={item?.url} />
-                                                ))}
-                                            </Carousel>
-                                            <div className="absolute right-[15px] top-[10px] bg-[#2f3334] text-white rounded-[20px] text-md px-[5px] py-[2px] z-10 leading-[14px]">
-                                                {carouselValue + 1}/{detailData?.imageList?.length}
-                                            </div>
-                                        </div>
-                                        <div className="px-[15px]">
-                                            <div className="text-lg font-[600] mt-[15px] mb-2 leading-[140%]">
-                                                {detailData?.copyWriting?.title}
-                                            </div>
-                                            <div className="text-base font-[400] leading-[150%] text-[#000]">
-                                                {detailData?.copyWriting?.content}
-                                            </div>
-                                            <div className="mt-[40px] flex justify-between text-md text-black/60">
-                                                <div>11-05 杭州</div>
-                                                <div className="flex items-center gap-1">
-                                                    <svg
-                                                        viewBox="0 0 1024 1024"
-                                                        version="1.1"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        p-id="4449"
-                                                        width="15"
-                                                        height="15"
-                                                    >
-                                                        <path
-                                                            d="M672 128 640 128 256 128C217.6 128 192 153.6 192 192l0 640c0 38.4 25.6 64 64 64l512 0c38.4 0 64-25.6 64-64L832 320 832 288 672 128zM800 819.2c0 25.6-19.2 51.2-51.2 51.2L268.8 870.4c-25.6 0-51.2-19.2-51.2-51.2L217.6 204.8c0-25.6 19.2-51.2 51.2-51.2L640 153.6 640 256c0 38.4 25.6 64 64 64l96 0L800 819.2zM716.8 288c-25.6 0-51.2-19.2-51.2-51.2L665.6 160l128 128L716.8 288z"
-                                                            p-id="4450"
-                                                        ></path>
-                                                        <path
-                                                            d="M691.2 416 332.8 416C326.4 416 320 409.6 320 403.2l0 0C320 390.4 326.4 384 332.8 384l352 0C697.6 384 704 390.4 704 403.2l0 0C704 409.6 697.6 416 691.2 416z"
-                                                            p-id="4451"
-                                                        ></path>
-                                                        <path
-                                                            d="M691.2 563.2 332.8 563.2C326.4 563.2 320 550.4 320 544l0 0c0-6.4 6.4-12.8 12.8-12.8l352 0c6.4 0 12.8 6.4 12.8 12.8l0 0C704 550.4 697.6 563.2 691.2 563.2z"
-                                                            p-id="4452"
-                                                        ></path>
-                                                        <path
-                                                            d="M499.2 704 332.8 704C326.4 704 320 697.6 320 684.8l0 0c0-6.4 6.4-12.8 12.8-12.8l160 0c6.4 0 12.8 6.4 12.8 12.8l0 0C512 697.6 505.6 704 499.2 704z"
-                                                            p-id="4453"
-                                                        ></path>
-                                                    </svg>
-                                                    生长长图
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center mt-[15px]">
-                                                <svg
-                                                    version="1.1"
-                                                    id="Layer_1"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                                                    x="0px"
-                                                    y="0px"
-                                                    width="30px"
-                                                    height="30px"
-                                                    viewBox="0 0 48 48"
-                                                    enableBackground="new 0 0 48 48"
-                                                    xmlSpace="preserve"
+            {loading ? (
+                <Spin className="h-full w-full flex justify-center items-center"></Spin>
+            ) : (
+                <div className="w-full max-w-[500px] shadow-lg">
+                    <Tabs
+                        centered
+                        items={[
+                            {
+                                label: '详情页',
+                                key: '1',
+                                children: (
+                                    <div className="h-[calc(100vh-46px)] relative">
+                                        <div className="h-full overflow-y-scroll">
+                                            <div className="relative max-h-[666px]">
+                                                <Carousel
+                                                    afterChange={setCarouselValue}
+                                                    draggable={true}
+                                                    adaptiveHeight
+                                                    dots={{ className: 'uls' }}
                                                 >
-                                                    <image
-                                                        id="image0"
-                                                        width="48"
-                                                        height="48"
-                                                        x="0"
-                                                        y="0"
-                                                        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                                                    {detailData?.imageList?.map((item: any) => (
+                                                        <Image preview={false} src={item?.url} />
+                                                    ))}
+                                                </Carousel>
+                                                <div className="absolute right-[15px] top-[10px] bg-[#2f3334] text-white rounded-[20px] text-md px-[5px] py-[2px] z-10 leading-[14px]">
+                                                    {carouselValue + 1}/{detailData?.imageList?.length}
+                                                </div>
+                                            </div>
+                                            <div className="px-[15px]">
+                                                <div className="text-lg font-[600] mt-[15px] mb-2 leading-[140%]">
+                                                    {detailData?.copyWriting?.title}
+                                                </div>
+                                                <div className="text-base font-[400] leading-[150%] text-[#000]">
+                                                    {detailData?.copyWriting?.content}
+                                                </div>
+                                                <div className="mt-[40px] flex justify-between text-md text-black/60">
+                                                    <div>11-05 杭州</div>
+                                                    <div className="flex items-center gap-1">
+                                                        <svg
+                                                            viewBox="0 0 1024 1024"
+                                                            version="1.1"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            p-id="4449"
+                                                            width="15"
+                                                            height="15"
+                                                        >
+                                                            <path
+                                                                d="M672 128 640 128 256 128C217.6 128 192 153.6 192 192l0 640c0 38.4 25.6 64 64 64l512 0c38.4 0 64-25.6 64-64L832 320 832 288 672 128zM800 819.2c0 25.6-19.2 51.2-51.2 51.2L268.8 870.4c-25.6 0-51.2-19.2-51.2-51.2L217.6 204.8c0-25.6 19.2-51.2 51.2-51.2L640 153.6 640 256c0 38.4 25.6 64 64 64l96 0L800 819.2zM716.8 288c-25.6 0-51.2-19.2-51.2-51.2L665.6 160l128 128L716.8 288z"
+                                                                p-id="4450"
+                                                            ></path>
+                                                            <path
+                                                                d="M691.2 416 332.8 416C326.4 416 320 409.6 320 403.2l0 0C320 390.4 326.4 384 332.8 384l352 0C697.6 384 704 390.4 704 403.2l0 0C704 409.6 697.6 416 691.2 416z"
+                                                                p-id="4451"
+                                                            ></path>
+                                                            <path
+                                                                d="M691.2 563.2 332.8 563.2C326.4 563.2 320 550.4 320 544l0 0c0-6.4 6.4-12.8 12.8-12.8l352 0c6.4 0 12.8 6.4 12.8 12.8l0 0C704 550.4 697.6 563.2 691.2 563.2z"
+                                                                p-id="4452"
+                                                            ></path>
+                                                            <path
+                                                                d="M499.2 704 332.8 704C326.4 704 320 697.6 320 684.8l0 0c0-6.4 6.4-12.8 12.8-12.8l160 0c6.4 0 12.8 6.4 12.8 12.8l0 0C512 697.6 505.6 704 499.2 704z"
+                                                                p-id="4453"
+                                                            ></path>
+                                                        </svg>
+                                                        生长长图
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center mt-[15px]">
+                                                    <svg
+                                                        version="1.1"
+                                                        id="Layer_1"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        xmlnsXlink="http://www.w3.org/1999/xlink"
+                                                        x="0px"
+                                                        y="0px"
+                                                        width="30px"
+                                                        height="30px"
+                                                        viewBox="0 0 48 48"
+                                                        enableBackground="new 0 0 48 48"
+                                                        xmlSpace="preserve"
+                                                    >
+                                                        <image
+                                                            id="image0"
+                                                            width="48"
+                                                            height="48"
+                                                            x="0"
+                                                            y="0"
+                                                            xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -293,143 +304,143 @@ const Share = () => {
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                                    />
-                                                </svg>
-                                                <div className="flex justify-end w-full ml-[15px] bg-[#f5f5f5] rounded-[100px] px-[15px] py-[9px]">
+                                                        />
+                                                    </svg>
+                                                    <div className="flex justify-end w-full ml-[15px] bg-[#f5f5f5] rounded-[100px] px-[15px] py-[9px]">
+                                                        <img
+                                                            className="h-[20px]"
+                                                            src="https://www.135editor.com/ai_editor/_nuxt/assets/images/red_book/toolbar//xhspl.9bd224.png"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="py-[20px] flex flex-col gap-[20px] items-center mb-[53px]">
                                                     <img
-                                                        className="h-[20px]"
-                                                        src="https://www.135editor.com/ai_editor/_nuxt/assets/images/red_book/toolbar//xhspl.9bd224.png"
+                                                        className="w-[50px]"
+                                                        src="https://www.135editor.com/ai_editor/_nuxt/assets/images/red_book/toolbar//xhsksj.47cb77.png"
                                                     />
-                                                </div>
-                                            </div>
-                                            <div className="py-[20px] flex flex-col gap-[20px] items-center mb-[53px]">
-                                                <img
-                                                    className="w-[50px]"
-                                                    src="https://www.135editor.com/ai_editor/_nuxt/assets/images/red_book/toolbar//xhsksj.47cb77.png"
-                                                />
-                                                <div className="text-md">
-                                                    <span className="text-[rgba(51,51,51,.6)]">这是一片荒草地，</span>
-                                                    <span className="text-[#13386c] cursor-pointer">点击评论</span>
+                                                    <div className="text-md">
+                                                        <span className="text-[rgba(51,51,51,.6)]">这是一片荒草地，</span>
+                                                        <span className="text-[#13386c] cursor-pointer">点击评论</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div
-                                        className="bg-white w-full absolute bottom-0 px-[15px] py-[8px] flex items-center"
-                                        style={{ borderTop: '1px solid #00000014' }}
-                                    >
-                                        <div className="w-full bg-[#f5f5f5] rounded-[1000px] text-[#999] text-md h-[36px] mr-[10px] pl-4 flex items-center gap-1">
-                                            <svg
-                                                viewBox="0 0 1024 1024"
-                                                version="1.1"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                p-id="5471"
-                                                width="15"
-                                                height="15"
-                                                fill="#999"
-                                            >
-                                                <path
-                                                    d="M153.6 902.656a32.256 32.256 0 0 1 0-64h716.8a32.256 32.256 0 0 1 0 64zM743.936 151.04l72.192 72.192a51.2 51.2 0 0 1 0 72.192L358.4 751.616a51.2 51.2 0 0 1-36.352 14.848H226.816a25.6 25.6 0 0 1-25.6-25.6v-97.792a51.2 51.2 0 0 1 14.848-36.352l455.68-455.68a51.2 51.2 0 0 1 72.192 0z m-478.72 497.152v54.272h54.272l442.88-442.88L708.096 204.8z"
-                                                    fill="#5A5A68"
-                                                    p-id="5472"
-                                                ></path>
-                                            </svg>
-                                            说点什么...
+                                        <div
+                                            className="bg-white w-full absolute bottom-0 px-[15px] py-[8px] flex items-center"
+                                            style={{ borderTop: '1px solid #00000014' }}
+                                        >
+                                            <div className="w-full bg-[#f5f5f5] rounded-[1000px] text-[#999] text-md h-[36px] mr-[10px] pl-4 flex items-center gap-1">
+                                                <svg
+                                                    viewBox="0 0 1024 1024"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    p-id="5471"
+                                                    width="15"
+                                                    height="15"
+                                                    fill="#999"
+                                                >
+                                                    <path
+                                                        d="M153.6 902.656a32.256 32.256 0 0 1 0-64h716.8a32.256 32.256 0 0 1 0 64zM743.936 151.04l72.192 72.192a51.2 51.2 0 0 1 0 72.192L358.4 751.616a51.2 51.2 0 0 1-36.352 14.848H226.816a25.6 25.6 0 0 1-25.6-25.6v-97.792a51.2 51.2 0 0 1 14.848-36.352l455.68-455.68a51.2 51.2 0 0 1 72.192 0z m-478.72 497.152v54.272h54.272l442.88-442.88L708.096 204.8z"
+                                                        fill="#5A5A68"
+                                                        p-id="5472"
+                                                    ></path>
+                                                </svg>
+                                                说点什么...
+                                            </div>
+                                            <div className="flex items-center gap-2 text-[#333] text-[13px]">
+                                                <svg
+                                                    viewBox="0 0 1024 1024"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    p-id="6478"
+                                                    width="20"
+                                                    height="20"
+                                                >
+                                                    <path
+                                                        d="M667.786667 117.333333C832.864 117.333333 938.666667 249.706667 938.666667 427.861333c0 138.250667-125.098667 290.506667-371.573334 461.589334a96.768 96.768 0 0 1-110.186666 0C210.432 718.368 85.333333 566.112 85.333333 427.861333 85.333333 249.706667 191.136 117.333333 356.213333 117.333333c59.616 0 100.053333 20.832 155.786667 68.096C567.744 138.176 608.170667 117.333333 667.786667 117.333333z m0 63.146667c-41.44 0-70.261333 15.189333-116.96 55.04-2.165333 1.845333-14.4 12.373333-17.941334 15.381333a32.32 32.32 0 0 1-41.770666 0c-3.541333-3.018667-15.776-13.536-17.941334-15.381333-46.698667-39.850667-75.52-55.04-116.96-55.04C230.186667 180.48 149.333333 281.258667 149.333333 426.698667 149.333333 537.6 262.858667 675.242667 493.632 834.826667a32.352 32.352 0 0 0 36.736 0C761.141333 675.253333 874.666667 537.6 874.666667 426.698667c0-145.44-80.853333-246.218667-206.88-246.218667z"
+                                                        fill="#000000"
+                                                        p-id="6479"
+                                                    ></path>
+                                                </svg>
+                                                <div>90+</div>
+                                                <svg
+                                                    viewBox="0 0 1024 1024"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    p-id="7486"
+                                                    width="20"
+                                                    height="20"
+                                                >
+                                                    <path
+                                                        d="M325.3 810l139.5-73.3c14.8-7.8 31.5-11.9 48.2-11.9 16.7 0 33.4 4.1 48.2 11.9L700.7 810l-26.6-155.1c-5.8-33.6 5.4-67.9 29.8-91.7l112.7-109.8-155.8-22.6c-33.7-4.9-62.9-26.1-78-56.7L513 232.9l-69.8 141.3c-15.1 30.5-44.3 51.6-78 56.6l-155.8 22.6 112.7 109.8c24.5 23.8 35.6 58.1 29.8 91.7L325.3 810m434.2 95.7c-2.3 0-4.7-0.6-6.9-1.7L533.7 789.1c-6.5-3.4-13.6-5.1-20.7-5.1s-14.2 1.7-20.7 5.1L273.4 904c-2.3 1.1-4.6 1.7-6.9 1.7-8.7 0-16.3-7.8-14.7-17.4l41.8-243.4c2.5-14.4-2.3-29.1-12.8-39.3l-177-172.4c-8.8-8.5-4-23.5 8.2-25.3l244.7-35.5c14.5-2.1 27.1-11.2 33.6-24.3l109.4-221.5c2.7-5.5 8-8.3 13.4-8.3 5.3 0 10.6 2.8 13.3 8.3L635.7 348c6.5 13.1 19.1 22.2 33.6 24.3L914 407.8c12.2 1.8 17.1 16.8 8.3 25.3L745.1 605.6c-10.5 10.2-15.3 24.9-12.8 39.3l41.8 243.4c1.6 9.6-6 17.4-14.6 17.4z"
+                                                        fill="#666666"
+                                                        p-id="7487"
+                                                    ></path>
+                                                </svg>
+                                                <div>7</div>
+                                                <svg
+                                                    viewBox="0 0 1071 1024"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    p-id="8513"
+                                                    width="20"
+                                                    height="20"
+                                                >
+                                                    <path
+                                                        d="M395.701 434.549c0 25.716-18.369 47.759-47.759 47.759-25.716 0-47.759-22.043-47.759-47.759 0-25.716 22.042-47.759 47.759-47.759 29.391 0 47.759 22.043 47.759 47.759v0zM943.095 408.833c0-198.385-183.69-360.032-411.465-360.032-231.449 0-415.138 161.647-415.138 360.032 0 117.562 66.129 227.775 176.341 293.903v113.888c0 11.021 7.348 18.369 14.694 22.042 0 0 3.674 0 7.348 0 7.348 0 11.021 0 14.694-3.674l51.434-33.065c0 0 0 0 3.674-3.674l58.78-36.739c29.391 3.674 58.78 7.348 88.171 7.348 227.775 0 411.465-161.647 411.465-360.032v0zM325.898 673.346c-102.865-58.78-165.321-157.972-165.321-264.513 0-172.669 165.321-315.946 371.053-315.946 202.058 0 367.379 143.278 367.379 315.946 0 172.669-165.321 315.946-367.379 315.946-29.391 0-58.78-3.674-88.171-7.348-7.348-3.674-14.694 0-18.369 0l-69.801 47.759c0 0 0 0 0 0l-18.369 11.021v-84.497c0-7.348-3.674-14.694-11.021-18.369v0zM586.737 423.53c0 25.716-22.042 47.759-47.759 47.759s-47.759-22.042-47.759-47.759c0-29.391 22.042-47.759 47.759-47.759 25.716 0 47.759 18.369 47.759 47.759v0zM770.428 423.53c0 25.716-18.369 47.759-47.759 47.759-25.716 0-47.759-22.042-47.759-47.759 0-29.391 22.042-47.759 47.759-47.759 29.391 0 47.759 18.369 47.759 47.759v0z"
+                                                        p-id="8514"
+                                                    ></path>
+                                                </svg>
+                                                <div>20+</div>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2 text-[#333] text-[13px]">
-                                            <svg
-                                                viewBox="0 0 1024 1024"
-                                                version="1.1"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                p-id="6478"
-                                                width="20"
-                                                height="20"
-                                            >
-                                                <path
-                                                    d="M667.786667 117.333333C832.864 117.333333 938.666667 249.706667 938.666667 427.861333c0 138.250667-125.098667 290.506667-371.573334 461.589334a96.768 96.768 0 0 1-110.186666 0C210.432 718.368 85.333333 566.112 85.333333 427.861333 85.333333 249.706667 191.136 117.333333 356.213333 117.333333c59.616 0 100.053333 20.832 155.786667 68.096C567.744 138.176 608.170667 117.333333 667.786667 117.333333z m0 63.146667c-41.44 0-70.261333 15.189333-116.96 55.04-2.165333 1.845333-14.4 12.373333-17.941334 15.381333a32.32 32.32 0 0 1-41.770666 0c-3.541333-3.018667-15.776-13.536-17.941334-15.381333-46.698667-39.850667-75.52-55.04-116.96-55.04C230.186667 180.48 149.333333 281.258667 149.333333 426.698667 149.333333 537.6 262.858667 675.242667 493.632 834.826667a32.352 32.352 0 0 0 36.736 0C761.141333 675.253333 874.666667 537.6 874.666667 426.698667c0-145.44-80.853333-246.218667-206.88-246.218667z"
-                                                    fill="#000000"
-                                                    p-id="6479"
-                                                ></path>
-                                            </svg>
-                                            <div>90+</div>
-                                            <svg
-                                                viewBox="0 0 1024 1024"
-                                                version="1.1"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                p-id="7486"
-                                                width="20"
-                                                height="20"
-                                            >
-                                                <path
-                                                    d="M325.3 810l139.5-73.3c14.8-7.8 31.5-11.9 48.2-11.9 16.7 0 33.4 4.1 48.2 11.9L700.7 810l-26.6-155.1c-5.8-33.6 5.4-67.9 29.8-91.7l112.7-109.8-155.8-22.6c-33.7-4.9-62.9-26.1-78-56.7L513 232.9l-69.8 141.3c-15.1 30.5-44.3 51.6-78 56.6l-155.8 22.6 112.7 109.8c24.5 23.8 35.6 58.1 29.8 91.7L325.3 810m434.2 95.7c-2.3 0-4.7-0.6-6.9-1.7L533.7 789.1c-6.5-3.4-13.6-5.1-20.7-5.1s-14.2 1.7-20.7 5.1L273.4 904c-2.3 1.1-4.6 1.7-6.9 1.7-8.7 0-16.3-7.8-14.7-17.4l41.8-243.4c2.5-14.4-2.3-29.1-12.8-39.3l-177-172.4c-8.8-8.5-4-23.5 8.2-25.3l244.7-35.5c14.5-2.1 27.1-11.2 33.6-24.3l109.4-221.5c2.7-5.5 8-8.3 13.4-8.3 5.3 0 10.6 2.8 13.3 8.3L635.7 348c6.5 13.1 19.1 22.2 33.6 24.3L914 407.8c12.2 1.8 17.1 16.8 8.3 25.3L745.1 605.6c-10.5 10.2-15.3 24.9-12.8 39.3l41.8 243.4c1.6 9.6-6 17.4-14.6 17.4z"
-                                                    fill="#666666"
-                                                    p-id="7487"
-                                                ></path>
-                                            </svg>
-                                            <div>7</div>
-                                            <svg
-                                                viewBox="0 0 1071 1024"
-                                                version="1.1"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                p-id="8513"
-                                                width="20"
-                                                height="20"
-                                            >
-                                                <path
-                                                    d="M395.701 434.549c0 25.716-18.369 47.759-47.759 47.759-25.716 0-47.759-22.043-47.759-47.759 0-25.716 22.042-47.759 47.759-47.759 29.391 0 47.759 22.043 47.759 47.759v0zM943.095 408.833c0-198.385-183.69-360.032-411.465-360.032-231.449 0-415.138 161.647-415.138 360.032 0 117.562 66.129 227.775 176.341 293.903v113.888c0 11.021 7.348 18.369 14.694 22.042 0 0 3.674 0 7.348 0 7.348 0 11.021 0 14.694-3.674l51.434-33.065c0 0 0 0 3.674-3.674l58.78-36.739c29.391 3.674 58.78 7.348 88.171 7.348 227.775 0 411.465-161.647 411.465-360.032v0zM325.898 673.346c-102.865-58.78-165.321-157.972-165.321-264.513 0-172.669 165.321-315.946 371.053-315.946 202.058 0 367.379 143.278 367.379 315.946 0 172.669-165.321 315.946-367.379 315.946-29.391 0-58.78-3.674-88.171-7.348-7.348-3.674-14.694 0-18.369 0l-69.801 47.759c0 0 0 0 0 0l-18.369 11.021v-84.497c0-7.348-3.674-14.694-11.021-18.369v0zM586.737 423.53c0 25.716-22.042 47.759-47.759 47.759s-47.759-22.042-47.759-47.759c0-29.391 22.042-47.759 47.759-47.759 25.716 0 47.759 18.369 47.759 47.759v0zM770.428 423.53c0 25.716-18.369 47.759-47.759 47.759-25.716 0-47.759-22.042-47.759-47.759 0-29.391 22.042-47.759 47.759-47.759 29.391 0 47.759 18.369 47.759 47.759v0z"
-                                                    p-id="8514"
-                                                ></path>
-                                            </svg>
-                                            <div>20+</div>
-                                        </div>
+                                        <Button
+                                            onClick={redbookShare}
+                                            className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto]"
+                                            type="primary"
+                                            icon={<SendOutlined />}
+                                        >
+                                            去小红书发布
+                                        </Button>
                                     </div>
-                                    <Button
-                                        onClick={redbookShare}
-                                        className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto]"
-                                        type="primary"
-                                        icon={<SendOutlined />}
-                                    >
-                                        去小红书发布
-                                    </Button>
-                                </div>
-                            )
-                        },
-                        {
-                            label: '列表页',
-                            key: '2',
-                            children: (
-                                <div className="h-[calc(100vh-46px)] relative">
-                                    <div className="h-full overflow-y-scroll">
-                                        <div className="w-full grid gap-2 grid-cols-2 mt-4">
-                                            <div className="shadow-md rounded-lg">
-                                                <Image
-                                                    preview={false}
-                                                    src={'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_051.jpg'}
-                                                />
-                                                <div className="p-2">
-                                                    <div className="my-2">💥杭州宝藏洗衣上门推荐 </div>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex gap-1 items-center">
-                                                            <svg
-                                                                version="1.1"
-                                                                id="Layer_1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                                                x="0px"
-                                                                y="0px"
-                                                                width="15px"
-                                                                height="15px"
-                                                                viewBox="0 0 48 48"
-                                                                enableBackground="new 0 0 48 48"
-                                                                xmlSpace="preserve"
-                                                            >
-                                                                <image
-                                                                    id="image0"
-                                                                    width="48"
-                                                                    height="48"
-                                                                    x="0"
-                                                                    y="0"
-                                                                    xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                                )
+                            },
+                            {
+                                label: '列表页',
+                                key: '2',
+                                children: (
+                                    <div className="h-[calc(100vh-46px)] relative">
+                                        <div className="h-full overflow-y-scroll">
+                                            <div className="w-full grid gap-2 grid-cols-2 mt-4">
+                                                <div className="shadow-md rounded-lg">
+                                                    <Image
+                                                        preview={false}
+                                                        src={'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_051.jpg'}
+                                                    />
+                                                    <div className="p-2">
+                                                        <div className="my-2">💥杭州宝藏洗衣上门推荐 </div>
+                                                        <div className="flex justify-between items-center">
+                                                            <div className="flex gap-1 items-center">
+                                                                <svg
+                                                                    version="1.1"
+                                                                    id="Layer_1"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                                                                    x="0px"
+                                                                    y="0px"
+                                                                    width="15px"
+                                                                    height="15px"
+                                                                    viewBox="0 0 48 48"
+                                                                    enableBackground="new 0 0 48 48"
+                                                                    xmlSpace="preserve"
+                                                                >
+                                                                    <image
+                                                                        id="image0"
+                                                                        width="48"
+                                                                        height="48"
+                                                                        x="0"
+                                                                        y="0"
+                                                                        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -584,60 +595,60 @@ const Share = () => {
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                                                />
-                                                            </svg>
-                                                            <div className=" text-xs text-black/60">魔法笔记</div>
-                                                        </div>
-                                                        <div className="flex items-end gap-1 text-black/60 text-xs">
-                                                            <svg
-                                                                viewBox="0 0 1024 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="6478"
-                                                                width="15"
-                                                                height="15"
-                                                            >
-                                                                <path
-                                                                    d="M667.786667 117.333333C832.864 117.333333 938.666667 249.706667 938.666667 427.861333c0 138.250667-125.098667 290.506667-371.573334 461.589334a96.768 96.768 0 0 1-110.186666 0C210.432 718.368 85.333333 566.112 85.333333 427.861333 85.333333 249.706667 191.136 117.333333 356.213333 117.333333c59.616 0 100.053333 20.832 155.786667 68.096C567.744 138.176 608.170667 117.333333 667.786667 117.333333z m0 63.146667c-41.44 0-70.261333 15.189333-116.96 55.04-2.165333 1.845333-14.4 12.373333-17.941334 15.381333a32.32 32.32 0 0 1-41.770666 0c-3.541333-3.018667-15.776-13.536-17.941334-15.381333-46.698667-39.850667-75.52-55.04-116.96-55.04C230.186667 180.48 149.333333 281.258667 149.333333 426.698667 149.333333 537.6 262.858667 675.242667 493.632 834.826667a32.352 32.352 0 0 0 36.736 0C761.141333 675.253333 874.666667 537.6 874.666667 426.698667c0-145.44-80.853333-246.218667-206.88-246.218667z"
-                                                                    fill="#000000"
-                                                                    p-id="6479"
-                                                                ></path>
-                                                            </svg>
-                                                            <div>90+</div>
+                                                                    />
+                                                                </svg>
+                                                                <div className=" text-xs text-black/60">魔法笔记</div>
+                                                            </div>
+                                                            <div className="flex items-end gap-1 text-black/60 text-xs">
+                                                                <svg
+                                                                    viewBox="0 0 1024 1024"
+                                                                    version="1.1"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    p-id="6478"
+                                                                    width="15"
+                                                                    height="15"
+                                                                >
+                                                                    <path
+                                                                        d="M667.786667 117.333333C832.864 117.333333 938.666667 249.706667 938.666667 427.861333c0 138.250667-125.098667 290.506667-371.573334 461.589334a96.768 96.768 0 0 1-110.186666 0C210.432 718.368 85.333333 566.112 85.333333 427.861333 85.333333 249.706667 191.136 117.333333 356.213333 117.333333c59.616 0 100.053333 20.832 155.786667 68.096C567.744 138.176 608.170667 117.333333 667.786667 117.333333z m0 63.146667c-41.44 0-70.261333 15.189333-116.96 55.04-2.165333 1.845333-14.4 12.373333-17.941334 15.381333a32.32 32.32 0 0 1-41.770666 0c-3.541333-3.018667-15.776-13.536-17.941334-15.381333-46.698667-39.850667-75.52-55.04-116.96-55.04C230.186667 180.48 149.333333 281.258667 149.333333 426.698667 149.333333 537.6 262.858667 675.242667 493.632 834.826667a32.352 32.352 0 0 0 36.736 0C761.141333 675.253333 874.666667 537.6 874.666667 426.698667c0-145.44-80.853333-246.218667-206.88-246.218667z"
+                                                                        fill="#000000"
+                                                                        p-id="6479"
+                                                                    ></path>
+                                                                </svg>
+                                                                <div>90+</div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div className="shadow-md rounded-lg">
-                                                <Image
-                                                    width="100%"
-                                                    preview={false}
-                                                    src={'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_033.gif'}
-                                                />
-                                                <div className="p-2">
-                                                    <div className="my-2">黄白小课堂 </div>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex gap-1 items-center">
-                                                            <svg
-                                                                version="1.1"
-                                                                id="Layer_1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                                                x="0px"
-                                                                y="0px"
-                                                                width="15px"
-                                                                height="15px"
-                                                                viewBox="0 0 48 48"
-                                                                enableBackground="new 0 0 48 48"
-                                                                xmlSpace="preserve"
-                                                            >
-                                                                <image
-                                                                    id="image0"
-                                                                    width="48"
-                                                                    height="48"
-                                                                    x="0"
-                                                                    y="0"
-                                                                    xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                                                <div className="shadow-md rounded-lg">
+                                                    <Image
+                                                        width="100%"
+                                                        preview={false}
+                                                        src={'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_033.gif'}
+                                                    />
+                                                    <div className="p-2">
+                                                        <div className="my-2">黄白小课堂 </div>
+                                                        <div className="flex justify-between items-center">
+                                                            <div className="flex gap-1 items-center">
+                                                                <svg
+                                                                    version="1.1"
+                                                                    id="Layer_1"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                                                                    x="0px"
+                                                                    y="0px"
+                                                                    width="15px"
+                                                                    height="15px"
+                                                                    viewBox="0 0 48 48"
+                                                                    enableBackground="new 0 0 48 48"
+                                                                    xmlSpace="preserve"
+                                                                >
+                                                                    <image
+                                                                        id="image0"
+                                                                        width="48"
+                                                                        height="48"
+                                                                        x="0"
+                                                                        y="0"
+                                                                        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -792,59 +803,59 @@ const Share = () => {
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                                                />
-                                                            </svg>
-                                                            <div className=" text-xs text-black/60">魔法笔记</div>
-                                                        </div>
-                                                        <div className="flex items-end gap-1 text-black/60 text-xs">
-                                                            <svg
-                                                                viewBox="0 0 1024 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="6478"
-                                                                width="15"
-                                                                height="15"
-                                                            >
-                                                                <path
-                                                                    d="M667.786667 117.333333C832.864 117.333333 938.666667 249.706667 938.666667 427.861333c0 138.250667-125.098667 290.506667-371.573334 461.589334a96.768 96.768 0 0 1-110.186666 0C210.432 718.368 85.333333 566.112 85.333333 427.861333 85.333333 249.706667 191.136 117.333333 356.213333 117.333333c59.616 0 100.053333 20.832 155.786667 68.096C567.744 138.176 608.170667 117.333333 667.786667 117.333333z m0 63.146667c-41.44 0-70.261333 15.189333-116.96 55.04-2.165333 1.845333-14.4 12.373333-17.941334 15.381333a32.32 32.32 0 0 1-41.770666 0c-3.541333-3.018667-15.776-13.536-17.941334-15.381333-46.698667-39.850667-75.52-55.04-116.96-55.04C230.186667 180.48 149.333333 281.258667 149.333333 426.698667 149.333333 537.6 262.858667 675.242667 493.632 834.826667a32.352 32.352 0 0 0 36.736 0C761.141333 675.253333 874.666667 537.6 874.666667 426.698667c0-145.44-80.853333-246.218667-206.88-246.218667z"
-                                                                    fill="#000000"
-                                                                    p-id="6479"
-                                                                ></path>
-                                                            </svg>
-                                                            <div>71</div>
+                                                                    />
+                                                                </svg>
+                                                                <div className=" text-xs text-black/60">魔法笔记</div>
+                                                            </div>
+                                                            <div className="flex items-end gap-1 text-black/60 text-xs">
+                                                                <svg
+                                                                    viewBox="0 0 1024 1024"
+                                                                    version="1.1"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    p-id="6478"
+                                                                    width="15"
+                                                                    height="15"
+                                                                >
+                                                                    <path
+                                                                        d="M667.786667 117.333333C832.864 117.333333 938.666667 249.706667 938.666667 427.861333c0 138.250667-125.098667 290.506667-371.573334 461.589334a96.768 96.768 0 0 1-110.186666 0C210.432 718.368 85.333333 566.112 85.333333 427.861333 85.333333 249.706667 191.136 117.333333 356.213333 117.333333c59.616 0 100.053333 20.832 155.786667 68.096C567.744 138.176 608.170667 117.333333 667.786667 117.333333z m0 63.146667c-41.44 0-70.261333 15.189333-116.96 55.04-2.165333 1.845333-14.4 12.373333-17.941334 15.381333a32.32 32.32 0 0 1-41.770666 0c-3.541333-3.018667-15.776-13.536-17.941334-15.381333-46.698667-39.850667-75.52-55.04-116.96-55.04C230.186667 180.48 149.333333 281.258667 149.333333 426.698667 149.333333 537.6 262.858667 675.242667 493.632 834.826667a32.352 32.352 0 0 0 36.736 0C761.141333 675.253333 874.666667 537.6 874.666667 426.698667c0-145.44-80.853333-246.218667-206.88-246.218667z"
+                                                                        fill="#000000"
+                                                                        p-id="6479"
+                                                                    ></path>
+                                                                </svg>
+                                                                <div>71</div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div className="shadow-md rounded-lg">
-                                                <Image
-                                                    preview={false}
-                                                    src={'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_075.jpg'}
-                                                />
-                                                <div className="p-2">
-                                                    <div className="my-2">💥本性善良的人都比较晚熟 </div>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex gap-1 items-center">
-                                                            <svg
-                                                                version="1.1"
-                                                                id="Layer_1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                                                x="0px"
-                                                                y="0px"
-                                                                width="15px"
-                                                                height="15px"
-                                                                viewBox="0 0 48 48"
-                                                                enableBackground="new 0 0 48 48"
-                                                                xmlSpace="preserve"
-                                                            >
-                                                                <image
-                                                                    id="image0"
-                                                                    width="48"
-                                                                    height="48"
-                                                                    x="0"
-                                                                    y="0"
-                                                                    xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+                                                <div className="shadow-md rounded-lg">
+                                                    <Image
+                                                        preview={false}
+                                                        src={'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_075.jpg'}
+                                                    />
+                                                    <div className="p-2">
+                                                        <div className="my-2">💥本性善良的人都比较晚熟 </div>
+                                                        <div className="flex justify-between items-center">
+                                                            <div className="flex gap-1 items-center">
+                                                                <svg
+                                                                    version="1.1"
+                                                                    id="Layer_1"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                                                                    x="0px"
+                                                                    y="0px"
+                                                                    width="15px"
+                                                                    height="15px"
+                                                                    viewBox="0 0 48 48"
+                                                                    enableBackground="new 0 0 48 48"
+                                                                    xmlSpace="preserve"
+                                                                >
+                                                                    <image
+                                                                        id="image0"
+                                                                        width="48"
+                                                                        height="48"
+                                                                        x="0"
+                                                                        y="0"
+                                                                        xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
                 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABFFBMVEUAAAAbidsSptUZmtcV
                 p9MWn9cUp9IIxsYA3bgA37kA27YhhN4Wo9QXnNsTp9MXntYVodUTptMMvcoA4LoA3roA3rUA4rwH
                 zcIRsc8Up9UdiuIeiOEdiOIOs8yMAP9DW+tBXOlDWupFWuw1beZEXOtgOPJRS+9WRO8qeOU8Y+li
@@ -999,46 +1010,47 @@ const Share = () => {
                 LwZ9R75NOqyBT58Obf92vhzyHflW6g9/+Pf/WOrnn3/+z//a6L//J9P//vGP/2d9gZr6fwApfYYx
                 DHMWAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIzLTA2LTA3VDE1OjQxOjA2KzA4OjAwLJ5v2AAAACV0
                 RVh0ZGF0ZTptb2RpZnkAMjAyMy0wNi0wN1QxNTo0MTowNiswODowMF3D12QAAAAASUVORK5CYII="
-                                                                />
-                                                            </svg>
-                                                            <div className=" text-xs text-black/60">魔法笔记</div>
-                                                        </div>
-                                                        <div className="flex items-end gap-1 text-black/60 text-xs">
-                                                            <svg
-                                                                viewBox="0 0 1024 1024"
-                                                                version="1.1"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                p-id="6478"
-                                                                width="15"
-                                                                height="15"
-                                                            >
-                                                                <path
-                                                                    d="M667.786667 117.333333C832.864 117.333333 938.666667 249.706667 938.666667 427.861333c0 138.250667-125.098667 290.506667-371.573334 461.589334a96.768 96.768 0 0 1-110.186666 0C210.432 718.368 85.333333 566.112 85.333333 427.861333 85.333333 249.706667 191.136 117.333333 356.213333 117.333333c59.616 0 100.053333 20.832 155.786667 68.096C567.744 138.176 608.170667 117.333333 667.786667 117.333333z m0 63.146667c-41.44 0-70.261333 15.189333-116.96 55.04-2.165333 1.845333-14.4 12.373333-17.941334 15.381333a32.32 32.32 0 0 1-41.770666 0c-3.541333-3.018667-15.776-13.536-17.941334-15.381333-46.698667-39.850667-75.52-55.04-116.96-55.04C230.186667 180.48 149.333333 281.258667 149.333333 426.698667 149.333333 537.6 262.858667 675.242667 493.632 834.826667a32.352 32.352 0 0 0 36.736 0C761.141333 675.253333 874.666667 537.6 874.666667 426.698667c0-145.44-80.853333-246.218667-206.88-246.218667z"
-                                                                    fill="#000000"
-                                                                    p-id="6479"
-                                                                ></path>
-                                                            </svg>
-                                                            <div>90+</div>
+                                                                    />
+                                                                </svg>
+                                                                <div className=" text-xs text-black/60">魔法笔记</div>
+                                                            </div>
+                                                            <div className="flex items-end gap-1 text-black/60 text-xs">
+                                                                <svg
+                                                                    viewBox="0 0 1024 1024"
+                                                                    version="1.1"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    p-id="6478"
+                                                                    width="15"
+                                                                    height="15"
+                                                                >
+                                                                    <path
+                                                                        d="M667.786667 117.333333C832.864 117.333333 938.666667 249.706667 938.666667 427.861333c0 138.250667-125.098667 290.506667-371.573334 461.589334a96.768 96.768 0 0 1-110.186666 0C210.432 718.368 85.333333 566.112 85.333333 427.861333 85.333333 249.706667 191.136 117.333333 356.213333 117.333333c59.616 0 100.053333 20.832 155.786667 68.096C567.744 138.176 608.170667 117.333333 667.786667 117.333333z m0 63.146667c-41.44 0-70.261333 15.189333-116.96 55.04-2.165333 1.845333-14.4 12.373333-17.941334 15.381333a32.32 32.32 0 0 1-41.770666 0c-3.541333-3.018667-15.776-13.536-17.941334-15.381333-46.698667-39.850667-75.52-55.04-116.96-55.04C230.186667 180.48 149.333333 281.258667 149.333333 426.698667 149.333333 537.6 262.858667 675.242667 493.632 834.826667a32.352 32.352 0 0 0 36.736 0C761.141333 675.253333 874.666667 537.6 874.666667 426.698667c0-145.44-80.853333-246.218667-206.88-246.218667z"
+                                                                        fill="#000000"
+                                                                        p-id="6479"
+                                                                    ></path>
+                                                                </svg>
+                                                                <div>90+</div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <Button
+                                            onClick={redbookShare}
+                                            className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto]"
+                                            type="primary"
+                                            icon={<SendOutlined />}
+                                        >
+                                            去小红书发布
+                                        </Button>
                                     </div>
-                                    <Button
-                                        onClick={redbookShare}
-                                        className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto]"
-                                        type="primary"
-                                        icon={<SendOutlined />}
-                                    >
-                                        去小红书发布
-                                    </Button>
-                                </div>
-                            )
-                        }
-                    ]}
-                ></Tabs>
-            </div>
+                                )
+                            }
+                        ]}
+                    ></Tabs>
+                </div>
+            )}
             <Modal title="笔记发布" open={open} onCancel={() => setOpen(false)} footer={false} closable={false}>
                 <div className="w-full flex justify-center items-center flex-col gap-2">
                     <QRCode value={`${process.env.REACT_APP_SHARE_URL}/share?uid=${query.get('uid')}`} />

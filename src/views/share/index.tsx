@@ -11,9 +11,11 @@ const Share = () => {
     const [carouselValue, setCarouselValue] = useState(0);
     const [open, setOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>(null);
+    const [redBookData, setRedBookData] = useState<any>(null);
     const getDetail = async () => {
         const result = await contentShare(query.get('uid'));
-        setDetailData(result.executeResult);
+        setDetailData(result.data.executeResult);
+        setRedBookData(result.verifyConfig);
     };
     useEffect(() => {
         getDetail();
@@ -31,18 +33,15 @@ const Share = () => {
             xhs.share({
                 shareInfo: {
                     type: 'normal', // 必填，笔记类型 'video' | 'normal'
-                    title: '测试', // 笔记标题
-                    content: '我是测试内容', // 笔记正文
-                    images: [
-                        'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_051.jpg',
-                        'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_075.jpg'
-                    ]
+                    title: detailData?.copyWriting?.title, // 笔记标题
+                    content: detailData?.copyWriting?.content, // 笔记正文
+                    images: detailData?.imageList?.map((item: any) => item.url)
                 },
                 verifyConfig: {
-                    appKey: ' ', //必填，应用的唯一标识,
-                    nonce: Math.random().toString(), // 必填，服务端生成签名的随机字符串
-                    timestamp: new Date().getTime(), // 必填，服务端生成签名的时间戳
-                    signature: 'sahdasdaksjh' // 必填，服务端生成的签名
+                    appKey: redBookData?.appKey, //必填，应用的唯一标识,
+                    nonce: redBookData?.nonce, // 必填，服务端生成签名的随机字符串
+                    timestamp: redBookData?.timestamp, // 必填，服务端生成签名的时间戳
+                    signature: redBookData?.signature // 必填，服务端生成的签名
                 },
                 fail: (e: any) => {
                     console.log(e);
@@ -1042,7 +1041,7 @@ const Share = () => {
             </div>
             <Modal title="笔记发布" open={open} onCancel={() => setOpen(false)} footer={false} closable={false}>
                 <div className="w-full flex justify-center items-center flex-col gap-2">
-                    <QRCode value={`${process.env.REACT_APP_BASE_URL}/share`} />
+                    <QRCode value={`${process.env.REACT_APP_BASE_URL}/share?uid=${query.get('uid')}`} />
                     <div className="text-md text-black/50">注意：小红书需更新到最新版本</div>
                 </div>
             </Modal>

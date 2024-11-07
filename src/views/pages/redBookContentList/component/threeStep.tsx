@@ -14,7 +14,8 @@ import {
     Select,
     Drawer,
     Progress,
-    Popover
+    Popover,
+    QRCode
 } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
@@ -237,6 +238,9 @@ const ThreeStep = ({
                 console.error('Error downloading images:', error);
             });
     };
+
+    //扫码发布
+    const [publishOpen, setPublishOpen] = useState(false);
     return (
         <div
             className="h-full"
@@ -273,7 +277,15 @@ const ThreeStep = ({
                             {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
                                 <Space>
-                                    <Button type="primary" loading={downLoading} onClick={downLoadImage}>
+                                    <Button
+                                        type="primary"
+                                        onClick={() => {
+                                            setPublishOpen(true);
+                                        }}
+                                    >
+                                        扫码发布
+                                    </Button>
+                                    <Button type="primary" loading={downLoading} onClick={() => setPublishOpen(true)}>
                                         打包下载
                                     </Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
@@ -545,6 +557,12 @@ const ThreeStep = ({
 
             <Modal style={{ zIndex: 8000 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
                 <img alt="example" style={{ width: '100%' }} src={previewImage} />
+            </Modal>
+            <Modal open={publishOpen} title={'小红书发布'} footer={null} onCancel={() => setPublishOpen(false)} closable={false}>
+                <div className="w-full flex justify-center items-center flex-col gap-2">
+                    <QRCode value={`${process.env.REACT_APP_BASE_URL}/share?uid=` + data?.uid} />
+                    <div className="text-md text-black/50">注意：小红书需更新到最新版本</div>
+                </div>
             </Modal>
             <Drawer
                 width={700}

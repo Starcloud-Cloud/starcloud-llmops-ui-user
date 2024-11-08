@@ -95,7 +95,7 @@ const Share = () => {
                                                 <div className="text-lg font-[600] mt-[15px] mb-2 leading-[140%]">
                                                     {detailData?.copyWriting?.title}
                                                 </div>
-                                                <div className="text-base font-[400] leading-[150%] text-[#000]">
+                                                <div className="text-base font-[400] leading-[150%] text-[#000] whitespace-pre-wrap">
                                                     {detailData?.copyWriting?.content}
                                                 </div>
                                                 <div className="mt-[40px] flex justify-between text-md text-black/60">

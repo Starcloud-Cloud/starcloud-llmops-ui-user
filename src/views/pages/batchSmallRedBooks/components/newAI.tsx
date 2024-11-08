@@ -730,7 +730,7 @@ const AiCreate = ({
                 return {
                     ...item,
                     render: (_: any, row: any) =>
-                        typeof row[item.dataIndex] === 'object' ? (
+                        row[item.dataIndex] !== null && typeof row[item.dataIndex] === 'object' ? (
                             <span className="text-[#ff4d4f]">字段结果类型错误，只支持返回字符串类型</span>
                         ) : (
                             row[item.dataIndex]
@@ -1000,6 +1000,7 @@ const AiCreate = ({
                         }
                     }}
                     handleCancel={() => {
+                        clearInterval(timer.current);
                         executionCountRef.current = 0;
                         setExecutionCount(executionCountRef.current);
                         aref.current = true;

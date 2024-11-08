@@ -164,12 +164,13 @@ function MyTemplate() {
                 setSaveDetail(res);
                 setOpen(true);
             });
-        } else if (
-            totalList.filter((item) => Number(item.creator) === user.id).length >=
-            allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp
-        ) {
-            setBotOpen(true);
         }
+        //  else if (
+        //     totalList.filter((item) => Number(item.creator) === user.id).length >=
+        //     allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp
+        // ) {
+        //     setBotOpen(true);
+        // }
     };
     const timeoutRef = useRef<any>();
     return (

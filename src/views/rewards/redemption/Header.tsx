@@ -127,8 +127,8 @@ const RedemptionHeader = () => {
                                 sx={{
                                     width: '90% !important',
                                     marginTop: '0 !important',
-                                    position: 'relative',
-                                    top: { sm: '-40px', xs: '-17px' }
+                                    position: 'relative'
+                                    // top: { sm: '-40px', xs: '-17px' }
                                 }} // Add this line
                             >
                                 <Grid
@@ -173,7 +173,7 @@ const RedemptionHeader = () => {
                                         </Button>
                                     </Grid>
                                 </Grid>
-                                <Grid
+                                {/* <Grid
                                     item
                                     xs={12}
                                     sm={3}
@@ -207,7 +207,7 @@ const RedemptionHeader = () => {
                                             {t('redemption.scancode')}
                                         </Typography>
                                     </div>
-                                </Grid>
+                                </Grid> */}
                             </Grid>
                         </Grid>
                     </CardContent>

@@ -1,11 +1,12 @@
 import { Row, Col, Card, Button } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import infoStore from 'store/entitlementAction';
 import copy from 'clipboard-copy';
-import { Tooltip, Box, IconButton } from '@mui/material';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { checkSignInStatus, signIn } from 'api/rewards';
+import { useAllDetail } from 'contexts/JWTContext';
 
 export const InviteMatrix = () => {
     const [word, setWord] = React.useState('');
@@ -41,25 +42,63 @@ export const InviteMatrix = () => {
     React.useEffect(() => {
         handleRadomWord();
     }, []);
+    const allDetail = useAllDetail();
+    const [disabledOpen, setDisabledOpen] = useState(false);
+    const handleSignIn = async () => {
+        await signIn();
+        setDisabledOpen(true);
+        allDetail?.setPre(allDetail?.pre + 1);
+    };
+    useEffect(() => {
+        checkSignInStatus().then((data) => {
+            if (data.todaySignIn) {
+                setDisabledOpen(true);
+            }
+        });
+    }, []);
 
     return (
         <div className="bg-white p-4 rounded">
             <div className="mt-3">
                 <p className="text-black text-2xl">邀请有奖</p>
             </div>
-            <Row gutter={24}>
+            <Row gutter={[20, 20]}>
                 <Col span={12}>
                     <Card
                         title="拉新规则"
                         bordered={false}
                         style={{
-                            boxShadow: 'none'
+                            boxShadow: 'none',
+                            backgroundColor: '#f5f5f5',
+                            height: '100%'
                         }}
                     >
                         <div>
                             <p className="text-base">分享邀请链接，邀请新人成功注册!</p>
                             <p className="ml-2">-邀请好友需为之前从未注册过魔法笔记的新用户。</p>
-                            <p className="ml-2">-用户每成功邀请1位好友注册，可获得5点矩阵豆。</p>
+                            <p className="ml-2">-用户每成功邀请1位好友注册，可获得10点矩阵豆。</p>
+                        </div>
+                    </Card>
+                </Col>
+                <Col span={12}>
+                    <Card
+                        bordered={false}
+                        title="每日签到"
+                        style={{
+                            boxShadow: 'none',
+                            backgroundColor: '#f5f5f5',
+                            height: '100%'
+                        }}
+                        extra={<EventNoteIcon />}
+                    >
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <div>方式一：点击右边“签到”即可获得2矩阵豆</div>
+                                <div>方式二：魔法AI小助手公众号“菜单栏--权益领取--点击签到”即可</div>
+                            </div>
+                            <Button onClick={handleSignIn} disabled={disabledOpen} type="primary">
+                                {disabledOpen ? '已签到' : '立即签到'}
+                            </Button>
                         </div>
                     </Card>
                 </Col>

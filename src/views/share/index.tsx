@@ -44,8 +44,14 @@ const Share = () => {
                     content: detailData?.copyWriting?.content, // 笔记正文
                     images: detailData?.imageList?.map((item: any) => item.url)
                 },
+                // verifyConfig: {
+                //     app_key: 'red.2AiITQapXH8WFKFH', //必填，应用的唯一标识,
+                //     nonce: 'c5cM1kfVLn11Lj02syZI7C', // 必填，服务端生成签名的随机字符串
+                //     timestamp: 1731052173737, // 必填，服务端生成签名的时间戳
+                //     signature: '80d8ec80f35910faaa8b7ca0798624ba24c6be85811523b0bd65307f37f996b5' // 必填，服务端生成的签名
+                // },
                 verifyConfig: {
-                    appKey: res?.appKey, //必填，应用的唯一标识,
+                    appKey: res?.app_key, //必填，应用的唯一标识,
                     nonce: res?.nonce, // 必填，服务端生成签名的随机字符串
                     timestamp: res?.timestamp, // 必填，服务端生成签名的时间戳
                     signature: res?.signature // 必填，服务端生成的签名

@@ -40,7 +40,8 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
                 return errMessage?.indexOf('权益不足') !== -1 && !count ? (
                     <span
                         onClick={() => {
-                            navigate('/subscribe');
+                            window.open(process.env.REACT_APP_SHARE_URL + '/subscribe');
+                            // navigate('/subscribe');
                         }}
                         className="!mr-0 cursor-pointer text-[#673ab7] hover:underline font-[500]"
                     >

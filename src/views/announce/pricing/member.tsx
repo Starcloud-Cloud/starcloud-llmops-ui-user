@@ -246,7 +246,7 @@ const planListDefault = (value: number) => [
         keyword: 'free',
         value: [
             <div className="flex items-center">
-                <span>矩阵豆：5</span>
+                <span>矩阵豆：10</span>
                 <Tooltip title={'用来AI创作图文笔记'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>

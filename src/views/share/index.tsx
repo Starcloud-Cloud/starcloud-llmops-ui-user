@@ -89,7 +89,9 @@ const Share = () => {
                                                     dots={{ className: 'uls' }}
                                                 >
                                                     {detailData?.imageList?.map((item: any) => (
-                                                        <Image preview={false} src={item?.url} />
+                                                        <div className="px-[30px]">
+                                                            <Image key={item?.url} preview={false} src={item?.url} />
+                                                        </div>
                                                     ))}
                                                 </Carousel>
                                                 <div className="absolute right-[15px] top-[10px] bg-[#2f3334] text-white rounded-[20px] text-md px-[5px] py-[2px] z-10 leading-[14px]">
@@ -376,6 +378,7 @@ const Share = () => {
                                             onClick={redbookShare}
                                             className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto]"
                                             type="primary"
+                                            size="large"
                                             icon={<SendOutlined />}
                                         >
                                             去小红书发布
@@ -389,7 +392,7 @@ const Share = () => {
                                 children: (
                                     <div className="h-[calc(100svh-46px)] relative">
                                         <div className="h-full overflow-y-scroll">
-                                            <div className="w-full grid gap-2 grid-cols-2 mt-4">
+                                            <div className="w-full grid gap-2 grid-cols-2 mt-4 px-2">
                                                 <div className="shadow-md rounded-lg">
                                                     <Image preview={false} src={detailData?.imageList[0]?.url} />
                                                     <div className="p-2">
@@ -1222,6 +1225,7 @@ const Share = () => {
                                             onClick={redbookShare}
                                             className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto]"
                                             type="primary"
+                                            size="large"
                                             icon={<SendOutlined />}
                                         >
                                             去小红书发布

@@ -3,6 +3,10 @@
         margin-bottom: 0;
     }
 
+    .ant-tabs-ink-bar {
+        width: 0 !important;
+    }
+
     .ant-tabs-nav::before {
         border: none;
     }

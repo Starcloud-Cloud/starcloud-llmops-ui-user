@@ -2,7 +2,7 @@ import { Tabs, Carousel, Image, Button, Modal, QRCode, Spin } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { contentShare } from 'api/redBook/batchIndex';
+import { contentShare, shareBuildSignature } from 'api/redBook/batchIndex';
 import './index.scss';
 
 const Share = () => {
@@ -11,7 +11,6 @@ const Share = () => {
     const [carouselValue, setCarouselValue] = useState(0);
     const [open, setOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>(null);
-    const [redBookData, setRedBookData] = useState<any>(null);
 
     const [loading, setLoading] = useState(false);
     const getDetail = async () => {
@@ -19,8 +18,7 @@ const Share = () => {
         try {
             const result = await contentShare(query.get('uid'));
             setLoading(false);
-            setDetailData(result.data.executeResult);
-            setRedBookData(result.verifyConfig);
+            setDetailData(result.executeResult);
         } catch (err) {
             setLoading(false);
         }
@@ -35,8 +33,9 @@ const Share = () => {
             document.body.removeChild(script); // 清理脚本
         };
     }, []);
-    const redbookShare = () => {
+    const redbookShare = async () => {
         if (/Mobi|Android/i.test(navigator.userAgent)) {
+            const res = await shareBuildSignature();
             // @ts-ignore
             xhs.share({
                 shareInfo: {
@@ -46,10 +45,10 @@ const Share = () => {
                     images: detailData?.imageList?.map((item: any) => item.url)
                 },
                 verifyConfig: {
-                    appKey: redBookData?.appKey, //必填，应用的唯一标识,
-                    nonce: redBookData?.nonce, // 必填，服务端生成签名的随机字符串
-                    timestamp: redBookData?.timestamp, // 必填，服务端生成签名的时间戳
-                    signature: redBookData?.signature // 必填，服务端生成的签名
+                    appKey: res?.appKey, //必填，应用的唯一标识,
+                    nonce: res?.nonce, // 必填，服务端生成签名的随机字符串
+                    timestamp: res?.timestamp, // 必填，服务端生成签名的时间戳
+                    signature: res?.signature // 必填，服务端生成的签名
                 },
                 fail: (e: any) => {
                     console.log(e);
@@ -1054,9 +1053,11 @@ const Share = () => {
             <Modal title="笔记发布" open={open} onCancel={() => setOpen(false)} footer={false} closable={false}>
                 <div className="w-full flex justify-center items-center flex-col gap-2">
                     <QRCode value={`${process.env.REACT_APP_SHARE_URL}/share?uid=${query.get('uid')}`} />
-                    <div className="text-md text-black/50">安卓：仅支持手机浏览器扫码</div>
-                    <div className="text-md text-black/50">苹果：支持微信/手机浏览器扫码</div>
-                    <div className="text-md text-black/50">注意：小红书需更新到最新版本</div>
+                    <div className="flex flex-col items-center">
+                        <div className="text-md text-[#000000a6]">安卓：仅支持手机浏览器扫码</div>
+                        <div className="text-md text-[#000000a6]">苹果：支持微信/手机浏览器扫码</div>
+                        <div className="text-md text-[#000000a6]">注意：小红书需更新到最新版本</div>
+                    </div>
                 </div>
             </Modal>
         </div>

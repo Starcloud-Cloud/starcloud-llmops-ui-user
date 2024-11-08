@@ -3,6 +3,7 @@ const WorkBoxPlugin = require('workbox-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
+
 module.exports = function override(config) {
     config.resolve.fallback = {
         process: require.resolve('process/browser'),
@@ -27,7 +28,6 @@ module.exports = function override(config) {
         config.output.filename = `static/js/[name].${version}.[contenthash:8].js`;
         config.output.chunkFilename = `static/js/[name].${version}.[contenthash:8].chunk.js`;
     }
-
     config.plugins = [
         ...config.plugins,
         new CompressionWebpackPlugin({

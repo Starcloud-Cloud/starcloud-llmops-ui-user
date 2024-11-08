@@ -18,6 +18,7 @@ import {
     QRCode
 } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { useNavigate } from 'react-router-dom';
 import 'swiper/css';
 import './threeStep.css';
 import 'swiper/css/pagination';
@@ -61,6 +62,7 @@ const ThreeStep = ({
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
 }) => {
+    const navigate = useNavigate();
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     const [tags, setTags] = React.useState<any>([]);
@@ -561,9 +563,17 @@ const ThreeStep = ({
             <Modal open={publishOpen} title={'小红书发布'} footer={null} onCancel={() => setPublishOpen(false)} closable={false}>
                 <div className="w-full flex justify-center items-center flex-col gap-2">
                     <QRCode value={`${process.env.REACT_APP_SHARE_URL}/share?uid=` + data?.uid} />
-                    <div className="text-md text-black/50">安卓：仅支持手机浏览器扫码</div>
-                    <div className="text-md text-black/50">苹果：支持微信/手机浏览器扫码</div>
-                    <div className="text-md text-black/50">注意：小红书需更新到最新版本</div>
+                    <div className="flex flex-col items-center">
+                        <div
+                            onClick={() => navigate(`/share?uid=` + data?.uid)}
+                            className="text-md underline cursor-pointer text-[#673ab7]"
+                        >
+                            查看效果
+                        </div>
+                        <div className="text-md text-[#000000a6]">安卓：仅支持手机浏览器扫码</div>
+                        <div className="text-md text-[#000000a6]">苹果：支持微信/手机浏览器扫码</div>
+                        <div className="text-md text-[#000000a6]">注意：小红书需更新到最新版本</div>
+                    </div>
                 </div>
             </Modal>
             <Drawer

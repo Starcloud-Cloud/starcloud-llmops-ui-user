@@ -49,6 +49,10 @@ export const planGet = (data: any) => {
 export const contentShare = (data: any) => {
     return request.get({ url: '/llm/xhs/content/share?uid=' + data });
 };
+//获取签名
+export const shareBuildSignature = () => {
+    return request.get({ url: '/llm/xhs/content/shareBuildSignature' });
+};
 //编辑
 export const planModify = (data: any) => {
     return request.post({ url: '/llm/creative/plan/modify', data });

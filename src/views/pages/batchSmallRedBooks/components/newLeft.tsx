@@ -656,10 +656,6 @@ const Lefts = ({
                 })
             );
             if (flag) {
-                if (totalCount > all_detail?.rights?.find((item: any) => item?.type === 'MATRIX_BEAN')?.remaining) {
-                    setBotOpen(true);
-                    return;
-                }
                 newSave(appRef.current);
             }
             setExeState(false);
@@ -696,8 +692,6 @@ const Lefts = ({
             upDateVersion();
         }
     }, [versionPre]);
-    //token 不足弹框
-    const [botOpen, setBotOpen] = useState(false);
     useEffect(() => {
         if (generateList?.length > 0) {
             setGetData && setGetData(generateList);
@@ -1031,13 +1025,6 @@ const Lefts = ({
                                                     size="large"
                                                     value={totalCount}
                                                     onChange={(e: any) => {
-                                                        if (
-                                                            e >
-                                                            all_detail?.rights?.find((item: any) => item?.type === 'MATRIX_BEAN')?.remaining
-                                                        ) {
-                                                            setBotOpen(true);
-                                                            return;
-                                                        }
                                                         setTotalCount(e);
                                                         setTotalCountRef && setTotalCountRef(e);
                                                     }}
@@ -1396,9 +1383,6 @@ const Lefts = ({
                     formOk={formOks}
                     sourceList={typeList}
                 />
-            )}
-            {botOpen && (
-                <PermissionUpgradeModal open={botOpen} handleClose={() => setBotOpen(false)} title={`权益不足，去升级`} from={''} />
             )}
         </>
     );

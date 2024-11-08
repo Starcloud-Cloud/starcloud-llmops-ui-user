@@ -8,8 +8,25 @@
     }
 
     .uls {
-        button::before {
-            display: none;
+        li {
+            width: 5px !important;
+
+            button::before {
+                display: none;
+            }
+
+            button {
+                width: 5px !important;
+                background: none !important;
+            }
+
+            button::after {
+                width: 5px;
+                height: 5px;
+                background: #ff253d;
+                border-radius: 5px;
+            }
         }
+
     }
 }

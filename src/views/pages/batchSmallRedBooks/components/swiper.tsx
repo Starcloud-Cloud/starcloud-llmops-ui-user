@@ -38,7 +38,7 @@ const Swipers = ({ item, show }: { item: any; show?: boolean }) => {
                             width={'100%'}
                             height={'100%'}
                             preview={false}
-                            src={`${el?.url}?x-oss-process=image/resize,w_${show ? 380 : 215}/quality,q_80`}
+                            src={`${el?.url}?x-oss-process=image/resize,w_${show ? 380 : 300}/quality,q_80`}
                         />
                     </SwiperSlide>
                 ))}

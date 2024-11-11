@@ -260,7 +260,9 @@ const Invite = () => {
                     </svg>
                     <div className="ml-[10px] font-bold text-3xl">{getPermission(ENUM_PERMISSION.APP_NAME)}</div>
                 </div>
-                <h1 className="mb-14 mt-6 text-xl text-center font-normal lg:text-lg lg:mb-10">AI跨境营销内容创作</h1>
+                <h1 className="mb-14 mt-6 text-xl text-center font-normal lg:text-lg lg:mb-10">
+                    {getPermission(ENUM_PERMISSION.SHARE_TITLE)}
+                </h1>
                 <div className="bg-[#f2f3f5] rounded-lg w-[440px]">
                     <div className="flex justify-between items-center p-6 lg:p-5 overflow-hidden gap-4">
                         <div className="w-full overflow-hidden">

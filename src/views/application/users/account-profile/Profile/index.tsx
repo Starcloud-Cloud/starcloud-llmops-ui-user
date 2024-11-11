@@ -36,7 +36,8 @@ import {
     Space,
     Popconfirm,
     Upload,
-    UploadProps
+    UploadProps,
+    Tooltip
 } from 'antd';
 
 // project imports
@@ -419,7 +420,19 @@ const Profilnew = () => {
                                     },
                                     description: {
                                         dataIndex: 'nickname',
-                                        search: false
+                                        search: false,
+                                        render: (_, row) => (
+                                            <div className="flex gap-2">
+                                                <div>{row.nickname}</div>
+                                                <Tooltip title="过期时间">
+                                                    <div className="cursoe-pointer">
+                                                        {row.refreshTokenExpireIn === -1
+                                                            ? '永久有效'
+                                                            : dayjs(row.refreshTokenExpireIn).format('YYYY-MM-DD HH-mm-ss')}
+                                                    </div>
+                                                </Tooltip>
+                                            </div>
+                                        )
                                     },
                                     actions: {
                                         render: (text, row) => [

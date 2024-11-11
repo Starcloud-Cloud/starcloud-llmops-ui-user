@@ -275,11 +275,10 @@ const Lefts = ({
                 item.value = JSON.parse(item.value);
             }
         });
-        if (result?.configuration?.imageStyleList?.length > 0) {
-            newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
-                result?.configuration?.imageStyleList ||
-                newImage?.variable?.variables?.find((el: any) => el.field === 'POSTER_STYLE_CONFIG')?.value;
-        }
+        // if (result?.configuration?.imageStyleList?.length > 0) {
+        newImage.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG').value =
+            result?.configuration?.imageStyleList || [];
+        // }
         setImagMater(newImage);
     };
     const getStepMater = async () => {

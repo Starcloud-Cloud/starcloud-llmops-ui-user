@@ -36,7 +36,8 @@ export const enum ENUM_PERMISSION {
     MARKET_VIDEO_MODAL = 'market_video_modal',
     SPRING_SALE = 'spring_sale',
     SHOW_RIGHTS = 'show_rights',
-    MENU = 'menu'
+    MENU = 'menu',
+    SHARE_TITLE = 'share_title'
 }
 
 const list: IList = {
@@ -57,7 +58,8 @@ const list: IList = {
     [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: true,
     [ENUM_PERMISSION.SPRING_SALE]: true,
     [ENUM_PERMISSION.SHOW_RIGHTS]: ['MAGIC_BEAN', 'MAGIC_IMAGE'],
-    [ENUM_PERMISSION.MENU]: 'mofaai'
+    [ENUM_PERMISSION.MENU]: 'mofaai',
+    [ENUM_PERMISSION.SHARE_TITLE]: 'AI跨境营销内容创作'
 };
 
 const announceList: IList = {
@@ -78,7 +80,8 @@ const announceList: IList = {
     [ENUM_PERMISSION.MARKET_VIDEO_MODAL]: false,
     [ENUM_PERMISSION.SPRING_SALE]: false,
     [ENUM_PERMISSION.SHOW_RIGHTS]: ['MATRIX_BEAN'],
-    [ENUM_PERMISSION.MENU]: 'juzhen'
+    [ENUM_PERMISSION.MENU]: 'juzhen',
+    [ENUM_PERMISSION.SHARE_TITLE]: '小红书图文笔记智能创作平台'
 };
 
 export const getPermission = (key: ENUM_PERMISSION) => {

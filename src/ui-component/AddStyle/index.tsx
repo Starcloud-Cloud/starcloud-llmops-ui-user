@@ -898,6 +898,9 @@ const AddStyle = React.forwardRef(
                                                     handleChoose(item.uuid);
                                                 }}
                                             />
+                                            {styleData?.some((el: any) => item.uuid === el.uuid) && (
+                                                <div className="text-xs text-[#673ab7] absolute left-1 top-1 z-50">已添加</div>
+                                            )}
                                             <Swiper
                                                 spaceBetween={30}
                                                 pagination={{

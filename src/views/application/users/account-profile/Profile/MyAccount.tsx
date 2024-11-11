@@ -105,6 +105,7 @@ const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate:
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} md={6}>
                                 <TextField
+                                    disabled
                                     id="outlined-basic5"
                                     fullWidth
                                     label={t('2profile.user.username')}

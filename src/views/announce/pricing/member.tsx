@@ -174,7 +174,7 @@ const plansDefault = (value: number) => [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '免费版',
-        description: '10矩阵豆',
+        description: '10魔法豆',
         monthPrice: '免费',
         yearPrice: '免费',
         des: '适用于新用户体验',
@@ -186,7 +186,7 @@ const plansDefault = (value: number) => [
         active: true,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
-        description: value === 1 ? '300矩阵豆' : '3600矩阵豆',
+        description: value === 1 ? '300魔法豆' : '3600魔法豆',
         monthPrice: 59,
         yearPrice: 599,
         preMonthPrice: 49.91,
@@ -202,7 +202,7 @@ const plansDefault = (value: number) => [
         active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '高级版',
-        description: value === 1 ? '1000矩阵豆' : '12000矩阵豆',
+        description: value === 1 ? '1000魔法豆' : '12000魔法豆',
         monthPrice: 199,
         yearPrice: 1999,
         preMonthPrice: 166.58,
@@ -217,7 +217,7 @@ const plansDefault = (value: number) => [
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
-        description: value === 1 ? '6个账号，2500矩阵豆' : '6个账号，30000矩阵豆',
+        description: value === 1 ? '6个账号，2500魔法豆' : '6个账号，30000魔法豆',
         monthPrice: 499,
         yearPrice: 4999,
         preMonthPrice: 416.58,
@@ -246,7 +246,7 @@ const planListDefault = (value: number) => [
         keyword: 'free',
         value: [
             <div className="flex items-center">
-                <span>矩阵豆：10</span>
+                <span>魔法豆：10</span>
                 <Tooltip title={'用来AI创作图文笔记'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
@@ -267,7 +267,7 @@ const planListDefault = (value: number) => [
         keyword: 'basic',
         value: [
             <div className="flex items-center">
-                <span>矩阵豆：{value === 1 ? 300 : 3600}</span>
+                <span>魔法豆：{value === 1 ? 300 : 3600}</span>
                 <Tooltip title={'用来AI创作图文笔记'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
@@ -288,7 +288,7 @@ const planListDefault = (value: number) => [
         keyword: 'plus',
         value: [
             <div className="flex items-center">
-                <span>矩阵豆：{value === 1 ? 1000 : 12000}</span>
+                <span>魔法豆：{value === 1 ? 1000 : 12000}</span>
                 <Tooltip title={'用来AI创作图文笔记'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
@@ -309,7 +309,7 @@ const planListDefault = (value: number) => [
         keyword: 'pro',
         value: [
             <div className="flex items-center">
-                <span>矩阵豆：{value === 1 ? 2500 : 30000}</span>
+                <span>魔法豆：{value === 1 ? 2500 : 30000}</span>
                 <Tooltip title={'用来AI创作图文笔记'}>
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
@@ -1011,7 +1011,7 @@ const Price1 = () => {
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
-                                                    <Typography variant="body2">{`${plan?.skus?.[0].rightsConfig.rightsBasicDTO.matrixBean}矩阵豆`}</Typography>
+                                                    <Typography variant="body2">{`${plan?.skus?.[0].rightsConfig.rightsBasicDTO.matrixBean}魔法豆`}</Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     {/* <div className="text-sm text-center text-[#d7d7d7] line-through">

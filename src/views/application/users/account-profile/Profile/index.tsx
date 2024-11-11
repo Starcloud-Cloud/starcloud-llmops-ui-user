@@ -366,7 +366,19 @@ const Profilnew = () => {
                     <TabPanel value={value} index={2}>
                         <div className="mb-2">
                             <AntTypography.Text type="secondary">扣子授权</AntTypography.Text>
-                            <AntBtn className="mt-2 ml-1" type="primary" size="small" onClick={() => setAuthDialogOpen(true)}>
+                            <AntBtn
+                                className="mt-2 ml-1"
+                                type="primary"
+                                size="small"
+                                onClick={async () => {
+                                    const url = await authRedirect({
+                                        type: 35,
+                                        redirectUri: `${window.location.origin}/auth-coze`
+                                    });
+                                    window.location.href = url;
+                                    // setAuthDialogOpen(true)
+                                }}
+                            >
                                 添加授权
                             </AntBtn>
                         </div>
@@ -437,12 +449,12 @@ const Profilnew = () => {
                                     type="primary"
                                     size="small"
                                     onClick={async () => {
-                                        // const url = await authRedirect({
-                                        //     type: 35,
-                                        //     redirectUri: `${window.location.origin}/auth-coze`
-                                        // });
-                                        // window.location.href = url;
-                                        setAuthDialogOpen(true);
+                                        const url = await authRedirect({
+                                            type: 35,
+                                            redirectUri: `${window.location.origin}/auth-coze`
+                                        });
+                                        window.location.href = url;
+                                        // setAuthDialogOpen(true);
                                     }}
                                 >
                                     添加授权

@@ -13,7 +13,7 @@ const list = [
     'Google/Amazon联网查询',
     '专属客服顾问提供专业指导'
 ];
-const juzhenList = ['立享最低300个矩阵豆', '添加更多社媒账号', '更多AI创作笔记模版', '更多批量发布账号上限', '专属客服顾问提供专业指导'];
+const juzhenList = ['立享最低300个魔法豆', '添加更多社媒账号', '更多AI创作笔记模版', '更多批量发布账号上限', '专属客服顾问提供专业指导'];
 
 export const PermissionUpgradeModal = ({
     handleClose,

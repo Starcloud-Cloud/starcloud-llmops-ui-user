@@ -76,7 +76,7 @@ export const InviteMatrix = () => {
                         <div>
                             <p className="text-base">分享邀请链接，邀请新人成功注册!</p>
                             <p className="ml-2">-邀请好友需为之前从未注册过魔法笔记的新用户。</p>
-                            <p className="ml-2">-用户每成功邀请1位好友注册，可获得10点矩阵豆。</p>
+                            <p className="ml-2">-用户每成功邀请1位好友注册，可获得10点魔法豆。</p>
                         </div>
                     </Card>
                 </Col>
@@ -93,7 +93,7 @@ export const InviteMatrix = () => {
                     >
                         <div className="flex justify-between items-center">
                             <div>
-                                <div>方式一：点击右边“签到”即可获得2矩阵豆</div>
+                                <div>方式一：点击右边“签到”即可获得2魔法豆</div>
                                 <div>方式二：魔法AI小助手公众号“菜单栏--权益领取--点击签到”即可</div>
                             </div>
                             <Button onClick={handleSignIn} disabled={disabledOpen} type="primary">

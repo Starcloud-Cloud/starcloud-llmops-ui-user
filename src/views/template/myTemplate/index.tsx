@@ -156,15 +156,15 @@ function MyTemplate() {
     const [appName, setAppName] = useState('');
     const [saveDetail, setSaveDetail] = useState<any>(null);
     const handleDetail = (data: { uid: string }) => {
-        if (
-            allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp === -1 ||
-            totalList.filter((item) => Number(item.creator) === user.id).length < allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp
-        ) {
-            getRecommendApp({ recommend: data.uid as string }).then((res) => {
-                setSaveDetail(res);
-                setOpen(true);
-            });
-        }
+        // if (
+        //     allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp === -1 ||
+        //     totalList.filter((item) => Number(item.creator) === user.id).length < allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp
+        // ) {
+        getRecommendApp({ recommend: data.uid as string }).then((res) => {
+            setSaveDetail(res);
+            setOpen(true);
+        });
+        // }
         //  else if (
         //     totalList.filter((item) => Number(item.creator) === user.id).length >=
         //     allDetail?.allDetail?.levels[0]?.levelConfigDTO?.usableApp
@@ -269,7 +269,7 @@ function MyTemplate() {
                     <Typography variant="h3" mt={4} mb={2}>
                         {t('apply.self')}
                     </Typography>
-                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 pb-4">
                         {appList.map((el: any, index: number) => (
                             <MarketTemplate
                                 type="APP"

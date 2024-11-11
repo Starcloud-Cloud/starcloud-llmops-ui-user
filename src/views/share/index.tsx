@@ -1,6 +1,6 @@
 import { Tabs, Carousel, Image, Button, Modal, QRCode, Spin } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { contentShare, shareBuildSignature } from 'api/redBook/batchIndex';
 import './index.scss';
@@ -23,6 +23,21 @@ const Share = () => {
             setLoading(false);
         }
     };
+    const faterDom = useRef<any>(null);
+    const [windowHeight, setWindowHeight] = useState('100vh');
+    useEffect(() => {
+        const handleResize = () => {
+            console.log(window.innerHeight);
+
+            setWindowHeight(window.innerHeight + 'px');
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
     useEffect(() => {
         getDetail();
         const script = document.createElement('script');
@@ -67,7 +82,7 @@ const Share = () => {
         }
     };
     return (
-        <div className="share w-full h-[100svh] flex justify-center">
+        <div style={{ height: windowHeight }} className="share w-full flex justify-center">
             {loading ? (
                 <Spin className="h-full w-full flex justify-center items-center"></Spin>
             ) : (
@@ -79,7 +94,13 @@ const Share = () => {
                                 label: '详情页',
                                 key: '1',
                                 children: (
-                                    <div className="h-[calc(100svh-46px)] relative">
+                                    <div
+                                        style={{
+                                            height: `calc(${windowHeight} - 46px)`
+                                        }}
+                                        ref={faterDom}
+                                        className=" relative"
+                                    >
                                         <div className="h-full overflow-y-scroll">
                                             <div className="relative max-h-[666px]">
                                                 <Carousel

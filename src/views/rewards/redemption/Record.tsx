@@ -383,7 +383,7 @@ const Record: React.FC<ShareProps> = ({ open, handleClose }) => {
                                         ) : (
                                             <TableCell align="center">
                                                 <Fragment key={1}>
-                                                    矩阵豆 · {row?.matrixBeanInit || 0} <br />
+                                                    魔法豆 · {row?.matrixBeanInit || 0} <br />
                                                 </Fragment>
                                             </TableCell>
                                         )}

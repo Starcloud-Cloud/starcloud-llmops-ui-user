@@ -47,6 +47,7 @@ import _ from 'lodash-es';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { spaceDetail, spaceUserList, spaceUpdate, spaceMetadata, spaceRole, spaceRemove } from 'api/section';
 import { origin_url } from 'utils/axios/config';
+import { getPermission, ENUM_PERMISSION } from 'utils/permission';
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -204,7 +205,7 @@ const SpaceEquity = () => {
             align: 'center',
             render: (_, row) => (
                 <span>
-                    {row.costPoints}/{row.imageCount}
+                    {getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints : row.matrixBeanCounts}/{row.imageCount}
                 </span>
             )
         },

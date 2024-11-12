@@ -1,93 +1,122 @@
-import { Tooltip, Popconfirm, Button, Space, Table } from 'antd';
-import { Delete, Settings } from '@mui/icons-material';
-import type { TableProps } from 'antd';
-import { InfoCircleOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
-import { t } from 'hooks/web/useI18n';
-import { useState, memo, useEffect } from 'react';
+import { Button, Input } from 'antd';
+import React, { useState, memo, useEffect, useRef, useMemo, useContext } from 'react';
 import _ from 'lodash-es';
-import VariableModal from '../variableModal';
 import { appFieldCode } from 'api/redBook/batchIndex';
+
+import { HolderOutlined } from '@ant-design/icons';
+import { Resizable } from 'react-resizable';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { EditableProTable } from '@ant-design/pro-components';
+import { DndContext } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { v4 as uuidv4 } from 'uuid';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
+
+const ResizeableTitle = (props: any) => {
+    const { onResize, width, ...restProps } = props;
+
+    if (!width) {
+        return <th {...restProps} />;
+    }
+
+    return (
+        <Resizable width={width} height={0} onResize={onResize} draggableOpts={{ enableUserSelectHack: false }}>
+            <th {...restProps} />
+        </Resizable>
+    );
+};
+
+interface RowContextProps {
+    setActivatorNodeRef?: (element: HTMLElement | null) => void;
+    listeners?: SyntheticListenerMap;
+}
+const RowContext = React.createContext<RowContextProps>({});
+const DragHandle: React.FC = () => {
+    const { setActivatorNodeRef, listeners } = useContext(RowContext);
+    return (
+        <Button type="text" size="small" icon={<HolderOutlined />} style={{ cursor: 'move' }} ref={setActivatorNodeRef} {...listeners} />
+    );
+};
+interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+    'data-row-key': string;
+}
+const Row: React.FC<RowProps> = (props) => {
+    const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+        id: props['data-row-key']
+    });
+
+    const style: React.CSSProperties = {
+        ...props.style,
+        transform: CSS.Translate.toString(transform),
+        transition,
+        ...(isDragging ? { position: 'relative', zIndex: 9999 } : {})
+    };
+
+    const contextValue = useMemo<RowContextProps>(() => ({ setActivatorNodeRef, listeners }), [setActivatorNodeRef, listeners]);
+
+    return (
+        <RowContext.Provider value={contextValue}>
+            <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+        </RowContext.Provider>
+    );
+};
+
 interface Variable {
     rows: any[];
     setRows: (data: any[]) => void;
 }
 
 const CreateVariable = ({ rows, setRows }: Variable) => {
-    const columns: TableProps<any>['columns'] = [
+    const columns: any = [
+        { key: 'sort', align: 'center', width: 80, render: () => <DragHandle />, editable: false },
         {
             title: '变量名称',
             dataIndex: 'label',
-            align: 'center'
+            align: 'center',
+            formItemProps: {
+                component: <Input />,
+                rules: [
+                    {
+                        required: true,
+                        message: '请输入字段名称'
+                    }
+                ]
+            }
         },
         {
-            title: '类型',
+            title: '变量类型',
             align: 'center',
-            render: (_, row) => <span>{t('myApp.' + row.style?.toLowerCase())}</span>
+            dataIndex: 'style',
+            valueType: 'select',
+            fieldProps: {
+                options: [
+                    { label: '输入框', value: 'INPUT' },
+                    { label: '文本框', value: 'TEXTAREA' },
+                    { label: '下拉框', value: 'SELECT' },
+                    { label: '图片', value: 'IMAGE' }
+                ]
+            }
+        },
+        {
+            title: '变量默认值',
+            dataIndex: 'defaultValue',
+            align: 'center',
+            formItemProps: {
+                component: <Input />
+            }
         },
         {
             title: '操作',
-            width: 100,
+            width: 60,
             align: 'center',
-            render: (_, row, i) => (
-                <Space>
-                    <Button
-                        onClick={() => {
-                            setVarIndex(i);
-                            setItemData(row);
-                            setTitle('编辑变量');
-                            setVariableOpen(true);
-                        }}
-                        size="small"
-                        shape="circle"
-                        icon={<SettingOutlined />}
-                        type="primary"
-                    />
-                    <Popconfirm
-                        title="删除变量"
-                        description="是否确认删除这条数据"
-                        onConfirm={() => {
-                            const newList = _.cloneDeep(tableData);
-                            newList?.splice(i, 1);
-                            setTableData(newList);
-                        }}
-                        onCancel={() => {}}
-                        okText="确认"
-                        cancelText="取消"
-                    >
-                        <Button
-                            size="small"
-                            shape="circle"
-                            icon={<DeleteOutlined />}
-                            disabled={row.group === 'SYSTEM'}
-                            danger
-                            type="primary"
-                        />
-                    </Popconfirm>
-                </Space>
-            )
+            valueType: 'option'
         }
     ];
-    const [title, setTitle] = useState('');
-    const [variableOpen, setVariableOpen] = useState(false);
-    const [varIndex, setVarIndex] = useState(-1);
-    const [itemData, setItemData] = useState<any>({});
     const [tableData, setTableData] = useState<any[]>([]);
-    const saveContent = (data: any) => {
-        if (title === '增加变量') {
-            if (tableData) {
-                setTableData([data, ...tableData]);
-                setVariableOpen(false);
-            } else {
-                setTableData([data]);
-                setVariableOpen(false);
-            }
-        } else {
-            const newList = _.cloneDeep(tableData);
-            newList[varIndex] = data;
-            setTableData(newList);
-            setVariableOpen(false);
-        }
-    };
     const [saveLoading, setSaveLoading] = useState(false);
     const handleSave = async () => {
         setSaveLoading(true);
@@ -97,46 +126,110 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
             });
             setSaveLoading(false);
             setRows(result);
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '保存全局变量成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
         } catch (err) {
             setSaveLoading(false);
         }
     };
     useEffect(() => {
-        setTableData(rows);
+        const newList = rows?.map((item) => ({ ...item, uuid: uuidv4() }));
+        setEditableKeys(newList?.map((item: any) => item.uuid));
+        setTableData(newList);
     }, []);
-    useEffect(() => {
-        if (!variableOpen) {
-            setItemData({});
+
+    //表格
+    const timer = useRef<any>();
+    const actionRef = useRef<any>();
+    const components = {
+        header: {
+            cell: ResizeableTitle
+        },
+        body: { row: Row }
+    };
+    const [editableKeys, setEditableKeys] = useState<React.Key[]>([]);
+    const onDragEnd = ({ active, over }: DragEndEvent) => {
+        if (active.id !== over?.id) {
+            const newList = (prevState: any) => {
+                const activeIndex = prevState.findIndex((record: any) => record.uuid === active?.id);
+                const overIndex = prevState.findIndex((record: any) => record.uuid === over?.id);
+                return arrayMove(prevState, activeIndex, overIndex);
+            };
+            setTableData(newList(tableData));
         }
-    }, [variableOpen]);
+    };
     return (
         <>
-            <div className="w-full flex justify-end mb-4">
-                <div className="flex gap-2">
-                    <Tooltip title={'变量将以表单形式让用户在执行前填写,用户填写的表单内容将自动替换提示词中的变量	'}>
-                        <InfoCircleOutlined className="cursor-pointer" />
-                    </Tooltip>
-                    <Button
-                        size="small"
-                        type="primary"
-                        onClick={() => {
-                            setTitle('增加变量');
-                            setVariableOpen(true);
+            <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+                <SortableContext items={tableData.map((i) => i.uuid)} strategy={verticalListSortingStrategy}>
+                    <EditableProTable<any>
+                        className="edit-table"
+                        rowKey={'uuid'}
+                        maxLength={50}
+                        tableAlertRender={false}
+                        components={components}
+                        rowSelection={false}
+                        editableFormRef={actionRef}
+                        toolBarRender={false}
+                        columns={columns}
+                        value={tableData}
+                        pagination={false}
+                        recordCreatorProps={{
+                            newRecordType: 'dataSource',
+                            creatorButtonText: '增加字段',
+                            record: () => {
+                                return {
+                                    uuid: uuidv4(),
+                                    style: 'INPUT'
+                                };
+                            }
                         }}
-                    >
-                        新增
-                    </Button>
-                </div>
-            </div>
-            <Table columns={columns} dataSource={tableData} pagination={false} />
+                        editable={{
+                            type: 'multiple',
+                            editableKeys: editableKeys,
+                            actionRender: (row, config, defaultDoms) => {
+                                return [
+                                    <Button
+                                        onClick={() => {
+                                            setTableData(tableData.filter((item, index) => index !== row.index));
+                                        }}
+                                        type="link"
+                                        danger
+                                    >
+                                        删除
+                                    </Button>
+                                ];
+                            },
+                            onValuesChange: (record, recordList) => {
+                                clearTimeout(timer.current);
+                                timer.current = setTimeout(() => {
+                                    let newList = _.cloneDeep(recordList);
+                                    newList.forEach((item, index) => {
+                                        item.field = item.name;
+                                    });
+                                    setTableData(newList);
+                                }, 500);
+                            },
+                            onChange: setEditableKeys
+                        }}
+                    />
+                </SortableContext>
+            </DndContext>
             <div className="flex justify-center mt-4">
                 <Button loading={saveLoading} type="primary" onClick={handleSave}>
                     保存
                 </Button>
             </div>
-            {variableOpen && (
-                <VariableModal title={title} open={variableOpen} setOpen={setVariableOpen} itemData={itemData} saveContent={saveContent} />
-            )}
         </>
     );
 };

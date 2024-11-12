@@ -1,5 +1,5 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
-import { Input, Image, Menu, Switch, Button, Divider, Tooltip } from 'antd';
+import { Input, Image, Menu, Switch, Button, Divider, Tooltip, Spin } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef, useMemo, Fragment } from 'react';
 import _ from 'lodash-es';
@@ -265,13 +265,15 @@ const EditStyle = ({
                                 <div className="text-lg">图片模版示意图</div>
                                 <div className="overflow-hidden p-3">
                                     <div className="relative w-[85%] mx-auto" ref={imgRef}>
-                                        {currentTemp?.example && (
+                                        {currentTemp?.example ? (
                                             <Image
                                                 width={'100%'}
                                                 preview={false}
                                                 src={currentTemp?.example + '?x-oss-process=image/resize,w_380/quality,q_80'}
                                                 placeholder
                                             />
+                                        ) : (
+                                            <Spin className="w-full flex justify-center items-center aspect-[9/16]" />
                                         )}
                                         {currentJson?.objects
                                             ?.filter((item: any) => item.type === 'image' || item.type.includes('text'))
@@ -468,7 +470,7 @@ const EditStyle = ({
                                                                     newData[index] = flag;
                                                                     setPerOpen(newData);
                                                                 }}
-                                                                code=""
+                                                                code="title"
                                                                 popoverWidth={popoverWidth}
                                                                 handleMenu={handleMenu}
                                                                 details={appData.appReqVO}

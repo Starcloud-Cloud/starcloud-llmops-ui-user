@@ -142,6 +142,16 @@ const VariableInput = ({
                             type: jsonType
                         });
                     }
+                } else if (code === 'title') {
+                    if (property?.description?.split('-')[1] !== '5') {
+                        arr.push({
+                            key: jsonType ? name + `.list('${key}')` : name + '.' + key,
+                            label: key,
+                            title: property?.title,
+                            desc: property?.description,
+                            type: jsonType
+                        });
+                    }
                 } else {
                     arr.push({
                         key: jsonType ? name + `.list('${key}')` : name + '.' + key,

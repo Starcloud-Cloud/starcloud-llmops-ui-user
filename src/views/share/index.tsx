@@ -56,7 +56,10 @@ const Share = () => {
                 shareInfo: {
                     type: 'normal', // 必填，笔记类型 'video' | 'normal'
                     title: detailData?.copyWriting?.title, // 笔记标题
-                    content: detailData?.copyWriting?.content, // 笔记正文
+                    content:
+                        detailData?.copyWriting?.content +
+                        '\n\n' +
+                        detailData?.copyWriting?.tagList?.map((item: string) => `#${item}`).join(' '), // 笔记正文
                     images: detailData?.imageList?.map((item: any) => item.url)
                 },
                 // verifyConfig: {
@@ -125,6 +128,9 @@ const Share = () => {
                                                 </div>
                                                 <div className="text-base font-[400] leading-[150%] text-[#000] whitespace-pre-wrap">
                                                     {detailData?.copyWriting?.content}
+                                                </div>
+                                                <div className="mt-2 font-[400] text-black text-base">
+                                                    {detailData?.copyWriting?.tagList?.map((item: string) => `#${item}`).join(' ')}
                                                 </div>
                                                 <div className="mt-[40px] flex justify-between text-md text-black/60">
                                                     <div>11-05 杭州</div>

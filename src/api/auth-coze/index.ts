@@ -12,3 +12,7 @@ export const authRedirect = (data: any) => {
 export const authBind = (data: any) => {
     return request.post({ url: '/system/social-user/bind', data });
 };
+//编辑
+export const updateNickname = (data: any) => {
+    return request.post({ url: '/system/social-user/update-nickname', data });
+};

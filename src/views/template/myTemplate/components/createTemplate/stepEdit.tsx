@@ -464,7 +464,7 @@ const StepEdit = ({
                                 <EditableProTable<any>
                                     className="edit-table"
                                     rowKey={'uuid'}
-                                    maxLength={30}
+                                    maxLength={50}
                                     tableAlertRender={false}
                                     components={components}
                                     rowSelection={false}

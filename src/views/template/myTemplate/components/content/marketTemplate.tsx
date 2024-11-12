@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import bgImg from 'assets/images/picture/bgImg.png';
 import dayjs from 'dayjs';
 import { Tooltip } from 'antd';
-const MarketTemplate = ({ like, data, handleDetail, type }: any) => {
+const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
     const getImage = (active: string) => {
         let image;
         try {
@@ -42,14 +42,16 @@ const MarketTemplate = ({ like, data, handleDetail, type }: any) => {
                 <div className="text-[#545454] text-[16px] font-bold line-clamp-2">{data.name}</div>
             </div>
             <div className="mt-4 text-xs text-[#808080] line-clamp-3">{data.description}</div>
-            <div className="text-xs text-black/50 absolute bottom-4 left-4 flex gap-4">
-                <Tooltip title="创建者">
-                    <div>{data.creator}</div>
-                </Tooltip>
-                <Tooltip title="更新时间">
-                    <div>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD HH-mm-ss')}</div>
-                </Tooltip>
-            </div>
+            {scene !== 'template' && (
+                <div className="text-xs text-black/50 absolute bottom-4 left-0 w-full px-4 flex justify-between gap-4">
+                    <Tooltip title="创建者">
+                        <div>{data.creator}</div>
+                    </Tooltip>
+                    <Tooltip title="更新时间">
+                        <div>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD HH-mm-ss')}</div>
+                    </Tooltip>
+                </div>
+            )}
             <div className="absolute left-[16px] bottom-[16px]">
                 {like === 'market' &&
                     (marketActive ? (

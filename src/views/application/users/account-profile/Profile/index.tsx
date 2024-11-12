@@ -37,7 +37,9 @@ import {
     Popconfirm,
     Upload,
     UploadProps,
-    Tooltip
+    Tooltip,
+    Modal,
+    Input
 } from 'antd';
 
 // project imports
@@ -64,12 +66,14 @@ import AvatarUpload from './Avatar';
 import { getUserInfo } from 'api/login';
 import { t } from 'hooks/web/useI18n';
 import dayjs from 'dayjs';
-import { authBind, authRedirect } from 'api/auth-coze';
+import { authBind, authRedirect, updateNickname } from 'api/auth-coze';
 import { ModalForm, ProFormText, ProFormTextArea, ProList } from '@ant-design/pro-components';
 import { getAccessToken } from 'utils/auth';
 import { PlusOutlined } from '@ant-design/icons';
 import { origin_url } from 'utils/axios/config';
 import { useAllDetail } from 'contexts/JWTContext';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 // ==============================|| PROFILE 1 ||============================== //
 
 // tabs panel
@@ -238,6 +242,10 @@ const Profilnew = () => {
         };
     // <Avatar alt={userProfile?.nickname} src={userProfile?.avatar} size="xl" />
     // </button>
+
+    const [open, setOpen] = useState(false);
+    const [id, setId] = useState(0);
+    const [nameValue, setNameValue] = useState('');
 
     return (
         <MainCard>
@@ -446,7 +454,17 @@ const Profilnew = () => {
                                                 <AntBtn danger type="text">
                                                     删除
                                                 </AntBtn>
-                                            </Popconfirm>
+                                            </Popconfirm>,
+                                            <AntBtn
+                                                type="text"
+                                                onClick={() => {
+                                                    setId(row.id);
+                                                    setNameValue(row.nickname);
+                                                    setOpen(true);
+                                                }}
+                                            >
+                                                编辑
+                                            </AntBtn>
                                         ],
                                         search: false
                                     }
@@ -504,6 +522,34 @@ const Profilnew = () => {
                     <ProFormTextArea name="remark" label="备注" placeholder="请输入备注" />
                 </ModalForm>
             )}
+            <Modal
+                onOk={async () => {
+                    await updateNickname({
+                        id,
+                        nickname: nameValue
+                    });
+                    setOpen(false);
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: '修改成功',
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            close: false
+                        })
+                    );
+                    fetchAuthList();
+                    actionRef.current?.reload();
+                }}
+                title={'编辑绑定名称'}
+                open={open}
+                onCancel={() => setOpen(false)}
+            >
+                <Input placeholder="请输入绑定名称" value={nameValue} onChange={(e) => setNameValue(e.target.value)} />
+            </Modal>
         </MainCard>
     );
 };

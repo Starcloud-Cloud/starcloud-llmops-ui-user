@@ -159,7 +159,6 @@ function Arrange({
         const newList = newData?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
         newList?.splice(num, 0, ...editTableData);
         newData.workflowConfig.steps = newList?.filter((item: any) => item);
-        console.log(newData);
         setNewDetail(newData);
     };
 
@@ -396,6 +395,9 @@ function Arrange({
                                             } else {
                                                 newData.steps[index].variable.variables = data;
                                             }
+                                            const newDetails = _.cloneDeep(detail);
+                                            newDetails.workflowConfig = newData;
+                                            setNewDetail(newDetails);
                                             changeConfigs(newData);
                                         }}
                                         variables={item?.flowStep?.variable?.variables}

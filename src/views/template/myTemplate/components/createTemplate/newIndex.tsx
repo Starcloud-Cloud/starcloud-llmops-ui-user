@@ -481,12 +481,8 @@ function CreateDetail() {
             ...detailRef.current,
             workflowConfig: data
         });
-        setDetail(
-            _.cloneDeep({
-                ...detailRef.current,
-                workflowConfig: data
-            })
-        );
+        console.log(detailRef.current);
+        setDetail(detailRef.current);
     };
     //设置提示词编排步骤的name desc
     const editChange = useCallback(
@@ -1650,7 +1646,7 @@ function CreateDetail() {
                     sourceList={refersSource}
                 />
             )}
-            <Drawer title="错误信息" placement="right" onClose={() => setErrOpen(false)} open={errOpen} mask={false}>
+            <Drawer zIndex={9999} title="错误信息" placement="right" onClose={() => setErrOpen(false)} open={errOpen} mask={false}>
                 <List
                     itemLayout="horizontal"
                     dataSource={errList}

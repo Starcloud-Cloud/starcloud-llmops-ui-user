@@ -32,7 +32,7 @@ import ApplicationAnalysis from 'views/template/applicationAnalysis';
 import Upload from './upLoad';
 import { del, copy } from 'api/template';
 import marketStore from 'store/market';
-import _ from 'lodash-es';
+import _, { update } from 'lodash-es';
 import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { materialTemplate } from 'api/redBook/batchIndex';
 import FormModal from 'views/pages/batchSmallRedBooks/components/formModal';
@@ -1291,6 +1291,7 @@ function CreateDetail() {
     };
     const detailPreRef = useRef(0);
     const [detailPre, setDetailPre] = useState(0);
+    const [updataDataPre, setUpdataDataPre] = useState(0);
 
     return detail ? (
         <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
@@ -1360,6 +1361,7 @@ function CreateDetail() {
                                             (i: any) => i.field === 'SYSTEM_POSTER_STYLE_CONFIG'
                                         ).value = JSON.parse(sysdata);
                                     }
+                                    console.log(arr[index]);
                                 }
                                 arr = [
                                     arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
@@ -1406,6 +1408,7 @@ function CreateDetail() {
                                     newData.workflowConfig.steps = newList;
                                     detailRef.current = newData;
                                     setDetail(detailRef?.current);
+                                    setUpdataDataPre(updataDataPre + 1);
                                 } else {
                                     const newData = _.cloneDeep(detailRef.current);
                                     newData.workflowConfig.steps.forEach((item: any) => {
@@ -1542,6 +1545,7 @@ function CreateDetail() {
                                                 getAppList={getList}
                                                 changePre={changePre}
                                                 planState={planState}
+                                                updataDataPre={updataDataPre}
                                                 detail={_.cloneDeep(detailRef.current)}
                                                 setDetail={(data: any, flag?: boolean) => saveDetails(data, flag)}
                                                 isMyApp={false}

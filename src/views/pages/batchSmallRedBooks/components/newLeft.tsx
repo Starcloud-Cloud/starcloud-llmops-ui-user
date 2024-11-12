@@ -32,6 +32,7 @@ const Lefts = ({
     imageStylePre,
     isMyApp,
     changePre,
+    updataDataPre,
     detail,
     data,
     saveLoading,
@@ -58,6 +59,7 @@ const Lefts = ({
     versionPre?: number;
     imageStylePre?: number;
     changePre?: number;
+    updataDataPre?: number;
     detail?: any;
     data?: any;
     saveLoading?: boolean;
@@ -698,7 +700,6 @@ const Lefts = ({
     }, [generateList]);
     const [imageVar, setImageVar] = useState<any>(null);
     useEffect(() => {
-        console.log(6);
         setImageMoke && setImageMoke(imageVar || imageMater);
     }, [imageVar]);
     const headerSaveAll = (data?: any) => {
@@ -844,6 +845,11 @@ const Lefts = ({
             getList(true, false, true);
         }
     }, [imageStylePre]);
+    useEffect(() => {
+        if (updataDataPre) {
+            getList(true, false);
+        }
+    }, [updataDataPre]);
     //选中保存
     const seleSave = (data: string, arr: any) => {
         const newData = _.cloneDeep(appRef.current);

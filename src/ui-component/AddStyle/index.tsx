@@ -134,6 +134,7 @@ const AddStyle = React.forwardRef(
                 newList.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value = JSON.parse(
                     newList.variable.variables.find((item: any) => item.field === 'CUSTOM_POSTER_STYLE_CONFIG').value
                 );
+                console.log(newList);
                 setImageVar && setImageVar(newList);
             } else {
                 setImageVar([]);

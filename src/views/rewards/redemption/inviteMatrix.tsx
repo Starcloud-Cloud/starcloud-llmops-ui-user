@@ -80,7 +80,7 @@ export const InviteMatrix = () => {
                         </div>
                     </Card>
                 </Col>
-                <Col span={12}>
+                {/* <Col span={12}>
                     <Card
                         bordered={false}
                         title="每日签到"
@@ -101,7 +101,7 @@ export const InviteMatrix = () => {
                             </Button>
                         </div>
                     </Card>
-                </Col>
+                </Col> */}
                 <Col span={12}>
                     <Card
                         bordered={false}

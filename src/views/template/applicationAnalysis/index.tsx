@@ -49,15 +49,19 @@ import useUserStore from 'store/user';
 import { Charts } from 'types/chat';
 import { DetailModal } from 'views/pages/redBookContentList/component/detailModal';
 import _ from 'lodash-es';
+import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 interface LogStatistics {
-    createDate: string;
+    updateDate: string;
     completionCostPoints: number;
+    matrixCostPoints: number;
+    completionErrorCount: number;
     imageAvgElapsed: number;
     completionAvgElapsed: number;
     imageCostPoints: number;
     completionTokens: number;
     chatTokens: number;
     imageSuccessCount: number;
+    imageErrorCount: number;
     completionSuccessCount: number;
 }
 interface TableData {
@@ -67,6 +71,7 @@ interface TableData {
     appName: string;
     imagePoints?: string;
     totalAnswerTokens: number;
+    matrixPoints: number;
     totalMessageTokens: number;
     totalElapsed: number;
     status: string;
@@ -145,22 +150,41 @@ function ApplicationAnalysis({
         }
     };
     const permissions = useUserStore((state) => state.permissions);
+
     //获取标数据
     const getStatistic = async () => {
+        const APP_HOME = getPermission(ENUM_PERMISSION.APP_HOME);
+
         let res: any;
         if (type === 'GENERATE_RECORD') {
             res = await logStatistics({ ...queryParams, appUid });
         } else {
             res = await statisticsByAppUid({ ...queryParams, appUid });
         }
-        const completionSuccessCount = res?.map((item: LogStatistics) => ({ y: item.completionSuccessCount, x: item.createDate }));
-        const completionCostPoints = res?.map((item: LogStatistics) => ({ y: item.completionCostPoints, x: item.createDate }));
-        const imageAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.imageAvgElapsed?.toFixed(2), x: item.createDate }));
-        const completionAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.completionAvgElapsed?.toFixed(2), x: item.createDate }));
-        const imageSuccessCount = res?.map((item: LogStatistics) => ({ y: item.imageSuccessCount, x: item.createDate }));
-        const imageCostPoints = res?.map((item: LogStatistics) => ({ y: item.imageCostPoints, x: item.createDate }));
-        const completionTokens = res?.map((item: LogStatistics) => ({ y: item.completionTokens, x: item.createDate }));
-        const chatTokens = res?.map((item: LogStatistics) => ({ y: item.chatTokens, x: item.createDate }));
+        const completionSuccessCount = res?.map((item: LogStatistics) => ({ y: item.completionSuccessCount, x: item.updateDate }));
+        const completionCostPoints = res?.map((item: LogStatistics) => ({
+            y: APP_HOME ? item.completionCostPoints : item.matrixCostPoints,
+            x: item.updateDate
+        }));
+        const completionErrorCount = res?.map((item: LogStatistics) => ({ y: item.completionErrorCount, x: item.updateDate }));
+
+        const imageAvgElapsed = res?.map((item: LogStatistics) => ({
+            y: APP_HOME ? item.imageAvgElapsed?.toFixed(2) : item.completionAvgElapsed?.toFixed(2),
+            x: item.updateDate
+        }));
+        const completionAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.completionAvgElapsed?.toFixed(2), x: item.updateDate }));
+        const imageSuccessCount = res?.map((item: LogStatistics) => ({
+            y: APP_HOME ? item.imageSuccessCount : item.completionSuccessCount,
+            x: item.updateDate
+        }));
+        const imageErrorCount = res?.map((item: LogStatistics) => ({
+            y: APP_HOME ? item.imageErrorCount : item.completionErrorCount,
+            x: item.updateDate
+        }));
+
+        const imageCostPoints = res?.map((item: LogStatistics) => ({ y: item.imageCostPoints, x: item.updateDate }));
+        const completionTokens = res?.map((item: LogStatistics) => ({ y: item.completionTokens, x: item.updateDate }));
+        const chatTokens = res?.map((item: LogStatistics) => ({ y: item.chatTokens, x: item.updateDate }));
         const newList = [];
         permissions?.includes('log:app:analysis:completionCostPoints') &&
             newList.push({
@@ -172,8 +196,10 @@ function ApplicationAnalysis({
                         : '聊天消耗魔法豆数',
                 subTitle: '全部消耗的魔法豆数',
                 name: '执行成功次数',
+                errTitle: '执行失败次数',
                 data: completionCostPoints,
                 successData: completionSuccessCount,
+                errData: completionErrorCount,
                 key: true
             });
         permissions?.includes('log:app:analysis:imageCostPoints') &&
@@ -181,9 +207,11 @@ function ApplicationAnalysis({
             newList.push({
                 title: '生成图片消耗数',
                 subTitle: '全部消耗的图片数',
+                errTitle: '图片失败次数',
                 name: '图片成功次数',
                 data: imageCostPoints,
                 successData: imageSuccessCount,
+                errData: imageErrorCount,
                 key: true
             });
         permissions?.includes('log:app:analysis:completionAvgElapsed') &&
@@ -306,7 +334,8 @@ function ApplicationAnalysis({
             series: key
                 ? [
                       { name: item.subTitle, data: item.data },
-                      { name: item.name, data: item.successData as any[] }
+                      { name: item.name, data: item.successData as any[] },
+                      { name: item.errTitle, data: item.errData as any[] }
                   ]
                 : [{ name: '', data: item.data }]
         };
@@ -597,7 +626,13 @@ function ApplicationAnalysis({
                                 {permissions?.includes('log:app:page:adminColumns') && (
                                     <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 )}
-                                <TableCell align="center">{row?.appMode === 'IMAGE' ? row.imagePoints : row.costPoints}</TableCell>
+                                <TableCell align="center">
+                                    {getPermission(ENUM_PERMISSION.APP_HOME)
+                                        ? row?.appMode === 'IMAGE'
+                                            ? row.imagePoints
+                                            : row.costPoints
+                                        : row.matrixPoints || 0}
+                                </TableCell>
                                 {permissions?.includes('log:app:page:adminColumns') && (
                                     <TableCell align="center">{row.totalElapsed}</TableCell>
                                 )}

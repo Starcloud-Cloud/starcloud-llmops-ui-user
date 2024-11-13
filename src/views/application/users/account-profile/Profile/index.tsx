@@ -436,7 +436,7 @@ const Profilnew = () => {
                                                     <div className="cursoe-pointer">
                                                         {row.refreshTokenExpireIn === -1
                                                             ? '永久有效'
-                                                            : dayjs(row.refreshTokenExpireIn).format('YYYY-MM-DD HH-mm-ss')}
+                                                            : dayjs(row.refreshTokenExpireIn * 1000).format('YYYY-MM-DD HH:mm:ss')}
                                                     </div>
                                                 </Tooltip>
                                             </div>

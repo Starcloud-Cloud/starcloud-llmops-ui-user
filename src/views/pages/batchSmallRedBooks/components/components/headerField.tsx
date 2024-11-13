@@ -216,7 +216,7 @@ const HeaderField = ({
                     <EditableProTable<any>
                         className="edit-table"
                         rowKey={rowKey}
-                        maxLength={30}
+                        maxLength={50}
                         tableAlertRender={false}
                         loading={tableLoading}
                         components={components}
@@ -228,7 +228,7 @@ const HeaderField = ({
                         pagination={false}
                         recordCreatorProps={{
                             newRecordType: 'dataSource',
-                            creatorButtonText: '添加字段',
+                            creatorButtonText: '增加字段',
                             record: () => ({
                                 id: Date.now(),
                                 uuid: Date.now(),

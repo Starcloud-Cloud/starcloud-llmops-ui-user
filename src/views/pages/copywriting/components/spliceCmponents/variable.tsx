@@ -67,10 +67,11 @@ const Row: React.FC<RowProps> = (props) => {
 
 interface Variable {
     rows: any[];
+    detail?: any;
     setRows: (data: any[]) => void;
 }
 
-const CreateVariable = ({ rows, setRows }: Variable) => {
+const CreateVariable = ({ rows, detail, setRows }: Variable) => {
     const columns: any = [
         { key: 'sort', align: 'center', width: 80, render: () => <DragHandle />, editable: false },
         {
@@ -235,10 +236,8 @@ const CreateVariable = ({ rows, setRows }: Variable) => {
 };
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
-        JSON.stringify(prevProps?.pre) === JSON.stringify(nextProps?.pre) &&
-        JSON.stringify(prevProps?.model) === JSON.stringify(nextProps?.model) &&
-        JSON.stringify(prevProps?.value) === JSON.stringify(nextProps?.value) &&
-        JSON.stringify(prevProps?.rows) === JSON.stringify(nextProps?.rows)
+        JSON.stringify(prevProps?.rows) === JSON.stringify(nextProps?.rows) &&
+        JSON.stringify(prevProps?.detail) === JSON.stringify(nextProps?.detail)
     );
 };
 export default memo(CreateVariable, arePropsEqual);

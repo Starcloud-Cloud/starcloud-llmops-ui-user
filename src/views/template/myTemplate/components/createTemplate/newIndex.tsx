@@ -1211,7 +1211,6 @@ function CreateDetail() {
     }, []);
     const [changePre, setChangePre] = useState(0);
     const [tableTitle, setTableTitle] = useState(0);
-    console.log(1);
 
     const [errOpen, setErrOpen] = useState(false);
     const [errList, setErrList] = useState<any[]>([]);
@@ -1343,7 +1342,7 @@ function CreateDetail() {
                             return;
                         }
                         if (detailRef?.current?.type === 'MEDIA_MATRIX') {
-                            if (value === '4') {
+                            if (value === '4' && createPlanRef.current.getDetail) {
                                 setDetailPre(0);
                                 const newData = _.cloneDeep(detailRef.current);
                                 let arr = newData?.workflowConfig?.steps;
@@ -1361,17 +1360,21 @@ function CreateDetail() {
                                             (i: any) => i.field === 'SYSTEM_POSTER_STYLE_CONFIG'
                                         ).value = JSON.parse(sysdata);
                                     }
-                                    console.log(arr[index]);
                                 }
                                 arr = [
                                     arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler'),
                                     ...createPlanRef.current.getDetail,
                                     arr.find((item: any) => item.flowStep.handler === 'PosterActionHandler')
                                 ];
+                                console.log(createPlanRef.current.getDetail, 111111111111111);
+
                                 newData.workflowConfig.steps = arr?.filter((item: any) => item);
                                 detailRef.current = newData;
                                 setDetail(detailRef?.current);
                                 setValue(key);
+                                if (createPlanRef.current.getDetail) {
+                                    setDetailPre(detailPre + 1);
+                                }
                             } else if (key === '4') {
                                 if (arrangeRef.current) {
                                     const newData = _.cloneDeep(detailRef.current);
@@ -1496,7 +1499,7 @@ function CreateDetail() {
                                 <div className="flex justify-center">
                                     <div className={`xl:w-[80%] lg:w-full pb-4`}>
                                         <Arrange
-                                            detail={detail}
+                                            detail={_.cloneDeep(detailRef.current)}
                                             setdetail={(data: any) => {
                                                 flowDataRef.current = data;
                                                 setFlowData(flowDataRef.current);

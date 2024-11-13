@@ -27,5 +27,7 @@ export interface Charts {
     key?: boolean;
     name?: string;
     subTitle?: string;
+    errTitle?: string;
     successData?: { x: string; y: string | number }[];
+    errData?: { x: string; y: string | number }[];
 }

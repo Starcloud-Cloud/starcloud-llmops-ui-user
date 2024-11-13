@@ -1,5 +1,5 @@
 import { Box, TextField, IconButton, Tooltip, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-import { Image, Dropdown, Popover, Switch, Spin } from 'antd';
+import { Image, Dropdown, Popover, Spin } from 'antd';
 import { VerticalAlignTopOutlined, VerticalAlignBottomOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
 import { BorderColor, AddCircleSharp, South, ExpandMore, MoreVert } from '@mui/icons-material';
 import { t } from 'hooks/web/useI18n';
@@ -169,6 +169,19 @@ function Arrange({
             </div>
         );
     }
+    const setVariable = (data: any, index: number, flag?: boolean) => {
+        const { workflowConfig: newData } = _.cloneDeep(detail);
+        if (flag) {
+            newData.steps.find((i: any) => i.flowStep.handler === 'PosterActionHandler').flowStep.variable.variables = data;
+        } else {
+            newData.steps[index].variable.variables = data;
+        }
+        const newDetails = _.cloneDeep(detail);
+        newDetails.workflowConfig = newData;
+        setNewDetail(newDetails);
+        changeConfigs(newData);
+    };
+
     return (
         <Box>
             {config?.steps?.map(
@@ -385,21 +398,7 @@ function Arrange({
                                                 (item: any) => item.field === 'SYSTEM_POSTER_STYLE_CONFIG'
                                             )?.value
                                         }
-                                        setVariable={(data: any, flag?: boolean) => {
-                                            const newData = _.cloneDeep(config);
-                                            if (flag) {
-                                                newData.steps.find(
-                                                    (i: any) => i.flowStep.handler === 'PosterActionHandler'
-                                                ).flowStep.variable.variables = data;
-                                                console.log(newData);
-                                            } else {
-                                                newData.steps[index].variable.variables = data;
-                                            }
-                                            const newDetails = _.cloneDeep(detail);
-                                            newDetails.workflowConfig = newData;
-                                            setNewDetail(newDetails);
-                                            changeConfigs(newData);
-                                        }}
+                                        setVariable={(data: any, flag?: boolean) => setVariable(data, index, flag)}
                                         variables={item?.flowStep?.variable?.variables}
                                         fields={item?.fields}
                                         handler={item?.flowStep?.handler}
@@ -528,6 +527,8 @@ function Arrange({
 }
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
+        JSON.stringify(prevProps?.detail) === JSON.stringify(nextProps?.detail) &&
+        JSON.stringify(prevProps?.config) === JSON.stringify(nextProps?.config) &&
         JSON.stringify(prevProps?.detailPre) === JSON.stringify(nextProps?.detailPre) &&
         JSON.stringify(prevProps?.config?.steps) === JSON.stringify(nextProps?.config?.steps) &&
         JSON.stringify(prevProps?.detail?.type) === JSON.stringify(nextProps?.detail?.type)

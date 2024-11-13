@@ -205,7 +205,7 @@ const SpaceEquity = () => {
             align: 'center',
             render: (_, row) => (
                 <span>
-                    {getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints : row.matrixBeanCounts}/{row.imageCount}
+                    {getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints || 0 : row.matrixBeanCounts || 0}/{row.imageCount}
                 </span>
             )
         },

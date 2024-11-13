@@ -287,7 +287,7 @@ const ThreeStep = ({
                                     >
                                         扫码发布
                                     </Button>
-                                    <Button type="primary" loading={downLoading} onClick={() => setPublishOpen(true)}>
+                                    <Button type="primary" loading={downLoading} onClick={() => downLoadImage()}>
                                         打包下载
                                     </Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>

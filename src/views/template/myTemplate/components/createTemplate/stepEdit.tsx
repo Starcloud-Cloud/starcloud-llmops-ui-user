@@ -445,13 +445,6 @@ const StepEdit = ({
                 )}
                 {handler === 'VariableActionHandler' && (
                     <Tabs.TabPane tab="变量" key="2">
-                        <button
-                            onClick={() => {
-                                console.log(detail);
-                            }}
-                        >
-                            1111
-                        </button>
                         <CreateVariable
                             rows={variable}
                             detail={detail}

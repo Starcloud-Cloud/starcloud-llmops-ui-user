@@ -587,7 +587,7 @@ function ApplicationAnalysis({
                                 </TableCell>
                             )}
                             <TableCell sx={{ minWidth: '100px' }} align="center">
-                                {t('generate.totalAnswerTokens')}
+                                {getPermission(ENUM_PERMISSION.APP_HOME) ? t('generate.totalAnswerTokens') : '消耗魔法豆'}
                             </TableCell>
                             {permissions?.includes('log:app:page:adminColumns') && (
                                 <TableCell sx={{ minWidth: '100px' }} align="center">

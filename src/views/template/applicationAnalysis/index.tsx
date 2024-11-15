@@ -173,14 +173,6 @@ function ApplicationAnalysis({
             x: item.updateDate
         }));
         const completionAvgElapsed = res?.map((item: LogStatistics) => ({ y: item.completionAvgElapsed?.toFixed(2), x: item.updateDate }));
-        const imageSuccessCount = res?.map((item: LogStatistics) => ({
-            y: APP_HOME ? item.imageSuccessCount : item.completionSuccessCount,
-            x: item.updateDate
-        }));
-        const imageErrorCount = res?.map((item: LogStatistics) => ({
-            y: APP_HOME ? item.imageErrorCount : item.completionErrorCount,
-            x: item.updateDate
-        }));
 
         const imageCostPoints = res?.map((item: LogStatistics) => ({ y: item.imageCostPoints, x: item.updateDate }));
         const completionTokens = res?.map((item: LogStatistics) => ({ y: item.completionTokens, x: item.updateDate }));
@@ -217,9 +209,11 @@ function ApplicationAnalysis({
         permissions?.includes('log:app:analysis:imageAvgElapsed') &&
             type === 'GENERATE_RECORD' &&
             newList.push({ title: '生成图片平均耗时(S)', data: imageAvgElapsed });
+
         permissions?.includes('log:app:analysis:completionTokens') &&
             (type === 'APP_ANALYSIS' || type === 'GENERATE_RECORD') &&
             newList.push({ title: '生成消耗Tokens', data: completionTokens });
+
         permissions?.includes('log:app:analysis:chatTokens') &&
             (type === 'CHAT_ANALYSIS' || type === 'GENERATE_RECORD') &&
             newList.push({ title: '聊天消耗Tokens', data: chatTokens });
@@ -575,37 +569,39 @@ function ApplicationAnalysis({
                             <TableCell sx={{ minWidth: '100px' }} align="center">
                                 {t('generate.mode')}
                             </TableCell>
-                            {permissions?.includes('log:app:page:adminColumns') && (
-                                <TableCell sx={{ minWidth: '100px' }} align="center">
-                                    执行场景
+                            <TableCell sx={{ minWidth: '100px' }} align="center">
+                                执行场景
+                            </TableCell>
+                            {permissions.includes('log:app:analysis:column:completionCostPoints') && (
+                                <TableCell sx={{ minWidth: '120px' }} align="center">
+                                    消耗魔法豆数
                                 </TableCell>
                             )}
-                            <TableCell sx={{ minWidth: '120px' }} align="center">
-                                消耗魔法豆数
-                            </TableCell>
-                            <TableCell sx={{ minWidth: '120px' }} align="center">
-                                消耗图片数
-                            </TableCell>
-                            {permissions?.includes('log:app:page:adminColumns') && (
-                                <TableCell sx={{ minWidth: '100px' }} align="center">
-                                    {t('generate.totalElapsed')} (s)
+                            {permissions.includes('log:app:analysis:column:imageCostPoints') && (
+                                <TableCell sx={{ minWidth: '120px' }} align="center">
+                                    消耗图片数
                                 </TableCell>
                             )}
                             <TableCell sx={{ minWidth: '100px' }} align="center">
-                                用户
+                                {t('generate.totalElapsed')} (s)
                             </TableCell>
+                            {permissions?.includes('log:app:analysis:column:user:nickname') && (
+                                <TableCell sx={{ minWidth: '100px' }} align="center">
+                                    用户
+                                </TableCell>
+                            )}
                             <TableCell sx={{ minWidth: '200px' }} align="center">
                                 {t('generate.status')}
                             </TableCell>
                             <TableCell sx={{ minWidth: '150px' }} align="center">
                                 更新时间
                             </TableCell>
-                            {permissions?.includes('log:app:page:adminColumns') && (
+                            {permissions?.includes('log:app:analysis:column:tokens') && (
                                 <TableCell sx={{ minWidth: '100px' }} align="center">
                                     消耗总Token
                                 </TableCell>
                             )}
-                            {permissions?.includes('log:app:page:adminColumns') && (
+                            {permissions?.includes('log:app:analysis:column:user:level') && (
                                 <TableCell sx={{ minWidth: '100px' }} align="center">
                                     用户等级
                                 </TableCell>
@@ -620,17 +616,19 @@ function ApplicationAnalysis({
                             <TableRow key={row.uid} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell align="center">{row.appName}</TableCell>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
-                                {permissions?.includes('log:app:page:adminColumns') && (
-                                    <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
+                                <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
+                                {permissions?.includes(' log:app:analysis:column:completionCostPoints') && (
+                                    <TableCell align="center">
+                                        {getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints || 0 : row.matrixPoints || 0}
+                                    </TableCell>
                                 )}
-                                <TableCell align="center">
-                                    {getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints || 0 : row.matrixPoints || 0}
-                                </TableCell>
-                                <TableCell align="center">{row.imagePoints || 0}</TableCell>
-                                {permissions?.includes('log:app:page:adminColumns') && (
-                                    <TableCell align="center">{row.totalElapsed}</TableCell>
+                                {permissions?.includes('log:app:analysis:column:imageCostPoints') && (
+                                    <TableCell align="center">{row.imagePoints || 0}</TableCell>
                                 )}
-                                <TableCell align="center">{row.appExecutor}</TableCell>
+                                <TableCell align="center">{row.totalElapsed}</TableCell>
+                                {permissions?.includes('log:app:analysis:column:user:nickname') && (
+                                    <TableCell align="center">{row.appExecutor}</TableCell>
+                                )}
                                 <TableCell align="center">
                                     {row.status !== 'SUCCESS' ? (
                                         row.errorCode === '2004008003' ? (
@@ -671,8 +669,10 @@ function ApplicationAnalysis({
                                     )}
                                 </TableCell>
                                 <TableCell align="center">{formatDate(row.updateTime)}</TableCell>
-                                {permissions?.includes('log:app:page:adminColumns') && <TableCell align="center">{row.tokens}</TableCell>}
-                                {permissions?.includes('log:app:page:adminColumns') && (
+                                {permissions?.includes('log:app:analysis:column:tokens') && (
+                                    <TableCell align="center">{row.tokens}</TableCell>
+                                )}
+                                {permissions?.includes('log:app:analysis:column:user:level') && (
                                     <TableCell align="center">
                                         {row.userLevels?.map((item) => (
                                             <p className="mt-[5px]">

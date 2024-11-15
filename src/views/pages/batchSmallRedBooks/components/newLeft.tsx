@@ -289,7 +289,7 @@ const Lefts = ({
         if (!newMember) {
             setTimeout(() => {
                 setTourOpen(true);
-            }, 300);
+            }, 500);
         }
     };
     const getStepMater = async () => {
@@ -930,7 +930,7 @@ const Lefts = ({
                         style={{
                             transform: leftWidth ? 'rotate(180deg)' : 'rotate(0deg)'
                         }}
-                        className={`absolute top-4 right-[-10px] z-[1000] duration-700`}
+                        className={`absolute top-3 right-[-10px] z-[1000] duration-700`}
                         onClick={() => setWidth && setWidth()}
                         size="small"
                         shape="circle"
@@ -938,6 +938,9 @@ const Lefts = ({
                         <RightOutlined />
                     </Button>
                 </Tooltip>
+                <div className="absolute top-4 right-5 z-[1000] text-xs text-[#673ab7] cursor-pointer" onClick={() => setTourOpen(true)}>
+                    指导
+                </div>
                 <div
                     style={{
                         height: detailShow

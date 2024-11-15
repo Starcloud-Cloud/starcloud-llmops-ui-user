@@ -201,13 +201,14 @@ const SpaceEquity = () => {
             dataIndex: 'mobile'
         },
         {
-            title: '已使用魔法豆/图片',
+            title: '已使用魔法豆',
             align: 'center',
-            render: (_, row) => (
-                <span>
-                    {getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints || 0 : row.matrixBeanCounts || 0}/{row.imageCount}
-                </span>
-            )
+            render: (_, row) => <span>{getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints || 0 : row.matrixBeanCounts || 0}</span>
+        },
+        {
+            title: '已使用图片',
+            align: 'center',
+            render: (_, row) => <span>{row.imageCount || 0}</span>
         },
         {
             title: '角色',

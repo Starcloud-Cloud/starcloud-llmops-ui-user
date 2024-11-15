@@ -310,12 +310,18 @@ function CreateDetail() {
         detailRef.current = {};
         if (data) {
             getApp({ uid: data }).then((res) => {
-                resUpperCase(res);
+                resUpperCase(res?.data);
             });
         } else {
             if (searchParams.get('uid')) {
                 getApp({ uid: searchParams.get('uid') as string }).then((res) => {
-                    resUpperCase(res);
+                    resUpperCase(res?.data);
+                    setTabisShow(res?.permissionMap);
+                    if (res?.permissionMap['app.edit']) {
+                        setValue('0');
+                    } else if (res?.permissionMap['app.execute']) {
+                        setValue('4');
+                    }
                 });
             } else {
                 getRecommendApp({ recommend: searchParams.get('recommend') as string }).then((res) => {
@@ -1292,6 +1298,9 @@ function CreateDetail() {
     const [detailPre, setDetailPre] = useState(0);
     const [updataDataPre, setUpdataDataPre] = useState(0);
 
+    //判断 Tab 是否显示
+    const [tabisShow, setTabisShow] = useState<any>(null);
+
     return detail ? (
         <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>
             <CardHeader
@@ -1313,7 +1322,9 @@ function CreateDetail() {
                 action={
                     <>
                         {searchParams.get('uid') && (
-                            <Dropdown menu={{ items }}>
+                            <Dropdown
+                                menu={{ items: tabisShow['app.delete'] ? items : items?.filter((item: any) => item.label !== '删除应用') }}
+                            >
                                 <IconButton sx={{ zIndex: 9 }}>
                                     <MoreVert />
                                 </IconButton>
@@ -1455,29 +1466,31 @@ function CreateDetail() {
                         }
                     }}
                 >
-                    <Tabs.TabPane tab=" 基础设置" key="0">
-                        <div className="flex justify-center ">
-                            <div className="xl:w-[80%] lg:w-full md:w-full">
-                                <Basis
-                                    detail={{
-                                        name: detail?.name,
-                                        description: detail?.description,
-                                        category: detail?.category,
-                                        tags: detail?.tags,
-                                        example: detail?.example,
-                                        sort: detail?.sort,
-                                        type: detail?.type,
-                                        icon: detail?.icon,
-                                        images: detail?.images
-                                    }}
-                                    basisPre={basisPre}
-                                    appModel={appModels?.appType}
-                                    setValues={setData}
-                                />
+                    {tabisShow['app.edit'] && (
+                        <Tabs.TabPane tab=" 基础设置" key="0">
+                            <div className="flex justify-center ">
+                                <div className="xl:w-[80%] lg:w-full md:w-full">
+                                    <Basis
+                                        detail={{
+                                            name: detail?.name,
+                                            description: detail?.description,
+                                            category: detail?.category,
+                                            tags: detail?.tags,
+                                            example: detail?.example,
+                                            sort: detail?.sort,
+                                            type: detail?.type,
+                                            icon: detail?.icon,
+                                            images: detail?.images
+                                        }}
+                                        basisPre={basisPre}
+                                        appModel={appModels?.appType}
+                                        setValues={setData}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </Tabs.TabPane>
-                    {permissions.includes('app:flow') && (
+                        </Tabs.TabPane>
+                    )}
+                    {tabisShow['app.edit'] && (
                         <Tabs.TabPane tab="流程编排" key="1">
                             <div
                                 ref={arrangeRef}
@@ -1527,7 +1540,7 @@ function CreateDetail() {
                             </div>
                         </Tabs.TabPane>
                     )}
-                    {permissions.includes('app:run') && (
+                    {tabisShow['app.execute'] && (
                         <Tabs.TabPane tab="运行应用" key="4">
                             <div className="w-full">
                                 {detail?.type === 'MEDIA_MATRIX' ? (
@@ -1599,7 +1612,7 @@ function CreateDetail() {
                             </div>
                         </Tabs.TabPane>
                     )}
-                    {detailRef.current?.uid && searchParams.get('uid') && permissions.includes('app:analyze') && (
+                    {detailRef.current?.uid && searchParams.get('uid') && tabisShow['app.analyse'] && (
                         <Tabs.TabPane tab="应用分析" key="2">
                             <div
                                 style={{

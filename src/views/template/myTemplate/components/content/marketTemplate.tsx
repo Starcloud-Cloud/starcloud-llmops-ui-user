@@ -45,7 +45,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
             {scene !== 'template' && (
                 <div className="text-xs text-black/50 absolute bottom-4 left-0 w-full px-4 flex justify-between gap-4">
                     <Tooltip title="创建者">
-                        <div>{data.creator}</div>
+                        <div>{data.creatorName}</div>
                     </Tooltip>
                     <Tooltip title="更新时间">
                         <div>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD HH-mm-ss')}</div>

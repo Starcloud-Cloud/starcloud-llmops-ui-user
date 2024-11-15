@@ -99,7 +99,7 @@ export const detailApp = (data: any) => {
 
 //获取我的应用
 export const getApp = (data: any) => {
-    return request.get({ url: `/llm/app/get/${data.uid}` });
+    return request.getOriginal({ url: `/llm/app/get/${data.uid}` });
 };
 //获取推荐
 export const getRecommendApp = (data: any) => {

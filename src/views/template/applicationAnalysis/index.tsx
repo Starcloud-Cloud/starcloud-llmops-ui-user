@@ -206,13 +206,7 @@ function ApplicationAnalysis({
             type === 'GENERATE_RECORD' &&
             newList.push({
                 title: '生成图片消耗数',
-                subTitle: '全部消耗的图片数',
-                errTitle: '图片失败次数',
-                name: '图片成功次数',
-                data: imageCostPoints,
-                successData: imageSuccessCount,
-                errData: imageErrorCount,
-                key: true
+                data: imageCostPoints
             });
         permissions?.includes('log:app:analysis:completionAvgElapsed') &&
             newList.push({
@@ -586,8 +580,11 @@ function ApplicationAnalysis({
                                     执行场景
                                 </TableCell>
                             )}
-                            <TableCell sx={{ minWidth: '100px' }} align="center">
-                                {getPermission(ENUM_PERMISSION.APP_HOME) ? t('generate.totalAnswerTokens') : '消耗魔法豆'}
+                            <TableCell sx={{ minWidth: '120px' }} align="center">
+                                消耗魔法豆数
+                            </TableCell>
+                            <TableCell sx={{ minWidth: '120px' }} align="center">
+                                消耗图片数
                             </TableCell>
                             {permissions?.includes('log:app:page:adminColumns') && (
                                 <TableCell sx={{ minWidth: '100px' }} align="center">
@@ -627,12 +624,9 @@ function ApplicationAnalysis({
                                     <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
                                 )}
                                 <TableCell align="center">
-                                    {getPermission(ENUM_PERMISSION.APP_HOME)
-                                        ? row?.appMode === 'IMAGE'
-                                            ? row.imagePoints
-                                            : row.costPoints
-                                        : row.matrixPoints || 0}
+                                    {getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints || 0 : row.matrixPoints || 0}
                                 </TableCell>
+                                <TableCell align="center">{row.imagePoints || 0}</TableCell>
                                 {permissions?.includes('log:app:page:adminColumns') && (
                                     <TableCell align="center">{row.totalElapsed}</TableCell>
                                 )}

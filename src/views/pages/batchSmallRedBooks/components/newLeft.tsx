@@ -1432,7 +1432,7 @@ const Lefts = ({
                     sourceList={typeList}
                 />
             )}
-            <Tour
+            {/* <Tour
                 open={tourOpen}
                 closeIcon={false}
                 onClose={() => setTourOpen(false)}
@@ -1440,7 +1440,7 @@ const Lefts = ({
                 onFinish={() => {
                     wsCache.set('newMember', true);
                 }}
-            />
+            /> */}
         </>
     );
 };

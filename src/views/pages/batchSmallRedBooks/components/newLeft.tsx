@@ -1,5 +1,6 @@
 import { getTenant, ENUM_TENANT } from 'utils/permission';
-import { Button, Image, Popconfirm, Form, Tabs, InputNumber, Tag, Row, Col, List, Drawer, Tooltip } from 'antd';
+import { Button, Image, Popconfirm, Form, Tabs, InputNumber, Tag, Tour, List, Drawer, Tooltip } from 'antd';
+import type { TourProps } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { AccordionDetails, AccordionSummary, Accordion } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
@@ -21,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import './newLeft.scss';
 import MaterialTable from './materialTable';
 import { appModify } from 'api/template/index';
+import { useCache, CACHE_KEY } from 'hooks/web/useCache';
 
 const Lefts = ({
     detailShow = true,
@@ -77,6 +79,7 @@ const Lefts = ({
     setTotalCountRef: (data: number) => void;
     setImageStyleList: (data: any[]) => void;
 }) => {
+    const { wsCache } = useCache();
     const navigate = useNavigate();
     const { allDetail: all_detail }: any = useAllDetail();
     const location = useLocation();
@@ -282,6 +285,12 @@ const Lefts = ({
             result?.configuration?.imageStyleList || [];
         // }
         setImagMater(newImage);
+        const newMember = wsCache.get('newMember');
+        if (!newMember) {
+            setTimeout(() => {
+                setTourOpen(true);
+            }, 300);
+        }
     };
     const getStepMater = async () => {
         const arr: any[] = [];
@@ -755,6 +764,7 @@ const Lefts = ({
             imageRef.current?.record?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value || '[]';
         await appModify({
             ...detail,
+            e: 2,
             workflowConfig: {
                 steps: arr?.filter((item: any) => item)
             },
@@ -884,6 +894,34 @@ const Lefts = ({
         }
     };
 
+    const [tourOpen, setTourOpen] = useState(false);
+    const steps1 = useRef(null);
+    const steps2 = useRef(null);
+    const steps3 = useRef(null);
+    const steps4 = useRef(null);
+    const tourStep: TourProps['steps'] = [
+        {
+            title: '第一步',
+            description: '可上传自己的图片和内容等，进行笔记生成',
+            target: () => steps1.current
+        },
+        {
+            title: '第二步',
+            description: '配置笔记图片生成的图片模版，支持不同风格模版组合生成',
+            target: () => steps2.current
+        },
+        {
+            title: '第三步',
+            description: '配置 AI 生成规则，灵活定制生成的内容',
+            target: () => steps3.current
+        },
+        {
+            title: '第四步',
+            description: '点击立即生成小红书内容',
+            target: () => steps4.current
+        }
+    ];
+
     return (
         <>
             <div className="relative h-full">
@@ -919,56 +957,57 @@ const Lefts = ({
                                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                             )) && (
                             <Tabs.TabPane key={'1'} tab="素材上传">
-                                {/* <div className="flex justify-between items-center mb-2">
-                                    <div>
-                                        <InfoCircleOutlined />
-                                        <span className="text-sm ml-1 text-stone-600">可上传自己的图片和内容等，进行笔记生成</span>
-                                    </div>
-                                </div> */}
-                                <MaterialTable
-                                    materialStatus={materialStatus}
-                                    updataTable={updataTable}
-                                    appUid={detail ? appData.appUid : appData.uid}
-                                    bizUid={appData.appUid}
-                                    bizType={detail ? 'APP' : 'APP_MARKET'}
-                                    uid={appData.uid}
-                                    tableTitle={tableTitle}
-                                    handleExecute={(data: number[]) => {
-                                        seleSave('SELECT', data);
-                                    }}
-                                />
+                                <div ref={steps1}>
+                                    <MaterialTable
+                                        materialStatus={materialStatus}
+                                        updataTable={updataTable}
+                                        appUid={detail ? appData.appUid : appData.uid}
+                                        bizUid={appData.appUid}
+                                        bizType={detail ? 'APP' : 'APP_MARKET'}
+                                        uid={appData.uid}
+                                        tableTitle={tableTitle}
+                                        handleExecute={(data: number[]) => {
+                                            seleSave('SELECT', data);
+                                        }}
+                                    />
+                                </div>
+
                                 {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                                     (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                                 ) && (
                                     <div className="mt-6">
                                         {detail ? (
-                                            <AddStyle
-                                                selectImgLoading={selectImgLoading}
-                                                materialStatus={materialStatus}
-                                                saveTemplate={saveTemplate}
-                                                details={appData?.configuration?.appInformation}
-                                                hasAddStyle={detail || !detailShow ? false : true}
-                                                setImageVar={setImageVar}
-                                                appUid={appData?.appUid}
-                                                ref={imageRef}
-                                                record={imageMater}
-                                                getList={() => getList(true)}
-                                                materialType={materialType}
-                                            />
+                                            <div ref={steps2}>
+                                                <AddStyle
+                                                    selectImgLoading={selectImgLoading}
+                                                    materialStatus={materialStatus}
+                                                    saveTemplate={saveTemplate}
+                                                    details={appData?.configuration?.appInformation}
+                                                    hasAddStyle={detail || !detailShow ? false : true}
+                                                    setImageVar={setImageVar}
+                                                    appUid={appData?.appUid}
+                                                    ref={imageRef}
+                                                    record={imageMater}
+                                                    getList={() => getList(true)}
+                                                    materialType={materialType}
+                                                />
+                                            </div>
                                         ) : (
-                                            <AddStyleApp
-                                                selectImgLoading={selectImgLoading}
-                                                allData={appData}
-                                                materialStatus={materialStatus}
-                                                details={appData?.configuration?.appInformation}
-                                                hasAddStyle={detail || !detailShow ? false : true}
-                                                setImageVar={setImageVar}
-                                                getList={() => getList(true)}
-                                                appUid={appData?.appUid}
-                                                ref={imageRef}
-                                                record={imageMater}
-                                                materialType={materialType}
-                                            />
+                                            <div ref={steps2}>
+                                                <AddStyleApp
+                                                    selectImgLoading={selectImgLoading}
+                                                    allData={appData}
+                                                    materialStatus={materialStatus}
+                                                    details={appData?.configuration?.appInformation}
+                                                    hasAddStyle={detail || !detailShow ? false : true}
+                                                    setImageVar={setImageVar}
+                                                    getList={() => getList(true)}
+                                                    appUid={appData?.appUid}
+                                                    ref={imageRef}
+                                                    record={imageMater}
+                                                    materialType={materialType}
+                                                />
+                                            </div>
                                         )}
                                     </div>
                                 )}
@@ -1059,7 +1098,7 @@ const Lefts = ({
                                     ? '2'
                                     : '1'
                             }
-                            tab="笔记生成"
+                            tab={<div ref={steps3}>笔记生成</div>}
                         >
                             <div className="flex justify-between items-center mb-2">
                                 <div>
@@ -1343,6 +1382,7 @@ const Lefts = ({
                 <div className="z-[1000] absolute bottom-0 flex gap-2 bg-[#fff] py-4 w-[calc(100%-8px)]">
                     {detailShow && (
                         <Button
+                            ref={steps4}
                             className="w-full"
                             type="primary"
                             onClick={() => {
@@ -1389,6 +1429,15 @@ const Lefts = ({
                     sourceList={typeList}
                 />
             )}
+            <Tour
+                open={tourOpen}
+                closeIcon={false}
+                onClose={() => setTourOpen(false)}
+                steps={tourStep}
+                onFinish={() => {
+                    wsCache.set('newMember', true);
+                }}
+            />
         </>
     );
 };

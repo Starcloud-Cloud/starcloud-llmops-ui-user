@@ -547,7 +547,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                     </div>
                 </>
             ) : (
-                <>
+                <div>
                     <div className="text-base font-semibold leading-[20px]">素材库</div>
                     <div className="mt-1 mb-2 text-xs text-black/50">可上传自己的图片和内容等，进行笔记生成</div>
                     <div
@@ -630,7 +630,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                         </div>
                         <SettingOutlined className="absolute top-4 right-4 cursor-pointer" />
                     </div>
-                </>
+                </div>
                 // <>
                 //     <div className="flex items-center justify-between mb-4">
                 //         <div>

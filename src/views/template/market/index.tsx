@@ -422,8 +422,9 @@ function TemplateMarket() {
         }
     ];
     useEffect(() => {
-        if (!wsCache.get('newMember')) {
+        if (!wsCache.get('newMember_market')) {
             setTourOpen(true);
+            wsCache.set('newMember_market', true);
         }
     }, []);
 

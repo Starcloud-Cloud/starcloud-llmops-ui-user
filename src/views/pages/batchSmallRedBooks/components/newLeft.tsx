@@ -289,7 +289,7 @@ const Lefts = ({
         if (!newMember) {
             setTimeout(() => {
                 setTourOpen(true);
-            }, 500);
+            }, 1000);
         }
     };
     const getStepMater = async () => {

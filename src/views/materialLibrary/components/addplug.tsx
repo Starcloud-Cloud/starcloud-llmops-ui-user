@@ -744,7 +744,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     try {
                                                         data = JSON.parse(bindData.content);
                                                     } catch (err) {}
-                                                    if (typeDisable && !data) {
+                                                    if (typeDisable && bindData.content && !data) {
                                                         dispatch(
                                                             openSnackbar({
                                                                 open: true,

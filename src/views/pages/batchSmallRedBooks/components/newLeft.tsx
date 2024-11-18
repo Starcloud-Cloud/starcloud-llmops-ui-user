@@ -1455,14 +1455,14 @@ const Lefts = ({
                     sourceList={typeList}
                 />
             )}
-            {/* <Tour
+            <Tour
                 open={tourOpen}
                 onClose={() => setTourOpen(false)}
                 steps={tourStep}
                 onFinish={() => {
                     wsCache.set('newMember', true);
                 }}
-            /> */}
+            />
         </>
     );
 };

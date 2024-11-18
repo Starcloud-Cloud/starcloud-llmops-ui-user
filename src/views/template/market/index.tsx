@@ -498,7 +498,7 @@ function TemplateMarket() {
                                     >
                                         {item.appList.map((el: any, i: number) => (
                                             <Col key={el?.uid} ref={colRef} className={`xxxl-col flex-shrink-0`}>
-                                                <div ref={i === 0 && index === 0 ? step3 : null}>
+                                                <div ref={i === 0 && index === 1 ? step3 : null}>
                                                     <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
                                                 </div>
                                             </Col>

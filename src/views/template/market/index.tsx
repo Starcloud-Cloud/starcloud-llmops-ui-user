@@ -23,7 +23,9 @@ import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 import { appPage } from 'api/template';
 import jsCookie from 'js-cookie';
 import { ENUM_TENANT, getTenant } from 'utils/permission';
-import { Image, Row, Col } from 'antd';
+import { Tour, Row, Col } from 'antd';
+import type { TourProps } from 'antd';
+import { useCache } from 'hooks/web/useCache';
 import './index.scss';
 interface MarketList {
     name: string;
@@ -60,6 +62,8 @@ function a11yProps(index: number) {
 }
 
 function TemplateMarket() {
+    const { wsCache } = useCache();
+
     const theme = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
@@ -394,6 +398,35 @@ function TemplateMarket() {
         };
     }, [colflag]);
 
+    const step1 = useRef(null);
+    const step2 = useRef(null);
+    const step3 = useRef(null);
+    const [tourOpen, setTourOpen] = useState(false);
+    const tourSteps: TourProps['steps'] = [
+        {
+            title: '第一步',
+            description: '欢迎访问魔法笔记，选择一个类型开始魔法旅途吧',
+            target: () => step1.current
+        },
+        {
+            title: '第二步',
+            description: '选择一个类型开始操作',
+            target: () => step2.current
+        },
+        {
+            title: '第三步',
+            description: '点击开始创作吧',
+            nextButtonProps: { style: { display: 'none' } },
+            prevButtonProps: { style: { display: 'none' } },
+            target: () => step3.current
+        }
+    ];
+    useEffect(() => {
+        if (!wsCache.get('newMember')) {
+            setTourOpen(true);
+        }
+    }, []);
+
     return (
         <Box
             className="Rows"
@@ -411,7 +444,7 @@ function TemplateMarket() {
         >
             <Tabs size="small" activeKey={value} onChange={setValue} aria-label="basic tabs example" className="h-full">
                 <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">应用市场</div>} key="0">
-                    <div className="mt-[-8px] pb-2 flex gap-3 w-full overflow-x-scroll">
+                    <div ref={step2} className="mt-[-8px] pb-2 flex gap-3 w-full overflow-x-scroll">
                         {menuList?.map((item, index) => (
                             <div
                                 onClick={() => {
@@ -463,9 +496,11 @@ function TemplateMarket() {
                                         gutter={[16, 16]}
                                         // wrap={queryParams.category === 'ALL' ? false : true}
                                     >
-                                        {item.appList.map((el: any, index: number) => (
+                                        {item.appList.map((el: any, i: number) => (
                                             <Col key={el?.uid} ref={colRef} className={`xxxl-col flex-shrink-0`}>
-                                                <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
+                                                <div ref={i === 0 && index === 0 ? step3 : null}>
+                                                    <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
+                                                </div>
                                             </Col>
                                         ))}
                                     </Row>
@@ -606,6 +641,7 @@ function TemplateMarket() {
                     }}
                 />
             )}
+            <Tour closeIcon={false} open={tourOpen} onClose={() => setTourOpen(false)} steps={tourSteps} />
         </Box>
     );
 }

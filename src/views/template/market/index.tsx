@@ -641,7 +641,7 @@ function TemplateMarket() {
                     }}
                 />
             )}
-            <Tour closeIcon={false} open={tourOpen} onClose={() => setTourOpen(false)} steps={tourSteps} />
+            <Tour open={tourOpen} onClose={() => setTourOpen(false)} steps={tourSteps} />
         </Box>
     );
 }

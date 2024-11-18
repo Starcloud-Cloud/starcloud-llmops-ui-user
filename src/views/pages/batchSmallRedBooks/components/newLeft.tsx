@@ -902,22 +902,45 @@ const Lefts = ({
     const tourStep: TourProps['steps'] = [
         {
             title: '第一步',
-            description: '可上传自己的图片和内容等，进行笔记生成',
+            description: (
+                <div>
+                    <div>将笔记图文中各内容填入素材库</div>
+                    <div>【新增素材】通过手工填入，每次一条内容</div>
+                    <div>【批量导入】通用Excel文件导入，可批量添加</div>
+                    <div>【智能生成】通过专属AI自动生成图文素材</div>
+                </div>
+            ),
             target: () => steps1.current
         },
         {
             title: '第二步',
-            description: '配置笔记图片生成的图片模版，支持不同风格模版组合生成',
+            description: '选择生成图片模版，预置多种风格图片模版，同时支持自定义模版',
             target: () => steps2.current
         },
         {
             title: '第三步',
-            description: '配置 AI 生成规则，灵活定制生成的内容',
+            description: (
+                <div>
+                    <div>配置笔记文案生成，灵活定制生成内容</div>
+                    <div>支持AI生成、仿写、随机选取</div>
+                    <div>可分区块分别生成，再整体合成</div>
+                </div>
+            ),
             target: () => steps3.current
         },
         {
             title: '第四步',
-            description: '点击立即生成小红书内容',
+            description: (
+                <div className="flex items-center">
+                    配置结束，立即生成试试吧！更多帮助内容可点击查看
+                    <span
+                        onClick={() => window.open('https://docs.dingtalk.com/i/nodes/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')}
+                        className="cursor-pointer text-[#673ab7]"
+                    >
+                        【使用指南】
+                    </span>
+                </div>
+            ),
             target: () => steps4.current
         }
     ];
@@ -1434,7 +1457,6 @@ const Lefts = ({
             )}
             {/* <Tour
                 open={tourOpen}
-                closeIcon={false}
                 onClose={() => setTourOpen(false)}
                 steps={tourStep}
                 onFinish={() => {

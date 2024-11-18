@@ -422,8 +422,9 @@ function TemplateMarket() {
         }
     ];
     useEffect(() => {
-        if (!wsCache.get('newMember')) {
+        if (!wsCache.get('newMember_market')) {
             setTourOpen(true);
+            wsCache.set('newMember_market', true);
         }
     }, []);
 
@@ -641,7 +642,7 @@ function TemplateMarket() {
                     }}
                 />
             )}
-            {/* <Tour closeIcon={false} open={tourOpen} onClose={() => setTourOpen(false)} steps={tourSteps} /> */}
+            <Tour open={tourOpen} onClose={() => setTourOpen(false)} steps={tourSteps} />
         </Box>
     );
 }

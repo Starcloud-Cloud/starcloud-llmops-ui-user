@@ -1,7 +1,7 @@
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import GradeIcon from '@mui/icons-material/Grade';
-import { favoriteCollect, favoriteCancel } from 'api/template/collect';
+import { favoriteCollect, favoriteCancel, getMarketUid } from 'api/template/collect';
 import './textnoWarp.scss';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -9,7 +9,9 @@ import { useEffect, useState } from 'react';
 import bgImg from 'assets/images/picture/bgImg.png';
 import dayjs from 'dayjs';
 import { Tooltip } from 'antd';
+import { useNavigate } from 'react-router-dom';
 const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
+    const navigate = useNavigate();
     const getImage = (active: string) => {
         let image;
         try {
@@ -51,6 +53,20 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                         <div>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD HH-mm-ss')}</div>
                     </Tooltip>
                 </div>
+            )}
+            {scene !== 'template' && data?.publishUid && (
+                <Tooltip title="已发布到应用市场，点击查看">
+                    <div
+                        className="text-xs text-[#673ab7] absolute top-2 right-2"
+                        onClick={async (e) => {
+                            const result = await getMarketUid(data.publishUid);
+                            navigate('/batchSmallRedBook?appUid=' + result);
+                            e.stopPropagation();
+                        }}
+                    >
+                        已发布
+                    </div>
+                </Tooltip>
             )}
             <div className="absolute left-[16px] bottom-[16px]">
                 {like === 'market' &&

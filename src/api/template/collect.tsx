@@ -15,3 +15,7 @@ export const favoriteCancel = (data: any) => {
 export const favoriteGetMarketInfo = (data: any) => {
     return request.post({ url: '/llm/app/favorite/getMarketInfo', data });
 };
+//获取应用市场 uid
+export const getMarketUid = (data: any) => {
+    return request.get({ url: '/llm/app/getMarketUid/' + data });
+};

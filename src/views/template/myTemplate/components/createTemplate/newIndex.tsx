@@ -1344,7 +1344,7 @@ function CreateDetail() {
                 }
             ></CardHeader>
             <Divider />
-            <div className="w-full absolute top-[24px] h-[calc(100vh-200px)]">
+            <div className="w-full absolute top-[24px] h-[calc(100vh-112px)]">
                 <Tabs
                     activeKey={value}
                     centered={true}
@@ -1354,7 +1354,6 @@ function CreateDetail() {
                         }
                         if (detailRef?.current?.type === 'MEDIA_MATRIX') {
                             if (value === '4' && createPlanRef.current.getDetail) {
-                                setDetailPre(0);
                                 const newData = _.cloneDeep(detailRef.current);
                                 let arr = newData?.workflowConfig?.steps;
                                 const a = arr.find((item: any) => item.flowStep.handler === 'MaterialActionHandler');
@@ -1384,7 +1383,8 @@ function CreateDetail() {
                                 setDetail(detailRef?.current);
                                 setValue(key);
                                 if (createPlanRef.current.getDetail) {
-                                    setDetailPre(detailPre + 1);
+                                    detailPreRef.current = detailPreRef.current + 1;
+                                    setDetailPre(detailPreRef.current);
                                 }
                             } else if (key === '4') {
                                 if (arrangeRef.current) {
@@ -1496,7 +1496,7 @@ function CreateDetail() {
                                 ref={arrangeRef}
                                 className="overflow-y-auto mt-[-16px]"
                                 style={{
-                                    height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 210px)',
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 162px)',
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
                                     backgroundRepeat: 'repeat'
@@ -1512,7 +1512,7 @@ function CreateDetail() {
                                 <div className="flex justify-center">
                                     <div className={`xl:w-[80%] lg:w-full pb-4`}>
                                         <Arrange
-                                            detail={_.cloneDeep(detailRef.current)}
+                                            detail={detail}
                                             setdetail={(data: any) => {
                                                 flowDataRef.current = data;
                                                 setFlowData(flowDataRef.current);
@@ -1547,7 +1547,7 @@ function CreateDetail() {
                                     <Spin spinning={viewLoading} tip="Loading">
                                         <div
                                             style={{
-                                                height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 220px)'
+                                                height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 174px)'
                                             }}
                                             className="bg-[rgb(244,246,248)]"
                                         >
@@ -1616,7 +1616,7 @@ function CreateDetail() {
                         <Tabs.TabPane tab="应用分析" key="2">
                             <div
                                 style={{
-                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 210px)'
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh -174px)'
                                 }}
                                 className="overflow-y-auto px-4"
                             >
@@ -1628,7 +1628,7 @@ function CreateDetail() {
                         <Tabs.TabPane tab="应用发布" key="3">
                             <div
                                 style={{
-                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 220px)'
+                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 174px)'
                                 }}
                                 className="overflow-y-auto px-4"
                             >

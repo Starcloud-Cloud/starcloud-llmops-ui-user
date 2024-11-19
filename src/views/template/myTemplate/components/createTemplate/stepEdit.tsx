@@ -360,8 +360,9 @@ const StepEdit = ({
     };
 
     useEffect(() => {
-        if (detail && handler === 'AssembleActionHandler' && !detailPre) {
-            setDetailPre(1);
+        if (detail && handler === 'AssembleActionHandler' && detailPre) {
+            console.log(detail);
+            setDetailPre(0);
             const newList = detail?.workflowConfig?.steps
                 ?.filter((item: any) => item?.flowStep?.handler === 'CustomActionHandler')
                 ?.map((item: any, index: number) => ({

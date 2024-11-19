@@ -382,7 +382,7 @@ function Arrange({
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <StepEdit
-                                        detail={newDetail || detail}
+                                        detail={item?.flowStep?.handler === 'PosterActionHandler' ? newDetail || detail : detail}
                                         setdetail={(data: any) => {
                                             getSteps(data);
                                             setdetail(data);

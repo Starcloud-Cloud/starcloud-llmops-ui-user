@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 // material-ui
 import { Button, CardContent, CardProps, Divider, Grid, IconButton, Modal, Tab, Tabs } from '@mui/material';
-import { Input, Popover, Radio, RadioChangeEvent, Tag } from 'antd';
+import { Input, Popover, Radio, RadioChangeEvent, Tag, InputNumber } from 'antd';
 
 const { Search } = Input;
 
@@ -16,6 +16,7 @@ import dayjs from 'dayjs';
 import Checkbox from '@mui/material/Checkbox';
 import { getDiscountList, getLickNameProduct } from 'api/vip';
 import { getCouponCode } from 'api/rewards';
+import './discountModal.scss';
 
 // generate random
 function rand() {
@@ -59,6 +60,8 @@ export function DiscountModal({
     setCurrentSelect,
     handleCreateOrder,
     handleCreateSignPay,
+    count,
+    setCount,
     categoryId
 }: {
     open: boolean;
@@ -68,6 +71,8 @@ export function DiscountModal({
     setCurrentSelect: (currentSelect: any) => void;
     handleCreateOrder: (payId?: number, discountCode?: number, type?: number, payType?: number) => void;
     handleCreateSignPay: (payId?: number) => void;
+    count: number;
+    setCount: (payId: number) => void;
     categoryId: number;
 }) {
     const [selectCode, setSelectCode] = React.useState<any>(); // payId
@@ -256,6 +261,40 @@ export function DiscountModal({
                                             )}
                                         </div>
                                     )}
+                                    <div className="flex justify-between items-center w-full mb-3">
+                                        <span className="text-[#868A91]">购买个数</span>
+                                        <div className="flex items-center">
+                                            <div
+                                                className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-l-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
+                                                style={{ borderRight: 'none' }}
+                                                onClick={async () => {
+                                                    if (count > 1) {
+                                                        setCount(-1);
+                                                        await handleFetchPay(currentSelect?.payId, discountCode);
+                                                    }
+                                                }}
+                                            >
+                                                —
+                                            </div>
+                                            <InputNumber
+                                                controls={false}
+                                                readOnly={true}
+                                                className="w-[80px] !rounded-[0px] number_input"
+                                                value={count}
+                                                min={1}
+                                            />
+                                            <div
+                                                className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-r-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
+                                                style={{ borderLeft: 'none' }}
+                                                onClick={async () => {
+                                                    setCount(1);
+                                                    await handleFetchPay(currentSelect?.payId, discountCode);
+                                                }}
+                                            >
+                                                +
+                                            </div>
+                                        </div>
+                                    </div>
                                     {!value && (
                                         <div className="flex w-full flex-col mb-3 mt-3">
                                             <span className="text-[#868A91] mb-2">折扣券</span>
@@ -342,6 +381,7 @@ export function DiscountModal({
                                             )}
                                         </div>
                                     )}
+
                                     {!!value && (
                                         <div className="flex justify-between items-center w-full mb-3">
                                             <span className="text-[#868A91]">扣款时间</span>

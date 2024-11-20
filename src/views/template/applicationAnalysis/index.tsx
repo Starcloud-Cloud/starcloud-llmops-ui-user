@@ -617,7 +617,7 @@ function ApplicationAnalysis({
                                 <TableCell align="center">{row.appName}</TableCell>
                                 <TableCell align="center">{t('generate.' + row.appMode)}</TableCell>
                                 <TableCell align="center">{appScene.find((item) => item.value === row.fromScene)?.label}</TableCell>
-                                {permissions?.includes(' log:app:analysis:column:completionCostPoints') && (
+                                {permissions?.includes('log:app:analysis:column:completionCostPoints') && (
                                     <TableCell align="center">
                                         {getPermission(ENUM_PERMISSION.APP_HOME) ? row.costPoints || 0 : row.matrixPoints || 0}
                                     </TableCell>

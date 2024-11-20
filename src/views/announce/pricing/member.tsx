@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 
 // material-ui
 import {
@@ -597,7 +597,7 @@ const Price1 = () => {
             if (type === 1) {
                 res = await createOrder({
                     terminal: 20,
-                    items: [{ skuId: payId, count: 1 }],
+                    items: [{ skuId: payId, count: countRef.current }],
                     promoCode: discountCode,
                     pointStatus: false,
                     deliveryType: 3,
@@ -606,7 +606,7 @@ const Price1 = () => {
             } else {
                 res = await createOrder({
                     terminal: 20,
-                    items: [{ skuId: payId, count: 1 }],
+                    items: [{ skuId: payId, count: countRef.current }],
                     couponId: discountCode,
                     pointStatus: false,
                     deliveryType: 3,
@@ -655,7 +655,7 @@ const Price1 = () => {
 
             res = await createSignV2({
                 terminal: 20,
-                items: [{ skuId: payId, count: 1 }],
+                items: [{ skuId: payId, count: countRef.current }],
                 pointStatus: false,
                 deliveryType: 3,
                 from
@@ -702,13 +702,23 @@ const Price1 = () => {
         if (!isSign) {
             // 不是签约
             if (type === 1) {
-                res = await getPrice({ items: [{ skuId: payId, count: 1 }], promoCode: discountCode, pointStatus: false, deliveryType: 3 });
+                res = await getPrice({
+                    items: [{ skuId: payId, count: countRef.current }],
+                    promoCode: discountCode,
+                    pointStatus: false,
+                    deliveryType: 3
+                });
             } else {
-                res = await getPrice({ items: [{ skuId: payId, count: 1 }], couponId: discountCode, pointStatus: false, deliveryType: 3 });
+                res = await getPrice({
+                    items: [{ skuId: payId, count: countRef.current }],
+                    couponId: discountCode,
+                    pointStatus: false,
+                    deliveryType: 3
+                });
             }
         } else {
             // 是签约
-            res = await getSignPrice({ items: [{ skuId: payId, count: 1 }], pointStatus: false, deliveryType: 3 });
+            res = await getSignPrice({ items: [{ skuId: payId, count: countRef.current }], pointStatus: false, deliveryType: 3 });
         }
         if (res) {
             setDiscountOpen(true);
@@ -750,6 +760,10 @@ const Price1 = () => {
             myRef?.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
+
+    //购买个数
+    const countRef = useRef(1);
+    const [count, setCount] = useState(1);
 
     return (
         <div className="relative">
@@ -1092,6 +1106,11 @@ const Price1 = () => {
                     handleCreateOrder={handleCreateOrder}
                     handleCreateSignPay={handleCreateSignPay}
                     categoryId={value.toString()?.includes('-') ? Number(value?.split('-')[0]) : value}
+                    count={count}
+                    setCount={(e) => {
+                        countRef.current += e;
+                        setCount(countRef.current);
+                    }}
                 />
             )}
             {/* <Record open={openRecord} handleClose={handleCloseRecord} /> */}

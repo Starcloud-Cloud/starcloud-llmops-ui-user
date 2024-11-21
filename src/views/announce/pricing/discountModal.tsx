@@ -137,7 +137,7 @@ export function DiscountModal({
         }
     }, [discountList]);
 
-    const handleRadio = async (e: RadioChangeEvent) => {
+    const handleRadio = async (e: any) => {
         const isSubscribe = currentSelect?.skus.find((item: any) => item.id === e.target.value).subscribeConfig.isSubscribe;
         setCurrentSelect((pre: any) => {
             return {
@@ -240,6 +240,42 @@ export function DiscountModal({
                                             <span className="text-xs">元</span>
                                         </div>
                                     </div>
+                                    {currentSelect?.title === '团队版' && (
+                                        <div className="flex justify-between items-center w-full mb-3">
+                                            <span className="text-[#868A91]">选择席位数</span>
+                                            <div className="flex items-center">
+                                                <div
+                                                    className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-l-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
+                                                    style={{ borderRight: 'none', cursor: count > 2 ? 'pointer' : 'not-allowed' }}
+                                                    onClick={async () => {
+                                                        if (count > 2) {
+                                                            setCount(-1);
+                                                            await handleFetchPay(currentSelect?.payId, discountCode);
+                                                        }
+                                                    }}
+                                                >
+                                                    —
+                                                </div>
+                                                <InputNumber
+                                                    controls={false}
+                                                    readOnly={true}
+                                                    className="w-[80px] !rounded-[0px] number_input"
+                                                    value={count}
+                                                    min={1}
+                                                />
+                                                <div
+                                                    className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-r-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
+                                                    style={{ borderLeft: 'none' }}
+                                                    onClick={async () => {
+                                                        setCount(1);
+                                                        await handleFetchPay(currentSelect?.payId, discountCode);
+                                                    }}
+                                                >
+                                                    +
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                     {currentSelect.experience ? (
                                         <div className="flex justify-between items-center w-full mb-3">
                                             <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
@@ -247,54 +283,120 @@ export function DiscountModal({
                                         </div>
                                     ) : (
                                         <div className="flex justify-between items-center w-full mb-3">
-                                            <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span>
-                                            {!value ? (
-                                                <span>
-                                                    <Radio.Group onChange={handleRadio} value={selectCode}>
+                                            {/* <span className="text-[#868A91]">{!value ? '购买时长' : '订阅时长'}</span> */}
+                                            {value ? (
+                                                <>
+                                                    <span className="text-[#868A91]">订阅时长</span>
+                                                    <span className="text-sm text-[#868A91]">月付</span>
+                                                </>
+                                            ) : (
+                                                <div className="flex items-center gap-4 mt-2">
+                                                    {currentSelect.skus.map((v: any, index: number) => (
+                                                        <div
+                                                            onClick={() => {
+                                                                handleRadio({ target: { value: v.id } });
+                                                            }}
+                                                            key={v.id}
+                                                            className="w-[146px] h-[166px] text-[#1b2337] rounded-[12px] cursor-pointer flex flex-col justify-between items-center border border-solid border-black/10 bg-white hover:!border-[#febf93]"
+                                                            style={{
+                                                                borderWidth: selectCode === v.id ? '2px' : '1px',
+                                                                borderColor: selectCode === v.id ? '#febf93' : '#0000001a',
+                                                                background: selectCode === v.id ? '#fffaf6' : '#fff'
+                                                            }}
+                                                        >
+                                                            <div className="h-full flex justify-center flex-col w-[146px] relative">
+                                                                <div className="pt-4 pb-3 text-base font-[700] text-center">
+                                                                    {v.properties[0].valueName}
+                                                                </div>
+                                                                {index === 2 && (
+                                                                    <span
+                                                                        className="absolute top-[-12px] right-[-2px] px-[8px] h-[24px] bg-[#ff6464] text-xs text-white leading-[24px]"
+                                                                        style={{ borderRadius: '12px 8px 8px 2px' }}
+                                                                    >
+                                                                        性价比首选
+                                                                    </span>
+                                                                )}
+                                                                <div className="flex justify-center items-end text-md gap-[2px]">
+                                                                    ¥
+                                                                    <span className="text-[20px] font-[700]">
+                                                                        {(v.price / 100).toFixed(2)}
+                                                                    </span>
+                                                                    /人
+                                                                </div>
+                                                                <div className="text-xs text-[#1b233766] mt-1 line-through leading-[20px] text-center">
+                                                                    原价¥{(v.marketPrice / 100).toFixed(2)}/人
+                                                                </div>
+                                                            </div>
+                                                            <div className="w-full h-[24px] rounded-b-[10px] text-xs text-center leading-[24px] bg-[#f3f4f9]">
+                                                                每月
+                                                                {v.properties[0].valueName !== '团队版'
+                                                                    ? (currentSelect.skus[0]?.price / 100).toFixed(2)
+                                                                    : (currentSelect.unitPrice / 100).toFixed(2)}
+                                                                元/人
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {/* {!value ? (
+                                                currentSelect?.title === '团队版' ? (
+                                                    <div className="flex items-center gap-4">
                                                         {currentSelect.skus.map((v: any, index: number) => (
-                                                            <Radio value={v.id}>{v.properties[0].valueName}</Radio>
+                                                            <div
+                                                                onClick={() => {
+                                                                    handleRadio({ target: { value: v.id } });
+                                                                }}
+                                                                key={v.id}
+                                                                className="w-[130px] h-[148px] text-[#1b2337] rounded-[12px] cursor-pointer flex flex-col justify-between items-center border border-solid border-black/10 bg-white hover:!border-[#febf93]"
+                                                                style={{
+                                                                    borderWidth: selectCode === v.id ? '2px' : '1px',
+                                                                    borderColor: selectCode === v.id ? '#febf93' : '#0000001a'
+                                                                }}
+                                                            >
+                                                                <div className="h-full flex justify-center flex-col w-[130px] relative">
+                                                                    <div className="pt-4 pb-3 text-base font-[700] text-center">
+                                                                        {v.properties[0].valueName}
+                                                                    </div>
+                                                                    {index === 0 && (
+                                                                        <span
+                                                                            className="absolute top-[-12px] right-[-2px] px-[8px] h-[24px] bg-[#ff6464] text-xs text-white leading-[24px]"
+                                                                            style={{ borderRadius: '12px 8px 8px 2px' }}
+                                                                        >
+                                                                            性价比首选
+                                                                        </span>
+                                                                    )}
+                                                                    <div className="flex justify-center items-end text-md gap-[2px]">
+                                                                        ¥
+                                                                        <span className="text-[24px] font-[700]">
+                                                                            {(v.price / 100).toFixed(2)}
+                                                                        </span>
+                                                                        /人
+                                                                    </div>
+                                                                    <div className="text-xs text-[#1b233766] mt-1 line-through leading-[20px] text-center">
+                                                                        原价¥{(v.marketPrice / 100).toFixed(2)}/人
+                                                                    </div>
+                                                                </div>
+                                                                <div className="w-full h-[24px] rounded-b-[10px] text-xs text-center leading-[24px] bg-[#f3f4f9]">
+                                                                    每月{(currentSelect.unitPrice / 100).toFixed(2)}元/人
+                                                                </div>
+                                                            </div>
                                                         ))}
-                                                    </Radio.Group>
-                                                </span>
+                                                    </div>
+                                                ) : (
+                                                    <span>
+                                                        <Radio.Group onChange={handleRadio} value={selectCode}>
+                                                            {currentSelect.skus.map((v: any, index: number) => (
+                                                                <Radio value={v.id}>{v.properties[0].valueName}</Radio>
+                                                            ))}
+                                                        </Radio.Group>
+                                                    </span>
+                                                )
                                             ) : (
                                                 <span className="text-sm text-[#868A91]">月付</span>
-                                            )}
+                                            )} */}
                                         </div>
                                     )}
-                                    <div className="flex justify-between items-center w-full mb-3">
-                                        <span className="text-[#868A91]">购买个数</span>
-                                        <div className="flex items-center">
-                                            <div
-                                                className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-l-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
-                                                style={{ borderRight: 'none' }}
-                                                onClick={async () => {
-                                                    if (count > 1) {
-                                                        setCount(-1);
-                                                        await handleFetchPay(currentSelect?.payId, discountCode);
-                                                    }
-                                                }}
-                                            >
-                                                —
-                                            </div>
-                                            <InputNumber
-                                                controls={false}
-                                                readOnly={true}
-                                                className="w-[80px] !rounded-[0px] number_input"
-                                                value={count}
-                                                min={1}
-                                            />
-                                            <div
-                                                className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-r-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
-                                                style={{ borderLeft: 'none' }}
-                                                onClick={async () => {
-                                                    setCount(1);
-                                                    await handleFetchPay(currentSelect?.payId, discountCode);
-                                                }}
-                                            >
-                                                +
-                                            </div>
-                                        </div>
-                                    </div>
+
                                     {!value && (
                                         <div className="flex w-full flex-col mb-3 mt-3">
                                             <span className="text-[#868A91] mb-2">折扣券</span>

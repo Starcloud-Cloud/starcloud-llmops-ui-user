@@ -762,8 +762,8 @@ const Price1 = () => {
     };
 
     //购买个数
-    const countRef = useRef(1);
-    const [count, setCount] = useState(1);
+    const countRef = useRef(2);
+    const [count, setCount] = useState(2);
 
     return (
         <div className="relative">

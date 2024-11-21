@@ -50,7 +50,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                         <div>{data.creatorName}</div>
                     </Tooltip>
                     <Tooltip title="更新时间">
-                        <div>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD HH-mm-ss')}</div>
+                        <div>{data.updateTime && dayjs(data.updateTime).format('YYYY-MM-DD HH:mm:ss')}</div>
                     </Tooltip>
                 </div>
             )}
@@ -62,6 +62,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                             const result = await getMarketUid(data.publishUid);
                             navigate('/batchSmallRedBook?appUid=' + result);
                             e.stopPropagation();
+                            e.preventDefault();
                         }}
                     >
                         已发布

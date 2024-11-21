@@ -53,10 +53,10 @@ const useRouteStore = create<RouteStore>((set) => ({
     // getAddRouters: () => flatMultiLevelRoutes(cloneDeep(get().addRouters)),
     // getMenuTabRouters: () => get().menuTabRouters,
     generateRoutes: async () => {
-        let res: any[];
+        let res: any[] = [];
         if (wsCache.get(CACHE_KEY.ROLE_ROUTERS)) {
             res = wsCache.get(CACHE_KEY.ROLE_ROUTERS);
-        } else {
+        } else if (location?.pathname !== '/' && location?.pathname !== '/invite' && location?.pathname !== '/share') {
             const resData = await getInfos();
             res = resData?.menus;
             wsCache.set(CACHE_KEY.ROLE_ROUTERS, res);

@@ -330,9 +330,7 @@ export function DiscountModal({
                                                             </div>
                                                             <div className="w-full h-[24px] rounded-b-[10px] text-xs text-center leading-[24px] bg-[#f3f4f9]">
                                                                 每月
-                                                                {v.properties[0].valueName !== '团队版'
-                                                                    ? (currentSelect.skus[0]?.price / 100).toFixed(2)
-                                                                    : (currentSelect.unitPrice / 100).toFixed(2)}
+                                                                {(v.unitPrice / 100).toFixed(2)}
                                                                 元/人
                                                             </div>
                                                         </div>

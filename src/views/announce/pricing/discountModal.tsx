@@ -249,7 +249,7 @@ export function DiscountModal({
                                                     className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-l-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
                                                     style={{ borderRight: 'none', cursor: count > 2 ? 'pointer' : 'not-allowed' }}
                                                     onClick={async () => {
-                                                        if (count > 1) {
+                                                        if (count > 2) {
                                                             setCount(-1);
                                                             await handleFetchPay(currentSelect?.payId, discountCode);
                                                         }

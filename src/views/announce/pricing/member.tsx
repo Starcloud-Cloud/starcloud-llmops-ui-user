@@ -183,7 +183,7 @@ const plansDefault = (value: number) => [
     },
     {
         keyword: 'basic',
-        active: true,
+        active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
         description: value === 1 ? '300魔法豆' : '3600魔法豆',
@@ -214,7 +214,7 @@ const plansDefault = (value: number) => [
     },
     {
         keyword: 'pro',
-        active: false,
+        active: true,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
         description: value === 1 ? '6个账号，2500魔法豆' : '6个账号，30000魔法豆',
@@ -597,7 +597,7 @@ const Price1 = () => {
             if (type === 1) {
                 res = await createOrder({
                     terminal: 20,
-                    items: [{ skuId: payId, count: countRef.current }],
+                    items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                     promoCode: discountCode,
                     pointStatus: false,
                     deliveryType: 3,
@@ -606,7 +606,7 @@ const Price1 = () => {
             } else {
                 res = await createOrder({
                     terminal: 20,
-                    items: [{ skuId: payId, count: countRef.current }],
+                    items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                     couponId: discountCode,
                     pointStatus: false,
                     deliveryType: 3,
@@ -655,7 +655,7 @@ const Price1 = () => {
 
             res = await createSignV2({
                 terminal: 20,
-                items: [{ skuId: payId, count: countRef.current }],
+                items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                 pointStatus: false,
                 deliveryType: 3,
                 from
@@ -688,7 +688,7 @@ const Price1 = () => {
             }
         }
     };
-
+    const subTitle = useRef('');
     // 获取价格
     const handleFetchPay = async (payId?: number, discountCode?: number, type?: number, isSign = false) => {
         if (!isLoggedIn) {
@@ -700,17 +700,19 @@ const Price1 = () => {
         }
         let res: any;
         if (!isSign) {
+            console.log(currentSelect);
+
             // 不是签约
             if (type === 1) {
                 res = await getPrice({
-                    items: [{ skuId: payId, count: countRef.current }],
+                    items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                     promoCode: discountCode,
                     pointStatus: false,
                     deliveryType: 3
                 });
             } else {
                 res = await getPrice({
-                    items: [{ skuId: payId, count: countRef.current }],
+                    items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                     couponId: discountCode,
                     pointStatus: false,
                     deliveryType: 3
@@ -718,7 +720,11 @@ const Price1 = () => {
             }
         } else {
             // 是签约
-            res = await getSignPrice({ items: [{ skuId: payId, count: countRef.current }], pointStatus: false, deliveryType: 3 });
+            res = await getSignPrice({
+                items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
+                pointStatus: false,
+                deliveryType: 3
+            });
         }
         if (res) {
             setDiscountOpen(true);
@@ -762,14 +768,8 @@ const Price1 = () => {
     };
 
     //购买个数
-    const countRef = useRef(1);
-    const [count, setCount] = useState(1);
-    useEffect(() => {
-        if (!discountOpen) {
-            countRef.current = 1;
-            setCount(countRef.current);
-        }
-    }, [discountOpen]);
+    const countRef = useRef(2);
+    const [count, setCount] = useState(2);
     return (
         <div className="relative">
             {/* <HeaderWrapper id="vip">
@@ -890,8 +890,7 @@ const Price1 = () => {
                                                         className={'w-4/5'}
                                                         variant={plan.active ? 'contained' : 'outlined'}
                                                         onClick={() => {
-                                                            console.log(plan);
-
+                                                            subTitle.current = plan.title;
                                                             setCurrentSelect({
                                                                 title: plan.title,
                                                                 select: value,

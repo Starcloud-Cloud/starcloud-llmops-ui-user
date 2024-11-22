@@ -768,8 +768,8 @@ const Price1 = () => {
     };
 
     //购买个数
-    const countRef = useRef(2);
-    const [count, setCount] = useState(2);
+    const countRef = useRef(5);
+    const [count, setCount] = useState(5);
     return (
         <div className="relative">
             {/* <HeaderWrapper id="vip">

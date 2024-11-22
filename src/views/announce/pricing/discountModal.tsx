@@ -246,10 +246,10 @@ export function DiscountModal({
                                             <span className="text-[#868A91]">选择席位数</span>
                                             <div className="flex items-center">
                                                 <div
-                                                    className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-l-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
-                                                    style={{ borderRight: 'none', cursor: count > 2 ? 'pointer' : 'not-allowed' }}
+                                                    className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-l-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer select-none"
+                                                    style={{ borderRight: 'none', cursor: count > 5 ? 'pointer' : 'not-allowed' }}
                                                     onClick={async () => {
-                                                        if (count > 2) {
+                                                        if (count > 5) {
                                                             setCount(-1);
                                                             await handleFetchPay(currentSelect?.payId, discountCode);
                                                         }
@@ -265,7 +265,7 @@ export function DiscountModal({
                                                     min={1}
                                                 />
                                                 <div
-                                                    className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-r-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer"
+                                                    className="border border-solid border-[#d9d9d9] bg-[#00000005] text-black/[88] rounded-r-[6px] w-[35px] h-[32px] flex justify-center items-center cursor-pointer select-none"
                                                     style={{ borderLeft: 'none' }}
                                                     onClick={async () => {
                                                         setCount(1);

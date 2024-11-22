@@ -1294,8 +1294,8 @@ function CreateDetail() {
             return 1;
         }
     };
-    const detailPreRef = useRef(0);
-    const [detailPre, setDetailPre] = useState(0);
+    const detailPreRef = useRef(1);
+    const [detailPre, setDetailPre] = useState(1);
     const [updataDataPre, setUpdataDataPre] = useState(0);
 
     //判断 Tab 是否显示

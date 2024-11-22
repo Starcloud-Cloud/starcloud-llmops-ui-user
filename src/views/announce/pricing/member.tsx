@@ -762,9 +762,14 @@ const Price1 = () => {
     };
 
     //购买个数
-    const countRef = useRef(2);
-    const [count, setCount] = useState(2);
-
+    const countRef = useRef(1);
+    const [count, setCount] = useState(1);
+    useEffect(() => {
+        if (!discountOpen) {
+            countRef.current = 1;
+            setCount(countRef.current);
+        }
+    }, [discountOpen]);
     return (
         <div className="relative">
             {/* <HeaderWrapper id="vip">
@@ -885,20 +890,22 @@ const Price1 = () => {
                                                         className={'w-4/5'}
                                                         variant={plan.active ? 'contained' : 'outlined'}
                                                         onClick={() => {
+                                                            console.log(plan);
+
                                                             setCurrentSelect({
                                                                 title: plan.title,
                                                                 select: value,
-                                                                payId: plan.id,
+                                                                payId: plan?.skus[plan?.skus?.length - 1]?.id,
                                                                 isSubscribe: plan?.isSubscribe,
                                                                 subscribeMoney: plan?.subscribeMoney,
                                                                 skus: plan.skus
                                                             });
-                                                            handleClick(index, plan.id);
+                                                            handleClick(index, plan?.skus[plan?.skus?.length - 1]?.id);
                                                         }}
                                                         color="secondary"
                                                     >
                                                         <div className="flex flex-col">
-                                                            <div> {plan.btnText}</div>
+                                                            <div>{plan.btnText}</div>
                                                             {plan?.isSubscribe && (
                                                                 <div className="flex justify-center items-center">
                                                                     <Tag className="ml-1" color="#f50">
@@ -921,13 +928,13 @@ const Price1 = () => {
                                                                 setCurrentSelect({
                                                                     title: item.properties[0].valueName,
                                                                     select: value,
-                                                                    payId: item?.id,
+                                                                    payId: plan?.skus[plan?.skus?.length - 1]?.id,
                                                                     experience: true,
                                                                     unitName: plan.unitName,
                                                                     isSubscribe: false,
                                                                     buyTime: item.rightsConfig.levelBasicDTO.timesRange.range
                                                                 });
-                                                                handleClick(3, item?.id);
+                                                                handleClick(3, plan?.skus[plan?.skus?.length - 1]?.id);
                                                             }}
                                                             color="secondary"
                                                         >

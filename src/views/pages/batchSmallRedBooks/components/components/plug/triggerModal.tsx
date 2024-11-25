@@ -640,7 +640,7 @@ ${JSON.stringify(value, null, 2)}
     useEffect(() => {
         loader.config({
             paths: {
-                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs'
+                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs'
             }
         });
     }, []);

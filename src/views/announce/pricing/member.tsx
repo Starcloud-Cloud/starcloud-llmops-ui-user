@@ -799,6 +799,7 @@ const Price1 = () => {
                             return (
                                 <Grid item xs={20} sm={10} md={4} key={index}>
                                     <MainCard
+                                        className=" hover:translate-y-[-10px] transition duration-700"
                                         boxShadow
                                         sx={{
                                             pt: 1.75,

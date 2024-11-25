@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
 import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, getSpaceList, plugVerifyResult } from 'api/redBook/plug';
 import _ from 'lodash-es';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
 import ChatMarkdown from 'ui-component/Markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { getAccessToken } from 'utils/auth';
@@ -417,7 +417,13 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     };
     const [typeDisable, setTypeDisable] = useState<boolean>(false);
     const [typeValue, setTypeValue] = useState<any>('接口验证');
-
+    useEffect(() => {
+        loader.config({
+            paths: {
+                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs'
+            }
+        });
+    }, []);
     return (
         <Modal
             title="插件配置"

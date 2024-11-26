@@ -4,9 +4,9 @@ import { Button, CardActions, CardContent, Divider, Grid, IconButton, Modal, Tex
 import { useTheme } from '@mui/material/styles';
 import { t } from 'hooks/web/useI18n';
 import { useState } from 'react';
+import { QRCode } from 'antd';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
-import QRCode from 'qrcode.react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';

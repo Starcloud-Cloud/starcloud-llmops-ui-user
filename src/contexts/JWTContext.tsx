@@ -218,7 +218,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             setAllDetail(result);
             setPreInvite(preInvite + 1);
         };
-        if (location?.pathname !== '/' && location?.pathname !== '/invite' && location?.pathname !== '/share') {
+        if (location?.pathname !== '/' && location?.pathname !== '/invite' && location?.pathname !== '/share'&& location?.pathname !== '/batchShare') {
             getList();
         }
     }, [pre]);

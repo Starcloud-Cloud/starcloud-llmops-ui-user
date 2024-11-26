@@ -56,7 +56,7 @@ const useRouteStore = create<RouteStore>((set) => ({
         let res: any[] = [];
         if (wsCache.get(CACHE_KEY.ROLE_ROUTERS)) {
             res = wsCache.get(CACHE_KEY.ROLE_ROUTERS);
-        } else if (location?.pathname !== '/' && location?.pathname !== '/invite' && location?.pathname !== '/share') {
+        } else if (location?.pathname !== '/' && location?.pathname !== '/invite' && location?.pathname !== '/share'&& location?.pathname !== '/batchShare') {
             const resData = await getInfos();
             res = resData?.menus;
             wsCache.set(CACHE_KEY.ROLE_ROUTERS, res);

@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { failureRetry } from 'api/redBook/batchIndex';
 import './index.scss';
 import BackupIcon from '@mui/icons-material/Backup';
-const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) => {
+const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailure }: any) => {
     const navigate = useNavigate();
     const [likeOpen, setLikeOpen] = useState(item?.liked);
     //执行按钮
@@ -384,8 +384,10 @@ const Goods = ({ item, setBusinessUid, setDetailOpen, show, timeFailure }: any) 
             ) : (
                 <div
                     onClick={() => {
-                        setBusinessUid(item.uid);
-                        setDetailOpen(true);
+                        if (!noDetail) {
+                            setBusinessUid(item.uid);
+                            setDetailOpen(true);
+                        }
                     }}
                 >
                     <Swipers show={show} item={item} />

@@ -1,4 +1,4 @@
-import { Collapse, Spin, Tag, Popover, Button, Popconfirm, Modal, Checkbox } from 'antd';
+import { Collapse, Spin, Tag, Popover, Button, Popconfirm, Modal, Checkbox, QRCode } from 'antd';
 import { CopyrightOutlined, CloseOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
@@ -72,6 +72,7 @@ const Right = ({
     const [downList, setDownList] = useState<any[]>([]);
     const batchDownload = (data: any[]) => {
         setDownList(data?.filter((item) => item.status === 'SUCCESS'));
+        setCheckValue(data?.filter((item) => item.status === 'SUCCESS')?.map((item) => item.uid));
         setDownOpen(true);
     };
     const [checkValue, setCheckValue] = useState<undefined | any[]>(undefined);
@@ -171,6 +172,10 @@ const Right = ({
     useEffect(() => {
         if (rightPage) setPageNum(1);
     }, [rightPage]);
+
+    //小红书分享
+    const [batchid, setBatchid] = useState('');
+    const [publishOpen, setPublishOpen] = useState(false);
     return (
         <>
             {bathList?.length === 0 || isexample ? (
@@ -319,7 +324,8 @@ const Right = ({
                                                         </Button>
                                                         <Button
                                                             onClick={(e) => {
-                                                                navigate('/batchShare?uid=' + item?.uid);
+                                                                setBatchid(item?.uid);
+                                                                setPublishOpen(true);
                                                                 e.stopPropagation();
                                                             }}
                                                             size="small"
@@ -355,7 +361,8 @@ const Right = ({
                                                         </Button>
                                                         <Button
                                                             onClick={(e) => {
-                                                                navigate('/batchShare?uid=' + item?.uid);
+                                                                setBatchid(item?.uid);
+                                                                setPublishOpen(true);
                                                                 e.stopPropagation();
                                                             }}
                                                             size="small"
@@ -442,6 +449,19 @@ const Right = ({
                     >
                         批量下载二维码({checkValue?.length || 0})
                     </Button>
+                </div>
+            </Modal>
+            <Modal open={publishOpen} title={'批量分享'} footer={null} onCancel={() => setPublishOpen(false)} closable={false}>
+                <div className="w-full flex justify-center items-center flex-col gap-2">
+                    <QRCode value={`${process.env.REACT_APP_SHARE_URL}/batchShare?uid=` + batchid} />
+                    <div className="flex flex-col items-center">
+                        <div
+                            onClick={() => navigate(`/batchShare?uid=` + batchid)}
+                            className="text-md underline cursor-pointer text-[#673ab7]"
+                        >
+                            查看效果
+                        </div>
+                    </div>
                 </div>
             </Modal>
         </>

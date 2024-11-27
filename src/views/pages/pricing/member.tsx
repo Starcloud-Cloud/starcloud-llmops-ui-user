@@ -223,7 +223,7 @@ const plansDefault = (value: number) => [
         active: false,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
-        description: value === 1 ? '6个账号，25000魔法豆，2000点作图' : '6个账号，300000魔法豆，24000点作图',
+        description: value === 1 ? '5个账号，25000魔法豆，2000点作图' : '5个账号，300000魔法豆，24000点作图',
         monthPrice: 499,
         yearPrice: 4999,
         preMonthPrice: 416.58,

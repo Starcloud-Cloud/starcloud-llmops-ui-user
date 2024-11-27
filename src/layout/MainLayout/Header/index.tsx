@@ -228,7 +228,7 @@ const Header = () => {
                     window.open(
                         getTenant() === ENUM_TENANT.AI
                             ? 'https://support.qq.com/products/646091'
-                            : 'https://alidocs.dingtalk.com/i/nodes/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb'
+                            : 'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb'
                     )
                 }
                 className="sm:ml-[47px] xs:ml-[20px]"

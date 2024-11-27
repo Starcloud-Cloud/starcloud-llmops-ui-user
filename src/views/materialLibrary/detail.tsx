@@ -570,7 +570,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             </svg>
                             <div className="text-[12px] font-bold mt-1">小红书分析</div>
                         </div> */}
-                        <div
+                        {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('AI素材生成');
@@ -593,7 +593,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">AI素材生成</div>
-                        </div>
+                        </div> */}
 
                         <div
                             onClick={() => {

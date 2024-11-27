@@ -1,18 +1,24 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { shareList } from 'api/redBook/batchIndex';
 import Good from '../pages/batchSmallRedBooks/good';
-import { QRCode, Image, Carousel } from 'antd';
+import { Image, Carousel } from 'antd';
+import dayjs from 'dayjs';
 import { DetailModal } from '../pages/redBookContentList/component/detailModal';
 const BatchShare = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const [detailOpen, setDetailOpen] = useState(false);
     const [businessUid, setBusinessUid] = useState('');
+    const [appName, setAppName] = useState('');
+    const [createTime, setCreateTime] = useState('');
     const [redList, setRedList] = useState<any[]>([]);
     const getList = async () => {
         const result = await shareList(params.get('uid'));
-        setRedList(result.list);
+        setAppName(result.appName);
+        setCreateTime(result.createTime);
+        setRedList(result.contentList);
     };
     useEffect(() => {
         getList();
@@ -20,38 +26,21 @@ const BatchShare = () => {
     return (
         <div className="p-4">
             <div>
-                <div className="text-xl inline-block align-bottom mr-2 font-[600]">每天学点金融学</div>
-                <div className="text-xs inline-block font-[400]">生成时间：2024-10-20 21:12:10</div>
+                <div className="text-xl inline-block align-bottom mr-2 font-[600]">{appName}</div>
+                <div className="text-xs inline-block font-[400]">生成时间：{dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}</div>
             </div>
             {/Mobi|Android/i.test(navigator.userAgent) ? (
                 <div className="grid mt-4 gap-2 grid-cols-2">
                     {redList?.map((item: any) => (
                         <div key={item?.businessUid}>
-                            {/* <Good
-                                item={item}
-                                setBusinessUid={(data: any) => {
-                                    setBusinessUid(data);
-                                    setDetailOpen(true);
-                                }}
-                                setDetailOpen={setDetailOpen}
-                                show={true}
-                            /> */}
-                            <div
-                                className="shadow-md rounded-lg"
-                                onClick={() => {
-                                    setBusinessUid(item.uid);
-                                    setDetailOpen(true);
-                                }}
-                            >
+                            <div className="shadow-md rounded-lg overflow-hidden" onClick={() => navigate(`/share?uid=${item?.uid}`)}>
                                 <Carousel draggable={true} adaptiveHeight dots={{ className: 'uls' }}>
                                     {item?.executeResult?.imageList?.map((item: any) => (
-                                        <div className="px-[10px]">
-                                            <Image key={item?.url} preview={false} src={item?.url} />
-                                        </div>
+                                        <Image key={item?.url} preview={false} src={item?.url} />
                                     ))}
                                 </Carousel>
                                 <div className="p-2">
-                                    <div className="my-2">{item?.executeResult?.copyWriting?.title} </div>
+                                    <div className="my-2 h-[37px] line-clamp-2">{item?.executeResult?.copyWriting?.title} </div>
                                     <div className="flex justify-between items-center">
                                         <div className="flex gap-1 items-center">
                                             <svg
@@ -252,12 +241,6 @@ const BatchShare = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="w-full flex justify-center mt-2">
-                                <QRCode
-                                    size={100}
-                                    value={process.env.REACT_APP_SHARE_URL || 'https://cn-test.mofabiji.com' + '/share?uid=' + item?.uid}
-                                />
-                            </div>
                         </div>
                     ))}
                 </div>
@@ -274,12 +257,6 @@ const BatchShare = () => {
                                 setDetailOpen={setDetailOpen}
                                 show={true}
                             />
-                            <div className="w-full flex justify-center mt-2">
-                                <QRCode
-                                    size={200}
-                                    value={process.env.REACT_APP_SHARE_URL || 'https://cn-test.mofabiji.com' + '/share?uid=' + item?.uid}
-                                />
-                            </div>
                         </div>
                     ))}
                 </div>
@@ -288,6 +265,7 @@ const BatchShare = () => {
                 <DetailModal
                     open={detailOpen}
                     isFlag={true}
+                    qrCodeShow={true}
                     changeList={() => {}}
                     handleClose={() => setDetailOpen(false)}
                     businessUid={businessUid}

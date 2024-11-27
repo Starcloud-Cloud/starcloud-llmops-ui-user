@@ -44,6 +44,7 @@ import { origin_url } from 'utils/axios/config';
 const ThreeStep = ({
     data,
     show,
+    qrCodeShow,
     pre,
     isFlag,
     exeDetail,
@@ -54,6 +55,7 @@ const ThreeStep = ({
 }: {
     data: any;
     show?: boolean;
+    qrCodeShow?: boolean;
     isFlag?: boolean;
     pre: number;
     exeDetail: boolean;
@@ -264,6 +266,25 @@ const ThreeStep = ({
             >
                 {/* <Spin spinning={aginLoading}> */}
                 <div className="w-full  h-full relative grid grid-cols-3">
+                    {qrCodeShow && (
+                        <div
+                            className="flex gap-2"
+                            style={{
+                                position: 'absolute',
+                                right: '12px',
+                                top: '-42px'
+                            }}
+                        >
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    setPublishOpen(true);
+                                }}
+                            >
+                                扫码发布
+                            </Button>
+                        </div>
+                    )}
                     {!show && !exeDetail && !isFlag && (
                         <div
                             className="flex gap-2"

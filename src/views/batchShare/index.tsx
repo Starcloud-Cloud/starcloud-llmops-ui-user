@@ -11,13 +11,15 @@ const BatchShare = () => {
     const params = new URLSearchParams(location.search);
     const [detailOpen, setDetailOpen] = useState(false);
     const [businessUid, setBusinessUid] = useState('');
-    const [appName, setAppName] = useState('');
-    const [createTime, setCreateTime] = useState('');
+    const [resData, setResData] = useState<any>(undefined);
     const [redList, setRedList] = useState<any[]>([]);
     const getList = async () => {
         const result = await shareList(params.get('uid'));
-        setAppName(result.appName);
-        setCreateTime(result.createTime);
+        setResData({
+            appName: result.appName,
+            createTime: result.createTime,
+            creator: result.creator
+        });
         setRedList(result.contentList);
     };
     useEffect(() => {
@@ -26,8 +28,9 @@ const BatchShare = () => {
     return (
         <div className="p-4">
             <div>
-                <div className="text-xl inline-block align-bottom mr-2 font-[600]">{appName}</div>
-                <div className="text-xs inline-block font-[400]">生成时间：{dayjs(createTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div className="text-xl inline-block align-bottom font-[600]">{resData?.appName}</div>
+                <div className="text-xs inline-block font-[500] mx-2">创建人：{resData?.creator}</div>
+                <div className="text-xs inline-block font-[400]">生成时间：{dayjs(resData?.createTime).format('YYYY-MM-DD HH:mm:ss')}</div>
             </div>
             {/Mobi|Android/i.test(navigator.userAgent) ? (
                 <div className="grid mt-4 gap-2 grid-cols-2">
@@ -36,7 +39,11 @@ const BatchShare = () => {
                             <div className="shadow-md rounded-lg overflow-hidden" onClick={() => navigate(`/share?uid=${item?.uid}`)}>
                                 <Carousel draggable={true} adaptiveHeight dots={{ className: 'uls' }}>
                                     {item?.executeResult?.imageList?.map((item: any) => (
-                                        <Image key={item?.url} preview={false} src={item?.url} />
+                                        <Image
+                                            key={item?.url}
+                                            preview={false}
+                                            src={item?.url + '?x-oss-process=image/resize,w_170/quality,q_80'}
+                                        />
                                     ))}
                                 </Carousel>
                                 <div className="p-2">
@@ -245,7 +252,7 @@ const BatchShare = () => {
                     ))}
                 </div>
             ) : (
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8 5xl:grid-cols-9 gap-4 mt-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8 5xl:grid-cols-9 gap-4 mt-6">
                     {redList?.map((item: any) => (
                         <div key={item?.businessUid}>
                             <Good

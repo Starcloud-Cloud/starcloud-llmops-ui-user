@@ -253,14 +253,9 @@ const planListDefault = (value: number) => [
             </div>,
             'AI创作裂变数量：3',
             '账号管理数量：3', // 0
-            '账号分组数量：0', // 1
-            '账号云同步', // 2
-            '一键检查账号状态', // 3
-            '一键发布次数/天：6次/天',
-            '每次发布账号数上限：3', // 4
-            '定时发布', // 4
-            '数据中心（数据聚合）', // 4
-            '评论管理' // 4
+            '官方模版',
+            '官方智能生成',
+            '一键分享小红书'
         ]
     },
     {
@@ -274,14 +269,9 @@ const planListDefault = (value: number) => [
             </div>,
             'AI创作裂变数量：8',
             '账号管理数量：10',
-            '账号分组数量：3',
-            '账号云同步',
-            '一键检查账号状态',
-            '一键发布次数/天：20次/天',
-            '每次发布账号数上限：10',
-            '定时发布',
-            '数据中心（数据聚合）',
-            '评论管理'
+            '官方模版',
+            '官方智能生成',
+            '一键分享小红书'
         ]
     },
     {
@@ -293,16 +283,11 @@ const planListDefault = (value: number) => [
                     <HelpOutlineIcon className="text-base ml-1 cursor-pointer tips" />
                 </Tooltip>
             </div>,
-            'AI创作裂变数量：16',
+            'AI创作裂变数量：32',
             '账号管理数量：30',
-            '账号分组数量：10',
-            '账号云同步',
-            '一键检查账号状态',
-            '一键发布次数/天：不限',
-            '每次发布账号数上限：30',
-            '定时发布',
-            '数据中心（数据聚合）',
-            '评论管理'
+            '官方模版',
+            '官方智能生成',
+            '一键分享小红书'
         ]
     },
     {
@@ -316,14 +301,9 @@ const planListDefault = (value: number) => [
             </div>,
             'AI创作裂变数量：32',
             '账号管理数量：80',
-            '账号分组数量：30',
-            '账号云同步',
-            '一键检查账号状态',
-            '一键发布次数/天：不限',
-            '每次发布账号数上限：50',
-            '定时发布',
-            '数据中心（数据聚合）',
-            '评论管理'
+            '官方模版',
+            '官方智能生成',
+            '一键分享小红书'
         ]
     },
     {
@@ -961,7 +941,9 @@ const Price1 = () => {
                                                         ?.find((item) => item.keyword === plan.keyword)
                                                         .value?.map((list: any, i: number) => (
                                                             <React.Fragment key={i}>
-                                                                <ListItem sx={!plan.permission.includes(i) ? priceListDisable : {}}>
+                                                                <ListItem
+                                                                //  sx={!plan.permission.includes(i) ? priceListDisable : {}}
+                                                                >
                                                                     <ListItemIcon>
                                                                         <CheckTwoToneIcon sx={{ fontSize: '1.3rem' }} />
                                                                     </ListItemIcon>

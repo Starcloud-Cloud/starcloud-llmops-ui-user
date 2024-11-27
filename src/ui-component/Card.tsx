@@ -16,14 +16,13 @@ import {
     Typography,
     linearProgressClasses
 } from '@mui/material';
-import { Image, Popover, Menu } from 'antd';
+import { Image, Popover, Menu, QRCode } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 import { styled, useTheme } from '@mui/material/styles';
 import Share from 'assets/images/share/share.png';
 import copy from 'clipboard-copy';
 import { themesDarkAfter, themesDarkBefor, themesLight } from 'hooks/useThemes';
 import { t } from 'hooks/web/useI18n';
-import QRCode from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dispatch } from 'store';
@@ -335,10 +334,10 @@ const Cards = ({ flag = false }) => {
                         </Box>
                         <List sx={{ pb: 0 }}>
                             <ListItem sx={{ padding: 0, fontSize: '12px' }}>
-                                <ListItemIcon>
+                                <ListItemIcon className="!min-w-[25px]">
                                     <LinkIcon />
                                 </ListItemIcon>
-                                <ListItemText primary={t('market.copyFiend')} />
+                                <ListItemText primary={<div className="!text-sm">{t('market.copyFiend')}</div>} />
                             </ListItem>
                         </List>
                         <Tooltip arrow placement="top" title={<Box sx={{ p: 0.5, fontSize: '14px' }}>{t('market.copy')}</Box>}>
@@ -356,13 +355,15 @@ const Cards = ({ flag = false }) => {
                                 邀请链接
                             </Typography>
                         </Tooltip>
-                        <Box marginTop={3} textAlign="center">
+                        <div className="my-4 flex justify-center">
                             <QRCode
-                                size={100}
+                                size={124}
                                 value={window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode}
                             />
-                            <Typography variant="h5">{t('market.invitation')}</Typography>
-                        </Box>
+                        </div>
+                        <Typography textAlign={'center'} variant="h5">
+                            {t('market.invitation')}
+                        </Typography>
                     </Box>
                 )}
             </CardContent>

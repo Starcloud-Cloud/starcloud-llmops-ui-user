@@ -17,9 +17,10 @@ type IAddAiModalProps = {
     show?: boolean;
     executeResult?: any;
     isFlag?: boolean;
+    qrCodeShow?: boolean;
 };
 
-export const DetailModal = ({ open, isFlag, handleClose, changeList, businessUid, show, executeResult }: IAddAiModalProps) => {
+export const DetailModal = ({ open, isFlag, qrCodeShow, handleClose, changeList, businessUid, show, executeResult }: IAddAiModalProps) => {
     const [detail, setDetail] = useState<any>(null);
     const preRef = useRef(0);
     const [pre, setPre] = useState(0);
@@ -168,6 +169,7 @@ export const DetailModal = ({ open, isFlag, handleClose, changeList, businessUid
             <div className="h-[calc(100vh-140px)] p-2">
                 <ThreeStep
                     isFlag={isFlag}
+                    qrCodeShow={qrCodeShow}
                     data={detail}
                     show={show}
                     pre={preRef.current}

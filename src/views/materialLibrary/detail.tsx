@@ -118,7 +118,8 @@ export const TableHeader = ({
     appUid,
     canSwitch,
     canExecute,
-    handleExecute
+    handleExecute,
+    bindAppContent
 }: {
     isShowField?: boolean;
     // 图标
@@ -165,6 +166,7 @@ export const TableHeader = ({
     canExecute: boolean;
     // 执行
     handleExecute?: (data: any[]) => void;
+    bindAppContent?: any[];
 }) => {
     const [plugOpen, setPlugOpen] = useState(false);
     const [plugTitle, setPlugTitle] = useState('插件市场');
@@ -475,6 +477,50 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 <div className="flex flex-col ml-2 justify-between">
                     <div className="cursor-pointer flex items-center ">
                         <span className="text-[20px] font-semibold mr-1">{name}</span>
+                        {!canSwitch &&
+                            bindAppContent &&
+                            bindAppContent?.length > 0 &&
+                            (bindAppContent?.length === 1 ? (
+                                <Button
+                                    onClick={() => {
+                                        if (bindAppContent[0]?.source === 'APP') {
+                                            navigate(`/createApp?uid=${bindAppContent[0]?.appUid}`);
+                                        } else {
+                                            navigate(`/batchSmallRedBook?appUid=${bindAppContent[0]?.appUid}`);
+                                        }
+                                    }}
+                                    className="ml-2"
+                                    type="primary"
+                                    size="small"
+                                >
+                                    马上去创作
+                                </Button>
+                            ) : (
+                                <Dropdown
+                                    menu={{
+                                        items: bindAppContent?.map((item) => ({
+                                            key: item.appUid,
+                                            label: (
+                                                <div>
+                                                    {item.source == 'APP' ? '我的应用' : item.source == 'APP' ? '应用市场' : item.source}
+                                                </div>
+                                            )
+                                        })),
+                                        onClick: (e) => {
+                                            if (bindAppContent?.find((item) => item.appUid === e.key)?.source === 'APP') {
+                                                navigate(`/createApp?uid=${e.key}`);
+                                            } else {
+                                                navigate(`/batchSmallRedBook?appUid=${e.key}`);
+                                            }
+                                        }
+                                    }}
+                                    placement="bottom"
+                                >
+                                    <Button className="ml-2" icon={<DownOutlined />} type="primary" size="small">
+                                        马上去创作
+                                    </Button>
+                                </Dropdown>
+                            ))}
                         {canSwitch && (
                             <Tooltip title="切换素材库">
                                 <svg
@@ -808,7 +854,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 async onOk() {
                                     const data = await createMaterialLibraryAppBind({
                                         libraryId: selectSwitchRowKeys[0],
-                                        appUid: bizUid
+                                        appUid: appUid
                                     });
                                     if (data) {
                                         message.success('切换成功!');
@@ -1748,6 +1794,7 @@ const MaterialLibraryDetail = ({
                         getTitleList={() => setForceUpdateHeader(forceUpdateHeader + 1)}
                         getList={() => setForceUpdate(forceUpdate + 1)}
                         libraryType={detail?.createSource}
+                        bindAppContent={detail?.bindAppContent}
                         canSwitch={false}
                         canExecute={false}
                         isShowField={true}

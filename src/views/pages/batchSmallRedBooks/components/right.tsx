@@ -1,4 +1,4 @@
-import { Collapse, Spin, Tag, Popover, Button, Popconfirm } from 'antd';
+import { Collapse, Spin, Tag, Popover, Button, Popconfirm, Modal, Checkbox, QRCode } from 'antd';
 import { CopyrightOutlined, CloseOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
@@ -7,7 +7,10 @@ import PlanList from './PlanList';
 import Good from '../good';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { planCancel } from 'api/redBook/batchIndex';
+import { planCancel, qrCode } from 'api/redBook/batchIndex';
+import JSZip from 'jszip';
+import _ from 'lodash-es';
+import { useNavigate } from 'react-router-dom';
 const Right = ({
     isexample,
     setIsexample,
@@ -39,6 +42,7 @@ const Right = ({
     timeFailure: (data: any) => void;
     getbatchPages: (data: any) => void;
 }) => {
+    const navigate = useNavigate();
     const scrollRef: any = useRef(null);
     const getStatus = (status: any) => {
         switch (status) {
@@ -63,9 +67,115 @@ const Right = ({
         getbatchPages({ pageNo: pageNum + 1, pageSize: 10 });
         setPageNum(pageNum + 1);
     };
+    //批量下载
+    const [downOpen, setDownOpen] = useState(false);
+    const [downList, setDownList] = useState<any[]>([]);
+    const batchDownload = (data: any[]) => {
+        setDownList(data?.filter((item) => item.status === 'SUCCESS'));
+        setCheckValue(data?.filter((item) => item.status === 'SUCCESS')?.map((item) => item.uid));
+        setDownOpen(true);
+    };
+    const [checkValue, setCheckValue] = useState<undefined | any[]>(undefined);
+    const appendIndexToDuplicates = (list: any[]) => {
+        const countMap: any = {};
+        const result = list.map((item) => {
+            // 初始化计数器
+            if (!countMap[item?.executeResult?.copyWriting?.title]) {
+                countMap[item?.executeResult?.copyWriting?.title] = 0;
+            }
+            countMap[item?.executeResult?.copyWriting?.title] += 1;
+
+            // 如果是重复的，添加计数后缀
+            if (countMap[item?.executeResult?.copyWriting?.title] > 1) {
+                const newData = _.cloneDeep(item);
+                newData.executeResult.copyWriting.title = `${item?.executeResult?.copyWriting?.title}_${
+                    countMap[item?.executeResult?.copyWriting?.title] - 1
+                }`;
+                return newData;
+            }
+            return item;
+        });
+        return result;
+    };
+    const [imgLoading, setImgLoading] = useState(false);
+    const downloadImage = async () => {
+        setImgLoading(true);
+        const zip = new JSZip();
+        const imageList = appendIndexToDuplicates(downList.filter((item) => checkValue?.includes(item.uid)));
+        const result = await qrCode({
+            domain: process.env.REACT_APP_SHARE_URL || 'https://cn-test.mofabiji.com',
+            uidList: imageList?.map((item) => item.uid)
+        });
+        const promises = imageList.map(async (imageUrl: any, index: number) => {
+            const response = await fetch(result?.find((item: any) => item.uid === imageUrl.uid)?.qrCode);
+            const arrayBuffer = await response.arrayBuffer();
+            zip.file(imageUrl?.executeResult?.copyWriting?.title + '.png', arrayBuffer);
+        });
+        Promise.all(promises)
+            .then(() => {
+                setImgLoading(false);
+                zip.generateAsync({ type: 'blob' }).then((content: any) => {
+                    const url = window.URL.createObjectURL(content);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '二维码分享.zip'; // 设置下载的文件名
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                });
+            })
+            .catch((error) => {
+                setImgLoading(false);
+                console.error('Error downloading images:', error);
+            });
+    };
+    const [textLoading, setTextLoading] = useState(false);
+    const downloadText = async () => {
+        setTextLoading(true);
+        const zip = new JSZip();
+        const imageList = appendIndexToDuplicates(downList.filter((item) => checkValue?.includes(item.uid)));
+        const promises = imageList.map(async (item: any, index: number) => {
+            const folder: any = zip.folder(item?.executeResult?.copyWriting?.title);
+            const images = item?.executeResult?.imageList?.map(async (el: any, i: number) => {
+                const response = await fetch(el.url);
+                const arrayBuffer = await response.arrayBuffer();
+                folder.file('image' + (i + 1) + `.${el?.url?.split('.')[el?.url?.split('.')?.length - 1]}`, arrayBuffer);
+            });
+            await Promise.all(images)
+                .then(async (res) => {
+                    let index = 1;
+                    folder.file(item?.executeResult?.copyWriting?.title + '.txt', item?.executeResult?.copyWriting?.content);
+                    zip.file(folder);
+                })
+                .catch((err) => {
+                    setTextLoading(false);
+                });
+        });
+
+        Promise.all(promises)
+            .then(() => {
+                setTextLoading(false);
+                zip.generateAsync({ type: 'blob' }).then((content: any) => {
+                    const url = window.URL.createObjectURL(content);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '小红书素材.zip'; // 设置下载的文件名
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                });
+            })
+            .catch((error) => {
+                setTextLoading(false);
+                console.error('Error downloading images:', error);
+            });
+    };
+
     useEffect(() => {
         if (rightPage) setPageNum(1);
     }, [rightPage]);
+
+    //小红书分享
+    const [batchid, setBatchid] = useState('');
+    const [publishOpen, setPublishOpen] = useState(false);
     return (
         <>
             {bathList?.length === 0 || isexample ? (
@@ -191,27 +301,77 @@ const Right = ({
                                             </div>
                                         </div>
                                         <div className="hidden xl:hidden 2xl:block">
-                                            <div className="flex gap-1 flex-wrap">
+                                            <div className="flex items-center gap-1 flex-wrap">
                                                 <span className="font-[600]">执行人:</span>
-                                                <div className="!w-[50px] line-clamp-1">{item?.creator}</div>
+                                                <div className="!w-[80px] line-clamp-1">{item?.creator}</div>
                                                 <span className="font-[600]">生成成功数:</span>
                                                 <span className="w-[17px]">{item?.successCount}</span>
                                                 <span className="font-[600]">生成失败数:</span>
                                                 <span className="w-[17px]">{item?.failureCount}</span>
                                                 <span className="font-[600]">生成总数:</span>
                                                 <span className="w-[17px]">{item?.totalCount}</span>
+                                                {item.status === 'COMPLETE' && batchDataList[i] && collapseActive[0] === item.uid && (
+                                                    <>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                batchDownload(batchDataList[i]);
+                                                                e.stopPropagation();
+                                                            }}
+                                                            size="small"
+                                                            type="primary"
+                                                        >
+                                                            批量下载
+                                                        </Button>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                setBatchid(item?.uid);
+                                                                setPublishOpen(true);
+                                                                e.stopPropagation();
+                                                            }}
+                                                            size="small"
+                                                            type="primary"
+                                                        >
+                                                            批量分享
+                                                        </Button>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="hidden 2xl:hidden xl:block lg:block md:block sm:block xs:block">
-                                            <div className="flex gap-1 flex-wrap">
+                                            <div className="flex items-center gap-1 flex-wrap">
                                                 <span className="font-[600]">执行人:</span>
-                                                <div className="!w-[50px] line-clamp-1">{item?.creator}</div>
+                                                <div className="!w-[80px] line-clamp-1">{item?.creator}</div>
                                                 <span className="font-[600]">成功数:</span>
                                                 <span className="w-[17px]">{item?.successCount}</span>
                                                 <span className="font-[600]">失败数:</span>
                                                 <span className="w-[17px]">{item?.failureCount}</span>
                                                 <span className="font-[600]">总数:</span>
                                                 <span className="w-[17px]">{item?.totalCount}</span>
+                                                {item.status === 'COMPLETE' && batchDataList[i] && collapseActive[0] === item.uid && (
+                                                    <>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                batchDownload(batchDataList[i]);
+                                                                e.stopPropagation();
+                                                            }}
+                                                            size="small"
+                                                            type="primary"
+                                                        >
+                                                            批量下载
+                                                        </Button>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                setBatchid(item?.uid);
+                                                                setPublishOpen(true);
+                                                                e.stopPropagation();
+                                                            }}
+                                                            size="small"
+                                                            type="primary"
+                                                        >
+                                                            批量分享
+                                                        </Button>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -242,6 +402,68 @@ const Right = ({
                     )}
                 </>
             )}
+            <Modal
+                title="批量下载"
+                width="60%"
+                open={downOpen}
+                onCancel={() => {
+                    setCheckValue(undefined);
+                    setDownOpen(false);
+                }}
+                footer={false}
+            >
+                <Checkbox.Group value={checkValue} onChange={setCheckValue}>
+                    <div className="grid grid-cols-4 gap-4">
+                        {downList?.map((item: any) => (
+                            <div className="relative" key={item?.businessUid}>
+                                <Good
+                                    item={item}
+                                    noDetail={true}
+                                    setBusinessUid={(data: any) => {
+                                        setBusinessUid({ uid: data, index: 0 });
+                                    }}
+                                    setDetailOpen={setDetailOpen}
+                                    show={true}
+                                />
+                                <Checkbox value={item?.uid} className="absolute top-2 right-2 z-[1]" />
+                            </div>
+                        ))}
+                    </div>
+                </Checkbox.Group>
+                <div className="flex justify-center gap-2 mt-4">
+                    <Button
+                        loading={textLoading}
+                        onClick={downloadText}
+                        disabled={!checkValue || checkValue?.length === 0}
+                        size="small"
+                        type="primary"
+                    >
+                        批量下载素材({checkValue?.length || 0})
+                    </Button>
+                    <Button
+                        loading={imgLoading}
+                        onClick={downloadImage}
+                        disabled={!checkValue || checkValue?.length === 0}
+                        size="small"
+                        type="primary"
+                    >
+                        批量下载二维码({checkValue?.length || 0})
+                    </Button>
+                </div>
+            </Modal>
+            <Modal open={publishOpen} title={'批量分享'} footer={null} onCancel={() => setPublishOpen(false)} closable={false}>
+                <div className="w-full flex justify-center items-center flex-col gap-2">
+                    <QRCode value={`${process.env.REACT_APP_SHARE_URL}/batchShare?uid=` + batchid} />
+                    <div className="flex flex-col items-center">
+                        <div
+                            onClick={() => navigate(`/batchShare?uid=` + batchid)}
+                            className="text-md underline cursor-pointer text-[#673ab7]"
+                        >
+                            查看效果
+                        </div>
+                    </div>
+                </div>
+            </Modal>
         </>
     );
 };

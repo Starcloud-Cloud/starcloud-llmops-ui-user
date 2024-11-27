@@ -30,7 +30,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { getUserInfo } from 'api/login';
-import QRCode from 'qrcode.react';
+import { QRCode } from 'antd';
 import infoStore from 'store/entitlementAction';
 import useUserStore from 'store/user';
 
@@ -251,9 +251,9 @@ const ProfileSection = () => {
                                                             '/login?q=' +
                                                             use?.inviteCode}
                                                     </Typography>
-                                                    <Box marginTop={1} textAlign="center">
+                                                    <div className="my-2 flex justify-center">
                                                         <QRCode
-                                                            size={100}
+                                                            size={124}
                                                             value={
                                                                 window.location.protocol +
                                                                 '//' +
@@ -262,10 +262,10 @@ const ProfileSection = () => {
                                                                 use?.inviteCode
                                                             }
                                                         />
-                                                        <Typography variant="h5" mb={1}>
-                                                            {t('market.invitation')}
-                                                        </Typography>
-                                                    </Box>
+                                                    </div>
+                                                    <Typography textAlign={'center'} variant="h5" mb={1}>
+                                                        {t('market.invitation')}
+                                                    </Typography>
                                                 </Card>
                                                 <Divider />
                                                 <List

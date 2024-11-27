@@ -183,7 +183,7 @@ const plansDefault = (value: number) => [
     },
     {
         keyword: 'basic',
-        active: true,
+        active: false,
         icon: <TwoWheelerTwoToneIcon fontSize="large" color="inherit" />,
         title: '基础版',
         description: value === 1 ? '300魔法豆' : '3600魔法豆',
@@ -214,7 +214,7 @@ const plansDefault = (value: number) => [
     },
     {
         keyword: 'pro',
-        active: false,
+        active: true,
         icon: <AirportShuttleTwoToneIcon fontSize="large" />,
         title: '团队版',
         description: value === 1 ? '6个账号，2500魔法豆' : '6个账号，30000魔法豆',
@@ -597,7 +597,7 @@ const Price1 = () => {
             if (type === 1) {
                 res = await createOrder({
                     terminal: 20,
-                    items: [{ skuId: payId, count: countRef.current }],
+                    items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                     promoCode: discountCode,
                     pointStatus: false,
                     deliveryType: 3,
@@ -606,7 +606,7 @@ const Price1 = () => {
             } else {
                 res = await createOrder({
                     terminal: 20,
-                    items: [{ skuId: payId, count: countRef.current }],
+                    items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                     couponId: discountCode,
                     pointStatus: false,
                     deliveryType: 3,
@@ -655,7 +655,7 @@ const Price1 = () => {
 
             res = await createSignV2({
                 terminal: 20,
-                items: [{ skuId: payId, count: countRef.current }],
+                items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                 pointStatus: false,
                 deliveryType: 3,
                 from
@@ -688,7 +688,7 @@ const Price1 = () => {
             }
         }
     };
-
+    const subTitle = useRef('');
     // 获取价格
     const handleFetchPay = async (payId?: number, discountCode?: number, type?: number, isSign = false) => {
         if (!isLoggedIn) {
@@ -700,17 +700,19 @@ const Price1 = () => {
         }
         let res: any;
         if (!isSign) {
+            console.log(currentSelect);
+
             // 不是签约
             if (type === 1) {
                 res = await getPrice({
-                    items: [{ skuId: payId, count: countRef.current }],
+                    items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                     promoCode: discountCode,
                     pointStatus: false,
                     deliveryType: 3
                 });
             } else {
                 res = await getPrice({
-                    items: [{ skuId: payId, count: countRef.current }],
+                    items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
                     couponId: discountCode,
                     pointStatus: false,
                     deliveryType: 3
@@ -718,7 +720,11 @@ const Price1 = () => {
             }
         } else {
             // 是签约
-            res = await getSignPrice({ items: [{ skuId: payId, count: countRef.current }], pointStatus: false, deliveryType: 3 });
+            res = await getSignPrice({
+                items: [{ skuId: payId, count: subTitle.current === '团队版' ? countRef.current : 1 }],
+                pointStatus: false,
+                deliveryType: 3
+            });
         }
         if (res) {
             setDiscountOpen(true);
@@ -762,9 +768,8 @@ const Price1 = () => {
     };
 
     //购买个数
-    const countRef = useRef(1);
-    const [count, setCount] = useState(1);
-
+    const countRef = useRef(5);
+    const [count, setCount] = useState(5);
     return (
         <div className="relative">
             {/* <HeaderWrapper id="vip">
@@ -794,6 +799,7 @@ const Price1 = () => {
                             return (
                                 <Grid item xs={20} sm={10} md={4} key={index}>
                                     <MainCard
+                                        className=" hover:translate-y-[-10px] transition duration-700"
                                         boxShadow
                                         sx={{
                                             pt: 1.75,
@@ -885,20 +891,21 @@ const Price1 = () => {
                                                         className={'w-4/5'}
                                                         variant={plan.active ? 'contained' : 'outlined'}
                                                         onClick={() => {
+                                                            subTitle.current = plan.title;
                                                             setCurrentSelect({
                                                                 title: plan.title,
                                                                 select: value,
-                                                                payId: plan.id,
+                                                                payId: plan?.skus[plan?.skus?.length - 1]?.id,
                                                                 isSubscribe: plan?.isSubscribe,
                                                                 subscribeMoney: plan?.subscribeMoney,
                                                                 skus: plan.skus
                                                             });
-                                                            handleClick(index, plan.id);
+                                                            handleClick(index, plan?.skus[plan?.skus?.length - 1]?.id);
                                                         }}
                                                         color="secondary"
                                                     >
                                                         <div className="flex flex-col">
-                                                            <div> {plan.btnText}</div>
+                                                            <div>{plan.btnText}</div>
                                                             {plan?.isSubscribe && (
                                                                 <div className="flex justify-center items-center">
                                                                     <Tag className="ml-1" color="#f50">
@@ -921,13 +928,13 @@ const Price1 = () => {
                                                                 setCurrentSelect({
                                                                     title: item.properties[0].valueName,
                                                                     select: value,
-                                                                    payId: item?.id,
+                                                                    payId: plan?.skus[plan?.skus?.length - 1]?.id,
                                                                     experience: true,
                                                                     unitName: plan.unitName,
                                                                     isSubscribe: false,
                                                                     buyTime: item.rightsConfig.levelBasicDTO.timesRange.range
                                                                 });
-                                                                handleClick(3, item?.id);
+                                                                handleClick(3, plan?.skus[plan?.skus?.length - 1]?.id);
                                                             }}
                                                             color="secondary"
                                                         >

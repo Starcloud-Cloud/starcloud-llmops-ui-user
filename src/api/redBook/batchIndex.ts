@@ -8,6 +8,14 @@ export const imageStyles = () => {
 export const planCancel = (data: any) => {
     return request.post({ url: '/llm/creative/plan/cancel', data });
 };
+//获取分享列表
+export const shareList = (data: any) => {
+    return request.get({ url: '/llm/xhs/content/share-list?batchUid=' + data });
+};
+//生成二维码
+export const qrCode = (data: any) => {
+    return request.post({ url: '/llm/xhs/content/qrCode', data });
+};
 
 //文案模板应用列表
 export const copyWritingTemplates = () => {

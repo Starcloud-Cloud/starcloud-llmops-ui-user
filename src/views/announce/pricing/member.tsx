@@ -252,7 +252,6 @@ const planListDefault = (value: number) => [
                 </Tooltip>
             </div>,
             'AI创作裂变数量：3',
-            '账号管理数量：3', // 0
             '官方模版',
             '官方智能生成',
             '一键分享小红书'
@@ -268,7 +267,6 @@ const planListDefault = (value: number) => [
                 </Tooltip>
             </div>,
             'AI创作裂变数量：8',
-            '账号管理数量：10',
             '官方模版',
             '官方智能生成',
             '一键分享小红书'
@@ -284,7 +282,6 @@ const planListDefault = (value: number) => [
                 </Tooltip>
             </div>,
             'AI创作裂变数量：32',
-            '账号管理数量：30',
             '官方模版',
             '官方智能生成',
             '一键分享小红书'
@@ -300,7 +297,6 @@ const planListDefault = (value: number) => [
                 </Tooltip>
             </div>,
             'AI创作裂变数量：32',
-            '账号管理数量：80',
             '官方模版',
             '官方智能生成',
             '一键分享小红书'
@@ -876,7 +872,7 @@ const Price1 = () => {
                                                                 title: plan.title,
                                                                 select: value,
                                                                 payId: plan?.skus[plan?.skus?.length - 1]?.id,
-                                                                isSubscribe: plan?.isSubscribe,
+                                                                isSubscribe: false,
                                                                 subscribeMoney: plan?.subscribeMoney,
                                                                 skus: plan.skus
                                                             });

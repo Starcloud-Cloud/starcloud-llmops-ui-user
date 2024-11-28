@@ -827,6 +827,20 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 绑定验证
                                             </Button>
                                         </div>
+                                        <div className="text-xs mt-2">
+                                            {!typeDisable && '直接输入可触发机器人调用具体工作流的对话内容，详细请看'}
+                                            {typeDisable && '复制成功运行的Coze工作流的“开始”节点的运行结果，详细请看'}
+                                            <span
+                                                onClick={() =>
+                                                    window.open(
+                                                        'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/YQBnd5ExVE0n2RNGSypQ2E7nWyeZqMmz'
+                                                    )
+                                                }
+                                                className="text-[#673ab7] cursor-pointer"
+                                            >
+                                                【如何添加插件】
+                                            </span>
+                                        </div>
                                     </Form.Item>
                                     <Form.Item label="验证状态">
                                         <Tag color={verifyStatus}>

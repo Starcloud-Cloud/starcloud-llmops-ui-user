@@ -127,6 +127,12 @@ const CreateVariable = ({ rows, detail, setRows }: Variable) => {
             });
             setSaveLoading(false);
             setRows(result);
+            const newList = result?.map((item: any) => ({
+                ...item,
+                uuid: uuidv4()
+            }));
+            setTableData(newList);
+            setEditableKeys(newList.map((item: any) => item.uuid));
             dispatch(
                 openSnackbar({
                     open: true,

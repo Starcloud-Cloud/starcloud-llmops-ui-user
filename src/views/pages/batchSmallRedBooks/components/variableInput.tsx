@@ -133,7 +133,7 @@ const VariableInput = ({
                 }
             } else {
                 if (code === 'PosterActionHandler') {
-                    if (property?.description?.split('-')[1] === '5') {
+                    if (property?.description?.split('-')[1] === '5' || property?.description?.split('-')[1] === 'image') {
                         arr.push({
                             key: jsonType ? name + `.list('${key}')` : name + '.' + key,
                             label: key,
@@ -266,7 +266,7 @@ const VariableInput = ({
                                 <img
                                     className="w-[15px]"
                                     src={
-                                        item.desc?.split('-')[1] === '5'
+                                        item.desc?.split('-')[1] === '5' || item.desc?.split('-')[1] === 'image'
                                             ? image
                                             : item.desc?.split('-')[1] === '0'
                                             ? string

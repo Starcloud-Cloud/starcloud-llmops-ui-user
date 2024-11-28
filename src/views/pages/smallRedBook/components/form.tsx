@@ -117,7 +117,8 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
                 </TextField>
             ) : item.style === 'IMAGE' ? (
                 <>
-                    <Upload {...props} disabled={!canUpload} className="mt-4">
+                    <div className="text-xs mt-4 mb-2">{item.label}</div>
+                    <Upload {...props} disabled={!canUpload}>
                         {item.value ? (
                             <div className="relative">
                                 <Image

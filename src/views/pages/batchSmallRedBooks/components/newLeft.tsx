@@ -908,13 +908,39 @@ const Lefts = ({
                     <div>【新增素材】通过手工填入，每次一条内容</div>
                     <div>【批量导入】通用Excel文件导入，可批量添加</div>
                     <div>【智能生成】通过专属AI自动生成图文素材</div>
+                    <div className="text-xs mt-[34px]">
+                        查看详细的
+                        <span
+                            onClick={() =>
+                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                            }
+                            className="cursor-pointer font-[500] text-[#673ab7]"
+                        >
+                            【使用指南】
+                        </span>
+                    </div>
                 </div>
             ),
             target: () => steps1.current
         },
         {
             title: '第二步',
-            description: '选择生成图片模版，预置多种风格图片模版，同时支持自定义模版',
+            description: (
+                <div>
+                    选择生成图片模版，预置多种风格图片模版，同时支持自定义模版
+                    <div className="text-xs mt-[34px]">
+                        查看详细的
+                        <span
+                            onClick={() =>
+                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                            }
+                            className="cursor-pointer font-[500] text-[#673ab7]"
+                        >
+                            【使用指南】
+                        </span>
+                    </div>
+                </div>
+            ),
             target: () => steps2.current
         },
         {
@@ -924,6 +950,17 @@ const Lefts = ({
                     <div>配置笔记文案生成，灵活定制生成内容</div>
                     <div>支持AI生成、仿写、随机选取</div>
                     <div>可分区块分别生成，再整体合成</div>
+                    <div className="text-xs mt-[34px]">
+                        查看详细的
+                        <span
+                            onClick={() =>
+                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                            }
+                            className="cursor-pointer font-[500] text-[#673ab7]"
+                        >
+                            【使用指南】
+                        </span>
+                    </div>
                 </div>
             ),
             target: () => steps3.current
@@ -933,12 +970,17 @@ const Lefts = ({
             description: (
                 <div className="flex items-center">
                     配置结束，立即生成试试吧！更多帮助内容可点击查看
-                    <span
-                        onClick={() => window.open('https://docs.dingtalk.com/i/nodes/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')}
-                        className="cursor-pointer text-[#673ab7]"
-                    >
-                        【使用指南】
-                    </span>
+                    <div className="text-xs mt-[34px]">
+                        查看详细的
+                        <span
+                            onClick={() =>
+                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                            }
+                            className="cursor-pointer font-[500] text-[#673ab7]"
+                        >
+                            【使用指南】
+                        </span>
+                    </div>
                 </div>
             ),
             target: () => steps4.current

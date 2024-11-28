@@ -2,7 +2,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { PlusOutlined, RightOutlined } from '@ant-design/icons';
 import { Box, Typography, IconButton } from '@mui/material';
-import { Tabs } from 'antd';
+import { Tabs, Button } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext, useRef } from 'react';
 import { t } from 'hooks/web/useI18n';
@@ -405,17 +405,72 @@ function TemplateMarket() {
     const tourSteps: TourProps['steps'] = [
         {
             title: '第一步',
-            description: '欢迎访问魔法笔记，选择一个类型开始魔法旅途吧',
+            description: (
+                <div>
+                    欢迎访问魔法笔记，选择一个类型开始魔法旅途吧
+                    <div className="text-xs mt-[34px]">
+                        查看详细的
+                        <span
+                            onClick={() =>
+                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                            }
+                            className="cursor-pointer font-[500] text-[#673ab7]"
+                        >
+                            【使用指南】
+                        </span>
+                    </div>
+                </div>
+            ),
             target: () => step1.current
         },
         {
             title: '第二步',
-            description: '选择一个类型开始操作',
+            description: (
+                <div>
+                    选择一个类型开始操作
+                    <div className="text-xs mt-[34px]">
+                        查看详细的
+                        <span
+                            onClick={() =>
+                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                            }
+                            className="cursor-pointer font-[500] text-[#673ab7]"
+                        >
+                            【使用指南】
+                        </span>
+                    </div>
+                </div>
+            ),
             target: () => step2.current
         },
         {
             title: '第三步',
-            description: '点击开始创作吧',
+            description: (
+                <div className="relative">
+                    点击开始创作吧
+                    <div className="text-xs mt-[34px]">
+                        查看详细的
+                        <span
+                            onClick={() =>
+                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                            }
+                            className="cursor-pointer font-[500] text-[#673ab7]"
+                        >
+                            【使用指南】
+                        </span>
+                    </div>
+                    <Button
+                        onClick={() => {
+                            navigate(`/batchSmallRedBook?appUid=${newList[0]?.appList[0]?.uid}`);
+                        }}
+                        type="primary"
+                        size="small"
+                        className="absolute right-0 bottom-[-31px]"
+                    >
+                        开始创作
+                    </Button>
+                </div>
+            ),
             nextButtonProps: { style: { display: 'none' } },
             prevButtonProps: { style: { display: 'none' } },
             target: () => step3.current

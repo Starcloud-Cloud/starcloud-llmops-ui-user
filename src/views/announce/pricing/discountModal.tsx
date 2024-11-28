@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 // material-ui
 import { Button, CardContent, CardProps, Divider, Grid, IconButton, Modal, Tab, Tabs } from '@mui/material';
@@ -121,7 +121,6 @@ export function DiscountModal({
         getLickNameProduct({ id: currentSelect.payId }).then((res) => {
             setTimeList(res);
         });
-        console.log(currentSelect);
         setSelectCode(currentSelect.payId);
     }, [currentSelect]);
 
@@ -182,7 +181,10 @@ export function DiscountModal({
             handleFetchPay(currentSelect?.payId);
         }
     };
-
+    const cheapest = useMemo(() => {
+        const newList = currentSelect.skus?.map((i: any) => i.unitPrice);
+        return newList.lastIndexOf(Math.min(...newList));
+    }, [currentSelect]);
     return (
         <Grid container justifyContent="flex-end">
             <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
@@ -309,7 +311,7 @@ export function DiscountModal({
                                                                 <div className="pt-4 pb-3 text-base font-[700] text-center">
                                                                     {v.properties[0].valueName}
                                                                 </div>
-                                                                {index === 2 && (
+                                                                {cheapest === index && (
                                                                     <span
                                                                         className="absolute top-[-12px] right-[-2px] px-[8px] h-[24px] bg-[#ff6464] text-xs text-white leading-[24px]"
                                                                         style={{ borderRadius: '12px 8px 8px 2px' }}

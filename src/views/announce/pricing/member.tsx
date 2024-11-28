@@ -676,8 +676,6 @@ const Price1 = () => {
         }
         let res: any;
         if (!isSign) {
-            console.log(currentSelect);
-
             // 不是签约
             if (type === 1) {
                 res = await getPrice({
@@ -871,12 +869,12 @@ const Price1 = () => {
                                                             setCurrentSelect({
                                                                 title: plan.title,
                                                                 select: value,
-                                                                payId: plan?.skus[plan?.skus?.length - 1]?.id,
-                                                                isSubscribe: false,
+                                                                payId: plan?.id,
+                                                                isSubscribe: plan?.isSubscribe,
                                                                 subscribeMoney: plan?.subscribeMoney,
                                                                 skus: plan.skus
                                                             });
-                                                            handleClick(index, plan?.skus[plan?.skus?.length - 1]?.id);
+                                                            handleClick(index, plan?.id);
                                                         }}
                                                         color="secondary"
                                                     >
@@ -904,13 +902,13 @@ const Price1 = () => {
                                                                 setCurrentSelect({
                                                                     title: item.properties[0].valueName,
                                                                     select: value,
-                                                                    payId: plan?.skus[plan?.skus?.length - 1]?.id,
+                                                                    payId: item?.id,
                                                                     experience: true,
                                                                     unitName: plan.unitName,
                                                                     isSubscribe: false,
                                                                     buyTime: item.rightsConfig.levelBasicDTO.timesRange.range
                                                                 });
-                                                                handleClick(3, plan?.skus[plan?.skus?.length - 1]?.id);
+                                                                handleClick(3, item?.id);
                                                             }}
                                                             color="secondary"
                                                         >

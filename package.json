@@ -143,6 +143,9 @@
         "build:cn-test-mofabiji": " dotenv -e .env.development react-app-rewired build",
         "build:cn-test": " dotenv -e .env.development react-app-rewired build",
         "build:cn-pro": " dotenv -e .env.cn-pro react-app-rewired build",
+        "build:cn-pro-mofabiji": " dotenv -e .env.cn-pro-mofabiji react-app-rewired build",
+        "build:cn-test-mofabiji": " dotenv -e .env.cn-test-mofabiji react-app-rewired build",
+
         "build:us-pro": " dotenv -e .env.us-pro react-app-rewired build",
         "lint": "eslint --ext .ts,.tsx ./src",
         "test": "react-scripts test",

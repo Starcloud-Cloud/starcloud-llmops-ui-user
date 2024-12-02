@@ -869,14 +869,14 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 if (Array.isArray(newoutputObj)) {
                                                     newoutputObj.map((item) => {
                                                         for (let key in item) {
-                                                            if (typeof item[key] === 'object') {
+                                                            if (typeof item[key] === 'object' && item[key] !== null) {
                                                                 newoutputflag = true;
                                                             }
                                                         }
                                                     });
                                                 } else {
                                                     for (let key in newoutputObj) {
-                                                        if (typeof newoutputObj[key] === 'object') {
+                                                        if (typeof newoutputObj[key] === 'object' && newoutputObj[key] !== null) {
                                                             newoutputflag = true;
                                                         }
                                                     }
@@ -1089,14 +1089,14 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 if (Array.isArray(newoutputObj)) {
                                                     newoutputObj.map((item) => {
                                                         for (let key in item) {
-                                                            if (typeof item[key] === 'object') {
+                                                            if (typeof item[key] === 'object' && item[key] !== null) {
                                                                 newoutputflag = true;
                                                             }
                                                         }
                                                     });
                                                 } else {
                                                     for (let key in newoutputObj) {
-                                                        if (typeof newoutputObj[key] === 'object') {
+                                                        if (typeof newoutputObj[key] === 'object' && newoutputObj[key] !== null) {
                                                             newoutputflag = true;
                                                         }
                                                     }

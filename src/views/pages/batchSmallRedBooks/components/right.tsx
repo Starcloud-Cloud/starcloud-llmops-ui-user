@@ -391,7 +391,6 @@ const Right = ({
                                 )
                             };
                         })}
-                        accordion
                     />
                     {batchTotal > pageNum * 10 && (
                         <div className="flex justify-center mt-4">
@@ -456,7 +455,7 @@ const Right = ({
                     <QRCode value={`${process.env.REACT_APP_SHARE_URL}/batchShare?uid=` + batchid} />
                     <div className="flex flex-col items-center">
                         <div
-                            onClick={() => navigate(`/batchShare?uid=` + batchid)}
+                            onClick={() => window.open(`${process.env.REACT_APP_SHARE_URL}/batchShare?uid=${batchid}`)}
                             className="text-md underline cursor-pointer text-[#673ab7]"
                         >
                             查看效果

@@ -1,5 +1,5 @@
 import { Box, Pagination, TextField, Typography, Button } from '@mui/material';
-import { TreeSelect, Row, Col, Modal } from 'antd';
+import { TreeSelect, Row, Col, Modal, Input, Select } from 'antd';
 import MarketTemplate from './components/content/marketTemplate';
 import MyselfTemplate from './components/content/mySelfTemplate';
 import { UpgradeModel } from 'views/template/myChat/components/upgradeRobotModel';
@@ -63,8 +63,7 @@ const RightArrow = () => {
 
 function MyTemplate() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
+    const { Option } = Select;
     const [recommendList, setRecommends] = useState([]);
     const [appList, setAppList] = useState<any[]>([]);
     const [newAppList, setNewApp] = useState<any[]>([]);
@@ -140,16 +139,8 @@ function MyTemplate() {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const paginationChange = (event: any, value: number) => {
-        setPageQuery({
-            ...pageQuery,
-            pageNo: value
-        });
-        setNewApp(appList.slice((value - 1) * pageQuery.pageSize, (value - 1) * pageQuery.pageSize + pageQuery.pageSize));
-    };
     const [botOpen, setBotOpen] = useState(false);
     const allDetail = useAllDetail();
-    const { user } = useUserStore();
     //弹窗
     const [open, setOpen] = useState(false);
     const [appNameOpen, setAppNameOpen] = useState(false);
@@ -173,6 +164,7 @@ function MyTemplate() {
         // }
     };
     const timeoutRef = useRef<any>();
+    const [searchSel, setSearchSel] = useState('all');
     return (
         <Box
             style={{
@@ -266,9 +258,13 @@ function MyTemplate() {
             )}
             {totals > 0 && (
                 <Box>
-                    <Typography variant="h3" mt={4} mb={2}>
-                        {t('apply.self')}
-                    </Typography>
+                    <div className="flex justify-between items-center">
+                        <div className="text-lg font-bold mt-8 mb-4">我的应用</div>
+                        <Select className="w-[100px]" value={searchSel} onChange={setSearchSel}>
+                            <Option value="all">所有人</Option>
+                            <Option value="myself">由我创建</Option>
+                        </Select>
+                    </div>
                     <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 pb-4">
                         {appList.map((el: any, index: number) => (
                             <MarketTemplate

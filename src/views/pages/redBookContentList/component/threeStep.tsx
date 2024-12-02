@@ -586,7 +586,7 @@ const ThreeStep = ({
                     <QRCode value={`${process.env.REACT_APP_SHARE_URL}/share?uid=` + data?.uid} />
                     <div className="flex flex-col items-center">
                         <div
-                            onClick={() => navigate(`/share?uid=` + data?.uid)}
+                            onClick={() => window.open(`${process.env.REACT_APP_SHARE_URL}/share?uid=${data?.uid}`)}
                             className="text-md underline cursor-pointer text-[#673ab7]"
                         >
                             查看效果

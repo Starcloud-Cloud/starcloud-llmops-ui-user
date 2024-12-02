@@ -420,7 +420,17 @@ const VariableInput = ({
                 {isPageText && (
                     <div className="flex items-center text-[12px]">
                         <ErrorOutlineIcon sx={{ marginLeft: '5px', cursor: 'pointer', fontSize: '12px' }} />
-                        <span>自动分页字段，可根据实际内容自动分页生成图片（最多18页）</span>
+                        <span>
+                            自动分页字段，可根据实际内容自动分页生成图片（最多18页）{' '}
+                            <span
+                                className="cursor-pointer text-[#673ab7]"
+                                onClick={() =>
+                                    window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/gwva2dxOW49qxLrjuEo4em09Vbkz3BRL')
+                                }
+                            >
+                                【使用说明】
+                            </span>
+                        </span>
                     </div>
                 )}
             </div>

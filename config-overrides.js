@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const WorkBoxPlugin = require('workbox-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require('path');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 
@@ -14,6 +16,7 @@ module.exports = function override(config) {
         path: require.resolve('path-browserify'), // 添加这行
         os: require.resolve('os-browserify/browser') // 添加这行
     };
+    config.plugins = config.plugins.filter(plugin => !(plugin instanceof HtmlWebpackPlugin));
 
     // https://stackoverflow.com/questions/69135310/workaround-for-cache-size-limit-in-create-react-app-pwa-service-worker
     config.plugins.forEach((plugin) => {
@@ -28,6 +31,7 @@ module.exports = function override(config) {
         config.output.filename = `static/js/[name].${version}.[contenthash:8].js`;
         config.output.chunkFilename = `static/js/[name].${version}.[contenthash:8].chunk.js`;
     }
+    console.log(process.env.REACT_APP_HTML)
     config.plugins = [
         ...config.plugins,
         new CompressionWebpackPlugin({
@@ -39,6 +43,9 @@ module.exports = function override(config) {
         new webpack.ProvidePlugin({
             process: 'process/browser.js',
             Buffer: ['buffer', 'Buffer']
+        }),
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, `public/${process.env.REACT_APP_HTML || 'index.html'}`),
         }),
         // new BundleAnalyzerPlugin(),
 

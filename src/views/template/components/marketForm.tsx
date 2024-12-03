@@ -526,7 +526,7 @@ function FormExecute({
                     <p>
                         支持以 XLS 文件形式批量导入页面元素，导入文件将自动刷新列表页。
                         <span className="text-[#673ab7] cursor-pointer" onClick={handleDownLoad}>
-                            下载导入Excel文件
+                            下载导入文件模板
                         </span>
                     </p>
                     <div className="flex justify-center mt-[20px]">

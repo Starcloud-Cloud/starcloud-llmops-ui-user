@@ -43,6 +43,7 @@ const CreateTab = ({
             system: data?.system || true,
             enable: data?.enable || true,
             isCopy: data?.isCopy || true,
+            isUseAllMaterial: data?.isUseAllMaterial || true,
             uuid: styleuid,
             templateList: data?.templateList?.map((item: any) => ({
                 ...item,
@@ -59,6 +60,7 @@ const CreateTab = ({
                     isMultimodalTitle: false,
                     uuid: fristuid,
                     isCopy: false,
+                    isUseAllMaterial: false,
                     variableList: []
                 }
             ],

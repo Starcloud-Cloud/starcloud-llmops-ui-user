@@ -2,11 +2,9 @@ import React, { useEffect, useState, useRef, memo } from 'react';
 import {
     Avatar,
     Card,
-    CollapseProps,
     Divider,
     Space,
     Button,
-    Spin,
     Input,
     UploadProps,
     Upload,
@@ -15,8 +13,11 @@ import {
     Drawer,
     Progress,
     Popover,
-    QRCode
+    QRCode,
+    Dropdown,
+    Tag
 } from 'antd';
+import type { MenuProps } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useNavigate } from 'react-router-dom';
 import 'swiper/css';
@@ -24,19 +25,14 @@ import './threeStep.css';
 import 'swiper/css/pagination';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { retryContent, modify } from '../../../../api/redBook/index';
+import { riskword, modify, riskReplace } from '../../../../api/redBook/index';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { Pagination } from 'swiper';
 
-import imgLoading from 'assets/images/picture/loading.gif';
-import CopyToClipboard from 'react-copy-to-clipboard';
-import { Tooltip } from '@mui/material';
 import { getAccessToken } from 'utils/auth';
-import { PlusOutlined } from '@ant-design/icons';
-import Left from '../../batchSmallRedBooks/components/newLeft';
+import { PlusOutlined, DownOutlined, SearchOutlined } from '@ant-design/icons';
 import { useAllDetail } from 'contexts/JWTContext';
-import jsCookie from 'js-cookie';
 import copy from 'clipboard-copy';
 import JSZip from 'jszip';
 import { origin_url } from 'utils/axios/config';
@@ -245,6 +241,70 @@ const ThreeStep = ({
 
     //扫码发布
     const [publishOpen, setPublishOpen] = useState(false);
+
+    //敏感词监测
+    const [wordsOpen, setWordsOpen] = useState(false);
+    const [wordsLoading, setWordsLoading] = useState(false);
+    const [wordsValue, setWordsValue] = useState('');
+    const [newWordsRes, setNewWordsRes] = useState<any>(undefined);
+    const handleRiskword = async () => {
+        setWordsLoading(true);
+        try {
+            const result = await riskword({
+                content: wordsValue
+            });
+            setNewWordsRes(result);
+            setWordsLoading(false);
+        } catch (err) {
+            setWordsLoading(false);
+        }
+    };
+    const editWords = async ({ key: processManner }: any) => {
+        const { content, topRiskStr, lowRiskStr } = newWordsRes;
+        const result = await riskReplace({
+            content,
+            topRiskStr,
+            lowRiskStr,
+            processManner
+        });
+        setNewWordsRes({
+            ...newWordsRes,
+            resContent: result.replaceContent
+        });
+    };
+    useEffect(() => {
+        if (!wordsOpen) {
+            setWordsValue('');
+            setNewWordsRes(undefined);
+        }
+    }, [wordsOpen]);
+
+    const items: MenuProps['items'] = [
+        {
+            key: 'riskPinyin',
+            label: '违禁词转拼音'
+        },
+        {
+            key: 'topPinyin',
+            label: '禁用词转拼音'
+        },
+        {
+            key: 'lowPinyin',
+            label: '敏感词转拼音'
+        },
+        {
+            key: 'riskEmpty',
+            label: '删除违禁词'
+        },
+        {
+            key: 'topEmpty',
+            label: '删除禁用词'
+        },
+        {
+            key: 'lowEmpty',
+            label: '删除敏感词'
+        }
+    ];
     return (
         <div
             className="h-full"
@@ -462,66 +522,80 @@ const ThreeStep = ({
                                     </div>
                                 )}
                                 <Divider style={{ margin: '2px 0' }} />
-                                <div className="mt-2">
-                                    {!exeDetail && (
-                                        <Space>
-                                            <Button
-                                                type="primary"
-                                                size="small"
-                                                onClick={() => {
-                                                    copy(text);
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '复制成功',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'success'
-                                                            },
-                                                            close: false,
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            transition: 'SlideLeft'
-                                                        })
-                                                    );
-                                                }}
-                                            >
-                                                复制内容
-                                            </Button>
-                                            <Button
-                                                type="primary"
-                                                size="small"
-                                                onClick={() => {
-                                                    copy(`${tags}`);
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '复制成功',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'success'
-                                                            },
-                                                            close: false,
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            transition: 'SlideLeft'
-                                                        })
-                                                    );
-                                                }}
-                                            >
-                                                复制标签
-                                            </Button>
-                                        </Space>
-                                    )}
-                                </div>
-                                <div className="max-h-[calc(100%-150px)] ">
+                                <div className="max-h-[calc(100%-150px)] mt-2">
                                     {editType ? (
-                                        <Input.TextArea
-                                            onChange={(e) => setText(e.target.value)}
-                                            className="text-base mb-2 whitespace-pre-wrap"
-                                            value={text}
-                                            rows={16}
-                                        />
+                                        <>
+                                            <div className="flex justify-end mb-2">
+                                                <Button
+                                                    onClick={() => {
+                                                        setWordsValue(text);
+                                                        setWordsOpen(true);
+                                                    }}
+                                                    type="primary"
+                                                    size="small"
+                                                >
+                                                    敏感词过滤
+                                                </Button>
+                                            </div>
+                                            <Input.TextArea
+                                                onChange={(e) => setText(e.target.value)}
+                                                className="text-base mb-2 whitespace-pre-wrap"
+                                                value={text}
+                                                rows={16}
+                                            />
+                                        </>
                                     ) : (
-                                        <div className="text-base mb-2 whitespace-pre-wrap select-none">{text}</div>
+                                        <>
+                                            {!exeDetail && (
+                                                <Space>
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(text);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        复制内容
+                                                    </Button>
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(`${tags}`);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        复制标签
+                                                    </Button>
+                                                </Space>
+                                            )}
+                                            <div className="text-base mb-2 whitespace-pre-wrap select-none">{text}</div>
+                                        </>
                                     )}
                                     {editType ? (
                                         <div className="flex gap-4 flex-wrap text-lg">
@@ -596,6 +670,73 @@ const ThreeStep = ({
                         <div className="text-md text-[#000000a6]">注意：小红书需更新到最新版本</div>
                     </div>
                 </div>
+            </Modal>
+            <Modal width={'80%'} open={wordsOpen} title={'敏感词过滤'} footer={null} onCancel={() => setWordsOpen(false)}>
+                <div className="w-full flex justify-between items-stretch gap-2 h-[452px]">
+                    <div className="flex-1">
+                        <Input.TextArea
+                            value={wordsValue}
+                            onChange={(e) => setWordsValue(e.target.value)}
+                            rows={16}
+                            className="text-base whitespace-pre-wrap"
+                        />
+                        <div className="flex justify-end gap-2 mt-2">
+                            <Button onClick={() => setWordsValue('')}>清空内容</Button>
+                            <Button loading={wordsLoading} onClick={handleRiskword} icon={<SearchOutlined />} type="primary">
+                                开始检测
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="w-[1px] bg-[#d9d9d9]"></div>
+                    <div className="flex-1">
+                        <div
+                            dangerouslySetInnerHTML={{ __html: newWordsRes?.resContent }}
+                            className="w-full border border-solid border-[#d9d9d9] rounded-lg h-[calc(100%-40px)] whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
+                        ></div>
+                        <div className="flex justify-end gap-2 mt-2">
+                            <Dropdown menu={{ items, onClick: editWords }}>
+                                <Button icon={<DownOutlined />}>编辑违禁词</Button>
+                            </Dropdown>
+                            <Button
+                                disabled={!newWordsRes?.resContent}
+                                onClick={() => {
+                                    copy(newWordsRes?.content);
+                                }}
+                                type="primary"
+                            >
+                                复制内容
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+                {newWordsRes?.riskList && (
+                    <Card className="mt-6" size="small" title="检测报告">
+                        <div className="text-sm text-[#e92424] font-[400] mt-4">禁用词，不得使用：{newWordsRes?.topRiskStr}</div>
+                        <div className="text-sm text-[#ff7800] font-[400]">敏感词，谨慎使用：{newWordsRes?.lowRiskStr}</div>
+                        <Divider className="my-2" />
+                        <div>
+                            {newWordsRes?.riskList?.map((item: any) => (
+                                <>
+                                    <div className="flex items-center gap-8 text-[#999] font-[500] mt-4">
+                                        <div>
+                                            <Tag color={item?.type === '禁用词' ? 'error' : 'warning'}>{item?.type}</Tag>
+                                            <span className="text-[#333]">{item.title}</span>
+                                        </div>
+                                        <div>
+                                            <span>来源：</span>
+                                            <span>{item?.sourse}</span>
+                                        </div>
+                                        <div className="flex-1">
+                                            <span>解释：</span>
+                                            <span>{item?.reason}</span>
+                                        </div>
+                                    </div>
+                                    <Divider className="my-2" />
+                                </>
+                            ))}
+                        </div>
+                    </Card>
+                )}
             </Modal>
             <Drawer
                 width={700}

@@ -1,7 +1,15 @@
 import { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { ActionType, ModalForm, ProFormTextArea, ProFormSelect } from '@ant-design/pro-components';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import { getMaterialTitle, getMaterialPage, createMaterial, updateMaterial, delMaterial, delsMaterial } from 'api/redBook/material';
+import {
+    getMaterialTitle,
+    getMaterialPage,
+    createMaterial,
+    updateMaterial,
+    copyMaterial,
+    delMaterial,
+    delsMaterial
+} from 'api/redBook/material';
 import { EditType } from 'views/materialLibrary/detail';
 import {
     Upload,
@@ -243,7 +251,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                 width: 60,
                 fixed: 'right',
                 render: (text: any, record: any, index: number) => (
-                    <div className="flex flex-col gap-2 justify-center">
+                    <div className="flex flex-col gap-1 justify-center">
                         <Button
                             type="link"
                             onClick={async () => {
@@ -255,6 +263,15 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                         >
                             编辑
                         </Button>
+                        <Popconfirm
+                            title="提示"
+                            description="请再次确认是否要复制"
+                            onConfirm={() => handleCopy(record.id)}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <Button type="link">复制</Button>
+                        </Popconfirm>
                         <Popconfirm
                             title="提示"
                             description="请再次确认是否要删除"
@@ -359,6 +376,11 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             columnName: list.columnName,
             description: list.description
         });
+    };
+    const handleCopy = async (id: string) => {
+        await copyMaterial({ id });
+        message.success('复制成功');
+        getList();
     };
     const handleDel = async (id: string) => {
         await delMaterial({ id });

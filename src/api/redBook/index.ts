@@ -33,3 +33,12 @@ export const retryContent = (data: string) => {
 export const modify = (data: any) => {
     return request.put({ url: `/llm/xhs/content/modify`, data });
 };
+
+//敏感词过滤
+export const riskword = (data: any) => {
+    return request.post({ url: `/llm/xhs/content/riskword`, data });
+};
+//敏感词编辑
+export const riskReplace = (data: any) => {
+    return request.post({ url: `/llm/xhs/content/riskReplace`, data });
+};

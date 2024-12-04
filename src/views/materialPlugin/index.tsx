@@ -170,7 +170,7 @@ const MaterialPlugin = () => {
     const [addOpen, setAddOpen] = useState(false);
     const [wayList, setWayList] = useState<any[]>([]);
     return (
-        <div className="bg-white p-4">
+        <div className="bg-white p-4 rounded-lg">
             <Tabs
                 activeKey={accessKey}
                 onChange={setAccessKey}

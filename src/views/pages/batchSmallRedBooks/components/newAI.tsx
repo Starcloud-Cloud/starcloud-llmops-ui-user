@@ -10,6 +10,7 @@ import RedBookAnalysis from './components/redBookAnalysis';
 import ImgOcr from './components/imgOcr';
 import TextExtraction from './components/textExtraction';
 import PlugModal from './components/plugModal';
+import Sensitive_words from './components/sensitive_words';
 import ResultLoading from './components/resultLoading';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -665,6 +666,8 @@ const AiCreate = ({
             setExecutionCount(executionCountRef.current);
         }
     };
+    //敏感词过滤
+    const handleWords = (retry = false) => {};
     //组件销毁时清除定时器
     useEffect(() => {
         return () => {
@@ -851,6 +854,8 @@ const AiCreate = ({
                 </div>
             ) : plugValue === 'wchat' ? (
                 <PlugModal handleWchat={handleWchat} />
+            ) : plugValue === 'sensitive_words' ? (
+                <Sensitive_words handleWords={handleWords} />
             ) : null}
             {/* 选择素材 */}
             <Modal
@@ -938,6 +943,8 @@ const AiCreate = ({
                             handleTextData(textNum.current);
                         } else if (selectValue === 'wchat') {
                             handleWchat(undefined, true);
+                        } else if (selectValue === 'sensitive_words') {
+                            handleWords(true);
                         }
                     }}
                     reTryExe={() => {
@@ -959,6 +966,8 @@ const AiCreate = ({
                             handleTextData(textNum.current, true);
                         } else if (selectValue === 'wchat') {
                             handleWchat(undefined, true);
+                        } else if (selectValue === 'sensitive_words') {
+                            handleWords(true);
                         }
                     }}
                     handleSave={() => {

@@ -24,6 +24,10 @@ export const updateMaterial = (data: any) => {
 export const updateBatchMaterial = (data: any) => {
     return request.put({ url: '/llm/material-library-slice/update-batch', data });
 };
+//复制表格
+export const copyMaterial = (params: any) => {
+    return request.post({ url: '/llm/material-library-slice/copy', params });
+};
 //删除表格
 export const delMaterial = (params: any) => {
     return request.delete({ url: '/llm/material-library-slice/delete', params });

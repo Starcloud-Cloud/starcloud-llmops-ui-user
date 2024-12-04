@@ -2,11 +2,9 @@ import React, { useEffect, useState, useRef, memo } from 'react';
 import {
     Avatar,
     Card,
-    CollapseProps,
     Divider,
     Space,
     Button,
-    Spin,
     Input,
     UploadProps,
     Upload,
@@ -15,8 +13,11 @@ import {
     Drawer,
     Progress,
     Popover,
-    QRCode
+    QRCode,
+    Dropdown,
+    Tag
 } from 'antd';
+import type { MenuProps } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useNavigate } from 'react-router-dom';
 import 'swiper/css';
@@ -24,22 +25,18 @@ import './threeStep.css';
 import 'swiper/css/pagination';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { retryContent, modify } from '../../../../api/redBook/index';
+import { riskword, modify, riskReplace } from '../../../../api/redBook/index';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { Pagination } from 'swiper';
 
-import imgLoading from 'assets/images/picture/loading.gif';
-import CopyToClipboard from 'react-copy-to-clipboard';
-import { Tooltip } from '@mui/material';
 import { getAccessToken } from 'utils/auth';
-import { PlusOutlined } from '@ant-design/icons';
-import Left from '../../batchSmallRedBooks/components/newLeft';
+import { PlusOutlined, DownOutlined, SearchOutlined } from '@ant-design/icons';
 import { useAllDetail } from 'contexts/JWTContext';
-import jsCookie from 'js-cookie';
 import copy from 'clipboard-copy';
 import JSZip from 'jszip';
 import { origin_url } from 'utils/axios/config';
+import SensitiveWords from 'views/sensitiveWords/index';
 
 const ThreeStep = ({
     data,
@@ -245,6 +242,11 @@ const ThreeStep = ({
 
     //扫码发布
     const [publishOpen, setPublishOpen] = useState(false);
+
+    //敏感词监测
+    const [wordsOpen, setWordsOpen] = useState(false);
+    const [wordsValue, setWordsValue] = useState('');
+
     return (
         <div
             className="h-full"
@@ -299,7 +301,7 @@ const ThreeStep = ({
                             } */}
                             {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
-                                <Space>
+                                <div className="flex items-center">
                                     <Button
                                         type="primary"
                                         onClick={() => {
@@ -308,13 +310,25 @@ const ThreeStep = ({
                                     >
                                         扫码发布
                                     </Button>
-                                    <Button type="primary" loading={downLoading} onClick={() => downLoadImage()}>
+                                    <Button className="ml-2" type="primary" loading={downLoading} onClick={() => downLoadImage()}>
                                         打包下载
+                                    </Button>
+                                    <Divider type="vertical" />
+                                    <Button
+                                        onClick={() => {
+                                            setWordsValue(text);
+                                            setWordsOpen(true);
+                                            setEditType(true);
+                                        }}
+                                        className="mr-2"
+                                        type="primary"
+                                    >
+                                        违禁词检测
                                     </Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                         编辑
                                     </Button>
-                                </Space>
+                                </div>
                             ) : (
                                 <Space>
                                     <Button type="primary" onClick={handleModify}>
@@ -462,66 +476,80 @@ const ThreeStep = ({
                                     </div>
                                 )}
                                 <Divider style={{ margin: '2px 0' }} />
-                                <div className="mt-2">
-                                    {!exeDetail && (
-                                        <Space>
-                                            <Button
-                                                type="primary"
-                                                size="small"
-                                                onClick={() => {
-                                                    copy(text);
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '复制成功',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'success'
-                                                            },
-                                                            close: false,
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            transition: 'SlideLeft'
-                                                        })
-                                                    );
-                                                }}
-                                            >
-                                                复制内容
-                                            </Button>
-                                            <Button
-                                                type="primary"
-                                                size="small"
-                                                onClick={() => {
-                                                    copy(`${tags}`);
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '复制成功',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'success'
-                                                            },
-                                                            close: false,
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            transition: 'SlideLeft'
-                                                        })
-                                                    );
-                                                }}
-                                            >
-                                                复制标签
-                                            </Button>
-                                        </Space>
-                                    )}
-                                </div>
-                                <div className="max-h-[calc(100%-150px)] ">
+                                <div className="max-h-[calc(100%-150px)] mt-2">
                                     {editType ? (
-                                        <Input.TextArea
-                                            onChange={(e) => setText(e.target.value)}
-                                            className="text-base mb-2 whitespace-pre-wrap"
-                                            value={text}
-                                            rows={16}
-                                        />
+                                        <>
+                                            <div className="flex justify-end mb-2">
+                                                <Button
+                                                    onClick={() => {
+                                                        setWordsValue(text);
+                                                        setWordsOpen(true);
+                                                    }}
+                                                    type="primary"
+                                                    size="small"
+                                                >
+                                                    违禁词检测
+                                                </Button>
+                                            </div>
+                                            <Input.TextArea
+                                                onChange={(e) => setText(e.target.value)}
+                                                className="text-base mb-2 whitespace-pre-wrap"
+                                                value={text}
+                                                rows={16}
+                                            />
+                                        </>
                                     ) : (
-                                        <div className="text-base mb-2 whitespace-pre-wrap select-none">{text}</div>
+                                        <>
+                                            {!exeDetail && (
+                                                <Space>
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(text);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        复制内容
+                                                    </Button>
+                                                    <Button
+                                                        type="primary"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            copy(`${tags}`);
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '复制成功',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'success'
+                                                                    },
+                                                                    close: false,
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                    transition: 'SlideLeft'
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        复制标签
+                                                    </Button>
+                                                </Space>
+                                            )}
+                                            <div className="text-base mb-2 whitespace-pre-wrap select-none">{text}</div>
+                                        </>
                                     )}
                                     {editType ? (
                                         <div className="flex gap-4 flex-wrap text-lg">
@@ -586,7 +614,7 @@ const ThreeStep = ({
                     <QRCode value={`${process.env.REACT_APP_SHARE_URL}/share?uid=` + data?.uid} />
                     <div className="flex flex-col items-center">
                         <div
-                            onClick={() => navigate(`/share?uid=` + data?.uid)}
+                            onClick={() => window.open(`${process.env.REACT_APP_SHARE_URL}/share?uid=${data?.uid}`)}
                             className="text-md underline cursor-pointer text-[#673ab7]"
                         >
                             查看效果
@@ -596,6 +624,9 @@ const ThreeStep = ({
                         <div className="text-md text-[#000000a6]">注意：小红书需更新到最新版本</div>
                     </div>
                 </div>
+            </Modal>
+            <Modal width={'80%'} open={wordsOpen} title={'违禁词检测'} footer={null} onCancel={() => setWordsOpen(false)}>
+                <SensitiveWords wordsOpen={wordsOpen} wordsValues={wordsValue} />
             </Modal>
             <Drawer
                 width={700}

@@ -339,14 +339,6 @@ const Right = ({
                                         </div>
                                         <div className="hidden 2xl:hidden xl:block lg:block md:block sm:block xs:block">
                                             <div className="flex items-center gap-1 flex-wrap">
-                                                <span className="font-[600]">执行人:</span>
-                                                <div className="!w-[80px] line-clamp-1">{item?.creator}</div>
-                                                <span className="font-[600]">成功数:</span>
-                                                <span className="w-[17px]">{item?.successCount}</span>
-                                                <span className="font-[600]">失败数:</span>
-                                                <span className="w-[17px]">{item?.failureCount}</span>
-                                                <span className="font-[600]">总数:</span>
-                                                <span className="w-[17px]">{item?.totalCount}</span>
                                                 {item.status === 'COMPLETE' && batchDataList[i] && collapseActive[0] === item.uid && (
                                                     <>
                                                         <Button
@@ -391,7 +383,6 @@ const Right = ({
                                 )
                             };
                         })}
-                        accordion
                     />
                     {batchTotal > pageNum * 10 && (
                         <div className="flex justify-center mt-4">
@@ -456,7 +447,7 @@ const Right = ({
                     <QRCode value={`${process.env.REACT_APP_SHARE_URL}/batchShare?uid=` + batchid} />
                     <div className="flex flex-col items-center">
                         <div
-                            onClick={() => navigate(`/batchShare?uid=` + batchid)}
+                            onClick={() => window.open(`${process.env.REACT_APP_SHARE_URL}/batchShare?uid=${batchid}`)}
                             className="text-md underline cursor-pointer text-[#673ab7]"
                         >
                             查看效果

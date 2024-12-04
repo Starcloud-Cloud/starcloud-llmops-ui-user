@@ -340,7 +340,7 @@ const MaterialLibrary = ({
     const [form] = Form.useForm();
 
     return (
-        <div className="h-full material-index bg-white">
+        <div className="h-full material-index bg-white rounded-lg">
             {mode === 'page' && (
                 <div className="px-6 pt-2">
                     <Button

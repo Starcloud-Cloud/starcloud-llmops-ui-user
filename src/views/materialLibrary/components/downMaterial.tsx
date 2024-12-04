@@ -68,7 +68,7 @@ const DownMaterial = ({ libraryId, uploadOpen, setUploadOpen, getList, getTitleL
             <p>
                 支持以 XLS 文件形式批量导入数据，导入文件将自动刷新素材列表。
                 <span className="text-[#673ab7] cursor-pointer" onClick={handleDownLoad}>
-                    下载导入Excel文件
+                    下载导入文件模板
                 </span>
             </p>
             {/* <div className="my-4 flex justify-center">

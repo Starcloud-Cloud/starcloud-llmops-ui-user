@@ -1,7 +1,6 @@
-import { Popover, Menu, Input, Checkbox, Button, Tooltip } from 'antd';
+import { Popover, Menu, Checkbox, Button, Tooltip } from 'antd';
 import { useLocation } from 'react-router-dom';
 import _ from 'lodash-es';
-import ExePrompt from 'views/pages/copywriting/components/spliceCmponents/exePrompt';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { schemeOptions } from 'api/redBook/copywriting';
@@ -9,47 +8,23 @@ import image from 'assets/images/icons/image.svg';
 import string from 'assets/images/icons/string.svg';
 import textBox from 'assets/images/icons/textBox.svg';
 import number from 'assets/images/icons/nu.svg';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const { SubMenu } = Menu;
-const { TextArea } = Input;
-const VariableInput = ({
+const Can = ({
     open,
     setOpen,
-    code,
     popoverWidth,
     handleMenu,
     index = 0,
-    row,
-    status = false,
-    title,
-    value,
-    pre,
-    setValue,
-    styles = {},
-    model,
     details,
-    stepCode = '图片生成',
-    disabled = false,
-    isPageText
+    stepCode
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
-    code?: string;
     popoverWidth?: number;
     handleMenu: (data: any) => void;
     index?: number;
-    title?: string;
-    value?: any;
-    row?: number;
-    status?: boolean;
-    setValue: (data: any) => void;
-    styles?: any;
-    pre?: number;
-    model?: string;
     details: any;
-    stepCode?: string;
-    disabled?: boolean;
-    isPageText?: boolean;
+    stepCode: string;
 }) => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -74,14 +49,14 @@ const VariableInput = ({
         });
         return newList;
     }, [details]);
-    const setData = (data: string, flag?: boolean) => {
+    const setData = (data: string) => {
         let newValue = _.cloneDeep(newValues);
         if (!newValue) {
             newValue = '';
         }
         const part1 = newValue.slice(0, inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
         const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
-        newValue = flag ? `${part1}{${data}}${part2}` : `${part1}{{${data}}}${part2}`;
+        newValue = `${part1}{{${data}}}${part2}`;
         setOpen(false);
         setNewValue(newValue);
         handleMenu({ index, newValue });
@@ -121,46 +96,22 @@ const VariableInput = ({
                         }))
                     ]
                 });
-                if (code !== 'PosterActionHandler') {
-                    arr.push({
-                        key: name + '.' + key,
-                        label: `${key}.list.(*)`,
-                        title: property?.title,
-                        desc: '元素内容集合',
-                        type: '*',
-                        children: getjsonschma(property?.items, `${name}.${key}`, '*')
-                    });
-                }
+                arr.push({
+                    key: name + '.' + key,
+                    label: `${key}.list.(*)`,
+                    title: property?.title,
+                    desc: '元素内容集合',
+                    type: '*',
+                    children: getjsonschma(property?.items, `${name}.${key}`, '*')
+                });
             } else {
-                if (code === 'PosterActionHandler') {
-                    if (property?.description?.split('-')[1] === '5' || property?.description?.split('-')[1] === 'image') {
-                        arr.push({
-                            key: jsonType ? name + `.list('${key}')` : name + '.' + key,
-                            label: key,
-                            title: property?.title,
-                            desc: property?.description,
-                            type: jsonType
-                        });
-                    }
-                } else if (code === 'title') {
-                    if (property?.description?.split('-')[1] !== '5') {
-                        arr.push({
-                            key: jsonType ? name + `.list('${key}')` : name + '.' + key,
-                            label: key,
-                            title: property?.title,
-                            desc: property?.description,
-                            type: jsonType
-                        });
-                    }
-                } else {
-                    arr.push({
-                        key: jsonType ? name + `.list('${key}')` : name + '.' + key,
-                        label: key,
-                        title: property?.title,
-                        desc: property?.description,
-                        type: jsonType
-                    });
-                }
+                arr.push({
+                    key: jsonType ? name + `.list('${key}')` : name + '.' + key,
+                    label: key,
+                    title: property?.title,
+                    desc: property?.description,
+                    type: jsonType
+                });
             }
         }
         return arr;
@@ -343,9 +294,6 @@ const VariableInput = ({
         }
     }, [open]);
     const [newValues, setNewValue] = useState('');
-    useEffect(() => {
-        setNewValue(value);
-    }, [pre]);
     return (
         <Popover
             trigger="click"
@@ -374,67 +322,15 @@ const VariableInput = ({
                 </div>
             }
         >
-            <div>
-                <div className="flex items-stretch relative">
-                    <TextArea
-                        disabled={disabled}
-                        style={styles}
-                        rows={row || 1}
-                        status={!newValues && status ? 'error' : ''}
-                        value={newValues}
-                        ref={(ref) => (inputList.current[index] = ref)}
-                        onChange={(e) => {
-                            setNewValue(e.target.value);
-                            e.stopPropagation();
-                        }}
-                        onBlur={(e) => {
-                            setValue(e.target.value);
-                            e.stopPropagation();
-                        }}
-                        className="rounded-r-[0px]"
-                        allowClear
-                    />
-                    <div
-                        onClick={(e) => {
-                            setOpen(true);
-                            e.stopPropagation();
-                        }}
-                        className="w-[50px] flex justify-center items-center border border-solid border-[#d9d9d9] ml-[-4px] bg-[#f8fafc] rounded-r-[6px] cursor-pointer"
-                        style={{ borderLeft: 'none' }}
-                    >
-                        参
-                    </div>
-                    <span className="text-black block bg-[#fff] px-[5px] absolute top-[-10px] left-2 text-[12px] bg-gradient-to-b from-[#fff] to-[#f8fafc] z-[1]">
-                        {title}
-                    </span>
-                    {model === 'AI_CUSTOM' && (
-                        <ExePrompt
-                            type="prompt_template_user"
-                            changePrompt={(data: any) => {
-                                setData(data, true);
-                            }}
-                            flag={true}
-                        />
-                    )}
-                </div>
-                {isPageText && (
-                    <div className="flex items-center text-[12px]">
-                        <ErrorOutlineIcon sx={{ marginLeft: '5px', cursor: 'pointer', fontSize: '12px' }} />
-                        <span>
-                            自动分页字段，可根据实际内容自动分页生成图片（最多18页）{' '}
-                            <span
-                                className="cursor-pointer text-[#673ab7]"
-                                onClick={() =>
-                                    window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/gwva2dxOW49qxLrjuEo4em09Vbkz3BRL')
-                                }
-                            >
-                                【使用说明】
-                            </span>
-                        </span>
-                    </div>
-                )}
+            <div
+                onClick={(e) => {
+                    setOpen(true);
+                }}
+                className="w-[25px] h-[25px] rounded-md bg-[#e7b8ff33] text-xs text-[#673ab7] text-center leading-[25px] cursor-pointer"
+            >
+                参
             </div>
         </Popover>
     );
 };
-export default VariableInput;
+export default Can;

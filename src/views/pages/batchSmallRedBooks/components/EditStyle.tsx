@@ -251,6 +251,16 @@ const EditStyle = ({
                                 setData(newData);
                             }}
                         />
+                        <div className="text-xs inline-block">是否使用全部素材 </div>
+                        <Switch
+                            checked={imageStyleData?.isUseAllMaterial}
+                            onChange={(e) => {
+                                const newData = _.cloneDeep(imageStyleData);
+                                newData.isUseAllMaterial = e;
+                                setData(newData);
+                            }}
+                        />
+
                         {!canEdit && (
                             <Button type="primary" onClick={handleCopy}>
                                 复制

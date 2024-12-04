@@ -76,7 +76,7 @@ const SensitiveWords = ({ wordsOpen, wordsValues }: { wordsOpen?: boolean; words
         }
     ];
     return (
-        <div className="bg-white h-full p-4">
+        <div className="bg-white h-full p-4 rounded-lg">
             <div className="text-lg font-[600] mb-6">违禁词检测</div>
             <div className="w-full flex justify-between items-stretch gap-2 h-[452px]">
                 <div className="flex-1">

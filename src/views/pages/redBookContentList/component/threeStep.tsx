@@ -36,6 +36,7 @@ import { useAllDetail } from 'contexts/JWTContext';
 import copy from 'clipboard-copy';
 import JSZip from 'jszip';
 import { origin_url } from 'utils/axios/config';
+import SensitiveWords from 'views/sensitiveWords/index';
 
 const ThreeStep = ({
     data,
@@ -244,67 +245,8 @@ const ThreeStep = ({
 
     //敏感词监测
     const [wordsOpen, setWordsOpen] = useState(false);
-    const [wordsLoading, setWordsLoading] = useState(false);
     const [wordsValue, setWordsValue] = useState('');
-    const [newWordsRes, setNewWordsRes] = useState<any>(undefined);
-    const handleRiskword = async () => {
-        setWordsLoading(true);
-        try {
-            const result = await riskword({
-                content: wordsValue
-            });
-            setNewWordsRes(result);
-            setWordsLoading(false);
-        } catch (err) {
-            setWordsLoading(false);
-        }
-    };
-    const editWords = async ({ key: processManner }: any) => {
-        const { content, topRiskStr, lowRiskStr } = newWordsRes;
-        const result = await riskReplace({
-            content,
-            topRiskStr,
-            lowRiskStr,
-            processManner
-        });
-        setNewWordsRes({
-            ...newWordsRes,
-            resContent: result.replaceContent
-        });
-    };
-    useEffect(() => {
-        if (!wordsOpen) {
-            setWordsValue('');
-            setNewWordsRes(undefined);
-        }
-    }, [wordsOpen]);
 
-    const items: MenuProps['items'] = [
-        {
-            key: 'riskPinyin',
-            label: '违禁词转拼音'
-        },
-        {
-            key: 'topPinyin',
-            label: '禁用词转拼音'
-        },
-        {
-            key: 'lowPinyin',
-            label: '敏感词转拼音'
-        },
-        {
-            key: 'riskEmpty',
-            label: '删除违禁词'
-        },
-        {
-            key: 'topEmpty',
-            label: '删除禁用词'
-        },
-        {
-            key: 'lowEmpty',
-            label: '删除敏感词'
-        }
-    ];
     return (
         <div
             className="h-full"
@@ -359,7 +301,7 @@ const ThreeStep = ({
                             } */}
                             {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
-                                <Space>
+                                <div className="flex items-center">
                                     <Button
                                         type="primary"
                                         onClick={() => {
@@ -368,13 +310,25 @@ const ThreeStep = ({
                                     >
                                         扫码发布
                                     </Button>
-                                    <Button type="primary" loading={downLoading} onClick={() => downLoadImage()}>
+                                    <Button className="ml-2" type="primary" loading={downLoading} onClick={() => downLoadImage()}>
                                         打包下载
+                                    </Button>
+                                    <Divider type="vertical" />
+                                    <Button
+                                        onClick={() => {
+                                            setWordsValue(text);
+                                            setWordsOpen(true);
+                                            setEditType(true);
+                                        }}
+                                        className="mr-2"
+                                        type="primary"
+                                    >
+                                        违禁词检测
                                     </Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                         编辑
                                     </Button>
-                                </Space>
+                                </div>
                             ) : (
                                 <Space>
                                     <Button type="primary" onClick={handleModify}>
@@ -534,7 +488,7 @@ const ThreeStep = ({
                                                     type="primary"
                                                     size="small"
                                                 >
-                                                    敏感词过滤
+                                                    违禁词检测
                                                 </Button>
                                             </div>
                                             <Input.TextArea
@@ -671,72 +625,8 @@ const ThreeStep = ({
                     </div>
                 </div>
             </Modal>
-            <Modal width={'80%'} open={wordsOpen} title={'敏感词过滤'} footer={null} onCancel={() => setWordsOpen(false)}>
-                <div className="w-full flex justify-between items-stretch gap-2 h-[452px]">
-                    <div className="flex-1">
-                        <Input.TextArea
-                            value={wordsValue}
-                            onChange={(e) => setWordsValue(e.target.value)}
-                            rows={16}
-                            className="text-base whitespace-pre-wrap"
-                        />
-                        <div className="flex justify-end gap-2 mt-2">
-                            <Button onClick={() => setWordsValue('')}>清空内容</Button>
-                            <Button loading={wordsLoading} onClick={handleRiskword} icon={<SearchOutlined />} type="primary">
-                                开始检测
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="w-[1px] bg-[#d9d9d9]"></div>
-                    <div className="flex-1">
-                        <div
-                            dangerouslySetInnerHTML={{ __html: newWordsRes?.resContent }}
-                            className="w-full border border-solid border-[#d9d9d9] rounded-lg h-[calc(100%-40px)] whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
-                        ></div>
-                        <div className="flex justify-end gap-2 mt-2">
-                            <Dropdown menu={{ items, onClick: editWords }}>
-                                <Button icon={<DownOutlined />}>编辑违禁词</Button>
-                            </Dropdown>
-                            <Button
-                                disabled={!newWordsRes?.resContent}
-                                onClick={() => {
-                                    copy(newWordsRes?.content);
-                                }}
-                                type="primary"
-                            >
-                                复制内容
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-                {newWordsRes?.riskList && (
-                    <Card className="mt-6" size="small" title="检测报告">
-                        <div className="text-sm text-[#e92424] font-[400] mt-4">禁用词，不得使用：{newWordsRes?.topRiskStr}</div>
-                        <div className="text-sm text-[#ff7800] font-[400]">敏感词，谨慎使用：{newWordsRes?.lowRiskStr}</div>
-                        <Divider className="my-2" />
-                        <div>
-                            {newWordsRes?.riskList?.map((item: any) => (
-                                <>
-                                    <div className="flex items-center gap-8 text-[#999] font-[500] mt-4">
-                                        <div>
-                                            <Tag color={item?.type === '禁用词' ? 'error' : 'warning'}>{item?.type}</Tag>
-                                            <span className="text-[#333]">{item.title}</span>
-                                        </div>
-                                        <div>
-                                            <span>来源：</span>
-                                            <span>{item?.sourse}</span>
-                                        </div>
-                                        <div className="flex-1">
-                                            <span>解释：</span>
-                                            <span>{item?.reason}</span>
-                                        </div>
-                                    </div>
-                                    <Divider className="my-2" />
-                                </>
-                            ))}
-                        </div>
-                    </Card>
-                )}
+            <Modal width={'80%'} open={wordsOpen} title={'违禁词检测'} footer={null} onCancel={() => setWordsOpen(false)}>
+                <SensitiveWords wordsOpen={wordsOpen} wordsValues={wordsValue} />
             </Modal>
             <Drawer
                 width={700}

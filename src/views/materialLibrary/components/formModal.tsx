@@ -130,6 +130,8 @@ const FormModal = ({
             width={'60%'}
             title={title}
             open={editOpen}
+            closable={false}
+            maskClosable={false}
             styles={{
                 body: {
                     height: '60vh',

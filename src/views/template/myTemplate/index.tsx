@@ -281,7 +281,7 @@ function MyTemplate() {
                             }}
                         />
                         <Select
-                            className="w-[100px]"
+                            className="w-[120px]"
                             value={queryParams.searchSel}
                             onChange={(data) => {
                                 setQueryParams({

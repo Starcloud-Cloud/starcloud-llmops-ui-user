@@ -93,14 +93,14 @@ function MyTemplate() {
             if (newValue.searchSel !== 'all' && allDetail?.allDetail?.id !== item.creator) {
                 searchSel = false;
             }
-            // if (newValue.categories) {
-            //     if (item.category) {
-            //         topicMatch = item.category === newValue.categories;
-            //         // newValue.categories.some((topic) => item.categories.includes(topic));
-            //     } else {
-            //         topicMatch = false;
-            //     }
-            // }
+            if (newValue.categories) {
+                if (item.category) {
+                    topicMatch = item.category === newValue.categories;
+                    // newValue.categories.some((topic) => item.categories.includes(topic));
+                } else {
+                    topicMatch = false;
+                }
+            }
             // if (newValue.tags && newValue.tags.length > 0) {
             //     if (item.tags) {
             //         tagMatch = newValue.tags.some((tag) => item.tags.includes(tag));
@@ -174,70 +174,6 @@ function MyTemplate() {
                 overflow: 'hidden'
             }}
         >
-            {/* <Row className="mt-4" gutter={[16, 16]}>
-                <Col span={6}>
-                    <TextField
-                        color="secondary"
-                        label={t('apply.name')}
-                        onChange={(e) => {
-                            changeParams(e);
-                            clearTimeout(timeoutRef.current);
-                            timeoutRef.current = setTimeout(() => {
-                                query(e.target);
-                            }, 200);
-                        }}
-                        name="name"
-                        value={queryParams.name}
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                    />
-                </Col>
-                <Col span={6}>
-                    <div className="myApp relative w-full">
-                        <TreeSelect
-                            placeholder="请选择类目"
-                            className="bg-[#f8fafc]  h-[51px] border border-solid border-[#697586ad] rounded-[6px] antdSel"
-                            showSearch
-                            style={{
-                                width: '100%'
-                            }}
-                            value={queryParams?.categories}
-                            dropdownStyle={{ maxHeight: 600, overflow: 'auto' }}
-                            allowClear
-                            treeCheckable={false}
-                            treeDefaultExpandAll
-                            onChange={(data: string) => {
-                                setQueryParams({
-                                    ...queryParams,
-                                    categories: data
-                                });
-                                clearTimeout(timeoutRef.current);
-                                timeoutRef.current = setTimeout(() => {
-                                    query({ name: 'categories', value: data });
-                                }, 200);
-                            }}
-                            onClear={() => {
-                                setQueryParams({
-                                    ...queryParams,
-                                    categories: ''
-                                });
-                                clearTimeout(timeoutRef.current);
-                                timeoutRef.current = setTimeout(() => {
-                                    query({ name: 'categories', value: '' });
-                                }, 200);
-                            }}
-                            fieldNames={{
-                                label: 'name',
-                                value: 'code'
-                            }}
-                            treeData={cateTree}
-                        />
-                        <span className=" block bg-gradient-to-b from-[#F4F6F8] to-[#f8fafc] px-[5px] absolute top-[-7px] left-5 text-[12px] text-[#697586]">
-                            类目
-                        </span>
-                    </div>
-                </Col>
-            </Row> */}
             <Box display="flex" alignItems="end" mt={2} mb={2}>
                 <Typography variant="h3">{t('apply.recommend')}</Typography>
                 <Typography fontSize="12px" ml={1}>
@@ -268,9 +204,10 @@ function MyTemplate() {
             <Box>
                 <div className="flex justify-between items-center">
                     <div className="text-lg font-bold mt-8 mb-4">我的应用</div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center">
                         <div className="text-xs whitespace-nowrap">应用名称：</div>
                         <Input
+                            className="w-[150px]"
                             value={queryParams.name}
                             onChange={(e) => {
                                 setQueryParams({
@@ -280,8 +217,36 @@ function MyTemplate() {
                                 clearTimeout(timeoutRef.current);
                             }}
                         />
+                        <div className="text-xs whitespace-nowrap ml-2">类目：</div>
+                        <TreeSelect
+                            className="w-[150px] mr-2"
+                            placeholder="请选择类目"
+                            showSearch
+                            value={queryParams?.categories}
+                            dropdownStyle={{ maxHeight: 600, overflow: 'auto' }}
+                            allowClear
+                            treeCheckable={false}
+                            treeDefaultExpandAll
+                            onChange={(data: string) => {
+                                setQueryParams({
+                                    ...queryParams,
+                                    categories: data
+                                });
+                            }}
+                            onClear={() => {
+                                setQueryParams({
+                                    ...queryParams,
+                                    categories: ''
+                                });
+                            }}
+                            fieldNames={{
+                                label: 'name',
+                                value: 'code'
+                            }}
+                            treeData={cateTree}
+                        />
                         <Select
-                            className="w-[120px]"
+                            className="w-[150px]"
                             value={queryParams.searchSel}
                             onChange={(data) => {
                                 setQueryParams({

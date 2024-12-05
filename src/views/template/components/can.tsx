@@ -298,7 +298,7 @@ const Can = ({
         <Popover
             trigger="click"
             arrow={false}
-            placement="bottomLeft"
+            placement="bottom"
             open={open}
             onOpenChange={() => setOpen(false)}
             content={

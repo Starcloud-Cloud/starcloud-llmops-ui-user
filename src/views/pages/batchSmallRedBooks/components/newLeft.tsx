@@ -762,7 +762,7 @@ const Lefts = ({
             .variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = data;
         const newData =
             imageRef.current?.record?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value || '[]';
-        await appModify({
+        const result: any = await appModify({
             ...detail,
             e: 2,
             workflowConfig: {
@@ -777,6 +777,11 @@ const Lefts = ({
                 }
             }
         });
+        if (result && result.verificationList?.length > 0) {
+            setErrMessageList(result?.verificationList);
+            setMessageOpen(true);
+            return false;
+        }
         dispatch(
             openSnackbar({
                 open: true,

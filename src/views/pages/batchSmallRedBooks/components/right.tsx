@@ -220,6 +220,7 @@ const Right = ({
             ) : (
                 <>
                     <Collapse
+                        accordion
                         onChange={changeCollapse}
                         activeKey={collapseActive}
                         items={bathList?.map((item, i) => {

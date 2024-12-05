@@ -626,7 +626,14 @@ const ThreeStep = ({
                 </div>
             </Modal>
             <Modal width={'80%'} open={wordsOpen} title={'违禁词检测'} footer={null} onCancel={() => setWordsOpen(false)}>
-                <SensitiveWords wordsOpen={wordsOpen} wordsValues={wordsValue} />
+                <SensitiveWords
+                    wordsOpen={wordsOpen}
+                    wordsValues={wordsValue}
+                    updateNote={(data) => {
+                        setText(data);
+                        setWordsOpen(false);
+                    }}
+                />
             </Modal>
             <Drawer
                 width={700}

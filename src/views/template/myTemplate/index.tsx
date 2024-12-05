@@ -73,37 +73,34 @@ function MyTemplate() {
     });
     const [cateTree, setCateTree] = useState<any[]>([]);
     const categoryList = marketStore((state) => state.categoryList);
-    const [queryParams, setQueryParams] = useState<{ name: string; categories: string; tags: (string | null)[] }>({
+    const [queryParams, setQueryParams] = useState<any>({
         name: '',
         categories: '',
-        tags: []
+        tags: [],
+        searchSel: 'all'
     });
     const { totals, totalList, setTotals, setTotalList } = myApp();
-    const changeParams = (e: any) => {
-        const { name, value } = e.target;
-        setQueryParams({
-            ...queryParams,
-            [name]: value
-        });
-    };
-    const query = ({ name, value }: any) => {
-        const newValue = { ...queryParams };
-        (newValue as any)[name] = value;
+    const query = () => {
+        const newValue: any = _.cloneDeep(queryParams);
         const setValue = totalList.filter((item) => {
             let nameMatch = true;
             let topicMatch = true;
             let tagMatch = true;
+            let searchSel = true;
             if (newValue.name) {
                 nameMatch = item.name.toLowerCase().includes(newValue.name.toLowerCase());
             }
-            if (newValue.categories) {
-                if (item.category) {
-                    topicMatch = item.category === newValue.categories;
-                    // newValue.categories.some((topic) => item.categories.includes(topic));
-                } else {
-                    topicMatch = false;
-                }
+            if (newValue.searchSel !== 'all' && allDetail?.allDetail?.id !== item.creator) {
+                searchSel = false;
             }
+            // if (newValue.categories) {
+            //     if (item.category) {
+            //         topicMatch = item.category === newValue.categories;
+            //         // newValue.categories.some((topic) => item.categories.includes(topic));
+            //     } else {
+            //         topicMatch = false;
+            //     }
+            // }
             // if (newValue.tags && newValue.tags.length > 0) {
             //     if (item.tags) {
             //         tagMatch = newValue.tags.some((tag) => item.tags.includes(tag));
@@ -111,12 +108,17 @@ function MyTemplate() {
             //         tagMatch = false;
             //     }
             // }
-            return nameMatch && topicMatch && tagMatch;
+            return nameMatch && topicMatch && tagMatch && searchSel;
         });
         setAppList(setValue);
         setTotals(setValue.length);
         setNewApp(setValue.slice(0, pageQuery.pageSize));
     };
+    useEffect(() => {
+        timeoutRef.current = setTimeout(() => {
+            query();
+        }, 200);
+    }, [queryParams]);
     useEffect(() => {
         recommends().then((res) => {
             setRecommends(res);
@@ -164,7 +166,6 @@ function MyTemplate() {
         // }
     };
     const timeoutRef = useRef<any>();
-    const [searchSel, setSearchSel] = useState('all');
     return (
         <Box
             style={{
@@ -173,7 +174,7 @@ function MyTemplate() {
                 overflow: 'hidden'
             }}
         >
-            <Row className="mt-4" gutter={[16, 16]}>
+            {/* <Row className="mt-4" gutter={[16, 16]}>
                 <Col span={6}>
                     <TextField
                         color="secondary"
@@ -236,11 +237,19 @@ function MyTemplate() {
                         </span>
                     </div>
                 </Col>
-            </Row>
+            </Row> */}
             <Box display="flex" alignItems="end" mt={2} mb={2}>
                 <Typography variant="h3">{t('apply.recommend')}</Typography>
                 <Typography fontSize="12px" ml={1}>
                     {t('apply.AppDesc')}
+                    <span
+                        className="cursor-pointer text-[#673AB7]"
+                        onClick={() =>
+                            window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/m9bN7RYPWdRDbn2kimo9o77RJZd1wyK0')
+                        }
+                    >
+                        【如何创建应用】
+                    </span>
                 </Typography>
             </Box>
             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
@@ -256,29 +265,49 @@ function MyTemplate() {
                     from={'usableApp_0'}
                 />
             )}
-            {totals > 0 && (
-                <Box>
-                    <div className="flex justify-between items-center">
-                        <div className="text-lg font-bold mt-8 mb-4">我的应用</div>
-                        <Select className="w-[100px]" value={searchSel} onChange={setSearchSel}>
+            <Box>
+                <div className="flex justify-between items-center">
+                    <div className="text-lg font-bold mt-8 mb-4">我的应用</div>
+                    <div className="flex items-center gap-2">
+                        <div className="text-xs whitespace-nowrap">应用名称：</div>
+                        <Input
+                            value={queryParams.name}
+                            onChange={(e) => {
+                                setQueryParams({
+                                    ...queryParams,
+                                    name: e.target.value
+                                });
+                                clearTimeout(timeoutRef.current);
+                            }}
+                        />
+                        <Select
+                            className="w-[100px]"
+                            value={queryParams.searchSel}
+                            onChange={(data) => {
+                                setQueryParams({
+                                    ...queryParams,
+                                    searchSel: data
+                                });
+                            }}
+                        >
                             <Option value="all">所有人</Option>
                             <Option value="myself">由我创建</Option>
                         </Select>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 pb-4">
-                        {appList.map((el: any, index: number) => (
-                            <MarketTemplate
-                                type="APP"
-                                key={el?.uid}
-                                handleDetail={({ uid }: { uid: string }) => {
-                                    navigate('/createApp?uid=' + uid);
-                                }}
-                                data={el}
-                            />
-                        ))}
-                    </div>
-                </Box>
-            )}
+                </div>
+                <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 pb-4">
+                    {appList.map((el: any, index: number) => (
+                        <MarketTemplate
+                            type="APP"
+                            key={el?.uid}
+                            handleDetail={({ uid }: { uid: string }) => {
+                                navigate('/createApp?uid=' + uid);
+                            }}
+                            data={el}
+                        />
+                    ))}
+                </div>
+            </Box>
             <Modal
                 title="创建应用"
                 open={open}

@@ -6,8 +6,17 @@ import { riskword, riskReplace } from 'api/redBook/index';
 import copy from 'clipboard-copy';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import dayjs from 'dayjs';
 import './index.scss';
-const SensitiveWords = ({ wordsOpen, wordsValues }: { wordsOpen?: boolean; wordsValues?: string }) => {
+const SensitiveWords = ({
+    wordsOpen,
+    wordsValues,
+    updateNote
+}: {
+    wordsOpen?: boolean;
+    wordsValues?: string;
+    updateNote?: (data: string) => void;
+}) => {
     //敏感词监测
     const [wordsLoading, setWordsLoading] = useState(false);
     const [wordsValue, setWordsValue] = useState('');
@@ -80,17 +89,27 @@ const SensitiveWords = ({ wordsOpen, wordsValues }: { wordsOpen?: boolean; words
             <div className="text-lg font-[600] mb-6">违禁词检测</div>
             <div className="w-full flex justify-between items-stretch gap-2 h-[452px]">
                 <div className="flex-1">
-                    <Input.TextArea
-                        value={wordsValue}
-                        onChange={(e) => setWordsValue(e.target.value)}
-                        rows={16}
-                        className="text-base whitespace-pre-wrap"
-                    />
-                    <div className="flex justify-end gap-2 mt-2">
-                        <Button onClick={() => setWordsValue('')}>清空内容</Button>
-                        <Button loading={wordsLoading} onClick={handleRiskword} icon={<SearchOutlined />} type="primary">
-                            开始检测
-                        </Button>
+                    <div className="relative h-[auto]">
+                        <Input.TextArea
+                            placeholder="请输入或粘贴需要检测的内容"
+                            value={wordsValue}
+                            onChange={(e) => setWordsValue(e.target.value)}
+                            rows={16}
+                            maxLength={20000}
+                            className="text-base whitespace-pre-wrap max-h-[412px] min-h-[412px]"
+                        />
+                        <div className="text-xs text-[#909399] absolute right-4 bottom-2">{wordsValue?.length || 0}/20000</div>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                        <div className="text-sm text-[#909399] font-[400]">
+                            词库更新日期：{dayjs(new Date().getTime())?.format('YYYY-MM-DD')}
+                        </div>
+                        <div className="flex gap-2">
+                            <Button onClick={() => setWordsValue('')}>清空内容</Button>
+                            <Button loading={wordsLoading} onClick={handleRiskword} icon={<SearchOutlined />} type="primary">
+                                开始检测
+                            </Button>
+                        </div>
                     </div>
                 </div>
                 <div className="w-[1px] bg-[#d9d9d9]"></div>
@@ -149,6 +168,21 @@ const SensitiveWords = ({ wordsOpen, wordsValues }: { wordsOpen?: boolean; words
                         >
                             复制内容
                         </Button>
+                        {wordsValues && (
+                            <Button
+                                disabled={!newWordsRes?.resContent}
+                                onClick={() => {
+                                    updateNote &&
+                                        updateNote(
+                                            newWordsRes?.resContent
+                                                ?.replace(/<span class="(jwy-lowRisk|jwy-topRisk)">([\s\S]*?)<\/span>/g, '$2')
+                                                ?.replace(/<span class="(jwy-lowRisk|jwy-topRisk)">([\s\S]*?)<\/span>/g, '$2')
+                                        );
+                                }}
+                            >
+                                更新笔记
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

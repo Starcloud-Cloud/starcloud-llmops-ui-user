@@ -90,7 +90,7 @@ function MyTemplate() {
             if (newValue.name) {
                 nameMatch = item.name.toLowerCase().includes(newValue.name.toLowerCase());
             }
-            if (newValue.searchSel !== 'all' && allDetail?.allDetail?.id !== item.creator) {
+            if (newValue.searchSel !== 'all' && allDetail?.allDetail?.id?.toString() !== item.creator) {
                 searchSel = false;
             }
             if (newValue.categories) {
@@ -207,7 +207,7 @@ function MyTemplate() {
                     <div className="flex items-center">
                         <div className="text-xs whitespace-nowrap">应用名称：</div>
                         <Input
-                            className="w-[150px]"
+                            className="w-[150px] bg-white"
                             value={queryParams.name}
                             onChange={(e) => {
                                 setQueryParams({

@@ -777,8 +777,10 @@ const Lefts = ({
                 }
             }
         });
-        if (result && result.verificationList?.length > 0) {
-            setErrMessageList(result?.verificationList);
+        console.log(result);
+
+        if (result && result?.data?.verificationList?.length > 0) {
+            setErrMessageList(result?.data?.verificationList);
             setMessageOpen(true);
             return false;
         }

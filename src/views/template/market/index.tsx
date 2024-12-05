@@ -467,7 +467,7 @@ function TemplateMarket() {
                     </div>
                     <Button
                         onClick={() => {
-                            navigate(`/batchSmallRedBook?appUid=${newList[0]?.appList[0]?.uid}`);
+                            setTourOpen(false);
                         }}
                         type="primary"
                         size="small"

@@ -330,7 +330,10 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
         //         </>
         //     )}
         // </div>
-        <div key={item.businessUid} className="overflow-hidden cursor-pointer relative border border-solid border-[#CECAD5] rounded-[16px]">
+        <div
+            key={item.businessUid}
+            className="w-full overflow-hidden cursor-pointer relative border border-solid border-[#CECAD5] rounded-[16px]"
+        >
             {item.status !== 'SUCCESS' ? (
                 <div className="relative">
                     <div className="p-[16px] aspect-[263/351] flex justify-center items-center relative gu">

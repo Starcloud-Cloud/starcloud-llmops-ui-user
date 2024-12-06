@@ -4,4 +4,6 @@
 .addStyle .ant-image-preview-wrap {
     z-index: 99999;
 }
-
+.fengge .ant-checkbox-inner {
+    background: #f5f5f5;
+}

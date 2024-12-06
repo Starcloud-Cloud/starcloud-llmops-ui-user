@@ -30,7 +30,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
-import { PlusOutlined, DeleteOutlined, SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, ExclamationCircleOutlined, DeleteOutlined, SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -798,7 +798,7 @@ const AddStyle = React.forwardRef(
                 </div>
                 <Drawer
                     // zIndex={99999}
-                    title="选择风格模版"
+                    title="选择图片模板"
                     // mask={false}
                     // maskClosable={false}
                     onClose={() => {
@@ -859,7 +859,7 @@ const AddStyle = React.forwardRef(
                                     fontSize: '12px'
                                 }}
                             />
-                            <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款风格模版供您选择</p>
+                            <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款图片模版供您选择</p>
                         </div>
                         {/* <div>
                             {hasAddStyle && (
@@ -875,9 +875,14 @@ const AddStyle = React.forwardRef(
                         </div> */}
                     </div>
                     {/* <Spin spinning={selectImgLoading}> */}
-                    <div className="h-[calc(100% - 60px)]">
+                    <div className="h-[calc(100% - 60px)] fengge">
                         <div className="bg-white p-3">
-                            <span className="text-stone-700 font-semibold">系统风格</span>
+                            <span className="text-stone-700 font-semibold">
+                                系统图片风格
+                                <Tooltip title="勾选想使用的图片模版">
+                                    <ExclamationCircleOutlined className="cursor-pointer ml-2" />
+                                </Tooltip>
+                            </span>
                             <div className="grid gap-4 grid-cols-4 mt-3">
                                 {templateList?.map((item, index) => {
                                     return (
@@ -948,7 +953,12 @@ const AddStyle = React.forwardRef(
                         {hasAddStyle && (
                             <div className="bg-white p-3 mt-2">
                                 <div>
-                                    <span className="text-stone-700 font-semibold">自定义风格</span>
+                                    <span className="text-stone-700 font-semibold">
+                                        自定义图片风格
+                                        <Tooltip title="勾选想使用的图片模版">
+                                            <ExclamationCircleOutlined className="cursor-pointer ml-2" />
+                                        </Tooltip>
+                                    </span>
                                     <div className="grid gap-4 grid-cols-4 mt-3">
                                         {canAddCustomStyle && (
                                             <div
@@ -964,7 +974,7 @@ const AddStyle = React.forwardRef(
                                                             fontSize: '24px'
                                                         }}
                                                     />
-                                                    <span className="mt-3">创建自定义风格</span>
+                                                    <span className="mt-3">创建自定义图片风格</span>
                                                 </div>
                                             </div>
                                         )}
@@ -1163,7 +1173,7 @@ const AddStyle = React.forwardRef(
                     <Modal
                         width={'80%'}
                         open={systemOPen}
-                        title="系统风格模版配置"
+                        title="系统图片模版配置"
                         onCancel={() => {
                             setSystemOPen(false);
                             setSyszanVariable([]);

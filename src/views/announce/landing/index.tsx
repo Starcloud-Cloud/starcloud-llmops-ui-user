@@ -17,6 +17,7 @@ import { useLocation } from 'react-router-dom';
 import CustomizeSection from './CustomizeSection';
 import VideoSection from './VideoSection';
 import { getTenant, ENUM_TENANT } from 'utils/permission';
+
 // import IncludeSection from './IncludeSection';
 //import RtlInfoSection from './RtlInfoSection';
 
@@ -57,56 +58,44 @@ const Landing = () => {
                 <AppBar />
                 <HeaderSection />
             </HeaderWrapper>
-
             {getTenant() === ENUM_TENANT.AI && (
                 <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default', pt: '45px' }}>
                     <VideoSection />
                 </SectionWrapper>
             )}
-
             {/* 2. card section */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <CardSection />
             </SectionWrapper> */}
-
             {/* 4. Developer Experience section */}
-
             {/* 3. about section */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <FeatureSection />
             </SectionWrapper> */}
-
             {/* 4. Apps */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'grey.100' }}>
                 <PreBuildDashBoard />
             </SectionWrapper> */}
-
             {/* 5. people section */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <PeopleSection />
             </SectionWrapper> */}
-
             {/* 6. startup section */}
             {/* <SectionWrapper sx={{ py: 0 }}>
                 <StartupProjectSection />
             </SectionWrapper> */}
-
             {/* multi-language section */}
-
             {/*  <SectionWrapper sx={{ py: 0 }}>
                 <RtlInfoSection />
             </SectionWrapper> */}
-
             {/* framework section */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <FrameworkSection />
             </SectionWrapper> */}
-
             {/* 7. inculde section */}
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'dark.dark' : 'background.default' }}>
                 <IncludeSection />
             </SectionWrapper> */}
-
             {/* footer section */}
             <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', py: 0 }}>
                 <FooterSection />

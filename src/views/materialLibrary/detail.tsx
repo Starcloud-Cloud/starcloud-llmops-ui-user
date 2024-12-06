@@ -51,7 +51,7 @@ import {
 } from 'api/material';
 import { delOwner, publishedList, ownerListList, detailPlug, metadataData } from 'api/redBook/plug';
 import { getMetadata, addPlugConfigInfo, delPlug } from 'api/plug/index';
-import { createBatchMaterial, updateBatchMaterial } from 'api/redBook/material';
+import { createBatchMaterial, updateBatchMaterial, copyMaterial } from 'api/redBook/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -1594,10 +1594,10 @@ const MaterialLibraryDetail = ({
                     dataIndex: 'operation',
                     className: 'align-middle',
                     isDefault: true,
-                    width: 100,
+                    width: 60,
                     fixed: 'right',
                     render: (text: any, record: any, index: number) => (
-                        <div className="flex items-center justify-center">
+                        <div className="flex flex-col items-center justify-center">
                             <Button
                                 type="link"
                                 onClick={async () => {
@@ -1609,6 +1609,15 @@ const MaterialLibraryDetail = ({
                             >
                                 编辑
                             </Button>
+                            <Popconfirm
+                                title="提示"
+                                description="请再次确认是否要复制"
+                                onConfirm={() => handleCopy(record.id)}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button type="link">复制</Button>
+                            </Popconfirm>
                             <Popconfirm
                                 title="提示"
                                 description="请再次确认是否要删除"
@@ -1666,10 +1675,14 @@ const MaterialLibraryDetail = ({
         getTableList(null, page.pageNo);
     }, [forceUpdate]);
 
+    const handleCopy = async (id: string) => {
+        await copyMaterial({ id });
+        setForceUpdate(forceUpdate + 1);
+        message.success('复制成功');
+    };
     const handleDel = async (id: number) => {
         const data = await delMaterialLibrarySlice({ id });
         if (data) {
-            setForceUpdate(forceUpdate + 1);
             message.success('删除成功');
         }
     };

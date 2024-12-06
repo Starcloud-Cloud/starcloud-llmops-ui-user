@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { shareList } from 'api/redBook/batchIndex';
 import Good from '../pages/batchSmallRedBooks/good';
-import { Image, Carousel } from 'antd';
+import { Image, Carousel, Button, QRCode } from 'antd';
 import dayjs from 'dayjs';
 import { DetailModal } from '../pages/redBookContentList/component/detailModal';
 const BatchShare = () => {
@@ -10,6 +10,7 @@ const BatchShare = () => {
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const [detailOpen, setDetailOpen] = useState(false);
+    const [qrOpen, setQrOpen] = useState(false);
     const [businessUid, setBusinessUid] = useState('');
     const [resData, setResData] = useState<any>(undefined);
     const [redList, setRedList] = useState<any[]>([]);
@@ -31,6 +32,11 @@ const BatchShare = () => {
                 <div className="text-xl inline-block align-bottom font-[600]">{resData?.appName}</div>
                 <div className="text-xs inline-block font-[500] mx-2">创建人：{resData?.creator}</div>
                 <div className="text-xs inline-block font-[400]">生成时间：{dayjs(resData?.createTime).format('YYYY-MM-DD HH:mm:ss')}</div>
+                {!/Mobi|Android/i.test(navigator.userAgent) && (
+                    <Button className="ml-2" size="small" type="primary" onClick={() => setQrOpen(!qrOpen)}>
+                        {qrOpen ? '隐藏分享二维码' : '展示分享二维码'}
+                    </Button>
+                )}
             </div>
             {/Mobi|Android/i.test(navigator.userAgent) ? (
                 <div className="grid mt-4 gap-2 grid-cols-2">
@@ -254,7 +260,7 @@ const BatchShare = () => {
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 4xl:grid-cols-8 5xl:grid-cols-9 gap-4 mt-6">
                     {redList?.map((item: any) => (
-                        <div key={item?.businessUid}>
+                        <div key={item?.businessUid} className="flex flex-col gap-2 items-center">
                             <Good
                                 item={item}
                                 setBusinessUid={(data: any) => {
@@ -264,6 +270,7 @@ const BatchShare = () => {
                                 setDetailOpen={setDetailOpen}
                                 show={true}
                             />
+                            {qrOpen && <QRCode value={process.env.REACT_APP_SHARE_URL + '/share?uid=' + item?.uid} />}
                         </div>
                     ))}
                 </div>

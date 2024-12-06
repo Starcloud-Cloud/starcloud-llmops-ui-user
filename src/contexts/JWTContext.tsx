@@ -20,7 +20,7 @@ import { getAccessToken } from 'utils/auth';
 import useUserStore from 'store/user';
 import useAuthorizedStore from 'store/authorize';
 import useRouteStore from 'store/router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // import Dialog from '@mui/material/Dialog';
 // import DialogActions from '@mui/material/DialogActions';
@@ -55,6 +55,7 @@ const JWTContext = createContext<JWTContextType | null>(null);
 
 export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     const location = useLocation();
+    const navigate = useNavigate();
     const [state, dispatch] = useReducer(accountReducer, initialState);
     const isSetUser = useUserStore((states) => states.isSetUser);
     const setUserInfoAction = useUserStore((states) => states.setUserInfoAction);
@@ -190,6 +191,17 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         });
     };
 
+    useEffect(() => {
+        if (
+            /Mobi|Android/i.test(navigator.userAgent) &&
+            location.pathname !== '/batchShare' &&
+            location.pathname !== '/share' &&
+            location.pathname !== '/'
+        ) {
+            navigate('/');
+        }
+    }, []);
+
     const updateProfile = () => {};
 
     //用户信息
@@ -218,7 +230,12 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             setAllDetail(result);
             setPreInvite(preInvite + 1);
         };
-        if (location?.pathname !== '/' && location?.pathname !== '/invite' && location?.pathname !== '/share'&& location?.pathname !== '/batchShare') {
+        if (
+            location?.pathname !== '/' &&
+            location?.pathname !== '/invite' &&
+            location?.pathname !== '/share' &&
+            location?.pathname !== '/batchShare'
+        ) {
             getList();
         }
     }, [pre]);

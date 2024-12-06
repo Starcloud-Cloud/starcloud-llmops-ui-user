@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Button, CardMedia, Container, Grid, Stack, Typography } from '@mui/material';
-import { Image, Divider } from 'antd';
+import { Image } from 'antd';
+import copy from 'clipboard-copy';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 // third party
 import { motion } from 'framer-motion';
@@ -695,21 +698,48 @@ const HeaderSection = () => {
         //         </Grid>
         //     </Grid>
         // </Container>
-        <Box className="flex items-center flex-col" sx={{ mt: { xs: 15, sm: 11, md: 16, lg: 25 }, mb: { xs: 2.5, md: 10 } }}>
+        <Box className="flex items-center flex-col" sx={{ mt: { xs: 18, sm: 11, md: 16, lg: 25 }, mb: { xs: 2.5, md: 10 } }}>
             <div className="px-4 2xl:text-8xl xs:text-2xl sm:text-4xl md:text-6xl text-6xl text-center font-[600]">
                 小红书图文笔记智能创作平台
             </div>
             <div className="px-4 text-[#5b5b66] text-xl xs:text-sm sm:text-base md:text-xl text-center 2xl:my-[40px] my-[30px] sm:my-[20px] xs:my-[20px] md:my-[30px]">
                 利用AI帮助品牌和创作者快速建立自动化和智能化的营销内容生产能力
             </div>
-            <div
-                onClick={() => {
-                    navigate('/appMarket');
-                }}
-                className="flex justify-center items-center  cursor-pointer text-white bg-[#673ab7] px-4 py-2 rounded-md font-[600] leading-[150%] text-[20px] w-[150px] xs:w-[auto] xs:text-sm sm:text-[10px] sm:text-base md:w-[150px] md:text-lg"
-            >
-                开启创作
-            </div>
+            {/Mobi|Android/i.test(navigator.userAgent) ? (
+                <div className="flex flex-col items-center gap-2 text-xs text-black/50">
+                    <Button
+                        onClick={() => {
+                            copy(process.env.REACT_APP_SHARE_URL || '');
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '复制成功',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'success'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    close: false
+                                })
+                            );
+                        }}
+                        variant="contained"
+                        color="secondary"
+                    >
+                        复制网址链接
+                    </Button>
+                    <div>请使用电脑访问以获得更好的操作体验！</div>
+                </div>
+            ) : (
+                <div
+                    onClick={() => {
+                        navigate('/appMarket');
+                    }}
+                    className="flex justify-center items-center  cursor-pointer text-white bg-[#673ab7] px-4 py-2 rounded-md font-[600] leading-[150%] text-[20px] w-[150px] xs:w-[auto] xs:text-sm sm:text-[10px] sm:text-base md:w-[150px] md:text-lg"
+                >
+                    开启创作
+                </div>
+            )}
             <div className="2xl:mt-[100px] mt-[50px] w-full flex flex-self-center overflow-hidden whitespace-nowrap">
                 <div className="flex gap-4 items-center marquee-track">
                     <div className="flex items-center gap-4">

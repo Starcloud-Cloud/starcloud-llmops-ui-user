@@ -490,9 +490,11 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 >
                                                     <Select
                                                         onChange={(e) => {
-                                                            getBotList('accessTokenId', e);
                                                             form.setFieldValue('spaceId', undefined);
-                                                            getSpaceLists(e);
+                                                            if (form.getFieldValue('type') !== 'coze_workflow') {
+                                                                getBotList('accessTokenId', e);
+                                                                getSpaceLists(e);
+                                                            }
                                                         }}
                                                     >
                                                         {accountList?.map((item) => (

@@ -7,3 +7,6 @@
 .fengge .ant-checkbox-inner {
     background: #f5f5f5;
 }
+.fengge .ant-checkbox-checked .ant-checkbox-inner {
+    background: #673ab7;
+}

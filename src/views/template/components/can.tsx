@@ -13,7 +13,7 @@ const Can = ({
     open,
     setOpen,
     popoverWidth,
-    handleMenu,
+    setData,
     index = 0,
     details,
     stepCode
@@ -21,7 +21,7 @@ const Can = ({
     open: boolean;
     setOpen: (data: boolean) => void;
     popoverWidth?: number;
-    handleMenu: (data: any) => void;
+    setData: (data: any) => void;
     index?: number;
     details: any;
     stepCode: string;
@@ -49,18 +49,18 @@ const Can = ({
         });
         return newList;
     }, [details]);
-    const setData = (data: string) => {
-        let newValue = _.cloneDeep(newValues);
-        if (!newValue) {
-            newValue = '';
-        }
-        const part1 = newValue.slice(0, inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
-        const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
-        newValue = `${part1}{{${data}}}${part2}`;
-        setOpen(false);
-        setNewValue(newValue);
-        handleMenu({ index, newValue });
-    };
+    // const setData = (data: string) => {
+    //     let newValue = _.cloneDeep(newValues);
+    //     if (!newValue) {
+    //         newValue = '';
+    //     }
+    //     const part1 = newValue.slice(0, inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
+    //     const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
+    //     newValue = `${part1}{{${data}}}${part2}`;
+    //     setOpen(false);
+    //     setNewValue(newValue);
+    //     handleMenu({ index, newValue });
+    // };
     const [schemaList, setSchemaList] = useState<any[]>([]);
     function getjsonschma(json: any, name?: string, jsonType?: string) {
         const arr: any = [];

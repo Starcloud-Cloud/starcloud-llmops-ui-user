@@ -1,7 +1,7 @@
 import { TextField, MenuItem } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
 import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Select, Input, Tooltip } from 'antd';
-import { PlusOutlined, ArrowsAltOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined, ArrowsAltOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { t } from 'i18next';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,10 +9,12 @@ import { getAccessToken } from 'utils/auth';
 import { verifyJSON, changeJSONValue } from './validaForm';
 import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
 import { materialImport, materialResilt, materialExport, executeTest } from 'api/redBook/batchIndex';
-import { useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { origin_url } from 'utils/axios/config';
 import Can from './can';
+import { useLocation } from 'react-router-dom';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 function FormExecute({
     item,
@@ -35,7 +37,7 @@ function FormExecute({
     setUsePrompt
 }: any) {
     const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
+    const query = new URLSearchParams(location.search);
     const mt = {
         marginTop: 2
     };
@@ -202,8 +204,123 @@ function FormExecute({
 
     const [canOpen, setCanOpen] = useState(false);
 
-    const promptExe = () => {};
+    const promptRef = useRef('');
+    const [customValue, setCustomValue] = useState('');
+    const [promptValue, setPromptValue] = useState('');
 
+    const promptExe = async () => {
+        const newData = _.cloneDeep(details);
+        newData.workflowConfig.steps
+            .find((i: any) => i.field === stepCode)
+            .variable.variables.find((i: any) => item.field === i.field).value = customValue;
+        setCustomLoading(true);
+        const res: any = await executeTest({
+            aiModel: usePrompt,
+            appReqVO: newData,
+            stepId: stepCode,
+            source: query.get('appUid') ? 'MARKET' : 'APP',
+            appUid: query.get('appUid') || query.get('uid')
+        });
+        promptRef.current = '';
+        setPromptValue('');
+        const reader = res.getReader();
+        const textDecoder = new TextDecoder();
+        let outerJoins: any;
+
+        while (1) {
+            let joins = outerJoins;
+            const { done, value } = await reader.read();
+
+            if (done) {
+                setCustomLoading(false);
+                break;
+            }
+            let str = textDecoder.decode(value);
+            const lines = str.split('\n');
+            lines.forEach((message, i: number) => {
+                if (i === 0 && joins) {
+                    message = joins + message;
+                    joins = undefined;
+                }
+                if (i === lines.length - 1) {
+                    if (message && message.indexOf('}') === -1) {
+                        joins = message;
+                        return;
+                    }
+                }
+                let bufferObj;
+                if (message?.startsWith('data:')) {
+                    bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                }
+                if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                    promptRef.current += bufferObj.content;
+                    setPromptValue(promptRef.current);
+                } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: bufferObj.content,
+                            variant: 'alert',
+                            alert: {
+                                color: 'success'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            close: false
+                        })
+                    );
+                } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
+                    dispatch(
+                        openSnackbar({
+                            open: true,
+                            message: t('market.warning'),
+                            variant: 'alert',
+                            alert: {
+                                color: 'error'
+                            },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                            close: false
+                        })
+                    );
+                }
+            });
+        }
+    };
+    useEffect(() => {
+        if (!customOpen) {
+            setPromptValue('');
+        }
+    }, [customOpen]);
+    useEffect(() => {
+        if (handlerCode === 'CustomActionHandler') {
+            setCustomValue(item.value);
+        }
+    }, []);
+    const canRef = useRef<any>();
+    const setData = (data: string) => {
+        let newValue = _.cloneDeep(item.value);
+        if (!newValue) {
+            newValue = '';
+        }
+        const part1 = newValue.slice(0, canRef.current?.resizableTextArea?.textArea?.selectionStart);
+        const part2 = newValue.slice(canRef.current?.resizableTextArea?.textArea?.selectionStart);
+        newValue = `${part1}{{${data}}}${part2}`;
+        setCanOpen(false);
+        onChange({ name: item.field, value: newValue });
+    };
+
+    const cansRef = useRef<any>();
+    const [canOpens, setCanOpens] = useState(false);
+    const setCanData = (data: string) => {
+        let newValue = _.cloneDeep(customValue);
+        if (!newValue) {
+            newValue = '';
+        }
+        const part1 = newValue.slice(0, cansRef.current?.resizableTextArea?.textArea?.selectionStart);
+        const part2 = newValue.slice(cansRef.current?.resizableTextArea?.textArea?.selectionStart);
+        newValue = `${part1}{{${data}}}${part2}`;
+        setCanOpens(false);
+        setCustomValue(newValue);
+    };
     return (
         <>
             {handlerCode === 'CustomActionHandler' && item.style === 'TEXTAREA' ? (
@@ -219,7 +336,6 @@ function FormExecute({
                             <Tooltip title="展开">
                                 <ArrowsAltOutlined
                                     onClick={() => {
-                                        console.log(item);
                                         setCustomOpen(true);
                                         setCustomTitle(item.label);
                                     }}
@@ -229,9 +345,7 @@ function FormExecute({
                             <Can
                                 open={canOpen}
                                 setOpen={setCanOpen}
-                                handleMenu={({ newValue }) => {
-                                    onChange({ name: item.field, value: newValue });
-                                }}
+                                setData={setData}
                                 details={details}
                                 stepCode={stepCode}
                                 index={undefined}
@@ -239,7 +353,7 @@ function FormExecute({
                             />
                         </div>
                     </div>
-                    <Input.TextArea value={item.value} onChange={(e) => onChange(e.target)} rows={8} />
+                    <Input.TextArea ref={canRef} value={item.value} onChange={(e) => onChange(e.target)} rows={8} />
                 </div>
             ) : (handlerCode !== 'OpenAIChatActionHandler' && item.style === 'TEXTAREA') ||
               (handlerCode === 'AssembleActionHandler' && item.field === 'TITLE') ? (
@@ -580,11 +694,9 @@ function FormExecute({
                                     className="w-[120px]"
                                 />
                                 <Can
-                                    open={canOpen}
-                                    setOpen={setCanOpen}
-                                    handleMenu={({ newValue }) => {
-                                        onChange({ name: item.field, value: newValue });
-                                    }}
+                                    open={canOpens}
+                                    setOpen={setCanOpens}
+                                    setData={setCanData}
                                     details={details}
                                     stepCode={stepCode}
                                     index={undefined}
@@ -593,27 +705,30 @@ function FormExecute({
                             </div>
                         </div>
                         <Input.TextArea
-                            value={item.value}
-                            onChange={(e) => onChange(e.target)}
+                            value={customValue}
+                            ref={cansRef}
+                            onChange={(e) => setCustomValue(e.target.value)}
                             className="text-base whitespace-pre-wrap !h-[400px]"
                         />
                         <div className="flex justify-end gap-2 mt-2">
-                            <Button onClick={() => onChange({ name: item.field, value: '' })}>清空内容</Button>
-                            <Button loading={customLoading} onClick={() => {}} icon={<SearchOutlined />} type="primary">
-                                Prompt 生成
+                            <Button loading={customLoading} onClick={promptExe} type="primary">
+                                AI 生成
                             </Button>
                         </div>
                     </div>
                     <div className="flex-1">
                         <div className="h-[25px] mb-2">AI 生成结果</div>
                         <div
-                            // dangerouslySetInnerHTML={{ __html: newWordsRes?.resContent }}
+                            dangerouslySetInnerHTML={{ __html: promptValue }}
                             className="w-full h-[400px] border border-solid border-[#d9d9d9] rounded-lg whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
                         />
                         <div className="flex justify-end gap-2 mt-2">
                             <Button
-                                // disabled={!newWordsRes?.resContent}
-                                onClick={() => {}}
+                                disabled={!customValue}
+                                onClick={() => {
+                                    onChange({ name: item.field, value: customValue });
+                                    setCustomOpen(false);
+                                }}
                                 type="primary"
                             >
                                 插入内容
@@ -627,13 +742,14 @@ function FormExecute({
 }
 const arePropsEqual = (prevProps: any, nextProps: any) => {
     return (
-        JSON.stringify(prevProps?.item) === JSON.stringify(nextProps?.item) &&
-        JSON.stringify(prevProps?.open) === JSON.stringify(nextProps?.open) &&
-        JSON.stringify(prevProps?.columns) === JSON.stringify(nextProps?.columns) &&
-        JSON.stringify(prevProps?.model) === JSON.stringify(nextProps?.model) &&
-        JSON.stringify(prevProps?.details) === JSON.stringify(nextProps?.details) &&
-        JSON.stringify(prevProps?.stepCode) === JSON.stringify(nextProps?.stepCode) &&
-        JSON.stringify(prevProps?.materialValue) === JSON.stringify(nextProps?.materialValue)
+        _.isEqual(prevProps?.item, nextProps?.item) &&
+        _.isEqual(prevProps?.open, nextProps?.open) &&
+        _.isEqual(prevProps?.columns, nextProps?.columns) &&
+        _.isEqual(prevProps?.model, nextProps?.model) &&
+        _.isEqual(prevProps?.details, nextProps?.details) &&
+        _.isEqual(prevProps?.stepCode, nextProps?.stepCode) &&
+        _.isEqual(prevProps?.materialValue, nextProps?.materialValue) &&
+        _.isEqual(prevProps?.usePrompt, nextProps?.usePrompt)
     );
 };
 export default memo(FormExecute, arePropsEqual);

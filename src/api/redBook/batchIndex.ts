@@ -1,4 +1,9 @@
 import request from 'utils/axios';
+import fetch from 'utils/fetch';
+//执行
+export const executeTest = (data: any) => {
+    return fetch('/llm/app/execute/test', 'post', data);
+};
 
 //图片风格列表
 export const imageStyles = () => {
@@ -176,8 +181,4 @@ export const plugChat = (data: any) => {
 //ocr
 export const plugList = (params: any) => {
     return request.get({ url: `llm/coze/temp/chat/result`, params });
-};
-//prompt 生成
-export const executeTest = (params: any) => {
-    return request.get({ url: `/llm/app/execute/test`, params });
 };

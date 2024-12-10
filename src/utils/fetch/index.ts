@@ -24,6 +24,7 @@ export default function fetchRequest(url: string, method: string, body: any, hea
 
         fetch(base_url + url, { ...options, signal })
             .then((response) => {
+                console.log('response', response);
                 clearTimeout(timer); // 请求成功时，清除计时器
                 if (!response.ok) {
                     throw new Error(`Request failed with status ${response.status}`);
@@ -34,7 +35,6 @@ export default function fetchRequest(url: string, method: string, body: any, hea
                 resolve(data);
             })
             .catch((error) => {
-                console.log(error, 'error');
                 clearTimeout(timer); // 请求失败时，清除计时器
                 reject(error);
             });

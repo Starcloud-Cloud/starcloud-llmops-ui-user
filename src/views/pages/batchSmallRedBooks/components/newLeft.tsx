@@ -1450,6 +1450,25 @@ const Lefts = ({
                                                                               setAppDataGen();
                                                                               setAppData(appRef.current);
                                                                           }}
+                                                                          usePrompt={
+                                                                              item?.flowStep?.handler !== 'CustomActionHandler'
+                                                                                  ? undefined
+                                                                                  : item?.flowStep?.variable?.variables?.find(
+                                                                                        (i: any) => i.field === 'model'
+                                                                                    )?.value
+                                                                          }
+                                                                          setUsePrompt={(value: string) => {
+                                                                              const newList = _.cloneDeep(generRef.current);
+                                                                              newList[index].flowStep.variable.variables[
+                                                                                  newList[index].flowStep.variable.variables.findIndex(
+                                                                                      (i: any) => i.field === 'model'
+                                                                                  )
+                                                                              ].value = value;
+                                                                              generRef.current = newList;
+                                                                              setGenerateList(generRef.current);
+                                                                              setAppDataGen();
+                                                                              setAppData(appRef.current);
+                                                                          }}
                                                                       />
                                                                   )}
                                                         </div>

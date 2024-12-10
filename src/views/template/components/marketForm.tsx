@@ -1,4 +1,4 @@
-import { TextField, MenuItem, FormControl, Autocomplete, Chip } from '@mui/material';
+import { TextField, MenuItem } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
 import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Select, Input, Tooltip } from 'antd';
 import { PlusOutlined, ArrowsAltOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getAccessToken } from 'utils/auth';
 import { verifyJSON, changeJSONValue } from './validaForm';
 import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
-import { materialImport, materialResilt, materialExport } from 'api/redBook/batchIndex';
+import { materialImport, materialResilt, materialExport, executeTest } from 'api/redBook/batchIndex';
 import { useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { origin_url } from 'utils/axios/config';
@@ -30,7 +30,9 @@ function FormExecute({
     setMaterialType,
     history,
     materialValue,
-    materialList
+    materialList,
+    usePrompt,
+    setUsePrompt
 }: any) {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -199,6 +201,8 @@ function FormExecute({
     const [customTitle, setCustomTitle] = useState('');
 
     const [canOpen, setCanOpen] = useState(false);
+
+    const promptExe = () => {};
 
     return (
         <>
@@ -414,7 +418,7 @@ function FormExecute({
                         }}
                         notFoundContent={false}
                         dropdownStyle={{ display: 'none' }}
-                        className="w-full h-[51px]"
+                        className="w-full min-h-[51px]"
                         mode="tags"
                         size="large"
                     />
@@ -557,13 +561,24 @@ function FormExecute({
                 </Modal>
             )}
             <Modal width="60%" title={customTitle} open={customOpen} onCancel={() => setCustomOpen(false)} footer={null}>
-                <div className="w-full flex justify-between items-stretch gap-4 h-[486px]">
+                <div className="w-full flex justify-between items-stretch gap-4">
                     <div className="flex-1">
                         <div className="text-xs flex justify-between items-end mb-2">
                             <div>用户提示词</div>
                             <div className="flex gap-2 items-center">
                                 使用大模型：
-                                <Select size="small" className="w-[100px]" />
+                                <Select
+                                    value={usePrompt}
+                                    onChange={setUsePrompt}
+                                    size="small"
+                                    options={[
+                                        { label: '默认模型3.5', value: 'GPT35' },
+                                        { label: '默认模型4.0', value: 'GPT4' },
+                                        { label: '通义千问', value: 'QWEN' },
+                                        { label: '通义千问MAX', value: 'QWEN_MAX' }
+                                    ]}
+                                    className="w-[120px]"
+                                />
                                 <Can
                                     open={canOpen}
                                     setOpen={setCanOpen}
@@ -580,11 +595,10 @@ function FormExecute({
                         <Input.TextArea
                             value={item.value}
                             onChange={(e) => onChange(e.target)}
-                            rows={16}
-                            className="text-base whitespace-pre-wrap"
+                            className="text-base whitespace-pre-wrap !h-[400px]"
                         />
                         <div className="flex justify-end gap-2 mt-2">
-                            <Button onClick={() => {}}>清空内容</Button>
+                            <Button onClick={() => onChange({ name: item.field, value: '' })}>清空内容</Button>
                             <Button loading={customLoading} onClick={() => {}} icon={<SearchOutlined />} type="primary">
                                 Prompt 生成
                             </Button>
@@ -592,12 +606,10 @@ function FormExecute({
                     </div>
                     <div className="flex-1">
                         <div className="h-[25px] mb-2">AI 生成结果</div>
-                        <div className="relative h-[calc(100%-73px)]">
-                            <div
-                                // dangerouslySetInnerHTML={{ __html: newWordsRes?.resContent }}
-                                className="w-full border border-solid border-[#d9d9d9] rounded-lg h-full whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
-                            />
-                        </div>
+                        <div
+                            // dangerouslySetInnerHTML={{ __html: newWordsRes?.resContent }}
+                            className="w-full h-[400px] border border-solid border-[#d9d9d9] rounded-lg whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
+                        />
                         <div className="flex justify-end gap-2 mt-2">
                             <Button
                                 // disabled={!newWordsRes?.resContent}

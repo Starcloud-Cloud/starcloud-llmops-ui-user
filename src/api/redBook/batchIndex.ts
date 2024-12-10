@@ -177,3 +177,7 @@ export const plugChat = (data: any) => {
 export const plugList = (params: any) => {
     return request.get({ url: `llm/coze/temp/chat/result`, params });
 };
+//prompt 生成
+export const executeTest = (params: any) => {
+    return request.get({ url: `/llm/app/execute/test`, params });
+};

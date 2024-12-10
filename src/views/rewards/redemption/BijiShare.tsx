@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { Modal, IconButton, Typography, CardContent, CardMedia, Tooltip, Button, Grid } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
-import wechat1 from 'assets/images/landing/wechat.png';
+import mofabijiwechat from 'assets/images/landing/juzhen/wechat.png';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { openSnackbar } from '../../../store/slices/snackbar';
 import ContentCopyTwoToneIcon from '@mui/icons-material/ContentCopyTwoTone';
@@ -109,7 +109,7 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
                                 {'查看示例 >'}
                             </Typography>
                         </div>
-                        <CardMedia component="img" image={wechat1} alt="img1" sx={{ width: { xs: '30%', sm: '30%', md: '30%' } }} />
+                        <CardMedia component="img" image={mofabijiwechat} alt="img1" sx={{ width: { xs: '30%', sm: '30%', md: '30%' } }} />
 
                         <Typography sx={{ mt: 1 }}>详情加入魔法AI体验群咨询</Typography>
                     </CardContent>

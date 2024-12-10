@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
-import mofabijiwechat from 'assets/images/landing/mofabijiwechat.png';
+import mofabijiwechat from 'assets/images/landing/juzhen/wechat.png';
 import { CardContent, CardMedia } from '@mui/material';
 
 interface CustomModalProps {

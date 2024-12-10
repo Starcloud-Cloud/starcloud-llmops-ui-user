@@ -557,9 +557,9 @@ function FormExecute({
                 </Modal>
             )}
             <Modal width="60%" title={customTitle} open={customOpen} onCancel={() => setCustomOpen(false)} footer={null}>
-                <div className="w-full flex justify-between items-stretch gap-2 h-[452px]">
+                <div className="w-full flex justify-between items-stretch gap-4 h-[486px]">
                     <div className="flex-1">
-                        <div className="text-xs flex justify-between items-end">
+                        <div className="text-xs flex justify-between items-end mb-2">
                             <div>用户提示词</div>
                             <div className="flex gap-2 items-center">
                                 使用大模型：
@@ -590,9 +590,9 @@ function FormExecute({
                             </Button>
                         </div>
                     </div>
-                    <div className="w-[1px] bg-[#d9d9d9]"></div>
                     <div className="flex-1">
-                        <div className="relative h-[calc(100%-40px)]">
+                        <div className="h-[25px] mb-2">AI 生成结果</div>
+                        <div className="relative h-[calc(100%-73px)]">
                             <div
                                 // dangerouslySetInnerHTML={{ __html: newWordsRes?.resContent }}
                                 className="w-full border border-solid border-[#d9d9d9] rounded-lg h-full whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
@@ -601,20 +601,7 @@ function FormExecute({
                         <div className="flex justify-end gap-2 mt-2">
                             <Button
                                 // disabled={!newWordsRes?.resContent}
-                                onClick={() => {
-                                    // dispatch(
-                                    //     openSnackbar({
-                                    //         open: true,
-                                    //         message: '复制成功',
-                                    //         variant: 'alert',
-                                    //         alert: {
-                                    //             color: 'success'
-                                    //         },
-                                    //         close: false,
-                                    //         anchorOrigin: { vertical: 'top', horizontal: 'center' }
-                                    //     })
-                                    // );
-                                }}
+                                onClick={() => {}}
                                 type="primary"
                             >
                                 插入内容

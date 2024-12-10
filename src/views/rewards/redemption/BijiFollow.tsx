@@ -1,11 +1,9 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { CardContent, CardMedia, IconButton, Modal, Typography } from '@mui/material';
-import douyin from 'assets/images/landing/douyin.png';
-import mofabijiwechat from 'assets/images/landing/mofabijiwechat.png';
+import mofabijiwechat from 'assets/images/landing/juzhen/wechat.png';
+import redbook from 'assets/images/landing/juzhen/redbook.jpg';
 import MainCard from 'ui-component/cards/MainCard';
 import { Popover } from 'antd';
-import workWechatPay from 'assets/images/landing/work_wechat_pay.png';
-import sph from 'assets/images/pages/sph.jpg';
 
 interface ShareProps {
     open: boolean;
@@ -15,15 +13,9 @@ interface ShareProps {
 const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
     const socialPlatforms = [
         {
-            name: '视频号',
-            // link: 'https://www.xiaohongshu.com/user/profile/630d7122000000000f0056da',
-            link: '',
-            image: sph
-        },
-        {
-            name: '官方抖音账号',
+            name: '官方小红书账号',
             link: 'https://www.douyin.com/user/MS4wLjABAAAAr50QU2RZbGT7mWYL66Sex9dN988l3Nc0R5v3ZpM3RPx0Rc06U0RQkbAa-9MhnqPw',
-            image: douyin
+            image: redbook
         }
     ];
 
@@ -102,14 +94,14 @@ const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
                                         alt={platform.name}
                                         sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }}
                                     />
-                                    <Typography variant="h6" component="h3">
+                                    <Typography mt={1} variant="h6" component="h3">
                                         {platform.name}
                                     </Typography>
                                 </div>
                             ))}
                         </div>
 
-                        <Typography sx={{ mt: 1 }}>详情加入魔法AI体验群咨询</Typography>
+                        <Typography sx={{ mt: 1 }}>详情加入魔法笔记体验群咨询</Typography>
                     </CardContent>
                 </MainCard>
             </div>

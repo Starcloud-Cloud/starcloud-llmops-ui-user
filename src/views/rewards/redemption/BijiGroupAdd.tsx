@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
-import mofabijiwechat from 'assets/images/landing/mofabijiwechat.png';
+import mofabijiwechat from 'assets/images/landing/juzhen/wechat.png';
 import { CardContent, CardMedia } from '@mui/material';
 
 interface CustomModalProps {
@@ -59,10 +59,7 @@ const GroupAdd: React.FC<CustomModalProps> = ({ open, handleClose }) => {
                     >
                         <CardMedia component="img" image={mofabijiwechat} alt="img1" sx={{ width: { xs: '80%', sm: '80%', md: '80%' } }} />
                         <Typography id="modal-description" variant="body1" sx={{ mt: 2 }}>
-                            扫码加入用户群，可获取基础免费权益包
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 2 }}>
-                            送50魔法豆
+                            扫码加入用户群，可获取基础免费权益兑换码
                         </Typography>
                     </CardContent>
                 </MainCard>

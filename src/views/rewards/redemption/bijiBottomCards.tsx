@@ -34,19 +34,19 @@ const BijiBottomCards: React.FC = () => {
         {
             title: '方法一',
             subtitle: '加入社群',
-            description: '加入魔法笔记官方社群即可获得相应权益包',
+            description: '加入魔法笔记官方社群即可获得相应权益兑换码',
             buttonText: '点击加入',
             Icon: GroupAddIcon,
-            endText: '送 50 魔法豆',
+            endText: '送 10 魔法豆',
             onClick: handleOpenGroupAdd
         },
         {
             title: '方法二',
             subtitle: '社媒分享',
-            description: '注册一位获取一个权益包，无上限，发送链接邀请注册。每邀请三个获取额外权益包（联系客服）',
+            description: '分享一次送一次，无上限,社交媒体发布测评，截图认证可获取权益兑换码',
             buttonText: '点击参加',
             Icon: ShareIcon,
-            endText: '送50魔法豆',
+            endText: '送10魔法豆',
             onClick: handleOpenShare
         },
         {
@@ -55,17 +55,16 @@ const BijiBottomCards: React.FC = () => {
             description: '需要什么图片模板?哪些模板不满意？您的建议是我们改进的动力。',
             buttonText: '点击参加',
             Icon: PollIcon,
-            endText: '送50魔法豆',
-            onClick: () => window.open('http://ov9t0w4iwaq9xq9l.mikecrm.com/OX02r3z', '_blank')
+            endText: '送10魔法豆',
+            onClick: () => window.open('http://www.mofabiji.com', '_blank')
         },
         {
             title: '方法四',
             subtitle: '关注 魔法笔记',
-            description:
-                '关注魔法笔记的官方小红书，公共号，后台私信发送 "mofabiji" ，即可获取权益兑换码。如有问题请加入魔法笔记 微信群联系运营人员。',
+            description: '关注魔法笔记的官方小红书，后台私信发送 "mofabiji" ，即可获取权益兑换码',
             buttonText: '点击参加',
             Icon: ShareIcon,
-            endText: '',
+            endText: '送10魔法豆',
             onClick: handleOpenFollow
         }
     ];

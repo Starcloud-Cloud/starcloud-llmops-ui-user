@@ -43,7 +43,7 @@ const BijiBottomCards: React.FC = () => {
         {
             title: '方法二',
             subtitle: '社媒分享',
-            description: '分享一次送一次，无上限,社交媒体发布测评，截图认证可获取权益兑换码',
+            description: '分享社交媒体发布测评，截图认证可获取权益兑换码',
             buttonText: '点击参加',
             Icon: ShareIcon,
             endText: '送10魔法豆',

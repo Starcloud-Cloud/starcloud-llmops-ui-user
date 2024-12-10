@@ -415,7 +415,7 @@ function FormExecute({
                             }}
                             notFoundContent={false}
                             dropdownStyle={{ display: 'none' }}
-                            className="w-full min-h-[51px]"
+                            className="w-full min-h-[51px] !text-sm"
                             mode="tags"
                             size="large"
                         />

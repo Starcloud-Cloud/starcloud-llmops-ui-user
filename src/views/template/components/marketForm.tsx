@@ -559,6 +559,24 @@ function FormExecute({
             <Modal width="60%" title={customTitle} open={customOpen} onCancel={() => setCustomOpen(false)} footer={null}>
                 <div className="w-full flex justify-between items-stretch gap-2 h-[452px]">
                     <div className="flex-1">
+                        <div className="text-xs flex justify-between items-end">
+                            <div>用户提示词</div>
+                            <div className="flex gap-2 items-center">
+                                使用大模型：
+                                <Select size="small" className="w-[100px]" />
+                                <Can
+                                    open={canOpen}
+                                    setOpen={setCanOpen}
+                                    handleMenu={({ newValue }) => {
+                                        onChange({ name: item.field, value: newValue });
+                                    }}
+                                    details={details}
+                                    stepCode={stepCode}
+                                    index={undefined}
+                                    popoverWidth={popoverWidth}
+                                />
+                            </div>
+                        </div>
                         <Input.TextArea
                             value={item.value}
                             onChange={(e) => onChange(e.target)}

@@ -35,7 +35,7 @@ const Redemption = () => {
             ) : (
                 <>
                     <InviteMatrix />
-                    {/* <BijibottomCards /> */}
+                    <BijibottomCards />
                 </>
             )}
         </Grid>

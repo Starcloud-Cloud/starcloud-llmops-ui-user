@@ -412,7 +412,9 @@ function TemplateMarket() {
                         查看详细的
                         <span
                             onClick={() =>
-                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                                window.open(
+                                    'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/Qnp9zOoBVBnOkGgbfyGvEAkEV1DK0g6l?dontjump=true'
+                                )
                             }
                             className="cursor-pointer font-[500] text-[#673ab7]"
                         >
@@ -432,7 +434,9 @@ function TemplateMarket() {
                         查看详细的
                         <span
                             onClick={() =>
-                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                                window.open(
+                                    'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/Qnp9zOoBVBnOkGgbfyGvEAkEV1DK0g6l?dontjump=true'
+                                )
                             }
                             className="cursor-pointer font-[500] text-[#673ab7]"
                         >
@@ -452,7 +456,9 @@ function TemplateMarket() {
                         查看详细的
                         <span
                             onClick={() =>
-                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                                window.open(
+                                    'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/Qnp9zOoBVBnOkGgbfyGvEAkEV1DK0g6l?dontjump=true'
+                                )
                             }
                             className="cursor-pointer font-[500] text-[#673ab7]"
                         >
@@ -461,7 +467,7 @@ function TemplateMarket() {
                     </div>
                     <Button
                         onClick={() => {
-                            navigate(`/batchSmallRedBook?appUid=${newList[0]?.appList[0]?.uid}`);
+                            setTourOpen(false);
                         }}
                         type="primary"
                         size="small"
@@ -520,8 +526,8 @@ function TemplateMarket() {
                     <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-36px)] overflow-x-hidden overflow-y-scroll">
                         {newList?.map((item, index) => (
                             <div key={index}>
-                                {item.appList?.length > 0 && item?.code !== 'HOT' && (
-                                    <div style={{ marginTop: index === 0 ? 0 : '16px' }} className="flex justify-between items-center mb-4">
+                                {item.appList?.length > 0 && (
+                                    <div className="flex justify-between items-center my-4">
                                         <div className="flex items-center gap-2">
                                             <img height="20px" src={getImage(item.icon)} alt="" />
                                             <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
@@ -542,7 +548,7 @@ function TemplateMarket() {
                                         )}
                                     </div>
                                 )}
-                                {item.appList.length > 0 && item?.code !== 'HOT' && (
+                                {item.appList.length > 0 && (
                                     <Row
                                         className="overflow-x-hidden pb-[5px]"
                                         style={{
@@ -560,119 +566,9 @@ function TemplateMarket() {
                                             </Col>
                                         ))}
                                     </Row>
-                                    // <div
-                                    //     className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 grid-rows-2"
-                                    //     // style={{
-                                    //     //     height: queryParams.category === 'ALL' ? '190px' : 'auto',
-                                    //     //     overflowY: queryParams.category === 'ALL' ? 'hidden' : 'visible',
-                                    //     //     paddingBottom: queryParams.category === 'ALL' ? '0px' : '10px'
-                                    //     // }}
-                                    // >
-                                    //     {item.appList.map((el: any, index: number) => (
-                                    //         <MarketTemplate
-                                    //             like="market"
-                                    //             type="MARKET"
-                                    //             key={el?.uid}
-                                    //             handleDetail={handleDetail}
-                                    //             data={el}
-                                    //         />
-                                    //     ))}
-                                    // </div>
                                 )}
                             </div>
                         ))}
-                    </div>
-                </Tabs.TabPane>
-                {/* {getTenant() !== ENUM_TENANT.AI && (
-                    <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">我的应用</div>} key="1">
-                        <div className="relative">
-                            <div
-                                className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                                style={{
-                                    height: '190px',
-                                    overflowY: 'hidden'
-                                }}
-                            >
-                                <div
-                                    className="rounded-[12px] shadow-md border border-solid border-[transparent] hover:border-[#CECAD5] cursor-pointer h-[185px] bg-white p-4 flex gap-2 justify-center items-center flex-col"
-                                    onClick={() => navigate('/my-app')}
-                                >
-                                    <PlusOutlined className="text-[30px]" />
-                                    <div className="text-black/60 text-[14px]">找不到合适的？ 创建新应用</div>
-                                </div>
-                                {myAppList.map((el: any, index: number) => (
-                                    <MarketTemplate
-                                        type="APP"
-                                        key={el?.uid}
-                                        handleDetail={({ uid }: { uid: string }) => {
-                                            navigate('/createApp?uid=' + uid + '&source=market');
-                                        }}
-                                        data={el}
-                                    />
-                                ))}
-                            </div>
-                            {myAppList.length > 0 && (
-                                <div
-                                    onClick={() => {
-                                        navigate('/my-app');
-                                    }}
-                                    className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
-                                >
-                                    更多应用
-                                    <RightOutlined />
-                                </div>
-                            )}
-                        </div>
-                    </Tabs.TabPane>
-                )} */}
-                {newList?.some((item) => item?.code === 'HOT') && (
-                    <Tabs.TabPane
-                        tab={
-                            <div className="!text-[16px] !line-[25px] font-bold flex items-end gap-2">
-                                <img height="20px" src={getImage(newList?.find((item) => item?.code === 'HOT')?.icon)} alt="" />
-                                <span>{newList?.find((item) => item?.code === 'HOT')?.name}</span>
-                            </div>
-                        }
-                        key="2"
-                    >
-                        <div
-                            style={{
-                                minHeight: '190px'
-                            }}
-                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                        >
-                            {newList
-                                ?.find((item) => item?.code === 'HOT')
-                                ?.appList.map((el: any, index: number) => (
-                                    <MarketTemplate type="APP" like="market" key={el?.uid} handleDetail={handleDetail} data={el} />
-                                ))}
-                        </div>
-                    </Tabs.TabPane>
-                )}
-                <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">我的收藏</div>} key="3">
-                    <div className="relative">
-                        <div
-                            style={{
-                                height: '190px',
-                                overflowY: 'hidden'
-                            }}
-                            className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8"
-                        >
-                            {collectList.map((el: any, index: number) => (
-                                <MarketTemplate type="APP" key={el?.uid} handleDetail={handleDetail} data={el} />
-                            ))}
-                        </div>
-                        {collectList.length > 0 && (
-                            <div
-                                onClick={() => {
-                                    navigate('/collect');
-                                }}
-                                className="absolute right-0 top-[-35px] text-[#673ab7] cursor-pointer"
-                            >
-                                更多收藏
-                                <RightOutlined />
-                            </div>
-                        )}
                     </div>
                 </Tabs.TabPane>
             </Tabs>

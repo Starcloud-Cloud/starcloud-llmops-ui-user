@@ -1,4 +1,4 @@
-import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar, Switch, Image } from 'antd';
+import { Input, Select, Button, Table, message, Collapse, Popover, Space, Tag, Form, Avatar, Switch, Image, Tabs } from 'antd';
 const { Option } = Select;
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { QuestionCircleOutlined, HistoryOutlined, AppstoreFilled, CaretRightOutlined } from '@ant-design/icons';
@@ -461,6 +461,7 @@ const PlugAnalysis = ({
                     <QuestionCircleOutlined className="ml-1 cursor-pointer" />
                 </Popover>
             </div>
+            {/* <Tabs /> */}
             <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
                 {redBookData.requirement?.map((item: any) =>
                     item.variableType === 'String' ? (

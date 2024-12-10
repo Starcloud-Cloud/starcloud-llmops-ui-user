@@ -444,27 +444,32 @@ const Profilnew = () => {
                                     },
                                     actions: {
                                         render: (text, row) => [
-                                            <Popconfirm
-                                                title="提示"
-                                                description="确认删除?"
-                                                onConfirm={() => handleDelete(row)}
-                                                okText="是"
-                                                cancelText="否"
-                                            >
-                                                <AntBtn danger type="text">
-                                                    删除
-                                                </AntBtn>
-                                            </Popconfirm>,
-                                            <AntBtn
-                                                type="text"
-                                                onClick={() => {
-                                                    setId(row.id);
-                                                    setNameValue(row.nickname);
-                                                    setOpen(true);
-                                                }}
-                                            >
-                                                编辑
-                                            </AntBtn>
+                                            <div className="flex flex-col items-center">
+                                                <div>
+                                                    <Popconfirm
+                                                        title="提示"
+                                                        description="确认删除?"
+                                                        onConfirm={() => handleDelete(row)}
+                                                        okText="是"
+                                                        cancelText="否"
+                                                    >
+                                                        <AntBtn danger type="link">
+                                                            删除
+                                                        </AntBtn>
+                                                    </Popconfirm>
+                                                    <AntBtn
+                                                        type="link"
+                                                        onClick={() => {
+                                                            setId(row.id);
+                                                            setNameValue(row.nickname);
+                                                            setOpen(true);
+                                                        }}
+                                                    >
+                                                        编辑
+                                                    </AntBtn>
+                                                </div>
+                                                <div className="text-xs text-[#000]">创建人：{row.createName}</div>
+                                            </div>
                                         ],
                                         search: false
                                     }

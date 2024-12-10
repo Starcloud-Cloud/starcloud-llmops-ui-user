@@ -31,7 +31,7 @@ import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
 import { appModify } from 'api/template';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -1062,7 +1062,7 @@ const AddStyleApp = React.forwardRef(
                 );
             });
         };
-
+        const [selModal, setSelModal] = useState<any>('');
         return (
             <div className="addStyle">
                 <div className="flex justify-between items-end">
@@ -1229,7 +1229,7 @@ const AddStyleApp = React.forwardRef(
                 </div>
                 <Drawer
                     // zIndex={99999}
-                    title="选择风格模版"
+                    title="选择图片模板"
                     // mask={false}
                     // maskClosable={false}
                     onClose={() => {
@@ -1290,7 +1290,7 @@ const AddStyleApp = React.forwardRef(
                                     fontSize: '12px'
                                 }}
                             />
-                            <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款风格模版供您选择</p>
+                            <p className="text-xs">系统根据您的创作笔记类型，为您找到了{templateList?.length || 0}款图片模版供您选择</p>
                         </div>
                         {/* <div>
                             {hasAddStyle && (
@@ -1306,9 +1306,14 @@ const AddStyleApp = React.forwardRef(
                         </div> */}
                     </div>
                     <Spin spinning={selectImgLoading}>
-                        <div className="h-[calc(100% - 60px)]">
+                        <div className="h-[calc(100% - 60px)] fengge">
                             <div className="bg-white p-3">
-                                <span className="text-stone-700 font-semibold">系统风格</span>
+                                <span className="text-stone-700 font-semibold">
+                                    系统图片风格
+                                    <Tooltip title="勾选想使用的图片模版">
+                                        <ExclamationCircleOutlined className="cursor-pointer ml-2" />
+                                    </Tooltip>
+                                </span>
                                 <div className="grid gap-4 grid-cols-4 mt-3">
                                     {templateList?.map((item, index) => {
                                         return (
@@ -1383,13 +1388,33 @@ const AddStyleApp = React.forwardRef(
                             {hasAddStyle && (
                                 <div className="bg-white p-3 mt-2">
                                     <div>
-                                        <span className="text-stone-700 font-semibold">自定义风格</span>
+                                        <span className="text-stone-700 font-semibold">
+                                            自定义图片风格
+                                            <Tooltip title="勾选想使用的图片模版">
+                                                <ExclamationCircleOutlined className="cursor-pointer ml-2" />
+                                            </Tooltip>
+                                        </span>
                                         <div className="grid gap-4 grid-cols-4 mt-3">
                                             <div
                                                 className={`flex overflow-x-auto cursor-pointer w-full outline outline-offset-2 outline-1 outline-[#ccc] rounded-sm relative  h-[200px]`}
                                                 onClick={() => {
                                                     setAddType(1);
                                                     setIsModalOpen(true);
+                                                    const fristuid = uuidv4()?.split('-')?.join('');
+                                                    setCurrentStyle({
+                                                        ...currentStyle,
+                                                        name: '自定义模版' + (customList?.length + 1),
+                                                        templateList: [
+                                                            {
+                                                                key: '1',
+                                                                name: '图片 1',
+                                                                model: '',
+                                                                uuid: fristuid,
+                                                                variableList: []
+                                                            }
+                                                        ]
+                                                    });
+                                                    setSelModal(fristuid);
                                                 }}
                                             >
                                                 <div className="flex flex-col justify-center items-center w-full h-[200px]">
@@ -1398,7 +1423,7 @@ const AddStyleApp = React.forwardRef(
                                                             fontSize: '24px'
                                                         }}
                                                     />
-                                                    <span className="mt-3">创建自定义风格</span>
+                                                    <span className="mt-3">创建自定义图片风格</span>
                                                 </div>
                                             </div>
                                             {customList?.map((item, index) => {
@@ -1547,6 +1572,8 @@ const AddStyleApp = React.forwardRef(
                         </div>
 
                         <StyleTabs
+                            selModal={selModal}
+                            setSelModal={setSelModal}
                             schemaList={[]}
                             imageStyleData={currentStyle?.templateList || [{ id: '', name: `图片 1`, model: '', key: 1, variableList: [] }]}
                             typeList={[]}

@@ -250,7 +250,7 @@ export const PicImagePick = ({
     };
 
     return (
-        <Modal width={1000} title="图片选择" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <Modal width={'80%'} title="图片选择" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <Search
                 placeholder="请输入搜索的图片"
                 enterButton
@@ -422,7 +422,7 @@ export const PicImagePick = ({
                 {hits.length ? (
                     <Spin spinning={loading}>
                         <div className="min-h-[300px]">
-                            <Masonry columnsCount={4}>
+                            <Masonry columnsCount={6}>
                                 {hits.map((item: any, index: number) => (
                                     <div className="mx-2 my-2 relative" key={index}>
                                         <Checkbox

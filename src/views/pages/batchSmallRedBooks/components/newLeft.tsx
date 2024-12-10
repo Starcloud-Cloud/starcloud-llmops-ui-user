@@ -762,7 +762,7 @@ const Lefts = ({
             .variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = data;
         const newData =
             imageRef.current?.record?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value || '[]';
-        await appModify({
+        const result: any = await appModify({
             ...detail,
             e: 2,
             workflowConfig: {
@@ -777,6 +777,13 @@ const Lefts = ({
                 }
             }
         });
+        console.log(result);
+
+        if (result && result?.data?.verificationList?.length > 0) {
+            setErrMessageList(result?.data?.verificationList);
+            setMessageOpen(true);
+            return false;
+        }
         dispatch(
             openSnackbar({
                 open: true,
@@ -912,7 +919,9 @@ const Lefts = ({
                         查看详细的
                         <span
                             onClick={() =>
-                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                                window.open(
+                                    'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/Qnp9zOoBVBnOkGgbfyGvEAkEV1DK0g6l?dontjump=true'
+                                )
                             }
                             className="cursor-pointer font-[500] text-[#673ab7]"
                         >
@@ -932,7 +941,9 @@ const Lefts = ({
                         查看详细的
                         <span
                             onClick={() =>
-                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                                window.open(
+                                    'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/Qnp9zOoBVBnOkGgbfyGvEAkEV1DK0g6l?dontjump=true'
+                                )
                             }
                             className="cursor-pointer font-[500] text-[#673ab7]"
                         >
@@ -954,7 +965,9 @@ const Lefts = ({
                         查看详细的
                         <span
                             onClick={() =>
-                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                                window.open(
+                                    'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/Qnp9zOoBVBnOkGgbfyGvEAkEV1DK0g6l?dontjump=true'
+                                )
                             }
                             className="cursor-pointer font-[500] text-[#673ab7]"
                         >
@@ -974,7 +987,9 @@ const Lefts = ({
                         查看详细的
                         <span
                             onClick={() =>
-                                window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/6LeBq413JAmaNpD0SyKaQDdZJDOnGvpb')
+                                window.open(
+                                    'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/Qnp9zOoBVBnOkGgbfyGvEAkEV1DK0g6l?dontjump=true'
+                                )
                             }
                             className="cursor-pointer font-[500] text-[#673ab7]"
                         >

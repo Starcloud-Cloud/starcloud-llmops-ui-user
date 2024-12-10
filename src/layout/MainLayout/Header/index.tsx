@@ -80,8 +80,14 @@ const Header = () => {
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         const currentData = firstMenu[newValue];
-        navigate(currentData.path);
-        setRoutesIndex(newValue);
+        const reg =
+            /(((^https?:(?:\/\/)?)(?:[-:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&%@.\w_]*)#?(?:[\w]*))?)$/;
+        if (reg.test(currentData.path)) {
+            window.open(currentData.path);
+        } else {
+            navigate(currentData.path);
+            setRoutesIndex(newValue);
+        }
     };
 
     useEffect(() => {
@@ -321,6 +327,8 @@ const Header = () => {
                                         sx={{ width: '100%' }}
                                     />
                                 </Box>
+                                <div className="text-xs my-2">进群享受内测500篇笔记的生成额度</div>
+                                <div className="text-xs">使用反馈还有赠送哦！</div>
                             </Box>
                         </Box>
                     }
@@ -335,7 +343,7 @@ const Header = () => {
                     >
                         <QrCode2Icon />
                         <Typography sx={{ whiteSpace: 'nowrap' }} ml={1}>
-                            魔法笔记AI工具群
+                            魔法笔记交流群
                         </Typography>
                         <KeyboardArrowDownIcon />
                     </Box>

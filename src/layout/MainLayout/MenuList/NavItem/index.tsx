@@ -104,12 +104,23 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
     if (item.target) {
         itemTarget = '_blank';
     }
+    const reg =
+        /(((^https?:(?:\/\/)?)(?:[-:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&%@.\w_]*)#?(?:[\w]*))?)$/;
+    console.log(item);
 
     let listItemProps: {
         component: ForwardRefExoticComponent<RefAttributes<HTMLAnchorElement>> | string;
         href?: string;
         target?: LinkTarget;
-    } = { component: forwardRef((props, ref) => <Link ref={ref} {...props} to={item.url!} target={itemTarget} />) };
+    } = {
+        component: forwardRef((props, ref) =>
+            reg.test(item.url) ? (
+                <Link target="_blank" ref={ref} {...props} to={item.url!} />
+            ) : (
+                <Link ref={ref} {...props} to={item.url!} target={itemTarget} />
+            )
+        )
+    };
     if (item?.external) {
         listItemProps = { component: 'a', href: item.url, target: itemTarget };
     }
@@ -206,7 +217,6 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
                             {itemIcon}
                         </ListItemIcon>
                     </ButtonBase>
-
                     {(drawerOpen || (!drawerOpen && level !== 1)) && (
                         <ListItemText
                             primary={

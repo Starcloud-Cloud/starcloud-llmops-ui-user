@@ -477,6 +477,9 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
         }
     };
     const [fileList, setfileList] = useState<any[]>([]);
+    useEffect(() => {
+        console.log(fileList);
+    }, [fileList]);
     const props: UploadProps = {
         name: 'image',
         multiple: true,

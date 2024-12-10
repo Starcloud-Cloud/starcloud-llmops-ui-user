@@ -231,7 +231,6 @@ const NavGroup = ({ item, lastItem, remItems, lastItemId }: NavGroupProps) => {
                                                     )}
                                                 </div>
                                             )}
-
                                             {currentItem.caption && (
                                                 <Typography
                                                     variant="caption"

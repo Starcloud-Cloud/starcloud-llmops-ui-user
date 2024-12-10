@@ -40,7 +40,13 @@ const ResultLoading = ({
     handleCancel: () => void;
 }) => {
     return (
-        <Modal width={'80%'} open={materialExecutionOpen} onCancel={() => setMaterialExecutionOpen(false)} footer={false}>
+        <Modal
+            title="笔记素材智能生成"
+            width={'80%'}
+            open={materialExecutionOpen}
+            onCancel={() => setMaterialExecutionOpen(false)}
+            footer={false}
+        >
             <div className="flex justify-center ">
                 <Progress percent={materialPre} type="circle" />
             </div>

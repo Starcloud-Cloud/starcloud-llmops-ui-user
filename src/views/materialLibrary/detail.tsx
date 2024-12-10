@@ -51,7 +51,7 @@ import {
 } from 'api/material';
 import { delOwner, publishedList, ownerListList, detailPlug, metadataData } from 'api/redBook/plug';
 import { getMetadata, addPlugConfigInfo, delPlug } from 'api/plug/index';
-import { createBatchMaterial, updateBatchMaterial } from 'api/redBook/material';
+import { createBatchMaterial, updateBatchMaterial, copyMaterial } from 'api/redBook/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -1159,7 +1159,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     setMaterialflag && setMaterialflag(false);
                 }}
                 footer={false}
-                title="绑定插件"
+                title="应用插件"
             >
                 <div className="flex justify-end mb-4">
                     <Button
@@ -1173,114 +1173,204 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         绑定插件
                     </Button>
                 </div>
-                {definitionList?.length > 0 ? (
-                    <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
-                        {definitionList?.map((el: any) => {
-                            return (
-                                <div
-                                    style={{
-                                        display: materialflag && el.scene === 'DATA_ADDED' ? 'block' : !materialflag ? 'block' : 'none'
-                                    }}
-                                    onClick={() => handleOpenPlug(el)}
-                                    className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
-                                    key={el.uid}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        {el.avatar ? (
-                                            <Avatar shape="square" size={64} src={el.avatar} />
-                                        ) : (
-                                            <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
-                                        )}
-                                        <div className="flex-1">
-                                            <div className="text-[18px]  line-clamp-1 font-bold flex items-center gap-2">
-                                                {el.bindName}
-                                                {el.jobEnable && (
-                                                    <Tooltip title="定时执行已开启">
-                                                        <HistoryOutlined className="text-[#673ab7]" />
-                                                    </Tooltip>
-                                                )}
-                                            </div>
-                                            <div className="line-clamp-2 h-[44px]">{el.description}</div>
-                                        </div>
-                                    </div>
-                                    {el?.systemPlugin && <Tag color="processing">官方插件</Tag>}
-                                    <Divider className="my-2" />
-                                    <div className="flex justify-between text-xs">
-                                        <div className="flex">{wayList.find((item) => item.value === el.type)?.label}</div>
-                                        <div className="flex">{el.creator}</div>
-                                    </div>
-                                    {!el?.systemPlugin && (
-                                        <Popconfirm
-                                            title="提示"
-                                            description="请再次确认是否删除？"
-                                            onConfirm={async (e: any) => {
-                                                e.stopPropagation();
-                                                try {
-                                                    await delPlug(el.configUid);
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '删除成功',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'success'
-                                                            },
-                                                            close: false,
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            transition: 'SlideDown'
-                                                        })
-                                                    );
-                                                    setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
-                                                } catch (err) {}
-                                            }}
-                                            onCancel={(e) => e?.stopPropagation()}
-                                            okText="Yes"
-                                            cancelText="No"
-                                        >
-                                            <DeleteOutlined
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                }}
-                                                className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
-                                            />
-                                        </Popconfirm>
+                <div className="w-full grid justify-content-center gap-4 responsive-list-container md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-5 5xl:grid-cols-6">
+                    {definitionList?.map((el: any) => {
+                        return (
+                            <div
+                                style={{
+                                    display: materialflag && el.scene === 'DATA_ADDED' ? 'block' : !materialflag ? 'block' : 'none'
+                                }}
+                                onClick={() => handleOpenPlug(el)}
+                                className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                                key={el.uid}
+                            >
+                                <div className="flex items-center gap-4">
+                                    {el.avatar ? (
+                                        <Avatar shape="square" size={64} src={el.avatar} />
+                                    ) : (
+                                        <Avatar shape="square" size={64} icon={<AppstoreFilled />} />
                                     )}
+                                    <div className="flex-1">
+                                        <div className="text-[18px]  line-clamp-1 font-bold flex items-center gap-2">
+                                            {el.bindName}
+                                            {el.jobEnable && (
+                                                <Tooltip title="定时执行已开启">
+                                                    <HistoryOutlined className="text-[#673ab7]" />
+                                                </Tooltip>
+                                            )}
+                                        </div>
+                                        <div className="line-clamp-2 h-[44px]">{el.description}</div>
+                                    </div>
                                 </div>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <div className="flex flex-col justify-center items-center">
-                        <svg viewBox="0 0 1680 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11739" width="90" height="60">
-                            <path
-                                d="M362.37 776.212a475.918 138.637 0 1 0 951.837 0 475.918 138.637 0 1 0-951.837 0z"
-                                fill="#E6E6E6"
-                                p-id="11740"
-                            ></path>
-                            <path
-                                d="M989.34 419.274v98.028a12.933 12.933 0 0 1-12.932 12.933H699.91a12.933 12.933 0 0 1-12.932-12.933v-98.028a12.933 12.933 0 0 0-12.933-12.933H480.574a12.933 12.933 0 0 0-12.933 12.933v415.91a12.933 12.933 0 0 0 12.933 12.933h709.221a12.933 12.933 0 0 0 12.933-12.932V419.274a12.933 12.933 0 0 0-12.933-12.933h-187.522a12.933 12.933 0 0 0-12.932 12.933z"
-                                fill="#F2F2F2"
-                                p-id="11741"
-                            ></path>
-                            <path
-                                d="M1189.795 858.463H480.574a23.279 23.279 0 0 1-23.279-23.278V419.274a23.279 23.279 0 0 1 23.279-23.28h193.471a23.279 23.279 0 0 1 23.279 23.28v98.028a2.587 2.587 0 0 0 2.586 2.587h276.498a2.328 2.328 0 0 0 2.587-2.587v-98.028a23.279 23.279 0 0 1 23.278-23.28h187.522a23.279 23.279 0 0 1 23.279 23.28v415.91a23.279 23.279 0 0 1-23.279 23.28zM480.574 416.687a2.328 2.328 0 0 0-2.587 2.587v415.91a2.587 2.587 0 0 0 2.587 2.587h709.221a2.845 2.845 0 0 0 2.587-2.586V419.274a2.587 2.587 0 0 0-2.587-2.587h-187.522a2.587 2.587 0 0 0-2.586 2.587v98.028a23.279 23.279 0 0 1-23.279 23.279H699.91a23.279 23.279 0 0 1-23.279-23.279v-98.028a2.328 2.328 0 0 0-2.586-2.587z"
-                                fill="#B3B3B3"
-                                p-id="11742"
-                            ></path>
-                            <path
-                                d="M475.4 421.86l-15.777-13.45 193.213-229.682a24.313 24.313 0 0 1 17.846-8.277l340.903 1.552a23.279 23.279 0 0 1 18.105 8.794l181.056 227.872-16.036 12.932-181.056-227.871-342.713-2.587z"
-                                fill="#B3B3B3"
-                                p-id="11743"
-                            ></path>
-                        </svg>
-                        <div
-                            onClick={() => setBindOpen(true)}
-                            className="text-xs underline cursor-pointer text-black/50 hover:text-[#673ab7]"
-                        >
-                            暂无插件 去绑定
+                                {el?.systemPlugin && <Tag color="processing">官方插件</Tag>}
+                                <Divider className="my-2" />
+                                <div className="flex justify-between text-xs">
+                                    <div className="flex">{wayList.find((item) => item.value === el.type)?.label}</div>
+                                    <div className="flex">{el.creator}</div>
+                                </div>
+                                {!el?.systemPlugin && (
+                                    <Popconfirm
+                                        title="提示"
+                                        description="请再次确认是否删除？"
+                                        onConfirm={async (e: any) => {
+                                            e.stopPropagation();
+                                            try {
+                                                await delPlug(el.configUid);
+                                                dispatch(
+                                                    openSnackbar({
+                                                        open: true,
+                                                        message: '删除成功',
+                                                        variant: 'alert',
+                                                        alert: {
+                                                            color: 'success'
+                                                        },
+                                                        close: false,
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                        transition: 'SlideDown'
+                                                    })
+                                                );
+                                                setFocusUpdateDefinitionList(focusUpdateDefinitionList + 1);
+                                            } catch (err) {}
+                                        }}
+                                        onCancel={(e) => e?.stopPropagation()}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <DeleteOutlined
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                            className="absolute top-[16px] right-[16px] hover:text-[#ff4d4f]"
+                                        />
+                                    </Popconfirm>
+                                )}
+                            </div>
+                        );
+                    })}
+                    <div
+                        onClick={() => {
+                            setPlugOpen(true);
+                            setPlugTitle('文本智能提取');
+                            setPlugValue('extraction');
+                        }}
+                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="flex justify-center items-center w-[64px] h-[64px] rounded-[6px] bg-black/25">
+                                <svg
+                                    viewBox="0 0 1024 1024"
+                                    version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    p-id="6760"
+                                    width="32"
+                                    height="32"
+                                >
+                                    <path
+                                        d="M791.466667 699.2l47.466666 47.466667h-215.466666v52.266666h215.466666l-47.466666 47.466667 36.8 37.333333 109.866666-110.933333-109.866666-110.933333-36.8 37.333333zM576 669.866667H181.333333V196.8h669.333334v367.466667h70.4V199.466667c0-43.2-34.666667-77.866667-77.866667-77.866667H188.8c-43.2 0-77.866667 34.666667-77.866667 77.866667v467.733333c0 43.2 34.666667 77.866667 77.866667 77.866667H576v-75.2zM569.066667 820.266667H248c-24 0-43.2 16.533333-43.2 37.333333s19.2 37.333333 43.2 37.333333h321.066667v-74.666666z"
+                                        p-id="6761"
+                                    ></path>
+                                    <path
+                                        d="M586.133333 595.733333c-17.6-1.6-27.2-5.333333-33.6-11.2l-0.533333-0.533333c-5.866667-6.4-9.066667-20.266667-9.066667-42.133333V308.8c0-3.2 2.666667-5.866667 5.866667-5.866667h37.333333c33.6 0 35.733333 4.8 46.4 14.4 11.733333 9.066667 16.533333 13.866667 22.933334 43.733334 0.533333 2.666667 3.2 4.8 5.866666 4.8h2.133334c3.733333 0 6.4-2.666667 5.866666-6.4l-0.533333-100.266667H346.133333c-3.2 0-5.866667 2.666667-5.866666 5.866667l-0.533334 93.866666c0 3.733333 2.666667 6.4 5.866667 6.4h2.133333c3.2 0 5.333333-2.133333 5.866667-4.8 5.866667-29.866667 11.2-34.666667 22.933333-43.733333 10.666667-9.066667 12.8-13.866667 46.4-13.866667h37.333334c3.2 0 5.866667 2.666667 5.866666 5.866667v226.133333c0 26.133333-2.666667 41.6-8.533333 46.4-0.533333 0-0.533333 0.533333-1.066667 1.066667-5.333333 6.933333-13.866667 11.2-31.466666 13.333333-3.2 0-5.333333 2.666667-5.333334 5.866667 0 3.2 2.666667 5.866667 5.866667 5.866667h158.933333c3.2 0 5.866667-2.666667 5.866667-5.866667 1.066667-2.666667-1.066667-5.866667-4.266667-5.866667zM725.333333 501.866667l-0.533333-42.666667h-137.6c-1.6 0-2.666667 1.066667-2.666667 2.666667v40c0 1.6 1.066667 2.666667 2.666667 2.666666h1.066667c1.066667 0 2.133333-1.066667 2.666666-2.133333 2.666667-12.8 4.8-14.933333 9.6-18.666667 4.266667-3.733333 5.333333-5.866667 19.733334-5.866666h16c1.6 0 2.666667 1.066667 2.666666 2.666666v96.533334c0 11.2-1.066667 17.6-3.733333 19.733333l-0.533333 0.533333c-2.133333 3.2-5.866667 4.8-13.333334 5.333334-1.6 0-2.666667 1.066667-2.666666 2.666666s1.066667 2.666667 2.666666 2.666667h67.733334c1.6 0 2.666667-1.066667 2.666666-2.666667 0-1.066667-1.066667-2.666667-2.666666-2.666666-7.466667-0.533333-11.733333-2.133333-14.4-4.8s-3.733333-8.533333-3.733334-18.133334V480.533333c0-1.6 1.066667-2.666667 2.666667-2.666666h16c14.4 0 15.466667 2.133333 19.733333 5.866666 4.8 3.733333 6.933333 5.866667 9.6 18.666667 0.533333 1.066667 1.066667 2.133333 2.666667 2.133333h1.066667c1.6 0 3.2-1.066667 2.666666-2.666666z m0 0"
+                                        p-id="6762"
+                                    ></path>
+                                </svg>
+                            </div>
+
+                            <div className="flex-1">
+                                <div className="text-[18px]  line-clamp-1 font-bold flex items-center gap-2">文本智能提取</div>
+                                <div className="line-clamp-2 h-[44px]">{}</div>
+                            </div>
+                        </div>
+                        <Tag color="processing">官方插件</Tag>
+                        <Divider className="my-2" />
+                        <div className="flex justify-between text-xs">
+                            <div className="flex">应用插件</div>
+                            <div className="flex">魔法笔记</div>
                         </div>
                     </div>
-                )}
+                    <div
+                        onClick={() => {
+                            setPlugOpen(true);
+                            setPlugTitle('图片OCR提取');
+                            setPlugValue('imageOcr');
+                        }}
+                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="flex justify-center items-center w-[64px] h-[64px] rounded-[6px] bg-black/25">
+                                <svg
+                                    viewBox="0 0 1024 1024"
+                                    version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    p-id="9623"
+                                    width="32"
+                                    height="32"
+                                >
+                                    <path
+                                        d="M640.189 960.294l-0.131-64 254.651-0.522 1.285-255.968 64 0.322-1.605 319.515-318.2 0.653z m-256.239-0.075l-318.197-1.237 0.251-319.042 64 0.051-0.201 255.239 254.396 0.989-0.249 64zM66.004 383.837L65.53 64.399l318.728 1.829-0.367 63.999-254.265-1.459 0.378 254.975-64 0.094zM897.495 383l-0.661-252.989-254.683 0.217-0.055-64 318.569-0.271 0.829 316.876-63.999 0.167zM404.866 510.522c0 24.75-5.328 46.895-15.984 66.43-10.656 19.537-25.553 34.719-44.688 45.547-19.137 10.828-40.562 16.242-64.281 16.242-23.146 0-44.201-5.242-63.164-15.727-18.965-10.484-33.717-25.207-44.258-44.172-10.543-18.963-15.812-40.418-15.812-64.367 0-25.093 5.328-47.665 15.984-67.718 10.656-20.05 25.609-35.549 44.859-46.492 19.25-10.941 41.135-16.414 65.656-16.414 23.604 0 44.714 5.242 63.336 15.727 18.619 10.484 33 25.438 43.141 44.859s15.211 41.451 15.211 66.085z m-78.719 2.062c0-20.281-3.896-36.265-11.688-47.953-7.793-11.688-18.45-17.531-31.969-17.531-14.781 0-26.297 5.615-34.547 16.844-8.25 11.231-12.375 27.1-12.375 47.609 0 20.053 4.096 35.693 12.289 46.922 8.191 11.23 19.336 16.844 33.43 16.844 8.594 0 16.328-2.52 23.203-7.562 6.875-5.041 12.203-12.26 15.984-21.656 3.782-9.396 5.673-20.566 5.673-33.517zM623.147 627.741c-20.396 7.332-43.943 11-70.641 11-26.24 0-48.872-5.012-67.891-15.039-19.021-10.025-33.545-24.291-43.57-42.797-10.028-18.504-15.039-39.846-15.039-64.023 0-26.009 5.613-49.156 16.844-69.437 11.229-20.281 27.097-35.949 47.609-47.008 20.51-11.057 44.114-16.586 70.813-16.586 21.312 0 41.938 2.578 61.875 7.734v68.578c-6.875-4.125-15.068-7.332-24.578-9.625a122.892 122.892 0 0 0-28.875-3.438c-20.168 0-36.066 5.787-47.695 17.359-11.631 11.575-17.446 27.271-17.446 47.093 0 19.709 5.814 35.264 17.446 46.664 11.629 11.402 27.184 17.102 46.664 17.102 17.988 0 36.15-4.582 54.484-13.75v66.173zM789.351 634.444l-18.391-53.109c-3.553-10.426-8.164-18.619-13.836-24.578-5.672-5.957-11.832-8.938-18.477-8.938h-2.922v86.625h-74.25V387.975h98.656c34.488 0 59.955 5.645 76.398 16.93 16.441 11.287 24.664 28.217 24.664 50.789 0 16.959-4.785 31.168-14.352 42.625-9.568 11.458-23.805 19.765-42.711 24.921v0.688c10.426 3.209 19.105 8.422 26.039 15.641 6.932 7.219 13.148 17.934 18.648 32.141l24.234 62.734h-83.7z m-7.047-168.265c0-8.25-2.521-14.781-7.562-19.594-5.043-4.812-12.949-7.219-23.719-7.219h-15.297v56.375h13.406c9.969 0 17.988-2.807 24.062-8.422 6.073-5.613 9.11-12.659 9.11-21.14z"
+                                        p-id="9624"
+                                    ></path>
+                                </svg>
+                            </div>
+
+                            <div className="flex-1">
+                                <div className="text-[18px]  line-clamp-1 font-bold flex items-center gap-2">图片OCR提取</div>
+                                <div className="line-clamp-2 h-[44px]">{}</div>
+                            </div>
+                        </div>
+                        <Tag color="processing">官方插件</Tag>
+                        <Divider className="my-2" />
+                        <div className="flex justify-between text-xs">
+                            <div className="flex">应用插件</div>
+                            <div className="flex">魔法笔记</div>
+                        </div>
+                    </div>
+                    <div
+                        onClick={() => {
+                            setPlugOpen(true);
+                            setPlugTitle('AI字段补齐');
+                            setPlugValue('generate_material_one');
+                        }}
+                        className="p-4 border border-solid border-[#d9d9d9] rounded-lg hover:border-[#673ab7] cursor-pointer hover:shadow-md relative"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="flex justify-center items-center w-[64px] h-[64px] rounded-[6px] bg-black/25">
+                                <svg
+                                    viewBox="0 0 1024 1024"
+                                    version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    p-id="12640"
+                                    width="32"
+                                    height="32"
+                                >
+                                    <path
+                                        d="M589.6 364.3c3 5 8.7 7.7 14.5 7l25.2-3.1c9.4-1.1 15.3-10.7 12.3-19.6l-28.4-82.8c-2.1-6-7.7-10.1-14.1-10.1H292.9c-6.2 0-11.7 3.8-13.9 9.5l-32 82.9c-3.5 9.2 2.6 19.2 12.4 20.2l28.8 2.9c5.8 0.6 11.4-2.2 14.4-7.3l1.6-2.8c20.2-34.2 31.2-42.8 35-44.9 3.9-2.2 16.6-7.2 51.7-7.2 3.3 0 6 0 8.3 0.1V574c-1.9 0.2-4.5 0.5-8.3 0.5h-33.5c-8.2 0-14.9 6.7-14.9 14.9v21.8c0 8.2 6.7 14.9 14.9 14.9h173.9c8.2 0 14.9-6.7 14.9-14.9v-21.8c0-8.2-6.7-14.9-14.9-14.9h-33.5c-3.7 0-6.5-0.3-8.3-0.8V310.4v-1c4.3-0.1 10-0.2 17.8-0.2 36.3 0 45.3 5.9 46.2 6.6 3.4 2.5 13.4 12 34.4 45.8l1.7 2.7z"
+                                        p-id="12641"
+                                    ></path>
+                                    <path
+                                        d="M880 112H144c-17.6 0-32 14.4-32 32v736c0 17.6 14.4 32 32 32h422.1c8.8 0 16-7.2 16-16v-40c0-8.8-7.2-16-16-16H184V184h656v389.6c0 8.8 7.2 16 16 16h40c8.8 0 16-7.2 16-16V144c0-17.6-14.4-32-32-32z"
+                                        p-id="12642"
+                                    ></path>
+                                    <path
+                                        d="M895.6 703.4h-97.8v-97.8c0-8.8-7.2-16-16-16H722c-8.8 0-16 7.2-16 16v97.8h-97.8c-8.8 0-16 7.2-16 16v59.8c0 8.8 7.2 16 16 16H706V893c0 8.8 7.2 16 16 16h59.8c8.8 0 16-7.2 16-16v-97.8h97.8c8.8 0 16-7.2 16-16v-59.8c0-8.8-7.2-16-16-16z"
+                                        p-id="12643"
+                                    ></path>
+                                </svg>
+                            </div>
+
+                            <div className="flex-1">
+                                <div className="text-[18px]  line-clamp-1 font-bold flex items-center gap-2">AI字段补齐</div>
+                                <div className="line-clamp-2 h-[44px]">{}</div>
+                            </div>
+                        </div>
+                        <Tag color="processing">官方插件</Tag>
+                        <Divider className="my-2" />
+                        <div className="flex justify-between text-xs">
+                            <div className="flex">应用插件</div>
+                            <div className="flex">魔法笔记</div>
+                        </div>
+                    </div>
+                </div>
             </Modal>
             <DownMaterial
                 libraryId={libraryId}
@@ -1594,10 +1684,10 @@ const MaterialLibraryDetail = ({
                     dataIndex: 'operation',
                     className: 'align-middle',
                     isDefault: true,
-                    width: 100,
+                    width: 60,
                     fixed: 'right',
                     render: (text: any, record: any, index: number) => (
-                        <div className="flex items-center justify-center">
+                        <div className="flex flex-col items-center justify-center">
                             <Button
                                 type="link"
                                 onClick={async () => {
@@ -1609,6 +1699,15 @@ const MaterialLibraryDetail = ({
                             >
                                 编辑
                             </Button>
+                            <Popconfirm
+                                title="提示"
+                                description="请再次确认是否要复制"
+                                onConfirm={() => handleCopy(record.id)}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button type="link">复制</Button>
+                            </Popconfirm>
                             <Popconfirm
                                 title="提示"
                                 description="请再次确认是否要删除"
@@ -1666,10 +1765,14 @@ const MaterialLibraryDetail = ({
         getTableList(null, page.pageNo);
     }, [forceUpdate]);
 
+    const handleCopy = async (id: string) => {
+        await copyMaterial({ id });
+        setForceUpdate(forceUpdate + 1);
+        message.success('复制成功');
+    };
     const handleDel = async (id: number) => {
         const data = await delMaterialLibrarySlice({ id });
         if (data) {
-            setForceUpdate(forceUpdate + 1);
             message.success('删除成功');
         }
     };

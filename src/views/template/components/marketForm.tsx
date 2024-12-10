@@ -405,54 +405,26 @@ function FormExecute({
                     </div>
                 </div>
             ) : item.style === 'TAG_BOX' ? (
-                <>
-                    <div className="mt-4">
-                        <FormControl key={item?.value} color="secondary" size="small" fullWidth>
-                            <Autocomplete
-                                multiple
-                                size="small"
-                                id="tags-filled"
-                                color="secondary"
-                                options={[]}
-                                defaultValue={item?.value || []}
-                                freeSolo
-                                renderTags={(value: readonly string[], getTagProps) =>
-                                    value?.map((option: string, index: number) => (
-                                        <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                                    ))
-                                }
-                                onChange={(e: any, newValue) => {
-                                    onChange({ name: item?.field, value: newValue });
-                                }}
-                                renderInput={(param) => (
-                                    <TextField
-                                        onBlur={(e: any) => {
-                                            if (e.target.value) {
-                                                let newValue: any = item?.value;
-                                                if (!newValue) {
-                                                    newValue = [];
-                                                }
-                                                const tag = e.target.value.split(/[\s,]+/).map((item: any) => {
-                                                    if (item[0] === '#') {
-                                                        return item.slice(1);
-                                                    } else {
-                                                        return item;
-                                                    }
-                                                });
-                                                newValue.push(...tag);
-                                                onChange({ name: item?.field, value: newValue });
-                                            }
-                                        }}
-                                        color="secondary"
-                                        {...param}
-                                        label={item.label}
-                                        placeholder="请输入标签然后回车"
-                                    />
-                                )}
-                            />
-                        </FormControl>
-                    </div>
-                </>
+                <div className="relative mt-4">
+                    <Select
+                        allowClear
+                        value={item.value}
+                        onChange={(value: any) => {
+                            onChange({ name: item?.field, value });
+                        }}
+                        notFoundContent={false}
+                        dropdownStyle={{ display: 'none' }}
+                        className="w-full h-[51px]"
+                        mode="tags"
+                        size="large"
+                    />
+                    <span
+                        className=" block bg-gradient-to-b from-[#fff] to-[#f8fafc] px-[5px] absolute top-[-10px] left-2 text-[12px]"
+                        style={{ color: '#697586' }}
+                    >
+                        {item.label}
+                    </span>
+                </div>
             ) : item.style === 'IMAGE_LIST' ? (
                 <>
                     <div className="mt-4 mb-2 font-bold text-xs">参考图片</div>

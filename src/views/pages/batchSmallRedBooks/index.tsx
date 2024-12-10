@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { KeyboardBackspace } from '@mui/icons-material';
@@ -18,6 +18,7 @@ import jsCookie from 'js-cookie';
 import { createSameApp } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template';
 import dayjs from 'dayjs';
+import ResultLoading from './components/components/resultLoading';
 const BatcSmallRedBooks = forwardRef(
     (
         {
@@ -339,6 +340,12 @@ const BatcSmallRedBooks = forwardRef(
             }
         };
         const [example, setIsexample] = useState(false);
+        // const materialPre = useMemo(()=>{
+        //     return 0
+        // },[])
+
+        //笔记素材智能生成
+        const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
         return (
             <div
                 style={{
@@ -496,46 +503,48 @@ const BatcSmallRedBooks = forwardRef(
                             setImageStyleList={setImageStyleList}
                         />
                     </div>
-                    <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full overflow-y-scroll">
-                        <Right
-                            rightPage={rightPage}
-                            isexample={example}
-                            setIsexample={setIsexample}
-                            batchTotal={batchTotal}
-                            bathList={bathList}
-                            exampleList={exampleList}
-                            collapseActive={collapseActive}
-                            batchOpen={batchOpen}
-                            changeCollapse={(data: any) => changeCollapse(data)}
-                            batchDataList={batchDataList}
-                            setBusinessUid={(data: any) => {
-                                setBusinessUid(data.uid);
-                                setBusinessIndex(data.index);
-                            }}
-                            getbatchPages={getbatchPages}
-                            setDetailOpen={(data: any) => setDetailOpen(data)}
-                            timeFailure={({ i, index }: { i: number; index: number }) => {
-                                collIndexRef.current = i;
-                                setCollIndex(collIndexRef.current);
-                                const pageNo = Number((index / 20) | 0) + 1;
-                                clearInterval(timer.current[pageNo]);
-                                timer.current[pageNo] = getLists(pageNo);
-                                timer.current[pageNo] = setInterval(() => {
-                                    if (
-                                        batchDataListRef.current[collIndexRef.current]?.every(
-                                            (item: any) =>
-                                                item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
-                                        )
-                                    ) {
-                                        clearInterval(timer.current[pageNo]);
-                                        setPre(pre + 1);
-                                        return;
-                                    }
-                                    getLists(pageNo);
-                                }, 2000);
-                                batchOpenRef.current = false;
-                            }}
-                        />
+                    <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full relative overflow-x-hidden">
+                        <div className="h-full overflow-y-scroll">
+                            <Right
+                                rightPage={rightPage}
+                                isexample={example}
+                                setIsexample={setIsexample}
+                                batchTotal={batchTotal}
+                                bathList={bathList}
+                                exampleList={exampleList}
+                                collapseActive={collapseActive}
+                                batchOpen={batchOpen}
+                                changeCollapse={(data: any) => changeCollapse(data)}
+                                batchDataList={batchDataList}
+                                setBusinessUid={(data: any) => {
+                                    setBusinessUid(data.uid);
+                                    setBusinessIndex(data.index);
+                                }}
+                                getbatchPages={getbatchPages}
+                                setDetailOpen={(data: any) => setDetailOpen(data)}
+                                timeFailure={({ i, index }: { i: number; index: number }) => {
+                                    collIndexRef.current = i;
+                                    setCollIndex(collIndexRef.current);
+                                    const pageNo = Number((index / 20) | 0) + 1;
+                                    clearInterval(timer.current[pageNo]);
+                                    timer.current[pageNo] = getLists(pageNo);
+                                    timer.current[pageNo] = setInterval(() => {
+                                        if (
+                                            batchDataListRef.current[collIndexRef.current]?.every(
+                                                (item: any) =>
+                                                    item?.status !== 'EXECUTING' && item?.status !== 'INIT' && item?.status !== 'FAILURE'
+                                            )
+                                        ) {
+                                            clearInterval(timer.current[pageNo]);
+                                            setPre(pre + 1);
+                                            return;
+                                        }
+                                        getLists(pageNo);
+                                    }, 2000);
+                                    batchOpenRef.current = false;
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
                 {detailOpen && (
@@ -547,6 +556,18 @@ const BatcSmallRedBooks = forwardRef(
                         businessUid={businessUid}
                     />
                 )}
+                {/* <ResultLoading
+                    tagFlag={true}
+                    canExecute={false}
+                    materialExecutionOpen={materialExecutionOpen}
+                    setMaterialExecutionOpen={setMaterialExecutionOpen}
+                    timeSpent={0}
+                    materialPre={materialPre}
+                    executionCount={executionCount}
+                    totalCount={totalCount}
+                    successCount={successCount}
+                    errorCount={errorCount}
+                /> */}
             </div>
         );
     }

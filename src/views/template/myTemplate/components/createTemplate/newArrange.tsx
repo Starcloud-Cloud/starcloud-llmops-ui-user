@@ -400,7 +400,7 @@ function Arrange({
                                         }
                                         setVariable={(data: any, flag?: boolean) => setVariable(data, index, flag)}
                                         variables={item?.flowStep?.variable?.variables}
-                                        fields={item?.fields}
+                                        fields={item?.field}
                                         handler={item?.flowStep?.handler}
                                         basisChange={basisChange}
                                         resReadOnly={item?.flowStep?.response?.readOnly}

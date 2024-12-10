@@ -2,6 +2,7 @@ import { Grid, Typography } from '@mui/material';
 import { t } from 'hooks/web/useI18n';
 import { useState } from 'react';
 import BottomCards from './BottomCards';
+import BijibottomCards from './bijiBottomCards';
 import Header from './Header';
 import MiddleCards from './MiddleCards';
 import Record from './Record';
@@ -32,7 +33,10 @@ const Redemption = () => {
                     <BottomCards />
                 </>
             ) : (
-                <InviteMatrix />
+                <>
+                    <InviteMatrix />
+                    {/* <BijibottomCards /> */}
+                </>
             )}
         </Grid>
     );

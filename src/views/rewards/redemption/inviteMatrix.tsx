@@ -58,7 +58,7 @@ export const InviteMatrix = () => {
     }, []);
 
     return (
-        <div className="bg-white p-4 rounded">
+        <div className="bg-white p-4 rounded mb-4">
             <div className="mt-3">
                 <p className="text-black text-2xl">邀请有奖</p>
             </div>

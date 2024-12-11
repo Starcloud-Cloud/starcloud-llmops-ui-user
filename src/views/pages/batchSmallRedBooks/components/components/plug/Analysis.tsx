@@ -461,68 +461,89 @@ const PlugAnalysis = ({
                     <QuestionCircleOutlined className="ml-1 cursor-pointer" />
                 </Popover>
             </div>
-            {/* <Tabs /> */}
-            <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
-                {redBookData.requirement?.map((item: any) =>
-                    item.variableType === 'String' ? (
-                        <Form.Item
-                            initialValue={item.variableValue}
-                            key={item.uuid}
-                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                            name={item.variableKey}
-                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                        >
-                            <Input />
-                        </Form.Item>
-                    ) : item.variableType === 'Array<String>' ? (
-                        <Form.Item required label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}>
-                            <div className="flex items-center relative bg-[#F4F4F6] px-4 py-2 text-xs font-sans justify-between rounded-t-md">
-                                <span>json</span>
-                            </div>
-                            <Form.Item
-                                initialValue={item.variableValue || '[]'}
-                                name={item.variableKey}
-                                rules={[
-                                    { required: true, message: item.variableKey + '是必填项' },
-                                    {
-                                        validator: (_, value) => {
-                                            if (!value) {
-                                                return Promise.resolve();
-                                            }
-                                            const parsedValue = parseInputToArray(value);
-                                            if (isArrayString(parsedValue)) {
-                                                return Promise.resolve();
-                                            }
-                                            return Promise.reject(new Error('请输入正确的JSON结构'));
-                                        }
-                                    }
-                                ]}
-                            >
-                                <Editor
-                                    className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
-                                    height="200px"
-                                    defaultLanguage="json"
-                                    options={{
-                                        minimap: { enabled: false }
-                                    }}
-                                    onChange={(value: any) => {}}
-                                />
-                            </Form.Item>
-                        </Form.Item>
-                    ) : item.variableType === 'Boolean' ? (
-                        <Form.Item
-                            valuePropName="checked"
-                            initialValue={item.variableValue ? true : false}
-                            key={item.uuid}
-                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                            name={item.variableKey}
-                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                        >
-                            <Switch />
-                        </Form.Item>
-                    ) : null
-                )}
-            </Form>
+            <Tabs
+                items={[
+                    {
+                        label: 'AI 识别',
+                        key: '1',
+                        children: (
+                            <>
+                                <Input.TextArea rows={10} />
+                                <div className="flex justify-center my-4">
+                                    <Button type="primary">AI 执行</Button>
+                                </div>
+                            </>
+                        )
+                    },
+                    {
+                        label: '手动输入',
+                        key: '2',
+                        children: (
+                            <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
+                                {redBookData.requirement?.map((item: any) =>
+                                    item.variableType === 'String' ? (
+                                        <Form.Item
+                                            initialValue={item.variableValue}
+                                            key={item.uuid}
+                                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                                            name={item.variableKey}
+                                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                                        >
+                                            <Input />
+                                        </Form.Item>
+                                    ) : item.variableType === 'Array<String>' ? (
+                                        <Form.Item required label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}>
+                                            <div className="flex items-center relative bg-[#F4F4F6] px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                                <span>json</span>
+                                            </div>
+                                            <Form.Item
+                                                initialValue={item.variableValue || '[]'}
+                                                name={item.variableKey}
+                                                rules={[
+                                                    { required: true, message: item.variableKey + '是必填项' },
+                                                    {
+                                                        validator: (_, value) => {
+                                                            if (!value) {
+                                                                return Promise.resolve();
+                                                            }
+                                                            const parsedValue = parseInputToArray(value);
+                                                            if (isArrayString(parsedValue)) {
+                                                                return Promise.resolve();
+                                                            }
+                                                            return Promise.reject(new Error('请输入正确的JSON结构'));
+                                                        }
+                                                    }
+                                                ]}
+                                            >
+                                                <Editor
+                                                    className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
+                                                    height="200px"
+                                                    defaultLanguage="json"
+                                                    options={{
+                                                        minimap: { enabled: false }
+                                                    }}
+                                                    onChange={(value: any) => {}}
+                                                />
+                                            </Form.Item>
+                                        </Form.Item>
+                                    ) : item.variableType === 'Boolean' ? (
+                                        <Form.Item
+                                            valuePropName="checked"
+                                            initialValue={item.variableValue ? true : false}
+                                            key={item.uuid}
+                                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                                            name={item.variableKey}
+                                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                                        >
+                                            <Switch />
+                                        </Form.Item>
+                                    ) : null
+                                )}
+                            </Form>
+                        )
+                    }
+                ]}
+            />
             <Collapse
                 className="analysis"
                 activeKey={activeKey}

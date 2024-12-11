@@ -460,7 +460,7 @@ const Right = ({
                     </div>
                 </div>
             </Modal>
-            {/* {isExe ? (
+            {isExe ? (
                 <div className="absolute w-[400px] left-[calc(50%-200px)] bottom-10 bg-white rounded-lg px-4 pt-1 pb-2 flex flex-col items-center gap-2 border-[0.5px] border-solid border-[#d9d9d9]">
                     <div className="w-full flex justify-between text-sm font-bold">
                         <div>智能生成</div>
@@ -488,7 +488,7 @@ const Right = ({
                         </svg>
                     </div>
                 </Tooltip>
-            )} */}
+            )}
         </div>
     );
 };

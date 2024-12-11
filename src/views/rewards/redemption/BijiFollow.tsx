@@ -1,7 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { CardContent, CardMedia, IconButton, Modal, Typography } from '@mui/material';
+import redbook from 'assets/images/landing/juzhen/redbook.png';
 import mofabijiwechat from 'assets/images/landing/juzhen/wechat.png';
-import redbook from 'assets/images/landing/juzhen/redbook.jpg';
 import MainCard from 'ui-component/cards/MainCard';
 import { Popover } from 'antd';
 
@@ -66,7 +66,7 @@ const Follow: React.FC<ShareProps> = ({ open, handleClose }) => {
                         }}
                     >
                         <Typography id="modal-description" sx={{ mb: 1 }}>
-                            关注魔法笔记的官方小红书，公共号，后台私信发送 "mofabiji" ，即可获取权益兑换码。如有问题请加入魔法笔记
+                            关注魔法笔记的官方小红书，后台私信发送 "mofabiji" ，即可获取权益兑换码。如有问题请加入魔法笔记
                             微信群联系运营人员。
                             <Popover
                                 zIndex={9999}

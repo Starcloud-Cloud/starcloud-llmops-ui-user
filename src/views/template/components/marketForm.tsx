@@ -708,7 +708,7 @@ function FormExecute({
                             value={customValue}
                             ref={cansRef}
                             onChange={(e) => setCustomValue(e.target.value)}
-                            className="text-base whitespace-pre-wrap !h-[400px]"
+                            className="whitespace-pre-wrap !h-[400px]"
                         />
                         <div className="flex justify-end gap-2 mt-2">
                             <Button loading={customLoading} onClick={promptExe} type="primary">

@@ -24,16 +24,15 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
         },
         {
             platform: '小红书',
-            description:
-                '用户在小红书发布产品相关的种草图文推送，保持1天以上或10人点赞，即可免费换取权益，符合要求的推送，每篇可兑换一次权益；'
+            description: '用户在小红书发布产品相关的种草图文推送，保持1天以上或10人点赞，即可免费换取权益；'
         },
         {
             platform: '微博',
-            description: '用户在微博推送产品相关的博文和图片，保留1天以上或10人点赞，即可免费换取权益，符合要求的博文，每篇可兑换一次权益；'
+            description: '用户在微博推送产品相关的博文和图片，保留1天以上或10人点赞，即可免费换取权益；'
         },
         {
             platform: '知乎',
-            description: '用户在知乎发布与产品相关的回答，保留1天以上或10人点赞，即可免费获取权益，符合要求的博文，每片可兑换一次权益；'
+            description: '用户在知乎发布与产品相关的回答，保留1天以上或10人点赞，即可免费获取权益；'
         }
     ];
 
@@ -41,7 +40,8 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
         '我最近在使用魔法笔记，发现还挺有用，推荐你试试',
         '分享一个我最近非常喜欢的AI工具，让我上瘾了！你也试试',
         '我最近非常喜欢的AI工具，有它我就不用加班了，不信你试试',
-        '最近爆粉了吗，这款AI出的一键批量生产笔记，粉丝涨了不少，你也试试'
+        '最近爆粉了吗，这款AI出的一键批量生产笔记，粉丝涨了不少，你也试试',
+        '我在用这个小红书 AI 创作工具，魔法笔记，各类热门笔记一分钟生成，你也来试试'
     ];
 
     return (
@@ -88,7 +88,7 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
                         }}
                     >
                         <Typography id="modal-description" sx={{ mb: 1 }}>
-                            在朋友圈/小红书/微博/知乎/抖音或其他社媒平台上发布产品相关文章和图片信息并符合要求，保留1天以上或10人点赞，即可免费获取权益。每条可兑换一次权益。
+                            在朋友圈/小红书/微博/知乎/抖音或其他社媒平台上发布产品相关文章和图片信息并符合要求，保留1天以上或10人点赞，即可免费获取权益。
                         </Typography>
 
                         {socialRules.map((item, index) => (
@@ -111,7 +111,7 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
                         </div>
                         <CardMedia component="img" image={mofabijiwechat} alt="img1" sx={{ width: { xs: '30%', sm: '30%', md: '30%' } }} />
 
-                        <Typography sx={{ mt: 1 }}>详情加入魔法AI体验群咨询</Typography>
+                        <Typography sx={{ mt: 1 }}>详情加入魔法笔记体验群咨询</Typography>
                     </CardContent>
                 </MainCard>
                 <Modal
@@ -140,7 +140,7 @@ const Share: React.FC<ShareProps> = ({ open, handleClose }) => {
                                 justifyContent: 'center',
                                 maxHeight: '90vh', // 将高度稍微减小一些
                                 overflowY: 'auto',
-                                width: { xs: 400, lg: 600 }
+                                width: { xs: 450, lg: 650 }
                             }}
                             title="分享示例"
                         >

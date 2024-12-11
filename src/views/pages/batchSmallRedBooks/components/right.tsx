@@ -25,7 +25,8 @@ const Right = ({
     setBusinessUid,
     setDetailOpen,
     timeFailure,
-    getbatchPages
+    getbatchPages,
+    setGenerationValue
 }: {
     isexample: boolean;
     setIsexample: (data: any) => void;
@@ -41,6 +42,7 @@ const Right = ({
     setDetailOpen: (data: any) => void;
     timeFailure: (data: any) => void;
     getbatchPages: (data: any) => void;
+    setGenerationValue: (data: any) => void;
 }) => {
     const navigate = useNavigate();
     const scrollRef: any = useRef(null);
@@ -179,6 +181,7 @@ const Right = ({
 
     //右下角智能生成
     const [isExe, setIsExe] = useState(true);
+    const [exeInputValue, setExeInputValue] = useState('');
 
     return (
         <div className="h-full overflow-x-hidden">
@@ -469,8 +472,14 @@ const Right = ({
                             className="text-xs cursor-pointer border border-solid border-[transparent] hover:border-[#d9d9d9] rounded-full w-[20px] h-[20px] flex justify-center items-center"
                         />
                     </div>
-                    <Input />
-                    <Button type="primary" size="small">
+                    <Input value={exeInputValue} onChange={(e) => setExeInputValue(e.target.value)} />
+                    <Button
+                        onClick={() => {
+                            setGenerationValue(exeInputValue);
+                        }}
+                        type="primary"
+                        size="small"
+                    >
                         点击生成笔记
                     </Button>
                 </div>

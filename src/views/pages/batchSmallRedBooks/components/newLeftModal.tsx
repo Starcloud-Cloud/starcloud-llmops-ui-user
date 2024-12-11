@@ -35,7 +35,8 @@ const LeftModalAdd = ({
     getTitleList,
     handleEditColumn,
     handleUpdateColumn,
-    handleExecute
+    handleExecute,
+    generationValue //右下角智能生成
 }: {
     appUid: string;
     bizUid: string;
@@ -64,6 +65,7 @@ const LeftModalAdd = ({
     handleEditColumn: (data: any) => void;
     handleUpdateColumn: (index: number, size: any) => void;
     handleExecute: any;
+    generationValue?: string;
 }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
     const handleDels = async () => {
@@ -102,6 +104,7 @@ const LeftModalAdd = ({
                     canSwitch={true}
                     canExecute={true}
                     handleExecute={handleExecute}
+                    generationValue={generationValue}
                 />
                 <div className="material-index material-detail-table">
                     <TablePro
@@ -137,7 +140,8 @@ const memoLeftModal = (pre: any, next: any) => {
         _.isEqual(pre.tableLoading, next.tableLoading) &&
         _.isEqual(pre.total, next.total) &&
         _.isEqual(pre.columns, next.columns) &&
-        _.isEqual(pre.tableData, next.tableData)
+        _.isEqual(pre.tableData, next.tableData) &&
+        _.isEqual(pre.generationValue, next.generationValue)
     );
 };
 export default memo(LeftModalAdd, memoLeftModal);

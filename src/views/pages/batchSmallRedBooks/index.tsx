@@ -18,7 +18,6 @@ import jsCookie from 'js-cookie';
 import { createSameApp } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template';
 import dayjs from 'dayjs';
-import ResultLoading from './components/components/resultLoading';
 const BatcSmallRedBooks = forwardRef(
     (
         {
@@ -340,12 +339,9 @@ const BatcSmallRedBooks = forwardRef(
             }
         };
         const [example, setIsexample] = useState(false);
-        // const materialPre = useMemo(()=>{
-        //     return 0
-        // },[])
 
-        //笔记素材智能生成
-        const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
+        //右下角智能生成
+        const [generationValue, setGenerationValue] = useState('');
         return (
             <div
                 style={{
@@ -501,6 +497,7 @@ const BatcSmallRedBooks = forwardRef(
                             setPlanUidRef={setPlanUidRef}
                             setTotalCountRef={setTotalCount}
                             setImageStyleList={setImageStyleList}
+                            generationValue={generationValue}
                         />
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full relative overflow-x-hidden">
@@ -543,6 +540,7 @@ const BatcSmallRedBooks = forwardRef(
                                     }, 2000);
                                     batchOpenRef.current = false;
                                 }}
+                                setGenerationValue={setGenerationValue}
                             />
                         </div>
                     </div>
@@ -556,18 +554,6 @@ const BatcSmallRedBooks = forwardRef(
                         businessUid={businessUid}
                     />
                 )}
-                {/* <ResultLoading
-                    tagFlag={true}
-                    canExecute={false}
-                    materialExecutionOpen={materialExecutionOpen}
-                    setMaterialExecutionOpen={setMaterialExecutionOpen}
-                    timeSpent={0}
-                    materialPre={materialPre}
-                    executionCount={executionCount}
-                    totalCount={totalCount}
-                    successCount={successCount}
-                    errorCount={errorCount}
-                /> */}
             </div>
         );
     }

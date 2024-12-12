@@ -49,7 +49,8 @@ const Lefts = ({
     setPlanUidRef,
     setTotalCountRef,
     setImageStyleList,
-    generationValue //右下角智能生成
+    generationValue, //右下角智能生成
+    exePlugUid //右下角智能生成
 }: {
     detailShow?: boolean;
     planState?: number;
@@ -78,6 +79,7 @@ const Lefts = ({
     setTotalCountRef: (data: number) => void;
     setImageStyleList: (data: any[]) => void;
     generationValue?: string;
+    exePlugUid?: string;
 }) => {
     const { wsCache } = useCache();
     const navigate = useNavigate();
@@ -1052,6 +1054,7 @@ const Lefts = ({
                                             seleSave('SELECT', data);
                                         }}
                                         generationValue={generationValue}
+                                        exePlugUid={exePlugUid}
                                     />
                                 </div>
 

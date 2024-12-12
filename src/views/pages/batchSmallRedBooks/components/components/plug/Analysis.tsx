@@ -6,7 +6,7 @@ import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
 import Editor, { loader } from '@monaco-editor/react';
-import { addPlugConfigInfo, updatePlugConfigInfo, configDetail } from 'api/plug';
+import { addPlugConfigInfo, updatePlugConfigInfo, configDetail, aiIdentify } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 import ResultLoading from '../resultLoading';
@@ -433,13 +433,28 @@ const PlugAnalysis = ({
     const [aiLoading, setAiLoading] = useState(false);
     const aiExeRef = useRef('');
     const [aiExeValue, setAiExeValue] = useState('');
+    const aiPreRef = useRef(0);
+    const [aiPre, setAiPre] = useState(0);
     const aiExe = async () => {
-        // const result = await
-        const res = { URL: 'title1' };
+        console.log(record);
         setAiLoading(true);
+        const result = await aiIdentify({
+            pluginName: record?.pluginName,
+            description: '',
+            userPrompt: '',
+            userInput: aiExeRef.current,
+            input: record?.pluginName,
+            inputFormart: record?.inputFormart
+        });
         setAiAccessKey('2');
         setAiLoading(false);
-        form.setFieldsValue(res);
+        console.log(typeof result);
+
+        for (let key of result) {
+            await form.setFieldValue(key, result[key]);
+        }
+        aiPreRef.current += 1;
+        setAiPre(aiPreRef.current);
     };
     useEffect(() => {
         if (generationValue) {
@@ -449,10 +464,13 @@ const PlugAnalysis = ({
         }
     }, [generationValue]);
     useEffect(() => {
-        if (redBookData.fieldList?.length > 0 && generationValue) {
+        if (redBookData.fieldList?.length > 0 && generationValue && aiPre) {
+            console.log(form.getFieldsValue());
             handleExe();
+            aiPreRef.current = 0;
+            setAiPre(aiPreRef.current);
         }
-    }, [JSON.stringify(redBookData.fieldList)]);
+    }, [JSON.stringify(redBookData.fieldList), aiPre]);
     return (
         <ModalForm
             modalProps={{

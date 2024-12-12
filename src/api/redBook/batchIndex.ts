@@ -177,3 +177,7 @@ export const plugChat = (data: any) => {
 export const plugList = (params: any) => {
     return request.get({ url: `llm/coze/temp/chat/result`, params });
 };
+//查询智能生成
+export const bindPlugin = (data: any) => {
+    return request.post({ url: `/llm/plugin/definition/bindPlugin`, data });
+};

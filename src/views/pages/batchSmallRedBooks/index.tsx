@@ -341,6 +341,7 @@ const BatcSmallRedBooks = forwardRef(
         const [example, setIsexample] = useState(false);
 
         //右下角智能生成
+        const [exePlugUid, setExePlugUid] = useState(undefined);
         const [generationValue, setGenerationValue] = useState('');
         return (
             <div
@@ -498,6 +499,7 @@ const BatcSmallRedBooks = forwardRef(
                             setTotalCountRef={setTotalCount}
                             setImageStyleList={setImageStyleList}
                             generationValue={generationValue}
+                            exePlugUid={exePlugUid}
                         />
                     </div>
                     <div className="flex-1 min-w-[650px] bg-white rounded-lg p-4 h-full relative overflow-x-hidden">
@@ -541,6 +543,7 @@ const BatcSmallRedBooks = forwardRef(
                                     batchOpenRef.current = false;
                                 }}
                                 setGenerationValue={setGenerationValue}
+                                setExePlugUid={setExePlugUid}
                             />
                         </div>
                     </div>

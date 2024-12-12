@@ -99,3 +99,11 @@ export const pluginPage = (data: any) => {
 export const pageJob = (data: any) => {
     return request.get({ url: '/llm/job/log/page', params: data });
 };
+/**
+ * ai 执行
+ * @param data
+ * @returns
+ */
+export const aiIdentify = (data: any) => {
+    return request.post({ url: '/llm/creative/plugins/aiIdentify', data });
+};

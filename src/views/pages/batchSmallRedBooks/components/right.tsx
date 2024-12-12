@@ -7,7 +7,7 @@ import PlanList from './PlanList';
 import Good from '../good';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { planCancel, qrCode } from 'api/redBook/batchIndex';
+import { planCancel, qrCode, bindPlugin } from 'api/redBook/batchIndex';
 import JSZip from 'jszip';
 import _ from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
@@ -26,7 +26,8 @@ const Right = ({
     setDetailOpen,
     timeFailure,
     getbatchPages,
-    setGenerationValue
+    setGenerationValue,
+    setExePlugUid
 }: {
     isexample: boolean;
     setIsexample: (data: any) => void;
@@ -43,6 +44,7 @@ const Right = ({
     timeFailure: (data: any) => void;
     getbatchPages: (data: any) => void;
     setGenerationValue: (data: any) => void;
+    setExePlugUid: (data: any) => void;
 }) => {
     const navigate = useNavigate();
     const scrollRef: any = useRef(null);
@@ -183,6 +185,16 @@ const Right = ({
     const [isExe, setIsExe] = useState(true);
     const [exeInputValue, setExeInputValue] = useState('');
 
+    useEffect(() => {
+        bindPlugin({
+            appUid: '687f7bcea1ff41cda140bd34758b0fc1',
+            planUid: 'ea8cf95016d4',
+            source: 'APP'
+        }).then((res) => {
+            const uid = res?.pluginDetailList[0]?.pluginConfig?.pluginUid;
+            setExePlugUid(uid);
+        });
+    }, []);
     return (
         <div className="h-full overflow-x-hidden">
             {bathList?.length === 0 || isexample ? (

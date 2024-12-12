@@ -42,7 +42,18 @@ import { v4 as uuidv4 } from 'uuid';
 import { updateMaterialLibraryTitle } from 'api/material';
 import { origin_url } from 'utils/axios/config';
 
-const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute, generationValue }: any) => {
+const MaterialTable = ({
+    materialStatus,
+    updataTable,
+    uid,
+    bizUid,
+    bizType,
+    appUid,
+    tableTitle,
+    handleExecute,
+    generationValue,
+    exePlugUid
+}: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [page, setPage] = useState({
@@ -723,6 +734,7 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                         setZoomOpen(false);
                     }}
                     generationValue={generationValue}
+                    exePlugUid={exePlugUid}
                 />
             </Modal>
             {isModalOpen && (
@@ -818,7 +830,8 @@ const memoMaterialTable = (pre: any, next: any) => {
         _.isEqual(pre.uid, next.uid) &&
         _.isEqual(pre.appUid, next.appUid) &&
         _.isEqual(pre.tableTitle, next.tableTitle) &&
-        _.isEqual(pre.generationValue, next.generationValue)
+        _.isEqual(pre.generationValue, next.generationValue) &&
+        _.isEqual(pre.exePlugUid, next.exePlugUid)
     );
 };
 export default memo(MaterialTable, memoMaterialTable);

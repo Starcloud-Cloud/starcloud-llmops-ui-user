@@ -818,6 +818,21 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 setBindLoading(false);
                                                             }
                                                         }, 4000);
+                                                        setTimeout(() => {
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '系统异常，请联系管理员',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'error'
+                                                                    },
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' }
+                                                                })
+                                                            );
+                                                            setBindLoading(false);
+                                                            clearInterval(timer.current);
+                                                        }, 240000);
                                                     } catch (err: any) {
                                                         clearInterval(timer.current);
 

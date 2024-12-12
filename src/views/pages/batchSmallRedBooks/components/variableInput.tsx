@@ -425,7 +425,9 @@ const VariableInput = ({
                             <span
                                 className="cursor-pointer text-[#673ab7]"
                                 onClick={() =>
-                                    window.open('https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/gwva2dxOW49qxLrjuEo4em09Vbkz3BRL')
+                                    window.open(
+                                        'https://alidocs.dingtalk.com/i/p/a0gX1nnO4R7ONmeJ/docs/jb9Y4gmKWr4XEROASom0lKNPJGXn6lpz?dontjump=true'
+                                    )
                                 }
                             >
                                 【使用说明】

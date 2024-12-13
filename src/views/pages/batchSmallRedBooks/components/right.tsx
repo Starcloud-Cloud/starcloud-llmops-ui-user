@@ -190,6 +190,8 @@ const Right = ({
 
     //右下角智能生成
     const [isExe, setIsExe] = useState(true);
+
+    const [exeInputOpen, setExeInputOpen] = useState(false);
     const [exeInputValue, setExeInputValue] = useState('');
 
     const [errMsg, setErrMsg] = useState('');
@@ -205,8 +207,12 @@ const Right = ({
     };
 
     const handleAiExe = async () => {
+        setExeInputOpen(true);
         setErrMsg('');
         setStepCurrent(0);
+        if (!exeInputValue) {
+            return false;
+        }
         //点击 ai生成笔记
         setAiStepOpen(true);
         try {
@@ -645,7 +651,14 @@ const Right = ({
                                 className="text-xs cursor-pointer border border-solid border-[transparent] hover:border-[#d9d9d9] rounded-full w-[20px] h-[20px] flex justify-center items-center"
                             />
                         </div>
-                        <Input value={exeInputValue} onChange={(e) => setExeInputValue(e.target.value)} />
+                        <div className="w-full">
+                            <Input
+                                status={exeInputOpen && !exeInputValue ? 'error' : ''}
+                                value={exeInputValue}
+                                onChange={(e) => setExeInputValue(e.target.value)}
+                            />
+                            {exeInputOpen && !exeInputValue && <div className="text-xs text-[#ff4d4f] mt-1 ml-1">内容必填</div>}
+                        </div>
                         <Button onClick={handleAiExe} type="primary" size="small">
                             点击生成笔记
                         </Button>

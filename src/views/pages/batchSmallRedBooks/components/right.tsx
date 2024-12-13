@@ -192,7 +192,8 @@ const Right = ({
     const [isExe, setIsExe] = useState(true);
     const [exeInputValue, setExeInputValue] = useState('');
 
-    const [aiRocord, setAiRocord] = useState<any>(undefined);
+    const [errMsg, setErrMsg] = useState('');
+    const [aiRocord, setAiRocord] = useState<any>(undefined); //获取详情数据
     const getAIData = async () => {
         const result = await bindPlugin({
             appUid: query.get('appUid') || query.get('uid'),
@@ -204,44 +205,88 @@ const Right = ({
     };
 
     const handleAiExe = async () => {
+        setErrMsg('');
         setStepCurrent(0);
         //点击 ai生成笔记
         setAiStepOpen(true);
-        const result = await aiIdentify({
-            pluginName: aiRocord?.pluginName,
-            description: '',
-            userPrompt: '',
-            userInput: exeInputValue,
-            inputFormart: aiRocord?.inputFormart
-        });
-        setStepCurrent(1);
-        handleNextExe(result);
+        try {
+            const result = await aiIdentify({
+                pluginName: aiRocord?.pluginName,
+                description: '',
+                userPrompt: '',
+                userInput: exeInputValue,
+                inputFormart: aiRocord?.inputFormart
+            });
+            setStepCurrent(1);
+            handleNextExe(result);
+        } catch (err: any) {
+            setErrMsg(err.msg);
+        }
     };
     const timer = useRef<any>(null);
     const handleNextExe = async (result: any) => {
         //ai生成笔记生成笔记完成 开始执行
-        const code = await plugExecute({
-            ...result,
-            uuid: aiRocord.pluginUid
-        });
-        setStepCurrent(2);
-        timer.current = setInterval(async () => {
-            try {
-                const res = await plugexEcuteResult({
-                    code,
-                    uuid: aiRocord.pluginUid
-                });
-                if (res.status === 'completed') {
-                    let List;
-                    if (Array.isArray(res.output) && aiRocord.outputType === 'list') {
-                        List = res.output;
-                    } else if (typeof res.output === 'object' && res.output !== null && aiRocord.outputType === 'obj') {
-                        List = [res.output];
-                    } else {
+        try {
+            const code = await plugExecute({
+                ...result,
+                uuid: aiRocord.pluginUid
+            });
+            setStepCurrent(2);
+            timer.current = setInterval(async () => {
+                try {
+                    const res = await plugexEcuteResult({
+                        code,
+                        uuid: aiRocord.pluginUid
+                    });
+                    if (res.status === 'completed') {
+                        let List;
+                        if (Array.isArray(res.output) && aiRocord.outputType === 'list') {
+                            List = res.output;
+                        } else if (typeof res.output === 'object' && res.output !== null && aiRocord.outputType === 'obj') {
+                            List = [res.output];
+                        } else {
+                            dispatch(
+                                openSnackbar({
+                                    open: true,
+                                    message: '返回数据类型有误，请稍后再试',
+                                    variant: 'alert',
+                                    alert: {
+                                        color: 'error'
+                                    },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                    close: false
+                                })
+                            );
+                            clearInterval(timer.current);
+                            return false;
+                        }
+                        const bindFieldData = JSON.parse(aiRocord?.fieldMap);
+                        const newList = List.map((item: any) => {
+                            const newItem: any = {};
+                            for (let key in item) {
+                                if (bindFieldData[key]) {
+                                    newItem[bindFieldData[key]] = item[key];
+                                } else {
+                                    newItem[key] = item[key];
+                                }
+                            }
+                            return newItem;
+                        });
+                        console.log(newList);
+                        getResult(newList);
+                        clearInterval(timer.current);
+                    } else if (res.status === 'failed' || res.status === 'requires_action' || res.status === 'canceled') {
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: '返回数据类型有误，请稍后再试',
+                                message:
+                                    res.status === 'failed'
+                                        ? '对话失败'
+                                        : res.status === 'requires_action'
+                                        ? '对话中断，需要进一步处理'
+                                        : res.status === 'canceled'
+                                        ? '对话已取消'
+                                        : '',
                                 variant: 'alert',
                                 alert: {
                                     color: 'error'
@@ -251,50 +296,15 @@ const Right = ({
                             })
                         );
                         clearInterval(timer.current);
-                        return false;
                     }
-                    const bindFieldData = JSON.parse(aiRocord?.fieldMap);
-                    const newList = List.map((item: any) => {
-                        const newItem: any = {};
-                        for (let key in item) {
-                            if (bindFieldData[key]) {
-                                newItem[bindFieldData[key]] = item[key];
-                            } else {
-                                newItem[key] = item[key];
-                            }
-                        }
-                        return newItem;
-                    });
-                    console.log(newList);
-                    getResult(newList);
-                    clearInterval(timer.current);
-                } else if (res.status === 'failed' || res.status === 'requires_action' || res.status === 'canceled') {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message:
-                                res.status === 'failed'
-                                    ? '对话失败'
-                                    : res.status === 'requires_action'
-                                    ? '对话中断，需要进一步处理'
-                                    : res.status === 'canceled'
-                                    ? '对话已取消'
-                                    : '',
-                            variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
-                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                            close: false
-                        })
-                    );
+                } catch (err: any) {
+                    setErrMsg(err.msg);
                     clearInterval(timer.current);
                 }
-            } catch (err: any) {
-                console.log(err);
-                clearInterval(timer.current);
-            }
-        }, 4000);
+            }, 4000);
+        } catch (err: any) {
+            setErrMsg(err.msg);
+        }
     };
     const getResult = async (data: any[]) => {
         const result = await getMaterialTitle({ appUid: query.get('appUid') || query.get('uid') });
@@ -325,12 +335,16 @@ const Right = ({
                 content: content
             };
         });
-        const res = await createBatchMaterial({ saveReqVOS: newData });
-        setStepCurrent(3);
-        setSeleValue(res);
-        setTimeout(() => {
-            setAiStepOpen(false);
-        }, 1000);
+        try {
+            const res = await createBatchMaterial({ saveReqVOS: newData });
+            setStepCurrent(3);
+            setSeleValue(res);
+            setTimeout(() => {
+                setAiStepOpen(false);
+            }, 1000);
+        } catch (err: any) {
+            setErrMsg(err.msg);
+        }
     };
     //获取表头
     useEffect(() => {
@@ -338,7 +352,7 @@ const Right = ({
             getAIData();
         }
     }, [planUid]);
-    const [aiStepOpen, setAiStepOpen] = useState(false);
+    const [aiStepOpen, setAiStepOpen] = useState(true);
     const [stepCurrent, setStepCurrent] = useState(0);
 
     return (
@@ -664,17 +678,36 @@ const Right = ({
                         direction="vertical"
                         size="small"
                         current={stepCurrent}
+                        status={errMsg ? 'error' : 'process'}
                         items={[
                             {
-                                icon: stepCurrent === 0 ? <LoadingOutlined /> : null,
-                                title: 'AI 识别中生成···'
+                                icon: stepCurrent === 0 && !errMsg ? <LoadingOutlined /> : null,
+                                title: 'AI 识别中生成···',
+                                description: (
+                                    <div className="text-xs font-bold">{stepCurrent === 0 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
+                                )
                             },
                             {
-                                icon: stepCurrent === 1 ? <LoadingOutlined /> : null,
-                                title: 'AI 识别生成成功，开始 Ai 执行中···'
+                                icon: stepCurrent === 1 && !errMsg ? <LoadingOutlined /> : null,
+                                title: 'AI 识别生成成功，开始 Ai 执行中···',
+                                description: (
+                                    <div className="text-xs font-bold">{stepCurrent === 1 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
+                                )
                             },
-                            { icon: stepCurrent === 2 ? <LoadingOutlined /> : null, title: 'Ai 执行成功，准备生成素材···' },
-                            { icon: stepCurrent === 3 ? <LoadingOutlined /> : null, title: '素材生成成功，准备插入并生成···' },
+                            {
+                                icon: stepCurrent === 2 && !errMsg ? <LoadingOutlined /> : null,
+                                title: 'Ai 执行成功，准备生成素材···',
+                                description: (
+                                    <div className="text-xs font-bold">{stepCurrent === 2 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
+                                )
+                            },
+                            {
+                                icon: stepCurrent === 3 && !errMsg ? <LoadingOutlined /> : null,
+                                title: '素材生成成功，准备插入并生成···',
+                                description: (
+                                    <div className="text-xs font-bold">{stepCurrent === 3 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
+                                )
+                            },
                             { title: '生成笔记···' }
                         ]}
                     />
@@ -685,12 +718,12 @@ const Right = ({
 };
 const RightMemo = (prevProps: any, nextProps: any) => {
     return (
-        JSON.stringify(prevProps?.isexample) === JSON.stringify(nextProps?.isexample) &&
-        JSON.stringify(prevProps?.bathList) === JSON.stringify(nextProps?.bathList) &&
-        JSON.stringify(prevProps?.collapseActive) === JSON.stringify(nextProps?.collapseActive) &&
-        JSON.stringify(prevProps?.batchOpen) === JSON.stringify(nextProps?.batchOpen) &&
-        JSON.stringify(prevProps?.batchDataList) === JSON.stringify(nextProps?.batchDataList) &&
-        JSON.stringify(prevProps?.exampleList) === JSON.stringify(nextProps?.exampleList)
+        _.isEqual(prevProps?.isexample, nextProps?.isexample) &&
+        _.isEqual(prevProps?.bathList, nextProps?.bathList) &&
+        _.isEqual(prevProps?.collapseActive, nextProps?.collapseActive) &&
+        _.isEqual(prevProps?.batchOpen, nextProps?.batchOpen) &&
+        _.isEqual(prevProps?.batchDataList, nextProps?.batchDataList) &&
+        _.isEqual(prevProps?.exampleList, nextProps?.exampleList)
     );
 };
 export default memo(Right, RightMemo);

@@ -674,7 +674,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                     key: '3',
                                     children: (
                                         <div>
-                                            <div className="text-sm mb-6 font-bold flex gap-2 items-end">
+                                            <div className="text-sm font-bold flex gap-2 items-end">
                                                 是否开启:
                                                 <Switch
                                                     value={aidistinguish?.enableAi}
@@ -685,6 +685,9 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                     }}
                                                 />
                                                 <span className="text-black/40 text-xs">(Tips:无法手动开启，验证成功后会自动开启!)</span>
+                                            </div>
+                                            <div className="mb-6 mt-1 text-xs text-black/40">
+                                                开启AI识别后，用户输入自然语言会自动生成入参去执行插件，并执行笔记生成流程。
                                             </div>
                                             <div className="flex gap-4 items-start">
                                                 <div className="flex-1">

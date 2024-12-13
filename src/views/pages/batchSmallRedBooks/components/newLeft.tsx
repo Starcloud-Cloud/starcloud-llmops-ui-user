@@ -16,8 +16,6 @@ import { useLocation } from 'react-router-dom';
 import Forms from '../../smallRedBook/components/form';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { useAllDetail } from 'contexts/JWTContext';
-import { PermissionUpgradeModal } from 'views/template/myChat/createChat/components/modal/permissionUpgradeModal';
 import { useNavigate } from 'react-router-dom';
 import './newLeft.scss';
 import MaterialTable from './materialTable';
@@ -50,7 +48,10 @@ const Lefts = ({
     getAppList,
     setPlanUidRef,
     setTotalCountRef,
-    setImageStyleList
+    setImageStyleList,
+
+    seleValue, //右下角智能生成
+    setSeleValue //右下角智能生成
 }: {
     detailShow?: boolean;
     planState?: number;
@@ -78,10 +79,11 @@ const Lefts = ({
     setPlanUidRef: (data: string) => void;
     setTotalCountRef: (data: number) => void;
     setImageStyleList: (data: any[]) => void;
+    seleValue?: any;
+    setSeleValue?: (data: any) => void;
 }) => {
     const { wsCache } = useCache();
     const navigate = useNavigate();
-    const { allDetail: all_detail }: any = useAllDetail();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     //存储的数据
@@ -1052,6 +1054,8 @@ const Lefts = ({
                                         handleExecute={(data: number[]) => {
                                             seleSave('SELECT', data);
                                         }}
+                                        seleValue={seleValue}
+                                        setSeleValue={setSeleValue}
                                     />
                                 </div>
 

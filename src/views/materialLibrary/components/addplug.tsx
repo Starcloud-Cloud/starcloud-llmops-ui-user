@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
 import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, getSpaceList, plugVerifyResult } from 'api/redBook/plug';
+import { aiIdentify } from 'api/plug/index';
 import _ from 'lodash-es';
 import Editor, { loader } from '@monaco-editor/react';
 import ChatMarkdown from 'ui-component/Markdown';
@@ -260,6 +261,17 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
     const handleOk = async () => {
         const result = await form.validateFields();
         if (rows) {
+            let obj = {};
+            if (aidistinguish?.enableAi) {
+                obj = { ...aidistinguish };
+            } else {
+                obj = {
+                    enableAi: rows?.enableAi,
+                    userPrompt: rows?.userPrompt,
+                    userInput: rows?.userInput,
+                    aiResult: rows?.aiResult
+                };
+            }
             await modifyPlug({
                 ...result,
                 botId: undefined,
@@ -271,14 +283,15 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 inputFormart: JSON.stringify(inputTable),
                 outputFormart: JSON.stringify(outputTable),
                 outputType,
-                uid: rows.uid
+                uid: rows.uid,
+                ...obj
             });
             message.success('编辑成功');
-            // if (rows.published) {
-            //     await plugPublish(rows.uid);
-            //     message.success('发布成功');
-            // }
         } else {
+            let obj = {};
+            if (aidistinguish?.enableAi) {
+                obj = { ...aidistinguish };
+            }
             await createPlug({
                 ...result,
                 botId: undefined,
@@ -315,6 +328,12 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 ...rows,
                 botId: rows.entityUid,
                 accessTokenId: rows.cozeTokenId
+            });
+            setaidistinguish({
+                enableAi: rows?.enableAi || false,
+                userPrompt: rows?.userPrompt || '',
+                userInput: rows?.userInput || '',
+                aiResult: rows?.aiResult || ''
             });
             setOutputType(rows.outputType);
             if (rows.avatar) {
@@ -424,6 +443,11 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             }
         });
     }, []);
+
+    //ai 识别
+    const [aidistinguish, setaidistinguish] = useState<any>(undefined);
+    const [aiLoading, setAiLoading] = useState<boolean>(false);
+
     return (
         <Modal
             title="插件配置"
@@ -644,6 +668,89 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                             }}
                                         />
                                     )
+                                },
+                                {
+                                    label: 'Ai 识别',
+                                    key: '3',
+                                    children: (
+                                        <div>
+                                            <div className="text-sm mb-6 font-bold flex gap-2 items-end">
+                                                是否开启:
+                                                <Switch
+                                                    value={aidistinguish?.enableAi}
+                                                    onChange={(e) => {
+                                                        if (!e) {
+                                                            setaidistinguish({ ...aidistinguish, enableAi: e });
+                                                        }
+                                                    }}
+                                                />
+                                                <span className="text-black/40 text-xs">(Tips:无法手动开启，验证成功后会自动开启!)</span>
+                                            </div>
+                                            <div className="flex gap-4 items-start">
+                                                <div className="flex-1">
+                                                    <div className="text-xs flex justify-between mb-2">
+                                                        <div>提示词</div>
+                                                        <div>恢复系统默认</div>
+                                                    </div>
+                                                    <TextArea
+                                                        value={aidistinguish?.userPrompt}
+                                                        onChange={(data) => {
+                                                            setaidistinguish({
+                                                                ...aidistinguish,
+                                                                userPrompt: data.target.value
+                                                            });
+                                                        }}
+                                                        disabled={aidistinguish?.enableAi}
+                                                        rows={16}
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="text-xs mb-2">用户输入</div>
+                                                    <TextArea
+                                                        value={aidistinguish?.userInput}
+                                                        onChange={(data) => {
+                                                            setaidistinguish({
+                                                                ...aidistinguish,
+                                                                userInput: data.target.value
+                                                            });
+                                                        }}
+                                                        disabled={aidistinguish?.enableAi}
+                                                        rows={8}
+                                                    />
+                                                    <div className="text-xs mb-2 mt-6">识别结果</div>
+                                                    <TextArea value={aidistinguish?.aiResult} disabled={aidistinguish?.enableAi} rows={8} />
+                                                </div>
+                                            </div>
+                                            <div className="mt-4 flex justify-center">
+                                                <Button
+                                                    loading={aiLoading}
+                                                    type="primary"
+                                                    onClick={async () => {
+                                                        setAiLoading(true);
+                                                        try {
+                                                            const result = await aiIdentify({
+                                                                ...aidistinguish,
+                                                                enableAi: undefined,
+                                                                pluginName: rows?.pluginName,
+                                                                description: rows?.description,
+                                                                inputFormart: rows?.inputFormart
+                                                            });
+                                                            setAiLoading(false);
+                                                            setaidistinguish({
+                                                                ...aidistinguish,
+                                                                enableAi: true,
+                                                                aiResult: JSON.stringify(result, null, 2)
+                                                            });
+                                                        } catch (err) {
+                                                            setAiLoading(false);
+                                                        }
+                                                    }}
+                                                >
+                                                    验证
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )
                                 }
                             ]}
                         />
@@ -818,6 +925,21 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 setBindLoading(false);
                                                             }
                                                         }, 4000);
+                                                        setTimeout(() => {
+                                                            dispatch(
+                                                                openSnackbar({
+                                                                    open: true,
+                                                                    message: '系统异常，请联系管理员',
+                                                                    variant: 'alert',
+                                                                    alert: {
+                                                                        color: 'error'
+                                                                    },
+                                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' }
+                                                                })
+                                                            );
+                                                            setBindLoading(false);
+                                                            clearInterval(timer.current);
+                                                        }, 240000);
                                                     } catch (err: any) {
                                                         clearInterval(timer.current);
 

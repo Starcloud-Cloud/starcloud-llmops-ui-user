@@ -6,7 +6,7 @@ import _ from 'lodash';
 import React from 'react';
 import { ModalForm } from '@ant-design/pro-components';
 import Editor, { loader } from '@monaco-editor/react';
-import { addPlugConfigInfo, updatePlugConfigInfo, configDetail } from 'api/plug';
+import { addPlugConfigInfo, updatePlugConfigInfo, configDetail, aiIdentify } from 'api/plug';
 import { plugexEcuteResult, plugExecute } from 'api/redBook/plug';
 import ChatMarkdown from 'ui-component/Markdown';
 import ResultLoading from '../resultLoading';
@@ -270,8 +270,6 @@ const PlugAnalysis = ({
                 }
             }, 4000);
         } catch (err) {
-            console.log(111111);
-
             setExecountLoading(false);
         }
     };
@@ -389,6 +387,34 @@ const PlugAnalysis = ({
         });
     };
     const [activeKey, setActiveKey] = useState<any>([]);
+    const handleExe = async () => {
+        if (!redBookData.fieldList?.length) {
+            message.error('请至少绑定一素材字段!');
+            return;
+        }
+        const result = await form.validateFields();
+        const newList = redBookData.requirement?.map((item: any) => ({
+            ...item,
+            variableValue: result[item.variableKey]
+        }));
+        await updatePlugConfigInfo({
+            libraryUid: record.libraryUid,
+            pluginUid: record.pluginUid,
+            uid: record.uid,
+            bindName: record.bindName,
+            fieldMap: JSON.stringify(redBookData.bindFieldData),
+            executeParams: JSON.stringify(newList)
+        });
+        setForceUpdate((pre: any) => pre + 1);
+        handleExecute();
+        handleAnalysis();
+    };
+    const handleSave = (flag?: boolean) => {
+        downTableData(materialzanListRef.current, 1, flag);
+        setPlugMarketOpen(false);
+        onOpenChange(false);
+        setMaterialExecutionOpen(false);
+    };
     useEffect(() => {
         if (!record?.fieldMap) {
             setActiveKey(['1']);
@@ -396,6 +422,12 @@ const PlugAnalysis = ({
             setActiveKey([]);
         }
     }, [record]);
+
+    //AI 识别
+    const [aiAccessKey, setAiAccessKey] = useState('1');
+    const [aiLoading, setAiLoading] = useState(false);
+    const aiExeRef = useRef('');
+    const [aiExeValue, setAiExeValue] = useState('');
     return (
         <ModalForm
             modalProps={{
@@ -448,281 +480,292 @@ const PlugAnalysis = ({
             onOpenChange={onOpenChange}
             submitter={false}
         >
-            <div className="text-[16px] font-bold mb-4">
-                1.输入内容
-                <Popover
-                    content={
-                        <div className="w-[500px] max-h-[300px] overflow-auto">
-                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.input || '{}'))} />
-                        </div>
-                    }
-                    title="参数示例"
-                >
-                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                </Popover>
-            </div>
-            {/* <Tabs /> */}
-            <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
-                {redBookData.requirement?.map((item: any) =>
-                    item.variableType === 'String' ? (
-                        <Form.Item
-                            initialValue={item.variableValue}
-                            key={item.uuid}
-                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                            name={item.variableKey}
-                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                        >
-                            <Input />
-                        </Form.Item>
-                    ) : item.variableType === 'Array<String>' ? (
-                        <Form.Item required label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}>
-                            <div className="flex items-center relative bg-[#F4F4F6] px-4 py-2 text-xs font-sans justify-between rounded-t-md">
-                                <span>json</span>
-                            </div>
-                            <Form.Item
-                                initialValue={item.variableValue || '[]'}
-                                name={item.variableKey}
-                                rules={[
-                                    { required: true, message: item.variableKey + '是必填项' },
-                                    {
-                                        validator: (_, value) => {
-                                            if (!value) {
-                                                return Promise.resolve();
-                                            }
-                                            const parsedValue = parseInputToArray(value);
-                                            if (isArrayString(parsedValue)) {
-                                                return Promise.resolve();
-                                            }
-                                            return Promise.reject(new Error('请输入正确的JSON结构'));
-                                        }
-                                    }
-                                ]}
-                            >
-                                <Editor
-                                    className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
-                                    height="200px"
-                                    defaultLanguage="json"
-                                    options={{
-                                        minimap: { enabled: false }
-                                    }}
-                                    onChange={(value: any) => {}}
-                                />
-                            </Form.Item>
-                        </Form.Item>
-                    ) : item.variableType === 'Boolean' ? (
-                        <Form.Item
-                            valuePropName="checked"
-                            initialValue={item.variableValue ? true : false}
-                            key={item.uuid}
-                            label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
-                            name={item.variableKey}
-                            rules={[{ required: true, message: item.variableKey + '是必填项' }]}
-                        >
-                            <Switch />
-                        </Form.Item>
-                    ) : null
-                )}
-            </Form>
-            <Collapse
-                className="analysis"
-                activeKey={activeKey}
-                onChange={setActiveKey}
-                expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+            {/* <Tabs
+                activeKey={aiAccessKey}
+                onChange={setAiAccessKey}
                 items={[
                     {
+                        label: 'AI 识别',
                         key: '1',
-                        label: (
-                            <div className="text-[16px] font-bold flex">
-                                2.输出字段绑定
-                                <Popover
-                                    content={
-                                        <div className="w-[500px] max-h-[300px] overflow-auto">
-                                            <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.output || '{}'))} />
-                                        </div>
-                                    }
-                                    title="参数示例"
-                                >
-                                    <QuestionCircleOutlined className="ml-1 cursor-pointer" />
-                                </Popover>
-                            </div>
-                        ),
                         children: (
-                            <Table
-                                pagination={false}
-                                bordered
-                                size="small"
-                                columns={[
-                                    {
-                                        title: '字段',
-                                        dataIndex: 'des',
-                                        align: 'center',
-                                        width: '40%',
-                                        render: (_, record) => record.des || record.label
-                                    },
-                                    {
-                                        title: '绑定到',
-                                        align: 'center',
-                                        width: '20%',
-                                        render: () => (
-                                            <svg
-                                                viewBox="0 0 1024 1024"
-                                                version="1.1"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                p-id="7263"
-                                                width="20"
-                                                height="20"
-                                            >
-                                                <path
-                                                    d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
-                                                    fill="#8a8a8a"
-                                                    p-id="7264"
-                                                ></path>
-                                            </svg>
-                                        )
-                                    },
-                                    {
-                                        title: '素材字段',
-                                        dataIndex: 'value',
-                                        align: 'center',
-                                        width: '40%',
-                                        render: (_, record) => {
-                                            return (
-                                                data.length > 0 && (
-                                                    <Select
-                                                        style={{ width: 160 }}
-                                                        allowClear
-                                                        value={record.value}
-                                                        onChange={(value) => {
-                                                            let fieldList = redBookData.fieldList || [];
-                                                            console.log(fieldList);
-
-                                                            let bindFieldData = redBookData.bindFieldData;
-                                                            if (value) {
-                                                                fieldList = [...fieldList, record.label_key];
-                                                                bindFieldData[record.label_key] = value;
-                                                            } else {
-                                                                fieldList = fieldList.filter((item: any) => item !== record.label_key);
-                                                                delete bindFieldData[record.label_key];
-                                                            }
-
-                                                            const copyData = [...data];
-                                                            const index = copyData.findIndex((item) => item.label_key === record.label_key);
-                                                            copyData[index].value = value;
-                                                            setData(copyData);
-
-                                                            setRedBookData((pre: any) => {
-                                                                return {
-                                                                    ...pre,
-                                                                    fieldList,
-                                                                    bindFieldData
-                                                                };
-                                                            });
-                                                        }}
-                                                    >
-                                                        {columns
-                                                            .filter((item) => !item.isDefault)
-                                                            ?.map((item) => {
-                                                                return (
-                                                                    <Option
-                                                                        key={item.dataIndex}
-                                                                        value={item.dataIndex}
-                                                                        disabled={Object.values(redBookData.bindFieldData || {}).includes(
-                                                                            item.dataIndex
-                                                                        )}
-                                                                    >
-                                                                        {item.title}
-                                                                    </Option>
-                                                                );
-                                                            })}
-                                                    </Select>
-                                                )
-                                            );
-                                        }
-                                    }
-                                ]}
-                                dataSource={data}
-                            />
+                            <>
+                                <Input.TextArea
+                                    value={aiExeValue}
+                                    onChange={(e) => {
+                                        aiExeRef.current = e.target.value;
+                                        setAiExeValue(aiExeRef.current);
+                                    }}
+                                    rows={10}
+                                />
+                                <div className="flex flex-col gap-1 items-center justify-center my-4">
+                                    <Button loading={aiLoading} type="primary">
+                                        AI 执行
+                                    </Button>
+                                    <div className="text-xs text-[#ff4d4f]">错误信息：</div>
+                                </div>
+                            </>
                         )
+                    },
+                    {
+                        label: '手动输入',
+                        key: '2',
+                        children: ( */}
+            <>
+                <div className="text-[16px] font-bold mb-4">
+                    1.输入内容
+                    <Popover
+                        content={
+                            <div className="w-[500px] max-h-[300px] overflow-auto">
+                                <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.input || '{}'))} />
+                            </div>
+                        }
+                        title="参数示例"
+                    >
+                        <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                    </Popover>
+                </div>
+                <Form form={form} layout={'vertical'} labelCol={{ span: 12 }}>
+                    {redBookData.requirement?.map((item: any) =>
+                        item.variableType === 'String' ? (
+                            <Form.Item
+                                initialValue={item.variableValue}
+                                key={item.uuid}
+                                label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                                name={item.variableKey}
+                                rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        ) : item.variableType === 'Array<String>' ? (
+                            <Form.Item required label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}>
+                                <div className="flex items-center relative bg-[#F4F4F6] px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                    <span>json</span>
+                                </div>
+                                <Form.Item
+                                    initialValue={item.variableValue || '[]'}
+                                    name={item.variableKey}
+                                    rules={[
+                                        { required: true, message: item.variableKey + '是必填项' },
+                                        {
+                                            validator: (_, value) => {
+                                                if (!value) {
+                                                    return Promise.resolve();
+                                                }
+                                                const parsedValue = parseInputToArray(value);
+                                                if (isArrayString(parsedValue)) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(new Error('请输入正确的JSON结构'));
+                                            }
+                                        }
+                                    ]}
+                                >
+                                    <Editor
+                                        className="border border-solid border-[#e1e1e4] rounded-b-md overflow-hidden border-t-transparent"
+                                        height="200px"
+                                        defaultLanguage="json"
+                                        options={{
+                                            minimap: { enabled: false }
+                                        }}
+                                        onChange={(value: any) => {}}
+                                    />
+                                </Form.Item>
+                            </Form.Item>
+                        ) : item.variableType === 'Boolean' ? (
+                            <Form.Item
+                                valuePropName="checked"
+                                initialValue={item.variableValue ? true : false}
+                                key={item.uuid}
+                                label={item.variableKey + (item.variableDesc ? `(${item.variableDesc})` : '')}
+                                name={item.variableKey}
+                                rules={[{ required: true, message: item.variableKey + '是必填项' }]}
+                            >
+                                <Switch />
+                            </Form.Item>
+                        ) : null
+                    )}
+                </Form>
+                <Collapse
+                    className="analysis"
+                    activeKey={activeKey}
+                    onChange={setActiveKey}
+                    expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+                    items={[
+                        {
+                            key: '1',
+                            label: (
+                                <div className="text-[16px] font-bold flex">
+                                    2.输出字段绑定
+                                    <Popover
+                                        content={
+                                            <div className="w-[500px] max-h-[300px] overflow-auto">
+                                                <ChatMarkdown textContent={value2JsonMd(JSON.parse(record?.output || '{}'))} />
+                                            </div>
+                                        }
+                                        title="参数示例"
+                                    >
+                                        <QuestionCircleOutlined className="ml-1 cursor-pointer" />
+                                    </Popover>
+                                </div>
+                            ),
+                            children: (
+                                <Table
+                                    pagination={false}
+                                    bordered
+                                    size="small"
+                                    columns={[
+                                        {
+                                            title: '字段',
+                                            dataIndex: 'des',
+                                            align: 'center',
+                                            width: '40%',
+                                            render: (_, record) => record.des || record.label
+                                        },
+                                        {
+                                            title: '绑定到',
+                                            align: 'center',
+                                            width: '20%',
+                                            render: () => (
+                                                <svg
+                                                    viewBox="0 0 1024 1024"
+                                                    version="1.1"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    p-id="7263"
+                                                    width="20"
+                                                    height="20"
+                                                >
+                                                    <path
+                                                        d="M170.666667 426.666667v170.666666h384l-149.333334 149.333334 103.253334 103.253333L846.506667 512l-337.92-337.92L405.333333 277.333333 554.666667 426.666667H170.666667z"
+                                                        fill="#8a8a8a"
+                                                        p-id="7264"
+                                                    ></path>
+                                                </svg>
+                                            )
+                                        },
+                                        {
+                                            title: '素材字段',
+                                            dataIndex: 'value',
+                                            align: 'center',
+                                            width: '40%',
+                                            render: (_, record) => {
+                                                return (
+                                                    data.length > 0 && (
+                                                        <Select
+                                                            style={{ width: 160 }}
+                                                            allowClear
+                                                            value={record.value}
+                                                            onChange={(value) => {
+                                                                let fieldList = redBookData.fieldList || [];
+                                                                console.log(fieldList);
+
+                                                                let bindFieldData = redBookData.bindFieldData;
+                                                                if (value) {
+                                                                    fieldList = [...fieldList, record.label_key];
+                                                                    bindFieldData[record.label_key] = value;
+                                                                } else {
+                                                                    fieldList = fieldList.filter((item: any) => item !== record.label_key);
+                                                                    delete bindFieldData[record.label_key];
+                                                                }
+
+                                                                const copyData = [...data];
+                                                                const index = copyData.findIndex(
+                                                                    (item) => item.label_key === record.label_key
+                                                                );
+                                                                copyData[index].value = value;
+                                                                setData(copyData);
+
+                                                                setRedBookData((pre: any) => {
+                                                                    return {
+                                                                        ...pre,
+                                                                        fieldList,
+                                                                        bindFieldData
+                                                                    };
+                                                                });
+                                                            }}
+                                                        >
+                                                            {columns
+                                                                .filter((item) => !item.isDefault)
+                                                                ?.map((item) => {
+                                                                    return (
+                                                                        <Option
+                                                                            key={item.dataIndex}
+                                                                            value={item.dataIndex}
+                                                                            disabled={Object.values(
+                                                                                redBookData.bindFieldData || {}
+                                                                            ).includes(item.dataIndex)}
+                                                                        >
+                                                                            {item.title}
+                                                                        </Option>
+                                                                    );
+                                                                })}
+                                                        </Select>
+                                                    )
+                                                );
+                                            }
+                                        }
+                                    ]}
+                                    dataSource={data}
+                                />
+                            )
+                        }
+                    ]}
+                />
+                <div className="flex justify-center gap-6 mt-6">
+                    <Button
+                        onClick={async () => {
+                            const result = await form.validateFields();
+                            const newList = redBookData.requirement?.map((item: any) => ({
+                                ...item,
+                                variableValue: result[item.variableKey]
+                            }));
+                            if (!record?.uid) {
+                                const res = await addPlugConfigInfo({
+                                    libraryUid: record.libraryUid,
+                                    pluginUid: record.pluginUid,
+                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                    executeParams: JSON.stringify(newList)
+                                });
+                                if (res) {
+                                    message.success('保存成功');
+                                    setForceUpdate((pre: any) => pre + 1);
+                                }
+                            } else {
+                                const res = await updatePlugConfigInfo({
+                                    libraryUid: record.libraryUid,
+                                    pluginUid: record.pluginUid,
+                                    uid: record.uid,
+                                    bindName: record.bindName,
+                                    fieldMap: JSON.stringify(redBookData.bindFieldData),
+                                    executeParams: JSON.stringify(newList)
+                                });
+                                if (res) {
+                                    message.success('保存成功');
+                                    setForceUpdate((pre: any) => pre + 1);
+                                }
+                            }
+                        }}
+                        type="primary"
+                    >
+                        保存配置
+                    </Button>
+                    <Button loading={execountLoading} onClick={handleExe} type="primary">
+                        执行
+                    </Button>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            setRowPre(rowPre + 1);
+                            setTriggerOpen(true);
+                        }}
+                    >
+                        定时任务
+                    </Button>
+                </div>
+            </>
+            {/* )
                     }
                 ]}
-            />
-            <div className="flex justify-center gap-6 mt-6">
-                <Button
-                    onClick={async () => {
-                        const result = await form.validateFields();
-                        const newList = redBookData.requirement?.map((item: any) => ({
-                            ...item,
-                            variableValue: result[item.variableKey]
-                        }));
-                        if (!record?.uid) {
-                            const res = await addPlugConfigInfo({
-                                libraryUid: record.libraryUid,
-                                pluginUid: record.pluginUid,
-                                fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                executeParams: JSON.stringify(newList)
-                            });
-                            if (res) {
-                                message.success('保存成功');
-                                setForceUpdate((pre: any) => pre + 1);
-                            }
-                        } else {
-                            const res = await updatePlugConfigInfo({
-                                libraryUid: record.libraryUid,
-                                pluginUid: record.pluginUid,
-                                uid: record.uid,
-                                bindName: record.bindName,
-                                fieldMap: JSON.stringify(redBookData.bindFieldData),
-                                executeParams: JSON.stringify(newList)
-                            });
-                            if (res) {
-                                message.success('保存成功');
-                                setForceUpdate((pre: any) => pre + 1);
-                            }
-                        }
-                    }}
-                    type="primary"
-                >
-                    保存配置
-                </Button>
-                <Button
-                    loading={execountLoading}
-                    onClick={async () => {
-                        if (!redBookData.fieldList?.length) {
-                            message.error('请至少绑定一素材字段!');
-                            return;
-                        }
-                        const result = await form.validateFields();
-                        const newList = redBookData.requirement?.map((item: any) => ({
-                            ...item,
-                            variableValue: result[item.variableKey]
-                        }));
-                        await updatePlugConfigInfo({
-                            libraryUid: record.libraryUid,
-                            pluginUid: record.pluginUid,
-                            uid: record.uid,
-                            bindName: record.bindName,
-                            fieldMap: JSON.stringify(redBookData.bindFieldData),
-                            executeParams: JSON.stringify(newList)
-                        });
-                        setForceUpdate((pre: any) => pre + 1);
-
-                        handleExecute();
-                        handleAnalysis();
-                    }}
-                    type="primary"
-                >
-                    执行
-                </Button>
-                <Button
-                    type="primary"
-                    onClick={() => {
-                        setRowPre(rowPre + 1);
-                        setTriggerOpen(true);
-                    }}
-                >
-                    定时任务
-                </Button>
-            </div>
+            /> */}
             <ResultLoading
                 tagFlag={true}
                 canExecute={canExecute}
@@ -760,12 +803,7 @@ const PlugAnalysis = ({
                     setErrorMessage(errorMessageRef.current);
                     handleExecute(true);
                 }}
-                handleSave={(flag?: boolean) => {
-                    downTableData(materialzanListRef.current, 1, flag);
-                    setPlugMarketOpen(false);
-                    onOpenChange(false);
-                    setMaterialExecutionOpen(false);
-                }}
+                handleSave={handleSave}
                 handleCancel={() => {
                     clearInterval(timer.current);
                     executionCountRef.current = 0;

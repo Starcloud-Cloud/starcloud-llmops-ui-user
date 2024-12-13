@@ -317,7 +317,7 @@ const Header = () => {
                                     微信扫码入群
                                 </Typography>
                                 <Typography my={1} fontSize="12px" color="#697586">
-                                    魔法AI矩阵交流群
+                                    魔法笔记交流群
                                 </Typography>
                                 <Box display="flex" justifyContent="center">
                                     <CardMedia
@@ -327,7 +327,7 @@ const Header = () => {
                                         sx={{ width: '100%' }}
                                     />
                                 </Box>
-                                <div className="text-xs my-2">进群享受内测500篇笔记的生成额度</div>
+                                <div className="text-xs my-2">进群领取权益码</div>
                                 <div className="text-xs">使用反馈还有赠送哦！</div>
                             </Box>
                         </Box>

@@ -97,7 +97,7 @@ const Share = () => {
                         onClick={() => {
                             window.open(process.env.REACT_APP_SHARE_URL);
                         }}
-                        className="h-[40px] font-[400] text-white text-xl bg-[rgb(128,102,225)] flex justify-center items-center gap-4 cursor-pointer"
+                        className="h-[40px] font-[400] text-white text-base bg-[rgb(128,102,225)] flex justify-center items-center gap-4 cursor-pointer"
                     >
                         <svg viewBox="0 0 1094 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="26183" width="25" height="25">
                             <path

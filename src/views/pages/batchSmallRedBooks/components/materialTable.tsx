@@ -42,7 +42,18 @@ import { v4 as uuidv4 } from 'uuid';
 import { updateMaterialLibraryTitle } from 'api/material';
 import { origin_url } from 'utils/axios/config';
 
-const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appUid, tableTitle, handleExecute }: any) => {
+const MaterialTable = ({
+    materialStatus,
+    updataTable,
+    uid,
+    bizUid,
+    bizType,
+    appUid,
+    tableTitle,
+    handleExecute,
+    seleValue,
+    setSeleValue
+}: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
     const [page, setPage] = useState({
@@ -540,6 +551,13 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
             );
         }
     }, [tableData, materialStatus]);
+    useEffect(() => {
+        if (seleValue) {
+            handleExecute(seleValue);
+            getList();
+            setSeleValue(null);
+        }
+    }, [seleValue]);
     return (
         <div>
             {materialStatus === 'picture' ? (
@@ -656,38 +674,6 @@ const MaterialTable = ({ materialStatus, updataTable, uid, bizUid, bizType, appU
                         <SettingOutlined className="absolute top-4 right-4 cursor-pointer" />
                     </div>
                 </div>
-                // <>
-                //     <div className="flex items-center justify-between mb-4">
-                //         <div>
-                //             <Button size="small" type="primary" onClick={() => setUploadOpen(true)}>
-                //                 批量导入
-                //             </Button>
-                //         </div>
-                //         <div className="flex gap-2 items-end">
-                //             <div className="text-xs text-black/50">点击放大编辑</div>
-                //             <Button onClick={() => setZoomOpen(true)} type="primary" shape="circle" icon={<ZoomInOutlined />}></Button>
-                //         </div>
-                //     </div>
-                //     <div className="material-index material-detail-table">
-                //         <TablePro
-                //             isSelection={true}
-                //             actionRef={actionRef}
-                //             columns={getClumn}
-                //             tableData={tableData}
-                //             tableLoading={tableLoading}
-                //             page={page}
-                //             setPage={setPage}
-                //             total={total}
-                //             setTableData={(data: any) => {
-                //                 tableRef.current = data;
-                //                 setTableData(data);
-                //             }}
-                //             getList={getList}
-                //             handleEditColumn={handleEditColumn}
-                //             onUpdateColumn={handleUpdateColumn}
-                //         />
-                //     </div>
-                // </>
             )}
             {editOpen && (
                 <FormModal
@@ -842,7 +828,8 @@ const memoMaterialTable = (pre: any, next: any) => {
         _.isEqual(pre.updataTable, next.updataTable) &&
         _.isEqual(pre.uid, next.uid) &&
         _.isEqual(pre.appUid, next.appUid) &&
-        _.isEqual(pre.tableTitle, next.tableTitle)
+        _.isEqual(pre.tableTitle, next.tableTitle) &&
+        _.isEqual(pre.seleValue, next.seleValue)
     );
 };
 export default memo(MaterialTable, memoMaterialTable);

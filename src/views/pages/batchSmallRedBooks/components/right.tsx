@@ -204,7 +204,6 @@ const Right = ({
         });
         const res = result?.pluginDetailList?.length > 0 ? result?.pluginDetailList[0] : undefined;
         setAiRocord(res ? { ...res?.pluginDefinition, ...res?.pluginConfig } : res);
-        setExeInputValue(res?.pluginDefinition?.userInput);
     };
 
     const handleAiExe = async () => {
@@ -660,6 +659,7 @@ const Right = ({
                         </div>
                         <div className="w-full">
                             <Input
+                                placeholder={aiRocord?.userInput}
                                 status={exeInputOpen && !exeInputValue ? 'error' : ''}
                                 value={exeInputValue}
                                 onChange={(e) => setExeInputValue(e.target.value)}

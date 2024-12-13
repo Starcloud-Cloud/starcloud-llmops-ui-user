@@ -313,7 +313,7 @@ const Right = ({
         }
     };
     const getResult = async (data: any[]) => {
-        const result = await getMaterialTitle({ appUid: query.get('appUid') || query.get('uid') });
+        const result = await getMaterialTitle({ appUid: query.get('uid') });
         const newData = data.map((record) => {
             const content = result?.tableMeta?.map((item: any) => {
                 if (item.columnType === EditType.Image) {

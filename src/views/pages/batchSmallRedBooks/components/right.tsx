@@ -204,6 +204,7 @@ const Right = ({
         });
         const res = result?.pluginDetailList?.length > 0 ? result?.pluginDetailList[0] : undefined;
         setAiRocord(res ? { ...res?.pluginDefinition, ...res?.pluginConfig } : res);
+        setExeInputValue(res?.pluginDefinition?.userInput);
     };
 
     const handleAiExe = async () => {
@@ -278,7 +279,6 @@ const Right = ({
                             }
                             return newItem;
                         });
-                        console.log(newList);
                         getResult(newList);
                         clearInterval(timer.current);
                     } else if (res.status === 'failed' || res.status === 'requires_action' || res.status === 'canceled') {

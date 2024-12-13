@@ -228,7 +228,7 @@ const Right = ({
         //ai生成笔记生成笔记完成 开始执行
         try {
             const code = await plugExecute({
-                ...result,
+                inputParams: result,
                 uuid: aiRocord.pluginUid
             });
             setStepCurrent(2);
@@ -637,7 +637,7 @@ const Right = ({
             </Modal>
             {aiRocord &&
                 (isExe ? (
-                    <div className="absolute w-[400px] left-[calc(50%-200px)] bottom-10 bg-[#ede7f6] rounded-lg px-4 pt-1 pb-2 flex flex-col items-center gap-2 border-[0.5px] border-solid border-[#d9d9d9]">
+                    <div className="absolute w-[400px] left-[calc(50%-200px)] bottom-10 bg-[#ede7f6] rounded-lg px-4 pt-1 pb-2 flex flex-col items-center gap-2 border-[0.5px] border-solid border-[#d9d9d9] z-[1]">
                         <div className="w-full flex justify-between text-sm font-bold mb-2">
                             <div>智能生成</div>
                             <CloseOutlined

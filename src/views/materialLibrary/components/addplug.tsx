@@ -45,6 +45,7 @@ const AddPlug = ({
     const navigate = useNavigate();
 
     const timer = useRef<any>(null);
+    const timer2 = useRef<any>(null);
     const [status, setStatus] = useState('gold');
     const [verifyStatus, setverifyStatus] = useState('gold');
     const [errmessage, seterrmessage] = useState('');
@@ -320,6 +321,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         });
         return () => {
             clearInterval(timer.current);
+            clearTimeout(timer2.current);
         };
     }, []);
     useEffect(() => {
@@ -920,6 +922,7 @@ ${aidistinguish?.aiResult}
                                                                     code: res,
                                                                     accessTokenId: form.getFieldValue('accessTokenId')
                                                                 });
+                                                                clearTimeout(timer2.current);
                                                                 if (result.verifyState) {
                                                                     clearInterval(timer.current);
                                                                     setverifyStatus('success');
@@ -956,7 +959,7 @@ ${aidistinguish?.aiResult}
                                                                 setBindLoading(false);
                                                             }
                                                         }, 4000);
-                                                        setTimeout(() => {
+                                                        timer2.current = setTimeout(() => {
                                                             dispatch(
                                                                 openSnackbar({
                                                                     open: true,
@@ -973,7 +976,7 @@ ${aidistinguish?.aiResult}
                                                         }, 240000);
                                                     } catch (err: any) {
                                                         clearInterval(timer.current);
-
+                                                        clearTimeout(timer2.current);
                                                         setBindLoading(false);
                                                     }
                                                 }}

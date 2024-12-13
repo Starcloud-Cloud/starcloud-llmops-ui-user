@@ -1,5 +1,5 @@
 import { Collapse, Spin, Tag, Popover, Button, Popconfirm, Modal, Checkbox, QRCode, Input, Tooltip, Steps, Image } from 'antd';
-import { CopyrightOutlined, CloseOutlined, LoadingOutlined } from '@ant-design/icons';
+import { CopyrightOutlined, CloseOutlined, LoadingOutlined, HistoryOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -231,6 +231,7 @@ const Right = ({
         }
     };
     const timer = useRef<any>(null);
+    const timer1 = useRef<any>(null);
     const handleNextExe = async (result: any) => {
         //ai生成笔记生成笔记完成 开始执行
         try {
@@ -246,6 +247,7 @@ const Right = ({
                         uuid: aiRocord.pluginUid
                     });
                     if (res.status === 'completed') {
+                        clearTimeout(timer1.current);
                         let List;
                         if (Array.isArray(res.output) && aiRocord.outputType === 'list') {
                             List = res.output;
@@ -306,8 +308,13 @@ const Right = ({
                 } catch (err: any) {
                     setErrMsg(err.msg);
                     clearInterval(timer.current);
+                    clearTimeout(timer1.current);
                 }
             }, 4000);
+            timer1.current = setTimeout(() => {
+                clearInterval(timer.current);
+                setErrMsg('请求超时，请联系管理员');
+            }, 240000);
         } catch (err: any) {
             setErrMsg(err.msg);
         }
@@ -358,7 +365,7 @@ const Right = ({
             getAIData();
         }
     }, [planUid]);
-    const [aiStepOpen, setAiStepOpen] = useState(false);
+    const [aiStepOpen, setAiStepOpen] = useState(true);
     const [stepCurrent, setStepCurrent] = useState(0);
 
     return (
@@ -717,7 +724,15 @@ const Right = ({
                             },
                             {
                                 icon: stepCurrent === 2 && !errMsg ? <LoadingOutlined /> : null,
-                                title: 'AI 执行成功，准备生成素材···',
+                                title: (
+                                    <div>
+                                        AI 执行成功，准备生成素材··· <HistoryOutlined />{' '}
+                                        <span className="text-[#673ab7]">
+                                            预计耗时：
+                                            {((aiRocord?.executeTimeAvg * 1.1) / 1000) | 0}s
+                                        </span>
+                                    </div>
+                                ),
                                 description: (
                                     <div className="text-xs font-bold">{stepCurrent === 2 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
                                 )

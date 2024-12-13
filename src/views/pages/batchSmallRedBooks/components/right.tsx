@@ -365,7 +365,7 @@ const Right = ({
             getAIData();
         }
     }, [planUid]);
-    const [aiStepOpen, setAiStepOpen] = useState(true);
+    const [aiStepOpen, setAiStepOpen] = useState(false);
     const [stepCurrent, setStepCurrent] = useState(0);
 
     return (

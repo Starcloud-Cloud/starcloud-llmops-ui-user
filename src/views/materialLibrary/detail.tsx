@@ -119,9 +119,7 @@ export const TableHeader = ({
     canSwitch,
     canExecute,
     handleExecute,
-    bindAppContent,
-    generationValue, //右下角智能生成
-    exePlugUid //右下角智能生成
+    bindAppContent
 }: {
     isShowField?: boolean;
     // 图标
@@ -169,8 +167,6 @@ export const TableHeader = ({
     // 执行
     handleExecute?: (data: any[]) => void;
     bindAppContent?: any[];
-    generationValue?: string;
-    exePlugUid?: string;
 }) => {
     const [plugOpen, setPlugOpen] = useState(false);
     const [plugTitle, setPlugTitle] = useState('插件市场');
@@ -473,11 +469,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             }, 500);
         }
     }, [searchValue]);
-    useEffect(() => {
-        if (generationValue && definitionList.length > 0) {
-            handleOpenPlug(definitionList?.find((item) => item.uid === exePlugUid));
-        }
-    }, [generationValue, definitionList]);
 
     return (
         <div className="relative">
@@ -1421,7 +1412,6 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     metaData={metaData}
                     libraryUid={libraryUid}
                     canExecute={canExecute}
-                    generationValue={generationValue}
                 />
             )}
         </div>

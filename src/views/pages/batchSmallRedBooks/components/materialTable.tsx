@@ -51,8 +51,8 @@ const MaterialTable = ({
     appUid,
     tableTitle,
     handleExecute,
-    generationValue,
-    exePlugUid
+    seleValue,
+    setSeleValue
 }: any) => {
     const [form] = Form.useForm();
     const [imageForm] = Form.useForm();
@@ -551,12 +551,13 @@ const MaterialTable = ({
             );
         }
     }, [tableData, materialStatus]);
-
     useEffect(() => {
-        if (generationValue) {
-            setZoomOpen(true);
+        if (seleValue) {
+            handleExecute(seleValue);
+            getList();
+            setSeleValue(null);
         }
-    }, [generationValue]);
+    }, [seleValue]);
     return (
         <div>
             {materialStatus === 'picture' ? (
@@ -733,8 +734,6 @@ const MaterialTable = ({
                         handleExecute(data);
                         setZoomOpen(false);
                     }}
-                    generationValue={generationValue}
-                    exePlugUid={exePlugUid}
                 />
             </Modal>
             {isModalOpen && (
@@ -830,8 +829,7 @@ const memoMaterialTable = (pre: any, next: any) => {
         _.isEqual(pre.uid, next.uid) &&
         _.isEqual(pre.appUid, next.appUid) &&
         _.isEqual(pre.tableTitle, next.tableTitle) &&
-        _.isEqual(pre.generationValue, next.generationValue) &&
-        _.isEqual(pre.exePlugUid, next.exePlugUid)
+        _.isEqual(pre.seleValue, next.seleValue)
     );
 };
 export default memo(MaterialTable, memoMaterialTable);

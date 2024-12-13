@@ -146,6 +146,20 @@ const HeaderField = ({
             render: (_: any, row: any) => (row?.isRequired ? <Tag color="processing">必填</Tag> : '')
         },
         {
+            width: 200,
+            title: '部门名称',
+            align: 'center',
+            editable: false,
+            render: (_: any, row: any) => row?.deptName
+        },
+        {
+            width: 200,
+            title: '创建人',
+            align: 'center',
+            editable: false,
+            render: (_: any, row: any) => row?.createName
+        },
+        {
             title: '操作',
             align: 'center',
             valueType: 'option',

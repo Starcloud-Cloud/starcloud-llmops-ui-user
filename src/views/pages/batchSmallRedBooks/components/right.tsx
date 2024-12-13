@@ -352,7 +352,7 @@ const Right = ({
             getAIData();
         }
     }, [planUid]);
-    const [aiStepOpen, setAiStepOpen] = useState(true);
+    const [aiStepOpen, setAiStepOpen] = useState(false);
     const [stepCurrent, setStepCurrent] = useState(0);
 
     return (
@@ -637,8 +637,8 @@ const Right = ({
             </Modal>
             {aiRocord &&
                 (isExe ? (
-                    <div className="absolute w-[400px] left-[calc(50%-200px)] bottom-10 bg-white rounded-lg px-4 pt-1 pb-2 flex flex-col items-center gap-2 border-[0.5px] border-solid border-[#d9d9d9]">
-                        <div className="w-full flex justify-between text-sm font-bold">
+                    <div className="absolute w-[400px] left-[calc(50%-200px)] bottom-10 bg-[#ede7f6] rounded-lg px-4 pt-1 pb-2 flex flex-col items-center gap-2 border-[0.5px] border-solid border-[#d9d9d9]">
+                        <div className="w-full flex justify-between text-sm font-bold mb-2">
                             <div>智能生成</div>
                             <CloseOutlined
                                 onClick={() => setIsExe(false)}
@@ -654,7 +654,7 @@ const Right = ({
                     <Tooltip title="点击展开智能生成" placement="topLeft">
                         <div
                             onClick={() => setIsExe(true)}
-                            className="absolute right-[-20px] bottom-4 bg-white cursor-pointer w-[70px] h-[40px] p-4 flex items-center rounded-full border border-solid border-[#d9d9d9]"
+                            className="absolute right-[-20px] bottom-4 bg-[#ede7f6] cursor-pointer w-[70px] h-[40px] p-4 flex items-center rounded-full border border-solid border-[#d9d9d9]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -672,7 +672,15 @@ const Right = ({
                         </div>
                     </Tooltip>
                 ))}
-            <Modal title="笔记生成进度" open={aiStepOpen} onCancel={() => setAiStepOpen(false)} footer={false}>
+            <Modal
+                title="笔记生成进度"
+                open={aiStepOpen}
+                onCancel={() => setAiStepOpen(false)}
+                closable={errMsg ? true : false}
+                maskClosable={false}
+                footer={false}
+                keyboard={false}
+            >
                 <div className="mt-4 flex justify-center">
                     <Steps
                         direction="vertical"
@@ -696,7 +704,7 @@ const Right = ({
                             },
                             {
                                 icon: stepCurrent === 2 && !errMsg ? <LoadingOutlined /> : null,
-                                title: 'Ai 执行成功，准备生成素材···',
+                                title: 'AI 执行成功，准备生成素材···',
                                 description: (
                                     <div className="text-xs font-bold">{stepCurrent === 2 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
                                 )
@@ -708,7 +716,7 @@ const Right = ({
                                     <div className="text-xs font-bold">{stepCurrent === 3 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
                                 )
                             },
-                            { title: '生成笔记···' }
+                            { title: 'AI 生成笔记···' }
                         ]}
                     />
                 </div>
@@ -719,6 +727,7 @@ const Right = ({
 const RightMemo = (prevProps: any, nextProps: any) => {
     return (
         _.isEqual(prevProps?.isexample, nextProps?.isexample) &&
+        _.isEqual(prevProps?.planUid, nextProps?.planUid) &&
         _.isEqual(prevProps?.bathList, nextProps?.bathList) &&
         _.isEqual(prevProps?.collapseActive, nextProps?.collapseActive) &&
         _.isEqual(prevProps?.batchOpen, nextProps?.batchOpen) &&

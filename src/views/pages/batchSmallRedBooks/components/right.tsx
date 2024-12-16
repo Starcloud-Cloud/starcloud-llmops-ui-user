@@ -196,6 +196,7 @@ const Right = ({
 
     const [errMsg, setErrMsg] = useState('');
     const [aiRocord, setAiRocord] = useState<any>(undefined); //获取详情数据
+    const [aiData, setAiData] = useState(undefined);
     const getAIData = async () => {
         const result = await bindPlugin({
             appUid: query.get('appUid') || query.get('uid'),
@@ -209,6 +210,7 @@ const Right = ({
     const handleAiExe = async () => {
         setExeInputOpen(true);
         setErrMsg('');
+        setAiData(undefined);
         setStepCurrent(0);
         if (!exeInputValue) {
             return false;
@@ -218,12 +220,13 @@ const Right = ({
         try {
             const result = await aiIdentify({
                 pluginName: aiRocord?.pluginName,
-                description: '',
-                userPrompt: '',
+                description: aiRocord?.description,
+                userPrompt: aiRocord?.userPrompt,
                 userInput: exeInputValue,
                 inputFormart: aiRocord?.inputFormart
             });
             setStepCurrent(1);
+            setAiData(result);
             handleNextExe(result);
         } catch (err: any) {
             setErrMsg(err.msg);
@@ -357,6 +360,18 @@ const Right = ({
         } catch (err: any) {
             setErrMsg(err.msg);
         }
+    };
+    const getrejectData = (data: any) => {
+        if (!data) '';
+        const result = [];
+        for (let key in data) {
+            result.push(
+                <div className="mt-1">
+                    {key}:{data[key]}
+                </div>
+            );
+        }
+        return result;
     };
     //获取表头
     useEffect(() => {
@@ -719,22 +734,32 @@ const Right = ({
                                 icon: stepCurrent === 1 && !errMsg ? <LoadingOutlined /> : null,
                                 title: 'AI 识别生成成功，开始 Ai 执行中···',
                                 description: (
-                                    <div className="text-xs font-bold">{stepCurrent === 1 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
+                                    <div className="text-xs font-bold">
+                                        {stepCurrent === 1 && errMsg ? (
+                                            `错误信息：(${errMsg})`
+                                        ) : (
+                                            <div className="max-h-[300px] overflow-y-scroll font-[500] flex gap-2 items-center mt-2">
+                                                {aiData && <div>入参信息：</div>}
+                                                <div>{getrejectData(aiData)}</div>
+                                            </div>
+                                        )}
+                                    </div>
                                 )
                             },
                             {
                                 icon: stepCurrent === 2 && !errMsg ? <LoadingOutlined /> : null,
-                                title: (
-                                    <div>
-                                        AI 执行成功，准备生成素材··· <HistoryOutlined />{' '}
-                                        <span className="text-[#673ab7]">
-                                            预计耗时：
-                                            {((aiRocord?.executeTimeAvg * 1.1) / 1000) | 0}s
-                                        </span>
-                                    </div>
-                                ),
+                                title: <div>AI 执行成功，生成素材中···</div>,
                                 description: (
-                                    <div className="text-xs font-bold">{stepCurrent === 2 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
+                                    <div className="text-xs font-bold">
+                                        {stepCurrent === 2 && errMsg ? (
+                                            `错误信息：(${errMsg})`
+                                        ) : (
+                                            <span className="text-[#673ab7]">
+                                                <HistoryOutlined /> 预计耗时：
+                                                {((aiRocord?.executeTimeAvg * 1.1) / 1000) | 40}s
+                                            </span>
+                                        )}
+                                    </div>
                                 )
                             },
                             {

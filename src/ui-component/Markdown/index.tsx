@@ -88,7 +88,7 @@ const ChatMarkdown = (props: tProps) => {
                                     </div>
                                     <SyntaxHighlighter
                                         showLineNumbers={true}
-                                        className="max-h-[400px]"
+                                        className="max-h-[400px] Code"
                                         style={vscDarkPlus as any}
                                         language={match[1]}
                                         PreTag="div"

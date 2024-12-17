@@ -298,7 +298,13 @@ const StepEdit = ({
             required: true,
             dataIndex: 'description',
             formItemProps: {
-                component: <Input />
+                component: <Input />,
+                rules: [
+                    {
+                        max: 100,
+                        message: '字段描述不能超过 100 个字'
+                    }
+                ]
             }
         },
         {

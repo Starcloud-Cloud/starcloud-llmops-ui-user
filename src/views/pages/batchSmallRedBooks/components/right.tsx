@@ -1,5 +1,5 @@
 import { Collapse, Spin, Tag, Popover, Button, Popconfirm, Modal, Checkbox, QRCode, Input, Tooltip, Steps, Image } from 'antd';
-import { CopyrightOutlined, CloseOutlined, LoadingOutlined } from '@ant-design/icons';
+import { CopyrightOutlined, CloseOutlined, LoadingOutlined, HistoryOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -190,10 +190,13 @@ const Right = ({
 
     //右下角智能生成
     const [isExe, setIsExe] = useState(true);
+
+    const [exeInputOpen, setExeInputOpen] = useState(false);
     const [exeInputValue, setExeInputValue] = useState('');
 
     const [errMsg, setErrMsg] = useState('');
     const [aiRocord, setAiRocord] = useState<any>(undefined); //获取详情数据
+    const [aiData, setAiData] = useState(undefined);
     const getAIData = async () => {
         const result = await bindPlugin({
             appUid: query.get('appUid') || query.get('uid'),
@@ -205,30 +208,37 @@ const Right = ({
     };
 
     const handleAiExe = async () => {
+        setExeInputOpen(true);
         setErrMsg('');
+        setAiData(undefined);
         setStepCurrent(0);
+        if (!exeInputValue) {
+            return false;
+        }
         //点击 ai生成笔记
         setAiStepOpen(true);
         try {
             const result = await aiIdentify({
                 pluginName: aiRocord?.pluginName,
-                description: '',
-                userPrompt: '',
+                description: aiRocord?.description,
+                userPrompt: aiRocord?.userPrompt,
                 userInput: exeInputValue,
                 inputFormart: aiRocord?.inputFormart
             });
             setStepCurrent(1);
+            setAiData(result);
             handleNextExe(result);
         } catch (err: any) {
             setErrMsg(err.msg);
         }
     };
     const timer = useRef<any>(null);
+    const timer1 = useRef<any>(null);
     const handleNextExe = async (result: any) => {
         //ai生成笔记生成笔记完成 开始执行
         try {
             const code = await plugExecute({
-                ...result,
+                inputParams: result,
                 uuid: aiRocord.pluginUid
             });
             setStepCurrent(2);
@@ -239,6 +249,7 @@ const Right = ({
                         uuid: aiRocord.pluginUid
                     });
                     if (res.status === 'completed') {
+                        clearTimeout(timer1.current);
                         let List;
                         if (Array.isArray(res.output) && aiRocord.outputType === 'list') {
                             List = res.output;
@@ -272,7 +283,6 @@ const Right = ({
                             }
                             return newItem;
                         });
-                        console.log(newList);
                         getResult(newList);
                         clearInterval(timer.current);
                     } else if (res.status === 'failed' || res.status === 'requires_action' || res.status === 'canceled') {
@@ -300,14 +310,19 @@ const Right = ({
                 } catch (err: any) {
                     setErrMsg(err.msg);
                     clearInterval(timer.current);
+                    clearTimeout(timer1.current);
                 }
             }, 4000);
+            timer1.current = setTimeout(() => {
+                clearInterval(timer.current);
+                setErrMsg('请求超时，请联系管理员');
+            }, 240000);
         } catch (err: any) {
             setErrMsg(err.msg);
         }
     };
     const getResult = async (data: any[]) => {
-        const result = await getMaterialTitle({ appUid: query.get('appUid') || query.get('uid') });
+        const result = await getMaterialTitle({ appUid: query.get('uid') });
         const newData = data.map((record) => {
             const content = result?.tableMeta?.map((item: any) => {
                 if (item.columnType === EditType.Image) {
@@ -346,13 +361,25 @@ const Right = ({
             setErrMsg(err.msg);
         }
     };
+    const getrejectData = (data: any) => {
+        if (!data) '';
+        const result = [];
+        for (let key in data) {
+            result.push(
+                <div>
+                    {key}:{typeof data[key] === 'object' ? data[key].join(',') : data[key]}
+                </div>
+            );
+        }
+        return <div className="flex flex-col gap-1">{result}</div>;
+    };
     //获取表头
     useEffect(() => {
         if (planUid) {
             getAIData();
         }
     }, [planUid]);
-    const [aiStepOpen, setAiStepOpen] = useState(true);
+    const [aiStepOpen, setAiStepOpen] = useState(false);
     const [stepCurrent, setStepCurrent] = useState(0);
 
     return (
@@ -637,15 +664,23 @@ const Right = ({
             </Modal>
             {aiRocord &&
                 (isExe ? (
-                    <div className="absolute w-[400px] left-[calc(50%-200px)] bottom-10 bg-white rounded-lg px-4 pt-1 pb-2 flex flex-col items-center gap-2 border-[0.5px] border-solid border-[#d9d9d9]">
-                        <div className="w-full flex justify-between text-sm font-bold">
+                    <div className="absolute w-[400px] left-[calc(50%-200px)] bottom-10 bg-[#ede7f6] rounded-lg px-4 pt-1 pb-2 flex flex-col items-center gap-2 border-[0.5px] border-solid border-[#d9d9d9] z-[1]">
+                        <div className="w-full flex justify-between text-sm font-bold mb-2">
                             <div>智能生成</div>
                             <CloseOutlined
                                 onClick={() => setIsExe(false)}
                                 className="text-xs cursor-pointer border border-solid border-[transparent] hover:border-[#d9d9d9] rounded-full w-[20px] h-[20px] flex justify-center items-center"
                             />
                         </div>
-                        <Input value={exeInputValue} onChange={(e) => setExeInputValue(e.target.value)} />
+                        <div className="w-full">
+                            <Input
+                                placeholder={aiRocord?.userInput}
+                                status={exeInputOpen && !exeInputValue ? 'error' : ''}
+                                value={exeInputValue}
+                                onChange={(e) => setExeInputValue(e.target.value)}
+                            />
+                            {exeInputOpen && !exeInputValue && <div className="text-xs text-[#ff4d4f] mt-1 ml-1">内容必填</div>}
+                        </div>
                         <Button onClick={handleAiExe} type="primary" size="small">
                             点击生成笔记
                         </Button>
@@ -654,7 +689,7 @@ const Right = ({
                     <Tooltip title="点击展开智能生成" placement="topLeft">
                         <div
                             onClick={() => setIsExe(true)}
-                            className="absolute right-[-20px] bottom-4 bg-white cursor-pointer w-[70px] h-[40px] p-4 flex items-center rounded-full border border-solid border-[#d9d9d9]"
+                            className="absolute right-[-20px] bottom-4 bg-[#ede7f6] cursor-pointer w-[70px] h-[40px] p-4 flex items-center rounded-full border border-solid border-[#d9d9d9]"
                         >
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -672,7 +707,15 @@ const Right = ({
                         </div>
                     </Tooltip>
                 ))}
-            <Modal title="笔记生成进度" open={aiStepOpen} onCancel={() => setAiStepOpen(false)} footer={false}>
+            <Modal
+                title="笔记生成进度"
+                open={aiStepOpen}
+                onCancel={() => setAiStepOpen(false)}
+                closable={errMsg ? true : false}
+                maskClosable={false}
+                footer={false}
+                keyboard={false}
+            >
                 <div className="mt-4 flex justify-center">
                     <Steps
                         direction="vertical"
@@ -691,14 +734,34 @@ const Right = ({
                                 icon: stepCurrent === 1 && !errMsg ? <LoadingOutlined /> : null,
                                 title: 'AI 识别生成成功，开始 Ai 执行中···',
                                 description: (
-                                    <div className="text-xs font-bold">{stepCurrent === 1 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
+                                    <div className="text-xs font-bold">
+                                        {stepCurrent === 1 && errMsg ? (
+                                            `错误信息：(${errMsg})`
+                                        ) : (
+                                            <div className="max-h-[300px] overflow-y-scroll font-[500] flex gap-2 items-center mt-2">
+                                                {aiData && <div>入参信息：</div>}
+                                                <div>{getrejectData(aiData)}</div>
+                                            </div>
+                                        )}
+                                    </div>
                                 )
                             },
                             {
                                 icon: stepCurrent === 2 && !errMsg ? <LoadingOutlined /> : null,
-                                title: 'Ai 执行成功，准备生成素材···',
+                                title: <div>AI 执行成功，生成素材中···</div>,
                                 description: (
-                                    <div className="text-xs font-bold">{stepCurrent === 2 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
+                                    <div className="text-xs font-bold mt-2">
+                                        {stepCurrent === 2 && errMsg ? (
+                                            `错误信息：(${errMsg})`
+                                        ) : stepCurrent === 2 ? (
+                                            <span className="text-[#673ab7]">
+                                                <HistoryOutlined /> 预计耗时：
+                                                {((aiRocord?.executeTimeAvg * 1.1) / 1000) | 40}s
+                                            </span>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </div>
                                 )
                             },
                             {
@@ -708,7 +771,7 @@ const Right = ({
                                     <div className="text-xs font-bold">{stepCurrent === 3 && errMsg ? `错误信息：(${errMsg})` : ''}</div>
                                 )
                             },
-                            { title: '生成笔记···' }
+                            { title: 'AI 生成笔记···' }
                         ]}
                     />
                 </div>
@@ -719,6 +782,7 @@ const Right = ({
 const RightMemo = (prevProps: any, nextProps: any) => {
     return (
         _.isEqual(prevProps?.isexample, nextProps?.isexample) &&
+        _.isEqual(prevProps?.planUid, nextProps?.planUid) &&
         _.isEqual(prevProps?.bathList, nextProps?.bathList) &&
         _.isEqual(prevProps?.collapseActive, nextProps?.collapseActive) &&
         _.isEqual(prevProps?.batchOpen, nextProps?.batchOpen) &&

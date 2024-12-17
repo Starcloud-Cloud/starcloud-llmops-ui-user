@@ -122,8 +122,9 @@ const TablePro = ({
                     setEditableRowKeys([]);
                     return;
                 }
-                setEditableRowKeys([getRowKey(record, rowIndex)]);
-                setDataIndex([item.dataIndex || (item.key as string)]);
+                // 列表编辑暂时隐藏
+                // setEditableRowKeys([getRowKey(record, rowIndex)]);
+                // setDataIndex([item.dataIndex || (item.key as string)]);
             },
             // onMouseLeave: () => {
             //     setDataIndex([]);
@@ -202,7 +203,7 @@ const TablePro = ({
                 toolBarRender={false}
                 columns={dataColumns}
                 value={tableData}
-                controlled
+                // controlled
                 pagination={
                     isPagination
                         ? false

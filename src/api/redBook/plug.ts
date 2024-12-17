@@ -28,6 +28,10 @@ export const plugVerify = (data: any) => {
 export const plugVerifyResult = (data: any) => {
     return request.post({ url: '/llm/plugin/definition/verifyResult', data });
 };
+//获取默认 prompt
+export const plugPrompt = (data: any) => {
+    return request.post({ url: '/llm/plugin/definition/prompt', data });
+};
 //新增
 export const createPlug = (data: any) => {
     return request.post({ url: '/llm/plugin/definition/create', data });

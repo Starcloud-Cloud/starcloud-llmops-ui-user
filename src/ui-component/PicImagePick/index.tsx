@@ -224,6 +224,7 @@ export const PicImagePick = ({
                 .filter((item: any) => item.value) || []
         );
     }, [values, columns]);
+    const newTags = ['表情', '职业人物', '鲜花', '贴纸'];
 
     const handleChange = (tag: string, checked: boolean) => {
         const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter((t) => t !== tag);
@@ -286,137 +287,156 @@ export const PicImagePick = ({
                     </div>
                 </div>
             )}
-            <div className="mt-2">
-                <Space>
-                    <span className="border-solid">筛选项</span>
-                    <Select
-                        style={{ width: '120px' }}
-                        placeholder="图片类型"
-                        value={query?.image_type}
-                        onChange={(value) => {
-                            setCurrentPage(1);
-                            setHits([]);
-                            setTotalHits(0);
-                            setQuery((pre: any) => ({
-                                ...pre,
-                                image_type: value
-                            }));
-                        }}
-                    >
-                        <Option value={'all'}>全部</Option>
-                        <Option value={'photo'}>照片</Option>
-                        <Option value={'illustration'}>插画</Option>
-                        <Option value={'vector'}>向量</Option>
-                    </Select>
-                    <Select
-                        style={{ width: '120px' }}
-                        placeholder="图像方向"
-                        value={query?.orientation}
-                        onChange={(value) => {
-                            setCurrentPage(1);
-                            setHits([]);
-                            setTotalHits(0);
-                            setQuery((pre: any) => ({
-                                ...pre,
-                                orientation: value
-                            }));
-                        }}
-                    >
-                        <Option value={'all'}>全部</Option>
-                        <Option value={'horizontal'}>水平</Option>
-                        <Option value={'vertical'}>垂直</Option>
-                    </Select>
-                    <Popover
-                        placement="bottom"
-                        content={
+            <Space className="my-2">
+                <span className="border-solid">筛选项</span>
+                <Select
+                    style={{ width: '120px' }}
+                    placeholder="图片类型"
+                    value={query?.image_type}
+                    onChange={(value) => {
+                        setCurrentPage(1);
+                        setHits([]);
+                        setTotalHits(0);
+                        setQuery((pre: any) => ({
+                            ...pre,
+                            image_type: value
+                        }));
+                    }}
+                >
+                    <Option value={'all'}>全部</Option>
+                    <Option value={'photo'}>照片</Option>
+                    <Option value={'illustration'}>插画</Option>
+                    <Option value={'vector'}>向量</Option>
+                </Select>
+                <Select
+                    style={{ width: '120px' }}
+                    placeholder="图像方向"
+                    value={query?.orientation}
+                    onChange={(value) => {
+                        setCurrentPage(1);
+                        setHits([]);
+                        setTotalHits(0);
+                        setQuery((pre: any) => ({
+                            ...pre,
+                            orientation: value
+                        }));
+                    }}
+                >
+                    <Option value={'all'}>全部</Option>
+                    <Option value={'horizontal'}>水平</Option>
+                    <Option value={'vertical'}>垂直</Option>
+                </Select>
+                <Popover
+                    placement="bottom"
+                    content={
+                        <div>
+                            <div className="text-slate-400">大于</div>
                             <div>
-                                <div className="text-slate-400">大于</div>
-                                <div>
-                                    <InputNumber
-                                        placeholder="宽度(像素)"
-                                        value={size?.min_width}
-                                        onChange={(value) => {
-                                            setSize((pre: any) => ({
-                                                ...pre,
-                                                min_width: value
-                                            }));
-                                        }}
-                                    />
-                                    x
-                                    <InputNumber
-                                        placeholder="长度(像素)"
-                                        value={size?.min_height}
-                                        onChange={(value) => {
-                                            setSize((pre: any) => ({
-                                                ...pre,
-                                                min_height: value
-                                            }));
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex justify-end mt-2">
-                                    <Button
-                                        type="primary"
-                                        onClick={() => {
-                                            setCurrentPage(1);
-                                            setHits([]);
-                                            setTotalHits(0);
-                                            setQuery((pre: any) => ({
-                                                ...pre,
-                                                ...size
-                                            }));
-                                        }}
-                                    >
-                                        确定
-                                    </Button>
-                                </div>
+                                <InputNumber
+                                    placeholder="宽度(像素)"
+                                    value={size?.min_width}
+                                    onChange={(value) => {
+                                        setSize((pre: any) => ({
+                                            ...pre,
+                                            min_width: value
+                                        }));
+                                    }}
+                                />
+                                x
+                                <InputNumber
+                                    placeholder="长度(像素)"
+                                    value={size?.min_height}
+                                    onChange={(value) => {
+                                        setSize((pre: any) => ({
+                                            ...pre,
+                                            min_height: value
+                                        }));
+                                    }}
+                                />
                             </div>
-                        }
-                        arrow={false}
-                    >
-                        <Input
-                            style={{ width: '120px' }}
-                            placeholder="尺寸"
-                            disabled
-                            className="!bg-white"
-                            value={query.min_width && query.min_height && `${query.min_width} x ${query.min_height}`}
-                        />
-                    </Popover>
-                    <Select
-                        style={{ width: '300px' }}
-                        placeholder="颜色"
-                        mode="multiple"
-                        value={query?.colors ? query?.colors?.split(',') : []}
-                        onChange={(value) => {
-                            setCurrentPage(1);
-                            setHits([]);
-                            setTotalHits(0);
+                            <div className="flex justify-end mt-2">
+                                <Button
+                                    type="primary"
+                                    onClick={() => {
+                                        setCurrentPage(1);
+                                        setHits([]);
+                                        setTotalHits(0);
+                                        setQuery((pre: any) => ({
+                                            ...pre,
+                                            ...size
+                                        }));
+                                    }}
+                                >
+                                    确定
+                                </Button>
+                            </div>
+                        </div>
+                    }
+                    arrow={false}
+                >
+                    <Input
+                        style={{ width: '120px' }}
+                        placeholder="尺寸"
+                        disabled
+                        className="!bg-white"
+                        value={query.min_width && query.min_height && `${query.min_width} x ${query.min_height}`}
+                    />
+                </Popover>
+                <Select
+                    style={{ width: '300px' }}
+                    placeholder="颜色"
+                    mode="multiple"
+                    value={query?.colors ? query?.colors?.split(',') : []}
+                    onChange={(value) => {
+                        setCurrentPage(1);
+                        setHits([]);
+                        setTotalHits(0);
+                        setQuery((pre: any) => ({
+                            ...pre,
+                            colors: value.join(',')
+                        }));
+                    }}
+                >
+                    <Option value={'grayscale'}>灰度</Option>
+                    <Option value={'transparent'}>透明</Option>
+                    <Option value={'red'}>红色</Option>
+                    <Option value={'orange'}>橙色</Option>
+                    <Option value={'yellow'}>黄色</Option>
+                    <Option value={'green'}>绿色</Option>
+                    <Option value={'turquoise'}>青绿色</Option>
+                    <Option value={'blue'}>蓝色</Option>
+                    <Option value={'lilac'}>淡紫色</Option>
+                    <Option value={'pink'}>粉红色</Option>
+                    <Option value={'white'}>白色</Option>
+                    <Option value={'gray'}>灰色</Option>
+                    <Option value={'black'}>黑色</Option>
+                    <Option value={'brown'}>棕色</Option>
+                </Select>
+                <Button type="primary" onClick={() => handleFilter()}>
+                    保存筛选项
+                </Button>
+            </Space>
+            <br />
+            <Space>
+                {newTags.map((item) => (
+                    <div
+                        className="px-2 py-1 rounded-md border border-solid border-[#d9d9d9] cursor-pointer text-xs "
+                        onClick={() => {
+                            setInputValue(item);
+                            setQ(item);
+                            setCanSearch(true);
                             setQuery((pre: any) => ({
                                 ...pre,
-                                colors: value.join(',')
+                                colors: 'transparent',
+                                image_type: 'illustration'
                             }));
                         }}
+                        key={item}
                     >
-                        <Option value={'grayscale'}>灰度</Option>
-                        <Option value={'transparent'}>透明</Option>
-                        <Option value={'red'}>红色</Option>
-                        <Option value={'orange'}>橙色</Option>
-                        <Option value={'yellow'}>黄色</Option>
-                        <Option value={'green'}>绿色</Option>
-                        <Option value={'turquoise'}>青绿色</Option>
-                        <Option value={'blue'}>蓝色</Option>
-                        <Option value={'lilac'}>淡紫色</Option>
-                        <Option value={'pink'}>粉红色</Option>
-                        <Option value={'white'}>白色</Option>
-                        <Option value={'gray'}>灰色</Option>
-                        <Option value={'black'}>黑色</Option>
-                        <Option value={'brown'}>棕色</Option>
-                    </Select>
-                    <Button type="primary" onClick={() => handleFilter()}>
-                        保存筛选项
-                    </Button>
-                </Space>
-            </div>
+                        {item}
+                    </div>
+                ))}
+            </Space>
 
             <div className="mt-3 max-h-[560px] overflow-auto" ref={scrollRef}>
                 {hits.length ? (

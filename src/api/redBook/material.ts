@@ -49,3 +49,7 @@ export const templateImport = (data: any) => {
 export const templateUpdate = (data: any) => {
     return request.post({ url: `/llm/material-library/update-plugin-Config`, data });
 };
+//批量导出
+export const exportData = (data: any) => {
+    return request.get({ url: `/llm/material-library/exportData`, params: data });
+};

@@ -7,7 +7,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import './index.scss';
-import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, getSpaceList, plugVerifyResult } from 'api/redBook/plug';
+import { plugVerify, createPlug, modifyPlug, cozePage, spaceBots, getSpaceList, plugVerifyResult, plugPrompt } from 'api/redBook/plug';
 import { aiIdentify } from 'api/plug/index';
 import _ from 'lodash-es';
 import Editor, { loader } from '@monaco-editor/react';
@@ -45,6 +45,7 @@ const AddPlug = ({
     const navigate = useNavigate();
 
     const timer = useRef<any>(null);
+    const timer2 = useRef<any>(null);
     const [status, setStatus] = useState('gold');
     const [verifyStatus, setverifyStatus] = useState('gold');
     const [errmessage, seterrmessage] = useState('');
@@ -266,7 +267,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 obj = { ...aidistinguish };
             } else {
                 obj = {
-                    enableAi: rows?.enableAi,
+                    enableAi: aidistinguish?.enableAi,
                     userPrompt: rows?.userPrompt,
                     userInput: rows?.userInput,
                     aiResult: rows?.aiResult
@@ -320,6 +321,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         });
         return () => {
             clearInterval(timer.current);
+            clearTimeout(timer2.current);
         };
     }, []);
     useEffect(() => {
@@ -674,7 +676,10 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                     key: '3',
                                     children: (
                                         <div>
-                                            <div className="text-sm font-bold flex gap-2 items-end">
+                                            <div className="text-xs text-black/40">
+                                                开启AI识别后，用户输入自然语言会自动生成入参去执行插件，并执行笔记生成流程。
+                                            </div>
+                                            <div className="text-sm font-bold flex gap-2 items-end mb-6 mt-2">
                                                 是否开启:
                                                 <Switch
                                                     value={aidistinguish?.enableAi}
@@ -686,14 +691,34 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                 />
                                                 <span className="text-black/40 text-xs">(Tips:无法手动开启，验证成功后会自动开启!)</span>
                                             </div>
-                                            <div className="mb-6 mt-1 text-xs text-black/40">
-                                                开启AI识别后，用户输入自然语言会自动生成入参去执行插件，并执行笔记生成流程。
-                                            </div>
+
                                             <div className="flex gap-4 items-start">
                                                 <div className="flex-1">
                                                     <div className="text-xs flex justify-between mb-2">
                                                         <div>提示词</div>
-                                                        <div>恢复系统默认</div>
+                                                        <div
+                                                            onClick={async () => {
+                                                                if (!aidistinguish?.enableAi) {
+                                                                    const res = await plugPrompt({
+                                                                        ...aidistinguish,
+                                                                        enableAi: undefined,
+                                                                        aiResult: undefined,
+                                                                        userPrompt: undefined,
+                                                                        pluginName: rows?.pluginName,
+                                                                        description: rows?.description,
+                                                                        inputFormart: rows?.inputFormart
+                                                                    });
+                                                                    setaidistinguish({
+                                                                        ...aidistinguish,
+                                                                        userPrompt: res
+                                                                    });
+                                                                }
+                                                            }}
+                                                            className="cursor-pointer"
+                                                            style={{ color: !aidistinguish?.enableAi ? '#673ab7' : 'black' }}
+                                                        >
+                                                            恢复系统默认
+                                                        </div>
                                                     </div>
                                                     <TextArea
                                                         value={aidistinguish?.userPrompt}
@@ -704,10 +729,10 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                             });
                                                         }}
                                                         disabled={aidistinguish?.enableAi}
-                                                        rows={16}
+                                                        rows={20}
                                                     />
                                                 </div>
-                                                <div className="flex-1">
+                                                <div className="w-[50%] markDown">
                                                     <div className="text-xs mb-2">用户输入</div>
                                                     <TextArea
                                                         value={aidistinguish?.userInput}
@@ -718,10 +743,15 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                             });
                                                         }}
                                                         disabled={aidistinguish?.enableAi}
-                                                        rows={8}
+                                                        rows={6}
                                                     />
                                                     <div className="text-xs mb-2 mt-6">识别结果</div>
-                                                    <TextArea value={aidistinguish?.aiResult} disabled={aidistinguish?.enableAi} rows={8} />
+                                                    <ChatMarkdown
+                                                        textContent={`
+~~~json
+${aidistinguish?.aiResult}
+                                                                            `}
+                                                    />
                                                 </div>
                                             </div>
                                             <div className="mt-4 flex justify-center">
@@ -892,6 +922,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                     code: res,
                                                                     accessTokenId: form.getFieldValue('accessTokenId')
                                                                 });
+                                                                clearTimeout(timer2.current);
                                                                 if (result.verifyState) {
                                                                     clearInterval(timer.current);
                                                                     setverifyStatus('success');
@@ -928,7 +959,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                                 setBindLoading(false);
                                                             }
                                                         }, 4000);
-                                                        setTimeout(() => {
+                                                        timer2.current = setTimeout(() => {
                                                             dispatch(
                                                                 openSnackbar({
                                                                     open: true,
@@ -945,7 +976,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                                         }, 240000);
                                                     } catch (err: any) {
                                                         clearInterval(timer.current);
-
+                                                        clearTimeout(timer2.current);
                                                         setBindLoading(false);
                                                     }
                                                 }}

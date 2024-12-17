@@ -171,6 +171,7 @@ const PlugAnalysis = ({
     const [materialzanList, setMaterialzanList] = useState<any[]>([]);
 
     const timer = useRef<any>(null);
+    const timer1 = useRef<any>(null);
     const handleExecute = async (retry?: boolean) => {
         setExecountLoading(true);
         try {
@@ -220,6 +221,7 @@ const PlugAnalysis = ({
                                 })
                             );
                             clearInterval(timer.current);
+                            clearTimeout(timer1.current);
                             return false;
                         }
                         const newList = List.map((item: any) => {
@@ -240,6 +242,7 @@ const PlugAnalysis = ({
                         materialzanListRef.current = newList;
                         setMaterialzanList(materialzanListRef.current);
                         clearInterval(timer.current);
+                        clearTimeout(timer1.current);
                     } else if (res.status === 'failed' || res.status === 'requires_action' || res.status === 'canceled') {
                         executionCountRef.current = 0;
                         setExecutionCount(executionCountRef.current);
@@ -256,6 +259,7 @@ const PlugAnalysis = ({
                         );
                         setErrorMessage(errorMessageRef.current);
                         clearInterval(timer.current);
+                        clearTimeout(timer1.current);
                     }
                 } catch (err: any) {
                     console.log(err);
@@ -266,9 +270,20 @@ const PlugAnalysis = ({
                     errorMessageRef.current.push(err.msg);
                     setErrorMessage(errorMessageRef.current);
                     clearInterval(timer.current);
+                    clearTimeout(timer1.current);
                     clearInterval(timeLoading.current);
                 }
             }, 4000);
+            timer1.current = setTimeout(() => {
+                executionCountRef.current = 0;
+                setExecutionCount(executionCountRef.current);
+                errorCountRef.current = 1;
+                setErrorCount(errorCountRef.current);
+                errorMessageRef.current.push('执行已超时，请重试');
+                setErrorMessage(errorMessageRef.current);
+                clearInterval(timer.current);
+                clearInterval(timeLoading.current);
+            }, 240000);
         } catch (err) {
             setExecountLoading(false);
         }
@@ -321,6 +336,7 @@ const PlugAnalysis = ({
             setPrenum(preeNum.current);
             clearInterval(timer.current);
             clearInterval(timeLoading.current);
+            clearTimeout(timer1.current);
         }
     }, [open, materialExecutionOpen]);
 
@@ -806,6 +822,7 @@ const PlugAnalysis = ({
                 handleSave={handleSave}
                 handleCancel={() => {
                     clearInterval(timer.current);
+                    clearTimeout(timer1.current);
                     executionCountRef.current = 0;
                     setExecutionCount(executionCountRef.current);
                     aref.current = true;

@@ -366,12 +366,12 @@ const Right = ({
         const result = [];
         for (let key in data) {
             result.push(
-                <div className="mt-1">
-                    {key}:{data[key]}
+                <div>
+                    {key}:{typeof data[key] === 'object' ? data[key].join(',') : data[key]}
                 </div>
             );
         }
-        return result;
+        return <div className="flex flex-col gap-1">{result}</div>;
     };
     //获取表头
     useEffect(() => {
@@ -750,14 +750,16 @@ const Right = ({
                                 icon: stepCurrent === 2 && !errMsg ? <LoadingOutlined /> : null,
                                 title: <div>AI 执行成功，生成素材中···</div>,
                                 description: (
-                                    <div className="text-xs font-bold">
+                                    <div className="text-xs font-bold mt-2">
                                         {stepCurrent === 2 && errMsg ? (
                                             `错误信息：(${errMsg})`
-                                        ) : (
+                                        ) : stepCurrent === 2 ? (
                                             <span className="text-[#673ab7]">
                                                 <HistoryOutlined /> 预计耗时：
                                                 {((aiRocord?.executeTimeAvg * 1.1) / 1000) | 40}s
                                             </span>
+                                        ) : (
+                                            ''
                                         )}
                                     </div>
                                 )

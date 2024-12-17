@@ -102,14 +102,14 @@ const CreateVariable = ({ rows, detail, setRows }: Variable) => {
                 ]
             }
         },
-        {
-            title: '变量默认值',
-            dataIndex: 'defaultValue',
-            align: 'center',
-            formItemProps: {
-                component: <Input />
-            }
-        },
+        // {
+        //     title: '变量默认值',
+        //     dataIndex: 'defaultValue',
+        //     align: 'center',
+        //     formItemProps: {
+        //         component: <Input />
+        //     }
+        // },
         {
             title: '操作',
             width: 60,

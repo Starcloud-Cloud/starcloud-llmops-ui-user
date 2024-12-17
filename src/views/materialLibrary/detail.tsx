@@ -47,11 +47,12 @@ import {
     getMaterialLibraryTitleList,
     materialDefinitionList,
     updateMaterialLibrarySlice,
-    updateMaterialLibraryTitle
+    updateMaterialLibraryTitle,
+    updateMaterial
 } from 'api/material';
 import { delOwner, publishedList, ownerListList, detailPlug, metadataData } from 'api/redBook/plug';
 import { getMetadata, addPlugConfigInfo, delPlug } from 'api/plug/index';
-import { createBatchMaterial, updateBatchMaterial, copyMaterial } from 'api/redBook/material';
+import { createBatchMaterial, updateBatchMaterial, copyMaterial, exportData } from 'api/redBook/material';
 import { dictData } from 'api/template';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -95,6 +96,7 @@ export const TableHeader = ({
     isShowField,
     iconUrl,
     name,
+    description,
     setEditOpen,
     setColOpen,
     setTitle,
@@ -126,6 +128,7 @@ export const TableHeader = ({
     iconUrl?: string;
     // 素材库名称
     name: string;
+    description?: string;
     //编辑|新增素材名称
     setTitle: (title: string) => void;
     materialflag?: boolean;
@@ -186,10 +189,22 @@ export const TableHeader = ({
 
     const items: any = [
         {
+            key: '3',
+            label: '编辑素材库信息',
+            onClick: () => {
+                form.setFieldsValue({
+                    name,
+                    description
+                });
+                setMaterialOpen(true);
+            }
+        },
+        {
             key: '1',
             label: '编辑素材字段',
             onClick: () => setColOpen(true)
         }
+
         // {
         //     key: '2',
         //     label: '导入数据',
@@ -205,7 +220,7 @@ export const TableHeader = ({
     }, [plugOpen]);
 
     const downTableData = async (data: any[], num: number, flag?: boolean) => {
-        setTableLoading && setTableLoading(true);
+        // setTableLoading && setTableLoading(true);
         const tableMetaList = _.cloneDeep(tableMeta);
         const newData = data.map((record) => {
             const recordKeys = Object.keys(record);
@@ -470,6 +485,17 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         }
     }, [searchValue]);
 
+    //编辑
+    const [form] = Form.useForm();
+    const [materialOpen, setMaterialOpen] = useState(false);
+    const handleOk = async () => {
+        const values = await form.validateFields();
+        await updateMaterial({ ...values, id: libraryId, status: 1 });
+        message.success('修改成功!');
+        setMaterialOpen(false);
+        getTitleList();
+    };
+
     return (
         <div className="relative">
             <div className="flex items-center">
@@ -641,7 +667,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             <div className="text-[12px] font-bold mt-1">AI素材生成</div>
                         </div> */}
 
-                        <div
+                        {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('文本智能提取');
@@ -667,8 +693,8 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">文本智能提取</div>
-                        </div>
-                        <div
+                        </div> */}
+                        {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('图片OCR提取');
@@ -690,7 +716,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">图片OCR提取</div>
-                        </div>
+                        </div> */}
                         {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
@@ -722,7 +748,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             </svg>
                             <div className="text-[12px] font-bold mt-1">敏感词检测</div>
                         </div> */}
-                        <div
+                        {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
                                 setPlugTitle('AI字段补齐');
@@ -752,7 +778,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                                 ></path>
                             </svg>
                             <div className="text-[12px] font-bold mt-1">AI字段补齐</div>
-                        </div>
+                        </div> */}
                         {/* <div
                             onClick={() => {
                                 setPlugOpen(true);
@@ -784,7 +810,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             </svg>
                             <div className="text-[12px] font-bold mt-1">微信公众号分析</div>
                         </div> */}
-                        <Divider className="mx-0" type="vertical" style={{ height: '35px' }} />
+                        {/* <Divider className="mx-0" type="vertical" style={{ height: '35px' }} /> */}
                     </Space>
                     <div
                         onClick={() => {
@@ -826,6 +852,38 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         >
                             新增素材
                         </Button>
+                        {/* <Dropdown
+                            menu={{
+                                items: [
+                                    {
+                                        key: '1',
+                                        label: `选择导出（${selectedRowKeys.length}）`,
+                                        disabled: selectedRowKeys.length === 0,
+                                        onClick: async () => {
+                                            console.log(selectedRowKeys);
+                                            const result = await exportData({
+                                                id: libraryId,
+                                                sliceIds: selectedRowKeys
+                                            });
+                                        }
+                                    },
+                                    {
+                                        key: '2',
+                                        label: '全部导出',
+                                        onClick: async () => {
+                                            const result = await exportData({
+                                                id: libraryId,
+                                                sliceIds: undefined
+                                            });
+                                        }
+                                    }
+                                ]
+                            }}
+                        >
+                            <Button icon={<DownOutlined />} type="primary">
+                                批量导出
+                            </Button>
+                        </Dropdown> */}
                         {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
@@ -1414,6 +1472,18 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                     canExecute={canExecute}
                 />
             )}
+            {materialOpen && (
+                <Modal width={580} title={'修改素材库'} open={materialOpen} onOk={handleOk} onCancel={() => setMaterialOpen(false)}>
+                    <Form layout="vertical" form={form}>
+                        <Form.Item label="名称" name="name" rules={[{ required: true }]}>
+                            <Input placeholder="填写名称" maxLength={100} showCount />
+                        </Form.Item>
+                        <Form.Item label="描述" name={'description'}>
+                            <Input.TextArea placeholder="填写描述" showCount maxLength={500} rows={3} />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            )}
         </div>
     );
 };
@@ -1910,6 +1980,7 @@ const MaterialLibraryDetail = ({
                 {mode === 'page' && (
                     <TableHeader
                         name={detail?.name}
+                        description={detail?.description}
                         iconUrl={detail?.iconUrl}
                         setTitle={setTitle}
                         setEditOpen={setEditOpen}

@@ -172,6 +172,15 @@ const EditStyle = ({
                 });
                 const json = JSON.parse(res.json);
                 setCurrentJson({ ...json });
+                const newData = _.cloneDeep(imageStyleData);
+                const newList = res?.variableList?.map((item: any) => ({
+                    ...item,
+                    value: imageStyleData?.variableList?.find((el: any) => el?.field === item?.field)?.value
+                }));
+                setData({
+                    ...newData,
+                    variableList: newList
+                });
             });
         }
     }, [imageStyleData?.code]);

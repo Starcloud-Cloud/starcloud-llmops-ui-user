@@ -123,7 +123,7 @@ const StyleTabs = ({
                             </div>
                         ),
                         key: i.toString(),
-                        closable: canEdit ? false : i === 0 ? false : true,
+                        closable: canEdit ? false : imageStyleData?.length === 1 ? false : true,
                         children: (
                             <EditStyle
                                 activeKey={activeKey}

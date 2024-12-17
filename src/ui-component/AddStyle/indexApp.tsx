@@ -1333,6 +1333,11 @@ const AddStyleApp = React.forwardRef(
                                                         handleChoose(item.uuid);
                                                     }}
                                                 />
+                                                {styleData?.some((el: any) => item.uuid === el.uuid) && (
+                                                    <div className="text-xs text-[#673ab7] absolute left-1 top-1 z-50 bg-white px-1 rounded-md">
+                                                        已添加
+                                                    </div>
+                                                )}
                                                 <div className="absolute z-50 bottom-0 w-[150px] flex justify-around bg-[rgba(0,0,0,0.4)] py-1">
                                                     <Tooltip title="复制">
                                                         <span onClick={() => handleSysCopy(index)}>

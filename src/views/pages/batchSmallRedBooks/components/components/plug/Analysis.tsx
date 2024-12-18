@@ -177,6 +177,7 @@ const PlugAnalysis = ({
         try {
             const formRes = await form.validateFields();
             const code = await plugExecute({
+                libraryUid: record.libraryUid,
                 uuid: record.pluginUid,
                 inputParams: formRes
             });

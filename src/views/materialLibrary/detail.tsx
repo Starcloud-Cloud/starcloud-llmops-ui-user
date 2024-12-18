@@ -495,6 +495,22 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
         setMaterialOpen(false);
         getTitleList();
     };
+    //批量下载
+    const batchDownload = async (ids?: any) => {
+        const result = await exportData({
+            id: libraryId,
+            sliceIds: ids
+        });
+        // 创建一个a标签用于下载
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(result);
+        downloadLink.setAttribute('download', `${name}.xls`); // 设置下载文件的名称
+        document.body.appendChild(downloadLink);
+        // 触发点击事件以开始下载
+        downloadLink.click();
+        // 移除下载链接
+        document.body.removeChild(downloadLink);
+    };
 
     return (
         <div className="relative">
@@ -852,38 +868,29 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         >
                             新增素材
                         </Button>
-                        {/* <Dropdown
-                            menu={{
-                                items: [
-                                    {
-                                        key: '1',
-                                        label: `选择导出（${selectedRowKeys.length}）`,
-                                        disabled: selectedRowKeys.length === 0,
-                                        onClick: async () => {
-                                            console.log(selectedRowKeys);
-                                            const result = await exportData({
-                                                id: libraryId,
-                                                sliceIds: selectedRowKeys
-                                            });
+                        {isShowField && (
+                            <Dropdown
+                                menu={{
+                                    items: [
+                                        {
+                                            key: '1',
+                                            label: `选择导出（${selectedRowKeys.length}）`,
+                                            disabled: selectedRowKeys.length === 0,
+                                            onClick: () => batchDownload(selectedRowKeys)
+                                        },
+                                        {
+                                            key: '2',
+                                            label: '全部导出',
+                                            onClick: () => batchDownload()
                                         }
-                                    },
-                                    {
-                                        key: '2',
-                                        label: '全部导出',
-                                        onClick: async () => {
-                                            const result = await exportData({
-                                                id: libraryId,
-                                                sliceIds: undefined
-                                            });
-                                        }
-                                    }
-                                ]
-                            }}
-                        >
-                            <Button icon={<DownOutlined />} type="primary">
-                                批量导出
-                            </Button>
-                        </Dropdown> */}
+                                    ]
+                                }}
+                            >
+                                <Button icon={<DownOutlined />} type="primary">
+                                    批量导出
+                                </Button>
+                            </Dropdown>
+                        )}
                         {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
@@ -1842,6 +1849,7 @@ const MaterialLibraryDetail = ({
     };
     const handleDel = async (id: number) => {
         const data = await delMaterialLibrarySlice({ id });
+        setForceUpdate(forceUpdate + 1);
         if (data) {
             message.success('删除成功');
         }
@@ -1929,10 +1937,12 @@ const MaterialLibraryDetail = ({
         // const values = await form.validateFields();
         if (currentRecord) {
             await handleEditColumn({ ...values, id: currentRecord.id }, 1);
+            form.resetFields();
             setEditOpen(false);
             setCurrentRecord(null);
         } else {
             await handleEditColumn({ ...values }, 2);
+            form.resetFields();
             setEditOpen(false);
             setCurrentRecord(null);
         }

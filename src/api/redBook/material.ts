@@ -51,5 +51,5 @@ export const templateUpdate = (data: any) => {
 };
 //批量导出
 export const exportData = (data: any) => {
-    return request.get({ url: `/llm/material-library/exportData`, params: data });
+    return request.download({ url: `/llm/material-library/exportData`, params: data });
 };

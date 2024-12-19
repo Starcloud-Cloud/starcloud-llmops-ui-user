@@ -17,6 +17,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { EditType } from 'views/materialLibrary/detail';
 import '../../../materialLibrary/index.scss';
 const AiCreate = ({
+    plugTitle,
     libraryId,
     bizType,
     bizUid,
@@ -29,6 +30,7 @@ const AiCreate = ({
     setPlugOpen,
     getTitleList
 }: {
+    plugTitle: string;
     libraryId: string;
     bizType: string;
     bizUid: string;
@@ -897,6 +899,7 @@ const AiCreate = ({
             {/* 素材执行 loading */}
             {materialExecutionOpen && (
                 <ResultLoading
+                    name={plugTitle}
                     materialExecutionOpen={materialExecutionOpen}
                     setMaterialExecutionOpen={setMaterialExecutionOpen}
                     materialPre={materialPre}

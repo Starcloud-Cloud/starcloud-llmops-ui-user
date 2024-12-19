@@ -501,15 +501,19 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             id: libraryId,
             sliceIds: ids
         });
-        // 创建一个a标签用于下载
-        const downloadLink = document.createElement('a');
-        downloadLink.href = window.URL.createObjectURL(result);
-        downloadLink.setAttribute('download', `${name}.xls`); // 设置下载文件的名称
-        document.body.appendChild(downloadLink);
-        // 触发点击事件以开始下载
-        downloadLink.click();
-        // 移除下载链接
-        document.body.removeChild(downloadLink);
+        console.log(result);
+        try {
+            // 创建一个a标签用于下载
+            const downloadLink = document.createElement('a');
+            downloadLink.href = window.URL.createObjectURL(result);
+            downloadLink.download = `${name}.xls`;
+            document.body.appendChild(downloadLink);
+            // 触发点击事件以开始下载
+            downloadLink.click();
+            // 移除下载链接
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     return (
@@ -868,29 +872,27 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                         >
                             新增素材
                         </Button>
-                        {isShowField && (
-                            <Dropdown
-                                menu={{
-                                    items: [
-                                        {
-                                            key: '1',
-                                            label: `选择导出（${selectedRowKeys.length}）`,
-                                            disabled: selectedRowKeys.length === 0,
-                                            onClick: () => batchDownload(selectedRowKeys)
-                                        },
-                                        {
-                                            key: '2',
-                                            label: '全部导出',
-                                            onClick: () => batchDownload()
-                                        }
-                                    ]
-                                }}
-                            >
-                                <Button icon={<DownOutlined />} type="primary">
-                                    批量导出
-                                </Button>
-                            </Dropdown>
-                        )}
+                        <Dropdown
+                            menu={{
+                                items: [
+                                    {
+                                        key: '1',
+                                        label: `选择导出（${selectedRowKeys.length}）`,
+                                        disabled: selectedRowKeys.length === 0,
+                                        onClick: () => batchDownload(selectedRowKeys)
+                                    },
+                                    {
+                                        key: '2',
+                                        label: '全部导出',
+                                        onClick: () => batchDownload()
+                                    }
+                                ]
+                            }}
+                        >
+                            <Button icon={<DownOutlined />} type="primary">
+                                批量导出
+                            </Button>
+                        </Dropdown>
                         {isShowField && (
                             <Dropdown menu={{ items }} className="absolute right-0 top-0">
                                 <Button>
@@ -907,6 +909,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             <Modal width={800} maskClosable={false} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>
                 <div className="font-bold text-xl mb-8 flex items-center gap-2">{plugTitle}</div>
                 <AiCreate
+                    plugTitle={plugTitle}
                     libraryId={libraryId}
                     bizType={bizType}
                     bizUid={bizUid}

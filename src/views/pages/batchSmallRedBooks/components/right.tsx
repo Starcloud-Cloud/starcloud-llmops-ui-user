@@ -239,7 +239,8 @@ const Right = ({
         try {
             const code = await plugExecute({
                 inputParams: result,
-                uuid: aiRocord.pluginUid
+                uuid: aiRocord.pluginUid,
+                libraryUid: aiRocord.libraryUid
             });
             setStepCurrent(2);
             timer.current = setInterval(async () => {

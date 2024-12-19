@@ -28,22 +28,22 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.8/dayjs.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/antd/5.6.1/reset.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/5.6.1/antd.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ant-design-icons/5.1.4/index.umd.min.js"></script>
 
         <!-- babel 翻译 -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.5/babel.min.js"></script>
 
+        <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.7.2/axios.js"></script>
+
         <script src="https://cdn.tailwindcss.com/3.3.2"></script>
 
         <script type="text/babel" data-plugins="transform-modules-umd">
-        
             const Share = () => {
-
                 const { Tabs, Carousel, Image, Button, Modal, QRCode, Spin } = antd
-                const {SendOutlined} = icons
                 const {useState,useEffect,useRef} = React
-                // const location = useLocation();
-                // const query = new URLSearchParams(location.search);
+                console.log(window.location);
+                const host = window.location.host
+                const uid = window.location.search.split('?uid=')[1]||''
+                const BASEURL = (host.indexOf('http://localhost/')!==-1||host.indexOf('http://127.0.0.1')||host.indexOf('http://192.168'))?'https://cn-test.mofabiji.com':host
                 const [carouselValue, setCarouselValue] = useState(0);
                 const [open, setOpen] = useState(false);
                 const [detailData, setDetailData] = useState(null);
@@ -52,14 +52,15 @@
                 const getDetail = async () => {
                     setLoading(true);
                     try {
-                        // const result = await contentShare(query.get('uid'));
+                        const result = await axios.get(BASEURL+'/admin-api/llm/xhs/content/share?uid='+uid)
                         setLoading(false);
-                        // setDetailData(result.executeResult);
+                        setDetailData(result?.data?.data?.executeResult);
                         // @ts-ignore
                         document.querySelector('title') &&
                             // @ts-ignore
                             (document.querySelector('title').innerHTML = '魔法笔记｜' + result?.executeResult?.copyWriting?.title);
                     } catch (err) {
+                        console.log(err);
                         setLoading(false);
                     }
                 };
@@ -67,7 +68,7 @@
                 const [windowHeight, setWindowHeight] = useState('100vh');
                 useEffect(() => {
                     const handleResize = () => {
-                        setWindowHeight(window.innerHeight - 40 + 'px');
+                        setWindowHeight(window.innerHeight - 55 + 'px');
                     };
 
                     window.addEventListener('resize', handleResize);
@@ -88,35 +89,30 @@
                 }, []);
                 const redbookShare = async () => {
         if (/Mobi|Android/i.test(navigator.userAgent)) {
-            // const res = await shareBuildSignature();
+            const result = await axios.get(BASEURL+'/admin-api/llm/xhs/content/shareBuildSignature');
+            const res = result?.data?.data;
             // @ts-ignore
-            // xhs.share({
-            //     shareInfo: {
-            //         type: 'normal', // 必填，笔记类型 'video' | 'normal'
-            //         title: detailData?.copyWriting?.title, // 笔记标题
-            //         content:
-            //             detailData?.copyWriting?.content +
-            //             '\n\n' +
-            //             detailData?.copyWriting?.tagList?.map((item) => `#${item}`).join(' '), // 笔记正文
-            //         images: detailData?.imageList?.map((item) => item.url)
-            //     },
-            //     // verifyConfig: {
-            //     //     app_key: 'red.2AiITQapXH8WFKFH', //必填，应用的唯一标识,
-            //     //     nonce: 'c5cM1kfVLn11Lj02syZI7C', // 必填，服务端生成签名的随机字符串
-            //     //     timestamp: 1731052173737, // 必填，服务端生成签名的时间戳
-            //     //     signature: '80d8ec80f35910faaa8b7ca0798624ba24c6be85811523b0bd65307f37f996b5' // 必填，服务端生成的签名
-            //     // },
-            //     verifyConfig: {
-            //         appKey: res?.app_key, //必填，应用的唯一标识,
-            //         nonce: res?.nonce, // 必填，服务端生成签名的随机字符串
-            //         timestamp: res?.timestamp, // 必填，服务端生成签名的时间戳
-            //         signature: res?.signature // 必填，服务端生成的签名
-            //     },
-            //     fail: (e) => {
-            //         console.log(e);
-            //         // 调用失败时执行的回调函数
-            //     }
-            // });
+            xhs.share({
+                shareInfo: {
+                    type: 'normal', // 必填，笔记类型 'video' | 'normal'
+                    title: detailData?.copyWriting?.title, // 笔记标题
+                    content:
+                        detailData?.copyWriting?.content +
+                        '\n\n' +
+                        detailData?.copyWriting?.tagList?.map((item) => `#${item}`).join(' '), // 笔记正文
+                    images: detailData?.imageList?.map((item) => item.url)
+                },
+                verifyConfig: {
+                    appKey: res?.app_key, //必填，应用的唯一标识,
+                    nonce: res?.nonce, // 必填，服务端生成签名的随机字符串
+                    timestamp: res?.timestamp, // 必填，服务端生成签名的时间戳
+                    signature: res?.signature // 必填，服务端生成的签名
+                },
+                fail: (e) => {
+                    console.log(e);
+                    // 调用失败时执行的回调函数
+                }
+            });
         } else {
             setOpen(true);
         }
@@ -127,7 +123,7 @@
             {loading ? (
                 <Spin className="h-full w-full flex justify-center items-center"></Spin>
             ) : (
-                <div className="w-full max-w-[500px] shadow-lg">
+                <div className="w-full max-w-[500px] shadow-lg"  style={{ height: `calc(${windowHeight} + '40px')` }}>
                     <div
                         onClick={() => {
                         }}
@@ -185,11 +181,11 @@
                                 key: '1',
                                 children: (
                                     <div
+                                        ref={faterDom}
                                         style={{
                                             height: `calc(${windowHeight} - 46px)`
                                         }}
-                                        ref={faterDom}
-                                        className=" relative"
+                                        className="relative"
                                     >
                                         <div className="h-full overflow-y-scroll">
                                             <div className="relative max-h-[666px]">
@@ -490,11 +486,11 @@
                                         </div>
                                         <Button
                                             onClick={redbookShare}
-                                            className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto]"
+                                            className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto] flex gap-2 items-center"
                                             type="primary"
                                             size="large"
-                                            icon={<SendOutlined />}
                                         >
+                                        <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4388" width="25" height="25"><path d="M856.92 127.83c-5.08 0-10.16 1.17-15.24 3.13L151.8 420.42c-30.86 12.89-32.04 55.86-2.35 71.1L369 601.29c-9.38 15.24-7.43 35.16 5.46 48.05 7.42 7.81 17.58 11.72 27.73 11.72 7.04 0 14.46-1.96 20.71-6.25l109.78 219.54c7.03 14.45 21.1 21.49 34.76 21.49 14.85 0 29.3-7.81 35.95-23.83l289.47-689.88c11.33-26.96-9.77-54.3-35.94-54.3z m-292.6 635.58L481.5 597.39l42.58-42.19c15.23-15.24 15.23-39.85 0-55.08-7.81-7.81-17.58-11.72-27.74-11.72-10.15 0-19.92 3.91-27.73 11.72l-42.19 42.19-165.64-82.82 523.08-219.54-219.54 523.46z" fill="#ffffff" p-id="4389"></path></svg>
                                             去小红书发布
                                         </Button>
                                     </div>
@@ -504,13 +500,15 @@
                                 label: '列表页',
                                 key: '2',
                                 children: (
-                                    <div className="relative">
+                                    <div className="relative" style={{
+                                            height: `calc(${windowHeight} - 47px)`
+                                        }}>
                                         <div className="h-full overflow-y-scroll">
                                             <div className="w-full grid gap-2 grid-cols-2 mt-4 px-2">
                                                 <div className="shadow-md rounded-lg">
                                                     <Image preview={false} src={detailData?.imageList[0]?.url} />
                                                     <div className="p-2">
-                                                        <div className="my-2">{detailData?.copyWriting?.title} </div>
+                                                        <div className="my-2 line-clamp-1">{detailData?.copyWriting?.title} </div>
                                                         <div className="flex justify-between items-center">
                                                             <div className="flex gap-1 items-center">
                                                                 <svg
@@ -717,7 +715,7 @@
                                                         src={'https://service-oss-juzhen.mofaai.com.cn/web/wayl/DM_20241020150431_051.jpg'}
                                                     />
                                                     <div className="p-2">
-                                                        <div className="my-2">💥杭州宝藏洗衣上门推荐 </div>
+                                                        <div className="my-2 line-clamp-1">💥杭州宝藏洗衣上门推荐 </div>
                                                         <div className="flex justify-between items-center">
                                                             <div className="flex gap-1 items-center">
                                                                 <svg
@@ -1337,11 +1335,11 @@
                                         </div>
                                         <Button
                                             onClick={redbookShare}
-                                            className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto]"
+                                            className="absolute bottom-[40px] left-[calc(50%-76px)] w-[auto] flex items-center gap-2"
                                             type="primary"
                                             size="large"
-                                            icon={<SendOutlined />}
                                         >
+                                        <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4388" width="25" height="25"><path d="M856.92 127.83c-5.08 0-10.16 1.17-15.24 3.13L151.8 420.42c-30.86 12.89-32.04 55.86-2.35 71.1L369 601.29c-9.38 15.24-7.43 35.16 5.46 48.05 7.42 7.81 17.58 11.72 27.73 11.72 7.04 0 14.46-1.96 20.71-6.25l109.78 219.54c7.03 14.45 21.1 21.49 34.76 21.49 14.85 0 29.3-7.81 35.95-23.83l289.47-689.88c11.33-26.96-9.77-54.3-35.94-54.3z m-292.6 635.58L481.5 597.39l42.58-42.19c15.23-15.24 15.23-39.85 0-55.08-7.81-7.81-17.58-11.72-27.74-11.72-10.15 0-19.92 3.91-27.73 11.72l-42.19 42.19-165.64-82.82 523.08-219.54-219.54 523.46z" fill="#ffffff" p-id="4389"></path></svg>
                                             去小红书发布
                                         </Button>
                                     </div>
@@ -1354,6 +1352,7 @@
             <Modal title="笔记发布" open={open} onCancel={() => setOpen(false)} footer={false} closable={false}>
                 <div className="w-full flex justify-center items-center flex-col gap-2">
                     <div className="flex flex-col items-center">
+                        <QRCode value={`${BASEURL}/share.html?uid=${uid}`} />
                         <div className="text-md text-[#000000a6]">安卓：仅支持手机浏览器扫码</div>
                         <div className="text-md text-[#000000a6]">苹果：支持微信/手机浏览器扫码</div>
                         <div className="text-md text-[#000000a6]">注意：小红书需更新到最新版本</div>

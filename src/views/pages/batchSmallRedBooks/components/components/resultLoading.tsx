@@ -1,8 +1,9 @@
-import { Modal, Progress, Tag, Table, Button } from 'antd';
+import { Modal, Progress, Tag, Table, Button, Tooltip } from 'antd';
 import { HistoryOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 
 const ResultLoading = ({
+    name,
     tagFlag,
     canExecute,
     materialExecutionOpen,
@@ -21,6 +22,7 @@ const ResultLoading = ({
     handleSave,
     handleCancel
 }: {
+    name?: string;
     tagFlag?: boolean;
     canExecute?: boolean;
     materialExecutionOpen: boolean;
@@ -41,7 +43,14 @@ const ResultLoading = ({
 }) => {
     return (
         <Modal
-            title="笔记素材智能生成"
+            title={
+                <div className="flex items-end gap-2">
+                    <div>笔记素材智能生成</div>
+                    <Tooltip title="插件名称">
+                        <div className="text-xs cursor-pointer">({name})</div>
+                    </Tooltip>
+                </div>
+            }
             width={'80%'}
             open={materialExecutionOpen}
             onCancel={() => setMaterialExecutionOpen(false)}

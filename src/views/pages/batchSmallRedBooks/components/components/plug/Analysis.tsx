@@ -147,7 +147,7 @@ const PlugAnalysis = ({
         }
     }, [columns, record]);
 
-    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
+    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(true);
     //处理过的素材数据
     const aref = useRef(false);
     const totalCountRef = useRef(0);
@@ -784,6 +784,7 @@ const PlugAnalysis = ({
                 ]}
             /> */}
             <ResultLoading
+                name={record?.pluginName}
                 tagFlag={true}
                 canExecute={canExecute}
                 materialExecutionOpen={materialExecutionOpen}

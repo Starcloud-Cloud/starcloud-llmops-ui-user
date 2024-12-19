@@ -909,6 +909,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
             <Modal width={800} maskClosable={false} open={plugOpen} onCancel={() => setPlugOpen(false)} footer={false}>
                 <div className="font-bold text-xl mb-8 flex items-center gap-2">{plugTitle}</div>
                 <AiCreate
+                    plugTitle={plugTitle}
                     libraryId={libraryId}
                     bizType={bizType}
                     bizUid={bizUid}

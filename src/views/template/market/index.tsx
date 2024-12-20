@@ -26,8 +26,6 @@ import { ENUM_TENANT, getTenant } from 'utils/permission';
 import { Tour, Row, Col } from 'antd';
 import type { TourProps } from 'antd';
 import { useCache } from 'hooks/web/useCache';
-import { useDispatch } from 'store';
-import { openDrawer } from 'store/slices/menu';
 import './index.scss';
 interface MarketList {
     name: string;
@@ -490,15 +488,6 @@ function TemplateMarket() {
             wsCache.set('newMember_market', true);
         }
     }, []);
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(openDrawer(false));
-        return () => {
-            dispatch(openDrawer(true));
-        };
-    }, []);
-
     return (
         <Box
             className="Rows"

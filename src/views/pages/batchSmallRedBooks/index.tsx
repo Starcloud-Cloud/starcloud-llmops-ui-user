@@ -18,6 +18,8 @@ import jsCookie from 'js-cookie';
 import { createSameApp } from 'api/redBook/batchIndex';
 import { marketDeatail } from 'api/template';
 import dayjs from 'dayjs';
+import { useDispatch } from 'store';
+import { openDrawer } from 'store/slices/menu';
 const BatcSmallRedBooks = forwardRef(
     (
         {
@@ -342,6 +344,15 @@ const BatcSmallRedBooks = forwardRef(
 
         //右下角智能生成
         const [seleValue, setSeleValue] = useState(null);
+
+        const dispatch = useDispatch();
+
+        useEffect(() => {
+            dispatch(openDrawer(false));
+            return () => {
+                dispatch(openDrawer(true));
+            };
+        }, []);
         return (
             <div
                 style={{

@@ -1,5 +1,5 @@
 import { Collapse, Spin, Tag, Popover, Button, Popconfirm, Modal, Checkbox, QRCode, Input, Tooltip, Steps, Image } from 'antd';
-import { CopyrightOutlined, CloseOutlined, LoadingOutlined, HistoryOutlined } from '@ant-design/icons';
+import { CopyrightOutlined, CloseOutlined, LoadingOutlined, HistoryOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import copy from 'clipboard-copy';
 import dayjs from 'dayjs';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -368,7 +368,7 @@ const Right = ({
         for (let key in data) {
             result.push(
                 <div>
-                    {key}:{typeof data[key] === 'object' ? data[key].join(',') : data[key]}
+                    {key}：{typeof data[key] === 'object' ? data[key].join(',') : data[key]}
                 </div>
             );
         }
@@ -753,7 +753,12 @@ const Right = ({
                                 description: (
                                     <div className="text-xs font-bold mt-2">
                                         {stepCurrent === 2 && errMsg ? (
-                                            `错误信息：(${errMsg})`
+                                            <div>
+                                                错误信息：插件执行异常，请重试或联系管理员{' '}
+                                                <Tooltip className="cursor-pointer" title={errMsg}>
+                                                    <ExclamationCircleOutlined />
+                                                </Tooltip>
+                                            </div>
                                         ) : stepCurrent === 2 ? (
                                             <span className="text-[#673ab7]">
                                                 <HistoryOutlined /> 预计耗时：

@@ -40,6 +40,8 @@ import { schemeMetadata } from 'api/redBook/copywriting';
 import CreatePlan from 'views/pages/batchSmallRedBooks';
 import useUserStore from 'store/user';
 import jsCookie from 'js-cookie';
+import { useDispatch } from 'store';
+import { openDrawer } from 'store/slices/menu';
 const { confirm } = Modal;
 interface Items {
     label: string;
@@ -1300,6 +1302,15 @@ function CreateDetail() {
 
     //判断 Tab 是否显示
     const [tabisShow, setTabisShow] = useState<any>(null);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(openDrawer(false));
+        return () => {
+            dispatch(openDrawer(true));
+        };
+    }, []);
 
     return detail ? (
         <Card sx={{ height: jsCookie.get('isClient') ? '100vh' : '100%', overflowY: 'auto', position: 'relative' }}>

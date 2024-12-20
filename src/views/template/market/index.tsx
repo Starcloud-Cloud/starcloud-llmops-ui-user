@@ -488,7 +488,6 @@ function TemplateMarket() {
             wsCache.set('newMember_market', true);
         }
     }, []);
-
     return (
         <Box
             className="Rows"

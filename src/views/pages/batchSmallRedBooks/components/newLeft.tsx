@@ -21,6 +21,7 @@ import './newLeft.scss';
 import MaterialTable from './materialTable';
 import { appModify } from 'api/template/index';
 import { useCache, CACHE_KEY } from 'hooks/web/useCache';
+import ReTryExe from './retryExe';
 
 const Lefts = ({
     detailShow = true,
@@ -1042,23 +1043,26 @@ const Lefts = ({
                                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
                             )) && (
                             <Tabs.TabPane key={'1'} tab="素材上传">
-                                <div ref={steps1}>
-                                    <MaterialTable
-                                        materialStatus={materialStatus}
-                                        updataTable={updataTable}
-                                        appUid={detail ? appData.appUid : appData.uid}
-                                        bizUid={appData.appUid}
-                                        bizType={detail ? 'APP' : 'APP_MARKET'}
-                                        uid={appData.uid}
-                                        tableTitle={tableTitle}
-                                        handleExecute={(data: number[]) => {
-                                            seleSave('SELECT', data);
-                                        }}
-                                        seleValue={seleValue}
-                                        setSeleValue={setSeleValue}
-                                    />
-                                </div>
-
+                                {detailShow ? (
+                                    <div ref={steps1}>
+                                        <MaterialTable
+                                            materialStatus={materialStatus}
+                                            updataTable={updataTable}
+                                            appUid={detail ? appData.appUid : appData.uid}
+                                            bizUid={appData.appUid}
+                                            bizType={detail ? 'APP' : 'APP_MARKET'}
+                                            uid={appData.uid}
+                                            tableTitle={tableTitle}
+                                            handleExecute={(data: number[]) => {
+                                                seleSave('SELECT', data);
+                                            }}
+                                            seleValue={seleValue}
+                                            setSeleValue={setSeleValue}
+                                        />
+                                    </div>
+                                ) : (
+                                    <ReTryExe />
+                                )}
                                 {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                                     (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
                                 ) && (

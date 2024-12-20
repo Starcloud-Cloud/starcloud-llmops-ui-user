@@ -619,7 +619,7 @@ const ThreeStep = ({
                 />
             </Modal>
             <Drawer
-                width={700}
+                width={500}
                 // style={{ zIndex: 9999 }}
                 style={{ transform: 'none !important' }}
                 rootStyle={{

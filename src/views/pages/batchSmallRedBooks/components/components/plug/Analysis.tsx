@@ -176,10 +176,18 @@ const PlugAnalysis = ({
         setExecountLoading(true);
         try {
             const formRes = await form.validateFields();
+            const newRes: any = {};
+            for (let key in formRes) {
+                if (redBookData.requirement?.find((item: any) => item?.variableType === 'Array<String>' && item?.variableKey === key)) {
+                    newRes[key] = JSON.parse(formRes[key] || '[]');
+                } else {
+                    newRes[key] = formRes[key];
+                }
+            }
             const code = await plugExecute({
                 libraryUid: record.libraryUid,
                 uuid: record.pluginUid,
-                inputParams: formRes
+                inputParams: newRes
             });
             setExecountLoading(false);
             if (!retry) {
@@ -286,6 +294,8 @@ const PlugAnalysis = ({
                 clearInterval(timeLoading.current);
             }, 240000);
         } catch (err) {
+            console.log(err);
+
             setExecountLoading(false);
         }
     };

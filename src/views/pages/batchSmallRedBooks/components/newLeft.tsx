@@ -76,9 +76,9 @@ const Lefts = ({
     setWidth?: () => void;
     setAppInfo?: (data: any) => void;
     getAppList?: () => void;
-    setPlanUidRef: (data: string) => void;
-    setTotalCountRef: (data: number) => void;
-    setImageStyleList: (data: any[]) => void;
+    setPlanUidRef?: (data: string) => void;
+    setTotalCountRef?: (data: number) => void;
+    setImageStyleList?: (data: any[]) => void;
     seleValue?: any;
     setSeleValue?: (data: any) => void;
 }) => {

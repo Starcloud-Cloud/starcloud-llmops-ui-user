@@ -147,7 +147,7 @@ const PlugAnalysis = ({
         }
     }, [columns, record]);
 
-    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(true);
+    const [materialExecutionOpen, setMaterialExecutionOpen] = useState(false);
     //处理过的素材数据
     const aref = useRef(false);
     const totalCountRef = useRef(0);

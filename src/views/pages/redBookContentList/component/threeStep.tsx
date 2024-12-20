@@ -1,23 +1,5 @@
 import React, { useEffect, useState, useRef, memo } from 'react';
-import {
-    Avatar,
-    Card,
-    Divider,
-    Space,
-    Button,
-    Input,
-    UploadProps,
-    Upload,
-    Modal,
-    Select,
-    Drawer,
-    Progress,
-    Popover,
-    QRCode,
-    Dropdown,
-    Tag
-} from 'antd';
-import type { MenuProps } from 'antd';
+import { Avatar, Card, Divider, Space, Button, Input, UploadProps, Upload, Modal, Select, Drawer, Progress, Popover, QRCode } from 'antd';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useNavigate } from 'react-router-dom';
 import 'swiper/css';
@@ -25,18 +7,19 @@ import './threeStep.css';
 import 'swiper/css/pagination';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { riskword, modify, riskReplace } from '../../../../api/redBook/index';
+import { modify } from '../../../../api/redBook/index';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { Pagination } from 'swiper';
 
 import { getAccessToken } from 'utils/auth';
-import { PlusOutlined, DownOutlined, SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { useAllDetail } from 'contexts/JWTContext';
 import copy from 'clipboard-copy';
 import JSZip from 'jszip';
 import { origin_url } from 'utils/axios/config';
 import SensitiveWords from 'views/sensitiveWords/index';
+import Left from '../../batchSmallRedBooks/components/newLeft';
 
 const ThreeStep = ({
     data,
@@ -299,7 +282,6 @@ const ThreeStep = ({
                             {/* {jsCookie.get('isClient')&&
                             <Button>加入代发布列表</Button>
                             } */}
-                            {/* <Button onClick={doRetry}>重新生成</Button> */}
                             {!editType ? (
                                 <div className="flex items-center">
                                     <Button
@@ -325,6 +307,7 @@ const ThreeStep = ({
                                     >
                                         违禁词检测
                                     </Button>
+                                    <Button onClick={doRetry}>重新生成</Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                         编辑
                                     </Button>
@@ -648,7 +631,7 @@ const ThreeStep = ({
                 getContainer={false}
                 onClose={() => setOpen(false)}
             >
-                {/* <div className="mt-[-24px] h-[calc(100%+24px)]">
+                <div className="mt-[-24px] h-[calc(100%+24px)]">
                     <Left
                         detailShow={false}
                         data={data}
@@ -657,7 +640,7 @@ const ThreeStep = ({
                             try {
                                 setSaveLoading(true);
                                 setSataStatus(false);
-                                await retryContent(data);
+                                // await retryContent(data);
                                 setSaveLoading(false);
                                 setOpen(false);
                                 setAginLoading(true);
@@ -672,7 +655,7 @@ const ThreeStep = ({
                             console.log(uid);
                         }}
                     />
-                </div> */}
+                </div>
             </Drawer>
         </div>
     );

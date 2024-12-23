@@ -118,6 +118,7 @@ const Lefts = ({
     const getList = async (flag?: boolean, appUpdate?: boolean, saveUpdate?: boolean) => {
         let result;
         let newList: any;
+
         if (data) {
             result = _.cloneDeep(data);
             newList = _.cloneDeep(result?.executeParam?.appInformation);

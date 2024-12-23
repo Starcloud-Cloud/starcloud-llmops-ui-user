@@ -325,6 +325,7 @@ function FormExecute({
     };
     useEffect(() => {
         if (customOpen) {
+            setCustomValue(item.value);
             setUseModel(usePrompt);
         }
     }, [customOpen]);

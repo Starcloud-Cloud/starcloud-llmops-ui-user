@@ -512,7 +512,18 @@ const StepEdit = ({
                                             return [
                                                 <Button
                                                     onClick={() => {
-                                                        console.log(row);
+                                                        const prompt =
+                                                            row?.flowStep?.variable?.variables?.find((i: any) => i.field === 'prompt')
+                                                                ?.value || '';
+                                                        const model =
+                                                            row?.flowStep?.variable?.variables?.find((i: any) => i.field === 'model')
+                                                                ?.value || 'GPT35';
+                                                        setEditContentRow(row);
+                                                        form.setFieldsValue({
+                                                            prompt,
+                                                            model
+                                                        });
+                                                        setEditContentOpen(true);
                                                     }}
                                                     type="link"
                                                 >
@@ -670,9 +681,31 @@ const StepEdit = ({
                     changevariable={saveContent}
                 />
             )}
-            <Modal title="编辑内容生成字段" open={editContentOpen} onCancel={() => setEditContentOpen(false)} footer={null}>
+            <Modal
+                width="60%"
+                title="编辑内容生成字段"
+                open={editContentOpen}
+                onCancel={() => setEditContentOpen(false)}
+                onOk={async () => {
+                    const { prompt, model } = await form.validateFields();
+                    console.log(prompt, model);
+                    const newData = _.cloneDeep(editContentRow);
+                    newData.flowStep.variable.variables.find((i: any) => i.field === 'prompt').value = prompt;
+                    newData.flowStep.variable.variables.find((i: any) => i.field === 'model').value = model;
+                    setEditTableData(
+                        editTableData.map((item, index) => {
+                            if (index === editContentRow?.index) {
+                                return newData;
+                            } else {
+                                return item;
+                            }
+                        })
+                    );
+                    setEditContentOpen(false);
+                }}
+            >
                 <Form form={form} labelCol={{ span: 6 }}>
-                    <Form.Item label="模型选择">
+                    <Form.Item label="模型选择" required name="model">
                         <Selects
                             options={[
                                 { label: '默认模型3.5', value: 'GPT35' },
@@ -682,8 +715,8 @@ const StepEdit = ({
                             ]}
                         />
                     </Form.Item>
-                    <Form.Item label="系统提示词">
-                        <Input />
+                    <Form.Item label="系统提示词" rules={[{ required: true, message: '请输入系统提示词' }]} name="prompt">
+                        <Input.TextArea rows={10} />
                     </Form.Item>
                 </Form>
             </Modal>

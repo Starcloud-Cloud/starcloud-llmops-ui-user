@@ -1,7 +1,7 @@
 import { TextField, MenuItem } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
 import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Select, Input, Tooltip } from 'antd';
-import { PlusOutlined, ArrowsAltOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, ContainerOutlined, ArrowsAltOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { t } from 'i18next';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
@@ -33,8 +33,9 @@ function FormExecute({
     history,
     materialValue,
     materialList,
+    stepIndex,
     usePrompt,
-    setUsePrompt
+    setUsePromptValue
 }: any) {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
@@ -176,13 +177,6 @@ function FormExecute({
 
     //文本框
     const [open, setOpen] = useState(false);
-    const widthRef: any = useRef(null);
-    const [popoverWidth, setPopoverWidth] = useState(undefined);
-    useEffect(() => {
-        if (widthRef.current) {
-            setPopoverWidth(widthRef.current?.offsetWidth);
-        }
-    }, [widthRef]);
     const onDragEnd = (result: any) => {
         if (!result.destination) return;
         let values: any = _.cloneDeep(item.value);
@@ -207,82 +201,90 @@ function FormExecute({
     const promptRef = useRef('');
     const [customValue, setCustomValue] = useState('');
     const [promptValue, setPromptValue] = useState('');
+    const [useModel, setUseModel] = useState('GPT35');
 
     const promptExe = async () => {
         const newData = _.cloneDeep(details);
         newData.workflowConfig.steps
             .find((i: any) => i.field === stepCode)
             .variable.variables.find((i: any) => item.field === i.field).value = customValue;
+        newData.workflowConfig.steps
+            .find((_: any, i: number) => i === stepIndex + 1)
+            .flowStep.variable.variables.find((i: any) => i.field === 'model').value = useModel;
         setCustomLoading(true);
-        const res: any = await executeTest({
-            aiModel: usePrompt,
-            appReqVO: newData,
-            stepId: stepCode,
-            source: query.get('appUid') ? 'MARKET' : 'APP',
-            appUid: query.get('appUid') || query.get('uid')
-        });
-        promptRef.current = '';
-        setPromptValue('');
-        const reader = res.getReader();
-        const textDecoder = new TextDecoder();
-        let outerJoins: any;
-
-        while (1) {
-            let joins = outerJoins;
-            const { done, value } = await reader.read();
-
-            if (done) {
-                setCustomLoading(false);
-                break;
-            }
-            let str = textDecoder.decode(value);
-            const lines = str.split('\n');
-            lines.forEach((message, i: number) => {
-                if (i === 0 && joins) {
-                    message = joins + message;
-                    joins = undefined;
-                }
-                if (i === lines.length - 1) {
-                    if (message && message.indexOf('}') === -1) {
-                        joins = message;
-                        return;
-                    }
-                }
-                let bufferObj;
-                if (message?.startsWith('data:')) {
-                    bufferObj = message.substring(5) && JSON.parse(message.substring(5));
-                }
-                if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
-                    promptRef.current += bufferObj.content;
-                    setPromptValue(promptRef.current);
-                } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: bufferObj.content,
-                            variant: 'alert',
-                            alert: {
-                                color: 'success'
-                            },
-                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                            close: false
-                        })
-                    );
-                } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
-                    dispatch(
-                        openSnackbar({
-                            open: true,
-                            message: t('market.warning'),
-                            variant: 'alert',
-                            alert: {
-                                color: 'error'
-                            },
-                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                            close: false
-                        })
-                    );
-                }
+        try {
+            const res: any = await executeTest({
+                aiModel: useModel,
+                appReqVO: newData,
+                stepId: stepCode,
+                source: query.get('appUid') ? 'MARKET' : 'APP',
+                appUid: query.get('appUid') || query.get('uid')
             });
+            promptRef.current = '';
+            setPromptValue('');
+            const reader = res.getReader();
+            const textDecoder = new TextDecoder();
+            let outerJoins: any;
+
+            while (1) {
+                let joins = outerJoins;
+                const { done, value } = await reader.read();
+
+                if (done) {
+                    setCustomLoading(false);
+                    break;
+                }
+                let str = textDecoder.decode(value);
+                const lines = str.split('\n');
+                lines.forEach((message, i: number) => {
+                    if (i === 0 && joins) {
+                        message = joins + message;
+                        joins = undefined;
+                    }
+                    if (i === lines.length - 1) {
+                        if (message && message.indexOf('}') === -1) {
+                            joins = message;
+                            return;
+                        }
+                    }
+                    let bufferObj;
+                    if (message?.startsWith('data:')) {
+                        bufferObj = message.substring(5) && JSON.parse(message.substring(5));
+                    }
+                    if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                        promptRef.current += bufferObj.content;
+                        setPromptValue(promptRef.current);
+                    } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: bufferObj.content,
+                                variant: 'alert',
+                                alert: {
+                                    color: 'success'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
+                    } else if (bufferObj && bufferObj.code !== 200 && bufferObj.code !== 300900000) {
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: t('market.warning'),
+                                variant: 'alert',
+                                alert: {
+                                    color: 'error'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                close: false
+                            })
+                        );
+                    }
+                });
+            }
+        } catch (err) {
+            setCustomLoading(false);
         }
     };
     useEffect(() => {
@@ -321,6 +323,11 @@ function FormExecute({
         setCanOpens(false);
         setCustomValue(newValue);
     };
+    useEffect(() => {
+        if (customOpen) {
+            setUseModel(usePrompt);
+        }
+    }, [customOpen]);
     return (
         <>
             {handlerCode === 'CustomActionHandler' && item.style === 'TEXTAREA' ? (
@@ -328,11 +335,14 @@ function FormExecute({
                     <div className="flex justify-between items-center text-sm font-[500] mb-1">
                         <div>
                             {item.label}{' '}
-                            <Tooltip title={item.description || '暂无描述'}>
+                            <Tooltip title={'向模型提供用户指令，如查询或任何基于文本输入的提问'}>
                                 <ExclamationCircleOutlined className="cursor-pointer" />
                             </Tooltip>
                         </div>
                         <div className="flex items-center gap-2">
+                            <Tooltip title="提示词库暂未开放">
+                                <ContainerOutlined className="cursor-not-allowed" />
+                            </Tooltip>
                             <Tooltip title="展开">
                                 <ArrowsAltOutlined
                                     onClick={() => {
@@ -349,7 +359,6 @@ function FormExecute({
                                 details={details}
                                 stepCode={stepCode}
                                 index={undefined}
-                                popoverWidth={popoverWidth}
                             />
                         </div>
                     </div>
@@ -357,11 +366,10 @@ function FormExecute({
                 </div>
             ) : (handlerCode !== 'OpenAIChatActionHandler' && item.style === 'TEXTAREA') ||
               (handlerCode === 'AssembleActionHandler' && item.field === 'TITLE') ? (
-                <div ref={widthRef} className="w-full relative mt-4">
+                <div className="w-full relative mt-4">
                     <VariableInput
                         open={open}
                         setOpen={setOpen}
-                        popoverWidth={popoverWidth}
                         handleMenu={({ newValue }) => {
                             onChange({ name: item.field, value: newValue });
                         }}
@@ -674,69 +682,79 @@ function FormExecute({
                     {uploadLoading && <Progress size="small" percent={percent} />}
                 </Modal>
             )}
-            <Modal width="60%" title={customTitle} open={customOpen} onCancel={() => setCustomOpen(false)} footer={null}>
-                <div className="w-full flex justify-between items-stretch gap-4">
-                    <div className="flex-1">
-                        <div className="text-xs flex justify-between items-end mb-2">
-                            <div>用户提示词</div>
-                            <div className="flex gap-2 items-center">
-                                使用大模型：
-                                <Select
-                                    value={usePrompt}
-                                    onChange={setUsePrompt}
-                                    size="small"
-                                    options={[
-                                        { label: '默认模型3.5', value: 'GPT35' },
-                                        { label: '默认模型4.0', value: 'GPT4' },
-                                        { label: '通义千问', value: 'QWEN' },
-                                        { label: '通义千问MAX', value: 'QWEN_MAX' }
-                                    ]}
-                                    className="w-[120px]"
+            {customOpen && (
+                <Modal width="60%" title={customTitle} open={customOpen} onCancel={() => setCustomOpen(false)} footer={null}>
+                    <div className="w-full flex justify-between items-stretch gap-4">
+                        <div className="flex-1">
+                            <div className="text-xs flex justify-between items-end mb-2">
+                                <div>用户提示词</div>
+                                <div className="flex gap-2 items-center">
+                                    使用大模型：
+                                    <Select
+                                        value={useModel}
+                                        onChange={setUseModel}
+                                        size="small"
+                                        options={[
+                                            { label: '默认模型3.5', value: 'GPT35' },
+                                            { label: '默认模型4.0', value: 'GPT4' },
+                                            { label: '通义千问', value: 'QWEN' },
+                                            { label: '通义千问MAX', value: 'QWEN_MAX' }
+                                        ]}
+                                        className="w-[120px]"
+                                    />
+                                    <Can
+                                        open={canOpens}
+                                        setOpen={setCanOpens}
+                                        setData={setCanData}
+                                        details={details}
+                                        stepCode={stepCode}
+                                        index={undefined}
+                                    />
+                                </div>
+                            </div>
+                            <div className="relative">
+                                <Input.TextArea
+                                    value={customValue}
+                                    ref={cansRef}
+                                    onChange={(e) => setCustomValue(e.target.value)}
+                                    className="whitespace-pre-wrap !h-[400px]"
+                                    maxLength={2000}
                                 />
-                                <Can
-                                    open={canOpens}
-                                    setOpen={setCanOpens}
-                                    setData={setCanData}
-                                    details={details}
-                                    stepCode={stepCode}
-                                    index={undefined}
-                                    popoverWidth={popoverWidth}
-                                />
+                                <div className="absolute bottom-2 right-2 text-xs">{customValue?.length || 0}/2000</div>
+                            </div>
+                            <div className="mt-1 text-xs text-black/60">
+                                执行时，变量占位符会替换为真实的数据，如：素材库，全局变量中的值。 请确保已经有值，不然影响AI生成效果。
                             </div>
                         </div>
-                        <Input.TextArea
-                            value={customValue}
-                            ref={cansRef}
-                            onChange={(e) => setCustomValue(e.target.value)}
-                            className="whitespace-pre-wrap !h-[400px]"
-                        />
-                        <div className="flex justify-end gap-2 mt-2">
+                        <div className="flex-1">
+                            <div className="h-[25px] mb-2">AI 生成结果</div>
+                            <div
+                                dangerouslySetInnerHTML={{ __html: promptValue }}
+                                className="w-full h-[400px] border border-solid border-[#d9d9d9] rounded-lg whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
+                            />
+                        </div>
+                    </div>
+                    <div className="flex gap-4 mt-2">
+                        <div className="flex-1 flex justify-end">
                             <Button loading={customLoading} onClick={promptExe} type="primary">
                                 AI 生成
                             </Button>
                         </div>
-                    </div>
-                    <div className="flex-1">
-                        <div className="h-[25px] mb-2">AI 生成结果</div>
-                        <div
-                            dangerouslySetInnerHTML={{ __html: promptValue }}
-                            className="w-full h-[400px] border border-solid border-[#d9d9d9] rounded-lg whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
-                        />
-                        <div className="flex justify-end gap-2 mt-2">
+                        <div className="flex-1 flex justify-end">
                             <Button
                                 disabled={!customValue}
                                 onClick={() => {
-                                    onChange({ name: item.field, value: customValue });
+                                    setUsePromptValue({ name: item.field, value: customValue, aiModel: useModel });
                                     setCustomOpen(false);
                                 }}
                                 type="primary"
                             >
-                                插入内容
+                                更新提示词
                             </Button>
                         </div>
                     </div>
-                </div>
-            </Modal>
+                </Modal>
+            )}
         </>
     );
 }

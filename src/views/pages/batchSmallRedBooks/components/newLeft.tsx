@@ -1004,7 +1004,6 @@ const Lefts = ({
             target: () => steps4.current
         }
     ];
-
     return (
         <>
             <div className="relative h-full">
@@ -1061,11 +1060,28 @@ const Lefts = ({
                                         />
                                     </div>
                                 ) : (
-                                    <ReTryExe />
+                                    <ReTryExe
+                                        tableData={
+                                            appData?.executeParam?.appInformation?.workflowConfig?.steps[0]?.variable?.variables?.find(
+                                                (item: any) => item.field === 'MATERIAL_LIST'
+                                            )?.value || []
+                                        }
+                                        formOk={(data) => {
+                                            const newData = _.cloneDeep(appRef.current);
+                                            newData.executeParam.appInformation.workflowConfig.steps[0].variable.variables.find(
+                                                (item: any) => item.field === 'MATERIAL_LIST'
+                                            ).value = [data];
+                                            appRef.current = newData;
+                                            setAppData(appRef.current);
+                                        }}
+                                    />
                                 )}
-                                {appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
+                                {(appData?.configuration?.appInformation?.workflowConfig?.steps?.find(
                                     (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
-                                ) && (
+                                ) ||
+                                    appData?.executeParam?.appInformation?.workflowConfig?.steps?.find(
+                                        (item: any) => item?.flowStep?.handler === 'PosterActionHandler'
+                                    )) && (
                                     <div className="mt-6">
                                         {detail ? (
                                             <div ref={steps2}>
@@ -1458,6 +1474,7 @@ const Lefts = ({
                                                                               setAppDataGen();
                                                                               setAppData(appRef.current);
                                                                           }}
+                                                                          stepIndex={index}
                                                                           usePrompt={
                                                                               item?.flowStep?.handler !== 'CustomActionHandler'
                                                                                   ? undefined
@@ -1465,13 +1482,16 @@ const Lefts = ({
                                                                                         (i: any) => i.field === 'model'
                                                                                     )?.value
                                                                           }
-                                                                          setUsePrompt={(value: string) => {
+                                                                          setUsePromptValue={(data: any) => {
                                                                               const newList = _.cloneDeep(generRef.current);
                                                                               newList[index].flowStep.variable.variables[
                                                                                   newList[index].flowStep.variable.variables.findIndex(
                                                                                       (i: any) => i.field === 'model'
                                                                                   )
-                                                                              ].value = value;
+                                                                              ].value = data?.aiModel;
+                                                                              newList[index].variable.variables.find(
+                                                                                  (de: any) => de.field === data.name
+                                                                              ).value = data.value;
                                                                               generRef.current = newList;
                                                                               setGenerateList(generRef.current);
                                                                               setAppDataGen();

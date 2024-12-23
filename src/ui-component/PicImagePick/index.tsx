@@ -17,6 +17,7 @@ const { Search } = Input;
 const { Option } = Select;
 
 export const PicImagePick = ({
+    isrery,
     getList,
     materialList,
     allData,
@@ -29,6 +30,7 @@ export const PicImagePick = ({
     values,
     pluginConfig
 }: {
+    isrery?: boolean;
     getList?: any;
     materialList?: any;
     allData?: any;
@@ -412,9 +414,11 @@ export const PicImagePick = ({
                     <Option value={'black'}>黑色</Option>
                     <Option value={'brown'}>棕色</Option>
                 </Select>
-                <Button type="primary" onClick={() => handleFilter()}>
-                    保存筛选项
-                </Button>
+                {!isrery && (
+                    <Button type="primary" onClick={() => handleFilter()}>
+                        保存筛选项
+                    </Button>
+                )}
             </Space>
             <br />
             <Space>

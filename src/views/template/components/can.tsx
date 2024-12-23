@@ -12,7 +12,6 @@ const { SubMenu } = Menu;
 const Can = ({
     open,
     setOpen,
-    popoverWidth,
     setData,
     index = 0,
     details,
@@ -20,7 +19,6 @@ const Can = ({
 }: {
     open: boolean;
     setOpen: (data: boolean) => void;
-    popoverWidth?: number;
     setData: (data: any) => void;
     index?: number;
     details: any;
@@ -49,18 +47,6 @@ const Can = ({
         });
         return newList;
     }, [details]);
-    // const setData = (data: string) => {
-    //     let newValue = _.cloneDeep(newValues);
-    //     if (!newValue) {
-    //         newValue = '';
-    //     }
-    //     const part1 = newValue.slice(0, inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
-    //     const part2 = newValue.slice(inputList?.current[index]?.resizableTextArea?.textArea?.selectionStart);
-    //     newValue = `${part1}{{${data}}}${part2}`;
-    //     setOpen(false);
-    //     setNewValue(newValue);
-    //     handleMenu({ index, newValue });
-    // };
     const [schemaList, setSchemaList] = useState<any[]>([]);
     function getjsonschma(json: any, name?: string, jsonType?: string) {
         const arr: any = [];
@@ -293,7 +279,6 @@ const Can = ({
             );
         }
     }, [open]);
-    const [newValues, setNewValue] = useState('');
     return (
         <Popover
             trigger="click"
@@ -302,7 +287,7 @@ const Can = ({
             open={open}
             onOpenChange={() => setOpen(false)}
             content={
-                <div style={{ width: popoverWidth + 'px', maxWidth: '1024px', minWidth: '512px' }} className={'flex items-stretch gap-2'}>
+                <div className={'w-[600px] flex items-stretch gap-2'}>
                     <div className="flex flex-col flex-1 h-[310px]">
                         <span className="text-sm text-gray-500 mb-2">
                             <span className="mr-2">变量选择</span>
@@ -314,10 +299,8 @@ const Can = ({
                             {renderMenuItems(schemaList, index)}
                         </Menu>
                     </div>
-                    <div className="flex flex-col flex-1 h-[310px]">
-                        <div className="flex-1 border border-solid border-[#d9d9d9] h-[300px] rounded-lg p-4 whitespace-pre-wrap">
-                            {tipValue}
-                        </div>
+                    <div className="flex-1 h-[310px] w-full border border-solid border-[#d9d9d9] rounded-lg p-4 whitespace-pre-wrap">
+                        {tipValue}
                     </div>
                 </div>
             }

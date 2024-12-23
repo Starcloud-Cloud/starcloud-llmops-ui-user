@@ -1,4 +1,4 @@
-import { Tabs, Button, Table, Tooltip, Switch, Popconfirm, Tag, Input, Space } from 'antd';
+import { Tabs, Button, Table, Tooltip, Switch, Popconfirm, Tag, Input, Space, Modal, Form, Select as Selects } from 'antd';
 import type { TableProps } from 'antd';
 import { InfoCircleOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
@@ -346,6 +346,12 @@ const StepEdit = ({
     const timer = useRef<any>(null);
     const [editableKeys, setEditableKeys] = useState<any[]>([]);
     const [editTableData, setEditTableData] = useState<any[]>([]);
+
+    //编辑内容生成字段
+    const [editContentOpen, setEditContentOpen] = useState(false);
+    const [form] = Form.useForm();
+    const [editContentRow, setEditContentRow] = useState<any | undefined>(undefined);
+
     const onDragEnd = ({ active, over }: DragEndEvent) => {
         if (active.id !== over?.id) {
             const newList = (prevState: any) => {
@@ -506,6 +512,14 @@ const StepEdit = ({
                                             return [
                                                 <Button
                                                     onClick={() => {
+                                                        console.log(row);
+                                                    }}
+                                                    type="link"
+                                                >
+                                                    编辑
+                                                </Button>,
+                                                <Button
+                                                    onClick={() => {
                                                         setEditTableData(editTableData.filter((item, index) => index !== row.index));
                                                     }}
                                                     type="link"
@@ -656,6 +670,23 @@ const StepEdit = ({
                     changevariable={saveContent}
                 />
             )}
+            <Modal title="编辑内容生成字段" open={editContentOpen} onCancel={() => setEditContentOpen(false)} footer={null}>
+                <Form form={form} labelCol={{ span: 6 }}>
+                    <Form.Item label="模型选择">
+                        <Selects
+                            options={[
+                                { label: '默认模型3.5', value: 'GPT35' },
+                                { label: '默认模型4.0', value: 'GPT4' },
+                                { label: '通义千问', value: 'QWEN' },
+                                { label: '通义千问MAX', value: 'QWEN_MAX' }
+                            ]}
+                        />
+                    </Form.Item>
+                    <Form.Item label="系统提示词">
+                        <Input />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };

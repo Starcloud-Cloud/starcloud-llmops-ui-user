@@ -307,7 +307,7 @@ const ThreeStep = ({
                                     >
                                         违禁词检测
                                     </Button>
-                                    <Button onClick={doRetry}>重新生成</Button>
+                                    {/* <Button onClick={doRetry}>重新生成</Button> */}
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                         编辑
                                     </Button>

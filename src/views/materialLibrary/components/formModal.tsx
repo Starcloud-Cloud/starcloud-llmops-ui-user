@@ -22,6 +22,7 @@ export const propShow: UploadProps = {
     }
 };
 const FormModal = ({
+    isrery,
     getList,
     pluginConfig,
     libraryId,
@@ -38,6 +39,7 @@ const FormModal = ({
     materialType,
     row
 }: {
+    isrery?: boolean;
     pluginConfig?: string;
     libraryId?: string | null;
     getList?: any;
@@ -350,6 +352,7 @@ const FormModal = ({
             />
             {isModalOpen && (
                 <PicImagePick
+                    isrery={isrery}
                     getList={getList}
                     libraryId={libraryId}
                     pluginConfig={pluginConfig}

@@ -173,18 +173,22 @@ const Lefts = ({
                     const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
                     const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
                     const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
+                    const num3 = item.variable.variables?.findIndex((item: any) => item.field === 'MATERIAL_TYPE');
                     if (item.type === 'RANDOM') {
                         item.variable.variables[num].isShow = false;
                         item.variable.variables[num1].isShow = true;
                         item.variable.variables[num2].isShow = false;
+                        item.variable.variables[num3].isShow = true;
                     } else if (item.type === 'AI_PARODY') {
                         item.variable.variables[num].isShow = false;
                         item.variable.variables[num1].isShow = true;
                         item.variable.variables[num2].isShow = true;
+                        item.variable.variables[num3].isShow = true;
                     } else {
                         item.variable.variables[num].isShow = true;
                         item.variable.variables[num1].isShow = false;
                         item.variable.variables[num2].isShow = false;
+                        item.variable.variables[num3].isShow = false;
                     }
                 }
             });
@@ -1255,6 +1259,7 @@ const Lefts = ({
                                                                               appData?.configuration?.appInformation ||
                                                                               appData?.executeParam?.appInformation
                                                                           }
+                                                                          variables={item?.variable?.variables || []}
                                                                           materialList={
                                                                               item?.variable?.variables?.find(
                                                                                   (item: any) => item?.field === 'MATERIAL_TYPE'
@@ -1338,20 +1343,28 @@ const Lefts = ({
                                                                                   const num2 = item.variable.variables?.findIndex(
                                                                                       (item: any) => item.field === 'PARODY_REQUIREMENT'
                                                                                   );
+                                                                                  const num3 = item.variable.variables?.findIndex(
+                                                                                      (item: any) => item.field === 'MATERIAL_TYPE'
+                                                                                  );
                                                                                   if (e.value === 'RANDOM') {
                                                                                       newList[index].variable.variables[num].isShow = false;
                                                                                       newList[index].variable.variables[num1].isShow = true;
                                                                                       newList[index].variable.variables[num2].isShow =
                                                                                           false;
+                                                                                      newList[index].variable.variables[num3].isShow = true;
                                                                                   } else if (e.value === 'AI_PARODY') {
                                                                                       newList[index].variable.variables[num].isShow = false;
                                                                                       newList[index].variable.variables[num1].isShow = true;
                                                                                       newList[index].variable.variables[num2].isShow = true;
+                                                                                      newList[index].variable.variables[num3].isShow = true;
                                                                                   } else {
                                                                                       newList[index].variable.variables[num].isShow = true;
                                                                                       newList[index].variable.variables[num1].isShow =
                                                                                           false;
                                                                                       newList[index].variable.variables[num2].isShow =
+                                                                                          false;
+                                                                                      false;
+                                                                                      newList[index].variable.variables[num3].isShow =
                                                                                           false;
                                                                                   }
                                                                               }
@@ -1370,19 +1383,7 @@ const Lefts = ({
                                                                               appData?.configuration?.appInformation ||
                                                                               appData?.executeParam?.appInformation
                                                                           }
-                                                                          materialList={
-                                                                              item?.variable?.variables?.find(
-                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
-                                                                              )?.options || []
-                                                                          }
-                                                                          materialValue={
-                                                                              item?.variable?.variables?.find(
-                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
-                                                                              )?.value ||
-                                                                              item?.variable?.variables?.find(
-                                                                                  (item: any) => item?.field === 'MATERIAL_TYPE'
-                                                                              )?.defaultValue
-                                                                          }
+                                                                          variables={item?.variable?.variables || []}
                                                                           stepCode={item?.field}
                                                                           model={''}
                                                                           handlerCode={item?.flowStep?.handler}
@@ -1453,20 +1454,27 @@ const Lefts = ({
                                                                                   const num2 = item.variable.variables?.findIndex(
                                                                                       (item: any) => item.field === 'PARODY_REQUIREMENT'
                                                                                   );
+                                                                                  const num3 = item.variable.variables?.findIndex(
+                                                                                      (item: any) => item.field === 'PARODY_REQUIREMENT'
+                                                                                  );
                                                                                   if (e.value === 'RANDOM') {
                                                                                       newList[index].variable.variables[num].isShow = false;
                                                                                       newList[index].variable.variables[num1].isShow = true;
                                                                                       newList[index].variable.variables[num2].isShow =
                                                                                           false;
+                                                                                      newList[index].variable.variables[num3].isShow = true;
                                                                                   } else if (e.value === 'AI_PARODY') {
                                                                                       newList[index].variable.variables[num].isShow = false;
                                                                                       newList[index].variable.variables[num1].isShow = true;
                                                                                       newList[index].variable.variables[num2].isShow = true;
+                                                                                      newList[index].variable.variables[num3].isShow = true;
                                                                                   } else {
                                                                                       newList[index].variable.variables[num].isShow = true;
                                                                                       newList[index].variable.variables[num1].isShow =
                                                                                           false;
                                                                                       newList[index].variable.variables[num2].isShow =
+                                                                                          false;
+                                                                                      newList[index].variable.variables[num3].isShow =
                                                                                           false;
                                                                                   }
                                                                               }

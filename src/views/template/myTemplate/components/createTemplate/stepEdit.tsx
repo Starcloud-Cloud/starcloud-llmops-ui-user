@@ -256,11 +256,6 @@ const StepEdit = ({
         body: { row: Row }
     };
     const actionRef = useRef<any>();
-    const materialFieldTypeList = [
-        { label: 'AI 生成', value: 'AI_CUSTOM' },
-        { label: 'AI 仿写', value: 'AI_PARODY' },
-        { label: '随机获取', value: 'RANDOM' }
-    ];
     const editColumns: any = [
         { key: 'sort', align: 'center', width: 80, render: () => <DragHandle />, editable: false },
         {
@@ -308,25 +303,6 @@ const StepEdit = ({
             }
         },
         {
-            title: '字段类型',
-            width: 200,
-            required: true,
-            align: 'center',
-            valueType: 'select',
-            dataIndex: 'type',
-            fieldProps: {
-                options: materialFieldTypeList
-            },
-            formItemProps: {
-                rules: [
-                    {
-                        required: true,
-                        message: '请选择字段类型'
-                    }
-                ]
-            }
-        },
-        {
             title: '操作',
             align: 'center',
             valueType: 'option',
@@ -348,9 +324,12 @@ const StepEdit = ({
     const [editTableData, setEditTableData] = useState<any[]>([]);
 
     //编辑内容生成字段
+    const cansRef = useRef<any>(null);
     const [editContentOpen, setEditContentOpen] = useState(false);
     const [form] = Form.useForm();
     const [editContentRow, setEditContentRow] = useState<any | undefined>(undefined);
+    const [eDitContentUuid, setEDitContentUuid] = useState<any[]>([]);
+    const [editContentTable, setEditContentTable] = useState<any[]>([]);
 
     const onDragEnd = ({ active, over }: DragEndEvent) => {
         if (active.id !== over?.id) {
@@ -391,6 +370,8 @@ const StepEdit = ({
             setdetail(editTableData);
         }
     }, [editTableData]);
+
+    const [active, setActive] = useState('1');
     return (
         <div>
             <Tabs>
@@ -498,7 +479,7 @@ const StepEdit = ({
                                             );
                                             return {
                                                 uuid: uuidv4(),
-                                                type: 'AI_CUSTOM',
+                                                // type: 'AI_CUSTOM',
                                                 ...stepLists?.find((item) => item?.flowStep?.handler === 'CustomActionHandler'),
                                                 name: field,
                                                 field
@@ -519,6 +500,13 @@ const StepEdit = ({
                                                             row?.flowStep?.variable?.variables?.find((i: any) => i.field === 'model')
                                                                 ?.value || 'GPT35';
                                                         setEditContentRow(row);
+                                                        const newList = row?.variable?.variables?.map((i: any) => ({
+                                                            ...i,
+                                                            uuid: uuidv4()
+                                                        }));
+                                                        setEditContentTable(newList?.filter((item: any) => item.isShow));
+                                                        setEDitContentUuid(newList?.map((i: any) => i.uuid));
+
                                                         form.setFieldsValue({
                                                             prompt,
                                                             model
@@ -692,6 +680,11 @@ const StepEdit = ({
                     const newData = _.cloneDeep(editContentRow);
                     newData.flowStep.variable.variables.find((i: any) => i.field === 'prompt').value = prompt;
                     newData.flowStep.variable.variables.find((i: any) => i.field === 'model').value = model;
+                    newData.variable.variables = newData.variable.variables?.map((item: any) => ({
+                        ...item,
+                        label: editContentTable?.find((el) => el.field === item.field)?.label || item.label,
+                        description: editContentTable?.find((el) => el.field === item.field)?.description || item.description
+                    }));
                     setEditTableData(
                         editTableData.map((item, index) => {
                             if (index === editContentRow?.index) {
@@ -704,21 +697,159 @@ const StepEdit = ({
                     setEditContentOpen(false);
                 }}
             >
-                <Form form={form} labelCol={{ span: 6 }}>
-                    <Form.Item label="模型选择" required name="model">
-                        <Selects
-                            options={[
-                                { label: '默认模型3.5', value: 'GPT35' },
-                                { label: '默认模型4.0', value: 'GPT4' },
-                                { label: '通义千问', value: 'QWEN' },
-                                { label: '通义千问MAX', value: 'QWEN_MAX' }
+                <div className="flex items-center gap-2">
+                    生成模式:
+                    {editContentRow?.variable?.variables?.map(
+                        (i: any) =>
+                            i.field === 'GENERATE_MODE' && (
+                                <Selects
+                                    className="w-[200px]"
+                                    key={i.field}
+                                    value={i.value}
+                                    options={i.options}
+                                    onChange={(e) => {
+                                        const newData = _.cloneDeep(editContentRow);
+                                        newData.variable.variables.find((i: any) => i.field === 'GENERATE_MODE').value = e;
+
+                                        const num = newData.variable.variables?.findIndex(
+                                            (item: any) => item.field === 'CUSTOM_REQUIREMENT'
+                                        );
+                                        const num1 = newData.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                                        const num2 = newData.variable.variables?.findIndex(
+                                            (item: any) => item.field === 'PARODY_REQUIREMENT'
+                                        );
+                                        const num3 = newData.variable.variables?.findIndex((item: any) => item.field === 'MATERIAL_TYPE');
+                                        if (e === 'RANDOM') {
+                                            newData.variable.variables[num].isShow = false;
+                                            newData.variable.variables[num1].isShow = true;
+                                            newData.variable.variables[num2].isShow = false;
+                                            newData.variable.variables[num3].isShow = true;
+                                        } else if (e === 'AI_PARODY') {
+                                            newData.variable.variables[num].isShow = false;
+                                            newData.variable.variables[num1].isShow = true;
+                                            newData.variable.variables[num2].isShow = true;
+                                            newData.variable.variables[num3].isShow = true;
+                                        } else {
+                                            newData.variable.variables[num].isShow = true;
+                                            newData.variable.variables[num1].isShow = false;
+                                            newData.variable.variables[num2].isShow = false;
+                                            newData.variable.variables[num3].isShow = false;
+                                        }
+                                        const newList = newData.variable.variables
+                                            ?.filter((item: any) => item.isShow)
+                                            ?.map((item: any) => ({
+                                                ...item,
+                                                uuid: uuidv4()
+                                            }));
+                                        setEDitContentUuid(newList?.map((item: any) => item.uuid));
+                                        setEditContentTable(newList);
+                                        setEditContentRow(newData);
+                                        if (e === 'RANDOM') {
+                                            setActive('2');
+                                        }
+                                    }}
+                                />
+                            )
+                    )}
+                </div>
+                <Tabs activeKey={active} onChange={setActive}>
+                    {editContentRow?.variable?.variables?.find((item: any) => item.field === 'GENERATE_MODE')?.value !== 'RANDOM' && (
+                        <Tabs.TabPane tab="AI 模型配置" key="1">
+                            <Form form={form} labelCol={{ span: 6 }}>
+                                <Form.Item label="模型选择" required name="model">
+                                    <Selects
+                                        options={[
+                                            { label: '默认模型3.5', value: 'GPT35' },
+                                            { label: '默认模型4.0', value: 'GPT4' },
+                                            { label: '通义千问', value: 'QWEN' },
+                                            { label: '通义千问MAX', value: 'QWEN_MAX' }
+                                        ]}
+                                    />
+                                </Form.Item>
+                                <Form.Item label="系统提示词">
+                                    <Form.Item rules={[{ required: true, message: '请输入系统提示词' }]} name="prompt">
+                                        <Input.TextArea ref={cansRef} rows={10} />
+                                    </Form.Item>
+                                    <div className="flex gap-1 items-center flex-wrap mt-1">
+                                        {editContentRow?.variable?.variables?.map(
+                                            (el: any) =>
+                                                el?.field !== 'GENERATE_MODE' &&
+                                                el?.field !== 'CUSTOM_REQUIREMENT' &&
+                                                el?.field !== 'PARODY_REQUIREMENT' &&
+                                                el.isShow && (
+                                                    <Tooltip key={el.field} title={el?.description}>
+                                                        <span
+                                                            onClick={() => {
+                                                                let newValue = form.getFieldValue('prompt');
+                                                                if (!newValue) {
+                                                                    newValue = '';
+                                                                }
+                                                                const part1 = newValue.slice(
+                                                                    0,
+                                                                    cansRef.current?.resizableTextArea?.textArea?.selectionStart
+                                                                );
+                                                                const part2 = newValue.slice(
+                                                                    cansRef.current?.resizableTextArea?.textArea?.selectionStart
+                                                                );
+                                                                form.setFieldValue(
+                                                                    'prompt',
+                                                                    `${part1}{STEP.${editContentRow?.field}.${el?.field}}${part2}`
+                                                                );
+                                                            }}
+                                                            className="text-xs text-white bg-[#673ab7] rounded-full px-2 py-1 cursor-pointer"
+                                                        >
+                                                            {el?.label}
+                                                        </span>
+                                                    </Tooltip>
+                                                )
+                                        )}
+                                    </div>
+                                </Form.Item>
+                            </Form>
+                        </Tabs.TabPane>
+                    )}
+                    <Tabs.TabPane tab="字段配置" key="2">
+                        <EditableProTable<any>
+                            className="edit-table"
+                            rowKey={'uuid'}
+                            tableAlertRender={false}
+                            rowSelection={false}
+                            toolBarRender={false}
+                            columns={[
+                                {
+                                    title: '字段名称',
+                                    align: 'center',
+                                    width: 300,
+                                    dataIndex: 'label',
+                                    formItemProps: {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请输入字段名称'
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    title: '字段描述',
+                                    align: 'center',
+                                    dataIndex: 'description'
+                                }
                             ]}
+                            value={editContentTable}
+                            pagination={false}
+                            recordCreatorProps={false}
+                            editable={{
+                                type: 'multiple',
+                                editableKeys: eDitContentUuid,
+                                onValuesChange: (record, recordList) => {
+                                    setEditContentTable(recordList);
+                                },
+                                onChange: setEDitContentUuid
+                            }}
                         />
-                    </Form.Item>
-                    <Form.Item label="系统提示词" rules={[{ required: true, message: '请输入系统提示词' }]} name="prompt">
-                        <Input.TextArea rows={10} />
-                    </Form.Item>
-                </Form>
+                    </Tabs.TabPane>
+                </Tabs>
             </Modal>
         </div>
     );

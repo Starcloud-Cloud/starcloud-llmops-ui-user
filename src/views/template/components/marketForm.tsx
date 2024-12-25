@@ -1,6 +1,6 @@
 import { TextField, MenuItem } from '@mui/material';
 import { useState, memo, useEffect, useRef } from 'react';
-import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Select, Input, Tooltip } from 'antd';
+import { Table, Button, Modal, Upload, UploadProps, Progress, Radio, Checkbox, Image, Select, Input, Tooltip, Popover } from 'antd';
 import { PlusOutlined, ContainerOutlined, ArrowsAltOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { t } from 'i18next';
 import _ from 'lodash-es';
@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getAccessToken } from 'utils/auth';
 import { verifyJSON, changeJSONValue } from './validaForm';
 import VariableInput from 'views/pages/batchSmallRedBooks/components/variableInput';
-import { materialImport, materialResilt, materialExport, executeTest } from 'api/redBook/batchIndex';
+import { materialImport, materialResilt, materialExport, executeTest, detailPrompt } from 'api/redBook/batchIndex';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { origin_url } from 'utils/axios/config';
 import Can from './can';
@@ -22,6 +22,7 @@ function FormExecute({
     onChange,
     pre,
     materialType,
+    variables,
     stepCode,
     model,
     handlerCode,
@@ -202,6 +203,7 @@ function FormExecute({
     const [customValue, setCustomValue] = useState('');
     const [promptValue, setPromptValue] = useState('');
     const [useModel, setUseModel] = useState('GPT35');
+    const [promptContent, setPromptContent] = useState<any>(null);
 
     const promptExe = async () => {
         const newData = _.cloneDeep(details);
@@ -225,13 +227,15 @@ function FormExecute({
             const reader = res.getReader();
             const textDecoder = new TextDecoder();
             let outerJoins: any;
-
+            let appConversationUid = '';
             while (1) {
                 let joins = outerJoins;
                 const { done, value } = await reader.read();
-
                 if (done) {
                     setCustomLoading(false);
+                    detailPrompt({ appConversationUid }).then((res) => {
+                        setPromptContent(res);
+                    });
                     break;
                 }
                 let str = textDecoder.decode(value);
@@ -252,6 +256,7 @@ function FormExecute({
                         bufferObj = message.substring(5) && JSON.parse(message.substring(5));
                     }
                     if (bufferObj?.code === 200 && bufferObj.type !== 'ads-msg') {
+                        appConversationUid = bufferObj.conversationUid;
                         promptRef.current += bufferObj.content;
                         setPromptValue(promptRef.current);
                     } else if (bufferObj?.code === 200 && bufferObj.type === 'ads-msg') {
@@ -271,7 +276,7 @@ function FormExecute({
                         dispatch(
                             openSnackbar({
                                 open: true,
-                                message: t('market.warning'),
+                                message: bufferObj?.content || t('market.warning'),
                                 variant: 'alert',
                                 alert: {
                                     color: 'error'
@@ -312,14 +317,15 @@ function FormExecute({
 
     const cansRef = useRef<any>();
     const [canOpens, setCanOpens] = useState(false);
-    const setCanData = (data: string) => {
+    const setCanData = (data: string, flag: boolean = false) => {
+        //flag 是否是点击用户变量
         let newValue = _.cloneDeep(customValue);
         if (!newValue) {
             newValue = '';
         }
         const part1 = newValue.slice(0, cansRef.current?.resizableTextArea?.textArea?.selectionStart);
         const part2 = newValue.slice(cansRef.current?.resizableTextArea?.textArea?.selectionStart);
-        newValue = `${part1}{{${data}}}${part2}`;
+        newValue = flag ? `${part1 + data + part2}` : `${part1}{{${data}}}${part2}`;
         setCanOpens(false);
         setCustomValue(newValue);
     };
@@ -329,6 +335,7 @@ function FormExecute({
             setUseModel(usePrompt);
         }
     }, [customOpen]);
+
     return (
         <>
             {handlerCode === 'CustomActionHandler' && item.style === 'TEXTAREA' ? (
@@ -341,9 +348,6 @@ function FormExecute({
                             </Tooltip>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Tooltip title="提示词库暂未开放">
-                                <ContainerOutlined className="cursor-not-allowed" />
-                            </Tooltip>
                             <Tooltip title="展开">
                                 <ArrowsAltOutlined
                                     onClick={() => {
@@ -607,7 +611,7 @@ function FormExecute({
                     <div className="w-full flex justify-between items-center mb-2">
                         <div className="relative">
                             <Select
-                                placeholder="选择素材类型"
+                                placeholder={variables?.find((el: any) => el?.field === 'MATERIAL_TYPE')?.description}
                                 onChange={(e) => {
                                     setMaterialType(e);
                                 }}
@@ -616,7 +620,7 @@ function FormExecute({
                                 options={materialList}
                             />
                             <span className="z-[100] block bg-[#fff] px-[5px] absolute top-[-9px] left-2 text-[10px] bg-gradient-to-b from-[#fff] to-[#f8fafc]">
-                                素材类型
+                                {variables?.find((el: any) => el?.field === 'MATERIAL_TYPE')?.label}
                             </span>
                         </div>
                         {/* <div>
@@ -684,13 +688,27 @@ function FormExecute({
                 </Modal>
             )}
             {customOpen && (
-                <Modal width="60%" title={customTitle} open={customOpen} onCancel={() => setCustomOpen(false)} footer={null}>
+                <Modal
+                    width="60%"
+                    title={customTitle}
+                    open={customOpen}
+                    onCancel={() => {
+                        setCustomOpen(false);
+                        setPromptContent(null);
+                    }}
+                    footer={null}
+                >
                     <div className="w-full flex justify-between items-stretch gap-4">
                         <div className="flex-1">
                             <div className="text-xs flex justify-between items-end mb-2">
                                 <div>用户提示词</div>
                                 <div className="flex gap-2 items-center">
-                                    使用大模型：
+                                    <Tooltip title="提示词库暂未开放">
+                                        <div className="w-[25px] h-[25px] rounded-md bg-[#ddd]/60 text-xs text-center leading-[25px] cursor-not-allowed">
+                                            <ContainerOutlined />
+                                        </div>
+                                    </Tooltip>
+                                    大模型:
                                     <Select
                                         value={useModel}
                                         onChange={setUseModel}
@@ -726,9 +744,49 @@ function FormExecute({
                             <div className="mt-1 text-xs text-black/60">
                                 执行时，变量占位符会替换为真实的数据，如：素材库，全局变量中的值。 请确保已经有值，不然影响AI生成效果。
                             </div>
+                            <div className="flex gap-1 items-center flex-wrap mt-1">
+                                {variables?.map(
+                                    (el: any) =>
+                                        item.field !== el.field &&
+                                        el.field !== 'GENERATE_MODE' &&
+                                        el.isShow && (
+                                            <Tooltip key={el.field} title={el?.description}>
+                                                <span
+                                                    onClick={() => {
+                                                        setCanData(`{STEP.${stepCode}.${el.field}}`, true);
+                                                    }}
+                                                    className="text-xs text-white bg-[#673ab7] rounded-full px-2 py-1 cursor-pointer"
+                                                >
+                                                    {el?.label}
+                                                </span>
+                                            </Tooltip>
+                                        )
+                                )}
+                            </div>
                         </div>
                         <div className="flex-1">
-                            <div className="h-[25px] mb-2">AI 生成结果</div>
+                            <div className="h-[25px] mb-2 flex items-center gap-2">
+                                AI 生成结果
+                                {promptContent?.systemPrompt && (
+                                    <Popover
+                                        content={
+                                            <div className="w-[400px] h-[300px] overflow-y-auto">
+                                                <div className="flex flex-col gap-2">
+                                                    <div>用户提示词：{promptContent?.userPrompt}</div>
+                                                    <div className="flex">
+                                                        <div className="whitespace-nowrap">系统提示词：</div>
+                                                        <div>{promptContent?.systemPrompt}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    >
+                                        <div className="w-[25px] h-[25px] rounded-md bg-[#e7b8ff33] text-xs text-[#673ab7] text-center leading-[25px] cursor-pointer font-bold">
+                                            P
+                                        </div>
+                                    </Popover>
+                                )}
+                            </div>
                             <div
                                 dangerouslySetInnerHTML={{ __html: promptValue }}
                                 className="w-full h-[400px] border border-solid border-[#d9d9d9] rounded-lg whitespace-pre-wrap text-base overflow-y-auto px-[11px] py-1"
@@ -746,6 +804,7 @@ function FormExecute({
                                 disabled={!customValue}
                                 onClick={() => {
                                     setUsePromptValue({ name: item.field, value: customValue, aiModel: useModel });
+                                    setPromptContent(null);
                                     setCustomOpen(false);
                                 }}
                                 type="primary"

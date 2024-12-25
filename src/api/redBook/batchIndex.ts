@@ -4,6 +4,10 @@ import fetch from 'utils/fetch';
 export const executeTest = (data: any) => {
     return fetch('/llm/app/execute/test', 'post', data);
 };
+//执行后绘画 id
+export const detailPrompt = (data: any) => {
+    return request.post({ url: '/llm/app/log/detail/prompt', data });
+};
 
 //图片风格列表
 export const imageStyles = () => {

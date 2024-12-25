@@ -454,19 +454,23 @@ function CreateDetail() {
             const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL'); //表格
             const num2 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex(
                 (item: any) => item.field === 'PARODY_REQUIREMENT'
-            ); //AI 仿写
+            );
+            const num3 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'MATERIAL_TYPE'); //AI 仿写
             if (e.value === 'RANDOM') {
                 newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
                 newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num3].isShow = true;
             } else if (e.value === 'AI_PARODY') {
                 newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
                 newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num3].isShow = true;
             } else {
                 newValue.workflowConfig.steps[steps].variable.variables[num].value = true;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num3].isShow = false;
             }
         }
         detailRef.current = _.cloneDeep(newValue);
@@ -556,35 +560,44 @@ function CreateDetail() {
     const [basisPre, setBasisPre] = useState(0);
     //保存更改
     const planStateRef = useRef(0);
+
+    const editVariable = (data: any) => {
+        const newData = _.cloneDeep(data);
+        newData?.forEach((item: any) => {
+            if (item?.flowStep?.handler === 'CustomActionHandler') {
+                const type = item.variable.variables.find((el: any) => el.field === 'GENERATE_MODE').value;
+                const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
+                const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
+                const num3 = item.variable.variables?.findIndex((item: any) => item.field === 'MATERIAL_TYPE');
+                if (type === 'RANDOM') {
+                    item.variable.variables[num].isShow = false;
+                    item.variable.variables[num1].isShow = true;
+                    item.variable.variables[num2].isShow = false;
+                    item.variable.variables[num3].isShow = true;
+                } else if (type === 'AI_PARODY') {
+                    item.variable.variables[num].isShow = false;
+                    item.variable.variables[num1].isShow = true;
+                    item.variable.variables[num2].isShow = true;
+                    item.variable.variables[num3].isShow = true;
+                } else {
+                    item.variable.variables[num].isShow = true;
+                    item.variable.variables[num1].isShow = false;
+                    item.variable.variables[num2].isShow = false;
+                    item.variable.variables[num3].isShow = false;
+                }
+            }
+        });
+        return newData;
+    };
     const [planState, setPlanState] = useState(0); //更新之后调计划的保存
     const saveDetail = (flag?: boolean, fieldShow?: boolean, isAppSave?: boolean) => {
         setErrOpen(false);
         const newList = _.cloneDeep(detailRef.current);
         const num = getCustomIndex(newList);
-        const newData = newList?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
+        let newData = newList?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
         newData?.splice(num, 0, ...flowDataRef.current);
-        newData?.forEach((item: any) => {
-            if (item?.flowStep?.handler === 'CustomActionHandler') {
-                item.variable.variables.find((el: any) => el.field === 'GENERATE_MODE').value = item.type;
-
-                const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
-                const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
-                const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
-                if (item.type === 'RANDOM') {
-                    item.variable.variables[num].isShow = false;
-                    item.variable.variables[num1].isShow = true;
-                    item.variable.variables[num2].isShow = false;
-                } else if (item.type === 'AI_PARODY') {
-                    item.variable.variables[num].isShow = false;
-                    item.variable.variables[num1].isShow = true;
-                    item.variable.variables[num2].isShow = true;
-                } else {
-                    item.variable.variables[num].isShow = true;
-                    item.variable.variables[num1].isShow = false;
-                    item.variable.variables[num2].isShow = false;
-                }
-            }
-        });
+        newData = editVariable(newData);
         newList.workflowConfig.steps = newData;
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {
@@ -727,29 +740,9 @@ function CreateDetail() {
         setErrOpen(false);
         const newList = _.cloneDeep(detailRef.current);
         const num = getCustomIndex(newList);
-        const newData = newList?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
+        let newData = newList?.workflowConfig?.steps?.filter((item: any) => item.flowStep.handler !== 'CustomActionHandler');
         newData?.splice(num, 0, ...flowDataRef.current);
-        newData?.forEach((item: any) => {
-            if (item?.flowStep?.handler === 'CustomActionHandler') {
-                item.variable.variables.find((el: any) => el.field === 'GENERATE_MODE').value = item.type;
-                const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
-                const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
-                const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
-                if (item.type === 'RANDOM') {
-                    item.variable.variables[num].isShow = false;
-                    item.variable.variables[num1].isShow = true;
-                    item.variable.variables[num2].isShow = false;
-                } else if (item.type === 'AI_PARODY') {
-                    item.variable.variables[num].isShow = false;
-                    item.variable.variables[num1].isShow = true;
-                    item.variable.variables[num2].isShow = true;
-                } else {
-                    item.variable.variables[num].isShow = true;
-                    item.variable.variables[num1].isShow = false;
-                    item.variable.variables[num2].isShow = false;
-                }
-            }
-        });
+        newData = editVariable(newData);
         newList.workflowConfig.steps = newData;
         const index: number = newList?.workflowConfig?.steps?.findIndex((item: any) => item?.flowStep?.handler === 'PosterActionHandler');
         if (index !== -1) {
@@ -1401,68 +1394,18 @@ function CreateDetail() {
                                 if (arrangeRef.current) {
                                     const newData = _.cloneDeep(detailRef.current);
                                     const num = getCustomIndex(newData);
-                                    const newList = newData?.workflowConfig?.steps?.filter(
+                                    let newList = newData?.workflowConfig?.steps?.filter(
                                         (item: any) => item.flowStep.handler !== 'CustomActionHandler'
                                     );
                                     newList?.splice(num, 0, ...flowDataRef.current);
-                                    newList?.forEach((item: any) => {
-                                        if (item?.flowStep?.handler === 'CustomActionHandler') {
-                                            item.variable.variables.find((el: any) => el.field === 'GENERATE_MODE').value = item.type;
-                                            const num = item.variable.variables?.findIndex(
-                                                (item: any) => item.field === 'CUSTOM_REQUIREMENT'
-                                            );
-                                            const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
-                                            const num2 = item.variable.variables?.findIndex(
-                                                (item: any) => item.field === 'PARODY_REQUIREMENT'
-                                            );
-                                            if (item.type === 'RANDOM') {
-                                                item.variable.variables[num].isShow = false;
-                                                item.variable.variables[num1].isShow = true;
-                                                item.variable.variables[num2].isShow = false;
-                                            } else if (item.type === 'AI_PARODY') {
-                                                item.variable.variables[num].isShow = false;
-                                                item.variable.variables[num1].isShow = true;
-                                                item.variable.variables[num2].isShow = true;
-                                            } else {
-                                                item.variable.variables[num].isShow = true;
-                                                item.variable.variables[num1].isShow = false;
-                                                item.variable.variables[num2].isShow = false;
-                                            }
-                                        }
-                                    });
+                                    newList = editVariable(newList);
                                     newData.workflowConfig.steps = newList;
                                     detailRef.current = newData;
                                     setDetail(detailRef?.current);
                                     setUpdataDataPre(updataDataPre + 1);
                                 } else {
                                     const newData = _.cloneDeep(detailRef.current);
-                                    newData.workflowConfig.steps.forEach((item: any) => {
-                                        if (item?.flowStep?.handler === 'CustomActionHandler') {
-                                            const num = item.variable.variables?.findIndex(
-                                                (item: any) => item.field === 'CUSTOM_REQUIREMENT'
-                                            );
-                                            const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
-                                            const num2 = item.variable.variables?.findIndex(
-                                                (item: any) => item.field === 'PARODY_REQUIREMENT'
-                                            );
-                                            const type = item?.variable?.variables?.find(
-                                                (item: any) => item?.field === 'GENERATE_MODE'
-                                            )?.value;
-                                            if (type === 'RANDOM') {
-                                                item.variable.variables[num].isShow = false;
-                                                item.variable.variables[num1].isShow = true;
-                                                item.variable.variables[num2].isShow = false;
-                                            } else if (type === 'AI_PARODY') {
-                                                item.variable.variables[num].isShow = false;
-                                                item.variable.variables[num1].isShow = true;
-                                                item.variable.variables[num2].isShow = true;
-                                            } else {
-                                                item.variable.variables[num].isShow = true;
-                                                item.variable.variables[num1].isShow = false;
-                                                item.variable.variables[num2].isShow = false;
-                                            }
-                                        }
-                                    });
+                                    newData.workflowConfig.steps = editVariable(newData.workflowConfig.steps);
                                     detailRef.current = newData;
                                     setDetail(detailRef?.current);
                                 }

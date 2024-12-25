@@ -235,19 +235,23 @@ function Deatail() {
             const num1 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.style === 'MATERIAL'); //表格
             const num2 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex(
                 (item: any) => item.field === 'PARODY_REQUIREMENT'
-            ); //AI 仿写
+            );
+            const num3 = newValue.workflowConfig.steps[steps].variable.variables?.findIndex((item: any) => item.field === 'MATERIAL_TYPE'); //AI 仿写
             if (e.value === 'RANDOM') {
                 newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
                 newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num3].isShow = true;
             } else if (e.value === 'AI_PARODY') {
                 newValue.workflowConfig.steps[steps].variable.variables[num].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = true;
                 newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = true;
+                newValue.workflowConfig.steps[steps].variable.variables[num3].isShow = true;
             } else {
                 newValue.workflowConfig.steps[steps].variable.variables[num].value = true;
                 newValue.workflowConfig.steps[steps].variable.variables[num1].isShow = false;
                 newValue.workflowConfig.steps[steps].variable.variables[num2].isShow = false;
+                newValue.workflowConfig.steps[steps].variable.variables[num3].isShow = false;
             }
         }
         detailRef.current = newValue;

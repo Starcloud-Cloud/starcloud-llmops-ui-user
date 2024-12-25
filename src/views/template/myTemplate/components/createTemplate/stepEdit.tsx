@@ -499,7 +499,16 @@ const StepEdit = ({
                                                         const model =
                                                             row?.flowStep?.variable?.variables?.find((i: any) => i.field === 'model')
                                                                 ?.value || 'GPT35';
-                                                        setEditContentRow(row);
+                                                        const newRow = _.cloneDeep(row);
+                                                        if (
+                                                            newRow?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')
+                                                                ?.value === 'GENERATE_MODE'
+                                                        ) {
+                                                            newRow.variable.variables.find(
+                                                                (item: any) => item.field === 'MATERIAL_TYPE'
+                                                            ).isShow = false;
+                                                        }
+                                                        setEditContentRow(newRow);
                                                         const newList = row?.variable?.variables?.map((i: any) => ({
                                                             ...i,
                                                             uuid: uuidv4()
@@ -698,57 +707,61 @@ const StepEdit = ({
                 }}
             >
                 <div className="flex items-center gap-2">
-                    生成模式:
                     {editContentRow?.variable?.variables?.map(
                         (i: any) =>
                             i.field === 'GENERATE_MODE' && (
-                                <Selects
-                                    className="w-[200px]"
-                                    key={i.field}
-                                    value={i.value}
-                                    options={i.options}
-                                    onChange={(e) => {
-                                        const newData = _.cloneDeep(editContentRow);
-                                        newData.variable.variables.find((i: any) => i.field === 'GENERATE_MODE').value = e;
+                                <>
+                                    {i.label}：
+                                    <Selects
+                                        className="w-[200px]"
+                                        key={i.field}
+                                        value={i.value}
+                                        options={i.options}
+                                        onChange={(e) => {
+                                            const newData = _.cloneDeep(editContentRow);
+                                            newData.variable.variables.find((i: any) => i.field === 'GENERATE_MODE').value = e;
 
-                                        const num = newData.variable.variables?.findIndex(
-                                            (item: any) => item.field === 'CUSTOM_REQUIREMENT'
-                                        );
-                                        const num1 = newData.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
-                                        const num2 = newData.variable.variables?.findIndex(
-                                            (item: any) => item.field === 'PARODY_REQUIREMENT'
-                                        );
-                                        const num3 = newData.variable.variables?.findIndex((item: any) => item.field === 'MATERIAL_TYPE');
-                                        if (e === 'RANDOM') {
-                                            newData.variable.variables[num].isShow = false;
-                                            newData.variable.variables[num1].isShow = true;
-                                            newData.variable.variables[num2].isShow = false;
-                                            newData.variable.variables[num3].isShow = true;
-                                        } else if (e === 'AI_PARODY') {
-                                            newData.variable.variables[num].isShow = false;
-                                            newData.variable.variables[num1].isShow = true;
-                                            newData.variable.variables[num2].isShow = true;
-                                            newData.variable.variables[num3].isShow = true;
-                                        } else {
-                                            newData.variable.variables[num].isShow = true;
-                                            newData.variable.variables[num1].isShow = false;
-                                            newData.variable.variables[num2].isShow = false;
-                                            newData.variable.variables[num3].isShow = false;
-                                        }
-                                        const newList = newData.variable.variables
-                                            ?.filter((item: any) => item.isShow)
-                                            ?.map((item: any) => ({
-                                                ...item,
-                                                uuid: uuidv4()
-                                            }));
-                                        setEDitContentUuid(newList?.map((item: any) => item.uuid));
-                                        setEditContentTable(newList);
-                                        setEditContentRow(newData);
-                                        if (e === 'RANDOM') {
-                                            setActive('2');
-                                        }
-                                    }}
-                                />
+                                            const num = newData.variable.variables?.findIndex(
+                                                (item: any) => item.field === 'CUSTOM_REQUIREMENT'
+                                            );
+                                            const num1 = newData.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                                            const num2 = newData.variable.variables?.findIndex(
+                                                (item: any) => item.field === 'PARODY_REQUIREMENT'
+                                            );
+                                            const num3 = newData.variable.variables?.findIndex(
+                                                (item: any) => item.field === 'MATERIAL_TYPE'
+                                            );
+                                            if (e === 'RANDOM') {
+                                                newData.variable.variables[num].isShow = false;
+                                                newData.variable.variables[num1].isShow = true;
+                                                newData.variable.variables[num2].isShow = false;
+                                                newData.variable.variables[num3].isShow = true;
+                                            } else if (e === 'AI_PARODY') {
+                                                newData.variable.variables[num].isShow = false;
+                                                newData.variable.variables[num1].isShow = true;
+                                                newData.variable.variables[num2].isShow = true;
+                                                newData.variable.variables[num3].isShow = true;
+                                            } else {
+                                                newData.variable.variables[num].isShow = true;
+                                                newData.variable.variables[num1].isShow = false;
+                                                newData.variable.variables[num2].isShow = false;
+                                                newData.variable.variables[num3].isShow = false;
+                                            }
+                                            const newList = newData.variable.variables
+                                                ?.filter((item: any) => item.isShow)
+                                                ?.map((item: any) => ({
+                                                    ...item,
+                                                    uuid: uuidv4()
+                                                }));
+                                            setEDitContentUuid(newList?.map((item: any) => item.uuid));
+                                            setEditContentTable(newList);
+                                            setEditContentRow(newData);
+                                            if (e === 'RANDOM') {
+                                                setActive('2');
+                                            }
+                                        }}
+                                    />
+                                </>
                             )
                     )}
                 </div>

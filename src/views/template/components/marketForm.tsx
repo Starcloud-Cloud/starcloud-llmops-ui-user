@@ -767,7 +767,7 @@ function FormExecute({
                         <div className="flex-1">
                             <div className="h-[25px] mb-2 flex items-center gap-2">
                                 AI 生成结果
-                                {promptContent?.systemPrompt && (
+                                {promptContent && (
                                     <Popover
                                         content={
                                             <div className="w-[400px] h-[300px] overflow-y-auto">

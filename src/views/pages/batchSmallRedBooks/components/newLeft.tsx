@@ -1368,6 +1368,8 @@ const Lefts = ({
                                                                                           false;
                                                                                   }
                                                                               }
+                                                                              console.log(newList);
+
                                                                               generRef.current = newList;
                                                                               setGenerateList(generRef.current);
                                                                               setAppDataGen();
@@ -1455,7 +1457,7 @@ const Lefts = ({
                                                                                       (item: any) => item.field === 'PARODY_REQUIREMENT'
                                                                                   );
                                                                                   const num3 = item.variable.variables?.findIndex(
-                                                                                      (item: any) => item.field === 'PARODY_REQUIREMENT'
+                                                                                      (item: any) => item.field === 'MATERIAL_TYPE'
                                                                                   );
                                                                                   if (e.value === 'RANDOM') {
                                                                                       newList[index].variable.variables[num].isShow = false;
@@ -1478,6 +1480,8 @@ const Lefts = ({
                                                                                           false;
                                                                                   }
                                                                               }
+                                                                              console.log(newList);
+
                                                                               generRef.current = newList;
                                                                               setGenerateList(generRef.current);
                                                                               setAppDataGen();

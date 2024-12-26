@@ -501,8 +501,8 @@ const StepEdit = ({
                                                                 ?.value || 'GPT35';
                                                         const newRow = _.cloneDeep(row);
                                                         if (
-                                                            newRow?.variable?.variables?.find((item: any) => item.field === 'MATERIAL_TYPE')
-                                                                ?.value === 'GENERATE_MODE'
+                                                            newRow?.variable?.variables?.find((item: any) => item.field === 'GENERATE_MODE')
+                                                                ?.value === 'AI_CUSTOM'
                                                         ) {
                                                             newRow.variable.variables.find(
                                                                 (item: any) => item.field === 'MATERIAL_TYPE'
@@ -780,7 +780,7 @@ const StepEdit = ({
                                     />
                                 </Form.Item>
                                 <Form.Item label="系统提示词">
-                                    <Form.Item rules={[{ required: true, message: '请输入系统提示词' }]} name="prompt">
+                                    <Form.Item name="prompt">
                                         <Input.TextArea ref={cansRef} rows={10} />
                                     </Form.Item>
                                     <div className="flex gap-1 items-center flex-wrap mt-1">

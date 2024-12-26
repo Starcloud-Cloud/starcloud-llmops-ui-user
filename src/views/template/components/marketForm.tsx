@@ -703,11 +703,11 @@ function FormExecute({
                             <div className="text-xs flex justify-between items-end mb-2">
                                 <div>用户提示词</div>
                                 <div className="flex gap-2 items-center">
-                                    <Tooltip title="提示词库暂未开放">
+                                    {/* <Tooltip title="提示词库暂未开放">
                                         <div className="w-[25px] h-[25px] rounded-md bg-[#ddd]/60 text-xs text-center leading-[25px] cursor-not-allowed">
                                             <ContainerOutlined />
                                         </div>
-                                    </Tooltip>
+                                    </Tooltip> */}
                                     大模型:
                                     <Select
                                         value={useModel}

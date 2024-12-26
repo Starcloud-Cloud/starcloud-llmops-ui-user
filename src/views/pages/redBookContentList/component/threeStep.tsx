@@ -302,12 +302,13 @@ const ThreeStep = ({
                                             setWordsOpen(true);
                                             setEditType(true);
                                         }}
-                                        className="mr-2"
                                         type="primary"
                                     >
                                         违禁词检测
                                     </Button>
-                                    {/* <Button onClick={doRetry}>重新生成</Button> */}
+                                    <Button className="mx-2" onClick={doRetry}>
+                                        重新生成
+                                    </Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                         编辑
                                     </Button>

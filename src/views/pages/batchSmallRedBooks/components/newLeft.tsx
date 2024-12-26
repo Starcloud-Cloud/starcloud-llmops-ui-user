@@ -585,6 +585,9 @@ const Lefts = ({
             const upData = data?.executeParam?.appInformation?.workflowConfig?.steps?.find(
                 (item: any) => item?.flowStep?.handler === 'MaterialActionHandler'
             );
+            upData.variable.variables.find((item: any) => item.field === 'MATERIAL_LIST').value = JSON.stringify(
+                upData.variable.variables.find((item: any) => item.field === 'MATERIAL_LIST').value
+            );
             data.executeParam.appInformation.workflowConfig.steps = [
                 upData,
                 ...newList,
@@ -838,11 +841,19 @@ const Lefts = ({
     };
     //改变给 sppData 赋值
     const setAppDataGen = () => {
-        const variable = appRef.current.configuration.appInformation.workflowConfig.steps;
+        const variable =
+            appRef.current?.configuration?.appInformation?.workflowConfig?.steps ||
+            appRef.current?.executeParam?.appInformation?.workflowConfig?.steps ||
+            [];
         const appOne = _.cloneDeep(variable[0]);
         const applast = _.cloneDeep(variable[variable?.length - 1]);
         const newappList = _.cloneDeep(appRef.current);
-        newappList.configuration.appInformation.workflowConfig.steps = [appOne, ...generRef.current, applast];
+        if (data) {
+            newappList.executeParam.appInformation.workflowConfig.steps = [appOne, ...generRef.current, applast];
+        } else {
+            newappList.configuration.appInformation.workflowConfig.steps = [appOne, ...generRef.current, applast];
+        }
+
         appRef.current = newappList;
         setAppData(appRef.current);
     };
@@ -1102,6 +1113,16 @@ const Lefts = ({
                                                     record={imageMater}
                                                     getList={() => getList(true)}
                                                     materialType={materialType}
+                                                    mode={data ? 2 : 1}
+                                                    setAppData={(data: any) => {
+                                                        setImagMater(
+                                                            data.executeParam.appInformation.workflowConfig.steps.find(
+                                                                (item: any) => item.flowStep.handler === 'PosterActionHandler'
+                                                            )
+                                                        );
+                                                        appRef.current = data;
+                                                        setAppData(appRef.current);
+                                                    }}
                                                 />
                                             </div>
                                         ) : (
@@ -1118,6 +1139,16 @@ const Lefts = ({
                                                     ref={imageRef}
                                                     record={imageMater}
                                                     materialType={materialType}
+                                                    mode={data ? 2 : 1}
+                                                    setAppData={(data: any) => {
+                                                        setImagMater(
+                                                            data.executeParam.appInformation.workflowConfig.steps.find(
+                                                                (item: any) => item.flowStep.handler === 'PosterActionHandler'
+                                                            )
+                                                        );
+                                                        appRef.current = data;
+                                                        setAppData(appRef.current);
+                                                    }}
                                                 />
                                             </div>
                                         )}

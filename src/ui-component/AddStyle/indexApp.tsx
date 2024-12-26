@@ -51,7 +51,8 @@ const AddStyleApp = React.forwardRef(
             getList,
             hasAddStyle = true,
             setImageVar,
-            allData
+            allData,
+            setAppData
         }: any,
         ref: any
     ) => {
@@ -141,17 +142,22 @@ const AddStyleApp = React.forwardRef(
 
         React.useEffect(() => {
             if (record) {
+                console.log('123123123');
+
                 let list: any = [];
                 if (mode === 2) {
                     const value = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE')?.value;
                     if (value) {
-                        list = [JSON.parse(value)];
+                        console.log(value);
+
+                        list = [typeof value === 'object' ? value : JSON.parse(value)];
                     }
                 } else {
                     list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
                 }
-
                 const typeList = list?.map((item: any) => ({ ...item, type: 1 }));
+                console.log(typeList, 'typeList');
+
                 setOriginStyleData(typeList);
                 setStyleData(typeList);
             }
@@ -432,45 +438,54 @@ const AddStyleApp = React.forwardRef(
             }
             if (type === 1) {
                 //切换
-                const copyOriginStyleData: any = [...originStyleData];
-                copyOriginStyleData[editIndex] = selectImgs?.[0];
 
-                const saveData: any = {};
-                saveData.configuration = {
-                    appInformation: allData.configuration.appInformation,
-                    imageStyleList: copyOriginStyleData.map((item: any, index: number) => ({ ...item, index: index + 1 })),
-                    materialList: allData.configuration.materialList
-                };
-                saveData.source = allData.source;
-                saveData.totalCount = allData.totalCount;
-                saveData.uid = allData.uid;
+                const newData = _.cloneDeep(allData);
+                newData.executeParam.appInformation.workflowConfig.steps
+                    .find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                    .variable.variables.find((item: any) => item.field === 'POSTER_STYLE').value = selectImgs?.[0];
+                console.log(newData);
+                setAppData(newData);
+                setVisible(false);
+                setSelectImgs([]);
+                setChooseImageIndex([]);
+                // const copyOriginStyleData: any = [...originStyleData];
+                // copyOriginStyleData[editIndex] = selectImgs?.[0];
+                // const saveData: any = {};
+                // saveData.configuration = {
+                //     appInformation: allData?.configuration?.appInformation || allData?.executeParam?.appInformation,
+                //     imageStyleList: copyOriginStyleData.map((item: any, index: number) => ({ ...item, index: index + 1 })),
+                //     materialList: allData?.configuration?.materialList || allData?.executeParam?.materialList
+                // };
+                // saveData.source = allData.source;
+                // saveData.totalCount = allData.totalCount;
+                // saveData.uid = allData.uid;
 
-                planModifyConfig({ ...saveData, validate: false })
-                    .then((res: any) => {
-                        setIsModalOpen(false);
-                        setUpdIndex('');
-                        setAddType(0);
-                        setCurrentStyle(null);
-                        getList();
-                        setVisible(false);
-                        setSelectImgs([]);
-                        setChooseImageIndex([]);
-                        dispatch(
-                            openSnackbar({
-                                open: true,
-                                message: '创作计划保存成功',
-                                variant: 'alert',
-                                alert: {
-                                    color: 'success'
-                                },
-                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                close: false
-                            })
-                        );
-                    })
-                    .catch((e: any) => {
-                        return;
-                    });
+                // planModifyConfig({ ...saveData, validate: false })
+                //     .then((res: any) => {
+                //         setIsModalOpen(false);
+                //         setUpdIndex('');
+                //         setAddType(0);
+                //         setCurrentStyle(null);
+                //         getList();
+                //         setVisible(false);
+                //         setSelectImgs([]);
+                //         setChooseImageIndex([]);
+                //         dispatch(
+                //             openSnackbar({
+                //                 open: true,
+                //                 message: '创作计划保存成功',
+                //                 variant: 'alert',
+                //                 alert: {
+                //                     color: 'success'
+                //                 },
+                //                 anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                //                 close: false
+                //             })
+                //         );
+                //     })
+                //     .catch((e: any) => {
+                //         return;
+                //     });
             }
         };
 
@@ -1067,11 +1082,22 @@ const AddStyleApp = React.forwardRef(
             <div className="addStyle">
                 <div className="flex justify-between items-end">
                     <div className="text-base font-semibold">图片模版</div>
-                    {mode === 1 && (
-                        <Button size="small" type="primary" onClick={() => handleAdd()}>
-                            增加模版
-                        </Button>
-                    )}
+                    {/* {mode === 1 && ( */}
+                    <Button
+                        size="small"
+                        type="primary"
+                        onClick={
+                            () => {
+                                setType(1);
+                                setVisible(true);
+                                setSwitchCheck(true);
+                            }
+                            //  handleAdd()
+                        }
+                    >
+                        增加模版
+                    </Button>
+                    {/* // )} */}
                 </div>
                 <div className="text-xs text-black/50 mt-1 mb-2">配置笔记图片生成的图片模版，支持不同风格模版组合生成</div>
                 {/* <Collapse items={collapseList} defaultActiveKey={[0]} /> */}
@@ -1131,63 +1157,65 @@ const AddStyleApp = React.forwardRef(
                                             <EditIcon className="text-sm text-white" />
                                         </span>
                                     </Tooltip>
-                                    <Popconfirm
-                                        placement="top"
-                                        title={`确认删除[${item?.name}]`}
-                                        // description={description}
-                                        okText="是"
-                                        cancelText="否"
-                                        onConfirm={async () => {
-                                            const copyStyleData = [...styleData];
-                                            copyStyleData.splice(index, 1);
-                                            setStyleData(copyStyleData);
+                                    {mode === 1 && (
+                                        <Popconfirm
+                                            placement="top"
+                                            title={`确认删除[${item?.name}]`}
+                                            // description={description}
+                                            okText="是"
+                                            cancelText="否"
+                                            onConfirm={async () => {
+                                                const copyStyleData = [...styleData];
+                                                copyStyleData.splice(index, 1);
+                                                setStyleData(copyStyleData);
 
-                                            // 走接口
-                                            const copyOriginStyleData: any = [...originStyleData];
-                                            copyOriginStyleData.splice(index, 1);
+                                                // 走接口
+                                                const copyOriginStyleData: any = [...originStyleData];
+                                                copyOriginStyleData.splice(index, 1);
 
-                                            const saveData: any = {};
-                                            saveData.configuration = {
-                                                appInformation: allData.configuration.appInformation,
-                                                imageStyleList: copyOriginStyleData,
-                                                materialList: allData.configuration.materialList
-                                            };
-                                            saveData.source = allData.source;
-                                            saveData.totalCount = allData.totalCount;
-                                            saveData.uid = allData.uid;
+                                                const saveData: any = {};
+                                                saveData.configuration = {
+                                                    appInformation: allData.configuration.appInformation,
+                                                    imageStyleList: copyOriginStyleData,
+                                                    materialList: allData.configuration.materialList
+                                                };
+                                                saveData.source = allData.source;
+                                                saveData.totalCount = allData.totalCount;
+                                                saveData.uid = allData.uid;
 
-                                            planModifyConfig({ ...saveData, validate: false })
-                                                .then((res: any) => {
-                                                    setIsModalOpen(false);
-                                                    setUpdIndex('');
-                                                    setAddType(0);
-                                                    setCurrentStyle(null);
-                                                    getList();
-                                                    setVisible(false);
-                                                    setSelectImgs([]);
-                                                    setChooseImageIndex([]);
-                                                    dispatch(
-                                                        openSnackbar({
-                                                            open: true,
-                                                            message: '创作计划保存成功',
-                                                            variant: 'alert',
-                                                            alert: {
-                                                                color: 'success'
-                                                            },
-                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                            close: false
-                                                        })
-                                                    );
-                                                })
-                                                .catch((e: any) => {
-                                                    return;
-                                                });
-                                        }}
-                                    >
-                                        <Tooltip title="删除">
-                                            <DeleteIcon className="text-sm text-white" />
-                                        </Tooltip>
-                                    </Popconfirm>
+                                                planModifyConfig({ ...saveData, validate: false })
+                                                    .then((res: any) => {
+                                                        setIsModalOpen(false);
+                                                        setUpdIndex('');
+                                                        setAddType(0);
+                                                        setCurrentStyle(null);
+                                                        getList();
+                                                        setVisible(false);
+                                                        setSelectImgs([]);
+                                                        setChooseImageIndex([]);
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '创作计划保存成功',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'success'
+                                                                },
+                                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                                close: false
+                                                            })
+                                                        );
+                                                    })
+                                                    .catch((e: any) => {
+                                                        return;
+                                                    });
+                                            }}
+                                        >
+                                            <Tooltip title="删除">
+                                                <DeleteIcon className="text-sm text-white" />
+                                            </Tooltip>
+                                        </Popconfirm>
+                                    )}
                                 </div>
                                 <Swiper
                                     spaceBetween={30}

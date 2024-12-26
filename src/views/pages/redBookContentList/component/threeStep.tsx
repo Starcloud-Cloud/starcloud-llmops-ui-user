@@ -20,6 +20,7 @@ import JSZip from 'jszip';
 import { origin_url } from 'utils/axios/config';
 import SensitiveWords from 'views/sensitiveWords/index';
 import Left from '../../batchSmallRedBooks/components/newLeft';
+import { retryContent } from 'api/redBook';
 
 const ThreeStep = ({
     data,
@@ -641,7 +642,7 @@ const ThreeStep = ({
                             try {
                                 setSaveLoading(true);
                                 setSataStatus(false);
-                                // await retryContent(data);
+                                await retryContent(data);
                                 setSaveLoading(false);
                                 setOpen(false);
                                 setAginLoading(true);

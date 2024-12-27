@@ -168,30 +168,6 @@ const Lefts = ({
             result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
             setSelectImgLoading(false);
             newList = _.cloneDeep(result?.configuration?.appInformation);
-            newList?.workflowConfig?.steps?.forEach((item: any) => {
-                if (item?.flowStep?.handler === 'CustomActionHandler') {
-                    const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
-                    const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
-                    const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
-                    const num3 = item.variable.variables?.findIndex((item: any) => item.field === 'MATERIAL_TYPE');
-                    if (item.type === 'RANDOM') {
-                        item.variable.variables[num].isShow = false;
-                        item.variable.variables[num1].isShow = true;
-                        item.variable.variables[num2].isShow = false;
-                        item.variable.variables[num3].isShow = true;
-                    } else if (item.type === 'AI_PARODY') {
-                        item.variable.variables[num].isShow = false;
-                        item.variable.variables[num1].isShow = true;
-                        item.variable.variables[num2].isShow = true;
-                        item.variable.variables[num3].isShow = true;
-                    } else {
-                        item.variable.variables[num].isShow = true;
-                        item.variable.variables[num1].isShow = false;
-                        item.variable.variables[num2].isShow = false;
-                        item.variable.variables[num3].isShow = false;
-                    }
-                }
-            });
             const collData: any = result?.configuration?.appInformation?.example;
             if (collData) {
                 setCollData && setCollData(collData.split(','));
@@ -200,6 +176,30 @@ const Lefts = ({
                 replace: true
             });
         }
+        newList?.workflowConfig?.steps?.forEach((item: any) => {
+            if (item?.flowStep?.handler === 'CustomActionHandler') {
+                const num = item.variable.variables?.findIndex((item: any) => item.field === 'CUSTOM_REQUIREMENT');
+                const num1 = item.variable.variables?.findIndex((item: any) => item.style === 'MATERIAL');
+                const num2 = item.variable.variables?.findIndex((item: any) => item.field === 'PARODY_REQUIREMENT');
+                const num3 = item.variable.variables?.findIndex((item: any) => item.field === 'MATERIAL_TYPE');
+                if (item.type === 'RANDOM') {
+                    item.variable.variables[num].isShow = false;
+                    item.variable.variables[num1].isShow = true;
+                    item.variable.variables[num2].isShow = false;
+                    item.variable.variables[num3].isShow = true;
+                } else if (item.type === 'AI_PARODY') {
+                    item.variable.variables[num].isShow = false;
+                    item.variable.variables[num1].isShow = true;
+                    item.variable.variables[num2].isShow = true;
+                    item.variable.variables[num3].isShow = true;
+                } else {
+                    item.variable.variables[num].isShow = true;
+                    item.variable.variables[num1].isShow = false;
+                    item.variable.variables[num2].isShow = false;
+                    item.variable.variables[num3].isShow = false;
+                }
+            }
+        });
         setTotalCount(result?.totalCount);
         setPlanUid(result?.uid);
         appRef.current = result;
@@ -1023,22 +1023,29 @@ const Lefts = ({
     return (
         <>
             <div className="relative h-full">
-                <Tooltip title={!leftWidth ? '展开' : '收缩'}>
-                    <Button
-                        style={{
-                            transform: leftWidth ? 'rotate(180deg)' : 'rotate(0deg)'
-                        }}
-                        className={`absolute top-3 right-[-10px] z-[1000] duration-700`}
-                        onClick={() => setWidth && setWidth()}
-                        size="small"
-                        shape="circle"
+                {detailShow && (
+                    <Tooltip title={!leftWidth ? '展开' : '收缩'}>
+                        <Button
+                            style={{
+                                transform: leftWidth ? 'rotate(180deg)' : 'rotate(0deg)'
+                            }}
+                            className={`absolute top-3 right-[-10px] z-[1000] duration-700`}
+                            onClick={() => setWidth && setWidth()}
+                            size="small"
+                            shape="circle"
+                        >
+                            <RightOutlined />
+                        </Button>
+                    </Tooltip>
+                )}
+                {detailShow && (
+                    <div
+                        className="absolute top-4 right-5 z-[1000] text-xs text-[#673ab7] cursor-pointer"
+                        onClick={() => setTourOpen(true)}
                     >
-                        <RightOutlined />
-                    </Button>
-                </Tooltip>
-                <div className="absolute top-4 right-5 z-[1000] text-xs text-[#673ab7] cursor-pointer" onClick={() => setTourOpen(true)}>
-                    指导
-                </div>
+                        指导
+                    </div>
+                )}
                 <div
                     style={{
                         height: detailShow

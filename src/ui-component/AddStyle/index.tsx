@@ -52,7 +52,8 @@ const AddStyle = React.forwardRef(
             allData,
             canAddCustomStyle = true,
             saveTemplate,
-            materialStatus
+            materialStatus,
+            setAppData
         }: any,
         ref: any
     ) => {
@@ -166,7 +167,7 @@ const AddStyle = React.forwardRef(
                 if (mode === 2) {
                     const value = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE')?.value;
                     if (value) {
-                        list = [JSON.parse(value)];
+                        list = [typeof value === 'object' ? value : JSON.parse(value)];
                     }
                 } else {
                     list = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE_CONFIG')?.value || [];
@@ -305,17 +306,26 @@ const AddStyle = React.forwardRef(
                     maxNumber = Math.max(...list.map((item: any) => parseInt(item.match(/\d+/))));
                 }
                 setStyleData([...styleData, ...selectImgs]);
+                setVisible(false);
+                setSelectImgs([]);
+                setChooseImageIndex([]);
+                setTimeout(() => {
+                    saveTemplate && saveTemplate();
+                });
             }
             if (type === 1) {
-                styleData[editIndex] = selectImgs?.[0];
-                setStyleData([...styleData]);
+                const newData = _.cloneDeep(allData);
+                newData.executeParam.appInformation.workflowConfig.steps
+                    .find((item: any) => item.flowStep.handler === 'PosterActionHandler')
+                    .variable.variables.find((item: any) => item.field === 'POSTER_STYLE').value = selectImgs?.[0];
+                console.log(newData);
+                setAppData(newData);
+                setVisible(false);
+                setSelectImgs([]);
+                setChooseImageIndex([]);
+                // styleData[editIndex] = selectImgs?.[0];
+                // setStyleData([...styleData]);
             }
-            setVisible(false);
-            setSelectImgs([]);
-            setChooseImageIndex([]);
-            setTimeout(() => {
-                saveTemplate && saveTemplate();
-            });
         };
 
         const handleOkV2 = () => {
@@ -691,9 +701,21 @@ const AddStyle = React.forwardRef(
                 </div> */}
                 <div className="flex justify-between items-end">
                     <div className="text-base font-semibold">图片模版</div>
-                    {mode === 1 && (
+                    {mode === 1 ? (
                         <Button size="small" type="primary" onClick={() => handleAdd()}>
                             增加模版
+                        </Button>
+                    ) : (
+                        <Button
+                            size="small"
+                            type="primary"
+                            onClick={() => {
+                                setType(1);
+                                setVisible(true);
+                                setSwitchCheck(true);
+                            }}
+                        >
+                            重新选择模版
                         </Button>
                     )}
                 </div>

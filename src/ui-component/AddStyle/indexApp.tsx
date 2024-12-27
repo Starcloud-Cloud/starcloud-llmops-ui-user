@@ -148,8 +148,6 @@ const AddStyleApp = React.forwardRef(
                 if (mode === 2) {
                     const value = record.variable.variables.find((item: any) => item.field === 'POSTER_STYLE')?.value;
                     if (value) {
-                        console.log(value);
-
                         list = [typeof value === 'object' ? value : JSON.parse(value)];
                     }
                 } else {
@@ -1082,22 +1080,23 @@ const AddStyleApp = React.forwardRef(
             <div className="addStyle">
                 <div className="flex justify-between items-end">
                     <div className="text-base font-semibold">图片模版</div>
-                    {/* {mode === 1 && ( */}
-                    <Button
-                        size="small"
-                        type="primary"
-                        onClick={
-                            () => {
+                    {mode === 1 ? (
+                        <Button size="small" type="primary" onClick={() => handleAdd()}>
+                            增加模版
+                        </Button>
+                    ) : (
+                        <Button
+                            size="small"
+                            type="primary"
+                            onClick={() => {
                                 setType(1);
                                 setVisible(true);
                                 setSwitchCheck(true);
-                            }
-                            //  handleAdd()
-                        }
-                    >
-                        增加模版
-                    </Button>
-                    {/* // )} */}
+                            }}
+                        >
+                            重新选择模版
+                        </Button>
+                    )}
                 </div>
                 <div className="text-xs text-black/50 mt-1 mb-2">配置笔记图片生成的图片模版，支持不同风格模版组合生成</div>
                 {/* <Collapse items={collapseList} defaultActiveKey={[0]} /> */}

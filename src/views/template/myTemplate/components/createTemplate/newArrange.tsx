@@ -73,21 +73,23 @@ function Arrange({
     //增加步骤
     const [stepOpen, setStepOpen] = useState<any[]>([]);
     const [stepLists, setStepList] = useState<any[]>([]);
-    const stepEtch = (index: number, name: string, steps: any, newStep: any, i: number) => {
-        if (steps.some((item: { name: string }) => item.name === name + index)) {
-            stepEtch(index + 1, name, steps, newStep, i);
-        } else {
-            const Name = _.cloneDeep(newStep);
-            Name.name = Name.name + index;
-            Name.field = Name.field + index;
-            const newValue = _.cloneDeep(config);
-            newValue.steps.splice(i + 1, 0, Name);
-            changeConfigs(newValue);
-            let newVal = [...expanded];
-            newVal = newVal.map(() => false);
-            newVal[i + 1] = true;
-            setExpanded(newVal);
-        }
+    const stepEtch = (index: number | undefined, name: string, steps: any, newStep: any, i: number) => {
+        // if (steps.some((item: { name: string }) => item.name === name + index)) {
+        //     stepEtch(index + 1, name, steps, newStep, i);
+        // } else {
+        const Name = _.cloneDeep(newStep);
+        Name.name = Name.name;
+        Name.field = Name.field;
+        // Name.name = Name.name + index;
+        // Name.field = Name.field + index;
+        const newValue = _.cloneDeep(config);
+        newValue.steps.splice(i + 1, 0, Name);
+        changeConfigs(newValue);
+        let newVal = [...expanded];
+        newVal = newVal.map(() => false);
+        newVal[i + 1] = true;
+        setExpanded(newVal);
+        // }
     };
     const addStep = (step: any, index: number) => {
         const newList = _.cloneDeep(stepOpen);
@@ -107,7 +109,7 @@ function Arrange({
                 }
             });
         }
-        stepEtch(index + 1, newStep.name, config.steps, newStep, index);
+        stepEtch(undefined, newStep.name, config.steps, newStep, index);
     };
     const [pre, setPre] = useState(0);
     useEffect(() => {

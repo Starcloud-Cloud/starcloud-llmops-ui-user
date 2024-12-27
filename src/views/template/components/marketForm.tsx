@@ -36,7 +36,8 @@ function FormExecute({
     materialList,
     stepIndex,
     usePrompt,
-    setUsePromptValue
+    setUsePromptValue,
+    detailShow
 }: any) {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
@@ -219,6 +220,7 @@ function FormExecute({
                 aiModel: useModel,
                 appReqVO: newData,
                 stepId: stepCode,
+                est: detailShow ? undefined : 'regen',
                 source: query.get('appUid') ? 'MARKET' : 'APP',
                 appUid: query.get('appUid') || query.get('uid')
             });

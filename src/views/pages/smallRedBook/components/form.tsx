@@ -183,10 +183,10 @@ const Form = ({ item, index, changeValue, flag }: { item: any; index: number; ch
             ) : null}
             {isModalOpen && (
                 <PicImagePick
+                    isrery={true}
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
                     setSelectImg={(value) => {
-                        console.log(value);
                         changeValue({ index, value: value?.largeImageURL });
                     }}
                 />

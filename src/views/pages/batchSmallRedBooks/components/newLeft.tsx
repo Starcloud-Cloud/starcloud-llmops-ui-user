@@ -1413,6 +1413,7 @@ const Lefts = ({
                                                                               setAppDataGen();
                                                                               setAppData(appRef.current);
                                                                           }}
+                                                                          detailShow={detailShow}
                                                                       />
                                                                   )
                                                                 : el?.isShow && (
@@ -1548,6 +1549,7 @@ const Lefts = ({
                                                                               setAppDataGen();
                                                                               setAppData(appRef.current);
                                                                           }}
+                                                                          detailShow={detailShow}
                                                                       />
                                                                   )}
                                                         </div>

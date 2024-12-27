@@ -25,7 +25,6 @@ export const DetailModal = ({ open, isFlag, qrCodeShow, handleClose, changeList,
     const preRef = useRef(0);
     const [pre, setPre] = useState(0);
     const [dataStatus, setSataStatus] = useState(false);
-    const [errMessage, setErrMessage] = useState('');
     //是否是生成记录的详情
     const [exeDetail, setExeDetail] = useState(false);
     const [count, setCount] = useState(1);
@@ -61,8 +60,21 @@ export const DetailModal = ({ open, isFlag, qrCodeShow, handleClose, changeList,
                         setSataStatus(true);
                         changeList && changeList(businessUid);
                         setDetail(res);
-                    } else if (res.status !== 'EXECUTING' && res.status === 'SUCCESS') {
-                        setErrMessage(res.errorMessage);
+                    } else if (res.status !== 'EXECUTING' && res.status === 'FAILURE') {
+                        setSataStatus(true);
+                        dispatch(
+                            openSnackbar({
+                                open: true,
+                                message: res.errorMessage,
+                                variant: 'alert',
+                                alert: {
+                                    color: 'error'
+                                },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                transition: 'SlideDown',
+                                close: false
+                            })
+                        );
                     }
                 }
             });
@@ -174,7 +186,6 @@ export const DetailModal = ({ open, isFlag, qrCodeShow, handleClose, changeList,
                     show={show}
                     pre={preRef.current}
                     dataStatus={dataStatus}
-                    errMessage={errMessage}
                     exeDetail={exeDetail}
                     setSataStatus={setSataStatus}
                     setPre={(data) => {

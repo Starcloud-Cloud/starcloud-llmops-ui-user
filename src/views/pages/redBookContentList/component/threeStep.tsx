@@ -30,7 +30,6 @@ const ThreeStep = ({
     isFlag,
     exeDetail,
     dataStatus,
-    errMessage,
     setSataStatus,
     setPre
 }: {
@@ -41,7 +40,6 @@ const ThreeStep = ({
     pre: number;
     exeDetail: boolean;
     dataStatus: boolean;
-    errMessage: string;
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
 }) => {
@@ -148,11 +146,6 @@ const ThreeStep = ({
             setAginLoading(false);
         }
     }, [dataStatus]);
-    useEffect(() => {
-        if (errMessage) {
-            clearInterval(timer.current);
-        }
-    }, [errMessage]);
     const props: UploadProps = {
         name: 'image',
         multiple: true,
@@ -568,23 +561,19 @@ const ThreeStep = ({
                     {aginLoading && (
                         <div className="z-[1000] absolute w-full h-full flex justify-center items-center bg-black/50">
                             <div className="flex flex-col gap-2 justify-center items-center bg-white w-[200px] h-[200px] rounded-lg">
-                                {errMessage ? (
-                                    <div className="text-[#ff4d4f]">错误信息：{errMessage}</div>
-                                ) : (
-                                    <>
-                                        <Progress
-                                            type="circle"
-                                            percent={Math.floor((data?.progress?.successStepCount / data?.progress?.totalStepCount) * 100)}
-                                        />
-                                        {data?.progress && (
-                                            <Popover content={'执行到第几步/总步数'}>
-                                                <div className="font-[500] cursor-pointer">
-                                                    {data?.progress?.successStepCount || '-'}/{data?.progress?.totalStepCount || '-'}
-                                                </div>
-                                            </Popover>
-                                        )}
-                                    </>
-                                )}
+                                <>
+                                    <Progress
+                                        type="circle"
+                                        percent={Math.floor((data?.progress?.successStepCount / data?.progress?.totalStepCount) * 100)}
+                                    />
+                                    {data?.progress && (
+                                        <Popover content={'执行到第几步/总步数'}>
+                                            <div className="font-[500] cursor-pointer">
+                                                {data?.progress?.successStepCount || '-'}/{data?.progress?.totalStepCount || '-'}
+                                            </div>
+                                        </Popover>
+                                    )}
+                                </>
                             </div>
                         </div>
                     )}

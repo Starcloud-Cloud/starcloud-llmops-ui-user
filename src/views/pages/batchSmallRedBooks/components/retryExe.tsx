@@ -4,11 +4,12 @@ import { useLocation } from 'react-router-dom';
 import React, { useState } from 'react';
 import { EditType } from 'views/materialLibrary/detail';
 import FormModal from 'views/materialLibrary/components/formModal';
-const ReTryExe = ({ tableData, formOk }: { tableData: any[]; formOk: (data: any) => void }) => {
+const ReTryExe = ({ tableData, formOk }: { tableData: any[]; formOk: (data: any, index: number) => void }) => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const [loading, setLoading] = useState(false);
     const [columns, setColumns] = useState<any>([]);
+    const [rowIndex, setRowIndex] = useState(0);
     const getTableTitle = async () => {
         setLoading(true);
         try {
@@ -59,6 +60,7 @@ const ReTryExe = ({ tableData, formOk }: { tableData: any[]; formOk: (data: any)
                                 await form.setFieldsValue(row);
                                 setRow(row);
                                 setOpen(true);
+                                setRowIndex(index);
                             }}
                         >
                             编辑
@@ -95,7 +97,7 @@ const ReTryExe = ({ tableData, formOk }: { tableData: any[]; formOk: (data: any)
                     columns={columns}
                     form={form}
                     formOk={(data) => {
-                        formOk(data);
+                        formOk(data, rowIndex);
                         setOpen(false);
                     }}
                     row={row}

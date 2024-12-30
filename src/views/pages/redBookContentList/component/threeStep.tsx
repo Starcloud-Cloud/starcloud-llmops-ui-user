@@ -1,7 +1,26 @@
 import React, { useEffect, useState, useRef, memo } from 'react';
-import { Avatar, Card, Divider, Space, Button, Input, UploadProps, Upload, Modal, Select, Drawer, Progress, Popover, QRCode } from 'antd';
+import {
+    Avatar,
+    Card,
+    Divider,
+    Space,
+    Button,
+    Input,
+    UploadProps,
+    Upload,
+    Modal,
+    Select,
+    Drawer,
+    Progress,
+    Popover,
+    QRCode,
+    Form,
+    Image,
+    Tooltip
+} from 'antd';
+import { PlusOutlined, LoadingOutlined, EyeOutlined, CloudUploadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import 'swiper/css';
 import './threeStep.css';
 import 'swiper/css/pagination';
@@ -13,7 +32,6 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { Pagination } from 'swiper';
 
 import { getAccessToken } from 'utils/auth';
-import { PlusOutlined } from '@ant-design/icons';
 import { useAllDetail } from 'contexts/JWTContext';
 import copy from 'clipboard-copy';
 import JSZip from 'jszip';
@@ -21,6 +39,11 @@ import { origin_url } from 'utils/axios/config';
 import SensitiveWords from 'views/sensitiveWords/index';
 import Left from '../../batchSmallRedBooks/components/newLeft';
 import { retryContent } from 'api/redBook';
+import { getMaterialTitle } from 'api/redBook/material';
+import { EditType } from '../../../materialLibrary/detail';
+import { PicImagePick } from 'ui-component/PicImagePick';
+import ReTryExe from '../../batchSmallRedBooks/components/retryExe';
+import _ from 'lodash-es';
 
 const ThreeStep = ({
     data,
@@ -43,7 +66,8 @@ const ThreeStep = ({
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
 }) => {
-    const navigate = useNavigate();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
     const [title, setTitle] = React.useState<string>('');
     const [text, setText] = React.useState<string>('');
     const [tags, setTags] = React.useState<any>([]);
@@ -224,6 +248,46 @@ const ThreeStep = ({
     const [wordsOpen, setWordsOpen] = useState(false);
     const [wordsValue, setWordsValue] = useState('');
 
+    //新版重新生成 leng=1
+    const [form] = Form.useForm();
+    const [retryExeIsShow, setRetryExeisShow] = useState(false);
+    const [columns, setColumns] = useState<any[]>([]);
+    const reTryExe = async (da: string) => {
+        const newData = _.cloneDeep(data);
+        newData.executeParam.appInformation.workflowConfig.steps
+            .find((item: any) => item?.flowStep.handler === 'MaterialActionHandler')
+            .variable.variables.find((item: any) => item.field === 'MATERIAL_LIST').value = da;
+        try {
+            setSaveLoading(true);
+            setSataStatus(false);
+            await retryContent(newData);
+            setRetryExeisShow(false);
+            setReOpen(false);
+            setSaveLoading(false);
+            setOpen(false);
+            setAginLoading(true);
+            timer.current = setInterval(() => {
+                setPre(Math.random() + Math.random());
+            }, 2000);
+        } catch (err) {
+            setSaveLoading(false);
+        }
+    };
+    useEffect(() => {
+        getMaterialTitle({ appUid: query.get('uid') }).then((res) => {
+            setColumns(res.tableMeta);
+        });
+    }, []);
+    //上传图片单独编辑
+    const [field, setField] = useState('');
+    const [loadingList, setLoadingList] = useState<any[]>([]);
+    const [canUpload, setCanUpload] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    //新版重新生成 leng>2
+    const [reOpen, setReOpen] = useState(false);
+    const [reTableData, setRetableData] = useState<any[]>([]);
+
     return (
         <div
             className="h-full"
@@ -300,7 +364,25 @@ const ThreeStep = ({
                                     >
                                         违禁词检测
                                     </Button>
-                                    <Button className="mx-2" onClick={doRetry}>
+                                    <Button
+                                        className="mx-2"
+                                        onClick={() => {
+                                            const newList = JSON.parse(
+                                                data?.executeParam?.appInformation?.workflowConfig?.steps
+                                                    ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                                                    ?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_LIST')?.value ||
+                                                    '[]'
+                                            );
+                                            if (newList.length === 1) {
+                                                form.setFieldsValue(newList[0]);
+                                                setRetryExeisShow(true);
+                                            } else {
+                                                setReOpen(true);
+                                                setRetableData(newList);
+                                            }
+                                        }}
+                                        // onClick={doRetry}
+                                    >
                                         重新生成
                                     </Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
@@ -378,7 +460,150 @@ const ThreeStep = ({
                             ))}
                     </div>
                     <div className="h-full overflow-auto col-span-1">
-                        {
+                        {retryExeIsShow ? (
+                            <div className="w-full h-full relative">
+                                <div className="h-full !pb-[32px] overflow-y-auto p-4">
+                                    <Form form={form} layout="vertical">
+                                        {columns?.map((item, index) => (
+                                            <Form.Item
+                                                key={item.columnCode}
+                                                label={item.columnName}
+                                                name={item.columnCode}
+                                                rules={
+                                                    item?.isRequired
+                                                        ? [{ required: true, message: item.columnName + '是必填项' }]
+                                                        : undefined
+                                                }
+                                            >
+                                                {item.columnType === EditType.Image ? (
+                                                    <Upload
+                                                        name="image"
+                                                        disabled={!canUpload}
+                                                        showUploadList={false}
+                                                        listType="picture-card"
+                                                        action={`${origin_url}${process.env.REACT_APP_API_URL}/llm/creative/plan/uploadImage`}
+                                                        headers={{ Authorization: 'Bearer ' + getAccessToken() }}
+                                                        onChange={(info) => {
+                                                            if (info?.file?.status === 'uploading' && !loadingList[index]) {
+                                                                const newList = _.cloneDeep(loadingList);
+                                                                newList[index] = true;
+                                                                setLoadingList(newList);
+                                                                form.setFieldValue(item.columnCode, undefined);
+                                                                return;
+                                                            }
+                                                            if (info?.file?.status === 'done') {
+                                                                form.setFieldValue(item.columnCode, info?.file?.response?.data?.url);
+                                                                const newList = _.cloneDeep(loadingList);
+                                                                newList[index] = false;
+                                                                setLoadingList(newList);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Form.Item
+                                                            className="!mb-0"
+                                                            shouldUpdate={(prevValues, currentValues) =>
+                                                                prevValues[item.columnCode] !== currentValues[item.columnCode]
+                                                            }
+                                                        >
+                                                            {({ getFieldValue }) => {
+                                                                const firstInputValue = getFieldValue(item.columnCode);
+                                                                return firstInputValue && !loadingList[index] ? (
+                                                                    <div className="relative">
+                                                                        <div className="relative">
+                                                                            <Image
+                                                                                onMouseEnter={() => setCanUpload(false)}
+                                                                                onClick={(e) => e.stopPropagation()}
+                                                                                width={82}
+                                                                                height={82}
+                                                                                // preview={false}
+                                                                                src={
+                                                                                    form.getFieldValue(item.columnCode) +
+                                                                                    '?x-oss-process=image/resize,w_100/quality,q_80'
+                                                                                }
+                                                                            />
+                                                                            {/* <div
+                                                                            className="absolute z-[1] cursor-pointer inset-0 bg-[rgba(0, 0, 0, 0.5)] flex justify-center items-center text-white opacity-0 hover:opacity-100"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                setPreviewOpen(true);
+                                                                            }}
+                                                                        >
+                                                                            <div>
+                                                                                <EyeOutlined />
+                                                                                预览
+                                                                            </div>
+                                                                        </div> */}
+                                                                        </div>
+                                                                        <div className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.4)]">
+                                                                            <Tooltip title="上传">
+                                                                                <div
+                                                                                    className="flex-1 flex justify-center"
+                                                                                    onMouseEnter={() => setCanUpload(true)}
+                                                                                    onMouseLeave={() => setCanUpload(false)}
+                                                                                >
+                                                                                    <CloudUploadOutlined className="text-white/60 hover:text-white" />
+                                                                                </div>
+                                                                            </Tooltip>
+                                                                            <Tooltip title="搜索">
+                                                                                <div
+                                                                                    className="flex-1 flex justify-center !cursor-pointer"
+                                                                                    onClick={(e) => {
+                                                                                        setField(item.columnCode);
+                                                                                        setIsModalOpen(true);
+                                                                                        e.stopPropagation();
+                                                                                    }}
+                                                                                >
+                                                                                    <SearchOutlined className="text-white/60 hover:text-white" />
+                                                                                </div>
+                                                                            </Tooltip>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div
+                                                                        className=" w-[80px] h-[80px] border border-dashed border-[#d9d9d9] rounded-[5px] bg-[#000]/[0.02] flex justify-center items-center flex-col cursor-pointer relative"
+                                                                        onMouseEnter={() => setCanUpload(true)}
+                                                                    >
+                                                                        {!loadingList[index] ? <PlusOutlined /> : <LoadingOutlined />}
+                                                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                                                        <Tooltip title="搜索">
+                                                                            <div
+                                                                                className="bottom-0 z-[1] absolute w-full h-[20px] hover:bg-black/30 flex justify-center items-center bg-[rgba(0,0,0,.5)]"
+                                                                                onClick={(e) => {
+                                                                                    setField(item.columnCode);
+                                                                                    setIsModalOpen(true);
+                                                                                    e.stopPropagation();
+                                                                                }}
+                                                                            >
+                                                                                <SearchOutlined className="text-white/80 hover:text-white" />
+                                                                            </div>
+                                                                        </Tooltip>
+                                                                    </div>
+                                                                );
+                                                            }}
+                                                        </Form.Item>
+                                                    </Upload>
+                                                ) : (
+                                                    <Input.TextArea autoSize={{ minRows: 3, maxRows: 8 }} />
+                                                )}
+                                            </Form.Item>
+                                        ))}
+                                    </Form>
+                                </div>
+                                <div className="z-[1] w-full px-4 absolute bottom-0 left-0 ">
+                                    <Button
+                                        loading={saveLoading}
+                                        onClick={async () => {
+                                            const result = await form.validateFields();
+                                            reTryExe(JSON.stringify([result]));
+                                        }}
+                                        className="w-full"
+                                        type="primary"
+                                    >
+                                        重新生成
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
                             <div className="w-full h-full p-4 !pl-2">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
@@ -556,7 +781,7 @@ const ThreeStep = ({
                                     )}
                                 </div>
                             </div>
-                        }
+                        )}
                     </div>
                     {aginLoading && (
                         <div className="z-[1000] absolute w-full h-full flex justify-center items-center bg-black/50">
@@ -579,7 +804,6 @@ const ThreeStep = ({
                     )}
                 </div>
             </Card>
-
             <Modal style={{ zIndex: 8000 }} open={previewOpen} title={'预览'} footer={null} onCancel={() => setPreviewOpen(false)}>
                 <img alt="example" style={{ width: '100%' }} src={previewImage} />
             </Modal>
@@ -648,6 +872,46 @@ const ThreeStep = ({
                     />
                 </div>
             </Drawer>
+            <Modal
+                zIndex={1000}
+                width={'60%'}
+                title="重新生成"
+                open={reOpen}
+                onCancel={() => setReOpen(false)}
+                footer={
+                    <div className="flex justify-end">
+                        <Button
+                            loading={saveLoading}
+                            type="primary"
+                            onClick={() => {
+                                reTryExe(JSON.stringify(reTableData));
+                            }}
+                        >
+                            重新生成
+                        </Button>
+                    </div>
+                }
+            >
+                <ReTryExe
+                    tableData={reTableData}
+                    formOk={(data, index) => {
+                        const newList = _.cloneDeep(reTableData);
+                        newList[index] = data;
+                        setRetableData(newList);
+                    }}
+                />
+            </Modal>
+            {isModalOpen && (
+                <PicImagePick
+                    isrery={true}
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    setSelectImg={(data) => {
+                        form.setFieldValue(field, data?.largeImageURL);
+                    }}
+                    columns={columns}
+                />
+            )}
         </div>
     );
 };

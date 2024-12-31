@@ -386,7 +386,7 @@ const ThreeStep = ({
                                         重新生成
                                     </Button>
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
-                                        编辑
+                                        编辑笔记
                                     </Button>
                                 </div>
                             ) : (
@@ -463,6 +463,10 @@ const ThreeStep = ({
                         {retryExeIsShow ? (
                             <div className="w-full h-full relative">
                                 <div className="h-full !pb-[32px] overflow-y-auto p-4">
+                                    <div className="text-xs text-black/50 mb-4">
+                                        <span className="font-bold">Tips:</span>
+                                        修改笔记所用素材后，可点击重新生成
+                                    </div>
                                     <Form form={form} layout="vertical">
                                         {columns?.map((item, index) => (
                                             <Form.Item
@@ -875,7 +879,12 @@ const ThreeStep = ({
             <Modal
                 zIndex={1000}
                 width={'60%'}
-                title="重新生成"
+                title={
+                    <div className="flex items-end gap-2">
+                        <div>重新生成</div>
+                        <div className="text-xs text-black/50 font-[400]">修改笔记所用素材后，可点击重新生成</div>
+                    </div>
+                }
                 open={reOpen}
                 onCancel={() => setReOpen(false)}
                 footer={

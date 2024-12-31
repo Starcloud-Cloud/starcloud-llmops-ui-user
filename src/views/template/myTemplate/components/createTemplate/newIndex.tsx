@@ -1348,7 +1348,10 @@ function CreateDetail() {
                 }
             ></CardHeader>
             <Divider />
-            <div className="w-full absolute top-[24px] h-[calc(100vh-112px)]">
+            <div
+                className="w-full absolute top-[24px] h-[calc(100%-24px)] myAppHeight"
+                // className="w-full absolute top-[24px] h-[calc(100vh-112px)]"
+            >
                 <Tabs
                     activeKey={value}
                     centered={true}
@@ -1422,8 +1425,8 @@ function CreateDetail() {
                 >
                     {tabisShow['app.edit'] && (
                         <Tabs.TabPane tab=" 基础设置" key="0">
-                            <div className="flex justify-center ">
-                                <div className="xl:w-[80%] lg:w-full md:w-full">
+                            <div className="flex justify-center h-full">
+                                <div className="xl:w-[80%] lg:w-full md:w-full h-full">
                                     <Basis
                                         detail={{
                                             name: detail?.name,
@@ -1450,7 +1453,10 @@ function CreateDetail() {
                                 ref={arrangeRef}
                                 className="overflow-y-auto mt-[-16px]"
                                 style={{
-                                    height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 162px)',
+                                    height: jsCookie.get('isClient')
+                                        ? 'calc(100vh - 70px)'
+                                        : //  `calc(100vh - 162px)`
+                                          '100%',
                                     backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10%)`,
                                     backgroundSize: '10px 10px',
                                     backgroundRepeat: 'repeat'
@@ -1496,12 +1502,15 @@ function CreateDetail() {
                     )}
                     {tabisShow['app.execute'] && (
                         <Tabs.TabPane tab="运行应用" key="4">
-                            <div className="w-full">
+                            <div className="w-full h-full">
                                 {detail?.type === 'MEDIA_MATRIX' ? (
                                     <Spin spinning={viewLoading} tip="Loading">
                                         <div
                                             style={{
-                                                height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 174px)'
+                                                height: jsCookie.get('isClient')
+                                                    ? 'calc(100vh - 86px)'
+                                                    : // 'calc(100vh - 174px)'
+                                                      '100%'
                                             }}
                                             className="bg-[rgb(244,246,248)]"
                                         >
@@ -1570,7 +1579,10 @@ function CreateDetail() {
                         <Tabs.TabPane tab="应用分析" key="2">
                             <div
                                 style={{
-                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh -174px)'
+                                    height: jsCookie.get('isClient')
+                                        ? 'calc(100vh - 86px)'
+                                        : // 'calc(100vh -174px)'
+                                          '100%'
                                 }}
                                 className="overflow-y-auto px-4"
                             >
@@ -1582,7 +1594,10 @@ function CreateDetail() {
                         <Tabs.TabPane tab="应用发布" key="3">
                             <div
                                 style={{
-                                    height: jsCookie.get('isClient') ? 'calc(100vh - 86px)' : 'calc(100vh - 174px)'
+                                    height: jsCookie.get('isClient')
+                                        ? 'calc(100vh - 86px)'
+                                        : // 'calc(100vh - 174px)'
+                                          '100%'
                                 }}
                                 className="overflow-y-auto px-4"
                             >

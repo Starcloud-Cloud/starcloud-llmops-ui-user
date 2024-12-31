@@ -1,5 +1,5 @@
 import { Modal, Progress, Tag, Table, Button, Tooltip } from 'antd';
-import { HistoryOutlined } from '@ant-design/icons';
+import { HistoryOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 
 const ResultLoading = ({
@@ -74,7 +74,12 @@ const ResultLoading = ({
                     errorMessage?.map((item, i) => (
                         <div className="mb-2 text-[#ff4d4f] text-xs flex justify-center">
                             <span className="font-bold">错误信息 {i + 1}：</span>
-                            {item}
+                            {item?.msg || item}
+                            {item?.reason && (
+                                <Tooltip title={item?.reason}>
+                                    <ExclamationCircleOutlined className="ml-1 cursor-pointer" />
+                                </Tooltip>
+                            )}
                         </div>
                     ))}
             </div>

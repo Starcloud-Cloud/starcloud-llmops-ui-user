@@ -157,7 +157,7 @@ const FormModal = ({
                 await formOk({ ...row, ...imageData, ...result });
             }}
         >
-            <Form form={form} labelCol={{ span: 7 }}>
+            <Form form={form} labelAlign="left" labelCol={{ md: 7, lg: 5 }}>
                 {columns?.map(
                     (item, index) =>
                         item.title !== '操作' &&

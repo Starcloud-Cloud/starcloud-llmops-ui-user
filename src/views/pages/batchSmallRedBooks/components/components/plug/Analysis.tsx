@@ -276,7 +276,11 @@ const PlugAnalysis = ({
                     setExecutionCount(executionCountRef.current);
                     errorCountRef.current = 1;
                     setErrorCount(errorCountRef.current);
-                    errorMessageRef.current.push(err.msg);
+                    if (err?.reason) {
+                        errorMessageRef.current.push({ msg: err.msg, reason: err.reason });
+                    } else {
+                        errorMessageRef.current.push(err.msg);
+                    }
                     setErrorMessage(errorMessageRef.current);
                     clearInterval(timer.current);
                     clearTimeout(timer1.current);

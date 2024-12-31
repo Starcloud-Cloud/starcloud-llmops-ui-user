@@ -4,3 +4,25 @@
         background-color: #f8fafc !important;
     }
 }
+
+.myAppHeight {
+    .ant-tabs {
+        height: 100%;
+
+        .ant-tabs-content {
+            height: 100%;
+
+            .ant-tabs-tabpane {
+                height: 100%;
+
+                .ant-spin-nested-loading {
+                    height: 100%;
+
+                    .ant-spin-container {
+                        height: 100%;
+                    }
+                }
+            }
+        }
+    }
+}

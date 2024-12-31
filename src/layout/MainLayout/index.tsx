@@ -24,7 +24,7 @@ import { openDrawer } from 'store/slices/menu';
 import { IconChevronRight } from '@tabler/icons';
 import { discountNewUser, getVipTimeOut } from 'api/vip';
 import CloseIcon from '@mui/icons-material/Close';
-import { Button } from 'antd';
+import { Button, Image } from 'antd';
 import dayjs from 'dayjs';
 
 import infoStore from 'store/entitlementAction';
@@ -38,6 +38,7 @@ import StorageCache from 'web-storage-cache';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
 import { useAllDetail } from 'contexts/JWTContext';
 import { InviteUser } from 'ui-component/invite-user';
+import bananer from 'assets/images/header/bananer.png';
 
 interface MainStyleProps {
     theme: Theme;
@@ -491,7 +492,7 @@ const MainLayout = () => {
     return (
         <ListingProvider>
             <div className="w-full">
-                {getPermission(ENUM_PERMISSION.SPRING_SALE) && (
+                {getPermission(ENUM_PERMISSION.SPRING_SALE) ? (
                     <div className="w-full">
                         {/* <img
                             src={require('../../assets/images/header/presents.jpg')}
@@ -558,6 +559,18 @@ const MainLayout = () => {
                             内测邀请：领取小红书笔记智能创作权益
                         </div>
                     </div>
+                ) : (
+                    <Image
+                        width={'100%'}
+                        src={bananer}
+                        preview={false}
+                        className="cursor-pointer"
+                        onClick={() => {
+                            window.open(
+                                'https://alidocs.dingtalk.com/notable/share/form/v01a2QnVJGx127xn4XB_dv19yqvsgs3oebp3pcjys_1qX0QQ0'
+                            );
+                        }}
+                    />
                 )}
                 <div className="flex flex-col">
                     {timeOutObj && (
@@ -613,7 +626,17 @@ const MainLayout = () => {
                                             // `${isMobile && '!p-0'}
                                             `!p-0 max-w-[1300px] overflow-y-auto`
                                         }
-                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '144px' : '88px'})` }}
+                                        sx={{
+                                            height: `calc(100vh - ${
+                                                getPermission(ENUM_PERMISSION.SPRING_SALE)
+                                                    ? '144px'
+                                                    : timeOutObj
+                                                    ? // '120px'
+                                                      '159px'
+                                                    : //  '88px'
+                                                      '127px'
+                                            })`
+                                        }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         {/* breadcrumb */}
@@ -627,7 +650,17 @@ const MainLayout = () => {
                                             // `${isMobile && '!p-0'}
                                             `!p-0 overflow-y-scroll`
                                         }
-                                        sx={{ height: `calc(100vh - ${getPermission(ENUM_PERMISSION.SPRING_SALE) ? '144px' : '88px'})` }}
+                                        sx={{
+                                            height: `calc(100vh - ${
+                                                getPermission(ENUM_PERMISSION.SPRING_SALE)
+                                                    ? '144px'
+                                                    : timeOutObj
+                                                    ? // '120px'
+                                                      '159px'
+                                                    : //  '88px'
+                                                      '127px'
+                                            })`
+                                        }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}
                                     >
                                         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />

@@ -85,7 +85,8 @@ const Basis = ({ basisPre, detail, appModel, setValues }: Anyevent) => {
     return (
         <div
             style={{
-                height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : 'calc(100vh - 172px)'
+                height: jsCookie.get('isClient') ? 'calc(100vh - 70px)' : '100%'
+                // 'calc(100vh - 172px)'
             }}
             className="overflow-y-auto mt-[-16px] pt-4"
         >

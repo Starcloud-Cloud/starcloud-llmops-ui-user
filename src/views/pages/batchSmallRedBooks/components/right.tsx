@@ -309,7 +309,7 @@ const Right = ({
                         clearInterval(timer.current);
                     }
                 } catch (err: any) {
-                    setErrMsg(err.msg);
+                    setErrMsg(err?.reason || err?.msg);
                     clearInterval(timer.current);
                     clearTimeout(timer1.current);
                 }

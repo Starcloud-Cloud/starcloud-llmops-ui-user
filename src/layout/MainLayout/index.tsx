@@ -562,6 +562,7 @@ const MainLayout = () => {
                 ) : (
                     <Image
                         width={'100%'}
+                        height={'50px'}
                         src={bananer}
                         preview={false}
                         className="cursor-pointer"
@@ -656,9 +657,9 @@ const MainLayout = () => {
                                                     ? '144px'
                                                     : timeOutObj
                                                     ? // '120px'
-                                                      '159px'
+                                                      '170px'
                                                     : //  '88px'
-                                                      '127px'
+                                                      '139px'
                                             })`
                                         }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}

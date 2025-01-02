@@ -31,6 +31,16 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
             setValue(true);
         }
     }, [pre]);
+    const getValue = (value: any) => {
+        let newValue: any[];
+        try {
+            newValue = JSON.parse(value);
+        } catch (e) {
+            newValue = [];
+        }
+        return newValue;
+    };
+
     return (
         <>
             {item.style === 'INPUT' ? (
@@ -183,7 +193,7 @@ function FormExecute({ item, onChange, pre, columns = [], setEditOpen, setTitle,
                             新增
                         </Button>
                     </div>
-                    <Table rowKey={(_, index) => String(index)} columns={columns} dataSource={item.value} pagination={false} />
+                    <Table rowKey={(_, index) => String(index)} columns={columns} dataSource={getValue(item.value)} pagination={false} />
                 </div>
             )}
         </>

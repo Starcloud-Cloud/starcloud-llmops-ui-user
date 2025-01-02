@@ -480,84 +480,92 @@ function ApplicationAnalysis({
     };
     return (
         <Box>
-            <Row className="my-4" gutter={[20, 20]}>
-                {!appUid && (
-                    <>
-                        <Col md={8} lg={6} xs={12}>
-                            <TextField
-                                label={t('generateLog.name')}
-                                value={queryParams.appName}
-                                name="appName"
-                                type="search"
-                                InputLabelProps={{ shrink: true }}
-                                onChange={handleChange}
-                                fullWidth
-                            />
-                        </Col>
-                        <Col md={8} lg={6} xs={12}>
-                            <TextField
-                                label={'用户 ID'}
-                                value={queryParams.userId}
-                                name="userId"
-                                type="search"
-                                InputLabelProps={{ shrink: true }}
-                                onChange={handleChange}
-                                fullWidth
-                            />
-                        </Col>
-                        <Col md={8} lg={6} xs={12}>
-                            <FormControl fullWidth>
-                                <InputLabel id="appMode">模式</InputLabel>
-                                <Selects
+            <div className="w-full overflow-x-hidden">
+                <Row className="py-4" gutter={[20, 20]}>
+                    {!appUid && (
+                        <>
+                            <Col md={8} lg={6} xs={12}>
+                                <TextField
+                                    label={t('generateLog.name')}
+                                    value={queryParams.appName}
+                                    name="appName"
                                     type="search"
-                                    labelId="appMode"
-                                    name="appMode"
-                                    label="模式"
-                                    value={queryParams.appMode}
+                                    InputLabelProps={{ shrink: true }}
                                     onChange={handleChange}
-                                >
-                                    {appMode.map((item) => (
-                                        <MenuItem value={item.value}>{item.label}</MenuItem>
-                                    ))}
-                                </Selects>
-                            </FormControl>
-                        </Col>
-                    </>
-                )}
-                <Col md={8} lg={6} xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id="fromScene">场景</InputLabel>
-                        <Selects labelId="fromScene" name="fromScene" label="场景" value={queryParams.fromScene} onChange={handleChange}>
-                            {appScene.map((item) => (
-                                <MenuItem value={item.value}>{item.label}</MenuItem>
-                            ))}
-                        </Selects>
-                    </FormControl>
-                </Col>
-                <Col md={8} lg={6} xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
-                        <Selects
-                            labelId="demo-simple-select-label"
-                            name="timeType"
-                            label={t('generateLog.date')}
-                            value={queryParams.timeType}
-                            onChange={handleChange}
-                        >
-                            {dateList?.map((item) => (
-                                <MenuItem key={item.value} value={item.value}>
-                                    {item.label}
-                                </MenuItem>
-                            ))}
-                        </Selects>
-                    </FormControl>
-                </Col>
-                <Col md={8} lg={6} xs={12}>
-                    <Button2 onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
-                        {t('generateLog.search')}
-                    </Button2>
-                </Col>
-            </Row>
+                                    fullWidth
+                                />
+                            </Col>
+                            <Col md={8} lg={6} xs={12}>
+                                <TextField
+                                    label={'用户 ID'}
+                                    value={queryParams.userId}
+                                    name="userId"
+                                    type="search"
+                                    InputLabelProps={{ shrink: true }}
+                                    onChange={handleChange}
+                                    fullWidth
+                                />
+                            </Col>
+                            <Col md={8} lg={6} xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="appMode">模式</InputLabel>
+                                    <Selects
+                                        type="search"
+                                        labelId="appMode"
+                                        name="appMode"
+                                        label="模式"
+                                        value={queryParams.appMode}
+                                        onChange={handleChange}
+                                    >
+                                        {appMode.map((item) => (
+                                            <MenuItem value={item.value}>{item.label}</MenuItem>
+                                        ))}
+                                    </Selects>
+                                </FormControl>
+                            </Col>
+                        </>
+                    )}
+                    <Col md={8} lg={6} xs={12}>
+                        <FormControl fullWidth>
+                            <InputLabel id="fromScene">场景</InputLabel>
+                            <Selects
+                                labelId="fromScene"
+                                name="fromScene"
+                                label="场景"
+                                value={queryParams.fromScene}
+                                onChange={handleChange}
+                            >
+                                {appScene.map((item) => (
+                                    <MenuItem value={item.value}>{item.label}</MenuItem>
+                                ))}
+                            </Selects>
+                        </FormControl>
+                    </Col>
+                    <Col md={8} lg={6} xs={12}>
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">{t('generateLog.date')}</InputLabel>
+                            <Selects
+                                labelId="demo-simple-select-label"
+                                name="timeType"
+                                label={t('generateLog.date')}
+                                value={queryParams.timeType}
+                                onChange={handleChange}
+                            >
+                                {dateList?.map((item) => (
+                                    <MenuItem key={item.value} value={item.value}>
+                                        {item.label}
+                                    </MenuItem>
+                                ))}
+                            </Selects>
+                        </FormControl>
+                    </Col>
+                    <Col md={8} lg={6} xs={12}>
+                        <Button2 onClick={querys} startIcon={<SearchIcon />} variant="contained" color="primary">
+                            {t('generateLog.search')}
+                        </Button2>
+                    </Col>
+                </Row>
+            </div>
             <Echarts generate={generate} list={list} />
             <TableContainer component={Paper} sx={{ mt: 2 }}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">

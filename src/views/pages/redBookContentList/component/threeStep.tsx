@@ -274,9 +274,11 @@ const ThreeStep = ({
         }
     };
     useEffect(() => {
-        getMaterialTitle({ appUid: query.get('uid') }).then((res) => {
-            setColumns(res.tableMeta);
-        });
+        if (query.get('uid')) {
+            getMaterialTitle({ appUid: query.get('uid') }).then((res) => {
+                setColumns(res.tableMeta);
+            });
+        }
     }, []);
     //上传图片单独编辑
     const [field, setField] = useState('');

@@ -43,6 +43,7 @@ import { getMaterialTitle } from 'api/redBook/material';
 import { EditType } from '../../../materialLibrary/detail';
 import { PicImagePick } from 'ui-component/PicImagePick';
 import ReTryExe from '../../batchSmallRedBooks/components/retryExe';
+import VideoModal from './videoModal';
 import _ from 'lodash-es';
 
 const ThreeStep = ({
@@ -66,6 +67,7 @@ const ThreeStep = ({
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
 }) => {
+    const Option = Select.Option;
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const [title, setTitle] = React.useState<string>('');
@@ -290,6 +292,40 @@ const ThreeStep = ({
     const [reOpen, setReOpen] = useState(false);
     const [reTableData, setRetableData] = useState<any[]>([]);
 
+    const [videoOpen, setVideoOpen] = useState(false);
+    const [openVideoMode, setOpenVideoMode] = useState(false);
+    const [quickConfiguration, setQuickConfiguration] = useState<any>(null);
+    const [templateList, setTemplateList] = useState<any[]>([]);
+    useEffect(() => {
+        const newData = data?.executeParam?.appInformation?.workflowConfig?.steps
+            ?.find((item: any) => item?.flowStep?.handler === 'PosterActionHandler')
+            ?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE')?.value;
+
+        if (newData) {
+            const template = JSON.parse(newData);
+            const obj: any = {};
+            setOpenVideoMode(template.templateList.some((item: any) => item.openVideoMode));
+            setTemplateList(template.templateList);
+            template.templateList.map((item: any) => {
+                if (item.quickConfiguration) {
+                    const newItem = JSON.parse(item.quickConfiguration);
+                    for (let key in newItem) {
+                        if (newItem[key] === true && obj[key] === undefined) {
+                            obj[key] = newItem[key];
+                        }
+                    }
+                }
+            });
+            setQuickConfiguration(obj);
+        } else {
+            setQuickConfiguration({
+                isRepeatEnable: false,
+                isRepeatRole: false,
+                isSoundEffect: false,
+                isVoiceRole: false
+            });
+        }
+    }, [data]);
     return (
         <div
             className="h-full"
@@ -390,6 +426,11 @@ const ThreeStep = ({
                                     <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                         编辑笔记
                                     </Button>
+                                    {openVideoMode && (
+                                        <Button className="ml-2" type="primary" onClick={() => setVideoOpen(true)} disabled={claim}>
+                                            视频生成
+                                        </Button>
+                                    )}
                                 </div>
                             ) : (
                                 <Space>
@@ -912,6 +953,12 @@ const ThreeStep = ({
                     }}
                 />
             </Modal>
+            <VideoModal
+                videoOpen={videoOpen}
+                setVideoOpen={setVideoOpen}
+                quickConfiguration={quickConfiguration}
+                templateList={templateList}
+            />
             {isModalOpen && (
                 <PicImagePick
                     isrery={true}

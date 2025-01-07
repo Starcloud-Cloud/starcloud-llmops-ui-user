@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Card, Form, Input, Select, InputNumber, Radio, Button, Space, Popover, Tooltip, Image } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Form, Input, Select, InputNumber, Radio, Button, Space, Popover, Tooltip, Image, Switch, Checkbox } from 'antd';
 import { DeleteOutlined, PlusOutlined, SwapOutlined, MoreOutlined } from '@ant-design/icons';
 import { DragOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { getImageTemplateJSON } from 'api/template/index';
 
 // 定义发音单元的数据结构
 interface VoiceUnit {
@@ -19,11 +18,16 @@ interface VoiceUnit {
         content: string;
         audio: {
             voiceRole: string;
-            source: string;
             frame: {
                 start: number;
                 end: number;
             };
+        };
+        settings: {
+            audioEnable: boolean; // 是否发音
+            repeatEnable: boolean; // 是否跟读
+            repeatRole: string; // 跟读发音角色
+            repeatCount: number; // 跟读次数
         };
         point: {
             x: number;
@@ -58,6 +62,8 @@ interface VoiceConfig {
         unitInterval: number; // 发音单元间隔
         voiceRole: string; // 发音角色
         soundEffect: string; // 发音效果
+        repeatEnable: boolean; // 是否跟读
+        repeatRole: string; // 跟读发音角色
         resolution: {
             width: number;
             height: number;
@@ -76,7 +82,25 @@ interface VoiceConfig {
     };
 }
 
-const VideoSetting: React.FC = () => {
+const VideoSetting: React.FC<{
+    currentElementId: string;
+    setCurrentElementId: (value: string) => void;
+    currentJson: any;
+    variableList: any[];
+    videoConfig: any;
+    upDateData: (value: any) => void;
+    quickConfiguration: any;
+    setQuickConfiguration: (value: any) => void;
+}> = ({
+    currentElementId,
+    setCurrentElementId,
+    currentJson,
+    variableList,
+    videoConfig,
+    upDateData,
+    quickConfiguration,
+    setQuickConfiguration
+}) => {
     const [form] = Form.useForm<VoiceConfig>();
     const [voiceUnits, setVoiceUnits] = useState<VoiceUnit[]>([
         {
@@ -91,11 +115,16 @@ const VideoSetting: React.FC = () => {
                     content: '标题',
                     audio: {
                         voiceRole: '男声1',
-                        source: '',
                         frame: {
                             start: 0,
                             end: 0
                         }
+                    },
+                    settings: {
+                        audioEnable: true,
+                        repeatEnable: true,
+                        repeatRole: '男声1',
+                        repeatCount: 2
                     },
                     point: {
                         x: 0,
@@ -139,11 +168,16 @@ const VideoSetting: React.FC = () => {
                     content: '标题',
                     audio: {
                         voiceRole: '男声1',
-                        source: '',
                         frame: {
                             start: 0,
                             end: 0
                         }
+                    },
+                    settings: {
+                        audioEnable: true,
+                        repeatEnable: true,
+                        repeatRole: '男声1',
+                        repeatCount: 2
                     },
                     point: {
                         x: 0,
@@ -174,6 +208,7 @@ const VideoSetting: React.FC = () => {
         setVoiceUnits([...voiceUnits, newUnit]);
     };
 
+    const [popForm] = Form.useForm();
     // 添加发音单元数据
     const addVoiceUnitItem = (index: number) => {
         const newList = _.cloneDeep(voiceUnits);
@@ -182,11 +217,16 @@ const VideoSetting: React.FC = () => {
             content: `发音单元${newList[index].elements.length + 1}`,
             audio: {
                 voiceRole: '男声1',
-                source: '',
                 frame: {
                     start: 0,
                     end: 0
                 }
+            },
+            settings: {
+                audioEnable: true,
+                repeatEnable: true,
+                repeatRole: '男声1',
+                repeatCount: 2
             },
             point: {
                 x: 0,
@@ -195,6 +235,12 @@ const VideoSetting: React.FC = () => {
                 by: 0
             }
         });
+        setVoiceUnits(newList);
+    };
+    // 删除发音单元元素
+    const removeVoiceUnitItem = (index: number, elementIndex: number) => {
+        const newList = _.cloneDeep(voiceUnits);
+        newList[index].elements.splice(elementIndex, 1);
         setVoiceUnits(newList);
     };
     // 切换类型
@@ -239,276 +285,357 @@ const VideoSetting: React.FC = () => {
         setVoiceUnits(items);
     };
 
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth); //检测窗口宽度
-    const [imgRes, setImgRes] = useState<any>(null);
-    const [currentElementId, setCurrentElementId] = useState<string>('');
-    const imgRef = useRef<HTMLDivElement>(null);
-    const scale = useMemo(() => {
-        return imgRef?.current && imgRes.json ? imgRef?.current?.offsetWidth / imgRes.json?.clipPath?.width : 1;
-    }, [imgRes, windowWidth, imgRef?.current]);
-    useEffect(() => {
-        getImageTemplateJSON('clxycsig600096fynph9b188w').then((res) => {
-            const newRes = res;
-            newRes.json = JSON.parse(res?.json);
-            setImgRes(newRes);
+    const handleValuesChange = (_: any, allValues: any) => {
+        upDateData({
+            ...allValues,
+            voiceUnits
         });
+        console.log(allValues, voiceUnits);
+    };
+    useEffect(() => {
+        console.log(videoConfig, currentJson);
+        if (videoConfig) {
+            const config = JSON.parse(videoConfig);
+            form.setFieldsValue({
+                globalSettings: config.globalSettings,
+                videoConfig: config.videoConfig
+            });
+            setVoiceUnits(config.voiceUnits);
+        }
     }, []);
     useEffect(() => {
-        const handleResize = () => {
-            setWindowWidth(window.innerWidth);
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+        form.validateFields().then((values) => {
+            upDateData({
+                ...values,
+                voiceUnits
+            });
+        });
+    }, [voiceUnits]);
 
     return (
-        <div className="w-full h-full p-4 flex gap-4">
-            <div className="flex-1 bg-white rounded-lg p-4 flex justify-center items-center">
-                <div className="w-[70%] relative" ref={imgRef}>
-                    <Image width="100%" preview={false} src={imgRes?.example} />
-                    {imgRes?.json?.objects
-                        ?.filter((item: any) => item.type === 'image' || item.type.includes('text'))
-                        ?.map((item: any, index: number) => {
-                            return (
-                                <div
-                                    key={`${item.id}-${index}`}
-                                    onMouseEnter={() => setCurrentElementId(item.id)}
-                                    onMouseLeave={() => setCurrentElementId('')}
-                                    className={`${
-                                        item.id === currentElementId ? 'outline outline-offset-2 outline-blue-500 w-full' : 'w-full'
-                                    }`}
-                                    style={{
-                                        width: `${item.width * item.scaleX * scale}px`,
-                                        height: `${item.height * item.scaleY * scale}px`,
-                                        left: `${item.left * scale}px`,
-                                        top: `${item.top * scale}px`,
-                                        position: 'absolute',
-                                        transform: `rotate(${item.angle}deg)`
-                                    }}
-                                />
-                            );
-                        })}
+        <Form
+            form={form}
+            layout="vertical"
+            // onFinish={handleSubmit}
+            initialValues={{
+                globalSettings: {
+                    elementInterval: 1,
+                    unitInterval: 2,
+                    voiceRole: '男声2',
+                    soundEffect: '手指',
+                    repeatEnable: false,
+                    repeatRole: '背景1',
+                    resolution: {
+                        width: 1286,
+                        height: 1714
+                    }
+                },
+                videoConfig: {
+                    mode: 'merge'
+                }
+            }}
+            onValuesChange={handleValuesChange}
+        >
+            <Card size="small" title="全局配置" style={{ marginBottom: 24 }}>
+                <Form.Item label="发音元素间隔" name={['globalSettings', 'elementInterval']} rules={[{ required: true }]}>
+                    <InputNumber addonAfter="秒" min={0} style={{ width: 200 }} />
+                </Form.Item>
+
+                <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
+                    <InputNumber addonAfter="秒" min={0} style={{ width: 200 }} />
+                </Form.Item>
+
+                <div className="flex items-center gap-2">
+                    <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
+                        <Select style={{ width: 200 }}>
+                            <Select.Option value="男声1">男声1</Select.Option>
+                            <Select.Option value="男声2">男声2</Select.Option>
+                            <Select.Option value="女声1">女声1</Select.Option>
+                            <Select.Option value="女声2">女声2</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Checkbox
+                        checked={quickConfiguration.isVoiceRole}
+                        onChange={() => setQuickConfiguration({ ...quickConfiguration, isVoiceRole: !quickConfiguration.isVoiceRole })}
+                    />
+                    <div className="text-xs">快捷配置</div>
                 </div>
-            </div>
-            <Card title="图文视频配置" className="flex-1 h-full overflow-y-scroll">
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={handleSubmit}
-                    initialValues={{
-                        globalSettings: {
-                            elementInterval: 1,
-                            unitInterval: 2,
-                            voiceRole: '男声2',
-                            soundEffect: '手指',
-                            resolution: {
-                                width: 1286,
-                                height: 1714
-                            }
-                        },
-                        videoConfig: {
-                            mode: 'merge'
+
+                <div className="flex items-center gap-2">
+                    <Form.Item label="发音效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
+                        <Select style={{ width: 200 }}>
+                            <Select.Option value="手指">手指</Select.Option>
+                            <Select.Option value="其他效果">其他效果</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Checkbox
+                        checked={quickConfiguration.isSoundEffect}
+                        onChange={() => setQuickConfiguration({ ...quickConfiguration, isSoundEffect: !quickConfiguration.isSoundEffect })}
+                    />
+                    <div className="text-xs">快捷配置</div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <Form.Item
+                        className="w-[200px]"
+                        label="是否跟读"
+                        name={['globalSettings', 'repeatEnable']}
+                        valuePropName="checked"
+                        rules={[{ required: true }]}
+                    >
+                        <Switch />
+                    </Form.Item>
+                    <Checkbox
+                        checked={quickConfiguration.isRepeatEnable}
+                        onChange={() =>
+                            setQuickConfiguration({ ...quickConfiguration, isRepeatEnable: !quickConfiguration.isRepeatEnable })
                         }
-                    }}
-                >
-                    <Card size="small" title="全局配置" style={{ marginBottom: 24 }}>
-                        <Form.Item label="发音元素间隔" name={['globalSettings', 'elementInterval']} rules={[{ required: true }]}>
-                            <InputNumber addonAfter="秒" min={0} style={{ width: 200 }} />
-                        </Form.Item>
+                    />
+                    <div className="text-xs">快捷配置</div>
+                </div>
 
-                        <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
-                            <InputNumber addonAfter="秒" min={0} style={{ width: 200 }} />
-                        </Form.Item>
+                <div className="flex items-center gap-2">
+                    <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']} rules={[{ required: true }]}>
+                        <Select style={{ width: 200 }}>
+                            <Select.Option value="背景1">背景1</Select.Option>
+                            <Select.Option value="背景2">背景2</Select.Option>
+                        </Select>
+                    </Form.Item>
+                    <Checkbox
+                        checked={quickConfiguration.isRepeatRole}
+                        onChange={() => setQuickConfiguration({ ...quickConfiguration, isRepeatRole: !quickConfiguration.isRepeatRole })}
+                    />
+                    <div className="text-xs">快捷配置</div>
+                </div>
+            </Card>
 
-                        <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
-                            <Select style={{ width: 200 }}>
-                                <Select.Option value="男声1">男声1</Select.Option>
-                                <Select.Option value="男声2">男声2</Select.Option>
-                                <Select.Option value="女声1">女声1</Select.Option>
-                                <Select.Option value="女声2">女声2</Select.Option>
-                            </Select>
-                        </Form.Item>
-
-                        <Form.Item label="发音效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
-                            <Select style={{ width: 200 }}>
-                                <Select.Option value="手指">手指</Select.Option>
-                                <Select.Option value="其他效果">其他效果</Select.Option>
-                            </Select>
-                        </Form.Item>
-                    </Card>
-
-                    <DragDropContext onDragEnd={onDragEnd}>
-                        <Droppable droppableId="draggable-card">
-                            {(provided) => (
-                                <div {...provided.droppableProps} ref={provided.innerRef}>
-                                    {voiceUnits.map((unit, index) => (
-                                        <Draggable key={unit.id} draggableId={unit.id.toString()} index={index}>
-                                            {(provided) => (
-                                                <div ref={provided.innerRef} {...provided.draggableProps}>
-                                                    <Card
-                                                        style={{ marginBottom: 16 }}
-                                                        title={`发音单元 ${index + 1}`}
-                                                        size="small"
-                                                        extra={
-                                                            <Space>
-                                                                <div {...provided.dragHandleProps}>
-                                                                    <DragOutlined className="cursor-move" />
-                                                                </div>
-                                                                <Button
-                                                                    type="text"
-                                                                    icon={<DeleteOutlined />}
-                                                                    onClick={() => removeVoiceUnit(unit.id)}
-                                                                    disabled={voiceUnits.length === 1}
-                                                                />
-                                                            </Space>
-                                                        }
-                                                    >
-                                                        {/* <div className="mb-4">
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="draggable-card">
+                    {(provided) => (
+                        <div {...provided.droppableProps} ref={provided.innerRef}>
+                            {voiceUnits.map((unit, index) => (
+                                <Draggable key={unit.id} draggableId={unit.id.toString()} index={index}>
+                                    {(provided) => (
+                                        <div ref={provided.innerRef} {...provided.draggableProps}>
+                                            <Card
+                                                style={{ marginBottom: 16 }}
+                                                title={`发音单元 ${index + 1}`}
+                                                size="small"
+                                                extra={
+                                                    <Space>
+                                                        <Button
+                                                            size="small"
+                                                            type="primary"
+                                                            icon={<PlusOutlined />}
+                                                            onClick={() => addVoiceUnitItem(index)}
+                                                        >
+                                                            增加发音元素
+                                                        </Button>
+                                                        <div {...provided.dragHandleProps}>
+                                                            <DragOutlined className="cursor-move" />
+                                                        </div>
+                                                        <Button
+                                                            type="text"
+                                                            icon={<DeleteOutlined />}
+                                                            onClick={() => removeVoiceUnit(unit.id)}
+                                                            disabled={voiceUnits.length === 1}
+                                                        />
+                                                    </Space>
+                                                }
+                                            >
+                                                {/* <div className="mb-4">
                                                                 <div className="text-md font-normal text-black/[0.88] mb-2">间隔时间</div>
                                                                 <InputNumber value={unit.settings.interval} addonAfter="秒" min={0} />
                                                             </div> */}
-                                                        <div className="flex flex-wrap gap-4">
-                                                            {unit.elements.map((item, i) => (
-                                                                <div
-                                                                    onMouseEnter={() => {
-                                                                        if (item.type === 'ref') {
-                                                                            setCurrentElementId(item.content);
-                                                                        }
-                                                                    }}
-                                                                    onMouseLeave={() => setCurrentElementId('')}
-                                                                    className={`rounded-lg border border-solid border-gray-300 relative px-6 ${
-                                                                        item.content === currentElementId
-                                                                            ? 'outline outline-offset-2 outline-blue-500'
-                                                                            : ''
-                                                                    }`}
-                                                                >
-                                                                    {item.type === 'text' ? (
-                                                                        <Input
-                                                                            className="w-[150px]"
-                                                                            variant="borderless"
-                                                                            value={item.content}
-                                                                            onChange={(e) => {
-                                                                                const newList = _.cloneDeep(voiceUnits);
-                                                                                newList[index].elements[i].content = e.target.value;
-                                                                                newList[index].elements[i].point = {
-                                                                                    x: 0,
-                                                                                    y: 0,
-                                                                                    bx: 0,
-                                                                                    by: 0
-                                                                                };
-                                                                                setVoiceUnits(newList);
-                                                                            }}
-                                                                        />
-                                                                    ) : (
-                                                                        <Select
-                                                                            variant="borderless"
-                                                                            value={item.content}
-                                                                            className="w-[150px]"
-                                                                            onChange={(value) => {
-                                                                                const newList = _.cloneDeep(voiceUnits);
-                                                                                newList[index].elements[i].content = value;
-                                                                                const point = imgRes?.json?.objects?.find(
-                                                                                    (item: any) => item.id === value
-                                                                                );
-                                                                                console.log(point);
-                                                                                const { left, top, width, height } = point;
-                                                                                newList[index].elements[i].point = {
-                                                                                    x: left,
-                                                                                    y: top,
-                                                                                    bx: left + width,
-                                                                                    by: top + height
-                                                                                };
-                                                                                setVoiceUnits(newList);
-                                                                            }}
-                                                                        >
-                                                                            {imgRes?.variableList?.map((item: any) => (
-                                                                                <Select.Option value={item.field}>
-                                                                                    {item.label}
-                                                                                </Select.Option>
-                                                                            ))}
-                                                                        </Select>
-                                                                    )}
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    {unit.elements.map((item, i) => (
+                                                        <div className="p-2 border border-solid border-[#f0f0f0] rounded-lg">
+                                                            <div className="mb-2 flex justify-between items-center">
+                                                                <div className="text-xs font-[500]">
+                                                                    {item.type === 'text' ? '文本' : '变量'}
+                                                                </div>
+                                                                <div className="flex gap-2">
                                                                     <Popover
+                                                                        title="发音元素配置"
+                                                                        onOpenChange={async (open) => {
+                                                                            if (!open) {
+                                                                                const result = await popForm.validateFields();
+                                                                                console.log(result);
+                                                                                const newList = _.cloneDeep(voiceUnits);
+                                                                                newList[index].elements[i].settings = result;
+                                                                                newList[index].elements[i].audio.voiceRole =
+                                                                                    result.voiceRole;
+                                                                                setVoiceUnits(newList);
+                                                                                popForm.resetFields();
+                                                                            } else {
+                                                                                popForm.setFieldsValue({
+                                                                                    ...item.settings,
+                                                                                    voiceRole: item.audio.voiceRole
+                                                                                });
+                                                                            }
+                                                                        }}
                                                                         content={
                                                                             <div className="w-[250px]">
-                                                                                <div>
-                                                                                    <div className="text-md font-normal text-black/[0.88] mb-2 mt-4">
-                                                                                        发音角色
-                                                                                    </div>
-                                                                                    <Select
-                                                                                        value={item.audio.voiceRole}
-                                                                                        onChange={(value) =>
-                                                                                            handleChange(value, i, index, 'voiceRole')
-                                                                                        }
-                                                                                        className="w-full"
+                                                                                <Form form={popForm}>
+                                                                                    <Form.Item
+                                                                                        label="是否发音"
+                                                                                        name="audioEnable"
+                                                                                        valuePropName="checked"
                                                                                     >
-                                                                                        <Select.Option value="男声1">男声1</Select.Option>
-                                                                                        <Select.Option value="男声2">男声2</Select.Option>
-                                                                                        <Select.Option value="女声1">女声1</Select.Option>
-                                                                                        <Select.Option value="女声2">女声2</Select.Option>
-                                                                                    </Select>
-                                                                                </div>
+                                                                                        <Switch />
+                                                                                    </Form.Item>
+                                                                                    <Form.Item label="发音角色" name="voiceRole">
+                                                                                        <Select>
+                                                                                            <Select.Option value="男声1">
+                                                                                                男声1
+                                                                                            </Select.Option>
+                                                                                            <Select.Option value="男声2">
+                                                                                                男声2
+                                                                                            </Select.Option>
+                                                                                            <Select.Option value="女声1">
+                                                                                                女声1
+                                                                                            </Select.Option>
+                                                                                            <Select.Option value="女声2">
+                                                                                                女声2
+                                                                                            </Select.Option>
+                                                                                        </Select>
+                                                                                    </Form.Item>
+                                                                                    <Form.Item
+                                                                                        label="是否跟读"
+                                                                                        name="repeatEnable"
+                                                                                        valuePropName="checked"
+                                                                                    >
+                                                                                        <Switch />
+                                                                                    </Form.Item>
+                                                                                    <Form.Item label="跟读角色" name="repeatRole">
+                                                                                        <Select>
+                                                                                            <Select.Option value="男声1">
+                                                                                                男声1
+                                                                                            </Select.Option>
+                                                                                            <Select.Option value="男声2">
+                                                                                                男声2
+                                                                                            </Select.Option>
+                                                                                            <Select.Option value="女声1">
+                                                                                                女声1
+                                                                                            </Select.Option>
+                                                                                            <Select.Option value="女声2">
+                                                                                                女声2
+                                                                                            </Select.Option>
+                                                                                        </Select>
+                                                                                    </Form.Item>
+                                                                                    <Form.Item label="跟读次数" name="repeatCount">
+                                                                                        <InputNumber min={1} addonAfter="次" />
+                                                                                    </Form.Item>
+                                                                                </Form>
                                                                             </div>
                                                                         }
                                                                         trigger="click"
                                                                         placement="top"
                                                                     >
-                                                                        <MoreOutlined className="text-xs absolute top-1 right-1 cursor-pointer text-black" />
+                                                                        <MoreOutlined className="text-xs cursor-pointer" />
                                                                     </Popover>
                                                                     <Tooltip title="切换类型">
                                                                         <SwapOutlined
                                                                             onClick={() => handleChangeType(index, i)}
-                                                                            className="text-xs absolute top-1 left-1 cursor-pointer"
+                                                                            className="cursor-pointer"
                                                                         />
                                                                     </Tooltip>
+                                                                    <DeleteOutlined
+                                                                        onClick={() => removeVoiceUnitItem(index, i)}
+                                                                        className="cursor-pointer"
+                                                                    />
                                                                 </div>
-                                                            ))}
+                                                            </div>
                                                             <div
-                                                                onClick={() => addVoiceUnitItem(index)}
-                                                                className="px-8 py-1 rounded-lg border border-solid border-gray-300 flex gap-2 items-center cursor-pointer"
+                                                                onMouseEnter={() => {
+                                                                    if (item.type === 'ref') {
+                                                                        setCurrentElementId(item.content);
+                                                                    }
+                                                                }}
+                                                                onMouseLeave={() => setCurrentElementId('')}
+                                                                className={`rounded-lg ${
+                                                                    item.content === currentElementId && item.type === 'ref'
+                                                                        ? 'outline outline-offset-2 outline-blue-500'
+                                                                        : ''
+                                                                }`}
                                                             >
-                                                                <PlusOutlined />
-                                                                <div className="text-base text-gray-500">增加数据</div>
+                                                                {item.type === 'text' ? (
+                                                                    <Input.TextArea
+                                                                        rows={2}
+                                                                        value={item.content}
+                                                                        onChange={(e) => {
+                                                                            const newList = _.cloneDeep(voiceUnits);
+                                                                            newList[index].elements[i].content = e.target.value;
+                                                                            newList[index].elements[i].point = {
+                                                                                x: 0,
+                                                                                y: 0,
+                                                                                bx: 0,
+                                                                                by: 0
+                                                                            };
+                                                                            setVoiceUnits(newList);
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <Select
+                                                                        value={item.content}
+                                                                        className="w-full"
+                                                                        onChange={(value) => {
+                                                                            const newList = _.cloneDeep(voiceUnits);
+                                                                            newList[index].elements[i].content = value;
+                                                                            const point = currentJson?.objects?.find(
+                                                                                (item: any) => item.id === value
+                                                                            );
+                                                                            const { left, top, width, height } = point;
+                                                                            newList[index].elements[i].point = {
+                                                                                x: left,
+                                                                                y: top,
+                                                                                bx: left + width,
+                                                                                by: top + height
+                                                                            };
+                                                                            setVoiceUnits(newList);
+                                                                        }}
+                                                                    >
+                                                                        {variableList?.map((item: any) => (
+                                                                            <Select.Option value={item.field}>{item.label}</Select.Option>
+                                                                        ))}
+                                                                    </Select>
+                                                                )}
                                                             </div>
                                                         </div>
-                                                    </Card>
+                                                    ))}
                                                 </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                    </DragDropContext>
-                    <Button className="mb-4" type="dashed" onClick={addVoiceUnit} block icon={<PlusOutlined />}>
-                        添加发音单元
-                    </Button>
+                                            </Card>
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
+            <Button className="mb-4" type="dashed" onClick={addVoiceUnit} block icon={<PlusOutlined />}>
+                添加发音单元
+            </Button>
 
-                    <Card size="small" title="视频生成配置">
-                        <Form.Item name={['videoConfig', 'mode']}>
-                            <Radio.Group>
-                                <Radio value="merge">合并生成</Radio>
-                                <Radio value="split">分开生成</Radio>
-                            </Radio.Group>
-                        </Form.Item>
-                    </Card>
-
-                    <div style={{ marginTop: 24, textAlign: 'right' }}>
-                        <Space>
-                            <Button>取消</Button>
-                            <Button type="primary" htmlType="submit">
-                                保存
-                            </Button>
-                        </Space>
-                    </div>
-                </Form>
+            <Card size="small" title="视频生成配置">
+                <Form.Item name={['videoConfig', 'mode']}>
+                    <Radio.Group>
+                        <Radio value="merge">合并生成</Radio>
+                        <Radio value="split">分开生成</Radio>
+                    </Radio.Group>
+                </Form.Item>
             </Card>
-        </div>
+
+            {/* <div style={{ marginTop: 24, textAlign: 'right' }}>
+                    <Space>
+                        <Button>取消</Button>
+                        <Button type="primary" htmlType="submit">
+                            保存
+                        </Button>
+                    </Space>
+                </div> */}
+        </Form>
     );
 };
 

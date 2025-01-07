@@ -1,4 +1,4 @@
-import { Tabs } from 'antd';
+import { Tabs, Tag } from 'antd';
 import { useState, useRef } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import EditStyle from '../../batchSmallRedBooks/components/EditStyle';
@@ -117,9 +117,14 @@ const StyleTabs = ({
                 items={imageStyleData?.map((item: any, i: number) => {
                     return {
                         label: (
-                            <div>
+                            <div className="flex items-center gap-1">
                                 {item.name}
-                                {!item.code && <InfoCircleOutlined className="text-[#ff4d4f] ml-[5px]" />}
+                                {item?.openVideoMode && (
+                                    <Tag bordered={false} color="success">
+                                        视频
+                                    </Tag>
+                                )}
+                                {!item.code && <InfoCircleOutlined className="text-[#ff4d4f]" />}
                             </div>
                         ),
                         key: i.toString(),

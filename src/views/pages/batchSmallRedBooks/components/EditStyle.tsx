@@ -1,6 +1,6 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
 import { Input, Image, Menu, Switch, Button, Divider, Tooltip, Spin } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, SwapOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef, useMemo, Fragment } from 'react';
 import _ from 'lodash-es';
 import { SelectTemplateModal } from './SelectTemplateModal';
@@ -13,6 +13,8 @@ import copy from 'clipboard-copy';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { useCache, CACHE_KEY } from 'hooks/web/useCache';
+import VideoSetting from 'views/videoSetting';
+import { debounce } from 'lodash-es';
 const { wsCache } = useCache();
 const EditStyle = ({
     activeKey,
@@ -39,7 +41,6 @@ const EditStyle = ({
     materialStatus?: string;
     canEdit?: boolean;
 }) => {
-    console.log(appData);
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
     const [tempList, setTempList] = React.useState<any>([]);
@@ -48,6 +49,7 @@ const EditStyle = ({
     const [currentElementId, setCurrentElementId] = useState('');
     const [currentJson, setCurrentJson] = useState<any>({});
     const [spinLoading, setSpinLoading] = useState(false);
+    const [isVideoOpen, setIsVideoOpen] = useState(false);
 
     const imgRef: any = useRef(null);
     useEffect(() => {
@@ -245,22 +247,33 @@ const EditStyle = ({
                             <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : '点击可切换图片'}</FormHelperText>
                         </FormControl>
                     </div>
-                    <div className="flex items-center gap-2 mt-[7px]">
-                        <div className="text-xs inline-block">
-                            是否复制图片{' '}
-                            <Tooltip title="设置分组字段后，需开启此功能，保证一组素材使用相同的模版风格">
-                                <ExclamationCircleOutlined className="cursor-pointer" />
-                            </Tooltip>
-                        </div>
-                        <Switch
-                            checked={imageStyleData?.isCopy}
-                            onChange={(e) => {
-                                const newData = _.cloneDeep(imageStyleData);
-                                newData.isCopy = e;
-                                setData(newData);
+                    <div>
+                        <Button
+                            icon={<SwapOutlined />}
+                            size="small"
+                            type="link"
+                            onClick={() => {
+                                setIsVideoOpen(!isVideoOpen);
                             }}
-                        />
-                        {/* <div className="text-xs inline-block">是否使用全部素材 </div>
+                        >
+                            图文视频模式切换
+                        </Button>
+                        <div className="flex items-center gap-2 mt-[7px]">
+                            <div className="text-xs inline-block">
+                                是否复制图片{' '}
+                                <Tooltip title="设置分组字段后，需开启此功能，保证一组素材使用相同的模版风格">
+                                    <ExclamationCircleOutlined className="cursor-pointer" />
+                                </Tooltip>
+                            </div>
+                            <Switch
+                                checked={imageStyleData?.isCopy}
+                                onChange={(e) => {
+                                    const newData = _.cloneDeep(imageStyleData);
+                                    newData.isCopy = e;
+                                    setData(newData);
+                                }}
+                            />
+                            {/* <div className="text-xs inline-block">是否使用全部素材 </div>
                         <Switch
                             checked={imageStyleData?.isUseAllMaterial}
                             onChange={(e) => {
@@ -270,11 +283,12 @@ const EditStyle = ({
                             }}
                         /> */}
 
-                        {!canEdit && (
-                            <Button type="primary" onClick={handleCopy}>
-                                复制
-                            </Button>
-                        )}
+                            {!canEdit && (
+                                <Button type="primary" onClick={handleCopy}>
+                                    复制
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
                 {imageStyleData?.code && (
@@ -324,46 +338,191 @@ const EditStyle = ({
                             <div>
                                 <Divider type="vertical" style={{ height: '100%' }} />
                             </div>
-                            <div className="flex-1">
-                                {materialStatus === 'default' && (
-                                    <div>
-                                        {imageStyleLength > 0 && (
-                                            <>
-                                                <div className="text-lg">图片生成配置</div>
-                                                <div className="text-xs text-black/50">
-                                                    {appData?.materialType === 'picture'
-                                                        ? '用上传素材的图片随机绑定到图片模板上'
-                                                        : '用上传素材的图片类型字段绑定到图片模板上的图片位置'}
-                                                </div>
-                                            </>
-                                        )}
-                                        <div className="flex flex-wrap">
-                                            {appData?.materialType === 'picture' ? (
+                            {isVideoOpen ? (
+                                <div className="flex-1 h-full overflow-y-scroll mt-4">
+                                    <div className="text-lg">视频生成配置</div>
+                                    <div className="flex items-center gap-2 my-4">
+                                        开启图文视频生成
+                                        <Switch
+                                            checked={imageStyleData?.openVideoMode || false}
+                                            onChange={(e) => {
+                                                const newData = _.cloneDeep(imageStyleData);
+                                                newData.openVideoMode = e;
+                                                setData(newData);
+                                            }}
+                                        />
+                                    </div>
+                                    <VideoSetting
+                                        quickConfiguration={
+                                            imageStyleData?.quickConfiguration
+                                                ? JSON.parse(imageStyleData?.quickConfiguration)
+                                                : {
+                                                      isVoiceRole: false,
+                                                      isRepeatEnable: false,
+                                                      isRepeatRole: false,
+                                                      isRepeatCount: false
+                                                  }
+                                        }
+                                        setQuickConfiguration={(value: any) => {
+                                            const newData = _.cloneDeep(imageStyleData);
+                                            newData.quickConfiguration = JSON.stringify(value);
+                                            setData(newData);
+                                        }}
+                                        currentElementId={currentElementId}
+                                        setCurrentElementId={setCurrentElementId}
+                                        currentJson={currentJson}
+                                        variableList={imageStyleData?.variableList}
+                                        videoConfig={imageStyleData?.videoConfig}
+                                        upDateData={debounce(async (data: any) => {
+                                            console.log(data);
+                                            const newData = _.cloneDeep(imageStyleData);
+                                            newData.videoConfig = JSON.stringify(data);
+                                            setData(newData);
+                                        }, 500)}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex-1">
+                                    {materialStatus === 'default' && (
+                                        <div>
+                                            {imageStyleLength > 0 && (
                                                 <>
-                                                    <div className="flex items-center gap-4 min-h-[32px]">
-                                                        <span>图片生成模式</span>
-                                                        <Switch
-                                                            disabled={canEdit}
-                                                            checked={imageStyleData?.mode === 'RANDOM' ? true : false}
-                                                            onChange={(e) => {
-                                                                const newData = _.cloneDeep(imageStyleData);
-                                                                if (e) {
-                                                                    newData.mode = 'RANDOM';
-                                                                } else {
-                                                                    newData.mode = 'SEQUENCE';
-                                                                }
-                                                                setData(newData);
-                                                            }}
-                                                        />
-                                                        <span className="text-[#673ab7]">
-                                                            {imageStyleData?.mode === 'RANDOM' ? '随机生成' : '顺序生成'}
-                                                        </span>
+                                                    <div className="text-lg">图片生成配置</div>
+                                                    <div className="text-xs text-black/50">
+                                                        {appData?.materialType === 'picture'
+                                                            ? '用上传素材的图片随机绑定到图片模板上'
+                                                            : '用上传素材的图片类型字段绑定到图片模板上的图片位置'}
                                                     </div>
                                                 </>
-                                            ) : (
-                                                imageStyleData?.variableList?.map(
+                                            )}
+                                            <div className="flex flex-wrap">
+                                                {appData?.materialType === 'picture' ? (
+                                                    <>
+                                                        <div className="flex items-center gap-4 min-h-[32px]">
+                                                            <span>图片生成模式</span>
+                                                            <Switch
+                                                                disabled={canEdit}
+                                                                checked={imageStyleData?.mode === 'RANDOM' ? true : false}
+                                                                onChange={(e) => {
+                                                                    const newData = _.cloneDeep(imageStyleData);
+                                                                    if (e) {
+                                                                        newData.mode = 'RANDOM';
+                                                                    } else {
+                                                                        newData.mode = 'SEQUENCE';
+                                                                    }
+                                                                    setData(newData);
+                                                                }}
+                                                            />
+                                                            <span className="text-[#673ab7]">
+                                                                {imageStyleData?.mode === 'RANDOM' ? '随机生成' : '顺序生成'}
+                                                            </span>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    imageStyleData?.variableList?.map(
+                                                        (el: any, index: number) =>
+                                                            el.type === 'IMAGE' &&
+                                                            el.field && (
+                                                                <div
+                                                                    key={index}
+                                                                    className="w-[50%] p-3"
+                                                                    ref={wrapperRef}
+                                                                    onClick={() => setCurrentElementId(el.field)}
+                                                                    onMouseEnter={() => setCurrentElementId(el.field)}
+                                                                    onMouseLeave={() => setCurrentElementId('')}
+                                                                >
+                                                                    <VariableInput
+                                                                        disabled={canEdit}
+                                                                        styles={
+                                                                            currentElementId === el.field
+                                                                                ? {
+                                                                                      border: '2px solid #673ab7'
+                                                                                  }
+                                                                                : {}
+                                                                        }
+                                                                        open={perOpen[index]}
+                                                                        setOpen={(flag) => {
+                                                                            const newData = _.cloneDeep(perOpen);
+                                                                            newData[index] = flag;
+                                                                            setPerOpen(newData);
+                                                                        }}
+                                                                        code="PosterActionHandler"
+                                                                        popoverWidth={popoverWidth}
+                                                                        handleMenu={handleMenu}
+                                                                        details={appData.appReqVO}
+                                                                        index={index}
+                                                                        title={el?.label}
+                                                                        value={el.value}
+                                                                        pre={pre}
+                                                                        setValue={(value) => {
+                                                                            const newData = _.cloneDeep(imageStyleData);
+                                                                            newData.variableList[index].value = value;
+                                                                            newData.variableList[index].uuid = uuidv4()
+                                                                                ?.split('-')
+                                                                                ?.join('');
+                                                                            setData(newData);
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            )
+                                                    )
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {imageStyleData?.variableList?.filter((item: any) => item?.type === 'TEXT')?.length > 0 && (
+                                        <div className="mt-2">
+                                            <div className="text-lg">图片文字配置</div>
+                                            <div className="text-xs text-black/50">可绑定数据或输入内容到图片模版上具体文字位置上</div>
+                                            <div className="flex items-center gap-4 min-h-[32px] ml-3">
+                                                <span>AI 图片分析生产标题</span>
+                                                <Switch
+                                                    disabled={canEdit}
+                                                    checked={imageStyleData?.isMultimodalTitle}
+                                                    onChange={(e) => {
+                                                        const newData = _.cloneDeep(imageStyleData);
+                                                        newData.isMultimodalTitle = e;
+                                                        setData(newData);
+                                                    }}
+                                                />
+                                            </div>
+                                            {imageStyleData?.isMultimodalTitle && (
+                                                <>
+                                                    <Input
+                                                        className="w-[400px] ml-3"
+                                                        value={imageStyleData?.multimodalTitleRequirement}
+                                                        onChange={(e) => {
+                                                            const newData = _.cloneDeep(imageStyleData);
+                                                            newData.multimodalTitleRequirement = e.target.value;
+                                                            setData(newData);
+                                                        }}
+                                                        placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
+                                                    />
+                                                    <div className="ml-3 text-xs text-black/50 my-2">
+                                                        <span className="text-[#673ab7] font-bold">Tips：</span>
+                                                        可使用下面的变量替换到图片文字字段中
+                                                    </div>
+                                                    <div className="ml-3 flex gap-2 text-xs mb-4">
+                                                        <Tooltip title="点击复制">
+                                                            <div
+                                                                onClick={() => textCopy(`{{AI分析.图片标题}}`)}
+                                                                className="cursor-pointer"
+                                                            >{`{{AI分析.图片标题}}`}</div>
+                                                        </Tooltip>
+                                                        <Tooltip title="点击复制">
+                                                            <div
+                                                                onClick={() => textCopy(`{{AI分析.图片副标题}}`)}
+                                                                className="cursor-pointer"
+                                                            >{`{{AI分析.图片副标题}}`}</div>
+                                                        </Tooltip>
+                                                    </div>
+                                                </>
+                                            )}
+                                            <div className="flex flex-wrap">
+                                                {imageStyleData?.variableList?.map(
                                                     (el: any, index: number) =>
-                                                        el.type === 'IMAGE' &&
+                                                        el.type === 'TEXT' &&
                                                         el.field && (
                                                             <div
                                                                 key={index}
@@ -374,6 +533,8 @@ const EditStyle = ({
                                                                 onMouseLeave={() => setCurrentElementId('')}
                                                             >
                                                                 <VariableInput
+                                                                    row={el.field === isPageInputId ? 4 : 1}
+                                                                    isPageText={el.field === isPageInputId}
                                                                     disabled={canEdit}
                                                                     styles={
                                                                         currentElementId === el.field
@@ -388,7 +549,7 @@ const EditStyle = ({
                                                                         newData[index] = flag;
                                                                         setPerOpen(newData);
                                                                     }}
-                                                                    code="PosterActionHandler"
+                                                                    code="title"
                                                                     popoverWidth={popoverWidth}
                                                                     handleMenu={handleMenu}
                                                                     details={appData.appReqVO}
@@ -399,117 +560,17 @@ const EditStyle = ({
                                                                     setValue={(value) => {
                                                                         const newData = _.cloneDeep(imageStyleData);
                                                                         newData.variableList[index].value = value;
-                                                                        newData.variableList[index].uuid = uuidv4()?.split('-')?.join('');
                                                                         setData(newData);
                                                                     }}
                                                                 />
                                                             </div>
                                                         )
-                                                )
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-
-                                {imageStyleData?.variableList?.filter((item: any) => item?.type === 'TEXT')?.length > 0 && (
-                                    <div className="mt-2">
-                                        <div className="text-lg">图片文字配置</div>
-                                        <div className="text-xs text-black/50">可绑定数据或输入内容到图片模版上具体文字位置上</div>
-                                        <div className="flex items-center gap-4 min-h-[32px] ml-3">
-                                            <span>AI 图片分析生产标题</span>
-                                            <Switch
-                                                disabled={canEdit}
-                                                checked={imageStyleData?.isMultimodalTitle}
-                                                onChange={(e) => {
-                                                    const newData = _.cloneDeep(imageStyleData);
-                                                    newData.isMultimodalTitle = e;
-                                                    setData(newData);
-                                                }}
-                                            />
-                                        </div>
-                                        {imageStyleData?.isMultimodalTitle && (
-                                            <>
-                                                <Input
-                                                    className="w-[400px] ml-3"
-                                                    value={imageStyleData?.multimodalTitleRequirement}
-                                                    onChange={(e) => {
-                                                        const newData = _.cloneDeep(imageStyleData);
-                                                        newData.multimodalTitleRequirement = e.target.value;
-                                                        setData(newData);
-                                                    }}
-                                                    placeholder="可填写对图片上标题生成内容的要求，默认可不填写"
-                                                />
-                                                <div className="ml-3 text-xs text-black/50 my-2">
-                                                    <span className="text-[#673ab7] font-bold">Tips：</span>
-                                                    可使用下面的变量替换到图片文字字段中
-                                                </div>
-                                                <div className="ml-3 flex gap-2 text-xs mb-4">
-                                                    <Tooltip title="点击复制">
-                                                        <div
-                                                            onClick={() => textCopy(`{{AI分析.图片标题}}`)}
-                                                            className="cursor-pointer"
-                                                        >{`{{AI分析.图片标题}}`}</div>
-                                                    </Tooltip>
-                                                    <Tooltip title="点击复制">
-                                                        <div
-                                                            onClick={() => textCopy(`{{AI分析.图片副标题}}`)}
-                                                            className="cursor-pointer"
-                                                        >{`{{AI分析.图片副标题}}`}</div>
-                                                    </Tooltip>
-                                                </div>
-                                            </>
-                                        )}
-                                        <div className="flex flex-wrap">
-                                            {imageStyleData?.variableList?.map(
-                                                (el: any, index: number) =>
-                                                    el.type === 'TEXT' &&
-                                                    el.field && (
-                                                        <div
-                                                            key={index}
-                                                            className="w-[50%] p-3"
-                                                            ref={wrapperRef}
-                                                            onClick={() => setCurrentElementId(el.field)}
-                                                            onMouseEnter={() => setCurrentElementId(el.field)}
-                                                            onMouseLeave={() => setCurrentElementId('')}
-                                                        >
-                                                            <VariableInput
-                                                                row={el.field === isPageInputId ? 4 : 1}
-                                                                isPageText={el.field === isPageInputId}
-                                                                disabled={canEdit}
-                                                                styles={
-                                                                    currentElementId === el.field
-                                                                        ? {
-                                                                              border: '2px solid #673ab7'
-                                                                          }
-                                                                        : {}
-                                                                }
-                                                                open={perOpen[index]}
-                                                                setOpen={(flag) => {
-                                                                    const newData = _.cloneDeep(perOpen);
-                                                                    newData[index] = flag;
-                                                                    setPerOpen(newData);
-                                                                }}
-                                                                code="title"
-                                                                popoverWidth={popoverWidth}
-                                                                handleMenu={handleMenu}
-                                                                details={appData.appReqVO}
-                                                                index={index}
-                                                                title={el?.label}
-                                                                value={el.value}
-                                                                pre={pre}
-                                                                setValue={(value) => {
-                                                                    const newData = _.cloneDeep(imageStyleData);
-                                                                    newData.variableList[index].value = value;
-                                                                    setData(newData);
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

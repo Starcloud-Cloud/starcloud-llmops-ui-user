@@ -17,7 +17,7 @@ interface VoiceUnit {
         type: 'text' | 'ref';
         content: string;
         audio: {
-            voiceRole: string;
+            voiceRole: string | undefined;
             frame: {
                 start: number;
                 end: number;
@@ -26,7 +26,7 @@ interface VoiceUnit {
         settings: {
             audioEnable: boolean; // 是否发音
             repeatEnable: boolean; // 是否跟读
-            repeatRole: string; // 跟读发音角色
+            repeatRole: string | undefined; // 跟读发音角色
             repeatCount: number; // 跟读次数
         };
         point: {
@@ -114,7 +114,7 @@ const VideoSetting: React.FC<{
                     type: 'text',
                     content: '标题',
                     audio: {
-                        voiceRole: '男声1',
+                        voiceRole: undefined,
                         frame: {
                             start: 0,
                             end: 0
@@ -123,8 +123,8 @@ const VideoSetting: React.FC<{
                     settings: {
                         audioEnable: true,
                         repeatEnable: true,
-                        repeatRole: '男声1',
-                        repeatCount: 2
+                        repeatRole: undefined,
+                        repeatCount: 1
                     },
                     point: {
                         x: 0,
@@ -167,7 +167,7 @@ const VideoSetting: React.FC<{
                     type: 'text',
                     content: '标题',
                     audio: {
-                        voiceRole: '男声1',
+                        voiceRole: undefined,
                         frame: {
                             start: 0,
                             end: 0
@@ -176,8 +176,8 @@ const VideoSetting: React.FC<{
                     settings: {
                         audioEnable: true,
                         repeatEnable: true,
-                        repeatRole: '男声1',
-                        repeatCount: 2
+                        repeatRole: undefined,
+                        repeatCount: 1
                     },
                     point: {
                         x: 0,
@@ -216,7 +216,7 @@ const VideoSetting: React.FC<{
             type: 'text',
             content: `发音单元${newList[index].elements.length + 1}`,
             audio: {
-                voiceRole: '男声1',
+                voiceRole: undefined,
                 frame: {
                     start: 0,
                     end: 0
@@ -225,8 +225,8 @@ const VideoSetting: React.FC<{
             settings: {
                 audioEnable: true,
                 repeatEnable: true,
-                repeatRole: '男声1',
-                repeatCount: 2
+                repeatRole: undefined,
+                repeatCount: 1
             },
             point: {
                 x: 0,
@@ -286,10 +286,15 @@ const VideoSetting: React.FC<{
     };
 
     const handleValuesChange = (_: any, allValues: any) => {
-        upDateData({
+        const newData = {
             ...allValues,
             voiceUnits
-        });
+        };
+        newData.globalSettings.resolution = {
+            width: 1286,
+            height: 1714
+        };
+        upDateData(newData);
         console.log(allValues, voiceUnits);
     };
     useEffect(() => {
@@ -305,10 +310,15 @@ const VideoSetting: React.FC<{
     }, []);
     useEffect(() => {
         form.validateFields().then((values) => {
-            upDateData({
+            const newData = {
                 ...values,
                 voiceUnits
-            });
+            };
+            newData.globalSettings.resolution = {
+                width: 1286,
+                height: 1714
+            };
+            upDateData(newData);
         });
     }, [voiceUnits]);
 

@@ -3,3 +3,6 @@ import request from 'utils/axios';
 export const generateVideo = (data: any) => {
     return request.post({ url: '/llm/xhs/content/video/generate', data });
 };
+export const getVideoResult = (data: any) => {
+    return request.post({ url: '/llm/xhs/content/video/result', data });
+};

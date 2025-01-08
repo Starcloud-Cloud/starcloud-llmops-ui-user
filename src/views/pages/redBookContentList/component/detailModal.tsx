@@ -182,6 +182,7 @@ export const DetailModal = ({ open, isFlag, qrCodeShow, handleClose, changeList,
                 <ThreeStep
                     isFlag={isFlag}
                     qrCodeShow={qrCodeShow}
+                    businessUid={businessUid}
                     data={detail}
                     show={show}
                     pre={preRef.current}

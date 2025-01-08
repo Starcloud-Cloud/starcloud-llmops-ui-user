@@ -1,33 +1,43 @@
 import { Modal, Form, Select, Image, Progress, Button, Switch } from 'antd';
 import { useState } from 'react';
+import { generateVideo } from 'api/video';
 const VideoModal = ({
     videoOpen,
     setVideoOpen,
+    businessUid,
     quickConfiguration,
     templateList
 }: {
     videoOpen: boolean;
     setVideoOpen: (value: boolean) => void;
+    businessUid: string;
     quickConfiguration: any;
     templateList: any[];
 }) => {
     const Option = Select.Option;
+    const [form] = Form.useForm();
 
-    const [executeVideoLoading, setExecuteVideoLoading] = useState(false);
     const [executeStep, setExecuteStep] = useState(0);
     const executeVideo = () => {
+        templateList.map((item: any) => {
+            generateVideo({
+                uid: businessUid,
+                quickConfiguration: JSON.stringify(form.getFieldsValue()),
+                videoConfig: item.quickConfiguration,
+                imageCode: item.code
+            });
+        });
         setExecuteStep(1);
-        setExecuteVideoLoading(true);
     };
     const executeSave = () => {};
 
     return (
         <Modal width={'700px'} open={videoOpen} title={'图文视频生成'} footer={null} onCancel={() => setVideoOpen(false)}>
-            <Form layout="vertical">
+            <Form form={form} layout="vertical">
                 {quickConfiguration?.isVoiceRole && (
                     <Form.Item label="发音角色" name="voiceRole" rules={[{ required: true, message: '请选择发音角色' }]}>
-                        <Select defaultValue="男声2" style={{ width: 200 }}>
-                            <Option value="男声1">男声1</Option>
+                        <Select defaultValue="温柔淑女" style={{ width: 200 }}>
+                            <Option value="温柔淑女">温柔淑女</Option>
                             <Option value="男声2">男声2</Option>
                             <Option value="女声1">女声1</Option>
                             <Option value="女声2">女声2</Option>
@@ -49,8 +59,8 @@ const VideoModal = ({
                 )}
                 {quickConfiguration?.isRepeatRole && (
                     <Form.Item label="跟读发音角色" name="readVoiceRole" rules={[{ required: true, message: '请选择跟读发音角色' }]}>
-                        <Select defaultValue="女声2" style={{ width: 200 }}>
-                            <Option value="男声1">男声1</Option>
+                        <Select defaultValue="温柔淑女" style={{ width: 200 }}>
+                            <Option value="温柔淑女">温柔淑女</Option>
                             <Option value="男声2">男声2</Option>
                             <Option value="女声1">女声1</Option>
                             <Option value="女声2">女声2</Option>
@@ -64,18 +74,17 @@ const VideoModal = ({
                     item?.openVideoMode && (
                         <div className="flex items-start gap-2 mb-4">
                             <Image src={item.example} preview={false} width={100} />
-                            <p className="text-base text-[#000000a6] font-[500]">未开始，点击生成，开始生成视频</p>
-                            <Button
-                                onClick={() => {
-                                    console.log(JSON.parse(item?.videoConfig));
-                                }}
-                            >
-                                获取视频参数
-                            </Button>
-                            {/* <div className="w-full flex flex-col items-start gap-2">
-                        <Progress percent={50} showInfo={false} />
-                        <div className="text-md text-black/50 font-[500]">生成中 50%</div>
-                    </div> */}
+                            {/* <p className="text-base text-[#000000a6] font-[500]">未开始，点击生成，开始生成视频</p> */}
+                            <div className="flex flex-col justify-between w-full h-full">
+                                <div className="w-full flex flex-col items-start gap-2">
+                                    <Progress percent={50} showInfo={false} />
+                                    <div className="text-md text-black/50 font-[500]">生成中 50%</div>
+                                </div>
+                                <div className="flex justify-end gap-2">
+                                    <Button>预览</Button>
+                                    <Button type="primary">下载</Button>
+                                </div>
+                            </div>
                         </div>
                     )
             )}

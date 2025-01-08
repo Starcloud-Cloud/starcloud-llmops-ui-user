@@ -55,7 +55,8 @@ const ThreeStep = ({
     exeDetail,
     dataStatus,
     setSataStatus,
-    setPre
+    setPre,
+    businessUid
 }: {
     data: any;
     show?: boolean;
@@ -66,6 +67,7 @@ const ThreeStep = ({
     dataStatus: boolean;
     setSataStatus: (data: boolean) => void;
     setPre: (data: number) => void;
+    businessUid: string;
 }) => {
     const Option = Select.Option;
     const location = useLocation();
@@ -956,6 +958,7 @@ const ThreeStep = ({
             <VideoModal
                 videoOpen={videoOpen}
                 setVideoOpen={setVideoOpen}
+                businessUid={businessUid}
                 quickConfiguration={quickConfiguration}
                 templateList={templateList}
             />

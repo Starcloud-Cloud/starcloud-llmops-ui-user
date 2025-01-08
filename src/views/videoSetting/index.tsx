@@ -288,12 +288,25 @@ const VideoSetting: React.FC<{
     const handleValuesChange = (_: any, allValues: any) => {
         const newData = {
             ...allValues,
+
             voiceUnits
         };
+
         newData.globalSettings.resolution = {
             width: 1286,
             height: 1714
         };
+        newData.globalSettings = {
+            ...allValues.globalSettings,
+            fps: 5,
+            format: 'mp4',
+            quality: 'height',
+            background: {
+                type: 'img',
+                source: 'material/images/tmp.png'
+            }
+        };
+
         upDateData(newData);
         console.log(allValues, voiceUnits);
     };
@@ -310,13 +323,23 @@ const VideoSetting: React.FC<{
     }, []);
     useEffect(() => {
         form.validateFields().then((values) => {
-            const newData = {
+            const newData: any = {
                 ...values,
                 voiceUnits
             };
             newData.globalSettings.resolution = {
                 width: 1286,
                 height: 1714
+            };
+            newData.globalSettings = {
+                ...values.globalSettings,
+                fps: 5,
+                format: 'mp4',
+                quality: 'height',
+                background: {
+                    type: 'img',
+                    source: 'material/images/tmp.png'
+                }
             };
             upDateData(newData);
         });

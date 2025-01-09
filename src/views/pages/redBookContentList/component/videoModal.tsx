@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Modal, Form, Select, Image, Progress, Button, Switch } from 'antd';
+import { Modal, Form, Select, Image, Progress, Button, Switch, Tooltip, Card } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { generateVideo, getVideoResult } from 'api/video';
 
 const VideoModal = ({
@@ -7,13 +8,15 @@ const VideoModal = ({
     setVideoOpen,
     businessUid,
     quickConfiguration,
-    templateList
+    templateList,
+    imageList
 }: {
     videoOpen: boolean;
     setVideoOpen: (value: boolean) => void;
     businessUid: string;
     quickConfiguration: any;
     templateList: any[];
+    imageList: any[];
 }) => {
     const Option = Select.Option;
     const [form] = Form.useForm();
@@ -71,107 +74,9 @@ const VideoModal = ({
     //预览
     const [previewVideo, setPreviewVideo] = useState<boolean>(false);
     const [previewVideoUrl, setPreviewVideoUrl] = useState<string>('');
-    const obj = {
-        id: '2',
-        resources: {
-            xxxxxxx: '你好啊',
-            牙膏: '牙膏'
-        },
-        globalSettings: {
-            elementInterval: 1,
-            unitInterval: 2,
-            voiceRole: '情感女声',
-            repeatEnable: true,
-            repeatRole: '跟读角色：温柔淑女',
-            soundEffect: '手指',
-            resolution: {
-                width: 1286,
-                height: 1714
-            },
-            fps: 5,
-            format: 'mp4',
-            quality: 'height',
-            background: {
-                type: 'img',
-                source: 'material/images/tmp.png'
-            }
-        },
-        voiceUnits: [
-            {
-                id: '1',
-                order: 1,
-                settings: {
-                    interval: 1
-                },
-                elements: [
-                    {
-                        type: 'text',
-                        content: 'teeth, teeth, teeth, 牙膏',
-                        settings: {
-                            audioEnable: true,
-                            repeatEnable: true,
-                            repeatRole: '跟读角色：温柔淑女',
-                            repeatCount: 1
-                        },
-                        audio: {
-                            voiceRole: '温柔淑女'
-                        },
-                        point: {
-                            x: 55.5442,
-                            y: 140.5672,
-                            bx: 844.4559,
-                            by: 253.5672
-                        }
-                    }
-                ],
-                soundEffect: {
-                    animation: {
-                        type: '圆圈',
-                        size: [150, 150],
-                        params: {}
-                    }
-                }
-            },
-            {
-                id: '2',
-                order: 1,
-                settings: {
-                    interval: 1
-                },
-                elements: [
-                    {
-                        type: 'text',
-                        content: 'teeth, teeth, teeth, teeth',
-                        settings: {
-                            audioEnable: true,
-                            repeatEnable: true,
-                            repeatRole: '跟读角色：温柔淑女',
-                            repeatCount: 1
-                        },
-                        audio: {
-                            voiceRole: '温柔淑女'
-                        },
-                        point: {
-                            x: 113.2877,
-                            y: 491.6392,
-                            bx: 779.2499,
-                            by: 983.1892
-                        }
-                    }
-                ],
-                soundEffect: {
-                    animation: {
-                        type: '圆圈',
-                        size: [150, 150],
-                        params: {}
-                    }
-                }
-            }
-        ]
-    };
 
     return (
-        <Modal width={'700px'} open={videoOpen} title={'图文视频生成'} footer={null} onCancel={() => setVideoOpen(false)}>
+        <Modal width={'600px'} open={videoOpen} title={'图文视频生成'} footer={null} onCancel={() => setVideoOpen(false)}>
             <Form
                 form={form}
                 layout="vertical"
@@ -216,49 +121,60 @@ const VideoModal = ({
                     </Form.Item>
                 )}
             </Form>
-            <div className="my-4 text-base font-[500]">生成内容</div>
+            <div className="my-4 text-base font-[500]">
+                生成列表{' '}
+                <Tooltip title="按照配置的图片模版数量生成对应的视频">
+                    <ExclamationCircleOutlined />
+                </Tooltip>
+            </div>
             {templateList?.map((item, index) => (
-                <div key={index} className="flex items-start gap-2 mb-4">
-                    <Image src={item.example} preview={false} width={100} />
-                    <div className="flex flex-col justify-between w-full h-full">
-                        {executeStep === 0 ? (
-                            <div className="text-base text-[#000000a6] font-[500]">未开始，点击生成，开始生成视频</div>
-                        ) : (
-                            <div className="w-full flex flex-col items-start gap-2">
-                                {results[index]?.status !== 'failed' && results[index]?.status !== 'completed' && (
-                                    <div className="w-full">
-                                        <Progress percent={results[index]?.progress || 0} showInfo={false} />
-                                        <div className="text-md font-[500]">生成中 {results[index]?.progress || 0}%</div>
+                <Card size="small" key={index} className="mb-4">
+                    <div className="flex items-start gap-2">
+                        <Image src={imageList?.filter((i) => i.code === item.code)[0]?.url} preview={false} width={100} />
+                        <div className="flex flex-col justify-between w-full min-h-[110px]">
+                            {executeStep === 0 ? (
+                                <div className="text-base text-[#000000a6] font-[500]">未开始，点击生成，开始生成视频</div>
+                            ) : (
+                                <div className="w-full flex flex-col items-start gap-2">
+                                    <div className="text-base w-full font-[500]">
+                                        {results[index]?.status === 'completed' ? (
+                                            <div className="text-[#52c41a]">生成成功</div>
+                                        ) : results[index]?.status === 'failed' || results[index]?.status === 'unknown' ? (
+                                            <div className="text-[#ff4d4f]">生成失败：{results[index]?.errorMessage}</div>
+                                        ) : (
+                                            <div className="w-full">
+                                                <Progress percent={results[index]?.progress || 0} showInfo={false} />
+                                                <div className="text-md font-[500]">生成中 {results[index]?.progress || 0}%</div>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                                <div className="text-md  font-[500]">
-                                    {results[index]?.status === 'completed'
-                                        ? '生成成功'
-                                        : results[index]?.status === 'failed'
-                                        ? '生成失败'
-                                        : null}
                                 </div>
+                            )}
+                            <div className="flex justify-end gap-2">
+                                {results[index]?.status === 'failed' ? (
+                                    <Button onClick={() => retryVideo(index)}>重试</Button>
+                                ) : results[index]?.status === 'completed' ? (
+                                    <div className="flex flex-col gap-2 justify-between">
+                                        <div className="flex gap-2">
+                                            <Button
+                                                onClick={() => {
+                                                    setPreviewVideoUrl(results[index]?.videoUrl);
+                                                    setPreviewVideo(true);
+                                                }}
+                                            >
+                                                预览
+                                            </Button>
+                                            <Button type="primary">下载</Button>
+                                        </div>
+                                        <Button onClick={() => retryVideo(index)} type="primary">
+                                            重新生成
+                                        </Button>
+                                    </div>
+                                ) : null}
                             </div>
-                        )}
-                        <div className="flex justify-end gap-2">
-                            {results[index]?.status === 'failed' ? (
-                                <Button onClick={() => retryVideo(index)}>重试</Button>
-                            ) : results[index]?.status === 'completed' ? (
-                                <div className="flex gap-2">
-                                    <Button
-                                        onClick={() => {
-                                            setPreviewVideoUrl(results[index]?.videoUrl);
-                                            setPreviewVideo(true);
-                                        }}
-                                    >
-                                        预览
-                                    </Button>
-                                    <Button type="primary">下载</Button>
-                                </div>
-                            ) : null}
                         </div>
                     </div>
-                </div>
+                </Card>
             ))}
             {executeStep === 0 ? (
                 <div className="flex justify-center gap-2 mt-4">

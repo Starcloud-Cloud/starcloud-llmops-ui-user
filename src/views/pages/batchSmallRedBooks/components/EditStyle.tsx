@@ -247,7 +247,7 @@ const EditStyle = ({
                             <FormHelperText>{!imageStyleData?.code ? '请选择图片模版后进行设置' : '点击可切换图片'}</FormHelperText>
                         </FormControl>
                     </div>
-                    <div>
+                    <div className="flex flex-col items-end gap-2">
                         <Button
                             icon={<SwapOutlined />}
                             size="small"
@@ -256,9 +256,9 @@ const EditStyle = ({
                                 setIsVideoOpen(!isVideoOpen);
                             }}
                         >
-                            图文视频模式切换
+                            {isVideoOpen ? '图片模版配置' : '图片视频配置'}
                         </Button>
-                        <div className="flex items-center gap-2 mt-[7px]">
+                        <div className="flex items-center gap-2">
                             <div className="text-xs inline-block">
                                 是否复制图片{' '}
                                 <Tooltip title="设置分组字段后，需开启此功能，保证一组素材使用相同的模版风格">
@@ -338,7 +338,7 @@ const EditStyle = ({
                             <div>
                                 <Divider type="vertical" style={{ height: '100%' }} />
                             </div>
-                            <div className="flex-1 max-h-[500px] overflow-y-scroll">
+                            <div className="flex-1">
                                 {isVideoOpen ? (
                                     <div className="h-full mt-4">
                                         <div className="text-lg">视频生成配置</div>
@@ -353,34 +353,36 @@ const EditStyle = ({
                                                 }}
                                             />
                                         </div>
-                                        <VideoSetting
-                                            quickConfiguration={
-                                                imageStyleData?.quickConfiguration
-                                                    ? JSON.parse(imageStyleData?.quickConfiguration)
-                                                    : {
-                                                          isVoiceRole: false,
-                                                          isRepeatEnable: false,
-                                                          isRepeatRole: false,
-                                                          isRepeatCount: false
-                                                      }
-                                            }
-                                            setQuickConfiguration={(value: any) => {
-                                                const newData = _.cloneDeep(imageStyleData);
-                                                newData.quickConfiguration = JSON.stringify(value);
-                                                setData(newData);
-                                            }}
-                                            currentElementId={currentElementId}
-                                            setCurrentElementId={setCurrentElementId}
-                                            currentJson={currentJson}
-                                            variableList={imageStyleData?.variableList}
-                                            videoConfig={imageStyleData?.videoConfig}
-                                            upDateData={debounce(async (data: any) => {
-                                                console.log(data);
-                                                const newData = _.cloneDeep(imageStyleData);
-                                                newData.videoConfig = JSON.stringify(data);
-                                                setData(newData);
-                                            }, 500)}
-                                        />
+                                        {imageStyleData?.openVideoMode && (
+                                            <VideoSetting
+                                                quickConfiguration={
+                                                    imageStyleData?.quickConfiguration
+                                                        ? JSON.parse(imageStyleData?.quickConfiguration)
+                                                        : {
+                                                              isVoiceRole: false,
+                                                              isRepeatEnable: false,
+                                                              isRepeatRole: false,
+                                                              isRepeatCount: false
+                                                          }
+                                                }
+                                                setQuickConfiguration={(value: any) => {
+                                                    const newData = _.cloneDeep(imageStyleData);
+                                                    newData.quickConfiguration = JSON.stringify(value);
+                                                    setData(newData);
+                                                }}
+                                                currentElementId={currentElementId}
+                                                setCurrentElementId={setCurrentElementId}
+                                                currentJson={currentJson}
+                                                variableList={imageStyleData?.variableList}
+                                                videoConfig={imageStyleData?.videoConfig}
+                                                upDateData={debounce(async (data: any) => {
+                                                    console.log(data);
+                                                    const newData = _.cloneDeep(imageStyleData);
+                                                    newData.videoConfig = JSON.stringify(data);
+                                                    setData(newData);
+                                                }, 500)}
+                                            />
+                                        )}
                                     </div>
                                 ) : (
                                     <div>

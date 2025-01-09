@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, Select, InputNumber, Radio, Button, Space, Popover, Tooltip, Image, Switch, Checkbox, Popconfirm } from 'antd';
+import { Card, Form, Input, Select, InputNumber, Tag, Button, Space, Popover, Tooltip, Image, Switch, Checkbox, Popconfirm } from 'antd';
 import { DeleteOutlined, PlusOutlined, SwapOutlined, MoreOutlined } from '@ant-design/icons';
-import { DragOutlined } from '@ant-design/icons';
+import { DragOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -11,7 +11,7 @@ interface VoiceUnit {
     id: string;
     order: number;
     settings: {
-        interval: number;
+        interval: number | undefined;
     };
     elements: Array<{
         type: 'text' | 'ref';
@@ -27,7 +27,7 @@ interface VoiceUnit {
             audioEnable: boolean; // 是否发音
             repeatEnable: boolean; // 是否跟读
             repeatRole: string | undefined; // 跟读发音角色
-            repeatCount: number; // 跟读次数
+            repeatCount: number | undefined; // 跟读次数
         };
         point: {
             x: number;
@@ -147,7 +147,7 @@ const VideoSetting: React.FC<{
             id: uuidv4(),
             order: 1,
             settings: {
-                interval: 1
+                interval: undefined
             },
             elements: [
                 {
@@ -164,7 +164,7 @@ const VideoSetting: React.FC<{
                         audioEnable: true,
                         repeatEnable: false,
                         repeatRole: undefined,
-                        repeatCount: 1
+                        repeatCount: undefined
                     },
                     point: {
                         x: 0,
@@ -200,7 +200,7 @@ const VideoSetting: React.FC<{
             id: uuidv4(),
             order: voiceUnits.length + 1,
             settings: {
-                interval: 1
+                interval: undefined
             },
             elements: [
                 {
@@ -217,7 +217,7 @@ const VideoSetting: React.FC<{
                         audioEnable: true,
                         repeatEnable: false,
                         repeatRole: undefined,
-                        repeatCount: 1
+                        repeatCount: undefined
                     },
                     point: {
                         x: 0,
@@ -266,7 +266,7 @@ const VideoSetting: React.FC<{
                 audioEnable: true,
                 repeatEnable: false,
                 repeatRole: undefined,
-                repeatCount: 1
+                repeatCount: undefined
             },
             point: {
                 x: 0,
@@ -386,70 +386,86 @@ const VideoSetting: React.FC<{
             }}
             onValuesChange={handleValuesChange}
         >
-            <Card size="small" title="全局配置" style={{ marginBottom: 24 }}>
-                <Form.Item label="发音元素间隔" name={['globalSettings', 'elementInterval']} rules={[{ required: true }]}>
-                    <InputNumber addonAfter="秒" min={0} style={{ width: 200 }} />
-                </Form.Item>
+            <div className="text-base font-[500] mb-4">全局配置</div>
 
-                <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
-                    <InputNumber addonAfter="秒" min={0} style={{ width: 200 }} />
-                </Form.Item>
-
-                <div className="flex items-center gap-2">
-                    <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
-                        <Select style={{ width: 200 }} options={voiceRoleOptions}></Select>
+            <div className="flex gap-2">
+                <div className="flex-1">
+                    <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
+                        <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 200 }} />
                     </Form.Item>
-                    <Checkbox
-                        checked={quickConfiguration.isVoiceRole}
-                        onChange={() => setQuickConfiguration({ ...quickConfiguration, isVoiceRole: !quickConfiguration.isVoiceRole })}
-                    />
-                    <div className="text-xs">快捷配置</div>
-                </div>
 
-                <div className="flex items-center gap-2">
-                    <Form.Item label="发音效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
-                        <Select style={{ width: 200 }}>
-                            <Select.Option value="手指">手指</Select.Option>
-                            <Select.Option value="圆圈">圆圈</Select.Option>
-                        </Select>
+                    <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
+                        <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 200 }} />
                     </Form.Item>
-                    <Checkbox
-                        checked={quickConfiguration.isSoundEffect}
-                        onChange={() => setQuickConfiguration({ ...quickConfiguration, isSoundEffect: !quickConfiguration.isSoundEffect })}
-                    />
-                    <div className="text-xs">快捷配置</div>
-                </div>
 
-                <div className="flex items-center gap-2">
-                    <Form.Item
-                        className="w-[200px]"
-                        label="是否跟读"
-                        name={['globalSettings', 'repeatEnable']}
-                        valuePropName="checked"
-                        rules={[{ required: true }]}
-                    >
-                        <Switch />
-                    </Form.Item>
-                    <Checkbox
-                        checked={quickConfiguration.isRepeatEnable}
-                        onChange={() =>
-                            setQuickConfiguration({ ...quickConfiguration, isRepeatEnable: !quickConfiguration.isRepeatEnable })
-                        }
-                    />
-                    <div className="text-xs">快捷配置</div>
+                    <div className="flex items-center gap-2">
+                        <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
+                            <Select style={{ width: 200 }} options={voiceRoleOptions}></Select>
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isVoiceRole}
+                            onChange={() => setQuickConfiguration({ ...quickConfiguration, isVoiceRole: !quickConfiguration.isVoiceRole })}
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
                 </div>
+                <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                        <Form.Item label="发音效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
+                            <Select style={{ width: 200 }}>
+                                <Select.Option value="手指">手指</Select.Option>
+                                <Select.Option value="圆圈">圆圈</Select.Option>
+                            </Select>
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isSoundEffect}
+                            onChange={() =>
+                                setQuickConfiguration({ ...quickConfiguration, isSoundEffect: !quickConfiguration.isSoundEffect })
+                            }
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
 
-                <div className="flex items-center gap-2">
-                    <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']} rules={[{ required: true }]}>
-                        <Select style={{ width: 200 }} options={voiceRoleOptions}></Select>
-                    </Form.Item>
-                    <Checkbox
-                        checked={quickConfiguration.isRepeatRole}
-                        onChange={() => setQuickConfiguration({ ...quickConfiguration, isRepeatRole: !quickConfiguration.isRepeatRole })}
-                    />
-                    <div className="text-xs">快捷配置</div>
+                    <div className="flex items-center gap-2">
+                        <Form.Item
+                            className="w-[200px]"
+                            label="是否跟读"
+                            name={['globalSettings', 'repeatEnable']}
+                            valuePropName="checked"
+                            rules={[{ required: true }]}
+                        >
+                            <Switch />
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isRepeatEnable}
+                            onChange={() =>
+                                setQuickConfiguration({ ...quickConfiguration, isRepeatEnable: !quickConfiguration.isRepeatEnable })
+                            }
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']} rules={[{ required: true }]}>
+                            <Select style={{ width: 200 }} options={voiceRoleOptions}></Select>
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isRepeatRole}
+                            onChange={() =>
+                                setQuickConfiguration({ ...quickConfiguration, isRepeatRole: !quickConfiguration.isRepeatRole })
+                            }
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
                 </div>
-            </Card>
+            </div>
+
+            <div className="text-base font-[500] my-4">
+                发音单元{' '}
+                <Tooltip title="tips: 添加要发音的图片模版字段">
+                    <ExclamationCircleOutlined className="cursor-pointer" />
+                </Tooltip>
+            </div>
 
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="draggable-card">
@@ -467,6 +483,10 @@ const VideoSetting: React.FC<{
                                                         <div {...provided.dragHandleProps}>
                                                             <DragOutlined className="cursor-move" />
                                                         </div>
+                                                        {unit.soundEffect.animation.type && (
+                                                            <Tag color="success">{unit.soundEffect.animation.type}</Tag>
+                                                        )}
+                                                        {unit.settings.interval && <Tag color="success">{unit.settings.interval}秒</Tag>}
                                                     </div>
                                                 }
                                                 size="small"
@@ -504,7 +524,7 @@ const VideoSetting: React.FC<{
                                                                             <Select allowClear options={soundEffectOptions}></Select>
                                                                         </Form.Item>
                                                                         <Form.Item label="发音元素间隔" name="interval">
-                                                                            <InputNumber min={1} addonAfter="秒" />
+                                                                            <InputNumber min={1} max={9} addonAfter="秒" />
                                                                         </Form.Item>
                                                                     </Form>
                                                                 </div>
@@ -523,10 +543,6 @@ const VideoSetting: React.FC<{
                                                     </Space>
                                                 }
                                             >
-                                                {/* <div className="mb-4">
-                                                                <div className="text-md font-normal text-black/[0.88] mb-2">间隔时间</div>
-                                                                <InputNumber value={unit.settings.interval} addonAfter="秒" min={0} />
-                                                            </div> */}
                                                 <div className="grid grid-cols-2 gap-4">
                                                     {unit.elements.map((item, i) => (
                                                         <div className="p-2 border border-solid border-[#f0f0f0] rounded-lg">
@@ -590,7 +606,7 @@ const VideoSetting: React.FC<{
                                                                                         ></Select>
                                                                                     </Form.Item>
                                                                                     <Form.Item label="跟读次数" name="repeatCount">
-                                                                                        <InputNumber min={1} addonAfter="次" />
+                                                                                        <InputNumber min={1} max={9} addonAfter="次" />
                                                                                     </Form.Item>
                                                                                 </Form>
                                                                             </div>
@@ -662,6 +678,20 @@ const VideoSetting: React.FC<{
                                                                         ))}
                                                                     </Select>
                                                                 )}
+                                                                <div className="mt-2">
+                                                                    {item.settings.audioEnable && <Tag color="success">发音</Tag>}
+                                                                    {item.audio.voiceRole && (
+                                                                        <Tag color="success">{item.audio.voiceRole}</Tag>
+                                                                    )}
+
+                                                                    {item.settings.repeatEnable && <Tag color="success">跟读</Tag>}
+                                                                    {item.settings.repeatRole && (
+                                                                        <Tag color="success">{item.settings.repeatRole}</Tag>
+                                                                    )}
+                                                                    {item.settings.repeatCount && (
+                                                                        <Tag color="success">{item.settings.repeatCount}次</Tag>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     ))}

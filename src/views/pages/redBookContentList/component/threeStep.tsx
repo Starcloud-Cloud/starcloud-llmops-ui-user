@@ -961,6 +961,7 @@ const ThreeStep = ({
                 businessUid={businessUid}
                 quickConfiguration={quickConfiguration}
                 templateList={templateList}
+                imageList={data?.executeResult?.imageList}
             />
             {isModalOpen && (
                 <PicImagePick

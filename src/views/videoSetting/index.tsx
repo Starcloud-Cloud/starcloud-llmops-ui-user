@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, Select, InputNumber, Radio, Button, Space, Popover, Tooltip, Image, Switch, Checkbox } from 'antd';
+import { Card, Form, Input, Select, InputNumber, Radio, Button, Space, Popover, Tooltip, Image, Switch, Checkbox, Popconfirm } from 'antd';
 import { DeleteOutlined, PlusOutlined, SwapOutlined, MoreOutlined } from '@ant-design/icons';
 import { DragOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
@@ -15,13 +15,13 @@ interface VoiceUnit {
     };
     elements: Array<{
         type: 'text' | 'ref';
-        content: string;
+        content: string | undefined;
         audio: {
             voiceRole: string | undefined;
-            frame: {
-                start: number;
-                end: number;
-            };
+            // frame: {
+            //     start: number;
+            //     end: number;
+            // };
         };
         settings: {
             audioEnable: boolean; // 是否发音
@@ -37,20 +37,20 @@ interface VoiceUnit {
         };
     }>;
     soundEffect: {
-        point: {
-            x: number;
-            y: number;
-            bx: number;
-            by: number;
-        };
-        frame: {
-            start: number;
-            end: number;
-        };
+        // point: {
+        //     x: number;
+        //     y: number;
+        //     bx: number;
+        //     by: number;
+        // };
+        // frame: {
+        //     start: number;
+        //     end: number;
+        // };
         animation: {
-            type: string;
-            size: [number, number];
-            params: object;
+            type: string | undefined;
+            // size: [number, number];
+            // params: object;
         };
     };
 }
@@ -77,9 +77,9 @@ interface VoiceConfig {
             };
         };
     };
-    videoConfig: {
-        mode: 'merge' | 'split'; // 视频生成配置：合并生成/分开生成
-    };
+    // videoConfig: {
+    //     mode: 'merge' | 'split'; // 视频生成配置：合并生成/分开生成
+    // };
 }
 
 const VideoSetting: React.FC<{
@@ -101,6 +101,46 @@ const VideoSetting: React.FC<{
     quickConfiguration,
     setQuickConfiguration
 }) => {
+    const voiceRoleOptions = [
+        {
+            label: '温柔女声',
+            value: '温柔女声'
+        },
+        {
+            label: '质朴青年',
+            value: '质朴青年'
+        },
+        {
+            label: '情感女声',
+            value: '情感女声'
+        },
+        {
+            label: '奶气萌娃',
+            value: '奶气萌娃'
+        },
+        {
+            label: '动漫海星',
+            value: '动漫海星'
+        },
+        {
+            label: '动漫小新',
+            value: '动漫小新'
+        },
+        {
+            label: '天才童声',
+            value: '天才童声'
+        }
+    ];
+    const soundEffectOptions = [
+        {
+            label: '手指',
+            value: '手指'
+        },
+        {
+            label: '圆圈',
+            value: '圆圈'
+        }
+    ];
     const [form] = Form.useForm<VoiceConfig>();
     const [voiceUnits, setVoiceUnits] = useState<VoiceUnit[]>([
         {
@@ -111,18 +151,18 @@ const VideoSetting: React.FC<{
             },
             elements: [
                 {
-                    type: 'text',
-                    content: '标题',
+                    type: 'ref',
+                    content: undefined,
                     audio: {
-                        voiceRole: undefined,
-                        frame: {
-                            start: 0,
-                            end: 0
-                        }
+                        voiceRole: undefined
+                        // frame: {
+                        //     start: 0,
+                        //     end: 0
+                        // }
                     },
                     settings: {
                         audioEnable: true,
-                        repeatEnable: true,
+                        repeatEnable: false,
                         repeatRole: undefined,
                         repeatCount: 1
                     },
@@ -135,20 +175,20 @@ const VideoSetting: React.FC<{
                 }
             ],
             soundEffect: {
-                point: {
-                    x: 0,
-                    y: 0,
-                    bx: 0,
-                    by: 0
-                },
-                frame: {
-                    start: 0,
-                    end: 0
-                },
+                // point: {
+                //     x: 0,
+                //     y: 0,
+                //     bx: 0,
+                //     by: 0
+                // },
+                // frame: {
+                //     start: 0,
+                //     end: 0
+                // },
                 animation: {
-                    type: 'default',
-                    size: [100, 100],
-                    params: {}
+                    type: undefined
+                    // size: [100, 100],
+                    // params: {}
                 }
             }
         }
@@ -164,18 +204,18 @@ const VideoSetting: React.FC<{
             },
             elements: [
                 {
-                    type: 'text',
-                    content: '标题',
+                    type: 'ref',
+                    content: undefined,
                     audio: {
-                        voiceRole: undefined,
-                        frame: {
-                            start: 0,
-                            end: 0
-                        }
+                        voiceRole: undefined
+                        // frame: {
+                        //     start: 0,
+                        //     end: 0
+                        // }
                     },
                     settings: {
                         audioEnable: true,
-                        repeatEnable: true,
+                        repeatEnable: false,
                         repeatRole: undefined,
                         repeatCount: 1
                     },
@@ -188,20 +228,20 @@ const VideoSetting: React.FC<{
                 }
             ],
             soundEffect: {
-                point: {
-                    x: 0,
-                    y: 0,
-                    bx: 0,
-                    by: 0
-                },
-                frame: {
-                    start: 0,
-                    end: 0
-                },
+                // point: {
+                //     x: 0,
+                //     y: 0,
+                //     bx: 0,
+                //     by: 0
+                // },
+                // frame: {
+                //     start: 0,
+                //     end: 0
+                // },
                 animation: {
-                    type: 'default',
-                    size: [100, 100],
-                    params: {}
+                    type: undefined
+                    // size: [100, 100],
+                    // params: {}
                 }
             }
         };
@@ -213,18 +253,18 @@ const VideoSetting: React.FC<{
     const addVoiceUnitItem = (index: number) => {
         const newList = _.cloneDeep(voiceUnits);
         newList[index].elements.push({
-            type: 'text',
-            content: `发音单元${newList[index].elements.length + 1}`,
+            type: 'ref',
+            content: undefined,
             audio: {
-                voiceRole: undefined,
-                frame: {
-                    start: 0,
-                    end: 0
-                }
+                voiceRole: undefined
+                // frame: {
+                //     start: 0,
+                //     end: 0
+                // }
             },
             settings: {
                 audioEnable: true,
-                repeatEnable: true,
+                repeatEnable: false,
                 repeatRole: undefined,
                 repeatCount: 1
             },
@@ -249,29 +289,10 @@ const VideoSetting: React.FC<{
         newList[index].elements[elementIndex].type = newList[index].elements[elementIndex].type === 'text' ? 'ref' : 'text';
         setVoiceUnits(newList);
     };
-    // 更新发音单元数据
-    const handleChange = (value: any, elementIndex: number, unitIndex: number, type: 'interval' | 'voiceRole') => {
-        const newList = _.cloneDeep(voiceUnits);
-        if (type === 'interval') {
-            newList[unitIndex].settings.interval = value;
-        } else if (type === 'voiceRole') {
-            newList[unitIndex].elements[elementIndex].audio.voiceRole = value;
-        }
-        setVoiceUnits(newList);
-    };
 
     // 删除发音单元
     const removeVoiceUnit = (id: string) => {
         setVoiceUnits(voiceUnits.filter((unit) => unit.id !== id));
-    };
-
-    // 提交表单
-    const handleSubmit = async (values: VoiceConfig) => {
-        const result = await form.validateFields();
-        console.log({
-            ...result,
-            voiceUnits
-        });
     };
 
     // 处理拖拽结束
@@ -292,20 +313,20 @@ const VideoSetting: React.FC<{
             voiceUnits
         };
 
-        newData.globalSettings.resolution = {
-            width: 1286,
-            height: 1714
-        };
-        newData.globalSettings = {
-            ...allValues.globalSettings,
-            fps: 5,
-            format: 'mp4',
-            quality: 'height',
-            background: {
-                type: 'img',
-                source: 'material/images/tmp.png'
-            }
-        };
+        // newData.globalSettings.resolution = {
+        //     width: 1286,
+        //     height: 1714
+        // };
+        // newData.globalSettings = {
+        //     ...allValues.globalSettings,
+        //     fps: 5,
+        //     format: 'mp4',
+        //     quality: 'height',
+        //     background: {
+        //         type: 'img',
+        //         source: 'material/images/tmp.png'
+        //     }
+        // };
 
         upDateData(newData);
         console.log(allValues, voiceUnits);
@@ -315,8 +336,8 @@ const VideoSetting: React.FC<{
         if (videoConfig) {
             const config = JSON.parse(videoConfig);
             form.setFieldsValue({
-                globalSettings: config.globalSettings,
-                videoConfig: config.videoConfig
+                globalSettings: config.globalSettings
+                // videoConfig: config.videoConfig
             });
             setVoiceUnits(config.voiceUnits);
         }
@@ -327,20 +348,20 @@ const VideoSetting: React.FC<{
                 ...values,
                 voiceUnits
             };
-            newData.globalSettings.resolution = {
-                width: 1286,
-                height: 1714
-            };
-            newData.globalSettings = {
-                ...values.globalSettings,
-                fps: 5,
-                format: 'mp4',
-                quality: 'height',
-                background: {
-                    type: 'img',
-                    source: 'material/images/tmp.png'
-                }
-            };
+            // newData.globalSettings.resolution = {
+            //     width: 1286,
+            //     height: 1714
+            // };
+            // newData.globalSettings = {
+            //     ...values.globalSettings,
+            //     fps: 5,
+            //     format: 'mp4',
+            //     quality: 'height',
+            //     background: {
+            //         type: 'img',
+            //         source: 'material/images/tmp.png'
+            //     }
+            // };
             upDateData(newData);
         });
     }, [voiceUnits]);
@@ -354,18 +375,14 @@ const VideoSetting: React.FC<{
                 globalSettings: {
                     elementInterval: 1,
                     unitInterval: 2,
-                    voiceRole: '男声2',
+                    voiceRole: '温柔女声',
                     soundEffect: '手指',
                     repeatEnable: false,
-                    repeatRole: '背景1',
-                    resolution: {
-                        width: 1286,
-                        height: 1714
-                    }
-                },
-                videoConfig: {
-                    mode: 'merge'
+                    repeatRole: '温柔女声'
                 }
+                // videoConfig: {
+                //     mode: 'merge'
+                // }
             }}
             onValuesChange={handleValuesChange}
         >
@@ -380,12 +397,7 @@ const VideoSetting: React.FC<{
 
                 <div className="flex items-center gap-2">
                     <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
-                        <Select style={{ width: 200 }}>
-                            <Select.Option value="男声1">男声1</Select.Option>
-                            <Select.Option value="男声2">男声2</Select.Option>
-                            <Select.Option value="女声1">女声1</Select.Option>
-                            <Select.Option value="女声2">女声2</Select.Option>
-                        </Select>
+                        <Select style={{ width: 200 }} options={voiceRoleOptions}></Select>
                     </Form.Item>
                     <Checkbox
                         checked={quickConfiguration.isVoiceRole}
@@ -398,7 +410,7 @@ const VideoSetting: React.FC<{
                     <Form.Item label="发音效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
                         <Select style={{ width: 200 }}>
                             <Select.Option value="手指">手指</Select.Option>
-                            <Select.Option value="其他效果">其他效果</Select.Option>
+                            <Select.Option value="圆圈">圆圈</Select.Option>
                         </Select>
                     </Form.Item>
                     <Checkbox
@@ -429,10 +441,7 @@ const VideoSetting: React.FC<{
 
                 <div className="flex items-center gap-2">
                     <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']} rules={[{ required: true }]}>
-                        <Select style={{ width: 200 }}>
-                            <Select.Option value="背景1">背景1</Select.Option>
-                            <Select.Option value="背景2">背景2</Select.Option>
-                        </Select>
+                        <Select style={{ width: 200 }} options={voiceRoleOptions}></Select>
                     </Form.Item>
                     <Checkbox
                         checked={quickConfiguration.isRepeatRole}
@@ -452,7 +461,14 @@ const VideoSetting: React.FC<{
                                         <div ref={provided.innerRef} {...provided.draggableProps}>
                                             <Card
                                                 style={{ marginBottom: 16 }}
-                                                title={`发音单元 ${index + 1}`}
+                                                title={
+                                                    <div className="flex items-center gap-2">
+                                                        <div>发音单元 {index + 1}</div>
+                                                        <div {...provided.dragHandleProps}>
+                                                            <DragOutlined className="cursor-move" />
+                                                        </div>
+                                                    </div>
+                                                }
                                                 size="small"
                                                 extra={
                                                     <Space>
@@ -464,9 +480,40 @@ const VideoSetting: React.FC<{
                                                         >
                                                             增加发音元素
                                                         </Button>
-                                                        <div {...provided.dragHandleProps}>
-                                                            <DragOutlined className="cursor-move" />
-                                                        </div>
+                                                        <Popover
+                                                            title="发音单元配置"
+                                                            onOpenChange={async (open) => {
+                                                                if (open) {
+                                                                    popForm.setFieldsValue({
+                                                                        type: unit.soundEffect.animation.type,
+                                                                        interval: unit.settings.interval
+                                                                    });
+                                                                } else {
+                                                                    const result = await popForm.validateFields();
+                                                                    const newList = _.cloneDeep(voiceUnits);
+                                                                    newList[index].soundEffect.animation.type = result.type;
+                                                                    newList[index].settings.interval = result.interval;
+                                                                    setVoiceUnits(newList);
+                                                                    popForm.resetFields();
+                                                                }
+                                                            }}
+                                                            content={
+                                                                <div className="w-[250px]">
+                                                                    <Form form={popForm}>
+                                                                        <Form.Item label="发音效果" name="type">
+                                                                            <Select allowClear options={soundEffectOptions}></Select>
+                                                                        </Form.Item>
+                                                                        <Form.Item label="发音元素间隔" name="interval">
+                                                                            <InputNumber min={1} addonAfter="秒" />
+                                                                        </Form.Item>
+                                                                    </Form>
+                                                                </div>
+                                                            }
+                                                            trigger="click"
+                                                            placement="top"
+                                                        >
+                                                            <MoreOutlined className="cursor-pointer" />
+                                                        </Popover>
                                                         <Button
                                                             type="text"
                                                             icon={<DeleteOutlined />}
@@ -486,6 +533,12 @@ const VideoSetting: React.FC<{
                                                             <div className="mb-2 flex justify-between items-center">
                                                                 <div className="text-xs font-[500]">
                                                                     {item.type === 'text' ? '文本' : '变量'}
+                                                                    <Tooltip title="切换类型">
+                                                                        <SwapOutlined
+                                                                            onClick={() => handleChangeType(index, i)}
+                                                                            className="cursor-pointer ml-2"
+                                                                        />
+                                                                    </Tooltip>
                                                                 </div>
                                                                 <div className="flex gap-2">
                                                                     <Popover
@@ -518,20 +571,10 @@ const VideoSetting: React.FC<{
                                                                                         <Switch />
                                                                                     </Form.Item>
                                                                                     <Form.Item label="发音角色" name="voiceRole">
-                                                                                        <Select>
-                                                                                            <Select.Option value="男声1">
-                                                                                                男声1
-                                                                                            </Select.Option>
-                                                                                            <Select.Option value="男声2">
-                                                                                                男声2
-                                                                                            </Select.Option>
-                                                                                            <Select.Option value="女声1">
-                                                                                                女声1
-                                                                                            </Select.Option>
-                                                                                            <Select.Option value="女声2">
-                                                                                                女声2
-                                                                                            </Select.Option>
-                                                                                        </Select>
+                                                                                        <Select
+                                                                                            allowClear
+                                                                                            options={voiceRoleOptions}
+                                                                                        ></Select>
                                                                                     </Form.Item>
                                                                                     <Form.Item
                                                                                         label="是否跟读"
@@ -541,20 +584,10 @@ const VideoSetting: React.FC<{
                                                                                         <Switch />
                                                                                     </Form.Item>
                                                                                     <Form.Item label="跟读角色" name="repeatRole">
-                                                                                        <Select>
-                                                                                            <Select.Option value="男声1">
-                                                                                                男声1
-                                                                                            </Select.Option>
-                                                                                            <Select.Option value="男声2">
-                                                                                                男声2
-                                                                                            </Select.Option>
-                                                                                            <Select.Option value="女声1">
-                                                                                                女声1
-                                                                                            </Select.Option>
-                                                                                            <Select.Option value="女声2">
-                                                                                                女声2
-                                                                                            </Select.Option>
-                                                                                        </Select>
+                                                                                        <Select
+                                                                                            allowClear
+                                                                                            options={voiceRoleOptions}
+                                                                                        ></Select>
                                                                                     </Form.Item>
                                                                                     <Form.Item label="跟读次数" name="repeatCount">
                                                                                         <InputNumber min={1} addonAfter="次" />
@@ -567,22 +600,18 @@ const VideoSetting: React.FC<{
                                                                     >
                                                                         <MoreOutlined className="text-xs cursor-pointer" />
                                                                     </Popover>
-                                                                    <Tooltip title="切换类型">
-                                                                        <SwapOutlined
-                                                                            onClick={() => handleChangeType(index, i)}
-                                                                            className="cursor-pointer"
-                                                                        />
-                                                                    </Tooltip>
-                                                                    <DeleteOutlined
-                                                                        onClick={() => removeVoiceUnitItem(index, i)}
-                                                                        className="cursor-pointer"
-                                                                    />
+                                                                    <Popconfirm
+                                                                        title="确定删除吗？"
+                                                                        onConfirm={() => removeVoiceUnitItem(index, i)}
+                                                                    >
+                                                                        <DeleteOutlined className="cursor-pointer" />
+                                                                    </Popconfirm>
                                                                 </div>
                                                             </div>
                                                             <div
                                                                 onMouseEnter={() => {
                                                                     if (item.type === 'ref') {
-                                                                        setCurrentElementId(item.content);
+                                                                        setCurrentElementId(item.content || '');
                                                                     }
                                                                 }}
                                                                 onMouseLeave={() => setCurrentElementId('')}
@@ -651,14 +680,14 @@ const VideoSetting: React.FC<{
                 添加发音单元
             </Button>
 
-            <Card size="small" title="视频生成配置">
+            {/* <Card size="small" title="视频生成配置">
                 <Form.Item name={['videoConfig', 'mode']}>
                     <Radio.Group>
                         <Radio value="merge">合并生成</Radio>
                         <Radio value="split">分开生成</Radio>
                     </Radio.Group>
                 </Form.Item>
-            </Card>
+            </Card> */}
 
             {/* <div style={{ marginTop: 24, textAlign: 'right' }}>
                     <Space>

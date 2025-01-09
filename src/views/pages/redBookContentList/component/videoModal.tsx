@@ -31,7 +31,7 @@ const VideoModal = ({
                     videoConfig: item.videoConfig,
                     imageCode: item.code
                 });
-                pollResult(res, index);
+                pollResult(res?.id, index);
             } catch (error) {}
         });
         setExecuteStep(1);
@@ -65,7 +65,7 @@ const VideoModal = ({
             videoConfig: templateList[index].videoConfig,
             imageCode: templateList[index].code
         });
-        pollResult(res, index);
+        pollResult(res?.id, index);
     };
 
     //预览
@@ -179,7 +179,7 @@ const VideoModal = ({
                     voiceRole: '温柔淑女',
                     soundEffect: '手指',
                     repeatEnable: false,
-                    readVoiceRole: '温柔淑女'
+                    repeatRole: '温柔淑女'
                 }}
             >
                 {quickConfiguration?.isVoiceRole && (
@@ -206,7 +206,7 @@ const VideoModal = ({
                     </Form.Item>
                 )}
                 {quickConfiguration?.isRepeatRole && (
-                    <Form.Item label="跟读发音角色" name="readVoiceRole" rules={[{ required: true, message: '请选择跟读发音角色' }]}>
+                    <Form.Item label="跟读发音角色" name="repeatRole" rules={[{ required: true, message: '请选择跟读发音角色' }]}>
                         <Select style={{ width: 200 }}>
                             <Option value="温柔淑女">温柔淑女</Option>
                             <Option value="男声2">男声2</Option>
@@ -227,16 +227,16 @@ const VideoModal = ({
                             <div className="w-full flex flex-col items-start gap-2">
                                 {results[index]?.status !== 'failed' && results[index]?.status !== 'completed' && (
                                     <div className="w-full">
-                                        <Progress percent={50} showInfo={false} />
-                                        {/* <div className="text-md text-black/50 font-[500]">生成中</div> */}
+                                        <Progress percent={results[index]?.progress || 0} showInfo={false} />
+                                        <div className="text-md font-[500]">生成中 {results[index]?.progress || 0}%</div>
                                     </div>
                                 )}
-                                <div className="text-md text-black/50 font-[500]">
+                                <div className="text-md  font-[500]">
                                     {results[index]?.status === 'completed'
                                         ? '生成成功'
                                         : results[index]?.status === 'failed'
                                         ? '生成失败'
-                                        : '生成中'}
+                                        : null}
                                 </div>
                             </div>
                         )}

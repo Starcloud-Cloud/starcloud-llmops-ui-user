@@ -418,6 +418,7 @@ const ThreeStep = ({
                                         </Button>
                                         <Button
                                             className="mx-2"
+                                            type="primary"
                                             onClick={() => {
                                                 const newList = JSON.parse(
                                                     data?.executeParam?.appInformation?.workflowConfig?.steps
@@ -435,7 +436,7 @@ const ThreeStep = ({
                                             }}
                                             // onClick={doRetry}
                                         >
-                                            重新生成
+                                            编辑图片
                                         </Button>
                                         <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
                                             编辑笔记

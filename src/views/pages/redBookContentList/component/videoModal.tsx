@@ -4,6 +4,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { saveSetting, generateVideo, getVideoResult } from 'api/video';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { dictData } from 'api/template';
 
 const VideoModal = ({
     videoOpen,
@@ -31,8 +32,9 @@ const VideoModal = ({
     const Option = Select.Option;
     const [form] = Form.useForm();
     const [excuteLoading, setExcuteLoading] = useState(false);
-    const [executeStep, setExecuteStep] = useState(0);
     const [results, setResults] = useState<any[]>([]);
+    const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
+    const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
 
     const executeVideo = () => {
         setExcuteLoading(true);
@@ -49,8 +51,6 @@ const VideoModal = ({
                 setExcuteLoading(false);
             }
         });
-
-        setExecuteStep(1);
     };
 
     const pollResult = async (videoUid: string, index: number) => {
@@ -142,6 +142,14 @@ const VideoModal = ({
             setResults(videoList);
         }
     }, [videoList]);
+    useEffect(() => {
+        dictData('', 'tts_voice_role').then((res) => {
+            setVoiceRoleOptions(res.list);
+        });
+        dictData('', 'tts_sound_effect').then((res) => {
+            setSoundEffectOptions(res.list);
+        });
+    }, []);
 
     //预览
     const [previewVideo, setPreviewVideo] = useState<boolean>(false);
@@ -161,20 +169,12 @@ const VideoModal = ({
             >
                 {quickConfiguration?.isVoiceRole && (
                     <Form.Item label="发音角色" name="voiceRole" rules={[{ required: true, message: '请选择发音角色' }]}>
-                        <Select style={{ width: 200 }}>
-                            <Option value="温柔淑女">温柔淑女</Option>
-                            <Option value="男声2">男声2</Option>
-                            <Option value="女声1">女声1</Option>
-                            <Option value="女声2">女声2</Option>
-                        </Select>
+                        <Select style={{ width: 200 }} options={voiceRoleOptions} />
                     </Form.Item>
                 )}
                 {quickConfiguration?.isSoundEffect && (
                     <Form.Item label="指示效果" name="soundEffect" rules={[{ required: true, message: '请选择指示效果' }]}>
-                        <Select style={{ width: 200 }}>
-                            <Option value="手指">手指</Option>
-                            <Option value="其他效果">其他效果</Option>
-                        </Select>
+                        <Select style={{ width: 200 }} options={soundEffectOptions} />
                     </Form.Item>
                 )}
                 {quickConfiguration?.isRepeatEnable && (
@@ -303,9 +303,11 @@ const VideoModal = ({
                     </Button>
                 </div>
             )}
-            <Modal width={'448px'} open={previewVideo} title={'预览视频'} footer={null} onCancel={() => setPreviewVideo(false)}>
-                <video src={previewVideoUrl} width={'400px'} controls />
-            </Modal>
+            {previewVideo && (
+                <Modal width={'448px'} open={previewVideo} title={'预览视频'} footer={null} onCancel={() => setPreviewVideo(false)}>
+                    <video src={previewVideoUrl} width={'400px'} controls />
+                </Modal>
+            )}
         </Modal>
     );
 };

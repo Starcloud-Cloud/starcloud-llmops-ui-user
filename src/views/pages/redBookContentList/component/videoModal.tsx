@@ -36,13 +36,14 @@ const VideoModal = ({
     const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
     const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
 
-    const executeVideo = () => {
+    const executeVideo = async () => {
+        const values = await form.validateFields();
         setExcuteLoading(true);
         templateList.forEach(async (item, index) => {
             try {
                 const res = await generateVideo({
                     uid: businessUid,
-                    quickConfiguration: JSON.stringify(form.getFieldsValue()),
+                    quickConfiguration: JSON.stringify(values),
                     videoConfig: item.videoConfig,
                     imageCode: item.code
                 });
@@ -108,9 +109,10 @@ const VideoModal = ({
         }
     };
     const saveSettings = async (flag?: any) => {
+        const values = await form.validateFields();
         const res = await saveSetting({
             uid: businessUid,
-            quickConfiguration: JSON.stringify(form.getFieldsValue()),
+            quickConfiguration: JSON.stringify(values),
             videoContents: results
         });
         if (flag) {
@@ -161,10 +163,10 @@ const VideoModal = ({
                 form={form}
                 layout="vertical"
                 initialValues={{
-                    voiceRole: '温柔淑女',
-                    soundEffect: '手指',
+                    voiceRole: undefined,
+                    soundEffect: undefined,
                     repeatEnable: false,
-                    repeatRole: '温柔淑女'
+                    repeatRole: undefined
                 }}
             >
                 {quickConfiguration?.isVoiceRole && (
@@ -205,7 +207,7 @@ const VideoModal = ({
                         <Image src={imageList?.filter((i) => i.code === item.code)[0]?.url} preview={false} width={100} />
                         <div className="flex flex-col justify-between w-full relative min-h-[110px]">
                             {!results[index] ? (
-                                <div className="text-base text-[#000000a6] font-[500]">未开始，点击生成，开始生成视频</div>
+                                <div className="text-base text-[#000000a6] font-[500]">未生成，点击生成视频按钮</div>
                             ) : (
                                 <div className="w-full flex flex-col items-start gap-2">
                                     <div className="text-base w-full font-[500]">
@@ -282,7 +284,7 @@ const VideoModal = ({
             ))}
             {results?.length === 0 ? (
                 <div className="flex justify-center gap-2 mt-4">
-                    <Button onClick={saveSettings}>保存配置</Button>
+                    <Button onClick={() => saveSettings()}>保存配置</Button>
                     <Button loading={excuteLoading} type="primary" onClick={executeVideo}>
                         生成视频
                     </Button>

@@ -186,12 +186,7 @@ const VideoModal = ({
                 )}
                 {quickConfiguration?.isRepeatRole && (
                     <Form.Item label="跟读发音角色" name="repeatRole" rules={[{ required: true, message: '请选择跟读发音角色' }]}>
-                        <Select style={{ width: 200 }}>
-                            <Option value="温柔淑女">温柔淑女</Option>
-                            <Option value="男声2">男声2</Option>
-                            <Option value="女声1">女声1</Option>
-                            <Option value="女声2">女声2</Option>
-                        </Select>
+                        <Select style={{ width: 200 }} options={voiceRoleOptions} />
                     </Form.Item>
                 )}
             </Form>

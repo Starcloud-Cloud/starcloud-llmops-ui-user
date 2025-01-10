@@ -345,11 +345,11 @@ const VideoSetting: React.FC<{
             initialValues={{
                 globalSettings: {
                     elementInterval: 1,
-                    unitInterval: 2,
-                    voiceRole: '温柔女声',
-                    soundEffect: '手指',
+                    unitInterval: 1,
+                    voiceRole: undefined,
+                    soundEffect: undefined,
                     repeatEnable: false,
-                    repeatRole: '温柔女声'
+                    repeatRole: undefined
                 }
                 // videoConfig: {
                 //     mode: 'merge'
@@ -361,7 +361,7 @@ const VideoSetting: React.FC<{
 
             <div className="flex gap-2">
                 <div className="flex-1">
-                    <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
+                    <Form.Item label="发音元素间隔" name={['globalSettings', 'elementInterval']} rules={[{ required: true }]}>
                         <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 200 }} />
                     </Form.Item>
 

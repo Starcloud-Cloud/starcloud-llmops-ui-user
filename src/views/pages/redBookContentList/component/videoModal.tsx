@@ -1,32 +1,42 @@
 import { useState, useEffect } from 'react';
 import { Modal, Form, Select, Image, Progress, Button, Switch, Tooltip, Card } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { generateVideo, getVideoResult } from 'api/video';
+import { saveSetting, generateVideo, getVideoResult } from 'api/video';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/slices/snackbar';
 
 const VideoModal = ({
     videoOpen,
     setVideoOpen,
     businessUid,
     quickConfiguration,
+    quickValue,
     templateList,
-    imageList
+    imageList,
+    videoList,
+    getDetail,
+    title
 }: {
     videoOpen: boolean;
     setVideoOpen: (value: boolean) => void;
     businessUid: string;
     quickConfiguration: any;
+    quickValue: any;
     templateList: any[];
     imageList: any[];
+    videoList: any[];
+    getDetail: () => void;
+    title: string;
 }) => {
     const Option = Select.Option;
     const [form] = Form.useForm();
+    const [excuteLoading, setExcuteLoading] = useState(false);
     const [executeStep, setExecuteStep] = useState(0);
     const [results, setResults] = useState<any[]>([]);
 
     const executeVideo = () => {
+        setExcuteLoading(true);
         templateList.forEach(async (item, index) => {
-            console.log(item);
-
             try {
                 const res = await generateVideo({
                     uid: businessUid,
@@ -35,17 +45,22 @@ const VideoModal = ({
                     imageCode: item.code
                 });
                 pollResult(res?.id, index);
-            } catch (error) {}
+            } catch (error) {
+                setExcuteLoading(false);
+            }
         });
+
         setExecuteStep(1);
     };
 
-    const pollResult = (videoUid: string, index: number) => {
+    const pollResult = async (videoUid: string, index: number) => {
+        setExcuteLoading(false);
         const interval = setInterval(async () => {
             try {
                 const res = await getVideoResult({
                     videoUid,
-                    creativeContentUid: businessUid
+                    creativeContentUid: businessUid,
+                    imageCode: templateList[index].code
                 });
                 if (res?.status === 'completed' || res?.status === 'failed') {
                     clearInterval(interval);
@@ -59,17 +74,71 @@ const VideoModal = ({
                 clearInterval(interval);
             }
         }, 2000);
+        try {
+            const res = await getVideoResult({
+                videoUid,
+                creativeContentUid: businessUid,
+                imageCode: templateList[index].code
+            });
+            if (res?.status === 'completed' || res?.status === 'failed') {
+                clearInterval(interval);
+            }
+            setResults((prev) => {
+                const newResults = [...prev];
+                newResults[index] = res;
+                return newResults;
+            });
+        } catch (error) {
+            clearInterval(interval);
+        }
     };
 
     const retryVideo = async (index: number) => {
-        const res = await generateVideo({
+        try {
+            setExcuteLoading(true);
+            const res = await generateVideo({
+                uid: businessUid,
+                quickConfiguration: JSON.stringify(form.getFieldsValue()),
+                videoConfig: templateList[index].videoConfig,
+                imageCode: templateList[index].code
+            });
+            pollResult(res?.id, index);
+        } catch (error) {
+            setExcuteLoading(false);
+        }
+    };
+    const saveSettings = async () => {
+        const res = await saveSetting({
             uid: businessUid,
             quickConfiguration: JSON.stringify(form.getFieldsValue()),
-            videoConfig: templateList[index].videoConfig,
-            imageCode: templateList[index].code
+            videoContents: results
         });
-        pollResult(res?.id, index);
+        getDetail();
+        dispatch(
+            openSnackbar({
+                open: true,
+                message: '保存成功',
+                variant: 'alert',
+                alert: {
+                    color: 'success'
+                },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                transition: 'SlideDown',
+                close: false
+            })
+        );
     };
+
+    useEffect(() => {
+        if (videoOpen && quickValue) {
+            form.setFieldsValue(quickValue);
+        }
+    }, [videoOpen]);
+    useEffect(() => {
+        if (videoList && videoList?.length > 0) {
+            setResults(videoList);
+        }
+    }, [videoList]);
 
     //预览
     const [previewVideo, setPreviewVideo] = useState<boolean>(false);
@@ -131,8 +200,8 @@ const VideoModal = ({
                 <Card size="small" key={index} className="mb-4">
                     <div className="flex items-start gap-2">
                         <Image src={imageList?.filter((i) => i.code === item.code)[0]?.url} preview={false} width={100} />
-                        <div className="flex flex-col justify-between w-full min-h-[110px]">
-                            {executeStep === 0 ? (
+                        <div className="flex flex-col justify-between w-full relative min-h-[110px]">
+                            {!results[index] ? (
                                 <div className="text-base text-[#000000a6] font-[500]">未开始，点击生成，开始生成视频</div>
                             ) : (
                                 <div className="w-full flex flex-col items-start gap-2">
@@ -140,7 +209,7 @@ const VideoModal = ({
                                         {results[index]?.status === 'completed' ? (
                                             <div className="text-[#52c41a]">生成成功</div>
                                         ) : results[index]?.status === 'failed' || results[index]?.status === 'unknown' ? (
-                                            <div className="text-[#ff4d4f]">生成失败：{results[index]?.errorMessage}</div>
+                                            <div className="text-[#ff4d4f]">生成失败：{results[index]?.error}</div>
                                         ) : (
                                             <div className="w-full">
                                                 <Progress percent={results[index]?.progress || 0} showInfo={false} />
@@ -150,9 +219,11 @@ const VideoModal = ({
                                     </div>
                                 </div>
                             )}
-                            <div className="flex justify-end gap-2">
+                            <div className="flex justify-end gap-2 absolute top-0 right-0 h-full">
                                 {results[index]?.status === 'failed' ? (
-                                    <Button onClick={() => retryVideo(index)}>重试</Button>
+                                    <Button loading={excuteLoading} onClick={() => retryVideo(index)}>
+                                        重试
+                                    </Button>
                                 ) : results[index]?.status === 'completed' ? (
                                     <div className="flex flex-col gap-2 justify-between">
                                         <div className="flex gap-2">
@@ -164,9 +235,39 @@ const VideoModal = ({
                                             >
                                                 预览
                                             </Button>
-                                            <Button type="primary">下载</Button>
+                                            <Button
+                                                type="primary"
+                                                onClick={async () => {
+                                                    const response = await fetch(results[index]?.videoUrl);
+                                                    const arrayBuffer = await response.arrayBuffer();
+                                                    const blob = new Blob([arrayBuffer], { type: 'video/mp4' });
+                                                    const videoUrl = URL.createObjectURL(blob);
+                                                    if (videoUrl) {
+                                                        const link = document.createElement('a');
+                                                        link.href = videoUrl;
+                                                        link.setAttribute('download', title + '.mp4'); // 设置下载文件名
+                                                        document.body.appendChild(link);
+                                                        link.click();
+                                                        document.body.removeChild(link);
+                                                    } else {
+                                                        dispatch(
+                                                            openSnackbar({
+                                                                open: true,
+                                                                message: '视频链接无效，无法下载',
+                                                                variant: 'alert',
+                                                                alert: {
+                                                                    color: 'error'
+                                                                },
+                                                                close: false
+                                                            })
+                                                        );
+                                                    }
+                                                }}
+                                            >
+                                                下载
+                                            </Button>
                                         </div>
-                                        <Button onClick={() => retryVideo(index)} type="primary">
+                                        <Button loading={excuteLoading} onClick={() => retryVideo(index)} type="primary">
                                             重新生成
                                         </Button>
                                     </div>
@@ -176,11 +277,14 @@ const VideoModal = ({
                     </div>
                 </Card>
             ))}
-            {executeStep === 0 ? (
+            {results?.length === 0 ? (
                 <div className="flex justify-center gap-2 mt-4">
                     <Button onClick={() => setVideoOpen(false)}>取消</Button>
-                    <Button type="primary" onClick={executeVideo}>
+                    <Button loading={excuteLoading} type="primary" onClick={executeVideo}>
                         生成视频
+                    </Button>
+                    <Button type="primary" onClick={saveSettings}>
+                        保存配置
                     </Button>
                 </div>
             ) : results?.some((item) => item?.status === 'pending' || item?.status === 'processing') ? (
@@ -189,11 +293,13 @@ const VideoModal = ({
                 </div>
             ) : (
                 <div className="flex justify-center gap-2 mt-4">
-                    <Button type="primary">确认</Button>
+                    <Button type="primary" onClick={saveSettings}>
+                        确认
+                    </Button>
                 </div>
             )}
-            <Modal width={'748px'} open={previewVideo} title={'预览视频'} footer={null} onCancel={() => setPreviewVideo(false)}>
-                <video src={previewVideoUrl} width={'700px'} controls />
+            <Modal width={'448px'} open={previewVideo} title={'预览视频'} footer={null} onCancel={() => setPreviewVideo(false)}>
+                <video src={previewVideoUrl} width={'400px'} controls />
             </Modal>
         </Modal>
     );

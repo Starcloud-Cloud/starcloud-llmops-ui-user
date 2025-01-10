@@ -16,9 +16,10 @@ import {
     QRCode,
     Form,
     Image,
-    Tooltip
+    Tooltip,
+    Carousel
 } from 'antd';
-import { PlusOutlined, LoadingOutlined, EyeOutlined, CloudUploadOutlined, SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined, LoadingOutlined, SwapOutlined, CloudUploadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import 'swiper/css';
@@ -328,6 +329,8 @@ const ThreeStep = ({
             });
         }
     }, [data]);
+
+    const [isVideo, setIsVideo] = useState(false);
     return (
         <div
             className="h-full"
@@ -370,7 +373,7 @@ const ThreeStep = ({
                     )}
                     {!show && !exeDetail && !isFlag && (
                         <div
-                            className="flex gap-2"
+                            className="flex gap-2 w-full justify-between"
                             style={{
                                 position: 'absolute',
                                 right: '12px',
@@ -380,70 +383,80 @@ const ThreeStep = ({
                             {/* {jsCookie.get('isClient')&&
                             <Button>加入代发布列表</Button>
                             } */}
-                            {!editType ? (
-                                <div className="flex items-center">
-                                    <Button
-                                        type="primary"
-                                        onClick={() => {
-                                            setPublishOpen(true);
-                                        }}
-                                    >
-                                        扫码发布
+                            <div className="ml-[100px]">
+                                {data?.executeResult?.videoList && data?.executeResult?.videoList?.length > 0 && (
+                                    <Button onClick={() => setIsVideo(!isVideo)} type="primary" icon={<SwapOutlined />}>
+                                        图文｜视频
                                     </Button>
-                                    <Button className="ml-2" type="primary" loading={downLoading} onClick={() => downLoadImage()}>
-                                        打包下载
-                                    </Button>
-                                    <Divider type="vertical" />
-                                    <Button
-                                        onClick={() => {
-                                            setWordsValue(text);
-                                            setWordsOpen(true);
-                                            setEditType(true);
-                                        }}
-                                        type="primary"
-                                    >
-                                        违禁词检测
-                                    </Button>
-                                    <Button
-                                        className="mx-2"
-                                        onClick={() => {
-                                            const newList = JSON.parse(
-                                                data?.executeParam?.appInformation?.workflowConfig?.steps
-                                                    ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
-                                                    ?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_LIST')?.value ||
-                                                    '[]'
-                                            );
-                                            if (newList.length === 1) {
-                                                form.setFieldsValue(newList[0]);
-                                                setRetryExeisShow(true);
-                                            } else {
-                                                setReOpen(true);
-                                                setRetableData(newList);
-                                            }
-                                        }}
-                                        // onClick={doRetry}
-                                    >
-                                        重新生成
-                                    </Button>
-                                    <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
-                                        编辑笔记
-                                    </Button>
-                                    {openVideoMode && (
-                                        <Button className="ml-2" type="primary" onClick={() => setVideoOpen(true)} disabled={claim}>
-                                            视频生成
+                                )}
+                            </div>
+
+                            <div>
+                                {!editType ? (
+                                    <div className="flex items-center">
+                                        <Button
+                                            type="primary"
+                                            onClick={() => {
+                                                setPublishOpen(true);
+                                            }}
+                                        >
+                                            扫码发布
                                         </Button>
-                                    )}
-                                </div>
-                            ) : (
-                                <Space>
-                                    <Button type="primary" onClick={handleModify}>
-                                        保存
-                                    </Button>
-                                    <Button type="default" onClick={() => setEditType(false)}>
-                                        取消
-                                    </Button>
-                                </Space>
-                            )}
+                                        <Button className="ml-2" type="primary" loading={downLoading} onClick={() => downLoadImage()}>
+                                            打包下载
+                                        </Button>
+                                        <Divider type="vertical" />
+                                        <Button
+                                            onClick={() => {
+                                                setWordsValue(text);
+                                                setWordsOpen(true);
+                                                setEditType(true);
+                                            }}
+                                            type="primary"
+                                        >
+                                            违禁词检测
+                                        </Button>
+                                        <Button
+                                            className="mx-2"
+                                            onClick={() => {
+                                                const newList = JSON.parse(
+                                                    data?.executeParam?.appInformation?.workflowConfig?.steps
+                                                        ?.find((item: any) => item?.flowStep?.handler === 'MaterialActionHandler')
+                                                        ?.variable?.variables?.find((item: any) => item?.field === 'MATERIAL_LIST')
+                                                        ?.value || '[]'
+                                                );
+                                                if (newList.length === 1) {
+                                                    form.setFieldsValue(newList[0]);
+                                                    setRetryExeisShow(true);
+                                                } else {
+                                                    setReOpen(true);
+                                                    setRetableData(newList);
+                                                }
+                                            }}
+                                            // onClick={doRetry}
+                                        >
+                                            重新生成
+                                        </Button>
+                                        <Button type="primary" onClick={() => setEditType(true)} disabled={claim}>
+                                            编辑笔记
+                                        </Button>
+                                        {openVideoMode && (
+                                            <Button className="ml-2" type="primary" onClick={() => setVideoOpen(true)} disabled={claim}>
+                                                视频生成
+                                            </Button>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <Space>
+                                        <Button type="primary" onClick={handleModify}>
+                                            保存
+                                        </Button>
+                                        <Button type="default" onClick={() => setEditType(false)}>
+                                            取消
+                                        </Button>
+                                    </Space>
+                                )}
+                            </div>
                         </div>
                     )}
                     <div className="relative h-full overflow-hidden col-span-2">
@@ -455,6 +468,10 @@ const ThreeStep = ({
                                         <div style={{ marginTop: 8 }}>上传</div>
                                     </div>
                                 </Upload>
+                            ) : isVideo ? (
+                                <div className="w-full h-full flex justify-center items-center">
+                                    <video src={data?.executeResult?.videoList[0]?.videoUrl} controls width="100%" />
+                                </div>
                             ) : (
                                 <>
                                     <div className="flex justify-between absolute top-[46%] w-full z-10">
@@ -959,9 +976,15 @@ const ThreeStep = ({
                 videoOpen={videoOpen}
                 setVideoOpen={setVideoOpen}
                 businessUid={businessUid}
+                title={data?.executeResult?.copyWriting?.title}
                 quickConfiguration={quickConfiguration}
+                quickValue={data?.executeParam?.quickConfiguration ? JSON.parse(data?.executeParam?.quickConfiguration) : null}
                 templateList={templateList}
                 imageList={data?.executeResult?.imageList}
+                videoList={data?.executeResult?.videoList}
+                getDetail={() => {
+                    setPre(Math.random() + Math.random());
+                }}
             />
             {isModalOpen && (
                 <PicImagePick

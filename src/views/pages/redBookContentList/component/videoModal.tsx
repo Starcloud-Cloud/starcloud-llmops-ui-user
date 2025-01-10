@@ -107,12 +107,15 @@ const VideoModal = ({
             setExcuteLoading(false);
         }
     };
-    const saveSettings = async () => {
+    const saveSettings = async (flag?: any) => {
         const res = await saveSetting({
             uid: businessUid,
             quickConfiguration: JSON.stringify(form.getFieldsValue()),
             videoContents: results
         });
+        if (flag) {
+            setVideoOpen(false);
+        }
         getDetail();
         dispatch(
             openSnackbar({
@@ -167,7 +170,7 @@ const VideoModal = ({
                     </Form.Item>
                 )}
                 {quickConfiguration?.isSoundEffect && (
-                    <Form.Item label="发音效果" name="soundEffect" rules={[{ required: true, message: '请选择发音效果' }]}>
+                    <Form.Item label="指示效果" name="soundEffect" rules={[{ required: true, message: '请选择指示效果' }]}>
                         <Select style={{ width: 200 }}>
                             <Option value="手指">手指</Option>
                             <Option value="其他效果">其他效果</Option>
@@ -279,12 +282,9 @@ const VideoModal = ({
             ))}
             {results?.length === 0 ? (
                 <div className="flex justify-center gap-2 mt-4">
-                    <Button onClick={() => setVideoOpen(false)}>取消</Button>
+                    <Button onClick={saveSettings}>保存配置</Button>
                     <Button loading={excuteLoading} type="primary" onClick={executeVideo}>
                         生成视频
-                    </Button>
-                    <Button type="primary" onClick={saveSettings}>
-                        保存配置
                     </Button>
                 </div>
             ) : results?.some((item) => item?.status === 'pending' || item?.status === 'processing') ? (
@@ -293,7 +293,12 @@ const VideoModal = ({
                 </div>
             ) : (
                 <div className="flex justify-center gap-2 mt-4">
-                    <Button type="primary" onClick={saveSettings}>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            saveSettings(true);
+                        }}
+                    >
                         确认
                     </Button>
                 </div>

@@ -470,7 +470,12 @@ const ThreeStep = ({
                                 </Upload>
                             ) : isVideo ? (
                                 <div className="w-full h-full flex justify-center items-center">
-                                    <video src={data?.executeResult?.videoList[0]?.videoUrl} controls width="100%" />
+                                    <video
+                                        src={data?.executeResult?.videoList[0]?.videoUrl}
+                                        controls
+                                        width={'100%'}
+                                        className="max-h-[100%]"
+                                    />
                                 </div>
                             ) : (
                                 <>

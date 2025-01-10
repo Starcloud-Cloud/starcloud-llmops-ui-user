@@ -5,6 +5,7 @@ import { DragOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { dictData } from 'api/template';
 
 // 定义发音单元的数据结构
 interface VoiceUnit {
@@ -61,7 +62,7 @@ interface VoiceConfig {
         elementInterval: number; // 发音元素间隔
         unitInterval: number; // 发音单元间隔
         voiceRole: string; // 发音角色
-        soundEffect: string; // 发音效果
+        soundEffect: string; // 指示效果
         repeatEnable: boolean; // 是否跟读
         repeatRole: string; // 跟读发音角色
         resolution: {
@@ -101,46 +102,8 @@ const VideoSetting: React.FC<{
     quickConfiguration,
     setQuickConfiguration
 }) => {
-    const voiceRoleOptions = [
-        {
-            label: '温柔女声',
-            value: '温柔女声'
-        },
-        {
-            label: '质朴青年',
-            value: '质朴青年'
-        },
-        {
-            label: '情感女声',
-            value: '情感女声'
-        },
-        {
-            label: '奶气萌娃',
-            value: '奶气萌娃'
-        },
-        {
-            label: '动漫海星',
-            value: '动漫海星'
-        },
-        {
-            label: '动漫小新',
-            value: '动漫小新'
-        },
-        {
-            label: '天才童声',
-            value: '天才童声'
-        }
-    ];
-    const soundEffectOptions = [
-        {
-            label: '手指',
-            value: '手指'
-        },
-        {
-            label: '圆圈',
-            value: '圆圈'
-        }
-    ];
+    const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
+    const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
     const [form] = Form.useForm<VoiceConfig>();
     const [voiceUnits, setVoiceUnits] = useState<VoiceUnit[]>([
         {
@@ -365,6 +328,14 @@ const VideoSetting: React.FC<{
             upDateData(newData);
         });
     }, [voiceUnits]);
+    useEffect(() => {
+        dictData('', 'tts_voice_role').then((res) => {
+            setVoiceRoleOptions(res.list);
+        });
+        dictData('', 'tts_sound_effect').then((res) => {
+            setSoundEffectOptions(res.list);
+        });
+    }, []);
 
     return (
         <Form
@@ -411,7 +382,7 @@ const VideoSetting: React.FC<{
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
-                        <Form.Item label="发音效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
+                        <Form.Item label="指示效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
                             <Select style={{ width: 200 }}>
                                 <Select.Option value="手指">手指</Select.Option>
                                 <Select.Option value="圆圈">圆圈</Select.Option>
@@ -520,7 +491,7 @@ const VideoSetting: React.FC<{
                                                             content={
                                                                 <div className="w-[250px]">
                                                                     <Form form={popForm}>
-                                                                        <Form.Item label="发音效果" name="type">
+                                                                        <Form.Item label="指示效果" name="type">
                                                                             <Select allowClear options={soundEffectOptions}></Select>
                                                                         </Form.Item>
                                                                         <Form.Item label="发音元素间隔" name="interval">
@@ -624,6 +595,7 @@ const VideoSetting: React.FC<{
                                                                     </Popconfirm>
                                                                 </div>
                                                             </div>
+
                                                             <div
                                                                 onMouseEnter={() => {
                                                                     if (item.type === 'ref') {
@@ -678,20 +650,18 @@ const VideoSetting: React.FC<{
                                                                         ))}
                                                                     </Select>
                                                                 )}
-                                                                <div className="mt-2">
-                                                                    {item.settings.audioEnable && <Tag color="success">发音</Tag>}
-                                                                    {item.audio.voiceRole && (
-                                                                        <Tag color="success">{item.audio.voiceRole}</Tag>
-                                                                    )}
+                                                            </div>
+                                                            <div className="mt-2">
+                                                                {item.settings.audioEnable && <Tag color="success">发音</Tag>}
+                                                                {item.audio.voiceRole && <Tag color="success">{item.audio.voiceRole}</Tag>}
 
-                                                                    {item.settings.repeatEnable && <Tag color="success">跟读</Tag>}
-                                                                    {item.settings.repeatRole && (
-                                                                        <Tag color="success">{item.settings.repeatRole}</Tag>
-                                                                    )}
-                                                                    {item.settings.repeatCount && (
-                                                                        <Tag color="success">{item.settings.repeatCount}次</Tag>
-                                                                    )}
-                                                                </div>
+                                                                {item.settings.repeatEnable && <Tag color="success">跟读</Tag>}
+                                                                {item.settings.repeatRole && (
+                                                                    <Tag color="success">{item.settings.repeatRole}</Tag>
+                                                                )}
+                                                                {item.settings.repeatCount && (
+                                                                    <Tag color="success">{item.settings.repeatCount}次</Tag>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     ))}

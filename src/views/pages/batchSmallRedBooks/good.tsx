@@ -386,6 +386,7 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
                 </div>
             ) : (
                 <div
+                    className="relative"
                     onClick={() => {
                         if (!noDetail) {
                             setBusinessUid(item.uid);
@@ -397,6 +398,11 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
                     <div className="p-[12px]">
                         <div className="h-[40px] text-sm font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
                     </div>
+                    {item?.executeResult?.videoList && (
+                        <Tag className="absolute top-1 left-1 z-[1]" color="success">
+                            视频
+                        </Tag>
+                    )}
                 </div>
             )}
         </div>

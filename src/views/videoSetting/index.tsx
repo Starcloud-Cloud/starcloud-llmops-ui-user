@@ -260,13 +260,23 @@ const VideoSetting: React.FC<{
 
     // 处理拖拽结束
     const onDragEnd = (result: any) => {
+        console.log(result);
         if (!result.destination) return;
 
-        const items = Array.from(voiceUnits);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-        console.log(items);
-        setVoiceUnits(items);
+        // 深拷贝当前数组
+        let newVoiceUnits = _.cloneDeep(voiceUnits);
+
+        [newVoiceUnits[result.source.index], newVoiceUnits[result.destination.index]] = [
+            newVoiceUnits[result.destination.index],
+            newVoiceUnits[result.source.index]
+        ];
+        // 更新顺序号并设置状态
+        setVoiceUnits(
+            newVoiceUnits.map((unit, index) => ({
+                ...unit,
+                order: index + 1
+            }))
+        );
     };
 
     const handleValuesChange = (_: any, allValues: any) => {
@@ -443,7 +453,7 @@ const VideoSetting: React.FC<{
                     {(provided) => (
                         <div {...provided.droppableProps} ref={provided.innerRef}>
                             {voiceUnits.map((unit, index) => (
-                                <Draggable key={unit.id} draggableId={unit.id.toString()} index={index}>
+                                <Draggable key={unit.id} draggableId={unit.id} index={index}>
                                     {(provided) => (
                                         <div ref={provided.innerRef} {...provided.draggableProps}>
                                             <Card

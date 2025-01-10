@@ -329,6 +329,11 @@ const ThreeStep = ({
             });
         }
     }, [data]);
+    useEffect(() => {
+        if (data?.executeResult?.videoList && data?.executeResult?.videoList?.length > 0) {
+            setIsVideo(true);
+        }
+    }, [data]);
 
     const [isVideo, setIsVideo] = useState(false);
     return (

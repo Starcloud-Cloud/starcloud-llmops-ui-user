@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal, Form, Select, Image, Progress, Button, Switch, Tooltip, Card } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import { saveSetting, generateVideo, getVideoResult } from 'api/video';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -145,13 +145,24 @@ const VideoModal = ({
         }
     }, [videoList]);
     useEffect(() => {
-        dictData('', 'tts_voice_role').then((res) => {
-            setVoiceRoleOptions(res.list);
+        dictData('', 'tts_voice_role_all_json').then((res) => {
+            setVoiceRoleOptions(JSON.parse(res.list[0]?.remark));
         });
         dictData('', 'tts_sound_effect').then((res) => {
             setSoundEffectOptions(res.list);
         });
     }, []);
+
+    // 添加音频播放函数
+    const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
+    const playAudioDemo = (demoLink: string) => {
+        if (audioPlayer) {
+            audioPlayer.pause();
+        }
+        const audio = new Audio(demoLink);
+        audio.play();
+        setAudioPlayer(audio);
+    };
 
     //预览
     const [previewVideo, setPreviewVideo] = useState<boolean>(false);
@@ -171,7 +182,25 @@ const VideoModal = ({
             >
                 {quickConfiguration?.isVoiceRole && (
                     <Form.Item label="发音角色" name="voiceRole" rules={[{ required: true, message: '请选择发音角色' }]}>
-                        <Select style={{ width: 200 }} options={voiceRoleOptions} />
+                        <Select optionLabelProp="label" style={{ width: 200 }}>
+                            {voiceRoleOptions?.map((item) => (
+                                <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                    <div className="flex items-center justify-between">
+                                        <span>{item.voice}</span>
+                                        {item.demo_link && (
+                                            <Button
+                                                type="text"
+                                                icon={<SoundOutlined />}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // 防止触发选择事件
+                                                    playAudioDemo(item.demo_link);
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                </Select.Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 )}
                 {quickConfiguration?.isSoundEffect && (
@@ -186,7 +215,25 @@ const VideoModal = ({
                 )}
                 {quickConfiguration?.isRepeatRole && (
                     <Form.Item label="跟读发音角色" name="repeatRole" rules={[{ required: true, message: '请选择跟读发音角色' }]}>
-                        <Select style={{ width: 200 }} options={voiceRoleOptions} />
+                        <Select optionLabelProp="label" style={{ width: 200 }}>
+                            {voiceRoleOptions?.map((item) => (
+                                <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                    <div className="flex items-center justify-between">
+                                        <span>{item.voice}</span>
+                                        {item.demo_link && (
+                                            <Button
+                                                type="text"
+                                                icon={<SoundOutlined />}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // 防止触发选择事件
+                                                    playAudioDemo(item.demo_link);
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                </Select.Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 )}
             </Form>

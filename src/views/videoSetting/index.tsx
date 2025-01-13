@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Select, InputNumber, Tag, Button, Space, Popover, Tooltip, Image, Switch, Checkbox, Popconfirm } from 'antd';
 import { DeleteOutlined, PlusOutlined, SwapOutlined, MoreOutlined } from '@ant-design/icons';
-import { DragOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { DragOutlined, ExclamationCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -341,13 +341,24 @@ const VideoSetting: React.FC<{
         });
     }, [voiceUnits]);
     useEffect(() => {
-        dictData('', 'tts_voice_role').then((res) => {
-            setVoiceRoleOptions(res.list);
+        dictData('', 'tts_voice_role_all_json').then((res) => {
+            setVoiceRoleOptions(JSON.parse(res.list[0]?.remark));
         });
         dictData('', 'tts_sound_effect').then((res) => {
             setSoundEffectOptions(res.list);
         });
     }, []);
+
+    const [audioPlayer, setAudioPlayer] = useState<HTMLAudioElement | null>(null);
+
+    const playAudioDemo = (demoLink: string) => {
+        if (audioPlayer) {
+            audioPlayer.pause();
+        }
+        const audio = new Audio(demoLink);
+        audio.play();
+        setAudioPlayer(audio);
+    };
 
     return (
         <Form
@@ -384,7 +395,25 @@ const VideoSetting: React.FC<{
 
                     <div className="flex items-center gap-2">
                         <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
-                            <Select style={{ width: 200 }} options={voiceRoleOptions}></Select>
+                            <Select optionLabelProp="label" style={{ width: 200 }}>
+                                {voiceRoleOptions?.map((item) => (
+                                    <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                        <div className="flex items-center justify-between">
+                                            <span>{item.voice}</span>
+                                            {item.demo_link && (
+                                                <Button
+                                                    type="text"
+                                                    icon={<SoundOutlined />}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // 防止触发选择事件
+                                                        playAudioDemo(item.demo_link);
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    </Select.Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                         <Checkbox
                             checked={quickConfiguration.isVoiceRole}
@@ -431,7 +460,25 @@ const VideoSetting: React.FC<{
 
                     <div className="flex items-center gap-2">
                         <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']}>
-                            <Select allowClear style={{ width: 200 }} options={voiceRoleOptions}></Select>
+                            <Select allowClear optionLabelProp="label" style={{ width: 200 }}>
+                                {voiceRoleOptions?.map((item) => (
+                                    <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                        <div className="flex items-center justify-between">
+                                            <span>{item.voice}</span>
+                                            {item.demo_link && (
+                                                <Button
+                                                    type="text"
+                                                    icon={<SoundOutlined />}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // 防止触发选择事件
+                                                        playAudioDemo(item.demo_link);
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    </Select.Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                         <Checkbox
                             checked={quickConfiguration.isRepeatRole}
@@ -586,13 +633,37 @@ const VideoSetting: React.FC<{
                                                                                     </Form.Item>
                                                                                     <Form.Item label="发音角色" name="voiceRole">
                                                                                         <Select
+                                                                                            optionLabelProp="label"
                                                                                             defaultValue={form.getFieldValue([
                                                                                                 'globalSettings',
                                                                                                 'voiceRole'
                                                                                             ])}
                                                                                             allowClear
-                                                                                            options={voiceRoleOptions}
-                                                                                        ></Select>
+                                                                                        >
+                                                                                            {voiceRoleOptions?.map((item) => (
+                                                                                                <Select.Option
+                                                                                                    key={item.code}
+                                                                                                    label={item.voice}
+                                                                                                    value={item.code}
+                                                                                                >
+                                                                                                    <div className="flex items-center justify-between">
+                                                                                                        <span>{item.voice}</span>
+                                                                                                        {item.demo_link && (
+                                                                                                            <Button
+                                                                                                                type="text"
+                                                                                                                icon={<SoundOutlined />}
+                                                                                                                onClick={(e) => {
+                                                                                                                    e.stopPropagation(); // 防止触发选择事件
+                                                                                                                    playAudioDemo(
+                                                                                                                        item.demo_link
+                                                                                                                    );
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                    </div>
+                                                                                                </Select.Option>
+                                                                                            ))}
+                                                                                        </Select>
                                                                                     </Form.Item>
                                                                                     <Form.Item
                                                                                         label="是否跟读"
@@ -603,13 +674,37 @@ const VideoSetting: React.FC<{
                                                                                     </Form.Item>
                                                                                     <Form.Item label="跟读角色" name="repeatRole">
                                                                                         <Select
+                                                                                            optionLabelProp="label"
                                                                                             allowClear
                                                                                             defaultValue={form.getFieldValue([
                                                                                                 'globalSettings',
                                                                                                 'repeatRole'
                                                                                             ])}
-                                                                                            options={voiceRoleOptions}
-                                                                                        ></Select>
+                                                                                        >
+                                                                                            {voiceRoleOptions?.map((item) => (
+                                                                                                <Select.Option
+                                                                                                    key={item.code}
+                                                                                                    label={item.voice}
+                                                                                                    value={item.code}
+                                                                                                >
+                                                                                                    <div className="flex items-center justify-between">
+                                                                                                        <span>{item.voice}</span>
+                                                                                                        {item.demo_link && (
+                                                                                                            <Button
+                                                                                                                type="text"
+                                                                                                                icon={<SoundOutlined />}
+                                                                                                                onClick={(e) => {
+                                                                                                                    e.stopPropagation(); // 防止触发选择事件
+                                                                                                                    playAudioDemo(
+                                                                                                                        item.demo_link
+                                                                                                                    );
+                                                                                                                }}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                    </div>
+                                                                                                </Select.Option>
+                                                                                            ))}
+                                                                                        </Select>
                                                                                     </Form.Item>
                                                                                     <Form.Item label="跟读次数" name="repeatCount">
                                                                                         <InputNumber min={1} max={9} addonAfter="次" />

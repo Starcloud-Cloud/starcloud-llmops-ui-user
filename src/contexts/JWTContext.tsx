@@ -196,6 +196,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             /Mobi|Android/i.test(navigator.userAgent) &&
             location.pathname !== '/batchShare' &&
             location.pathname !== '/share' &&
+            location.pathname !== '/shareVideo' &&
             location.pathname !== '/'
         ) {
             navigate('/');

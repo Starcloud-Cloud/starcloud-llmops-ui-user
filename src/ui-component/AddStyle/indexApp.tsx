@@ -31,7 +31,7 @@ import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
 import { appModify } from 'api/template';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
-import { PlusOutlined, ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EyeOutlined, ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -1127,7 +1127,7 @@ const AddStyleApp = React.forwardRef(
                                             <ContentCopyIcon className="text-sm text-white" />
                                         </span>
                                     </Tooltip> */}
-                                    <Tooltip title="修改">
+                                    <Tooltip title="查看">
                                         <span
                                             onClick={() => {
                                                 if (item.system) {
@@ -1153,7 +1153,8 @@ const AddStyleApp = React.forwardRef(
                                                 }
                                             }}
                                         >
-                                            <EditIcon className="text-sm text-white" />
+                                            {/* <EditIcon className="text-sm text-white" /> */}
+                                            <EyeOutlined className="text-sm text-white" />
                                         </span>
                                     </Tooltip>
                                     {mode === 1 && (

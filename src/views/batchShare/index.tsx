@@ -42,7 +42,16 @@ const BatchShare = () => {
                 <div className="grid mt-4 gap-2 grid-cols-2">
                     {redList?.map((item: any) => (
                         <div key={item?.businessUid}>
-                            <div className="shadow-md rounded-lg overflow-hidden" onClick={() => navigate(`/share?uid=${item?.uid}`)}>
+                            <div
+                                className="shadow-md rounded-lg overflow-hidden"
+                                onClick={() => {
+                                    if (item?.executeResult?.videoList) {
+                                        navigate(`/shareVideo?uid=${item?.uid}&type=video`);
+                                    } else {
+                                        navigate(`/share?uid=${item?.uid}&type=image`);
+                                    }
+                                }}
+                            >
                                 <Carousel draggable={true} adaptiveHeight dots={{ className: 'uls' }}>
                                     {item?.executeResult?.imageList?.map((item: any) => (
                                         <Image
@@ -270,7 +279,15 @@ const BatchShare = () => {
                                 setDetailOpen={setDetailOpen}
                                 show={true}
                             />
-                            {qrOpen && <QRCode value={process.env.REACT_APP_SHARE_URL + '/share?uid=' + item?.uid} />}
+                            {qrOpen && (
+                                <QRCode
+                                    value={
+                                        item?.executeResult?.videoList
+                                            ? process.env.REACT_APP_SHARE_URL + '/shareVideo?uid=' + item?.uid + '&type=video'
+                                            : process.env.REACT_APP_SHARE_URL + '/share?uid=' + item?.uid + '&type=image'
+                                    }
+                                />
+                            )}
                         </div>
                     ))}
                 </div>

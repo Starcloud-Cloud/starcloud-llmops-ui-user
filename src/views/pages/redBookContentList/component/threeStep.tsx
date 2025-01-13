@@ -101,7 +101,8 @@ const ThreeStep = ({
                     imageList: imageList.map((item: any, index) => ({
                         index: index + 1,
                         url: item.url,
-                        isMain: index === 0
+                        isMain: index === 0,
+                        code: item.code
                     }))
                 }
             });
@@ -118,7 +119,8 @@ const ThreeStep = ({
                     status: 'done',
                     name: item.url,
                     url: item.url,
-                    isMain: item.isMain
+                    isMain: item.isMain,
+                    code: item.code
                 }));
                 setImageList(imgs);
             }
@@ -155,7 +157,8 @@ const ThreeStep = ({
                 status: 'done',
                 name: item.url,
                 url: item.url,
-                isMain: item.isMain
+                isMain: item.isMain,
+                code: item.code
             }));
             setImageList(imgs);
         }
@@ -222,12 +225,25 @@ const ThreeStep = ({
     const downLoadImage = () => {
         setDownLoading(true);
         const zip = new JSZip();
-        const promises = imageList.map(async (imageUrl: any, index: number) => {
-            const response = await fetch(imageUrl.url);
-            const arrayBuffer = await response.arrayBuffer();
-            zip.file('image' + (index + 1) + `.${imageUrl?.url?.split('.')[imageUrl?.url?.split('.')?.length - 1]}`, arrayBuffer);
-            zip.file(title + '.txt', text);
-        });
+        let promises;
+        if (isVideo) {
+            promises = data?.executeResult?.videoList?.map(async (imageUrl: any, index: number) => {
+                const response = await fetch(imageUrl.videoUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                zip.file('video' + (index + 1) + `.mp4`, arrayBuffer);
+                zip.file(title + '.txt', text);
+            });
+        } else {
+            promises = imageList.map(async (imageUrl: any, index: number) => {
+                const response = await fetch(imageUrl.url);
+                const arrayBuffer = await response.arrayBuffer();
+
+                zip.file('image' + (index + 1) + `.${imageUrl?.url?.split('.')[imageUrl?.url?.split('.')?.length - 1]}`, arrayBuffer);
+
+                zip.file(title + '.txt', text);
+            });
+        }
+
         Promise.all(promises)
             .then(() => {
                 setDownLoading(false);
@@ -886,10 +902,22 @@ const ThreeStep = ({
             </Modal>
             <Modal open={publishOpen} title={'小红书发布'} footer={null} onCancel={() => setPublishOpen(false)} closable={false}>
                 <div className="w-full flex justify-center items-center flex-col gap-2">
-                    <QRCode value={`${process.env.REACT_APP_SHARE_URL}/share?uid=` + data?.uid} />
+                    <QRCode
+                        value={
+                            isVideo
+                                ? `${process.env.REACT_APP_SHARE_URL}/shareVideo?uid=${data?.uid}&type=video`
+                                : `${process.env.REACT_APP_SHARE_URL}/share?uid=${data?.uid}&type=image}`
+                        }
+                    />
                     <div className="flex flex-col items-center">
                         <div
-                            onClick={() => window.open(`${process.env.REACT_APP_SHARE_URL}/share?uid=${data?.uid}`)}
+                            onClick={() => {
+                                if (isVideo) {
+                                    window.open(`${process.env.REACT_APP_SHARE_URL}/shareVideo?uid=${data?.uid}&type=video`);
+                                } else {
+                                    window.open(`${process.env.REACT_APP_SHARE_URL}/share?uid=${data?.uid}&type=$image`);
+                                }
+                            }}
                             className="text-md underline cursor-pointer text-[#673ab7]"
                         >
                             查看效果

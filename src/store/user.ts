@@ -49,7 +49,13 @@ const useUserStore = create<UserStore>((set) => ({
         }
         let userInfo = wsCache.get(CACHE_KEY.INFO);
         // if (!userInfo) {
-        if (location?.pathname !== '/' && location?.pathname !== '/invite' && location?.pathname !== '/share') {
+        if (
+            location?.pathname !== '/' &&
+            location?.pathname !== '/invite' &&
+            location?.pathname !== '/share' &&
+            location?.pathname !== '/shareVideo' &&
+            location?.pathname !== '/batchShare'
+        ) {
             userInfo = await getInfos();
         }
 

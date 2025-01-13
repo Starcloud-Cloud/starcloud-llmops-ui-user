@@ -34,6 +34,7 @@ export default function ThemeRoutes() {
         { path: '/fingerprint', element: <Fingerprint /> },
         { path: '/invite', element: <Invite /> },
         { path: '/share', element: <Share /> },
+        { path: '/shareVideo', element: <Share /> },
         { path: '/batchShare', element: <BatchShare /> },
         // { path: '/subscribe', element: <PagesPrice /> },
         // { path: '/web-view/orderRecord', element: <OrderRecord /> },

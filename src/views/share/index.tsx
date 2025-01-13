@@ -9,6 +9,7 @@ import './index.scss';
 const Share = () => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
+    const type = query.get('type');
     const [carouselValue, setCarouselValue] = useState(0);
     const [open, setOpen] = useState(false);
     const [detailData, setDetailData] = useState<any>(null);
@@ -57,13 +58,14 @@ const Share = () => {
             // @ts-ignore
             xhs.share({
                 shareInfo: {
-                    type: 'normal', // 必填，笔记类型 'video' | 'normal'
+                    type: type === 'video' ? 'video' : 'normal', // 必填，笔记类型 'video' | 'normal'
                     title: detailData?.copyWriting?.title, // 笔记标题
                     content:
                         detailData?.copyWriting?.content +
                         '\n\n' +
                         detailData?.copyWriting?.tagList?.map((item: string) => `#${item}`).join(' '), // 笔记正文
-                    images: detailData?.imageList?.map((item: any) => item.url)
+                    images: detailData?.imageList?.map((item: any) => item.url),
+                    video: detailData?.videoList[0]?.videoUrl
                 },
                 // verifyConfig: {
                 //     app_key: 'red.2AiITQapXH8WFKFH', //必填，应用的唯一标识,
@@ -165,11 +167,17 @@ const Share = () => {
                                                     adaptiveHeight
                                                     dots={{ className: 'uls' }}
                                                 >
-                                                    {detailData?.imageList?.map((item: any) => (
-                                                        <div className="px-[30px]">
-                                                            <Image key={item?.url} preview={false} src={item?.url} />
-                                                        </div>
-                                                    ))}
+                                                    {type === 'video'
+                                                        ? detailData?.videoList?.map((item: any) => (
+                                                              <div className="px-[30px]">
+                                                                  <video width="100%" key={item?.videoUid} controls src={item?.videoUrl} />
+                                                              </div>
+                                                          ))
+                                                        : detailData?.imageList?.map((item: any) => (
+                                                              <div className="px-[30px]">
+                                                                  <Image key={item?.url} preview={false} src={item?.url} />
+                                                              </div>
+                                                          ))}
                                                 </Carousel>
                                                 <div className="absolute right-[15px] top-[10px] bg-[#2f3334] text-white rounded-[20px] text-md px-[5px] py-[2px] z-10 leading-[14px]">
                                                     {carouselValue + 1}/{detailData?.imageList?.length}

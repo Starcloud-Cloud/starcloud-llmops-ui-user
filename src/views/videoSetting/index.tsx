@@ -84,6 +84,7 @@ interface VoiceConfig {
 }
 
 const VideoSetting: React.FC<{
+    canEdit: boolean;
     currentElementId: string;
     setCurrentElementId: (value: string) => void;
     currentJson: any;
@@ -93,6 +94,7 @@ const VideoSetting: React.FC<{
     quickConfiguration: any;
     setQuickConfiguration: (value: any) => void;
 }> = ({
+    canEdit,
     currentElementId,
     setCurrentElementId,
     currentJson,
@@ -351,6 +353,7 @@ const VideoSetting: React.FC<{
         <Form
             form={form}
             layout="vertical"
+            disabled={canEdit}
             // onFinish={handleSubmit}
             initialValues={{
                 globalSettings: {
@@ -367,7 +370,7 @@ const VideoSetting: React.FC<{
             }}
             onValuesChange={handleValuesChange}
         >
-            <div className="text-base font-[500] mb-4">全局配置</div>
+            <div className="text-base font-[500] mb-4">基础配置</div>
 
             <div className="flex gap-2">
                 <div className="flex-1">
@@ -392,8 +395,8 @@ const VideoSetting: React.FC<{
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
-                        <Form.Item label="指示效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
-                            <Select style={{ width: 200 }}>
+                        <Form.Item label="指示效果" name={['globalSettings', 'soundEffect']}>
+                            <Select allowClear style={{ width: 200 }}>
                                 <Select.Option value="手指">手指</Select.Option>
                                 <Select.Option value="圆圈">圆圈</Select.Option>
                             </Select>
@@ -427,8 +430,8 @@ const VideoSetting: React.FC<{
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']} rules={[{ required: true }]}>
-                            <Select style={{ width: 200 }} options={voiceRoleOptions}></Select>
+                        <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']}>
+                            <Select allowClear style={{ width: 200 }} options={voiceRoleOptions}></Select>
                         </Form.Item>
                         <Checkbox
                             checked={quickConfiguration.isRepeatRole}
@@ -443,7 +446,7 @@ const VideoSetting: React.FC<{
 
             <div className="text-base font-[500] my-4">
                 发音单元{' '}
-                <Tooltip title="tips: 添加要发音的图片模版字段">
+                <Tooltip title="添加要发音的图片模版字段">
                     <ExclamationCircleOutlined className="cursor-pointer" />
                 </Tooltip>
             </div>
@@ -485,6 +488,7 @@ const VideoSetting: React.FC<{
                                                             title="发音单元配置"
                                                             onOpenChange={async (open) => {
                                                                 if (open) {
+                                                                    popForm.resetFields();
                                                                     popForm.setFieldsValue({
                                                                         type: unit.soundEffect.animation.type,
                                                                         interval: unit.settings.interval
@@ -495,17 +499,31 @@ const VideoSetting: React.FC<{
                                                                     newList[index].soundEffect.animation.type = result.type;
                                                                     newList[index].settings.interval = result.interval;
                                                                     setVoiceUnits(newList);
-                                                                    popForm.resetFields();
                                                                 }
                                                             }}
                                                             content={
                                                                 <div className="w-[250px]">
                                                                     <Form form={popForm}>
                                                                         <Form.Item label="指示效果" name="type">
-                                                                            <Select allowClear options={soundEffectOptions}></Select>
+                                                                            <Select
+                                                                                defaultValue={form.getFieldValue([
+                                                                                    'globalSettings',
+                                                                                    'soundEffect'
+                                                                                ])}
+                                                                                allowClear
+                                                                                options={soundEffectOptions}
+                                                                            ></Select>
                                                                         </Form.Item>
                                                                         <Form.Item label="发音元素间隔" name="interval">
-                                                                            <InputNumber min={1} max={9} addonAfter="秒" />
+                                                                            <InputNumber
+                                                                                defaultValue={form.getFieldValue([
+                                                                                    'globalSettings',
+                                                                                    'elementInterval'
+                                                                                ])}
+                                                                                min={1}
+                                                                                max={9}
+                                                                                addonAfter="秒"
+                                                                            />
                                                                         </Form.Item>
                                                                     </Form>
                                                                 </div>
@@ -543,14 +561,13 @@ const VideoSetting: React.FC<{
                                                                         onOpenChange={async (open) => {
                                                                             if (!open) {
                                                                                 const result = await popForm.validateFields();
-                                                                                console.log(result);
                                                                                 const newList = _.cloneDeep(voiceUnits);
                                                                                 newList[index].elements[i].settings = result;
                                                                                 newList[index].elements[i].audio.voiceRole =
                                                                                     result.voiceRole;
                                                                                 setVoiceUnits(newList);
-                                                                                popForm.resetFields();
                                                                             } else {
+                                                                                popForm.resetFields();
                                                                                 popForm.setFieldsValue({
                                                                                     ...item.settings,
                                                                                     voiceRole: item.audio.voiceRole
@@ -569,6 +586,10 @@ const VideoSetting: React.FC<{
                                                                                     </Form.Item>
                                                                                     <Form.Item label="发音角色" name="voiceRole">
                                                                                         <Select
+                                                                                            defaultValue={form.getFieldValue([
+                                                                                                'globalSettings',
+                                                                                                'voiceRole'
+                                                                                            ])}
                                                                                             allowClear
                                                                                             options={voiceRoleOptions}
                                                                                         ></Select>
@@ -583,6 +604,10 @@ const VideoSetting: React.FC<{
                                                                                     <Form.Item label="跟读角色" name="repeatRole">
                                                                                         <Select
                                                                                             allowClear
+                                                                                            defaultValue={form.getFieldValue([
+                                                                                                'globalSettings',
+                                                                                                'repeatRole'
+                                                                                            ])}
                                                                                             options={voiceRoleOptions}
                                                                                         ></Select>
                                                                                     </Form.Item>

@@ -342,9 +342,11 @@ const EditStyle = ({
                                 {isVideoOpen ? (
                                     <div className="h-full mt-4">
                                         <div className="text-lg">视频生成配置</div>
+                                        <div className="text-xs text-black/50">修改配置保存后，新生成的笔记才能生效</div>
                                         <div className="flex items-center gap-2 my-4">
                                             开启图文视频生成
                                             <Switch
+                                                disabled={canEdit}
                                                 checked={imageStyleData?.openVideoMode || false}
                                                 onChange={(e) => {
                                                     const newData = _.cloneDeep(imageStyleData);
@@ -355,6 +357,7 @@ const EditStyle = ({
                                         </div>
                                         {imageStyleData?.openVideoMode && (
                                             <VideoSetting
+                                                canEdit={canEdit}
                                                 quickConfiguration={
                                                     imageStyleData?.quickConfiguration
                                                         ? JSON.parse(imageStyleData?.quickConfiguration)

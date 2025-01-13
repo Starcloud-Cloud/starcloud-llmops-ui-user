@@ -113,10 +113,13 @@ const Right = ({
         setImgLoading(true);
         const zip = new JSZip();
         const imageList = appendIndexToDuplicates(downList.filter((item) => checkValue?.includes(item.uid)));
-        const result = await qrCode({
-            domain: process.env.REACT_APP_SHARE_URL || 'https://cn-test.mofabiji.com',
-            uidList: imageList?.map((item) => item.uid)
-        });
+        const result = await qrCode(
+            imageList?.map((item) => ({
+                domain: process.env.REACT_APP_SHARE_URL || 'https://cn-test.mofabiji.com',
+                uid: item.uid,
+                type: item?.executeResult?.videoList ? 'video' : 'image'
+            }))
+        );
         const promises = imageList.map(async (imageUrl: any, index: number) => {
             const response = await fetch(result?.find((item: any) => item.uid === imageUrl.uid)?.qrCode);
             const arrayBuffer = await response.arrayBuffer();
@@ -146,11 +149,21 @@ const Right = ({
         const imageList = appendIndexToDuplicates(downList.filter((item) => checkValue?.includes(item.uid)));
         const promises = imageList.map(async (item: any, index: number) => {
             const folder: any = zip.folder(item?.executeResult?.copyWriting?.title);
-            const images = item?.executeResult?.imageList?.map(async (el: any, i: number) => {
-                const response = await fetch(el.url);
-                const arrayBuffer = await response.arrayBuffer();
-                folder.file('image' + (i + 1) + `.${el?.url?.split('.')[el?.url?.split('.')?.length - 1]}`, arrayBuffer);
-            });
+            let images;
+            if (item?.executeResult?.videoList) {
+                images = item?.executeResult?.videoList?.map(async (el: any, i: number) => {
+                    const response = await fetch(el.videoUrl);
+                    const arrayBuffer = await response.arrayBuffer();
+                    folder.file('video' + (i + 1) + `.mp4`, arrayBuffer);
+                });
+            } else {
+                images = item?.executeResult?.imageList?.map(async (el: any, i: number) => {
+                    const response = await fetch(el.url);
+                    const arrayBuffer = await response.arrayBuffer();
+                    folder.file('image' + (i + 1) + `.${el?.url?.split('.')[el?.url?.split('.')?.length - 1]}`, arrayBuffer);
+                });
+            }
+
             await Promise.all(images)
                 .then(async (res) => {
                     let index = 1;

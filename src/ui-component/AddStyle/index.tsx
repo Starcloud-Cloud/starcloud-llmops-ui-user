@@ -30,7 +30,14 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper';
 import { planModifyConfig } from '../../api/redBook/batchIndex';
-import { PlusOutlined, ExclamationCircleOutlined, DeleteOutlined, SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+    PlusOutlined,
+    EyeOutlined,
+    ExclamationCircleOutlined,
+    DeleteOutlined,
+    SettingOutlined,
+    InfoCircleOutlined
+} from '@ant-design/icons';
 import CreateTab from 'views/pages/copywriting/components/spliceCmponents/tab';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
@@ -748,7 +755,7 @@ const AddStyle = React.forwardRef(
                                             <ContentCopyIcon className="text-sm text-white" />
                                         </span>
                                     </Tooltip> */}
-                                    <Tooltip title="修改">
+                                    <Tooltip title="查看">
                                         <span
                                             onClick={() => {
                                                 const copyStyleData = [...styleData];
@@ -760,7 +767,8 @@ const AddStyle = React.forwardRef(
                                                 setSwitchCheck(false);
                                             }}
                                         >
-                                            <EditIcon className="text-sm text-white" />
+                                            {/* <EditIcon className="text-sm text-white" /> */}
+                                            <EyeOutlined className="text-sm text-white" />
                                         </span>
                                     </Tooltip>
                                     <Popconfirm

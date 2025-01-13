@@ -199,7 +199,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                     </div> */}
                     <div className="text-white text-[16px] font-bold line-clamp-2">{data.name}</div>
                 </div>
-                <div className="absolute left-[16px] bottom-[8px] flex items-center gap-2">
+                <div className="absolute left-[16px] bottom-[8px] flex items-center gap-2 w-[calc(100%-32px)] overflow-x-auto whitespace-nowrap">
                     {like === 'market' &&
                         (marketActive ? (
                             <div
@@ -321,6 +321,9 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                             </svg>
                             智能生成
                         </div>
+                    )}
+                    {data.openVideoMode && (
+                        <div className="text-xs bg-[#673ab7] text-white font-bold py-1 px-2 flex items-center rounded-md">视频生成</div>
                     )}
                 </div>
             </div>

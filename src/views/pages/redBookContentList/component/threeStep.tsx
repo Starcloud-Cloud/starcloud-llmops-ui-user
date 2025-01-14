@@ -394,7 +394,7 @@ const ThreeStep = ({
                     )}
                     {!show && !exeDetail && !isFlag && (
                         <div
-                            className="flex gap-2 w-full justify-between"
+                            className="flex gap-2 w-[calc(100%-100px)] justify-between"
                             style={{
                                 position: 'absolute',
                                 right: '12px',
@@ -404,7 +404,7 @@ const ThreeStep = ({
                             {/* {jsCookie.get('isClient')&&
                             <Button>加入代发布列表</Button>
                             } */}
-                            <div className="ml-[100px]">
+                            <div>
                                 {data?.executeResult?.videoList && data?.executeResult?.videoList?.length > 0 && (
                                     <Button onClick={() => setIsVideo(!isVideo)} type="primary" icon={<SwapOutlined />}>
                                         图文｜视频

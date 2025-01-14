@@ -372,7 +372,7 @@ const ThreeStep = ({
                 }}
             >
                 {/* <Spin spinning={aginLoading}> */}
-                <div className="w-full  h-full relative grid grid-cols-3">
+                <div className="w-full h-full relative grid grid-cols-3">
                     {qrCodeShow && (
                         <div
                             className="flex gap-2"
@@ -394,7 +394,7 @@ const ThreeStep = ({
                     )}
                     {!show && !exeDetail && !isFlag && (
                         <div
-                            className="flex gap-2 w-full justify-between"
+                            className="flex gap-2 w-[calc(100%-100px)] justify-between"
                             style={{
                                 position: 'absolute',
                                 right: '12px',
@@ -404,7 +404,7 @@ const ThreeStep = ({
                             {/* {jsCookie.get('isClient')&&
                             <Button>加入代发布列表</Button>
                             } */}
-                            <div className="ml-[100px]">
+                            <div>
                                 {data?.executeResult?.videoList && data?.executeResult?.videoList?.length > 0 && (
                                     <Button onClick={() => setIsVideo(!isVideo)} type="primary" icon={<SwapOutlined />}>
                                         图文｜视频
@@ -490,16 +490,17 @@ const ThreeStep = ({
                                         <div style={{ marginTop: 8 }}>上传</div>
                                     </div>
                                 </Upload>
-                            ) : isVideo ? (
-                                <div className="w-full h-full flex justify-center items-center">
-                                    <video
-                                        src={data?.executeResult?.videoList[0]?.videoUrl}
-                                        controls
-                                        width={'100%'}
-                                        className="max-h-[100%]"
-                                    />
-                                </div>
                             ) : (
+                                // isVideo ? (
+                                //     <div className="w-full h-full flex justify-center items-center">
+                                //         <video
+                                //             src={data?.executeResult?.videoList[0]?.videoUrl}
+                                //             controls
+                                //             width={'100%'}
+                                //             className="max-h-[100%]"
+                                //         />
+                                //     </div>
+                                // ) :
                                 <>
                                     <div className="flex justify-between absolute top-[46%] w-full z-10">
                                         <Button
@@ -520,30 +521,36 @@ const ThreeStep = ({
                                         />
                                     </div>
                                     <div className="h-full">
-                                        {imageList.length > 0 && (
-                                            <Swiper
-                                                onSwiper={(swiper) => {
-                                                    setSwiperRef(swiper);
-                                                }}
-                                                slidesPerView={1}
-                                                // spaceBetween={30}
-                                                centeredSlides={false}
-                                                loop
-                                                pagination={{ clickable: true }}
-                                                modules={[Pagination]}
-                                                className="mySwiper h-full"
-                                                autoplay={{
-                                                    delay: 2500,
-                                                    disableOnInteraction: false
-                                                }}
-                                            >
-                                                {imageList.map((item: any, index) => (
-                                                    <SwiperSlide key={index}>
-                                                        <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
-                                                    </SwiperSlide>
-                                                ))}
-                                            </Swiper>
-                                        )}
+                                        <Swiper
+                                            onSwiper={(swiper) => {
+                                                setSwiperRef(swiper);
+                                            }}
+                                            slidesPerView={1}
+                                            // spaceBetween={30}
+                                            centeredSlides={false}
+                                            loop
+                                            pagination={{ clickable: true }}
+                                            modules={[Pagination]}
+                                            className="mySwiper h-full"
+                                            autoplay={{
+                                                delay: 2500,
+                                                disableOnInteraction: false
+                                            }}
+                                        >
+                                            {!isVideo
+                                                ? imageList?.map((item: any, index) => (
+                                                      <SwiperSlide key={index}>
+                                                          <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
+                                                      </SwiperSlide>
+                                                  ))
+                                                : data?.executeResult?.videoList &&
+                                                  data?.executeResult?.videoList?.length > 0 &&
+                                                  data?.executeResult?.videoList.map((item: any, index: number) => (
+                                                      <SwiperSlide key={index}>
+                                                          <video src={item?.videoUrl} controls width={'100%'} height={'100%'} />
+                                                      </SwiperSlide>
+                                                  ))}
+                                        </Swiper>
                                     </div>
                                 </>
                             ))}

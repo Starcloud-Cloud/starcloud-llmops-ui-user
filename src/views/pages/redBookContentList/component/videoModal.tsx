@@ -169,7 +169,14 @@ const VideoModal = ({
     const [previewVideoUrl, setPreviewVideoUrl] = useState<string>('');
 
     return (
-        <Modal width={'600px'} open={videoOpen} title={'图文视频生成'} footer={null} onCancel={() => setVideoOpen(false)}>
+        <Modal
+            width={'600px'}
+            open={videoOpen}
+            title={'图文视频生成'}
+            maskClosable={false}
+            footer={null}
+            onCancel={() => setVideoOpen(false)}
+        >
             <Form
                 form={form}
                 layout="vertical"

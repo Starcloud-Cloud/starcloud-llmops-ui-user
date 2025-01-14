@@ -774,6 +774,12 @@ const VideoSetting: React.FC<{
                                                                             };
                                                                             setVoiceUnits(newList);
                                                                         }}
+                                                                        showSearch
+                                                                        filterOption={(input, option) => {
+                                                                            return ((option?.children ?? '') as any)
+                                                                                .toLowerCase()
+                                                                                .includes(input.toLowerCase());
+                                                                        }}
                                                                     >
                                                                         {variableList?.map((item: any) => (
                                                                             <Select.Option value={item.field}>{item.label}</Select.Option>

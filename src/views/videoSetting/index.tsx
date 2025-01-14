@@ -64,6 +64,7 @@ interface VoiceConfig {
         voiceRole: string; // 发音角色
         soundEffect: string; // 指示效果
         repeatEnable: boolean; // 是否跟读
+        animationEnable: boolean; // 是否启用动效
         repeatRole: string; // 跟读发音角色
         resolution: {
             width: number;
@@ -373,6 +374,7 @@ const VideoSetting: React.FC<{
                     voiceRole: undefined,
                     soundEffect: undefined,
                     repeatEnable: false,
+                    animationEnable: false,
                     repeatRole: undefined
                 }
                 // videoConfig: {
@@ -418,6 +420,25 @@ const VideoSetting: React.FC<{
                         <Checkbox
                             checked={quickConfiguration.isVoiceRole}
                             onChange={() => setQuickConfiguration({ ...quickConfiguration, isVoiceRole: !quickConfiguration.isVoiceRole })}
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Form.Item
+                            label="是否启用动效"
+                            className="w-[200px]"
+                            name={['globalSettings', 'animationEnable']}
+                            valuePropName="checked"
+                            rules={[{ required: true }]}
+                        >
+                            <Switch />
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isAnimationEnable}
+                            onChange={() =>
+                                setQuickConfiguration({ ...quickConfiguration, isAnimationEnable: !quickConfiguration.isAnimationEnable })
+                            }
                         />
                         <div className="text-xs">快捷配置</div>
                     </div>

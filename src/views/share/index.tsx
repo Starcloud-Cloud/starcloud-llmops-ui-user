@@ -65,7 +65,7 @@ const Share = () => {
                         '\n\n' +
                         detailData?.copyWriting?.tagList?.map((item: string) => `#${item}`).join(' '), // 笔记正文
                     images: detailData?.imageList?.map((item: any) => item.url),
-                    video: detailData?.videoList[0]?.videoUrl
+                    video: detailData?.videoList && detailData?.videoList[0]?.videoUrl
                 },
                 // verifyConfig: {
                 //     app_key: 'red.2AiITQapXH8WFKFH', //必填，应用的唯一标识,
@@ -88,6 +88,12 @@ const Share = () => {
         } else {
             setOpen(true);
         }
+    };
+    const [videoHeight, setVideoHeight] = useState<number>(0);
+
+    const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+        const video = e.target as HTMLVideoElement;
+        setVideoHeight((video.videoHeight * (video.parentElement?.clientWidth || 0)) / video.videoWidth);
     };
     return (
         <div style={{ height: `calc(${windowHeight} + '40px')` }} className="share w-full flex justify-center">
@@ -162,20 +168,28 @@ const Share = () => {
                                         <div className="h-full overflow-y-scroll">
                                             <div className="relative max-h-[666px]">
                                                 <Carousel
+                                                    className="h-full"
                                                     afterChange={setCarouselValue}
                                                     draggable={true}
                                                     adaptiveHeight
                                                     dots={{ className: 'uls' }}
+                                                    style={{ height: type === 'video' ? videoHeight : 'auto' }}
                                                 >
                                                     {type === 'video'
                                                         ? detailData?.videoList?.map((item: any) => (
-                                                              <div className="px-[30px]">
-                                                                  <video width="100%" key={item?.videoUid} controls src={item?.videoUrl} />
+                                                              <div className="px-[30px]" key={item?.videoUid}>
+                                                                  <video
+                                                                      width="100%"
+                                                                      height="100%"
+                                                                      controls
+                                                                      src={item?.videoUrl}
+                                                                      onLoadedMetadata={handleLoadedMetadata}
+                                                                  />
                                                               </div>
                                                           ))
                                                         : detailData?.imageList?.map((item: any) => (
-                                                              <div className="px-[30px]">
-                                                                  <Image key={item?.url} preview={false} src={item?.url} />
+                                                              <div className="px-[30px]" key={item?.url}>
+                                                                  <Image preview={false} src={item?.url} />
                                                               </div>
                                                           ))}
                                                 </Carousel>

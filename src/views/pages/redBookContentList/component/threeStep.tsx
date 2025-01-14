@@ -227,12 +227,21 @@ const ThreeStep = ({
         const zip = new JSZip();
         let promises;
         if (isVideo) {
-            promises = data?.executeResult?.videoList?.map(async (imageUrl: any, index: number) => {
-                const response = await fetch(imageUrl.videoUrl);
-                const arrayBuffer = await response.arrayBuffer();
-                zip.file('video' + (index + 1) + `.mp4`, arrayBuffer);
-                zip.file(title + '.txt', text);
-            });
+            if (data?.executeResult?.video?.completeVideo) {
+                promises = [0]?.map(async (imageUrl: any, index: number) => {
+                    const response = await fetch(data?.executeResult?.video?.completeVideo?.videoUrl);
+                    const arrayBuffer = await response.arrayBuffer();
+                    zip.file(`video.mp4`, arrayBuffer);
+                    zip.file(title + '.txt', text);
+                });
+            } else {
+                promises = data?.executeResult?.video?.videoList?.map(async (imageUrl: any, index: number) => {
+                    const response = await fetch(imageUrl.videoUrl);
+                    const arrayBuffer = await response.arrayBuffer();
+                    zip.file('video' + (index + 1) + `.mp4`, arrayBuffer);
+                    zip.file(title + '.txt', text);
+                });
+            }
         } else {
             promises = imageList.map(async (imageUrl: any, index: number) => {
                 const response = await fetch(imageUrl.url);
@@ -346,7 +355,7 @@ const ThreeStep = ({
         }
     }, [data]);
     useEffect(() => {
-        if (data?.executeResult?.videoList && data?.executeResult?.videoList?.length > 0) {
+        if (data?.executeResult?.video) {
             setIsVideo(true);
         }
     }, [data]);
@@ -405,7 +414,7 @@ const ThreeStep = ({
                             <Button>加入代发布列表</Button>
                             } */}
                             <div>
-                                {data?.executeResult?.videoList && data?.executeResult?.videoList?.length > 0 && (
+                                {data?.executeResult?.video && (
                                     <Button onClick={() => setIsVideo(!isVideo)} type="primary" icon={<SwapOutlined />}>
                                         图文｜视频
                                     </Button>
@@ -491,16 +500,6 @@ const ThreeStep = ({
                                     </div>
                                 </Upload>
                             ) : (
-                                // isVideo ? (
-                                //     <div className="w-full h-full flex justify-center items-center">
-                                //         <video
-                                //             src={data?.executeResult?.videoList[0]?.videoUrl}
-                                //             controls
-                                //             width={'100%'}
-                                //             className="max-h-[100%]"
-                                //         />
-                                //     </div>
-                                // ) :
                                 <>
                                     <div className="flex justify-between absolute top-[46%] w-full z-10">
                                         <Button
@@ -537,19 +536,30 @@ const ThreeStep = ({
                                                 disableOnInteraction: false
                                             }}
                                         >
-                                            {!isVideo
-                                                ? imageList?.map((item: any, index) => (
-                                                      <SwiperSlide key={index}>
-                                                          <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
-                                                      </SwiperSlide>
-                                                  ))
-                                                : data?.executeResult?.videoList &&
-                                                  data?.executeResult?.videoList?.length > 0 &&
-                                                  data?.executeResult?.videoList.map((item: any, index: number) => (
-                                                      <SwiperSlide key={index}>
-                                                          <video src={item?.videoUrl} controls width={'100%'} height={'100%'} />
-                                                      </SwiperSlide>
-                                                  ))}
+                                            {!isVideo ? (
+                                                imageList?.map((item: any, index) => (
+                                                    <SwiperSlide key={index}>
+                                                        <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
+                                                    </SwiperSlide>
+                                                ))
+                                            ) : data?.executeResult?.video?.completeVideo?.videoUrl ? (
+                                                <SwiperSlide>
+                                                    <video
+                                                        src={data?.executeResult?.video?.completeVideo?.videoUrl}
+                                                        controls
+                                                        width={'100%'}
+                                                        height={'100%'}
+                                                    />
+                                                </SwiperSlide>
+                                            ) : (
+                                                data?.executeResult?.video?.videoList &&
+                                                data?.executeResult?.video?.videoList?.length > 0 &&
+                                                data?.executeResult?.video?.videoList.map((item: any, index: number) => (
+                                                    <SwiperSlide key={index}>
+                                                        <video src={item?.videoUrl} controls width={'100%'} height={'100%'} />
+                                                    </SwiperSlide>
+                                                ))
+                                            )}
                                         </Swiper>
                                     </div>
                                 </>
@@ -1027,7 +1037,7 @@ const ThreeStep = ({
                 quickValue={data?.executeParam?.quickConfiguration ? JSON.parse(data?.executeParam?.quickConfiguration) : null}
                 templateList={templateList}
                 imageList={data?.executeResult?.imageList}
-                videoList={data?.executeResult?.videoList}
+                video={data?.executeResult?.video}
                 getDetail={() => {
                     setPre(Math.random() + Math.random());
                 }}

@@ -15,7 +15,7 @@ const VideoModal = ({
     quickValue,
     templateList,
     imageList,
-    videoList,
+    video,
     getDetail,
     title
 }: {
@@ -26,7 +26,7 @@ const VideoModal = ({
     quickValue: any;
     templateList: any[];
     imageList: any[];
-    videoList: any[];
+    video: any;
     getDetail: () => void;
     title: string;
 }) => {
@@ -132,7 +132,10 @@ const VideoModal = ({
         await saveSetting({
             uid: businessUid,
             quickConfiguration: JSON.stringify(values),
-            videoContents: results
+            video: {
+                videoList: results,
+                completeVideo
+            }
         });
         if (flag) {
             setVideoOpen(false);
@@ -159,10 +162,11 @@ const VideoModal = ({
         }
     }, [videoOpen]);
     useEffect(() => {
-        if (videoList && videoList?.length > 0) {
-            setResults(videoList);
+        if (video) {
+            setResults(video?.videoList || []);
+            setCompleteVideo(video?.completeVideo || {});
         }
-    }, [videoList]);
+    }, [video]);
     useEffect(() => {
         dictData('', 'tts_voice_role_all_json').then((res) => {
             setVoiceRoleOptions(JSON.parse(res.list[0]?.remark));
@@ -228,6 +232,7 @@ const VideoModal = ({
 
     //合并视频
     const [mergeVideoLoading, setMergeVideoLoading] = useState(false);
+    const [completeVideo, setCompleteVideo] = useState<any>(null);
     const mergeVideo = () => {
         setMergeVideoLoading(true);
     };
@@ -324,7 +329,7 @@ const VideoModal = ({
                     {templateList?.map((item, index) => (
                         <Card size="small" key={index} className="mb-4">
                             <div className="flex items-start gap-2">
-                                <Image src={imageList?.filter((i) => i.code === item.code)[0]?.url} preview={false} width={100} />
+                                <Image src={imageList?.filter((i) => i.code === item?.code)[0]?.url} preview={false} width={100} />
                                 <div className="flex flex-col justify-between w-full relative min-h-[110px]">
                                     {!results[index] ? (
                                         <div className="text-base text-[#000000a6] font-[500]">未生成，点击生成视频按钮</div>

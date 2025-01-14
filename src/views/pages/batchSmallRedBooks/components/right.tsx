@@ -117,7 +117,7 @@ const Right = ({
             imageList?.map((item) => ({
                 domain: process.env.REACT_APP_SHARE_URL || 'https://cn-test.mofabiji.com',
                 uid: item.uid,
-                type: item?.executeResult?.videoList ? 'video' : 'image'
+                type: item?.executeResult?.video ? 'video' : 'image'
             }))
         );
         const promises = imageList.map(async (imageUrl: any, index: number) => {
@@ -150,8 +150,8 @@ const Right = ({
         const promises = imageList.map(async (item: any, index: number) => {
             const folder: any = zip.folder(item?.executeResult?.copyWriting?.title);
             let images;
-            if (item?.executeResult?.videoList) {
-                images = item?.executeResult?.videoList?.map(async (el: any, i: number) => {
+            if (item?.executeResult?.video) {
+                images = item?.executeResult?.video?.videoList?.map(async (el: any, i: number) => {
                     const response = await fetch(el.videoUrl);
                     const arrayBuffer = await response.arrayBuffer();
                     folder.file('video' + (i + 1) + `.mp4`, arrayBuffer);

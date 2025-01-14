@@ -45,7 +45,7 @@ const BatchShare = () => {
                             <div
                                 className="shadow-md rounded-lg overflow-hidden"
                                 onClick={() => {
-                                    if (item?.executeResult?.videoList) {
+                                    if (item?.executeResult?.video) {
                                         navigate(`/shareVideo?uid=${item?.uid}&type=video`);
                                     } else {
                                         navigate(`/share?uid=${item?.uid}&type=image`);
@@ -282,7 +282,7 @@ const BatchShare = () => {
                             {qrOpen && (
                                 <QRCode
                                     value={
-                                        item?.executeResult?.videoList
+                                        item?.executeResult?.video
                                             ? process.env.REACT_APP_SHARE_URL + '/shareVideo?uid=' + item?.uid + '&type=video'
                                             : process.env.REACT_APP_SHARE_URL + '/share?uid=' + item?.uid + '&type=image'
                                     }

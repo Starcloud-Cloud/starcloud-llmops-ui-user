@@ -802,9 +802,13 @@ const VideoSetting: React.FC<{
                                                                                 .includes(input.toLowerCase());
                                                                         }}
                                                                     >
-                                                                        {variableList?.map((item: any) => (
-                                                                            <Select.Option value={item.field}>{item.label}</Select.Option>
-                                                                        ))}
+                                                                        {variableList
+                                                                            ?.filter((item: any) => item.type !== 'IMAGE')
+                                                                            ?.map((item: any) => (
+                                                                                <Select.Option value={item.field}>
+                                                                                    {item.label}
+                                                                                </Select.Option>
+                                                                            ))}
                                                                     </Select>
                                                                 )}
                                                             </div>

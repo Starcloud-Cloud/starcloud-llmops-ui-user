@@ -117,7 +117,7 @@ const TermTable = ({
                                                 color: 'success'
                                             },
                                             close: false,
-                                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                             transition: 'SlideLeft'
                                         })
                                     );

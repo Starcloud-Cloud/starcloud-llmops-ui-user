@@ -51,7 +51,6 @@ const AuthForgotPassword = ({ ...others }) => {
                                 alert: {
                                     color: 'success'
                                 },
-
                                 close: false
                             })
                         );

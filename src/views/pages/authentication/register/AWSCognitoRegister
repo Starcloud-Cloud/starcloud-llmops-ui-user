@@ -50,7 +50,7 @@ const AWSCognitoRegister = ({ ...others }) => {
     const [checked, setChecked] = React.useState(true);
 
     const [strength, setStrength] = React.useState(0);
-    const [level, setLevel] = React.useState<StringColorProps>();
+    const [level, setLevel] = React.useState < StringColorProps > ();
     const { register } = useAuth();
 
     const handleClickShowPassword = () => {
@@ -107,10 +107,11 @@ const AWSCognitoRegister = ({ ...others }) => {
                                     alert: {
                                         color: 'success'
                                     },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                     close: false
                                 })
                             );
-                            
+
                             setTimeout(() => {
                                 navigate('/login', { replace: true });
                             }, 1500);

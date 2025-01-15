@@ -9,3 +9,8 @@ export const generateVideo = (data: any) => {
 export const getVideoResult = (data: any) => {
     return request.post({ url: '/llm/xhs/content/video/result', data });
 };
+
+//合并视频
+export const mergeVideo = (data: any) => {
+    return request.post({ url: '/llm/xhs/content/video/merge', data });
+};

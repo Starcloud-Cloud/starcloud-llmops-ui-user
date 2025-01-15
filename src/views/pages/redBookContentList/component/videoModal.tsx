@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Modal, Form, Select, Image, Progress, Button, Switch, Tooltip, Card, Tabs } from 'antd';
 import { ExclamationCircleOutlined, SoundOutlined } from '@ant-design/icons';
-import { saveSetting, generateVideo, getVideoResult } from 'api/video';
+import { saveSetting, generateVideo, getVideoResult, mergeVideo } from 'api/video';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import { dictData } from 'api/template';
@@ -33,15 +33,18 @@ const VideoModal = ({
     const Option = Select.Option;
     const [form] = Form.useForm();
     const [excuteLoading, setExcuteLoading] = useState(false);
+    const [reTryLoading, setReTryLoading] = useState<any[]>([]);
     const [results, setResults] = useState<any[]>([]);
     const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
     const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
 
     const timer = useRef<any>(null);
-    const progresstimer = useRef<any>(null);
+    const progresstimer = useRef<any>([]);
     const allTimer = useRef<any>([]);
     const executeVideo = async () => {
+        setProgress(0);
         const values = await form.validateFields();
+        console.log(templateList);
         setExcuteLoading(true);
         templateList.forEach(async (item, index) => {
             try {
@@ -49,7 +52,8 @@ const VideoModal = ({
                     uid: businessUid,
                     quickConfiguration: JSON.stringify(values),
                     videoConfig: item.videoConfig,
-                    imageCode: item.code
+                    imageCode: item.code,
+                    imageUrl: item.example
                 });
                 pollResult(res?.id, index);
             } catch (error) {
@@ -58,29 +62,33 @@ const VideoModal = ({
         });
         timer.current = setTimeout(() => {
             const newList = _.cloneDeep(results);
-            newList.forEach((item) => {
+            newList.forEach((item, index) => {
                 if (item?.status === 'pending' || item?.status === 'processing') {
                     item.status = 'failed';
                     item.error = '生成超时';
                 }
+                clearInterval(progresstimer.current[index]);
             });
             allTimer.current.forEach((item: any) => {
                 clearInterval(item);
             });
-            clearInterval(progresstimer.current);
+
             setResults(newList);
         }, 1000 * 60 * 3);
     };
 
     const pollResult = async (videoUid: string, index: number) => {
         setExcuteLoading(false);
-        progressTimer();
+        progressTimer(index);
         allTimer.current[index] = setInterval(async () => {
+            console.log(1);
+
             try {
                 const res = await getVideoResult({
                     videoUid,
                     creativeContentUid: businessUid,
-                    imageCode: templateList[index].code
+                    imageCode: templateList[index].code,
+                    imageUrl: templateList[index].example
                 });
                 if (res?.status === 'completed' || res?.status === 'failed') {
                     clearInterval(allTimer.current[index]);
@@ -98,10 +106,12 @@ const VideoModal = ({
             const res = await getVideoResult({
                 videoUid,
                 creativeContentUid: businessUid,
-                imageCode: templateList[index].code
+                imageCode: templateList[index].code,
+                imageUrl: templateList[index].example
             });
             if (res?.status === 'completed' || res?.status === 'failed') {
                 clearInterval(allTimer.current[index]);
+                clearInterval(progresstimer.current[index]);
             }
             setResults((prev) => {
                 const newResults = [...prev];
@@ -110,20 +120,38 @@ const VideoModal = ({
             });
         } catch (error) {
             clearInterval(allTimer.current[index]);
+            clearInterval(progresstimer.current[index]);
         }
     };
 
     const retryVideo = async (index: number) => {
+        setReTryLoading((prev) => {
+            const newList = [...prev];
+            newList[index] = true;
+            return newList;
+        });
+        setProgress(0);
         try {
             setExcuteLoading(true);
             const res = await generateVideo({
                 uid: businessUid,
                 quickConfiguration: JSON.stringify(form.getFieldsValue()),
                 videoConfig: templateList[index].videoConfig,
-                imageCode: templateList[index].code
+                imageCode: templateList[index].code,
+                imageUrl: templateList[index].example
+            });
+            setReTryLoading((prev) => {
+                const newList = [...prev];
+                newList[index] = false;
+                return newList;
             });
             pollResult(res?.id, index);
         } catch (error) {
+            setReTryLoading((prev) => {
+                const newList = [...prev];
+                newList[index] = false;
+                return newList;
+            });
             setExcuteLoading(false);
         }
     };
@@ -183,7 +211,7 @@ const VideoModal = ({
     }, []);
     const [progress, setProgress] = useState<number>(0);
 
-    const progressTimer = () => {
+    const progressTimer = (index: number) => {
         // 3分钟 = 180秒
         const duration = 180;
         // 目标进度
@@ -191,7 +219,9 @@ const VideoModal = ({
         // 计算每次增长的步长 (指数增长,开始快后面慢)
         const step = 0.5;
         const startTime = Date.now();
-        progresstimer.current = setInterval(() => {
+        progresstimer.current[index] = setInterval(() => {
+            console.log(1);
+
             const elapsedTime = (Date.now() - startTime) / 1000; // 已经过去的秒数
             const percentage = Math.min(elapsedTime / duration, 1);
 
@@ -205,12 +235,15 @@ const VideoModal = ({
             }
         }, 1000);
 
-        return () => clearInterval(progresstimer.current);
+        return () => clearInterval(progresstimer.current[index]);
     };
 
     useEffect(() => {
         if (results.every((item) => item.status === 'completed' || item.status === 'failed' || item.status === 'unknown')) {
-            clearInterval(progresstimer.current);
+            console.log(2);
+            progresstimer.current.forEach((item: any) => {
+                clearInterval(item);
+            });
             clearTimeout(timer.current);
         }
     }, [results]);
@@ -226,6 +259,18 @@ const VideoModal = ({
         setAudioPlayer(audio);
     };
 
+    const handleAnimationEnableChange = (checked: boolean) => {
+        if (!checked) {
+            form.setFieldValue('soundEffect', undefined);
+        }
+    };
+
+    const handleRepeatEnableChange = (checked: boolean) => {
+        if (!checked) {
+            form.setFieldValue('repeatRole', undefined);
+        }
+    };
+
     //预览
     const [previewVideo, setPreviewVideo] = useState<boolean>(false);
     const [previewVideoUrl, setPreviewVideoUrl] = useState<string>('');
@@ -233,8 +278,24 @@ const VideoModal = ({
     //合并视频
     const [mergeVideoLoading, setMergeVideoLoading] = useState(false);
     const [completeVideo, setCompleteVideo] = useState<any>(null);
-    const mergeVideo = () => {
+    const mergeVideos = async () => {
         setMergeVideoLoading(true);
+        try {
+            const res = await mergeVideo({
+                videos: results.map((item) => ({
+                    url: item?.videoUrl,
+                    type: 'none'
+                }))
+            });
+            setMergeVideoLoading(false);
+            setCompleteVideo({
+                videoUid: res?.id,
+                videoUrl: res?.url
+            });
+            console.log(res);
+        } catch (error) {
+            setMergeVideoLoading(false);
+        }
     };
 
     return (
@@ -246,81 +307,87 @@ const VideoModal = ({
             footer={null}
             onCancel={() => setVideoOpen(false)}
         >
+            <Form
+                form={form}
+                layout="vertical"
+                initialValues={{
+                    voiceRole: undefined,
+                    soundEffect: undefined,
+                    repeatEnable: false,
+                    repeatRole: undefined
+                }}
+            >
+                {quickConfiguration?.isVoiceRole && (
+                    <Form.Item label="发音角色" name="voiceRole" rules={[{ required: true, message: '请选择发音角色' }]}>
+                        <Select optionLabelProp="label" style={{ width: 250 }}>
+                            {voiceRoleOptions?.map((item) => (
+                                <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                    <div className="flex items-center justify-between">
+                                        <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                        {item.demo_link && (
+                                            <Button
+                                                type="text"
+                                                icon={<SoundOutlined />}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // 防止触发选择事件
+                                                    playAudioDemo(item.demo_link);
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                </Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                )}
+                {quickConfiguration?.isAnimationEnable && (
+                    <Form.Item label="是否启用动效" name="animationEnable" valuePropName="checked">
+                        <Switch onChange={handleAnimationEnableChange} />
+                    </Form.Item>
+                )}
+                {form.getFieldValue('animationEnable') && (
+                    <Form.Item noStyle dependencies={['animationEnable']}>
+                        {({ getFieldValue }) => {
+                            const animationEnabled = getFieldValue('animationEnable');
+                            return animationEnabled ? (
+                                <Form.Item label="指示效果" name="soundEffect" rules={[{ required: true, message: '请选择指示效果' }]}>
+                                    <Select style={{ width: 250 }} options={soundEffectOptions} />
+                                </Form.Item>
+                            ) : null;
+                        }}
+                    </Form.Item>
+                )}
+                {quickConfiguration?.isRepeatEnable && (
+                    <Form.Item label="是否跟读" name="repeatEnable" valuePropName="checked">
+                        <Switch onChange={handleRepeatEnableChange} />
+                    </Form.Item>
+                )}
+                {quickConfiguration?.isRepeatRole && (
+                    <Form.Item noStyle dependencies={['repeatEnable']}>
+                        {({ getFieldValue }) => {
+                            const repeatEnabled = getFieldValue('repeatEnable');
+                            return repeatEnabled ? (
+                                <Form.Item
+                                    label="跟读发音角色"
+                                    name="repeatRole"
+                                    rules={[{ required: true, message: '请选择跟读发音角色' }]}
+                                >
+                                    <Select optionLabelProp="label" style={{ width: 250 }}>
+                                        {voiceRoleOptions?.map((item) => (
+                                            <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                                {/* ... existing Select.Option content ... */}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            ) : null;
+                        }}
+                    </Form.Item>
+                )}
+            </Form>
             <Tabs>
                 <Tabs.TabPane tab="生成配置" key="1">
-                    <Form
-                        form={form}
-                        layout="vertical"
-                        initialValues={{
-                            voiceRole: undefined,
-                            soundEffect: undefined,
-                            repeatEnable: false,
-                            repeatRole: undefined
-                        }}
-                    >
-                        {quickConfiguration?.isVoiceRole && (
-                            <Form.Item label="发音角色" name="voiceRole" rules={[{ required: true, message: '请选择发音角色' }]}>
-                                <Select optionLabelProp="label" style={{ width: 200 }}>
-                                    {voiceRoleOptions?.map((item) => (
-                                        <Select.Option key={item.code} label={item.voice} value={item.code}>
-                                            <div className="flex items-center justify-between">
-                                                <span>{item.voice}</span>
-                                                {item.demo_link && (
-                                                    <Button
-                                                        type="text"
-                                                        icon={<SoundOutlined />}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // 防止触发选择事件
-                                                            playAudioDemo(item.demo_link);
-                                                        }}
-                                                    />
-                                                )}
-                                            </div>
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                        )}
-                        {quickConfiguration?.isAnimationEnable && (
-                            <Form.Item label="是否启用动效" name="animationEnable" valuePropName="checked">
-                                <Switch />
-                            </Form.Item>
-                        )}
-                        {quickConfiguration?.isSoundEffect && (
-                            <Form.Item label="指示效果" name="soundEffect" rules={[{ required: true, message: '请选择指示效果' }]}>
-                                <Select style={{ width: 200 }} options={soundEffectOptions} />
-                            </Form.Item>
-                        )}
-                        {quickConfiguration?.isRepeatEnable && (
-                            <Form.Item label="是否跟读" name="repeatEnable" valuePropName="checked">
-                                <Switch />
-                            </Form.Item>
-                        )}
-                        {quickConfiguration?.isRepeatRole && (
-                            <Form.Item label="跟读发音角色" name="repeatRole" rules={[{ required: true, message: '请选择跟读发音角色' }]}>
-                                <Select optionLabelProp="label" style={{ width: 200 }}>
-                                    {voiceRoleOptions?.map((item) => (
-                                        <Select.Option key={item.code} label={item.voice} value={item.code}>
-                                            <div className="flex items-center justify-between">
-                                                <span>{item.voice}</span>
-                                                {item.demo_link && (
-                                                    <Button
-                                                        type="text"
-                                                        icon={<SoundOutlined />}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // 防止触发选择事件
-                                                            playAudioDemo(item.demo_link);
-                                                        }}
-                                                    />
-                                                )}
-                                            </div>
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                        )}
-                    </Form>
-                    <div className="my-4 text-base font-[500]">
+                    <div className="mb-4 text-base font-[500]">
                         生成列表{' '}
                         <Tooltip title="按照配置的图片模版数量生成对应的视频">
                             <ExclamationCircleOutlined />
@@ -351,7 +418,7 @@ const VideoModal = ({
                                     )}
                                     <div className="flex justify-end gap-2 absolute top-0 right-0 h-full">
                                         {results[index]?.status === 'failed' ? (
-                                            <Button loading={excuteLoading} onClick={() => retryVideo(index)}>
+                                            <Button loading={reTryLoading[index]} onClick={() => retryVideo(index)}>
                                                 重试
                                             </Button>
                                         ) : results[index]?.status === 'completed' ? (
@@ -388,6 +455,7 @@ const VideoModal = ({
                                                                         alert: {
                                                                             color: 'error'
                                                                         },
+                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                                         close: false
                                                                     })
                                                                 );
@@ -397,7 +465,7 @@ const VideoModal = ({
                                                         下载
                                                     </Button>
                                                 </div>
-                                                <Button loading={excuteLoading} onClick={() => retryVideo(index)} type="primary">
+                                                <Button loading={reTryLoading[index]} onClick={() => retryVideo(index)} type="primary">
                                                     重新生成
                                                 </Button>
                                             </div>
@@ -433,30 +501,51 @@ const VideoModal = ({
                 </Tabs.TabPane>
                 {results?.length > 1 && results?.every((item) => item?.status === 'completed') && (
                     <Tabs.TabPane tab="合并视频" key="2">
-                        <div className="w-full min-h-[200px] flex justify-center items-center">
-                            <div className="flex flex-col gap-2 items-center">
-                                <Button loading={mergeVideoLoading} size="large" type="primary" onClick={mergeVideo}>
-                                    <svg
-                                        viewBox="0 0 1024 1024"
-                                        version="1.1"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        p-id="6936"
-                                        width="20"
-                                        height="20"
-                                    >
-                                        <path
-                                            d="M401.408 522.24h-196.608v-40.96h196.608l-47.104-47.104c-8.192-8.192-8.192-20.48 0-28.672 8.192-8.192 20.48-8.192 28.672 0l96.256 96.256-96.256 96.256c-8.192 8.192-20.48 8.192-28.672 0-8.192-8.192-8.192-20.48 0-28.672l47.104-47.104z m221.184-40.96h196.608v40.96h-196.608l47.104 47.104c8.192 8.192 8.192 20.48 0 28.672-8.192 8.192-20.48 8.192-28.672 0l-96.256-96.256 96.256-96.256c8.192-8.192 20.48-8.192 28.672 0 8.192 8.192 8.192 20.48 0 28.672l-47.104 47.104z m-202.752 286.72h40.96v61.44c0 34.816-26.624 61.44-61.44 61.44h-225.28c-34.816 0-61.44-26.624-61.44-61.44v-634.88c0-34.816 26.624-61.44 61.44-61.44h225.28c34.816 0 61.44 26.624 61.44 61.44v61.44h-40.96v-61.44c0-10.24-8.192-20.48-20.48-20.48h-225.28c-10.24 0-20.48 8.192-20.48 20.48v634.88c0 12.288 8.192 20.48 20.48 20.48h225.28c10.24 0 20.48-8.192 20.48-20.48v-61.44z m143.36 0h40.96v61.44c0 12.288 8.192 20.48 20.48 20.48h225.28c10.24 0 20.48-10.24 20.48-20.48v-634.88c0-12.288-8.192-20.48-20.48-20.48h-225.28c-10.24 0-20.48 10.24-20.48 20.48v63.488h-40.96V194.56c0-34.816 26.624-61.44 61.44-61.44h225.28c34.816 0 61.44 26.624 61.44 61.44v634.88c0 34.816-26.624 61.44-61.44 61.44h-225.28c-34.816 0-61.44-26.624-61.44-61.44v-61.44z"
-                                            fill="#fff"
-                                            p-id="6937"
-                                        ></path>
-                                    </svg>
-                                    合并视频
-                                </Button>
-                                <div className="text-xs text-black/50">
-                                    将所有已生成的视频合并为单个视频，合并后的视频将按照生成顺序依次播放
+                        {!completeVideo?.videoUrl ? (
+                            <div className="w-full min-h-[200px] flex justify-center items-center">
+                                <div className="flex flex-col gap-2 items-center">
+                                    <Button loading={mergeVideoLoading} size="large" type="primary" onClick={mergeVideos}>
+                                        <svg
+                                            viewBox="0 0 1024 1024"
+                                            version="1.1"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            p-id="6936"
+                                            width="20"
+                                            height="20"
+                                        >
+                                            <path
+                                                d="M401.408 522.24h-196.608v-40.96h196.608l-47.104-47.104c-8.192-8.192-8.192-20.48 0-28.672 8.192-8.192 20.48-8.192 28.672 0l96.256 96.256-96.256 96.256c-8.192 8.192-20.48 8.192-28.672 0-8.192-8.192-8.192-20.48 0-28.672l47.104-47.104z m221.184-40.96h196.608v40.96h-196.608l47.104 47.104c8.192 8.192 8.192 20.48 0 28.672-8.192 8.192-20.48 8.192-28.672 0l-96.256-96.256 96.256-96.256c8.192-8.192 20.48-8.192 28.672 0 8.192 8.192 8.192 20.48 0 28.672l-47.104 47.104z m-202.752 286.72h40.96v61.44c0 34.816-26.624 61.44-61.44 61.44h-225.28c-34.816 0-61.44-26.624-61.44-61.44v-634.88c0-34.816 26.624-61.44 61.44-61.44h225.28c34.816 0 61.44 26.624 61.44 61.44v61.44h-40.96v-61.44c0-10.24-8.192-20.48-20.48-20.48h-225.28c-10.24 0-20.48 8.192-20.48 20.48v634.88c0 12.288 8.192 20.48 20.48 20.48h225.28c10.24 0 20.48-8.192 20.48-20.48v-61.44z m143.36 0h40.96v61.44c0 12.288 8.192 20.48 20.48 20.48h225.28c10.24 0 20.48-10.24 20.48-20.48v-634.88c0-12.288-8.192-20.48-20.48-20.48h-225.28c-10.24 0-20.48 10.24-20.48 20.48v63.488h-40.96V194.56c0-34.816 26.624-61.44 61.44-61.44h225.28c34.816 0 61.44 26.624 61.44 61.44v634.88c0 34.816-26.624 61.44-61.44 61.44h-225.28c-34.816 0-61.44-26.624-61.44-61.44v-61.44z"
+                                                fill="#fff"
+                                                p-id="6937"
+                                            ></path>
+                                        </svg>
+                                        合并视频
+                                    </Button>
+                                    <div className="text-xs text-black/50">
+                                        将所有已生成的视频合并为单个视频，合并后的视频将按照生成顺序依次播放
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        ) : (
+                            <>
+                                <video src={completeVideo?.videoUrl} controls width={'100%'} />
+                                <div className="flex justify-center gap-2 mt-4">
+                                    <div>
+                                        <Button
+                                            loading={mergeVideoLoading}
+                                            onClick={() => {
+                                                mergeVideos();
+                                            }}
+                                        >
+                                            重新合并
+                                        </Button>
+                                        <Button type="primary" onClick={() => saveSettings(true)}>
+                                            确认
+                                        </Button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </Tabs.TabPane>
                 )}
             </Tabs>

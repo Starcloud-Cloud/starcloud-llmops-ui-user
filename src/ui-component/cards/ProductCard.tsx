@@ -36,6 +36,7 @@ const ProductCard = ({ id, color, name, image, description, offerPrice, salePric
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );

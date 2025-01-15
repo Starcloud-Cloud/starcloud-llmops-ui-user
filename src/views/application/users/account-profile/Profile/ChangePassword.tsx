@@ -37,6 +37,7 @@ const ChangePassword = () => {
                     alert: {
                         color: 'warning'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );

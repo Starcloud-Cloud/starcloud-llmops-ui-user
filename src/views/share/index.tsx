@@ -178,7 +178,7 @@ const Share = () => {
                                                     style={{ height: type === 'video' ? videoHeight : 'auto' }}
                                                 >
                                                     {type === 'video' ? (
-                                                        detailData?.video?.completeVideo ? (
+                                                        detailData?.video?.completeVideo?.videoUrl ? (
                                                             <div className="px-[30px]">
                                                                 <video
                                                                     width="100%"
@@ -189,17 +189,17 @@ const Share = () => {
                                                                 />
                                                             </div>
                                                         ) : (
-                                                            detailData?.video?.videoList?.map((item: any) => (
-                                                                <div className="px-[30px]" key={item?.videoUid}>
-                                                                    <video
-                                                                        width="100%"
-                                                                        height="100%"
-                                                                        controls
-                                                                        src={item?.videoUrl}
-                                                                        onLoadedMetadata={handleLoadedMetadata}
-                                                                    />
-                                                                </div>
-                                                            ))
+                                                            // detailData?.video?.videoList?.map((item: any) => (
+                                                            <div className="px-[30px]">
+                                                                <video
+                                                                    width="100%"
+                                                                    height="100%"
+                                                                    controls
+                                                                    src={detailData?.video?.videoList[0]?.videoUrl}
+                                                                    onLoadedMetadata={handleLoadedMetadata}
+                                                                />
+                                                            </div>
+                                                            // ))
                                                         )
                                                     ) : (
                                                         detailData?.imageList?.map((item: any) => (

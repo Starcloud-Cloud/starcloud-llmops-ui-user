@@ -32,6 +32,7 @@ export const AddKeywordDrawer = ({ open, handleClose, uid, forceUpdate }: IAddKe
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );

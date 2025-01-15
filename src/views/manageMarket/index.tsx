@@ -100,6 +100,7 @@ function Form() {
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );
@@ -116,6 +117,7 @@ function Form() {
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );

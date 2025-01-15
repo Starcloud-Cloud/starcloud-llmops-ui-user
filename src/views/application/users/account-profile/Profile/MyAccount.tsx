@@ -74,6 +74,7 @@ const MyAccount = ({ userProfile, forceUpdate }: MyAccountProps & { forceUpdate:
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );

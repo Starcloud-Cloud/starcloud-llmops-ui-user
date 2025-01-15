@@ -102,6 +102,7 @@ function Template({ like, data, handleDetail }: any) {
                                             alert: {
                                                 color: 'success'
                                             },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                             close: false
                                         })
                                     );
@@ -127,6 +128,7 @@ function Template({ like, data, handleDetail }: any) {
                                             alert: {
                                                 color: 'success'
                                             },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                             close: false
                                         })
                                     );
@@ -154,6 +156,7 @@ function Template({ like, data, handleDetail }: any) {
                                             alert: {
                                                 color: 'success'
                                             },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                             close: false
                                         })
                                     );
@@ -179,6 +182,7 @@ function Template({ like, data, handleDetail }: any) {
                                             alert: {
                                                 color: 'success'
                                             },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                             close: false
                                         })
                                     );

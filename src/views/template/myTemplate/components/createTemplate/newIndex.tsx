@@ -273,6 +273,7 @@ function CreateDetail() {
                                     alert: {
                                         color: 'success'
                                     },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                     close: false
                                 })
                             );
@@ -720,6 +721,7 @@ function CreateDetail() {
                                 alert: {
                                     color: 'success'
                                 },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 close: false
                             })
                         );
@@ -880,6 +882,7 @@ function CreateDetail() {
                             alert: {
                                 color: 'success'
                             },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                             close: false
                         })
                     );

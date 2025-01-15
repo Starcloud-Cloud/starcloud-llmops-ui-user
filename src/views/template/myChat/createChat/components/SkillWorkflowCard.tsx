@@ -107,6 +107,7 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -124,6 +125,7 @@ function SkillWorkflowCard({ data, handleEdit, forceUpdate }: any) {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );

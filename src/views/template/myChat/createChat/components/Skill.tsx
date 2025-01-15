@@ -117,6 +117,7 @@ const WorkflowEditModal = ({
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );
@@ -347,6 +348,7 @@ const WorkflowCreateModal = ({
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );

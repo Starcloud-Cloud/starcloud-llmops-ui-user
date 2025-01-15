@@ -1,4 +1,5 @@
 import { Progress, Skeleton, Popover, Button, Tag, Tooltip } from 'antd';
+import { PlayCircleOutlined } from '@ant-design/icons';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import GradeIcon from '@mui/icons-material/Grade';
 import Swipers from './components/swiper';
@@ -402,6 +403,24 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
                         <Tag className="absolute top-1 left-1 z-[1]" color="success">
                             视频
                         </Tag>
+                    )}
+                    {item?.executeResult?.video && (
+                        <div className="absolute top-[40%] left-[45%] z-[1] w-[40px] h-[40px] rounded-full bg-[#673ab7] flex justify-center items-center">
+                            <svg
+                                viewBox="0 0 1024 1024"
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                p-id="3280"
+                                width="20"
+                                height="20"
+                            >
+                                <path
+                                    d="M897.143467 597.051733l-464.648534 311.5264c-46.976 31.488-110.592 18.944-142.08-28.023466A102.4 102.4 0 0 1 273.066667 823.5264V200.4736c0-56.5504 45.8496-102.4 102.4-102.4a102.4 102.4 0 0 1 57.028266 17.348267l464.64 311.5264c46.976 31.488 59.528533 95.104 28.032 142.08a102.4 102.4 0 0 1-28.023466 28.023466z"
+                                    p-id="3281"
+                                    fill="#ffffff"
+                                ></path>
+                            </svg>
+                        </div>
                     )}
                 </div>
             )}

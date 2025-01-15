@@ -62,6 +62,7 @@ export const SiteDrawerCode = ({
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );
@@ -80,6 +81,7 @@ export const SiteDrawerCode = ({
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -204,7 +206,7 @@ header.appendChild(st);
                                                             color: 'success'
                                                         },
                                                         close: false,
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                         transition: 'SlideLeft'
                                                     })
                                                 )
@@ -271,7 +273,7 @@ header.appendChild(st);
                                                             color: 'success'
                                                         },
                                                         close: false,
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                         transition: 'SlideLeft'
                                                     })
                                                 )

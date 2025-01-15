@@ -46,6 +46,8 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import ReTryExe from '../../batchSmallRedBooks/components/retryExe';
 import VideoModal from './videoModal';
 import _ from 'lodash-es';
+import Plyr from 'plyr';
+import 'plyr/dist/plyr.css';
 
 const ThreeStep = ({
     data,
@@ -102,7 +104,8 @@ const ThreeStep = ({
                         index: index + 1,
                         url: item.url,
                         isMain: index === 0,
-                        code: item.code
+                        code: item.code,
+                        imageUrl: item.url
                     }))
                 }
             });
@@ -227,7 +230,7 @@ const ThreeStep = ({
         const zip = new JSZip();
         let promises;
         if (isVideo) {
-            if (data?.executeResult?.video?.completeVideo) {
+            if (data?.executeResult?.video?.completeVideo?.videoUrl) {
                 promises = [0]?.map(async (imageUrl: any, index: number) => {
                     const response = await fetch(data?.executeResult?.video?.completeVideo?.videoUrl);
                     const arrayBuffer = await response.arrayBuffer();
@@ -359,8 +362,27 @@ const ThreeStep = ({
             setIsVideo(true);
         }
     }, [data]);
-
     const [isVideo, setIsVideo] = useState(false);
+    useEffect(() => {
+        if (isVideo) {
+            if (data?.executeResult?.video?.completeVideo?.videoUrl) {
+                // 单个视频
+                new Plyr('#player', {
+                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                    hideControls: false
+                });
+            } else if (data?.executeResult?.video?.videoList?.length > 0) {
+                // 多个视频
+                data.executeResult.video.videoList.forEach((_: any, index: number) => {
+                    new Plyr(`#player-${index}`, {
+                        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                        hideControls: false
+                    });
+                });
+            }
+        }
+    }, [isVideo, data?.executeResult?.video]);
+
     return (
         <div
             className="h-full"
@@ -544,19 +566,23 @@ const ThreeStep = ({
                                                 ))
                                             ) : data?.executeResult?.video?.completeVideo?.videoUrl ? (
                                                 <SwiperSlide>
-                                                    <video
-                                                        src={data?.executeResult?.video?.completeVideo?.videoUrl}
-                                                        controls
-                                                        width={'100%'}
-                                                        height={'100%'}
-                                                    />
+                                                    <div className="w-full h-full flex items-center">
+                                                        <video
+                                                            id={`player`}
+                                                            src={data?.executeResult?.video?.completeVideo?.videoUrl}
+                                                            controls
+                                                            width={'100%'}
+                                                        />
+                                                    </div>
                                                 </SwiperSlide>
                                             ) : (
                                                 data?.executeResult?.video?.videoList &&
                                                 data?.executeResult?.video?.videoList?.length > 0 &&
                                                 data?.executeResult?.video?.videoList.map((item: any, index: number) => (
                                                     <SwiperSlide key={index}>
-                                                        <video src={item?.videoUrl} controls width={'100%'} height={'100%'} />
+                                                        <div className="w-full h-full flex items-center">
+                                                            <video id={`player-${index}`} src={item?.videoUrl} controls width={'100%'} />
+                                                        </div>
                                                     </SwiperSlide>
                                                 ))
                                             )}

@@ -52,6 +52,7 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -69,6 +70,7 @@ function SkillCard({ data, handleCreate, handleEdit, forceUpdate, workflowList }
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );

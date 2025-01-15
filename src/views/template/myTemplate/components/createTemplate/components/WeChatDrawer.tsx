@@ -43,6 +43,7 @@ const WeChatDrawer = ({
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );
@@ -99,7 +100,7 @@ const WeChatDrawer = ({
                                                             color: 'success'
                                                         },
                                                         close: false,
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                         transition: 'SlideLeft'
                                                     })
                                                 )

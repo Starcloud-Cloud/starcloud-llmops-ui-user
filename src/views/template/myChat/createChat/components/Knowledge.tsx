@@ -141,6 +141,7 @@ const QAModal = ({ open, handleClose }: { open: boolean; handleClose: () => void
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -331,6 +332,7 @@ const DocumentModal = ({
                             alert: {
                                 color: 'error'
                             },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                             close: false
                         })
                     );
@@ -365,6 +367,7 @@ const DocumentModal = ({
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );
@@ -393,6 +396,7 @@ const DocumentModal = ({
                             alert: {
                                 color: 'error'
                             },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                             close: false
                         })
                     );

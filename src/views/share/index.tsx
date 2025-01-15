@@ -64,7 +64,7 @@ const Share = () => {
                         detailData?.copyWriting?.content +
                         '\n\n' +
                         detailData?.copyWriting?.tagList?.map((item: string) => `#${item}`).join(' '), // 笔记正文
-                    images: detailData?.imageList?.map((item: any) => item.url),
+                    images: type === 'video' ? undefined : detailData?.imageList?.map((item: any) => item.url),
                     video: detailData?.videoList && detailData?.videoList[0]?.videoUrl
                 },
                 // verifyConfig: {

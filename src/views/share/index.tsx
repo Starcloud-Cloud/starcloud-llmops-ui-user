@@ -64,7 +64,7 @@ const Share = () => {
                         detailData?.copyWriting?.content +
                         '\n\n' +
                         detailData?.copyWriting?.tagList?.map((item: string) => `#${item}`).join(' '), // 笔记正文
-                    images: detailData?.imageList?.map((item: any) => item.url),
+                    images: type === 'video' ? undefined : detailData?.imageList?.map((item: any) => item.url),
                     video:
                         detailData?.video?.completeVideo?.videoUrl ||
                         (detailData?.video?.videoList && detailData?.video?.videoList[0]?.videoUrl)
@@ -189,7 +189,7 @@ const Share = () => {
                                                                 />
                                                             </div>
                                                         ) : (
-                                                            detailData?.videoList?.map((item: any) => (
+                                                            detailData?.video?.videoList?.map((item: any) => (
                                                                 <div className="px-[30px]" key={item?.videoUid}>
                                                                     <video
                                                                         width="100%"

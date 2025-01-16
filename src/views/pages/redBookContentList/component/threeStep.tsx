@@ -46,8 +46,7 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import ReTryExe from '../../batchSmallRedBooks/components/retryExe';
 import VideoModal from './videoModal';
 import _ from 'lodash-es';
-import Plyr from 'plyr';
-import 'plyr/dist/plyr.css';
+import H5Modal from './h5Modal';
 
 const ThreeStep = ({
     data,
@@ -230,9 +229,9 @@ const ThreeStep = ({
         const zip = new JSZip();
         let promises;
         if (isVideo) {
-            if (data?.executeResult?.video?.completeVideo?.videoUrl) {
+            if (data?.executeResult?.video?.completeVideoUrl) {
                 promises = [0]?.map(async (imageUrl: any, index: number) => {
-                    const response = await fetch(data?.executeResult?.video?.completeVideo?.videoUrl);
+                    const response = await fetch(data?.executeResult?.video?.completeVideoUrl);
                     const arrayBuffer = await response.arrayBuffer();
                     zip.file(`video.mp4`, arrayBuffer);
                     zip.file(title + '.txt', text);
@@ -363,25 +362,8 @@ const ThreeStep = ({
         }
     }, [data]);
     const [isVideo, setIsVideo] = useState(false);
-    // useEffect(() => {
-    //     if (isVideo) {
-    //         if (data?.executeResult?.video?.completeVideo?.videoUrl) {
-    //             // 单个视频
-    //             new Plyr('#player', {
-    //                 controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-    //                 hideControls: false
-    //             });
-    //         } else if (data?.executeResult?.video?.videoList?.length > 0) {
-    //             // 多个视频
-    //             data.executeResult.video.videoList.forEach((_: any, index: number) => {
-    //                 new Plyr(`#player-${index}`, {
-    //                     controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-    //                     hideControls: false
-    //                 });
-    //             });
-    //         }
-    //     }
-    // }, [isVideo, data?.executeResult?.video]);
+    //h5页面
+    const [h5Open, setH5Open] = useState(false);
 
     return (
         <div
@@ -498,9 +480,11 @@ const ThreeStep = ({
                                                 视频生成
                                             </Button>
                                         )}
-                                        {/* <Button type="primary" onClick={() => {}}>
-                                            H5页面
-                                        </Button> */}
+                                        {isVideo && (
+                                            <Button className="ml-2" type="primary" onClick={() => setH5Open(true)}>
+                                                H5页面
+                                            </Button>
+                                        )}
                                     </div>
                                 ) : (
                                     <Space>
@@ -527,7 +511,7 @@ const ThreeStep = ({
                             ) : (
                                 <>
                                     {((isVideo &&
-                                        !data?.executeResult?.video?.completeVideo?.videoUrl &&
+                                        !data?.executeResult?.video?.completeVideoUrl &&
                                         data?.executeResult?.video?.videoList?.length > 1) ||
                                         (!isVideo && imageList?.length > 1)) && (
                                         <div className="flex justify-between absolute top-[46%] w-full z-10">
@@ -572,12 +556,12 @@ const ThreeStep = ({
                                                         <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
                                                     </SwiperSlide>
                                                 ))
-                                            ) : data?.executeResult?.video?.completeVideo?.videoUrl ? (
+                                            ) : data?.executeResult?.video?.completeVideoUrl ? (
                                                 <SwiperSlide>
                                                     <div className="w-full h-full flex items-center">
                                                         <video
                                                             id={`player`}
-                                                            src={data?.executeResult?.video?.completeVideo?.videoUrl}
+                                                            src={data?.executeResult?.video?.completeVideoUrl}
                                                             controls
                                                             width={'100%'}
                                                         />
@@ -1087,6 +1071,7 @@ const ThreeStep = ({
                     columns={columns}
                 />
             )}
+            <H5Modal open={h5Open} setOpen={setH5Open} />
         </div>
     );
 };

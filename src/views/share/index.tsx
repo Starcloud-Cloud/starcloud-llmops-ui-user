@@ -66,8 +66,7 @@ const Share = () => {
                         detailData?.copyWriting?.tagList?.map((item: string) => `#${item}`).join(' '), // 笔记正文
                     images: type === 'video' ? undefined : detailData?.imageList?.map((item: any) => item.url),
                     video:
-                        detailData?.video?.completeVideo?.videoUrl ||
-                        (detailData?.video?.videoList && detailData?.video?.videoList[0]?.videoUrl)
+                        detailData?.video?.completeVideoUrl || (detailData?.video?.videoList && detailData?.video?.videoList[0]?.videoUrl)
                 },
                 // verifyConfig: {
                 //     app_key: 'red.2AiITQapXH8WFKFH', //必填，应用的唯一标识,
@@ -178,13 +177,13 @@ const Share = () => {
                                                     style={{ height: type === 'video' ? videoHeight : 'auto' }}
                                                 >
                                                     {type === 'video' ? (
-                                                        detailData?.video?.completeVideo?.videoUrl ? (
+                                                        detailData?.video?.completeVideoUrl ? (
                                                             <div className="px-[30px]">
                                                                 <video
                                                                     width="100%"
                                                                     height="100%"
                                                                     controls
-                                                                    src={detailData?.video?.completeVideo?.videoUrl}
+                                                                    src={detailData?.video?.completeVideoUrl}
                                                                     onLoadedMetadata={handleLoadedMetadata}
                                                                 />
                                                             </div>
@@ -211,7 +210,7 @@ const Share = () => {
                                                 </Carousel>
                                                 <div className="absolute right-[15px] top-[10px] bg-[#2f3334] text-white rounded-[20px] text-md px-[5px] py-[2px] z-10 leading-[14px]">
                                                     {carouselValue + 1}/
-                                                    {detailData?.video?.completeVideo?.videoUrl ? 1 : detailData?.imageList?.length}
+                                                    {detailData?.video?.completeVideoUrl ? 1 : detailData?.imageList?.length}
                                                 </div>
                                             </div>
                                             <div className="px-[15px]">

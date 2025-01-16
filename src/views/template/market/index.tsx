@@ -505,7 +505,7 @@ function TemplateMarket() {
         >
             {/* <Tabs size="small" activeKey={value} onChange={setValue} aria-label="basic tabs example" className="h-full">
                 <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">应用市场</div>} key="0"> */}
-            <div ref={step2} className="mt-[-8px] pb-2 flex gap-3 w-full overflow-x-scroll">
+            <div ref={step2} className="pb-2 flex gap-3 w-full overflow-x-scroll">
                 {menuList?.map((item, index) => (
                     <div
                         onClick={() => {

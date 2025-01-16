@@ -44,16 +44,15 @@ const VideoModal = ({
     const executeVideo = async () => {
         setProgress(0);
         const values = await form.validateFields();
-        console.log(templateList);
         setExcuteLoading(true);
-        templateList.forEach(async (item, index) => {
+        imageList.forEach(async (item, index) => {
             try {
                 const res = await generateVideo({
                     uid: businessUid,
                     quickConfiguration: JSON.stringify(values),
-                    videoConfig: item.videoConfig,
+                    videoConfig: templateList?.find((t) => t.code === item.code)?.videoConfig,
                     imageCode: item.code,
-                    imageUrl: item.example
+                    imageUrl: item.url
                 });
                 pollResult(res?.id, index);
             } catch (error) {
@@ -87,8 +86,8 @@ const VideoModal = ({
                 const res = await getVideoResult({
                     videoUid,
                     creativeContentUid: businessUid,
-                    imageCode: templateList[index].code,
-                    imageUrl: templateList[index].example
+                    imageCode: imageList[index].code,
+                    imageUrl: imageList[index].url
                 });
                 if (res?.status === 'completed' || res?.status === 'failed') {
                     clearInterval(allTimer.current[index]);
@@ -106,8 +105,8 @@ const VideoModal = ({
             const res = await getVideoResult({
                 videoUid,
                 creativeContentUid: businessUid,
-                imageCode: templateList[index].code,
-                imageUrl: templateList[index].example
+                imageCode: imageList[index].code,
+                imageUrl: imageList[index].url
             });
             if (res?.status === 'completed' || res?.status === 'failed') {
                 clearInterval(allTimer.current[index]);
@@ -136,9 +135,9 @@ const VideoModal = ({
             const res = await generateVideo({
                 uid: businessUid,
                 quickConfiguration: JSON.stringify(form.getFieldsValue()),
-                videoConfig: templateList[index].videoConfig,
-                imageCode: templateList[index].code,
-                imageUrl: templateList[index].example
+                videoConfig: templateList?.find((t) => t.code === imageList[index].code)?.videoConfig,
+                imageCode: imageList[index].code,
+                imageUrl: imageList[index].url
             });
             setReTryLoading((prev) => {
                 const newList = [...prev];
@@ -345,7 +344,7 @@ const VideoModal = ({
                         <Switch onChange={handleAnimationEnableChange} />
                     </Form.Item>
                 )}
-                {form.getFieldValue('animationEnable') && (
+                {quickConfiguration?.isAnimationEnable && (
                     <Form.Item noStyle dependencies={['animationEnable']}>
                         {({ getFieldValue }) => {
                             const animationEnabled = getFieldValue('animationEnable');
@@ -375,7 +374,19 @@ const VideoModal = ({
                                     <Select optionLabelProp="label" style={{ width: 250 }}>
                                         {voiceRoleOptions?.map((item) => (
                                             <Select.Option key={item.code} label={item.voice} value={item.code}>
-                                                {/* ... existing Select.Option content ... */}
+                                                <div className="flex items-center justify-between">
+                                                    <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                                    {item.demo_link && (
+                                                        <Button
+                                                            type="text"
+                                                            icon={<SoundOutlined />}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation(); // 防止触发选择事件
+                                                                playAudioDemo(item.demo_link);
+                                                            }}
+                                                        />
+                                                    )}
+                                                </div>
                                             </Select.Option>
                                         ))}
                                     </Select>
@@ -393,7 +404,7 @@ const VideoModal = ({
                             <ExclamationCircleOutlined />
                         </Tooltip>
                     </div>
-                    {templateList?.map((item, index) => (
+                    {imageList?.map((item, index) => (
                         <Card size="small" key={index} className="mb-4">
                             <div className="flex items-start gap-2">
                                 <Image src={imageList?.filter((i) => i.code === item?.code)[0]?.url} preview={false} width={100} />
@@ -529,7 +540,7 @@ const VideoModal = ({
                         ) : (
                             <>
                                 <video src={completeVideo?.videoUrl} controls width={'100%'} />
-                                <div className="flex justify-center gap-2 mt-4">
+                                <div className="flex justify-center flex-col items-center gap-4 mt-4">
                                     <div>
                                         <Button
                                             loading={mergeVideoLoading}
@@ -539,10 +550,30 @@ const VideoModal = ({
                                         >
                                             重新合并
                                         </Button>
-                                        <Button type="primary" onClick={() => saveSettings(true)}>
-                                            确认
+                                        <Button
+                                            className="ml-2"
+                                            type="primary"
+                                            onClick={async () => {
+                                                const response = await fetch(completeVideo?.videoUrl);
+                                                const arrayBuffer = await response.arrayBuffer();
+                                                const blob = new Blob([arrayBuffer], { type: 'video/mp4' });
+                                                const videoUrl = URL.createObjectURL(blob);
+                                                if (videoUrl) {
+                                                    const link = document.createElement('a');
+                                                    link.href = videoUrl;
+                                                    link.setAttribute('download', title + '.mp4'); // 设置下载文件名
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                }
+                                            }}
+                                        >
+                                            下载视频
                                         </Button>
                                     </div>
+                                    <Button type="primary" onClick={() => saveSettings(true)}>
+                                        确认
+                                    </Button>
                                 </div>
                             </>
                         )}

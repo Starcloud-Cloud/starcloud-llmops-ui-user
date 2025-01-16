@@ -376,7 +376,7 @@ const EditStyle = ({
                                                 currentElementId={currentElementId}
                                                 setCurrentElementId={setCurrentElementId}
                                                 currentJson={currentJson}
-                                                variableList={imageStyleData?.variableList}
+                                                variableList={imageStyleData?.variableList?.filter((item: any) => item.type !== 'IMAGE')}
                                                 videoConfig={imageStyleData?.videoConfig}
                                                 upDateData={debounce(async (data: any) => {
                                                     console.log(data);

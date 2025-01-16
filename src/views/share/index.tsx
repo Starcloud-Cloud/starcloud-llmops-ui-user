@@ -189,17 +189,17 @@ const Share = () => {
                                                                 />
                                                             </div>
                                                         ) : (
-                                                            // detailData?.video?.videoList?.map((item: any) => (
-                                                            <div className="px-[30px]">
-                                                                <video
-                                                                    width="100%"
-                                                                    height="100%"
-                                                                    controls
-                                                                    src={detailData?.video?.videoList[0]?.videoUrl}
-                                                                    onLoadedMetadata={handleLoadedMetadata}
-                                                                />
-                                                            </div>
-                                                            // ))
+                                                            detailData?.video?.videoList?.map((item: any, index: number) => (
+                                                                <div className="px-[30px]" key={index}>
+                                                                    <video
+                                                                        width="100%"
+                                                                        height="100%"
+                                                                        controls
+                                                                        src={item?.videoUrl}
+                                                                        onLoadedMetadata={handleLoadedMetadata}
+                                                                    />
+                                                                </div>
+                                                            ))
                                                         )
                                                     ) : (
                                                         detailData?.imageList?.map((item: any) => (
@@ -210,7 +210,8 @@ const Share = () => {
                                                     )}
                                                 </Carousel>
                                                 <div className="absolute right-[15px] top-[10px] bg-[#2f3334] text-white rounded-[20px] text-md px-[5px] py-[2px] z-10 leading-[14px]">
-                                                    {carouselValue + 1}/{detailData?.imageList?.length}
+                                                    {carouselValue + 1}/
+                                                    {detailData?.video?.completeVideo?.videoUrl ? 1 : detailData?.imageList?.length}
                                                 </div>
                                             </div>
                                             <div className="px-[15px]">

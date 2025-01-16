@@ -363,25 +363,25 @@ const ThreeStep = ({
         }
     }, [data]);
     const [isVideo, setIsVideo] = useState(false);
-    useEffect(() => {
-        if (isVideo) {
-            if (data?.executeResult?.video?.completeVideo?.videoUrl) {
-                // 单个视频
-                new Plyr('#player', {
-                    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-                    hideControls: false
-                });
-            } else if (data?.executeResult?.video?.videoList?.length > 0) {
-                // 多个视频
-                data.executeResult.video.videoList.forEach((_: any, index: number) => {
-                    new Plyr(`#player-${index}`, {
-                        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-                        hideControls: false
-                    });
-                });
-            }
-        }
-    }, [isVideo, data?.executeResult?.video]);
+    // useEffect(() => {
+    //     if (isVideo) {
+    //         if (data?.executeResult?.video?.completeVideo?.videoUrl) {
+    //             // 单个视频
+    //             new Plyr('#player', {
+    //                 controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+    //                 hideControls: false
+    //             });
+    //         } else if (data?.executeResult?.video?.videoList?.length > 0) {
+    //             // 多个视频
+    //             data.executeResult.video.videoList.forEach((_: any, index: number) => {
+    //                 new Plyr(`#player-${index}`, {
+    //                     controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+    //                     hideControls: false
+    //                 });
+    //             });
+    //         }
+    //     }
+    // }, [isVideo, data?.executeResult?.video]);
 
     return (
         <div

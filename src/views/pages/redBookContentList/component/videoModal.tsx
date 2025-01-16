@@ -320,7 +320,7 @@ const VideoModal = ({
                     <Form.Item label="发音角色" name="voiceRole" rules={[{ required: true, message: '请选择发音角色' }]}>
                         <Select optionLabelProp="label" style={{ width: 250 }}>
                             {voiceRoleOptions?.map((item) => (
-                                <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                <Select.Option key={item.code} label={`${item.name} - ${item.language} - ${item.voice}`} value={item.code}>
                                     <div className="flex items-center justify-between">
                                         <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
                                         {item.demo_link && (
@@ -373,7 +373,11 @@ const VideoModal = ({
                                 >
                                     <Select optionLabelProp="label" style={{ width: 250 }}>
                                         {voiceRoleOptions?.map((item) => (
-                                            <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                            <Select.Option
+                                                key={item.code}
+                                                label={`${item.name} - ${item.language} - ${item.voice}`}
+                                                value={item.code}
+                                            >
                                                 <div className="flex items-center justify-between">
                                                     <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
                                                     {item.demo_link && (
@@ -499,6 +503,9 @@ const VideoModal = ({
                         </div>
                     ) : (
                         <div className="flex justify-center gap-2 mt-4">
+                            <Button loading={excuteLoading} onClick={executeVideo}>
+                                重新生成
+                            </Button>
                             <Button
                                 type="primary"
                                 onClick={() => {

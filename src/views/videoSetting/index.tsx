@@ -432,7 +432,11 @@ const VideoSetting: React.FC<{
                         <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
                             <Select optionLabelProp="label" style={{ width: 250 }}>
                                 {voiceRoleOptions?.map((item) => (
-                                    <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                    <Select.Option
+                                        key={item.code}
+                                        label={`${item.name} - ${item.language} - ${item.voice}`}
+                                        value={item.code}
+                                    >
                                         <div className="flex items-center justify-between">
                                             <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
                                             {item.demo_link && (
@@ -482,7 +486,11 @@ const VideoSetting: React.FC<{
                         <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']}>
                             <Select allowClear optionLabelProp="label" style={{ width: 250 }}>
                                 {voiceRoleOptions?.map((item) => (
-                                    <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                    <Select.Option
+                                        key={item.code}
+                                        label={`${item.name} - ${item.language} - ${item.voice}`}
+                                        value={item.code}
+                                    >
                                         <div className="flex items-center justify-between">
                                             <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
                                             {item.demo_link && (
@@ -663,7 +671,7 @@ const VideoSetting: React.FC<{
                                                                                             {voiceRoleOptions?.map((item) => (
                                                                                                 <Select.Option
                                                                                                     key={item.code}
-                                                                                                    label={item.voice}
+                                                                                                    label={`${item.name} - ${item.language} - ${item.voice}`}
                                                                                                     value={item.code}
                                                                                                 >
                                                                                                     <div className="flex items-center justify-between">
@@ -704,7 +712,7 @@ const VideoSetting: React.FC<{
                                                                                             {voiceRoleOptions?.map((item) => (
                                                                                                 <Select.Option
                                                                                                     key={item.code}
-                                                                                                    label={item.voice}
+                                                                                                    label={`${item.name} - ${item.language} - ${item.voice}`}
                                                                                                     value={item.code}
                                                                                                 >
                                                                                                     <div className="flex items-center justify-between">

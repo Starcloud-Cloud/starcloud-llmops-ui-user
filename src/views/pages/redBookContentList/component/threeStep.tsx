@@ -494,10 +494,13 @@ const ThreeStep = ({
                                             编辑笔记
                                         </Button>
                                         {openVideoMode && (
-                                            <Button className="ml-2" type="primary" onClick={() => setVideoOpen(true)} disabled={claim}>
+                                            <Button className="ml-2" type="primary" onClick={() => setVideoOpen(true)}>
                                                 视频生成
                                             </Button>
                                         )}
+                                        {/* <Button type="primary" onClick={() => {}}>
+                                            H5页面
+                                        </Button> */}
                                     </div>
                                 ) : (
                                     <Space>
@@ -523,24 +526,29 @@ const ThreeStep = ({
                                 </Upload>
                             ) : (
                                 <>
-                                    <div className="flex justify-between absolute top-[46%] w-full z-10">
-                                        <Button
-                                            icon={<KeyboardBackspaceIcon />}
-                                            shape="circle"
-                                            onClick={() => {
-                                                console.log(swiperRef, 'swiperRef');
-                                                swiperRef?.slidePrev();
-                                            }}
-                                        />
-                                        <Button
-                                            style={{ marginLeft: '10px' }}
-                                            icon={<ArrowForwardIcon />}
-                                            shape="circle"
-                                            onClick={() => {
-                                                swiperRef?.slideNext();
-                                            }}
-                                        />
-                                    </div>
+                                    {((isVideo &&
+                                        !data?.executeResult?.video?.completeVideo?.videoUrl &&
+                                        data?.executeResult?.video?.videoList?.length > 1) ||
+                                        (!isVideo && imageList?.length > 1)) && (
+                                        <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                            <Button
+                                                icon={<KeyboardBackspaceIcon />}
+                                                shape="circle"
+                                                onClick={() => {
+                                                    console.log(swiperRef, 'swiperRef');
+                                                    swiperRef?.slidePrev();
+                                                }}
+                                            />
+                                            <Button
+                                                style={{ marginLeft: '10px' }}
+                                                icon={<ArrowForwardIcon />}
+                                                shape="circle"
+                                                onClick={() => {
+                                                    swiperRef?.slideNext();
+                                                }}
+                                            />
+                                        </div>
+                                    )}
                                     <div className="h-full">
                                         <Swiper
                                             onSwiper={(swiper) => {

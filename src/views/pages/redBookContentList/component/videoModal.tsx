@@ -400,14 +400,14 @@ const VideoModal = ({
                     </Form.Item>
                 )}
             </Form>
+            <div className="text-base font-[500]">
+                视频列表{' '}
+                <Tooltip title="按照配置的图片模版数量生成对应的视频">
+                    <ExclamationCircleOutlined className="cursor-pointer" />
+                </Tooltip>
+            </div>
             <Tabs>
                 <Tabs.TabPane tab="生成配置" key="1">
-                    <div className="mb-4 text-base font-[500]">
-                        生成列表{' '}
-                        <Tooltip title="按照配置的图片模版数量生成对应的视频">
-                            <ExclamationCircleOutlined />
-                        </Tooltip>
-                    </div>
                     {imageList?.map((item, index) => (
                         <Card size="small" key={index} className="mb-4">
                             <div className="flex items-start gap-2">

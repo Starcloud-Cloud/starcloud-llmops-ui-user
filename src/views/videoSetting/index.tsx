@@ -388,20 +388,57 @@ const VideoSetting: React.FC<{
             <div className="flex gap-2">
                 <div className="flex-1">
                     <Form.Item label="发音元素间隔" name={['globalSettings', 'elementInterval']} rules={[{ required: true }]}>
-                        <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 200 }} />
+                        <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 250 }} />
                     </Form.Item>
+                    <div className="flex items-center gap-2">
+                        <Form.Item
+                            label="是否启用动效"
+                            className="w-[250px]"
+                            name={['globalSettings', 'animationEnable']}
+                            valuePropName="checked"
+                            rules={[{ required: true }]}
+                        >
+                            <Switch />
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isAnimationEnable}
+                            onChange={() =>
+                                setQuickConfiguration({ ...quickConfiguration, isAnimationEnable: !quickConfiguration.isAnimationEnable })
+                            }
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
 
-                    <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
-                        <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 200 }} />
-                    </Form.Item>
+                    <div className="flex items-center gap-2">
+                        <Form.Item
+                            className="w-[250px]"
+                            label="是否跟读"
+                            name={['globalSettings', 'repeatEnable']}
+                            valuePropName="checked"
+                            rules={[{ required: true }]}
+                        >
+                            <Switch />
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isRepeatEnable}
+                            onChange={() =>
+                                setQuickConfiguration({ ...quickConfiguration, isRepeatEnable: !quickConfiguration.isRepeatEnable })
+                            }
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
 
                     <div className="flex items-center gap-2">
                         <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
-                            <Select optionLabelProp="label" style={{ width: 200 }}>
+                            <Select optionLabelProp="label" style={{ width: 250 }}>
                                 {voiceRoleOptions?.map((item) => (
-                                    <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                    <Select.Option
+                                        key={item.code}
+                                        label={`${item.name} - ${item.language} - ${item.voice}`}
+                                        value={item.code}
+                                    >
                                         <div className="flex items-center justify-between">
-                                            <span>{item.voice}</span>
+                                            <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
                                             {item.demo_link && (
                                                 <Button
                                                     type="text"
@@ -423,30 +460,15 @@ const VideoSetting: React.FC<{
                         />
                         <div className="text-xs">快捷配置</div>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                        <Form.Item
-                            label="是否启用动效"
-                            className="w-[200px]"
-                            name={['globalSettings', 'animationEnable']}
-                            valuePropName="checked"
-                            rules={[{ required: true }]}
-                        >
-                            <Switch />
-                        </Form.Item>
-                        <Checkbox
-                            checked={quickConfiguration.isAnimationEnable}
-                            onChange={() =>
-                                setQuickConfiguration({ ...quickConfiguration, isAnimationEnable: !quickConfiguration.isAnimationEnable })
-                            }
-                        />
-                        <div className="text-xs">快捷配置</div>
-                    </div>
                 </div>
                 <div className="flex-1">
+                    <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
+                        <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 250 }} />
+                    </Form.Item>
+
                     <div className="flex items-center gap-2">
                         <Form.Item label="指示效果" name={['globalSettings', 'soundEffect']}>
-                            <Select allowClear style={{ width: 200 }}>
+                            <Select allowClear style={{ width: 250 }}>
                                 <Select.Option value="手指">手指</Select.Option>
                                 <Select.Option value="圆圈">圆圈</Select.Option>
                             </Select>
@@ -461,31 +483,16 @@ const VideoSetting: React.FC<{
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Form.Item
-                            className="w-[200px]"
-                            label="是否跟读"
-                            name={['globalSettings', 'repeatEnable']}
-                            valuePropName="checked"
-                            rules={[{ required: true }]}
-                        >
-                            <Switch />
-                        </Form.Item>
-                        <Checkbox
-                            checked={quickConfiguration.isRepeatEnable}
-                            onChange={() =>
-                                setQuickConfiguration({ ...quickConfiguration, isRepeatEnable: !quickConfiguration.isRepeatEnable })
-                            }
-                        />
-                        <div className="text-xs">快捷配置</div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
                         <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']}>
-                            <Select allowClear optionLabelProp="label" style={{ width: 200 }}>
+                            <Select allowClear optionLabelProp="label" style={{ width: 250 }}>
                                 {voiceRoleOptions?.map((item) => (
-                                    <Select.Option key={item.code} label={item.voice} value={item.code}>
+                                    <Select.Option
+                                        key={item.code}
+                                        label={`${item.name} - ${item.language} - ${item.voice}`}
+                                        value={item.code}
+                                    >
                                         <div className="flex items-center justify-between">
-                                            <span>{item.voice}</span>
+                                            <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
                                             {item.demo_link && (
                                                 <Button
                                                     type="text"
@@ -664,11 +671,11 @@ const VideoSetting: React.FC<{
                                                                                             {voiceRoleOptions?.map((item) => (
                                                                                                 <Select.Option
                                                                                                     key={item.code}
-                                                                                                    label={item.voice}
+                                                                                                    label={`${item.name} - ${item.language} - ${item.voice}`}
                                                                                                     value={item.code}
                                                                                                 >
                                                                                                     <div className="flex items-center justify-between">
-                                                                                                        <span>{item.voice}</span>
+                                                                                                        <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
                                                                                                         {item.demo_link && (
                                                                                                             <Button
                                                                                                                 type="text"
@@ -705,11 +712,11 @@ const VideoSetting: React.FC<{
                                                                                             {voiceRoleOptions?.map((item) => (
                                                                                                 <Select.Option
                                                                                                     key={item.code}
-                                                                                                    label={item.voice}
+                                                                                                    label={`${item.name} - ${item.language} - ${item.voice}`}
                                                                                                     value={item.code}
                                                                                                 >
                                                                                                     <div className="flex items-center justify-between">
-                                                                                                        <span>{item.voice}</span>
+                                                                                                        <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
                                                                                                         {item.demo_link && (
                                                                                                             <Button
                                                                                                                 type="text"
@@ -802,13 +809,9 @@ const VideoSetting: React.FC<{
                                                                                 .includes(input.toLowerCase());
                                                                         }}
                                                                     >
-                                                                        {variableList
-                                                                            ?.filter((item: any) => item.type !== 'IMAGE')
-                                                                            ?.map((item: any) => (
-                                                                                <Select.Option value={item.field}>
-                                                                                    {item.label}
-                                                                                </Select.Option>
-                                                                            ))}
+                                                                        {variableList?.map((item: any) => (
+                                                                            <Select.Option value={item.field}>{item.label}</Select.Option>
+                                                                        ))}
                                                                     </Select>
                                                                 )}
                                                             </div>

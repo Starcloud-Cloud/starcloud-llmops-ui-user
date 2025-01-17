@@ -364,6 +364,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                                         alert: {
                                                             color: 'error'
                                                         },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                         close: false
                                                     })
                                                 );
@@ -378,6 +379,7 @@ const AddModal = ({ detailOpen, setDetailOpen }: { detailOpen: boolean; setDetai
                                                         alert: {
                                                             color: 'error'
                                                         },
+                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                         close: false
                                                     })
                                                 );

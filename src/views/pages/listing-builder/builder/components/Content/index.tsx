@@ -552,6 +552,7 @@ const Content = () => {
                     alert: {
                         color: 'error'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -1296,6 +1297,7 @@ const Content = () => {
                                                             alert: {
                                                                 color: 'success'
                                                             },
+                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                             close: false
                                                         })
                                                     );

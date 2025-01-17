@@ -70,6 +70,7 @@ const KeyWord = ({ setIsLoading }: { setIsLoading: any }) => {
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );

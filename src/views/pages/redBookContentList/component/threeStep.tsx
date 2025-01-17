@@ -46,6 +46,7 @@ import { PicImagePick } from 'ui-component/PicImagePick';
 import ReTryExe from '../../batchSmallRedBooks/components/retryExe';
 import VideoModal from './videoModal';
 import _ from 'lodash-es';
+import H5Modal from './h5Modal';
 
 const ThreeStep = ({
     data,
@@ -102,7 +103,8 @@ const ThreeStep = ({
                         index: index + 1,
                         url: item.url,
                         isMain: index === 0,
-                        code: item.code
+                        code: item.code,
+                        imageUrl: item.url
                     }))
                 }
             });
@@ -227,12 +229,21 @@ const ThreeStep = ({
         const zip = new JSZip();
         let promises;
         if (isVideo) {
-            promises = data?.executeResult?.videoList?.map(async (imageUrl: any, index: number) => {
-                const response = await fetch(imageUrl.videoUrl);
-                const arrayBuffer = await response.arrayBuffer();
-                zip.file('video' + (index + 1) + `.mp4`, arrayBuffer);
-                zip.file(title + '.txt', text);
-            });
+            if (data?.executeResult?.video?.completeVideoUrl) {
+                promises = [0]?.map(async (imageUrl: any, index: number) => {
+                    const response = await fetch(data?.executeResult?.video?.completeVideoUrl);
+                    const arrayBuffer = await response.arrayBuffer();
+                    zip.file(`video.mp4`, arrayBuffer);
+                    zip.file(title + '.txt', text);
+                });
+            } else {
+                promises = data?.executeResult?.video?.videoList?.map(async (imageUrl: any, index: number) => {
+                    const response = await fetch(imageUrl.videoUrl);
+                    const arrayBuffer = await response.arrayBuffer();
+                    zip.file('video' + (index + 1) + `.mp4`, arrayBuffer);
+                    zip.file(title + '.txt', text);
+                });
+            }
         } else {
             promises = imageList.map(async (imageUrl: any, index: number) => {
                 const response = await fetch(imageUrl.url);
@@ -346,12 +357,14 @@ const ThreeStep = ({
         }
     }, [data]);
     useEffect(() => {
-        if (data?.executeResult?.videoList && data?.executeResult?.videoList?.length > 0) {
+        if (data?.executeResult?.video) {
             setIsVideo(true);
         }
     }, [data]);
-
     const [isVideo, setIsVideo] = useState(false);
+    //h5页面
+    const [h5Open, setH5Open] = useState(false);
+
     return (
         <div
             className="h-full"
@@ -405,7 +418,7 @@ const ThreeStep = ({
                             <Button>加入代发布列表</Button>
                             } */}
                             <div>
-                                {data?.executeResult?.videoList && data?.executeResult?.videoList?.length > 0 && (
+                                {data?.executeResult?.video && (
                                     <Button onClick={() => setIsVideo(!isVideo)} type="primary" icon={<SwapOutlined />}>
                                         图文｜视频
                                     </Button>
@@ -463,10 +476,15 @@ const ThreeStep = ({
                                             编辑笔记
                                         </Button>
                                         {openVideoMode && (
-                                            <Button className="ml-2" type="primary" onClick={() => setVideoOpen(true)} disabled={claim}>
+                                            <Button className="ml-2" type="primary" onClick={() => setVideoOpen(true)}>
                                                 视频生成
                                             </Button>
                                         )}
+                                        {/* {isVideo && (
+                                            <Button className="ml-2" type="primary" onClick={() => setH5Open(true)}>
+                                                H5页面
+                                            </Button>
+                                        )} */}
                                     </div>
                                 ) : (
                                     <Space>
@@ -491,35 +509,30 @@ const ThreeStep = ({
                                     </div>
                                 </Upload>
                             ) : (
-                                // isVideo ? (
-                                //     <div className="w-full h-full flex justify-center items-center">
-                                //         <video
-                                //             src={data?.executeResult?.videoList[0]?.videoUrl}
-                                //             controls
-                                //             width={'100%'}
-                                //             className="max-h-[100%]"
-                                //         />
-                                //     </div>
-                                // ) :
                                 <>
-                                    <div className="flex justify-between absolute top-[46%] w-full z-10">
-                                        <Button
-                                            icon={<KeyboardBackspaceIcon />}
-                                            shape="circle"
-                                            onClick={() => {
-                                                console.log(swiperRef, 'swiperRef');
-                                                swiperRef?.slidePrev();
-                                            }}
-                                        />
-                                        <Button
-                                            style={{ marginLeft: '10px' }}
-                                            icon={<ArrowForwardIcon />}
-                                            shape="circle"
-                                            onClick={() => {
-                                                swiperRef?.slideNext();
-                                            }}
-                                        />
-                                    </div>
+                                    {((isVideo &&
+                                        !data?.executeResult?.video?.completeVideoUrl &&
+                                        data?.executeResult?.video?.videoList?.length > 1) ||
+                                        (!isVideo && imageList?.length > 1)) && (
+                                        <div className="flex justify-between absolute top-[46%] w-full z-10">
+                                            <Button
+                                                icon={<KeyboardBackspaceIcon />}
+                                                shape="circle"
+                                                onClick={() => {
+                                                    console.log(swiperRef, 'swiperRef');
+                                                    swiperRef?.slidePrev();
+                                                }}
+                                            />
+                                            <Button
+                                                style={{ marginLeft: '10px' }}
+                                                icon={<ArrowForwardIcon />}
+                                                shape="circle"
+                                                onClick={() => {
+                                                    swiperRef?.slideNext();
+                                                }}
+                                            />
+                                        </div>
+                                    )}
                                     <div className="h-full">
                                         <Swiper
                                             onSwiper={(swiper) => {
@@ -537,19 +550,34 @@ const ThreeStep = ({
                                                 disableOnInteraction: false
                                             }}
                                         >
-                                            {!isVideo
-                                                ? imageList?.map((item: any, index) => (
-                                                      <SwiperSlide key={index}>
-                                                          <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
-                                                      </SwiperSlide>
-                                                  ))
-                                                : data?.executeResult?.videoList &&
-                                                  data?.executeResult?.videoList?.length > 0 &&
-                                                  data?.executeResult?.videoList.map((item: any, index: number) => (
-                                                      <SwiperSlide key={index}>
-                                                          <video src={item?.videoUrl} controls width={'100%'} height={'100%'} />
-                                                      </SwiperSlide>
-                                                  ))}
+                                            {!isVideo ? (
+                                                imageList?.map((item: any, index) => (
+                                                    <SwiperSlide key={index}>
+                                                        <img className="w-full h-full object-contain bg-[#f8f8f8]" src={item.url} />
+                                                    </SwiperSlide>
+                                                ))
+                                            ) : data?.executeResult?.video?.completeVideoUrl ? (
+                                                <SwiperSlide>
+                                                    <div className="w-full h-full flex items-center">
+                                                        <video
+                                                            id={`player`}
+                                                            src={data?.executeResult?.video?.completeVideoUrl}
+                                                            controls
+                                                            width={'100%'}
+                                                        />
+                                                    </div>
+                                                </SwiperSlide>
+                                            ) : (
+                                                data?.executeResult?.video?.videoList &&
+                                                data?.executeResult?.video?.videoList?.length > 0 &&
+                                                data?.executeResult?.video?.videoList.map((item: any, index: number) => (
+                                                    <SwiperSlide key={index}>
+                                                        <div className="w-full h-full flex items-center">
+                                                            <video id={`player-${index}`} src={item?.videoUrl} controls width={'100%'} />
+                                                        </div>
+                                                    </SwiperSlide>
+                                                ))
+                                            )}
                                         </Swiper>
                                     </div>
                                 </>
@@ -1027,7 +1055,7 @@ const ThreeStep = ({
                 quickValue={data?.executeParam?.quickConfiguration ? JSON.parse(data?.executeParam?.quickConfiguration) : null}
                 templateList={templateList}
                 imageList={data?.executeResult?.imageList}
-                videoList={data?.executeResult?.videoList}
+                video={data?.executeResult?.video}
                 getDetail={() => {
                     setPre(Math.random() + Math.random());
                 }}
@@ -1043,6 +1071,7 @@ const ThreeStep = ({
                     columns={columns}
                 />
             )}
+            <H5Modal open={h5Open} setOpen={setH5Open} />
         </div>
     );
 };

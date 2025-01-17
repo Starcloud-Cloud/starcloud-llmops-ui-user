@@ -129,6 +129,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                     alert: {
                                         color: 'error'
                                     },
+                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                     close: false
                                 })
                             );
@@ -167,6 +168,7 @@ const JWTRegister = ({ inviteCode = '', ...others }: JWTRegisterProps) => {
                                         alert: {
                                             color: 'error'
                                         },
+                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                         close: false
                                     })
                                 );

@@ -184,6 +184,7 @@ const VoiceModal = ({
                         alert: {
                             color: 'error'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );
@@ -379,6 +380,7 @@ const ShortcutModal = ({ open, handleClose }: { open: boolean; handleClose: () =
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );

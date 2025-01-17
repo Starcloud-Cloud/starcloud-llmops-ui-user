@@ -95,6 +95,7 @@ const AuthResetPassword = ({ ...others }) => {
                                 alert: {
                                     color: 'success'
                                 },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 close: false
                             })
                         );
@@ -111,6 +112,7 @@ const AuthResetPassword = ({ ...others }) => {
                                 alert: {
                                     color: 'success'
                                 },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 close: false
                             })
                         );

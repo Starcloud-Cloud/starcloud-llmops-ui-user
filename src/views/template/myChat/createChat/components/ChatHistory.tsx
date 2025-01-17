@@ -477,6 +477,7 @@ const ChatHistory = ({ data, theme, handleRetry, chatBoxHeight, handleExample }:
                                                                             alert: {
                                                                                 color: 'success'
                                                                             },
+                                                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                                             close: false
                                                                         })
                                                                     );

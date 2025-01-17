@@ -48,6 +48,7 @@ export const AddDictModal = ({ open, handleClose, forceUpdate }: AddDictModalPro
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );

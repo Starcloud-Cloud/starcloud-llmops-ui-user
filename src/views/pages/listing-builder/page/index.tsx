@@ -235,6 +235,7 @@ const ListingBuilderPage: React.FC = () => {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -287,6 +288,7 @@ const ListingBuilderPage: React.FC = () => {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );

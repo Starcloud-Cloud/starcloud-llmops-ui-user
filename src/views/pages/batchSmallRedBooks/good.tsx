@@ -1,4 +1,5 @@
 import { Progress, Skeleton, Popover, Button, Tag, Tooltip } from 'antd';
+import { PlayCircleOutlined } from '@ant-design/icons';
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import GradeIcon from '@mui/icons-material/Grade';
 import Swipers from './components/swiper';
@@ -398,7 +399,7 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
                     <div className="p-[12px]">
                         <div className="h-[40px] text-sm font-[500] line-clamp-2">{item?.executeResult?.copyWriting?.title}</div>
                     </div>
-                    {item?.executeResult?.videoList && (
+                    {item?.executeResult?.video && (
                         <Tag className="absolute top-1 left-1 z-[1]" color="success">
                             视频
                         </Tag>

@@ -200,6 +200,7 @@ const IframeExecute = () => {
                                 alert: {
                                     color: 'success'
                                 },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 close: false
                             })
                         );
@@ -219,6 +220,7 @@ const IframeExecute = () => {
                                 alert: {
                                     color: 'error'
                                 },
+                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                 close: false
                             })
                         );

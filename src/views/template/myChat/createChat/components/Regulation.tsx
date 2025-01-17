@@ -375,6 +375,7 @@ export const Regulation = ({
                                                 alert: {
                                                     color: 'error'
                                                 },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                 close: false
                                             })
                                         );

@@ -425,6 +425,7 @@ function Upload({
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );
@@ -441,6 +442,7 @@ function Upload({
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );
@@ -469,6 +471,7 @@ function Upload({
                             alert: {
                                 color: 'success'
                             },
+                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                             close: false
                         })
                     );
@@ -514,6 +517,7 @@ function Upload({
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );
@@ -534,6 +538,7 @@ function Upload({
                         alert: {
                             color: 'success'
                         },
+                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                         close: false
                     })
                 );
@@ -564,6 +569,7 @@ function Upload({
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );
@@ -610,6 +616,7 @@ function Upload({
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -628,6 +635,7 @@ function Upload({
                 alert: {
                     color: 'success'
                 },
+                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                 close: false
             })
         );

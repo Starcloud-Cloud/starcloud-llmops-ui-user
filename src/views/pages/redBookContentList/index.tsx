@@ -234,6 +234,7 @@ const RedBookContentList: React.FC = () => {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -307,6 +308,7 @@ const RedBookContentList: React.FC = () => {
                     alert: {
                         color: 'success'
                     },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                     close: false
                 })
             );
@@ -476,7 +478,7 @@ const RedBookContentList: React.FC = () => {
                                                                             color: 'success'
                                                                         },
                                                                         close: false,
-                                                                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                                         transition: 'SlideLeft'
                                                                     })
                                                                 );

@@ -158,6 +158,7 @@ const AddLexicon = ({
                                             alert: {
                                                 color: 'success'
                                             },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                             close: false
                                         })
                                     );

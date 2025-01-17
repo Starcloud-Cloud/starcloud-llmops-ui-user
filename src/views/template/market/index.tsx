@@ -503,74 +503,74 @@ function TemplateMarket() {
                 borderRadius: '8px'
             }}
         >
-            <Tabs size="small" activeKey={value} onChange={setValue} aria-label="basic tabs example" className="h-full">
-                <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">应用市场</div>} key="0">
-                    <div ref={step2} className="mt-[-8px] pb-2 flex gap-3 w-full overflow-x-scroll">
-                        {menuList?.map((item, index) => (
-                            <div
-                                onClick={() => {
-                                    changeCategory(item, index);
-                                }}
-                                key={item.name}
-                                className="h-[31px] px-3 py-1 cursor-pointer font-[600] bg-white shadow-md rounded-[6px] text-[rgb(75,74,88)] flex items-center gap-1 hover:!bg-[#2E2E3814]"
-                                style={{
-                                    background: active === index ? '#ede7f6' : '#fff'
-                                }}
-                            >
-                                <img className="w-[20px] h-[20px]" src={getImage(item.icon)} />
-                                <span className="whitespace-nowrap">{item.name}</span>
-                            </div>
-                        ))}
+            {/* <Tabs size="small" activeKey={value} onChange={setValue} aria-label="basic tabs example" className="h-full">
+                <Tabs.TabPane tab={<div className="!text-[16px] !line-[25px] font-bold">应用市场</div>} key="0"> */}
+            <div ref={step2} className="pb-2 flex gap-3 w-full overflow-x-scroll">
+                {menuList?.map((item, index) => (
+                    <div
+                        onClick={() => {
+                            changeCategory(item, index);
+                        }}
+                        key={item.name}
+                        className="h-[31px] px-3 py-1 cursor-pointer font-[600] bg-white shadow-md rounded-[6px] text-[rgb(75,74,88)] flex items-center gap-1 hover:!bg-[#2E2E3814]"
+                        style={{
+                            background: active === index ? '#ede7f6' : '#fff'
+                        }}
+                    >
+                        <img className="w-[20px] h-[20px]" src={getImage(item.icon)} />
+                        <span className="whitespace-nowrap">{item.name}</span>
                     </div>
-                    <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-36px)] overflow-x-hidden overflow-y-scroll">
-                        {newList?.map((item, index) => (
-                            <div key={index}>
-                                {item.appList?.length > 0 && (
-                                    <div className="flex justify-between items-center my-4">
-                                        <div className="flex items-center gap-2">
-                                            <img height="20px" src={getImage(item.icon)} alt="" />
-                                            <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
-                                        </div>
-                                        {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
-                                            <div
-                                                onClick={() => {
-                                                    changeCategory(
-                                                        item,
-                                                        menuList.findIndex((value) => value.code === item.code)
-                                                    );
-                                                }}
-                                                className="text-[#673ab7] cursor-pointer"
-                                            >
-                                                更多应用
-                                                <RightOutlined />
-                                            </div>
-                                        )}
+                ))}
+            </div>
+            <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-36px)] overflow-x-hidden overflow-y-scroll">
+                {newList?.map((item, index) => (
+                    <div key={index}>
+                        {item.appList?.length > 0 && (
+                            <div className="flex justify-between items-center my-4">
+                                <div className="flex items-center gap-2">
+                                    <img height="20px" src={getImage(item.icon)} alt="" />
+                                    <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
+                                </div>
+                                {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
+                                    <div
+                                        onClick={() => {
+                                            changeCategory(
+                                                item,
+                                                menuList.findIndex((value) => value.code === item.code)
+                                            );
+                                        }}
+                                        className="text-[#673ab7] cursor-pointer"
+                                    >
+                                        更多应用
+                                        <RightOutlined />
                                     </div>
                                 )}
-                                {item.appList.length > 0 && (
-                                    <Row
-                                        className="overflow-x-hidden pb-[5px]"
-                                        style={{
-                                            maxHeight: queryParams.category === 'ALL' ? boxHeight * 2 + 20 + 'px' : 'auto',
-                                            overflowY: queryParams.category === 'ALL' ? 'hidden' : 'auto'
-                                        }}
-                                        gutter={[16, 16]}
-                                        // wrap={queryParams.category === 'ALL' ? false : true}
-                                    >
-                                        {item.appList.map((el: any, i: number) => (
-                                            <Col key={el?.uid} ref={colRef} className={`xxxl-col flex-shrink-0`}>
-                                                <div ref={i === 0 && index === 0 ? step3 : null}>
-                                                    <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
-                                                </div>
-                                            </Col>
-                                        ))}
-                                    </Row>
-                                )}
                             </div>
-                        ))}
+                        )}
+                        {item.appList.length > 0 && (
+                            <Row
+                                className="overflow-x-hidden pb-[5px]"
+                                style={{
+                                    maxHeight: queryParams.category === 'ALL' ? boxHeight * 2 + 20 + 'px' : 'auto',
+                                    overflowY: queryParams.category === 'ALL' ? 'hidden' : 'auto'
+                                }}
+                                gutter={[16, 16]}
+                                // wrap={queryParams.category === 'ALL' ? false : true}
+                            >
+                                {item.appList.map((el: any, i: number) => (
+                                    <Col key={el?.uid} ref={colRef} className={`xxxl-col flex-shrink-0`}>
+                                        <div ref={i === 0 && index === 0 ? step3 : null}>
+                                            <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
+                                        </div>
+                                    </Col>
+                                ))}
+                            </Row>
+                        )}
                     </div>
-                </Tabs.TabPane>
-            </Tabs>
+                ))}
+            </div>
+            {/* </Tabs.TabPane>
+            </Tabs> */}
             <MarketVideoModel
                 open={openMarketVideo}
                 handleClose={() => {

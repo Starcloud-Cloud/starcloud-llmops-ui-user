@@ -85,6 +85,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                                 alert: {
                                                     color: 'success'
                                                 },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                 close: false
                                             })
                                         );
@@ -109,6 +110,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                                 alert: {
                                                     color: 'success'
                                                 },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                 close: false
                                             })
                                         );
@@ -135,6 +137,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                                 alert: {
                                                     color: 'success'
                                                 },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                 close: false
                                             })
                                         );
@@ -160,6 +163,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                                 alert: {
                                                     color: 'success'
                                                 },
+                                                anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                 close: false
                                             })
                                         );
@@ -215,6 +219,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                                     alert: {
                                                         color: 'success'
                                                     },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                     close: false
                                                 })
                                             );
@@ -239,6 +244,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                                     alert: {
                                                         color: 'success'
                                                     },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                     close: false
                                                 })
                                             );
@@ -265,6 +271,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                                     alert: {
                                                         color: 'success'
                                                     },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                     close: false
                                                 })
                                             );
@@ -290,6 +297,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                                     alert: {
                                                         color: 'success'
                                                     },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
                                                     close: false
                                                 })
                                             );
@@ -323,7 +331,23 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                         </div>
                     )}
                     {data.openVideoMode && (
-                        <div className="text-xs bg-[#673ab7] text-white font-bold py-1 px-2 flex items-center rounded-md">视频生成</div>
+                        <div className="text-xs bg-[#673ab7] text-white font-bold py-1 px-2 flex items-center gap-1 rounded-md">
+                            <svg
+                                viewBox="0 0 1024 1024"
+                                version="1.1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                p-id="9767"
+                                width="12"
+                                height="12"
+                            >
+                                <path
+                                    d="M692.544 196.8h127.232a165.76 165.76 0 0 1 167.104 164.48v476.16a165.76 165.76 0 0 1-167.04 164.48H204.16a165.76 165.76 0 0 1-167.04-164.416V361.28a165.76 165.76 0 0 1 167.04-164.48h122.624L261.056 74.432a34.432 34.432 0 0 1 16.576-45.952 35.456 35.456 0 0 1 45.632 13.888l83.2 154.688h206.528l83.2-154.816A35.392 35.392 0 0 1 743.04 25.6a34.432 34.432 0 0 1 15.296 49.024l-65.792 122.112zM204.16 265.984a96 96 0 0 0-96.704 95.296v476.16a96 96 0 0 0 96.704 95.232h615.68a96 96 0 0 0 96.704-95.232v-476.16a96 96 0 0 0-96.704-95.296H204.16z m161.728 198.4v287.296a56.704 56.704 0 0 0 57.152 56.256 57.984 57.984 0 0 0 29.44-8l243.2-143.616a55.808 55.808 0 0 0 0-96.512l-243.2-143.616a57.6 57.6 0 0 0-78.464 19.2 55.616 55.616 0 0 0-8.128 28.992z m274.56 143.616l-204.288 120.64v-241.28z"
+                                    fill="#fff"
+                                    p-id="9768"
+                                ></path>
+                            </svg>
+                            视频生成
+                        </div>
                     )}
                 </div>
             </div>

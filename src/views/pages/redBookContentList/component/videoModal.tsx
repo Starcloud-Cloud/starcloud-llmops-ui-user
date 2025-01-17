@@ -196,7 +196,7 @@ const VideoModal = ({
             form.setFieldsValue(quickValue);
         }
         if (!videoOpen) {
-            setMergeStep(0);
+            // setMergeStep(0);
             setMergeProgress(0);
         }
     }, [videoOpen]);

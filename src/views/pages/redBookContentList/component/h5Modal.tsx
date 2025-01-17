@@ -24,7 +24,7 @@ const H5Modal = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) =>
                     <QRCode size={150} value="https://www.baidu.com" />
                     <div className="text-xs text-gray-500 mt-2 font-bold hover:text-[#673ab7] cursor-pointer">查看</div>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-4">
                     <Card size="small">
                         <div className="flex justify-between">
                             <div className="text-base font-bold">文件名 单词 A.mp4</div>
@@ -38,6 +38,34 @@ const H5Modal = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) =>
                         <div className="flex justify-between">
                             <div className="text-base font-bold">文件名 单词 B.mp3</div>
                             <div className="flex gap-2">
+                                <Button type="primary">下载</Button>
+                                <Button type="primary">扫码</Button>
+                            </div>
+                        </div>
+                    </Card>
+                    <Card size="small">
+                        <div className="flex justify-between">
+                            <div className="text-base font-bold">文件名 单词 B.pdf</div>
+                            <div className="flex gap-2">
+                                <Button>重新生成</Button>
+                                <Button type="primary">下载</Button>
+                                <Button type="primary">扫码</Button>
+                            </div>
+                        </div>
+                    </Card>
+                    <Card size="small">
+                        <div className="flex justify-between">
+                            <div className="text-base font-bold">文件名 单词 B.pdf</div>
+                            <div className="flex gap-2">
+                                <Button>重新生成</Button>
+                            </div>
+                        </div>
+                    </Card>
+                    <Card size="small">
+                        <div className="flex justify-between">
+                            <div className="text-base font-bold">xxxx单词 A--抗遗忘写本.pdf</div>
+                            <div className="flex gap-2">
+                                <Button>重新生成</Button>
                                 <Button type="primary">下载</Button>
                                 <Button type="primary">扫码</Button>
                             </div>

@@ -23,6 +23,7 @@ const RedBookContentList = Loadable(lazy(() => import('views/pages/redBookConten
 const Fingerprint = Loadable(lazy(() => import('views/fingerprint')));
 const Invite = Loadable(lazy(() => import('views/invite')));
 const Share = Loadable(lazy(() => import('views/share')));
+const DataShare = Loadable(lazy(() => import('views/dataShare')));
 const BatchShare = Loadable(lazy(() => import('views/batchShare')));
 
 // ==============================|| ROUTING RENDER ||============================== //
@@ -34,6 +35,7 @@ export default function ThemeRoutes() {
         { path: '/fingerprint', element: <Fingerprint /> },
         { path: '/invite', element: <Invite /> },
         { path: '/share', element: <Share /> },
+        { path: '/dataShare', element: <DataShare /> },
         { path: '/shareVideo', element: <Share /> },
         { path: '/batchShare', element: <BatchShare /> },
         // { path: '/subscribe', element: <PagesPrice /> },

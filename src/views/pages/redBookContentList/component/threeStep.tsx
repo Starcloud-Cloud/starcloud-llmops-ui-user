@@ -542,7 +542,9 @@ const ThreeStep = ({
                                             // spaceBetween={30}
                                             centeredSlides={false}
                                             loop
-                                            pagination={{ clickable: true }}
+                                            pagination={{
+                                                clickable: !isVideo ? true : false
+                                            }}
                                             modules={[Pagination]}
                                             className="mySwiper h-full"
                                             autoplay={{
@@ -564,6 +566,7 @@ const ThreeStep = ({
                                                             src={data?.executeResult?.video?.completeVideoUrl}
                                                             controls
                                                             width={'100%'}
+                                                            className="max-h-[100%] z-[1]"
                                                         />
                                                     </div>
                                                 </SwiperSlide>
@@ -573,7 +576,13 @@ const ThreeStep = ({
                                                 data?.executeResult?.video?.videoList.map((item: any, index: number) => (
                                                     <SwiperSlide key={index}>
                                                         <div className="w-full h-full flex items-center">
-                                                            <video id={`player-${index}`} src={item?.videoUrl} controls width={'100%'} />
+                                                            <video
+                                                                id={`player-${index}`}
+                                                                src={item?.videoUrl}
+                                                                controls
+                                                                width={'100%'}
+                                                                className="max-h-[100%] z-[1]"
+                                                            />
                                                         </div>
                                                     </SwiperSlide>
                                                 ))

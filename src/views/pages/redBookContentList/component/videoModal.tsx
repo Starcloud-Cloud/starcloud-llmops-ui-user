@@ -45,7 +45,7 @@ const VideoModal = ({
         setProgress([]);
         const values = await form.validateFields();
         setExcuteLoading(true);
-        imageList.forEach(async (item, index) => {
+        imageList.map(async (item, index) => {
             try {
                 const res = await generateVideo({
                     uid: businessUid,
@@ -95,6 +95,10 @@ const VideoModal = ({
                 setResults((prev) => {
                     const newResults = [...prev];
                     newResults[index] = res;
+                    const allCompleted = newResults.every((item) => item?.status === 'completed' || item?.status === 'failed');
+                    if (allCompleted && newResults.length === imageList.length) {
+                        saveSettings(false, newResults);
+                    }
                     return newResults;
                 });
             } catch (error) {
@@ -157,15 +161,15 @@ const VideoModal = ({
             setExcuteLoading(false);
         }
     };
-    const saveSettings = async (flag?: any) => {
+    const saveSettings = async (flag?: any, valueList?: any[], video?: any) => {
         const values = await form.validateFields();
         await saveSetting({
             uid: businessUid,
             quickConfiguration: JSON.stringify(values),
             video: {
-                videoList: results,
-                completeVideoUrl: completeVideo?.videoUrl,
-                completeAudioUrl: completeVideo?.completeAudioUrl
+                videoList: valueList || results,
+                completeVideoUrl: video?.videoUrl || completeVideo?.videoUrl,
+                completeAudioUrl: video?.audioUrl || completeVideo?.completeAudioUrl
             }
         });
         if (flag) {
@@ -279,18 +283,6 @@ const VideoModal = ({
         setAudioPlayer(audio);
     };
 
-    const handleAnimationEnableChange = (checked: boolean) => {
-        if (!checked) {
-            form.setFieldValue('soundEffect', undefined);
-        }
-    };
-
-    const handleRepeatEnableChange = (checked: boolean) => {
-        if (!checked) {
-            form.setFieldValue('repeatRole', undefined);
-        }
-    };
-
     //预览
     const [previewVideo, setPreviewVideo] = useState<boolean>(false);
     const [previewVideoUrl, setPreviewVideoUrl] = useState<string>('');
@@ -323,7 +315,7 @@ const VideoModal = ({
                 videoUrl: res?.url,
                 completeAudioUrl: res?.audio_url
             });
-            // saveSettings();
+            saveSettings(false, undefined, { videoUrl: res?.url, audioUrl: res?.audio_url });
         } catch (error: any) {
             clearInterval(progresstimer.current[0]);
             setMergeVideoLoading(false);
@@ -375,7 +367,7 @@ const VideoModal = ({
                 )}
                 {quickConfiguration?.isAnimationEnable && (
                     <Form.Item label="是否启用动效" name="animationEnable" valuePropName="checked">
-                        <Switch onChange={handleAnimationEnableChange} />
+                        <Switch />
                     </Form.Item>
                 )}
                 {quickConfiguration?.isAnimationEnable && (
@@ -392,7 +384,7 @@ const VideoModal = ({
                 )}
                 {quickConfiguration?.isRepeatEnable && (
                     <Form.Item label="是否跟读" name="repeatEnable" valuePropName="checked">
-                        <Switch onChange={handleRepeatEnableChange} />
+                        <Switch />
                     </Form.Item>
                 )}
                 {quickConfiguration?.isRepeatRole && (
@@ -459,7 +451,7 @@ const VideoModal = ({
                                                 ) : (
                                                     <div className="w-full">
                                                         <Progress percent={progress[index]} showInfo={false} />
-                                                        <div className="text-md font-[500]">生成中 {progress[index]}%</div>
+                                                        <div className="text-md font-[500]">生成中 {progress[index] || 0}%</div>
                                                     </div>
                                                 )}
                                             </div>
@@ -550,7 +542,10 @@ const VideoModal = ({
                     <Tabs.TabPane tab="合并视频" key="2">
                         <Card size="small" className="mb-4">
                             <div className="flex items-start gap-2">
-                                <Image src={''} preview={false} width={100} />
+                                <div>
+                                    <Image src={imageList[0]?.url} preview={false} width={100} />
+                                    <div className="text-xs text-black/50 mt-2 text-center">合并{results.length}个视频</div>
+                                </div>
                                 <div className="flex flex-col justify-between w-full relative min-h-[110px]">
                                     {mergeStep === 0 ? (
                                         <div className="text-base text-[#000000a6] font-[500]">未合成，点击合成视频按钮</div>
@@ -558,13 +553,13 @@ const VideoModal = ({
                                         <div className="w-full flex flex-col items-start gap-2">
                                             <div className="text-base w-full font-[500]">
                                                 {completeVideo?.videoUrl ? (
-                                                    <div className="text-[#52c41a]">生成成功</div>
+                                                    <div className="text-[#52c41a]">合并成功</div>
                                                 ) : mergeMessage ? (
-                                                    <div className="text-[#ff4d4f]">生成失败：{mergeMessage}</div>
+                                                    <div className="text-[#ff4d4f]">合并失败：{mergeMessage}</div>
                                                 ) : (
                                                     <div className="w-full">
                                                         <Progress percent={mergeProgress} showInfo={false} />
-                                                        <div className="text-md font-[500]">生成中 {mergeProgress}%</div>
+                                                        <div className="text-md font-[500]">合并中 {mergeProgress || 0}%</div>
                                                     </div>
                                                 )}
                                             </div>
@@ -590,7 +585,9 @@ const VideoModal = ({
                                                 合并视频
                                             </Button>
                                         ) : mergeMessage ? (
-                                            <Button>重试</Button>
+                                            <Button loading={mergeVideoLoading} onClick={mergeVideos}>
+                                                重试
+                                            </Button>
                                         ) : completeVideo?.videoUrl ? (
                                             <div className="flex flex-col gap-2 justify-between">
                                                 <div className="flex gap-2">

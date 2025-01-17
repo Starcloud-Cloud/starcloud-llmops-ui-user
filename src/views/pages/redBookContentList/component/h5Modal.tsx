@@ -1,19 +1,9 @@
-import { Modal, Input, Button, Switch, Select, QRCode, Card } from 'antd';
+import { Modal, Button, QRCode, Card, Popover, Form, Switch, Select, Radio, Image } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
 const H5Modal = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) => {
-    const [file1, setFile1] = useState('');
-    const [file2, setFile2] = useState('');
-    const [pdfName, setPdfName] = useState('');
-    const [pdfOption, setPdfOption] = useState(false);
-    const [fontSize, setFontSize] = useState('A');
-
-    const handleFile1Change = (e: React.ChangeEvent<HTMLInputElement>) => setFile1(e.target.value);
-    const handleFile2Change = (e: React.ChangeEvent<HTMLInputElement>) => setFile2(e.target.value);
-    const handlePdfNameChange = (e: React.ChangeEvent<HTMLInputElement>) => setPdfName(e.target.value);
-    const handlePdfOptionChange = (checked: boolean) => setPdfOption(checked);
-    const handleFontSizeChange = (value: string) => setFontSize(value);
-
+    const [form] = Form.useForm();
     return (
         <Modal title="H5页面" open={open} onCancel={() => setOpen(false)} width="60%" footer={null}>
             <div className="text-xs text-gray-500 mb-4">
@@ -44,6 +34,43 @@ const H5Modal = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) =>
                         </div>
                     </Card>
                     <Card size="small">
+                        <div className="flex justify-end mb-4">
+                            <Popover
+                                title="pdf 配置"
+                                placement="top"
+                                content={
+                                    <Form className="w-[300px]" layout="vertical" form={form}>
+                                        <Form.Item label="增加音频二维码" name="audio" valuePropName="checked">
+                                            <Switch />
+                                        </Form.Item>
+                                        <Form.Item label="增加视频二维码" name="video" valuePropName="checked">
+                                            <Switch />
+                                        </Form.Item>
+                                        <Form.Item label="二维码位置" name="position">
+                                            <Select>
+                                                <Select.Option value="左上">左上</Select.Option>
+                                                <Select.Option value="右上">右上</Select.Option>
+                                                <Select.Option value="左下">左下</Select.Option>
+                                                <Select.Option value="右下">右下</Select.Option>
+                                            </Select>
+                                        </Form.Item>
+                                        <div className="flex gap-2 justify-center">
+                                            <Button onClick={() => setOpen(false)}>取消</Button>
+                                            <Button
+                                                type="primary"
+                                                onClick={() => {
+                                                    /* 保存逻辑 */
+                                                }}
+                                            >
+                                                保存
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                }
+                            >
+                                <Button size="small" type="primary" shape="circle" icon={<SettingOutlined />} />
+                            </Popover>
+                        </div>
                         <div className="flex justify-between">
                             <div className="text-base font-bold">文件名 单词 B.pdf</div>
                             <div className="flex gap-2">
@@ -62,6 +89,59 @@ const H5Modal = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) =>
                         </div>
                     </Card>
                     <Card size="small">
+                        <div className="flex justify-end mb-4">
+                            <Popover
+                                title="遗忘单词本配置"
+                                placement="top"
+                                content={
+                                    <Form layout="vertical" className="w-[300px]">
+                                        <Form.Item label="选择单词的字段" name="fieldA">
+                                            <Select>
+                                                <Select.Option value="A">A</Select.Option>
+                                                <Select.Option value="B">B</Select.Option>
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item label="选择译义的字段" name="fieldB">
+                                            <Select>
+                                                <Select.Option value="A">A</Select.Option>
+                                                <Select.Option value="B">B</Select.Option>
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item label="选择模式" name="mode">
+                                            <Radio.Group className="w-full">
+                                                <div className="grid grid-cols-3 gap-2 w-full">
+                                                    <div className="flex flex-col items-center">
+                                                        <Image width={'100%'} height={100} src={''} preview={false} />
+                                                        <Radio value="option1">选项1</Radio>
+                                                    </div>
+                                                    <div className="flex flex-col items-center">
+                                                        <Image width={'100%'} height={100} src={''} preview={false} />
+                                                        <Radio value="option2">选项2</Radio>
+                                                    </div>
+                                                    <div className="flex flex-col items-center">
+                                                        <Image width={'100%'} height={100} src={''} preview={false} />
+                                                        <Radio value="option3">选项3</Radio>
+                                                    </div>
+                                                </div>
+                                            </Radio.Group>
+                                        </Form.Item>
+                                        <div className="flex gap-2 justify-center">
+                                            <Button onClick={() => setOpen(false)}>取消</Button>
+                                            <Button
+                                                type="primary"
+                                                onClick={() => {
+                                                    /* 保存逻辑 */
+                                                }}
+                                            >
+                                                保存
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                }
+                            >
+                                <Button size="small" type="primary" shape="circle" icon={<SettingOutlined />} />
+                            </Popover>
+                        </div>
                         <div className="flex justify-between">
                             <div className="text-base font-bold">xxxx单词 A--抗遗忘写本.pdf</div>
                             <div className="flex gap-2">

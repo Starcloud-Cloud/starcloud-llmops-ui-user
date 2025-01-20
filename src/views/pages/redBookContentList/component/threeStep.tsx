@@ -480,11 +480,11 @@ const ThreeStep = ({
                                                 视频生成
                                             </Button>
                                         )}
-                                        {/* {isVideo && (
+                                        {isVideo && (
                                             <Button className="ml-2" type="primary" onClick={() => setH5Open(true)}>
                                                 H5页面
                                             </Button>
-                                        )} */}
+                                        )}
                                     </div>
                                 ) : (
                                     <Space>
@@ -1080,7 +1080,13 @@ const ThreeStep = ({
                     columns={columns}
                 />
             )}
-            <H5Modal open={h5Open} setOpen={setH5Open} />
+            <H5Modal
+                open={h5Open}
+                setOpen={setH5Open}
+                uid={businessUid}
+                title={data?.executeResult?.copyWriting?.title}
+                columns={columns}
+            />
         </div>
     );
 };

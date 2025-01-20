@@ -224,6 +224,9 @@ const VideoModal = ({
                 clearInterval(item);
             });
             clearTimeout(timer.current);
+            progresstimer.current.forEach((item: any) => {
+                clearInterval(item);
+            });
         };
     }, []);
     const [progress, setProgress] = useState<number[]>([]);

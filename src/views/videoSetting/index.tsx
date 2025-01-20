@@ -269,17 +269,13 @@ const VideoSetting: React.FC<{
         // 深拷贝当前数组
         let newVoiceUnits = _.cloneDeep(voiceUnits);
 
-        [newVoiceUnits[result.source.index], newVoiceUnits[result.destination.index]] = [
-            newVoiceUnits[result.destination.index],
-            newVoiceUnits[result.source.index]
-        ];
-        // 更新顺序号并设置状态
-        setVoiceUnits(
-            newVoiceUnits.map((unit, index) => ({
-                ...unit,
-                order: index + 1
-            }))
-        );
+        // 获取拖动的元素
+        const [removed] = newVoiceUnits.splice(result.source.index, 1);
+        // 将元素插入到目标位置
+        newVoiceUnits.splice(result.destination.index, 0, removed);
+
+        // 更新状态
+        setVoiceUnits(newVoiceUnits);
     };
 
     const handleValuesChange = (_: any, allValues: any) => {
@@ -392,7 +388,7 @@ const VideoSetting: React.FC<{
                     </Form.Item>
                     <div className="flex items-center gap-2">
                         <Form.Item
-                            label="是否启用动效"
+                            label="是否启用指示效果"
                             className="w-[250px]"
                             name={['globalSettings', 'animationEnable']}
                             valuePropName="checked"

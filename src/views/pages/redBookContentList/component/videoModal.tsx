@@ -366,7 +366,7 @@ const VideoModal = ({
                     </Form.Item>
                 )}
                 {quickConfiguration?.isAnimationEnable && (
-                    <Form.Item label="是否启用动效" name="animationEnable" valuePropName="checked">
+                    <Form.Item label="是否启用指示效果" name="animationEnable" valuePropName="checked">
                         <Switch />
                     </Form.Item>
                 )}

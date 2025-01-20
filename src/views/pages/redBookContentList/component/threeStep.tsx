@@ -110,6 +110,7 @@ const ThreeStep = ({
             });
             setEditType(false);
             setLoading(false);
+            setPre(Math.random() + Math.random());
             if (res) {
                 setTags(res?.executeResult?.copyWriting?.tagList);
                 setText(res?.executeResult?.copyWriting?.content);
@@ -227,35 +228,34 @@ const ThreeStep = ({
     const downLoadImage = () => {
         setDownLoading(true);
         const zip = new JSZip();
-        let promises;
-        if (isVideo) {
-            if (data?.executeResult?.video?.completeVideoUrl) {
-                promises = [0]?.map(async (imageUrl: any, index: number) => {
-                    const response = await fetch(data?.executeResult?.video?.completeVideoUrl);
-                    const arrayBuffer = await response.arrayBuffer();
-                    zip.file(`video.mp4`, arrayBuffer);
-                    zip.file(title + '.txt', text);
-                });
-            } else {
-                promises = data?.executeResult?.video?.videoList?.map(async (imageUrl: any, index: number) => {
-                    const response = await fetch(imageUrl.videoUrl);
-                    const arrayBuffer = await response.arrayBuffer();
-                    zip.file('video' + (index + 1) + `.mp4`, arrayBuffer);
-                    zip.file(title + '.txt', text);
-                });
-            }
-        } else {
-            promises = imageList.map(async (imageUrl: any, index: number) => {
-                const response = await fetch(imageUrl.url);
+        let promises: any = [];
+        let promises1: any = [];
+        let promises2: any = [];
+        promises = imageList.map(async (imageUrl: any, index: number) => {
+            const response = await fetch(imageUrl.url);
+            const arrayBuffer = await response.arrayBuffer();
+
+            zip.file('image' + (index + 1) + `.${imageUrl?.url?.split('.')[imageUrl?.url?.split('.')?.length - 1]}`, arrayBuffer);
+
+            zip.file(title + '.txt', text);
+        });
+        if (data?.executeResult?.video?.completeVideoUrl) {
+            promises1 = [0]?.map(async (imageUrl: any, index: number) => {
+                const response = await fetch(data?.executeResult?.video?.completeVideoUrl);
                 const arrayBuffer = await response.arrayBuffer();
-
-                zip.file('image' + (index + 1) + `.${imageUrl?.url?.split('.')[imageUrl?.url?.split('.')?.length - 1]}`, arrayBuffer);
-
+                zip.file(`video.mp4`, arrayBuffer);
                 zip.file(title + '.txt', text);
             });
         }
-
-        Promise.all(promises)
+        if (data?.executeResult?.video?.videoList?.length > 0) {
+            promises2 = data?.executeResult?.video?.videoList?.map(async (imageUrl: any, index: number) => {
+                const response = await fetch(imageUrl.videoUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                zip.file('video' + (index + 1) + `.mp4`, arrayBuffer);
+                zip.file(title + '.txt', text);
+            });
+        }
+        Promise.all([Promise.all(promises), Promise.all(promises1), Promise.all(promises2)])
             .then(() => {
                 setDownLoading(false);
                 zip.generateAsync({ type: 'blob' }).then((content: any) => {

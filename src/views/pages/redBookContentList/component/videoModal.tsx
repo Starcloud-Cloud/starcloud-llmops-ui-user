@@ -37,6 +37,7 @@ const VideoModal = ({
     const [results, setResults] = useState<any[]>([]);
     const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
     const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
+    const [soundSpeedOptions, setSoundSpeedOptions] = useState<any[]>([]);
 
     const timer = useRef<any>(null);
     const progresstimer = useRef<any>([]);
@@ -139,9 +140,10 @@ const VideoModal = ({
             return newList;
         });
         try {
+            const values = await form.validateFields();
             const res = await generateVideo({
                 uid: businessUid,
-                quickConfiguration: JSON.stringify(form.getFieldsValue()),
+                quickConfiguration: JSON.stringify(values),
                 videoConfig: templateList?.find((t) => t.code === imageList[index].code)?.videoConfig,
                 imageCode: imageList[index].code,
                 imageUrl: imageList[index].url
@@ -219,11 +221,17 @@ const VideoModal = ({
         dictData('', 'tts_sound_effect').then((res) => {
             setSoundEffectOptions(res.list);
         });
+        dictData('', 'tts_voice_sound_speed').then((res) => {
+            setSoundSpeedOptions(res.list?.map((item: any) => ({ ...item, value: Number(item.value) })));
+        });
         return () => {
             allTimer.current.forEach((item: any) => {
                 clearInterval(item);
             });
             clearTimeout(timer.current);
+            progresstimer.current.forEach((item: any) => {
+                clearInterval(item);
+            });
         };
     }, []);
     const [progress, setProgress] = useState<number[]>([]);
@@ -363,6 +371,11 @@ const VideoModal = ({
                                 </Select.Option>
                             ))}
                         </Select>
+                    </Form.Item>
+                )}
+                {quickConfiguration?.isSoundSpeed && (
+                    <Form.Item label="发音角色语速" name="soundSpeed" rules={[{ required: true }]}>
+                        <Select allowClear options={soundSpeedOptions} style={{ width: 250 }} />
                     </Form.Item>
                 )}
                 {quickConfiguration?.isAnimationEnable && (

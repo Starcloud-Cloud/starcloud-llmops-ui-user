@@ -38,6 +38,7 @@ import { useCache, CACHE_KEY } from 'hooks/web/useCache';
 import { dispatch as dispatchs } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 const { wsCache } = useCache();
+import { NO_LOGIN_PAGES } from 'config';
 
 // import * as LoginApi from 'api/login';
 
@@ -192,13 +193,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
     };
 
     useEffect(() => {
-        if (
-            /Mobi|Android/i.test(navigator.userAgent) &&
-            location.pathname !== '/batchShare' &&
-            location.pathname !== '/share' &&
-            location.pathname !== '/shareVideo' &&
-            location.pathname !== '/'
-        ) {
+        if (/Mobi|Android/i.test(navigator.userAgent) && !NO_LOGIN_PAGES.includes(location?.pathname)) {
             navigate('/');
         }
     }, []);

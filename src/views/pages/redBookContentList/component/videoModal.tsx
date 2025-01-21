@@ -140,9 +140,10 @@ const VideoModal = ({
             return newList;
         });
         try {
+            const values = await form.validateFields();
             const res = await generateVideo({
                 uid: businessUid,
-                quickConfiguration: JSON.stringify(form.getFieldsValue()),
+                quickConfiguration: JSON.stringify(values),
                 videoConfig: templateList?.find((t) => t.code === imageList[index].code)?.videoConfig,
                 imageCode: imageList[index].code,
                 imageUrl: imageList[index].url
@@ -373,7 +374,7 @@ const VideoModal = ({
                     </Form.Item>
                 )}
                 {quickConfiguration?.isSoundSpeed && (
-                    <Form.Item label="发音角色语速" name="soundSpeed">
+                    <Form.Item label="发音角色语速" name="soundSpeed" rules={[{ required: true }]}>
                         <Select allowClear options={soundSpeedOptions} style={{ width: 250 }} />
                     </Form.Item>
                 )}

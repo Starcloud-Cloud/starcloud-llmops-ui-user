@@ -21,10 +21,19 @@ const Share = () => {
         }
     };
     //获取文件后缀
-    const getFileExtension = (url: string) => {
-        if (!url) return '';
-        const match = url.match(/\.([^.]+)$/);
-        return match ? match[1].toUpperCase() : '';
+    const getFileExtension = (url: string, key?: string) => {
+        if (!url) {
+            if (key === 'imagePdfUrl' || key === 'wordbookPdfUrl') {
+                return 'PDF';
+            } else if (key === 'completeVideoUrl') {
+                return 'MP4';
+            } else {
+                return 'MP3';
+            }
+        } else {
+            const match = url.match(/\.([^.]+)$/);
+            return match ? match[1].toUpperCase() : '';
+        }
     };
     const faterDom = useRef<any>(null);
     const [windowHeight, setWindowHeight] = useState('100vh');
@@ -139,7 +148,7 @@ const Share = () => {
                                                         <List.Item.Meta
                                                             title={`${detailData?.copyWriting?.title}${
                                                                 key === 'wordbookPdfUrl' ? '--抗遗忘写本' : ''
-                                                            }.${getFileExtension(value)}`}
+                                                            }.${getFileExtension(value, key)}`}
                                                         />
                                                         <Button
                                                             disabled={!value}

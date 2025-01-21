@@ -718,7 +718,14 @@ const VideoSetting: React.FC<{
                                                                                         </Select>
                                                                                     </Form.Item>
                                                                                     <Form.Item label="发音角色语速" name="soundSpeed">
-                                                                                        <Select allowClear options={soundSpeedOptions} />
+                                                                                        <Select
+                                                                                            defaultValue={form.getFieldValue([
+                                                                                                'globalSettings',
+                                                                                                'soundSpeed'
+                                                                                            ])}
+                                                                                            allowClear
+                                                                                            options={soundSpeedOptions}
+                                                                                        />
                                                                                     </Form.Item>
                                                                                     <Form.Item
                                                                                         label="是否跟读"

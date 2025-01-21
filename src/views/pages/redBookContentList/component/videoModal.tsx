@@ -221,7 +221,7 @@ const VideoModal = ({
             setSoundEffectOptions(res.list);
         });
         dictData('', 'tts_voice_sound_speed').then((res) => {
-            setSoundSpeedOptions(res.list);
+            setSoundSpeedOptions(res.list?.map((item: any) => ({ ...item, value: Number(item.value) })));
         });
         return () => {
             allTimer.current.forEach((item: any) => {
@@ -611,7 +611,19 @@ const VideoModal = ({
                                                     >
                                                         预览
                                                     </Button>
-                                                    <Button type="primary" onClick={async () => {}}>
+                                                    <Button
+                                                        type="primary"
+                                                        onClick={async () => {
+                                                            const response = await fetch(completeVideo?.videoUrl);
+                                                            const arrayBuffer = await response.arrayBuffer();
+                                                            const blob = new Blob([arrayBuffer], { type: 'video/mp4' });
+                                                            const videoUrl = URL.createObjectURL(blob);
+                                                            const link = document.createElement('a');
+                                                            link.href = videoUrl;
+                                                            link.download = title + '.MP4';
+                                                            link.click();
+                                                        }}
+                                                    >
                                                         下载
                                                     </Button>
                                                 </div>

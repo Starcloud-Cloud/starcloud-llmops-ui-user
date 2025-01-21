@@ -147,7 +147,7 @@ const H5Modal = ({
                 <div className="flex-1 flex flex-col gap-4">
                     <Card size="small">
                         <div className="flex justify-between">
-                            <div className="text-base font-bold">{title}.mp4</div>
+                            <div className="text-base font-bold">{title}.MP4</div>
                             <div className="flex gap-2">
                                 <Button
                                     onClick={() => download(h5Data?.resource?.completeVideoUrl, 'mp4')}
@@ -171,7 +171,7 @@ const H5Modal = ({
                     </Card>
                     <Card size="small">
                         <div className="flex justify-between">
-                            <div className="text-base font-bold">{title}.mp3</div>
+                            <div className="text-base font-bold">{title}.MP3</div>
                             <div className="flex gap-2">
                                 <Button
                                     onClick={() => download(h5Data?.resource?.completeAudioUrl, 'mp3')}
@@ -257,7 +257,7 @@ const H5Modal = ({
                             </Popover>
                         </div>
                         <div className="flex justify-between">
-                            <div className="text-base font-bold">{title}.pdf</div>
+                            <div className="text-base font-bold">{title}.PDF</div>
                             <div className="flex gap-2">
                                 <Button loading={pdfLoading} onClick={pdfExecute}>
                                     {h5Data?.resource?.imagePdfUrl ? '重新生成' : '生成'}
@@ -357,13 +357,13 @@ const H5Modal = ({
                             </Popover>
                         </div>
                         <div className="flex justify-between">
-                            <div className="text-base font-bold">{title}--抗遗忘写本.pdf</div>
+                            <div className="text-base font-bold">{title}--抗遗忘写本.PDF</div>
                             <div className="flex gap-2">
                                 <Button loading={wordbookLoading} onClick={wordbookExecute}>
                                     {h5Data?.resource?.wordbookPdfUrl ? '重新生成' : '生成'}
                                 </Button>
                                 <Button
-                                    onClick={() => download(h5Data?.resource?.wordbookPdfUrl, 'pdf')}
+                                    onClick={() => download(h5Data?.resource?.wordbookPdfUrl, 'PDF')}
                                     disabled={!h5Data?.resource?.wordbookPdfUrl}
                                     type="primary"
                                 >

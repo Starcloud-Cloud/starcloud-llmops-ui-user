@@ -37,6 +37,7 @@ const VideoModal = ({
     const [results, setResults] = useState<any[]>([]);
     const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
     const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
+    const [soundSpeedOptions, setSoundSpeedOptions] = useState<any[]>([]);
 
     const timer = useRef<any>(null);
     const progresstimer = useRef<any>([]);
@@ -219,6 +220,9 @@ const VideoModal = ({
         dictData('', 'tts_sound_effect').then((res) => {
             setSoundEffectOptions(res.list);
         });
+        dictData('', 'tts_voice_sound_speed').then((res) => {
+            setSoundSpeedOptions(res.list);
+        });
         return () => {
             allTimer.current.forEach((item: any) => {
                 clearInterval(item);
@@ -366,6 +370,11 @@ const VideoModal = ({
                                 </Select.Option>
                             ))}
                         </Select>
+                    </Form.Item>
+                )}
+                {quickConfiguration?.isSoundSpeed && (
+                    <Form.Item label="发音角色语速" name="soundSpeed">
+                        <Select allowClear options={soundSpeedOptions} style={{ width: 250 }} />
                     </Form.Item>
                 )}
                 {quickConfiguration?.isAnimationEnable && (

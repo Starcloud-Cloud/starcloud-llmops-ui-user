@@ -22,5 +22,5 @@ export const saveConfig = (data: any) => {
 };
 //h5 获取配置
 export const getShareResource = (data: any) => {
-    return request.get({ url: '/llm/xhs/content/shareResource/' + data });
+    return request.get({ url: '/llm/xhs/content/shareResult?uid=' + data });
 };

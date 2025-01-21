@@ -11,6 +11,9 @@ export const BASE_PATH = '';
 export const DASHBOARD_PATH = getTenant() === ENUM_TENANT.AI ? '/appMarket' : '/';
 export const HORIZONTAL_MAX_ITEM = 6;
 
+//不需要登录的页面
+export const NO_LOGIN_PAGES = ['/', '/invite', '/share', '/shareVideo', '/batchShare', '/dataShare'];
+
 const config: ConfigProps = {
     layout: LAYOUT_CONST.VERTICAL_LAYOUT, // vertical, horizontal
     drawerType: LAYOUT_CONST.DEFAULT_DRAWER, // default, mini-drawer

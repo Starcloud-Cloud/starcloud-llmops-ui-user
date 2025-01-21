@@ -357,7 +357,10 @@ const ThreeStep = ({
         }
     }, [data]);
     useEffect(() => {
-        if (data?.executeResult?.video) {
+        if (
+            data?.executeResult?.video?.completeVideoUrl ||
+            data?.executeResult?.video?.videoList?.filter((item: any) => item.videoUrl).length > 0
+        ) {
             setIsVideo(true);
         }
     }, [data]);
@@ -512,7 +515,7 @@ const ThreeStep = ({
                                 <>
                                     {((isVideo &&
                                         !data?.executeResult?.video?.completeVideoUrl &&
-                                        data?.executeResult?.video?.videoList?.length > 1) ||
+                                        data?.executeResult?.video?.videoList?.filter((item: any) => item.videoUrl).length > 1) ||
                                         (!isVideo && imageList?.length > 1)) && (
                                         <div className="flex justify-between absolute top-[46%] w-full z-10">
                                             <Button
@@ -572,20 +575,22 @@ const ThreeStep = ({
                                                 </SwiperSlide>
                                             ) : (
                                                 data?.executeResult?.video?.videoList &&
-                                                data?.executeResult?.video?.videoList?.length > 0 &&
-                                                data?.executeResult?.video?.videoList.map((item: any, index: number) => (
-                                                    <SwiperSlide key={index}>
-                                                        <div className="w-full h-full flex items-center">
-                                                            <video
-                                                                id={`player-${index}`}
-                                                                src={item?.videoUrl}
-                                                                controls
-                                                                width={'100%'}
-                                                                className="max-h-[100%] z-[1]"
-                                                            />
-                                                        </div>
-                                                    </SwiperSlide>
-                                                ))
+                                                data?.executeResult?.video?.videoList?.filter((item: any) => item.videoUrl).length > 0 &&
+                                                data?.executeResult?.video?.videoList
+                                                    ?.filter((item: any) => item.videoUrl)
+                                                    .map((item: any, index: number) => (
+                                                        <SwiperSlide key={index}>
+                                                            <div className="w-full h-full flex items-center">
+                                                                <video
+                                                                    id={`player-${index}`}
+                                                                    src={item?.videoUrl}
+                                                                    controls
+                                                                    width={'100%'}
+                                                                    className="max-h-[100%] z-[1]"
+                                                                />
+                                                            </div>
+                                                        </SwiperSlide>
+                                                    ))
                                             )}
                                         </Swiper>
                                     </div>

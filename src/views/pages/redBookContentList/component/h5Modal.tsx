@@ -136,7 +136,13 @@ const H5Modal = ({
             <div className="flex gap-4">
                 <div className="flex flex-col items-center justify-center">
                     <QRCode size={150} value={process.env.REACT_APP_SHARE_URL + '/dataShare?uid=' + uid} />
-                    <div className="text-xs text-gray-500 mt-2 font-bold hover:text-[#673ab7] cursor-pointer">查看</div>
+                    <div
+                        onClick={() => window.open(process.env.REACT_APP_SHARE_URL + '/dataShare?uid=' + uid)}
+                        className="text-md mt-2 underline text-[#673ab7] cursor-pointer"
+                    >
+                        查看效果
+                    </div>
+                    <div className="text-md text-[#000000a6]">扫码查看分享网页</div>
                 </div>
                 <div className="flex-1 flex flex-col gap-4">
                     <Card size="small">
@@ -286,18 +292,22 @@ const H5Modal = ({
                                 onOpenChange={setWordbookOpen}
                                 content={
                                     <Form form={form} layout="vertical" className="w-[300px]">
-                                        <Form.Item label="选择单词的字段" name="wordField" rules={[{ required: true }]}>
+                                        <Form.Item label='选择是"单词"的字段' name="wordField" rules={[{ required: true }]}>
                                             <Select>
-                                                {columns.map((item: any) => (
-                                                    <Select.Option value={item.columnCode}>{item.columnName}</Select.Option>
-                                                ))}
+                                                {columns
+                                                    ?.filter((item: any) => item.columnType !== 5)
+                                                    .map((item: any) => (
+                                                        <Select.Option value={item.columnCode}>{item.columnName}</Select.Option>
+                                                    ))}
                                             </Select>
                                         </Form.Item>
-                                        <Form.Item label="选择译义的字段" name="paraphraseField" rules={[{ required: true }]}>
+                                        <Form.Item label='选择是"译义"的字段' name="paraphraseField" rules={[{ required: true }]}>
                                             <Select>
-                                                {columns.map((item: any) => (
-                                                    <Select.Option value={item.columnCode}>{item.columnName}</Select.Option>
-                                                ))}
+                                                {columns
+                                                    ?.filter((item: any) => item.columnType !== 5)
+                                                    .map((item: any) => (
+                                                        <Select.Option value={item.columnCode}>{item.columnName}</Select.Option>
+                                                    ))}
                                             </Select>
                                         </Form.Item>
                                         <Form.Item label="选择模式" name="posterTemplate" rules={[{ required: true }]}>
@@ -383,7 +393,10 @@ const H5Modal = ({
             <Modal open={qrCodeOpen} onCancel={() => setQrCodeOpen(false)} footer={null}>
                 <div className="flex flex-col gap-2 items-center">
                     <QRCode size={180} value={qrCode} />
-                    <div className="text-xs font-bold text-black/50">扫码查看详情</div>
+                    <div onClick={() => window.open(qrCode)} className="text-md text-[#673ab7] underline cursor-pointer">
+                        查看效果
+                    </div>
+                    <div className="text-sm text-[#000000a6]">扫码查看详情</div>
                 </div>
             </Modal>
         </Modal>

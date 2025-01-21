@@ -7,6 +7,7 @@ import { generateRoute } from 'utils/routerHelper';
 import { AppCustomRouteRecordRaw, RouteStore } from 'types/router';
 import localStorage from 'redux-persist/es/storage';
 import { ENUM_PERMISSION, getPermission } from 'utils/permission';
+import { NO_LOGIN_PAGES } from 'config';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const { wsCache } = useCache();
@@ -56,13 +57,7 @@ const useRouteStore = create<RouteStore>((set) => ({
         let res: any[] = [];
         if (wsCache.get(CACHE_KEY.ROLE_ROUTERS)) {
             res = wsCache.get(CACHE_KEY.ROLE_ROUTERS);
-        } else if (
-            location?.pathname !== '/' &&
-            location?.pathname !== '/invite' &&
-            location?.pathname !== '/share' &&
-            location?.pathname !== '/shareVideo' &&
-            location?.pathname !== '/batchShare'
-        ) {
+        } else if (!NO_LOGIN_PAGES.includes(location?.pathname)) {
             const resData = await getInfos();
             res = resData?.menus;
             wsCache.set(CACHE_KEY.ROLE_ROUTERS, res);

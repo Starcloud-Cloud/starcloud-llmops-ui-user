@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { getAccessToken, removeToken } from 'utils/auth';
 import { CACHE_KEY, useCache } from 'hooks/web/useCache';
 import { getInfos, loginOut } from 'api/login';
+import { NO_LOGIN_PAGES } from 'config';
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const { wsCache } = useCache();
 
@@ -49,13 +50,7 @@ const useUserStore = create<UserStore>((set) => ({
         }
         let userInfo = wsCache.get(CACHE_KEY.INFO);
         // if (!userInfo) {
-        if (
-            location?.pathname !== '/' &&
-            location?.pathname !== '/invite' &&
-            location?.pathname !== '/share' &&
-            location?.pathname !== '/shareVideo' &&
-            location?.pathname !== '/batchShare'
-        ) {
+        if (!NO_LOGIN_PAGES.includes(location?.pathname)) {
             userInfo = await getInfos();
         }
 

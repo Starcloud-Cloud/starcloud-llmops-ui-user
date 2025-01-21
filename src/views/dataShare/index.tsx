@@ -15,10 +15,16 @@ const Share = () => {
         try {
             const result = await getShareResource(query.get('uid'));
             setLoading(false);
-            setDetailData(result);
+            setDetailData(result?.executeResult);
         } catch (err) {
             setLoading(false);
         }
+    };
+    //获取文件后缀
+    const getFileExtension = (url: string) => {
+        if (!url) return '';
+        const match = url.match(/\.([^.]+)$/);
+        return match ? match[1].toUpperCase() : '';
     };
     const faterDom = useRef<any>(null);
     const [windowHeight, setWindowHeight] = useState('100vh');
@@ -43,11 +49,17 @@ const Share = () => {
         const video = e.target as HTMLVideoElement;
         setVideoHeight((video.videoHeight * (video.parentElement?.clientWidth || 0)) / video.videoWidth);
     };
-    const download = (url: string) => {
-        // window.open(url, '_blank');
+    const download = async (url: string, extension: string) => {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = detailData?.copyWriting?.title + '.' + extension;
+        link.click();
     };
     return (
-        <div style={{ height: `calc(${windowHeight} + '40px')` }} className="share w-full flex justify-center">
+        <div className="share w-full flex justify-center">
             {loading ? (
                 <Spin className="h-full w-full flex justify-center items-center"></Spin>
             ) : (
@@ -72,18 +84,34 @@ const Share = () => {
                                                     className="h-full"
                                                     draggable={true}
                                                     adaptiveHeight
-                                                    dots={{ className: 'uls' }}
+                                                    dots={false}
                                                     style={{ height: videoHeight }}
                                                 >
-                                                    <div className="px-[30px]">
-                                                        <video
-                                                            width="100%"
-                                                            height="100%"
-                                                            controls
-                                                            src={detailData?.resource?.completeVideoUrl}
-                                                            onLoadedMetadata={handleLoadedMetadata}
-                                                        />
-                                                    </div>
+                                                    {detailData?.resource?.completeVideoUrl ? (
+                                                        <div className="px-[30px]">
+                                                            <video
+                                                                width="100%"
+                                                                height="100%"
+                                                                controls
+                                                                src={detailData?.resource?.completeVideoUrl}
+                                                                onLoadedMetadata={handleLoadedMetadata}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        detailData?.resource?.videoList
+                                                            ?.filter((item: any) => item.videoUrl)
+                                                            .map((item: any) => (
+                                                                <div className="px-[30px]" key={item.videoUrl}>
+                                                                    <video
+                                                                        width="100%"
+                                                                        height="100%"
+                                                                        controls
+                                                                        src={item.videoUrl}
+                                                                        onLoadedMetadata={handleLoadedMetadata}
+                                                                    />
+                                                                </div>
+                                                            ))
+                                                    )}
                                                 </Carousel>
                                             </div>
                                         </div>
@@ -103,11 +131,23 @@ const Share = () => {
                                         <div className="h-full overflow-y-scroll px-4">
                                             <List
                                                 itemLayout="horizontal"
-                                                dataSource={detailData?.resource ? Object.entries(detailData?.resource) : []}
+                                                dataSource={
+                                                    detailData?.resource ? (Object.entries(detailData?.resource) as [string, string][]) : []
+                                                }
                                                 renderItem={([key, value], index) => (
                                                     <List.Item>
-                                                        <List.Item.Meta title={key} />
-                                                        <Button onClick={() => {}} type="primary">
+                                                        <List.Item.Meta
+                                                            title={`${detailData?.copyWriting?.title}${
+                                                                key === 'wordbookPdfUrl' ? '--抗遗忘写本' : ''
+                                                            }.${getFileExtension(value)}`}
+                                                        />
+                                                        <Button
+                                                            disabled={!value}
+                                                            onClick={() => {
+                                                                download(value, getFileExtension(value));
+                                                            }}
+                                                            type="primary"
+                                                        >
                                                             <DownloadOutlined />
                                                             下载
                                                         </Button>

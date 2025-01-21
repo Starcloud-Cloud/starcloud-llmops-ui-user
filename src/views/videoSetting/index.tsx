@@ -28,6 +28,7 @@ interface VoiceUnit {
             audioEnable: boolean; // 是否发音
             repeatEnable: boolean; // 是否跟读
             repeatRole: string | undefined; // 跟读发音角色
+            soundSpeed: string | undefined; // 发音角色语速
             repeatCount: number | undefined; // 跟读次数
         };
         point: {
@@ -62,6 +63,7 @@ interface VoiceConfig {
         elementInterval: number; // 发音元素间隔
         unitInterval: number; // 发音单元间隔
         voiceRole: string; // 发音角色
+        soundSpeed: string; // 发音角色语音速度
         soundEffect: string; // 指示效果
         repeatEnable: boolean; // 是否跟读
         animationEnable: boolean; // 是否启用动效
@@ -107,6 +109,7 @@ const VideoSetting: React.FC<{
 }) => {
     const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
     const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
+    const [soundSpeedOptions, setSoundSpeedOptions] = useState<any[]>([]);
     const [form] = Form.useForm<VoiceConfig>();
     const [voiceUnits, setVoiceUnits] = useState<VoiceUnit[]>([
         {
@@ -130,7 +133,8 @@ const VideoSetting: React.FC<{
                         audioEnable: true,
                         repeatEnable: false,
                         repeatRole: undefined,
-                        repeatCount: undefined
+                        repeatCount: undefined,
+                        soundSpeed: undefined
                     },
                     point: {
                         x: 0,
@@ -183,7 +187,8 @@ const VideoSetting: React.FC<{
                         audioEnable: true,
                         repeatEnable: false,
                         repeatRole: undefined,
-                        repeatCount: undefined
+                        repeatCount: undefined,
+                        soundSpeed: undefined
                     },
                     point: {
                         x: 0,
@@ -232,7 +237,8 @@ const VideoSetting: React.FC<{
                 audioEnable: true,
                 repeatEnable: false,
                 repeatRole: undefined,
-                repeatCount: undefined
+                repeatCount: undefined,
+                soundSpeed: undefined
             },
             point: {
                 x: 0,
@@ -343,6 +349,9 @@ const VideoSetting: React.FC<{
         });
         dictData('', 'tts_sound_effect').then((res) => {
             setSoundEffectOptions(res.list);
+        });
+        dictData('', 'tts_voice_sound_speed').then((res) => {
+            setSoundSpeedOptions(res.list);
         });
     }, []);
 
@@ -512,6 +521,19 @@ const VideoSetting: React.FC<{
                         />
                         <div className="text-xs">快捷配置</div>
                     </div>
+
+                    <div className="flex items-center gap-2">
+                        <Form.Item label="发音角色语速" name={['globalSettings', 'soundSpeed']}>
+                            <Select allowClear options={soundSpeedOptions} style={{ width: 250 }} />
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isSoundSpeed}
+                            onChange={() =>
+                                setQuickConfiguration({ ...quickConfiguration, isSoundSpeed: !quickConfiguration.isSoundSpeed })
+                            }
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
                 </div>
             </div>
 
@@ -539,7 +561,13 @@ const VideoSetting: React.FC<{
                                                             <DragOutlined className="cursor-move" />
                                                         </div>
                                                         {unit.soundEffect.animation.type && (
-                                                            <Tag color="success">{unit.soundEffect.animation.type}</Tag>
+                                                            <Tag color="success">
+                                                                {
+                                                                    soundEffectOptions.find(
+                                                                        (item) => item.value === unit.soundEffect.animation.type
+                                                                    )?.label
+                                                                }
+                                                            </Tag>
                                                         )}
                                                         {unit.settings.interval && <Tag color="success">{unit.settings.interval}秒</Tag>}
                                                     </div>
@@ -689,6 +717,9 @@ const VideoSetting: React.FC<{
                                                                                             ))}
                                                                                         </Select>
                                                                                     </Form.Item>
+                                                                                    <Form.Item label="发音角色语速" name="soundSpeed">
+                                                                                        <Select allowClear options={soundSpeedOptions} />
+                                                                                    </Form.Item>
                                                                                     <Form.Item
                                                                                         label="是否跟读"
                                                                                         name="repeatEnable"
@@ -813,6 +844,15 @@ const VideoSetting: React.FC<{
                                                             </div>
                                                             <div className="mt-2">
                                                                 {item.settings.audioEnable && <Tag color="success">发音</Tag>}
+                                                                {item?.settings?.soundSpeed && (
+                                                                    <Tag color="success">
+                                                                        {
+                                                                            soundSpeedOptions.find(
+                                                                                (i) => i.value === item?.settings?.soundSpeed
+                                                                            )?.label
+                                                                        }
+                                                                    </Tag>
+                                                                )}
                                                                 {item.audio.voiceRole && <Tag color="success">{item.audio.voiceRole}</Tag>}
 
                                                                 {item.settings.repeatEnable && <Tag color="success">跟读</Tag>}

@@ -26,7 +26,7 @@ interface VoiceUnit {
         };
         settings: {
             audioEnable: boolean; // 是否发音
-            repeatEnable: boolean; // 是否跟读
+            // repeatEnable: boolean; // 是否跟读
             repeatRole: string | undefined; // 跟读发音角色
             soundSpeed: string | undefined; // 发音角色语速
             repeatCount: number | undefined; // 跟读次数
@@ -65,8 +65,8 @@ interface VoiceConfig {
         voiceRole: string; // 发音角色
         soundSpeed: string; // 发音角色语音速度
         soundEffect: string; // 指示效果
-        repeatEnable: boolean; // 是否跟读
-        animationEnable: boolean; // 是否启用动效
+        // repeatEnable: boolean; // 是否跟读
+        // animationEnable: boolean; // 是否启用动效
         repeatRole: string; // 跟读发音角色
         resolution: {
             width: number;
@@ -131,7 +131,7 @@ const VideoSetting: React.FC<{
                     },
                     settings: {
                         audioEnable: true,
-                        repeatEnable: false,
+                        // repeatEnable: false,
                         repeatRole: undefined,
                         repeatCount: undefined,
                         soundSpeed: undefined
@@ -185,7 +185,7 @@ const VideoSetting: React.FC<{
                     },
                     settings: {
                         audioEnable: true,
-                        repeatEnable: false,
+                        // repeatEnable: false,
                         repeatRole: undefined,
                         repeatCount: undefined,
                         soundSpeed: undefined
@@ -235,7 +235,7 @@ const VideoSetting: React.FC<{
             },
             settings: {
                 audioEnable: true,
-                repeatEnable: false,
+                // repeatEnable: false,
                 repeatRole: undefined,
                 repeatCount: undefined,
                 soundSpeed: undefined
@@ -378,8 +378,8 @@ const VideoSetting: React.FC<{
                     unitInterval: 1,
                     voiceRole: undefined,
                     soundEffect: undefined,
-                    repeatEnable: false,
-                    animationEnable: false,
+                    // repeatEnable: false,
+                    // animationEnable: false,
                     repeatRole: undefined
                 }
                 // videoConfig: {
@@ -395,7 +395,8 @@ const VideoSetting: React.FC<{
                     <Form.Item label="发音元素间隔" name={['globalSettings', 'elementInterval']} rules={[{ required: true }]}>
                         <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 250 }} />
                     </Form.Item>
-                    <div className="flex items-center gap-2">
+
+                    {/* <div className="flex items-center gap-2">
                         <Form.Item
                             label="是否启用指示效果"
                             className="w-[250px]"
@@ -412,9 +413,9 @@ const VideoSetting: React.FC<{
                             }
                         />
                         <div className="text-xs">快捷配置</div>
-                    </div>
+                    </div> */}
 
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                         <Form.Item
                             className="w-[250px]"
                             label="是否跟读"
@@ -431,7 +432,7 @@ const VideoSetting: React.FC<{
                             }
                         />
                         <div className="text-xs">快捷配置</div>
-                    </div>
+                    </div> */}
 
                     <div className="flex items-center gap-2">
                         <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
@@ -465,31 +466,13 @@ const VideoSetting: React.FC<{
                         />
                         <div className="text-xs">快捷配置</div>
                     </div>
-                </div>
-                <div className="flex-1">
-                    <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
-                        <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 250 }} />
-                    </Form.Item>
-
-                    <div className="flex items-center gap-2">
-                        <Form.Item label="指示效果" name={['globalSettings', 'soundEffect']}>
-                            <Select allowClear style={{ width: 250 }}>
-                                <Select.Option value="手指">手指</Select.Option>
-                                <Select.Option value="圆圈">圆圈</Select.Option>
-                            </Select>
-                        </Form.Item>
-                        <Checkbox
-                            checked={quickConfiguration.isSoundEffect}
-                            onChange={() =>
-                                setQuickConfiguration({ ...quickConfiguration, isSoundEffect: !quickConfiguration.isSoundEffect })
-                            }
-                        />
-                        <div className="text-xs">快捷配置</div>
-                    </div>
 
                     <div className="flex items-center gap-2">
                         <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']}>
                             <Select allowClear optionLabelProp="label" style={{ width: 250 }}>
+                                <Select.Option value="NULL" label="不跟读">
+                                    不跟读
+                                </Select.Option>
                                 {voiceRoleOptions?.map((item) => (
                                     <Select.Option
                                         key={item.code}
@@ -521,6 +504,11 @@ const VideoSetting: React.FC<{
                         />
                         <div className="text-xs">快捷配置</div>
                     </div>
+                </div>
+                <div className="flex-1">
+                    <Form.Item label="发音单元间隔" name={['globalSettings', 'unitInterval']} rules={[{ required: true }]}>
+                        <InputNumber addonAfter="秒" min={1} max={9} style={{ width: 250 }} />
+                    </Form.Item>
 
                     <div className="flex items-center gap-2">
                         <Form.Item label="发音角色语速" name={['globalSettings', 'soundSpeed']}>
@@ -530,6 +518,19 @@ const VideoSetting: React.FC<{
                             checked={quickConfiguration.isSoundSpeed}
                             onChange={() =>
                                 setQuickConfiguration({ ...quickConfiguration, isSoundSpeed: !quickConfiguration.isSoundSpeed })
+                            }
+                        />
+                        <div className="text-xs">快捷配置</div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Form.Item label="指示效果" name={['globalSettings', 'soundEffect']}>
+                            <Select allowClear style={{ width: 250 }} options={soundEffectOptions} />
+                        </Form.Item>
+                        <Checkbox
+                            checked={quickConfiguration.isSoundEffect}
+                            onChange={() =>
+                                setQuickConfiguration({ ...quickConfiguration, isSoundEffect: !quickConfiguration.isSoundEffect })
                             }
                         />
                         <div className="text-xs">快捷配置</div>
@@ -727,13 +728,13 @@ const VideoSetting: React.FC<{
                                                                                             options={soundSpeedOptions}
                                                                                         />
                                                                                     </Form.Item>
-                                                                                    <Form.Item
+                                                                                    {/* <Form.Item
                                                                                         label="是否跟读"
                                                                                         name="repeatEnable"
                                                                                         valuePropName="checked"
                                                                                     >
                                                                                         <Switch />
-                                                                                    </Form.Item>
+                                                                                    </Form.Item> */}
                                                                                     <Form.Item label="跟读角色" name="repeatRole">
                                                                                         <Select
                                                                                             optionLabelProp="label"
@@ -743,6 +744,9 @@ const VideoSetting: React.FC<{
                                                                                                 'repeatRole'
                                                                                             ])}
                                                                                         >
+                                                                                            <Select.Option value="NULL" label="不跟读">
+                                                                                                不跟读
+                                                                                            </Select.Option>
                                                                                             {voiceRoleOptions?.map((item) => (
                                                                                                 <Select.Option
                                                                                                     key={item.code}
@@ -860,11 +864,33 @@ const VideoSetting: React.FC<{
                                                                         }
                                                                     </Tag>
                                                                 )}
-                                                                {item.audio.voiceRole && <Tag color="success">{item.audio.voiceRole}</Tag>}
+                                                                {item.audio.voiceRole && (
+                                                                    <Tag color="success">
+                                                                        {
+                                                                            voiceRoleOptions?.find((i) => i.code === item.audio.voiceRole)
+                                                                                ?.name
+                                                                        }
+                                                                    </Tag>
+                                                                )}
 
-                                                                {item.settings.repeatEnable && <Tag color="success">跟读</Tag>}
-                                                                {item.settings.repeatRole && (
-                                                                    <Tag color="success">{item.settings.repeatRole}</Tag>
+                                                                {/* {item.settings.repeatEnable && <Tag color="success">跟读</Tag>} */}
+
+                                                                {item.settings.repeatRole === 'NULL' ? (
+                                                                    <Tag color="success">不跟读</Tag>
+                                                                ) : item.settings.repeatRole ? (
+                                                                    <Tag color="success">
+                                                                        跟读：
+                                                                        {
+                                                                            voiceRoleOptions?.find(
+                                                                                (i) => i.code === item.settings.repeatRole
+                                                                            )?.name
+                                                                        }
+                                                                    </Tag>
+                                                                ) : form.getFieldValue(['globalSettings', 'repeatRole']) &&
+                                                                  form.getFieldValue(['globalSettings', 'repeatRole']) !== 'NULL' ? (
+                                                                    <Tag color="success">跟读</Tag>
+                                                                ) : (
+                                                                    ''
                                                                 )}
                                                                 {item.settings.repeatCount && (
                                                                     <Tag color="success">{item.settings.repeatCount}次</Tag>

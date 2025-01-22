@@ -378,11 +378,11 @@ const VideoModal = ({
                         <Select allowClear options={soundSpeedOptions} style={{ width: 250 }} />
                     </Form.Item>
                 )}
-                {quickConfiguration?.isAnimationEnable && (
+                {/* {quickConfiguration?.isAnimationEnable && (
                     <Form.Item label="是否启用指示效果" name="animationEnable" valuePropName="checked">
                         <Switch />
                     </Form.Item>
-                )}
+                )} */}
                 {quickConfiguration?.isAnimationEnable && (
                     <Form.Item noStyle dependencies={['animationEnable']}>
                         {({ getFieldValue }) => {
@@ -395,11 +395,11 @@ const VideoModal = ({
                         }}
                     </Form.Item>
                 )}
-                {quickConfiguration?.isRepeatEnable && (
+                {/* {quickConfiguration?.isRepeatEnable && (
                     <Form.Item label="是否跟读" name="repeatEnable" valuePropName="checked">
                         <Switch />
                     </Form.Item>
-                )}
+                )} */}
                 {quickConfiguration?.isRepeatRole && (
                     <Form.Item noStyle dependencies={['repeatEnable']}>
                         {({ getFieldValue }) => {

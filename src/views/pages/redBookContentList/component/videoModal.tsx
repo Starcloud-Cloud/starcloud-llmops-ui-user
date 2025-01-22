@@ -330,7 +330,6 @@ const VideoModal = ({
             setMergeMessage(error?.message || '合并失败');
         }
     };
-
     return (
         <Modal
             width={'600px'}
@@ -346,7 +345,6 @@ const VideoModal = ({
                 initialValues={{
                     voiceRole: undefined,
                     soundEffect: undefined,
-                    repeatEnable: false,
                     repeatRole: undefined
                 }}
             >
@@ -379,63 +377,41 @@ const VideoModal = ({
                     </Form.Item>
                 )}
                 {quickConfiguration?.isAnimationEnable && (
-                    <Form.Item label="是否启用指示效果" name="animationEnable" valuePropName="checked">
-                        <Switch />
+                    // <Form.Item noStyle dependencies={['animationEnable']}>
+                    //     {({ getFieldValue }) => {
+                    //         const animationEnabled = getFieldValue('animationEnable');
+                    //         return animationEnabled ? (
+                    <Form.Item label="指示效果" name="soundEffect" rules={[{ required: true, message: '请选择指示效果' }]}>
+                        <Select style={{ width: 250 }} options={soundEffectOptions} />
                     </Form.Item>
-                )}
-                {quickConfiguration?.isAnimationEnable && (
-                    <Form.Item noStyle dependencies={['animationEnable']}>
-                        {({ getFieldValue }) => {
-                            const animationEnabled = getFieldValue('animationEnable');
-                            return animationEnabled ? (
-                                <Form.Item label="指示效果" name="soundEffect" rules={[{ required: true, message: '请选择指示效果' }]}>
-                                    <Select style={{ width: 250 }} options={soundEffectOptions} />
-                                </Form.Item>
-                            ) : null;
-                        }}
-                    </Form.Item>
-                )}
-                {quickConfiguration?.isRepeatEnable && (
-                    <Form.Item label="是否跟读" name="repeatEnable" valuePropName="checked">
-                        <Switch />
-                    </Form.Item>
+                    //         ) : null;
+                    //     }}
+                    // </Form.Item>
                 )}
                 {quickConfiguration?.isRepeatRole && (
-                    <Form.Item noStyle dependencies={['repeatEnable']}>
-                        {({ getFieldValue }) => {
-                            const repeatEnabled = getFieldValue('repeatEnable');
-                            return repeatEnabled ? (
-                                <Form.Item
-                                    label="跟读发音角色"
-                                    name="repeatRole"
-                                    rules={[{ required: true, message: '请选择跟读发音角色' }]}
-                                >
-                                    <Select optionLabelProp="label" style={{ width: 250 }}>
-                                        {voiceRoleOptions?.map((item) => (
-                                            <Select.Option
-                                                key={item.code}
-                                                label={`${item.name} - ${item.language} - ${item.voice}`}
-                                                value={item.code}
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
-                                                    {item.demo_link && (
-                                                        <Button
-                                                            type="text"
-                                                            icon={<SoundOutlined />}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation(); // 防止触发选择事件
-                                                                playAudioDemo(item.demo_link);
-                                                            }}
-                                                        />
-                                                    )}
-                                                </div>
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                            ) : null;
-                        }}
+                    <Form.Item label="跟读发音角色" name="repeatRole" rules={[{ required: true, message: '请选择跟读发音角色' }]}>
+                        <Select optionLabelProp="label" style={{ width: 250 }}>
+                            <Select.Option value="NULL" label="不跟读">
+                                不跟读
+                            </Select.Option>
+                            {voiceRoleOptions?.map((item) => (
+                                <Select.Option key={item.code} label={`${item.name} - ${item.language} - ${item.voice}`} value={item.code}>
+                                    <div className="flex items-center justify-between">
+                                        <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                        {item.demo_link && (
+                                            <Button
+                                                type="text"
+                                                icon={<SoundOutlined />}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // 防止触发选择事件
+                                                    playAudioDemo(item.demo_link);
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                </Select.Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 )}
             </Form>

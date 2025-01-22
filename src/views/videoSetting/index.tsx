@@ -468,7 +468,7 @@ const VideoSetting: React.FC<{
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']}>
+                        <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']} rules={[{ required: true }]}>
                             <Select allowClear optionLabelProp="label" style={{ width: 250 }}>
                                 <Select.Option value="NULL" label="不跟读">
                                     不跟读
@@ -511,7 +511,7 @@ const VideoSetting: React.FC<{
                     </Form.Item>
 
                     <div className="flex items-center gap-2">
-                        <Form.Item label="发音角色语速" name={['globalSettings', 'soundSpeed']}>
+                        <Form.Item label="发音角色语速" name={['globalSettings', 'soundSpeed']} rules={[{ required: true }]}>
                             <Select allowClear options={soundSpeedOptions} style={{ width: 250 }} />
                         </Form.Item>
                         <Checkbox
@@ -524,7 +524,7 @@ const VideoSetting: React.FC<{
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Form.Item label="指示效果" name={['globalSettings', 'soundEffect']}>
+                        <Form.Item label="指示效果" name={['globalSettings', 'soundEffect']} rules={[{ required: true }]}>
                             <Select allowClear style={{ width: 250 }} options={soundEffectOptions} />
                         </Form.Item>
                         <Checkbox
@@ -675,7 +675,7 @@ const VideoSetting: React.FC<{
                                                                             }
                                                                         }}
                                                                         content={
-                                                                            <div className="w-[250px]">
+                                                                            <div className="w-[300px]">
                                                                                 <Form form={popForm}>
                                                                                     <Form.Item
                                                                                         label="是否发音"
@@ -854,46 +854,57 @@ const VideoSetting: React.FC<{
                                                                 )}
                                                             </div>
                                                             <div className="mt-2">
-                                                                {item.settings.audioEnable && <Tag color="success">发音</Tag>}
-                                                                {item?.settings?.soundSpeed && (
-                                                                    <Tag color="success">
-                                                                        {
-                                                                            soundSpeedOptions.find(
-                                                                                (i) => i.value === item?.settings?.soundSpeed
-                                                                            )?.label
-                                                                        }
-                                                                    </Tag>
-                                                                )}
-                                                                {item.audio.voiceRole && (
-                                                                    <Tag color="success">
-                                                                        {
-                                                                            voiceRoleOptions?.find((i) => i.code === item.audio.voiceRole)
-                                                                                ?.name
-                                                                        }
-                                                                    </Tag>
-                                                                )}
+                                                                {item.settings.audioEnable ? (
+                                                                    <>
+                                                                        <Tag color="success">发音</Tag>
+                                                                        {item?.settings?.soundSpeed && (
+                                                                            <Tag color="success">
+                                                                                {
+                                                                                    soundSpeedOptions.find(
+                                                                                        (i) => i.value === item?.settings?.soundSpeed
+                                                                                    )?.label
+                                                                                }
+                                                                            </Tag>
+                                                                        )}
+                                                                        {item.audio.voiceRole && (
+                                                                            <Tag color="success">
+                                                                                发音角色：
+                                                                                {
+                                                                                    voiceRoleOptions?.find(
+                                                                                        (i) => i.code === item.audio.voiceRole
+                                                                                    )?.name
+                                                                                }
+                                                                            </Tag>
+                                                                        )}
 
-                                                                {/* {item.settings.repeatEnable && <Tag color="success">跟读</Tag>} */}
+                                                                        {/* {item.settings.repeatEnable && <Tag color="success">跟读</Tag>} */}
 
-                                                                {item.settings.repeatRole === 'NULL' ? (
-                                                                    <Tag color="success">不跟读</Tag>
-                                                                ) : item.settings.repeatRole ? (
-                                                                    <Tag color="success">
-                                                                        跟读：
-                                                                        {
-                                                                            voiceRoleOptions?.find(
-                                                                                (i) => i.code === item.settings.repeatRole
-                                                                            )?.name
-                                                                        }
-                                                                    </Tag>
-                                                                ) : form.getFieldValue(['globalSettings', 'repeatRole']) &&
-                                                                  form.getFieldValue(['globalSettings', 'repeatRole']) !== 'NULL' ? (
-                                                                    <Tag color="success">跟读</Tag>
+                                                                        {item.settings.repeatRole === 'NULL' ? (
+                                                                            <Tag color="success">不跟读</Tag>
+                                                                        ) : item.settings.repeatRole ? (
+                                                                            <Tag color="success">
+                                                                                跟读角色：
+                                                                                {
+                                                                                    voiceRoleOptions?.find(
+                                                                                        (i) => i.code === item.settings.repeatRole
+                                                                                    )?.name
+                                                                                }
+                                                                            </Tag>
+                                                                        ) : form.getFieldValue(['globalSettings', 'repeatRole']) &&
+                                                                          form.getFieldValue(['globalSettings', 'repeatRole']) !==
+                                                                              'NULL' ? (
+                                                                            <Tag color="success">跟读</Tag>
+                                                                        ) : (
+                                                                            ''
+                                                                        )}
+                                                                        {item.settings.repeatCount && (
+                                                                            <Tag color="success">
+                                                                                跟读次数：{item.settings.repeatCount}次
+                                                                            </Tag>
+                                                                        )}
+                                                                    </>
                                                                 ) : (
-                                                                    ''
-                                                                )}
-                                                                {item.settings.repeatCount && (
-                                                                    <Tag color="success">{item.settings.repeatCount}次</Tag>
+                                                                    <Tag color="success">不发音</Tag>
                                                                 )}
                                                             </div>
                                                         </div>

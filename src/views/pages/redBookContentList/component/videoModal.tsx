@@ -411,6 +411,9 @@ const VideoModal = ({
                                     rules={[{ required: true, message: '请选择跟读发音角色' }]}
                                 >
                                     <Select optionLabelProp="label" style={{ width: 250 }}>
+                                        <Select.Option value="NULL" label="不跟读">
+                                            不跟读
+                                        </Select.Option>
                                         {voiceRoleOptions?.map((item) => (
                                             <Select.Option
                                                 key={item.code}

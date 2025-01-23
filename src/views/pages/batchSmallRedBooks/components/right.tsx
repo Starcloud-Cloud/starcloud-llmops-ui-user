@@ -322,6 +322,7 @@ const Right = ({
                         clearInterval(timer.current);
                     }
                 } catch (err: any) {
+                    console.log(err, 'err');
                     setErrMsg(err?.reason || err?.msg);
                     clearInterval(timer.current);
                     clearTimeout(timer1.current);
@@ -336,6 +337,10 @@ const Right = ({
         }
     };
     const getResult = async (data: any[]) => {
+        if (!data || data?.length === 0) {
+            setErrMsg('未生成素材，请稍后重试');
+            return false;
+        }
         const result = await getMaterialTitle({ appUid: query.get('uid') });
         const newData = data.map((record) => {
             const content = result?.tableMeta?.map((item: any) => {

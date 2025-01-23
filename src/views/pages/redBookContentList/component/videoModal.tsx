@@ -391,7 +391,7 @@ const VideoModal = ({
                 {quickConfiguration?.isRepeatRole && (
                     <Form.Item label="跟读发音角色" name="repeatRole" rules={[{ required: true, message: '请选择跟读发音角色' }]}>
                         <Select optionLabelProp="label" style={{ width: 250 }}>
-                            <Select.Option value="NULL" label="不跟读">
+                            <Select.Option value="close_repeat" label="不跟读">
                                 不跟读
                             </Select.Option>
                             {voiceRoleOptions?.map((item) => (

@@ -470,7 +470,7 @@ const VideoSetting: React.FC<{
                     <div className="flex items-center gap-2">
                         <Form.Item label="跟读发音角色" name={['globalSettings', 'repeatRole']} rules={[{ required: true }]}>
                             <Select allowClear optionLabelProp="label" style={{ width: 250 }}>
-                                <Select.Option value="NULL" label="不跟读">
+                                <Select.Option value="close_repeat" label="不跟读">
                                     不跟读
                                 </Select.Option>
                                 {voiceRoleOptions?.map((item) => (
@@ -744,7 +744,10 @@ const VideoSetting: React.FC<{
                                                                                                 'repeatRole'
                                                                                             ])}
                                                                                         >
-                                                                                            <Select.Option value="NULL" label="不跟读">
+                                                                                            <Select.Option
+                                                                                                value="close_repeat"
+                                                                                                label="不跟读"
+                                                                                            >
                                                                                                 不跟读
                                                                                             </Select.Option>
                                                                                             {voiceRoleOptions?.map((item) => (
@@ -879,7 +882,7 @@ const VideoSetting: React.FC<{
 
                                                                         {/* {item.settings.repeatEnable && <Tag color="success">跟读</Tag>} */}
 
-                                                                        {item.settings.repeatRole === 'NULL' ? (
+                                                                        {item.settings.repeatRole === 'close_repeat' ? (
                                                                             <Tag color="success">不跟读</Tag>
                                                                         ) : item.settings.repeatRole ? (
                                                                             <Tag color="success">
@@ -892,7 +895,7 @@ const VideoSetting: React.FC<{
                                                                             </Tag>
                                                                         ) : form.getFieldValue(['globalSettings', 'repeatRole']) &&
                                                                           form.getFieldValue(['globalSettings', 'repeatRole']) !==
-                                                                              'NULL' ? (
+                                                                              'close_repeat' ? (
                                                                             <Tag color="success">跟读</Tag>
                                                                         ) : (
                                                                             ''

@@ -30,7 +30,7 @@ interface VoiceUnit {
             repeatRole: string | undefined; // 跟读发音角色
             soundSpeed: string | undefined; // 发音角色语速
             repeatCount: number | undefined; // 跟读次数
-            pauseEnable: boolean | undefined; // 是否换行停顿
+            pauseEnable: string | null; // 是否换行停顿
         };
         point: {
             x: number;
@@ -136,7 +136,7 @@ const VideoSetting: React.FC<{
                         repeatRole: undefined,
                         repeatCount: undefined,
                         soundSpeed: undefined,
-                        pauseEnable: undefined
+                        pauseEnable: null
                     },
                     point: {
                         x: 0,
@@ -191,7 +191,7 @@ const VideoSetting: React.FC<{
                         repeatRole: undefined,
                         repeatCount: undefined,
                         soundSpeed: undefined,
-                        pauseEnable: undefined
+                        pauseEnable: null
                     },
                     point: {
                         x: 0,
@@ -242,7 +242,7 @@ const VideoSetting: React.FC<{
                 repeatRole: undefined,
                 repeatCount: undefined,
                 soundSpeed: undefined,
-                pauseEnable: undefined
+                pauseEnable: null
             },
             point: {
                 x: 0,
@@ -782,12 +782,14 @@ const VideoSetting: React.FC<{
                                                                                     <Form.Item label="跟读次数" name="repeatCount">
                                                                                         <InputNumber min={1} max={9} addonAfter="次" />
                                                                                     </Form.Item>
-                                                                                    <Form.Item
-                                                                                        label="是否换行停顿"
-                                                                                        name="pauseEnable"
-                                                                                        valuePropName="checked"
-                                                                                    >
-                                                                                        <Switch />
+                                                                                    <Form.Item label="换行停顿" name="pauseEnable">
+                                                                                        <Select
+                                                                                            options={[
+                                                                                                { label: '不停顿', value: null },
+                                                                                                { label: '多行停顿', value: 'multiline' },
+                                                                                                { label: '单行+多行停顿', value: 'allline' }
+                                                                                            ]}
+                                                                                        />
                                                                                     </Form.Item>
                                                                                 </Form>
                                                                             </div>
@@ -916,7 +918,13 @@ const VideoSetting: React.FC<{
                                                                                 跟读次数：{item.settings.repeatCount}次
                                                                             </Tag>
                                                                         )}
-                                                                        {item.settings.pauseEnable && <Tag color="success">换行停顿</Tag>}
+                                                                        {item.settings.pauseEnable && (
+                                                                            <Tag color="success">
+                                                                                {item.settings.pauseEnable === 'multiline'
+                                                                                    ? '多行停顿'
+                                                                                    : '单行+多行停顿'}
+                                                                            </Tag>
+                                                                        )}
                                                                     </>
                                                                 ) : (
                                                                     <Tag color="success">不发音</Tag>

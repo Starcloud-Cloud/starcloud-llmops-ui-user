@@ -354,8 +354,8 @@ const VideoSetting: React.FC<{
         dictData('', 'tts_sound_effect').then((res) => {
             setSoundEffectOptions(res.list);
         });
-        dictData('', 'tts_voice_sound_speed').then((res) => {
-            setSoundSpeedOptions(res.list);
+        dictData('', 'tts_voice_speed_all_json').then((res) => {
+            setSoundSpeedOptions(JSON.parse(res.list[0]?.remark));
         });
     }, []);
 
@@ -516,7 +516,23 @@ const VideoSetting: React.FC<{
 
                     <div className="flex items-center gap-2">
                         <Form.Item label="发音角色语速" name={['globalSettings', 'soundSpeed']} rules={[{ required: true }]}>
-                            <Select allowClear options={soundSpeedOptions} style={{ width: 250 }} />
+                            <Select allowClear optionLabelProp="label" style={{ width: 250 }}>
+                                {soundSpeedOptions?.map((item) => (
+                                    <Select.Option key={item.speech_rate} label={item.name} value={item.speech_rate}>
+                                        <div className="w-full flex items-center justify-between">
+                                            <span>{item.name}</span>
+                                            <Button
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // 防止触发选择事件
+                                                    playAudioDemo(item.demo_link);
+                                                }}
+                                                type="text"
+                                                icon={<SoundOutlined />}
+                                            />
+                                        </div>
+                                    </Select.Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                         <Checkbox
                             checked={quickConfiguration.isSoundSpeed}
@@ -724,13 +740,35 @@ const VideoSetting: React.FC<{
                                                                                     </Form.Item>
                                                                                     <Form.Item label="发音角色语速" name="soundSpeed">
                                                                                         <Select
+                                                                                            allowClear
+                                                                                            optionLabelProp="label"
                                                                                             defaultValue={form.getFieldValue([
                                                                                                 'globalSettings',
                                                                                                 'soundSpeed'
                                                                                             ])}
-                                                                                            allowClear
-                                                                                            options={soundSpeedOptions}
-                                                                                        />
+                                                                                        >
+                                                                                            {soundSpeedOptions?.map((item) => (
+                                                                                                <Select.Option
+                                                                                                    key={item.speech_rate}
+                                                                                                    label={item.name}
+                                                                                                    value={item.speech_rate}
+                                                                                                >
+                                                                                                    <div className="w-full flex items-center justify-between">
+                                                                                                        <span>{item.name}</span>
+                                                                                                        <Button
+                                                                                                            onClick={(e) => {
+                                                                                                                e.stopPropagation(); // 防止触发选择事件
+                                                                                                                playAudioDemo(
+                                                                                                                    item.demo_link
+                                                                                                                );
+                                                                                                            }}
+                                                                                                            type="text"
+                                                                                                            icon={<SoundOutlined />}
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                </Select.Option>
+                                                                                            ))}
+                                                                                        </Select>
                                                                                     </Form.Item>
                                                                                     {/* <Form.Item
                                                                                         label="是否跟读"

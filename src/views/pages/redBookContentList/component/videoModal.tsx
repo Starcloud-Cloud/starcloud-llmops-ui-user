@@ -426,7 +426,7 @@ const VideoModal = ({
                     {imageList?.map((item, index) => (
                         <Card size="small" key={index} className="mb-4">
                             <div className="flex items-start gap-2">
-                                <Image src={imageList?.filter((i) => i.code === item?.code)[0]?.url} preview={false} width={100} />
+                                <Image src={item?.url} preview={false} width={100} />
                                 <div className="flex flex-col justify-between w-full relative min-h-[110px]">
                                     {!results[index] ? (
                                         <div className="text-base text-[#000000a6] font-[500]">未生成，点击生成视频按钮</div>

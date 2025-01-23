@@ -221,8 +221,8 @@ const VideoModal = ({
         dictData('', 'tts_sound_effect').then((res) => {
             setSoundEffectOptions(res.list);
         });
-        dictData('', 'tts_voice_sound_speed').then((res) => {
-            setSoundSpeedOptions(res.list?.map((item: any) => ({ ...item, value: Number(item.value) })));
+        dictData('', 'tts_voice_speed_all_json').then((res) => {
+            setSoundSpeedOptions(JSON.parse(res.list[0]?.remark));
         });
         return () => {
             allTimer.current.forEach((item: any) => {
@@ -373,7 +373,25 @@ const VideoModal = ({
                 )}
                 {quickConfiguration?.isSoundSpeed && (
                     <Form.Item label="发音角色语速" name="soundSpeed" rules={[{ required: true }]}>
-                        <Select allowClear options={soundSpeedOptions} style={{ width: 250 }} />
+                        <Select allowClear optionLabelProp="label" style={{ width: 250 }}>
+                            {soundSpeedOptions?.map((item) => (
+                                <Select.Option key={item.speech_rate} label={item.name} value={item.speech_rate}>
+                                    <div className="w-full flex items-center justify-between">
+                                        <span>{item.name}</span>
+                                        {item.demo_link && (
+                                            <Button
+                                                type="text"
+                                                icon={<SoundOutlined />}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // 防止触发选择事件
+                                                    playAudioDemo(item.demo_link);
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                </Select.Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 )}
                 {quickConfiguration?.isAnimationEnable && (

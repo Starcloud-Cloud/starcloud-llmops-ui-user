@@ -48,7 +48,7 @@ interface VoiceUnit {
             soundSpeed: string | undefined; // 发音角色语速
             repeatCount: number | undefined; // 跟读次数
             pauseEnable: string | null; // 是否换行停顿
-            enable: boolean; // 是否显示字幕
+            enable: boolean | undefined; // 是否显示字幕
         };
         point: {
             x: number;
@@ -105,7 +105,7 @@ interface VoiceConfig {
             fontSize: string | undefined;
             color: string | undefined;
             bgColor: string | undefined;
-            position: string | undefined;
+            position: number | undefined;
         };
     };
     // videoConfig: {
@@ -137,6 +137,7 @@ const VideoSetting: React.FC<{
     const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
     const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
     const [soundSpeedOptions, setSoundSpeedOptions] = useState<any[]>([]);
+    const [fontOptions, setFontOptions] = useState<any[]>([]);
     const [form] = Form.useForm<VoiceConfig>();
     const [voiceUnits, setVoiceUnits] = useState<VoiceUnit[]>([
         {
@@ -163,7 +164,7 @@ const VideoSetting: React.FC<{
                         repeatCount: undefined,
                         soundSpeed: undefined,
                         pauseEnable: null,
-                        enable: true
+                        enable: undefined
                     },
                     point: {
                         x: 0,
@@ -219,7 +220,7 @@ const VideoSetting: React.FC<{
                         repeatCount: undefined,
                         soundSpeed: undefined,
                         pauseEnable: null,
-                        enable: true
+                        enable: undefined
                     },
                     point: {
                         x: 0,
@@ -271,7 +272,7 @@ const VideoSetting: React.FC<{
                 repeatCount: undefined,
                 soundSpeed: undefined,
                 pauseEnable: null,
-                enable: true
+                enable: undefined
             },
             point: {
                 x: 0,
@@ -383,6 +384,9 @@ const VideoSetting: React.FC<{
         });
         dictData('', 'tts_voice_speed_all_json').then((res) => {
             setSoundSpeedOptions(JSON.parse(res.list[0]?.remark));
+        });
+        dictData('', 'tts_voice_font').then((res) => {
+            setFontOptions(res.list);
         });
     }, []);
 
@@ -615,14 +619,7 @@ const VideoSetting: React.FC<{
                                             label="字幕大小"
                                             rules={[{ required: true }]}
                                         >
-                                            <Select
-                                                style={{ width: 250 }}
-                                                options={[
-                                                    { label: '小', value: 'small' },
-                                                    { label: '中', value: 'middle' },
-                                                    { label: '大', value: 'large' }
-                                                ]}
-                                            />
+                                            <InputNumber addonAfter="像素" min={1} max={100} style={{ width: 250 }} />
                                         </Form.Item>
 
                                         <Form.Item
@@ -630,14 +627,7 @@ const VideoSetting: React.FC<{
                                             label="字体选择"
                                             rules={[{ required: true }]}
                                         >
-                                            <Select
-                                                style={{ width: 250 }}
-                                                options={[
-                                                    { label: '宋体', value: '宋体' },
-                                                    { label: '微软雅黑', value: '微软雅黑' },
-                                                    { label: 'Arial', value: 'Arial' }
-                                                ]}
-                                            />
+                                            <Select style={{ width: 250 }} options={fontOptions} />
                                         </Form.Item>
                                     </div>
                                     <div className="flex-1">
@@ -669,16 +659,12 @@ const VideoSetting: React.FC<{
                                             <ColorPicker />
                                         </Form.Item>
 
-                                        <Form.Item label="字幕位置" rules={[{ required: true }]}>
-                                            <Form.Item name={['globalSettings', 'subtitles', 'position']}>
-                                                <Select
-                                                    style={{ width: 250 }}
-                                                    options={[
-                                                        { label: '底部', value: 'bottom' },
-                                                        { label: '顶部', value: 'top' }
-                                                    ]}
-                                                />
-                                            </Form.Item>
+                                        <Form.Item
+                                            label="字幕位置"
+                                            rules={[{ required: true }]}
+                                            name={['globalSettings', 'subtitles', 'position']}
+                                        >
+                                            <InputNumber addonBefore="底部" addonAfter="像素" min={1} max={100} style={{ width: 250 }} />
                                         </Form.Item>
                                     </div>
                                 </div>
@@ -1007,7 +993,13 @@ const VideoSetting: React.FC<{
                                                                                         name="enable"
                                                                                         valuePropName="checked"
                                                                                     >
-                                                                                        <Switch />
+                                                                                        <Switch
+                                                                                            defaultValue={form.getFieldValue([
+                                                                                                'globalSettings',
+                                                                                                'subtitles',
+                                                                                                'enable'
+                                                                                            ])}
+                                                                                        />
                                                                                     </Form.Item>
                                                                                 </Form>
                                                                             </div>
@@ -1143,9 +1135,7 @@ const VideoSetting: React.FC<{
                                                                                     : '单行+多行停顿'}
                                                                             </Tag>
                                                                         )}
-                                                                        <Tag color="success">
-                                                                            {item.settings.enable ? '显示字幕' : '不显示字幕'}
-                                                                        </Tag>
+                                                                        {item.settings.enable && <Tag color="success">显示字幕</Tag>}
                                                                     </>
                                                                 ) : (
                                                                     <Tag color="success">不发音</Tag>

@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, Select, InputNumber, Tag, Button, Space, Popover, Tooltip, Image, Switch, Checkbox, Popconfirm } from 'antd';
+import {
+    Card,
+    Form,
+    Input,
+    Select,
+    InputNumber,
+    Tag,
+    Button,
+    Space,
+    Popover,
+    Tooltip,
+    Image,
+    Switch,
+    Checkbox,
+    Popconfirm,
+    Collapse,
+    ColorPicker
+} from 'antd';
 import { DeleteOutlined, PlusOutlined, SwapOutlined, MoreOutlined } from '@ant-design/icons';
 import { DragOutlined, ExclamationCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
@@ -31,6 +48,7 @@ interface VoiceUnit {
             soundSpeed: string | undefined; // 发音角色语速
             repeatCount: number | undefined; // 跟读次数
             pauseEnable: string | null; // 是否换行停顿
+            enable: boolean; // 是否显示字幕
         };
         point: {
             x: number;
@@ -80,6 +98,14 @@ interface VoiceConfig {
                 width: number;
                 height: number;
             };
+        };
+        subtitles: {
+            enable: boolean;
+            font: string | undefined;
+            fontSize: string | undefined;
+            color: string | undefined;
+            bgColor: string | undefined;
+            position: string | undefined;
         };
     };
     // videoConfig: {
@@ -136,7 +162,8 @@ const VideoSetting: React.FC<{
                         repeatRole: undefined,
                         repeatCount: undefined,
                         soundSpeed: undefined,
-                        pauseEnable: null
+                        pauseEnable: null,
+                        enable: true
                     },
                     point: {
                         x: 0,
@@ -191,7 +218,8 @@ const VideoSetting: React.FC<{
                         repeatRole: undefined,
                         repeatCount: undefined,
                         soundSpeed: undefined,
-                        pauseEnable: null
+                        pauseEnable: null,
+                        enable: true
                     },
                     point: {
                         x: 0,
@@ -242,7 +270,8 @@ const VideoSetting: React.FC<{
                 repeatRole: undefined,
                 repeatCount: undefined,
                 soundSpeed: undefined,
-                pauseEnable: null
+                pauseEnable: null,
+                enable: true
             },
             point: {
                 x: 0,
@@ -311,10 +340,8 @@ const VideoSetting: React.FC<{
         // };
 
         upDateData(newData);
-        console.log(allValues, voiceUnits);
     };
     useEffect(() => {
-        console.log(videoConfig, currentJson);
         if (videoConfig) {
             const config = JSON.parse(videoConfig);
             form.setFieldsValue({
@@ -385,6 +412,14 @@ const VideoSetting: React.FC<{
                     // repeatEnable: false,
                     // animationEnable: false,
                     repeatRole: undefined
+                },
+                subtitles: {
+                    enable: false,
+                    font: undefined,
+                    fontSize: undefined,
+                    color: undefined,
+                    bgColor: undefined,
+                    position: undefined
                 }
                 // videoConfig: {
                 //     mode: 'merge'
@@ -557,6 +592,144 @@ const VideoSetting: React.FC<{
                     </div>
                 </div>
             </div>
+            <Collapse
+                items={[
+                    {
+                        key: '1',
+                        label: '字幕配置',
+                        children: (
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <div className="flex-1">
+                                        <Form.Item
+                                            name={['globalSettings', 'subtitles', 'enable']}
+                                            valuePropName="checked"
+                                            label="开启字幕"
+                                            required
+                                        >
+                                            <Switch />
+                                        </Form.Item>
+
+                                        <Form.Item
+                                            name={['globalSettings', 'subtitles', 'fontSize']}
+                                            label="字幕大小"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Select
+                                                style={{ width: 250 }}
+                                                options={[
+                                                    { label: '小', value: 'small' },
+                                                    { label: '中', value: 'middle' },
+                                                    { label: '大', value: 'large' }
+                                                ]}
+                                            />
+                                        </Form.Item>
+
+                                        <Form.Item
+                                            name={['globalSettings', 'subtitles', 'font']}
+                                            label="字体选择"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Select
+                                                style={{ width: 250 }}
+                                                options={[
+                                                    { label: '宋体', value: '宋体' },
+                                                    { label: '微软雅黑', value: '微软雅黑' },
+                                                    { label: 'Arial', value: 'Arial' }
+                                                ]}
+                                            />
+                                        </Form.Item>
+                                    </div>
+                                    <div className="flex-1">
+                                        <Form.Item
+                                            name={['globalSettings', 'subtitles', 'color']}
+                                            label="字幕颜色"
+                                            normalize={(value) => {
+                                                if (value?.toHexString) {
+                                                    return value.toHexString().toUpperCase();
+                                                }
+                                                return value;
+                                            }}
+                                            rules={[{ required: true }]}
+                                        >
+                                            <ColorPicker />
+                                        </Form.Item>
+
+                                        <Form.Item
+                                            name={['globalSettings', 'subtitles', 'bgColor']}
+                                            label="字幕背景颜色"
+                                            normalize={(value) => {
+                                                if (value?.toHexString) {
+                                                    return value.toHexString().toUpperCase();
+                                                }
+                                                return value;
+                                            }}
+                                            rules={[{ required: true }]}
+                                        >
+                                            <ColorPicker />
+                                        </Form.Item>
+
+                                        <Form.Item label="字幕位置" rules={[{ required: true }]}>
+                                            <Form.Item name={['globalSettings', 'subtitles', 'position']}>
+                                                <Select
+                                                    style={{ width: 250 }}
+                                                    options={[
+                                                        { label: '底部', value: 'bottom' },
+                                                        { label: '顶部', value: 'top' }
+                                                    ]}
+                                                />
+                                            </Form.Item>
+                                        </Form.Item>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
+                    // {
+                    //     key: '2',
+                    //     label: '疯狂模式',
+                    //     children: (
+                    //         <div>
+                    //             <div className="flex items-center gap-2">
+                    //                 <div className="flex-1">
+                    //                     <Form.Item name="enableCrazyMode" valuePropName="checked" label="开启疯狂模式">
+                    //                         <Switch />
+                    //                     </Form.Item>
+
+                    //                     <Form.Item name="fontSize" label="字幕大小">
+                    //                         <Input style={{ width: 250 }} placeholder="20-100" />
+                    //                     </Form.Item>
+
+                    //                     <Form.Item name="fontFamily" label="字体选择">
+                    //                         <Select style={{ width: 250 }}>
+                    //                             <Select.Option value="ADS">ADS</Select.Option>
+                    //                             {/* 添加更多字体选项 */}
+                    //                         </Select>
+                    //                     </Form.Item>
+                    //                 </div>
+                    //                 <div className="flex-1">
+                    //                     <Form.Item name="fontColor" label="字幕颜色">
+                    //                         <ColorPicker />
+                    //                     </Form.Item>
+
+                    //                     <Form.Item name="maxRepeatTimes" label="最大重复次数">
+                    //                         <Input style={{ width: 250 }} placeholder="5-30" />
+                    //                     </Form.Item>
+
+                    //                     <Form.Item name="repeatMode" label="重复模式">
+                    //                         <Select style={{ width: 250 }}>
+                    //                             <Select.Option value="模式1">模式1</Select.Option>
+                    //                             <Select.Option value="模式2">模式2</Select.Option>
+                    //                             <Select.Option value="模式3">模式3</Select.Option>
+                    //                         </Select>
+                    //                     </Form.Item>
+                    //                 </div>
+                    //             </div>
+                    //         </div>
+                    //     )
+                    // }
+                ]}
+            />
 
             <div className="text-base font-[500] my-4">
                 发音单元{' '}
@@ -829,6 +1002,13 @@ const VideoSetting: React.FC<{
                                                                                             ]}
                                                                                         />
                                                                                     </Form.Item>
+                                                                                    <Form.Item
+                                                                                        label="是否显示字幕"
+                                                                                        name="enable"
+                                                                                        valuePropName="checked"
+                                                                                    >
+                                                                                        <Switch />
+                                                                                    </Form.Item>
                                                                                 </Form>
                                                                             </div>
                                                                         }
@@ -963,6 +1143,9 @@ const VideoSetting: React.FC<{
                                                                                     : '单行+多行停顿'}
                                                                             </Tag>
                                                                         )}
+                                                                        <Tag color="success">
+                                                                            {item.settings.enable ? '显示字幕' : '不显示字幕'}
+                                                                        </Tag>
                                                                     </>
                                                                 ) : (
                                                                     <Tag color="success">不发音</Tag>

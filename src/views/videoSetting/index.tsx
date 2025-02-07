@@ -15,8 +15,14 @@ import {
     Checkbox,
     Popconfirm,
     Collapse,
-    ColorPicker
+    ColorPicker,
+    theme,
+    Row,
+    Col,
+    Divider
 } from 'antd';
+import type { ColorPickerProps } from 'antd';
+import { cyan, generate, green, presetPalettes, red } from '@ant-design/colors';
 import { DeleteOutlined, PlusOutlined, SwapOutlined, MoreOutlined } from '@ant-design/icons';
 import { DragOutlined, ExclamationCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import _ from 'lodash-es';
@@ -112,6 +118,11 @@ interface VoiceConfig {
     //     mode: 'merge' | 'split'; // 视频生成配置：合并生成/分开生成
     // };
 }
+type Presets = Required<ColorPickerProps>['presets'][number];
+
+function genPresets(presets = presetPalettes) {
+    return Object.entries(presets).map<Presets>(([label, colors]) => ({ label, colors, key: label }));
+}
 
 const VideoSetting: React.FC<{
     canEdit: boolean;
@@ -134,6 +145,26 @@ const VideoSetting: React.FC<{
     quickConfiguration,
     setQuickConfiguration
 }) => {
+    const { token } = theme.useToken();
+
+    const presets = genPresets({
+        primary: generate(token.colorPrimary),
+        red,
+        green,
+        cyan
+    });
+    const customPanelRender: ColorPickerProps['panelRender'] = (_, { components: { Picker, Presets } }) => (
+        <Row justify="space-between" wrap={false}>
+            <Col span={12}>
+                <Presets />
+            </Col>
+            <Divider type="vertical" style={{ height: 'auto' }} />
+            <Col flex="auto">
+                <Picker />
+            </Col>
+        </Row>
+    );
+
     const [voiceRoleOptions, setVoiceRoleOptions] = useState<any[]>([]);
     const [soundEffectOptions, setSoundEffectOptions] = useState<any[]>([]);
     const [soundSpeedOptions, setSoundSpeedOptions] = useState<any[]>([]);
@@ -657,7 +688,12 @@ const VideoSetting: React.FC<{
                                             rules={[{ required: true }]}
                                             initialValue="#FFFFFF"
                                         >
-                                            <ColorPicker disabledAlpha />
+                                            <ColorPicker
+                                                styles={{ popupOverlayInner: { width: 480 } }}
+                                                presets={presets}
+                                                panelRender={customPanelRender}
+                                                disabledAlpha
+                                            />
                                         </Form.Item>
 
                                         <Form.Item
@@ -672,7 +708,12 @@ const VideoSetting: React.FC<{
                                             rules={[{ required: true }]}
                                             initialValue="#673ab7"
                                         >
-                                            <ColorPicker disabledAlpha />
+                                            <ColorPicker
+                                                styles={{ popupOverlayInner: { width: 480 } }}
+                                                presets={presets}
+                                                panelRender={customPanelRender}
+                                                disabledAlpha
+                                            />
                                         </Form.Item>
 
                                         <Form.Item

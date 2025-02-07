@@ -677,7 +677,7 @@ const VideoSetting: React.FC<{
 
                                                 if (value?.toHexString) {
                                                     if (value?.cleared) {
-                                                        return undefined;
+                                                        return '';
                                                     } else {
                                                         return value.toHexString().toUpperCase();
                                                     }
@@ -702,7 +702,7 @@ const VideoSetting: React.FC<{
                                             normalize={(value) => {
                                                 if (value?.toHexString) {
                                                     if (value?.cleared) {
-                                                        return undefined;
+                                                        return '';
                                                     } else {
                                                         return value.toHexString().toUpperCase();
                                                     }

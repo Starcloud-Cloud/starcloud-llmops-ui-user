@@ -355,6 +355,12 @@ const VideoSetting: React.FC<{
 
             voiceUnits
         };
+        newData.globalSettings.subtitles.position = {
+            x: 0,
+            y: newData.globalSettings.subtitles.position,
+            bx: 0,
+            by: 0
+        };
 
         // newData.globalSettings.resolution = {
         //     width: 1286,
@@ -376,17 +382,6 @@ const VideoSetting: React.FC<{
     useEffect(() => {
         if (videoConfig) {
             const config = JSON.parse(videoConfig);
-            console.log(config);
-            if (!config?.globalSettings?.subtitles) {
-                config.globalSettings.subtitles = {
-                    enable: true,
-                    font: 'PingFang',
-                    fontSize: 30,
-                    color: '#FFFFFF',
-                    bgColor: '#673ab7',
-                    position: 100
-                };
-            }
             form.setFieldsValue({
                 globalSettings: config.globalSettings
                 // videoConfig: config.videoConfig
@@ -400,10 +395,12 @@ const VideoSetting: React.FC<{
                 ...values,
                 voiceUnits
             };
-            // newData.globalSettings.resolution = {
-            //     width: 1286,
-            //     height: 1714
-            // };
+            newData.globalSettings.subtitles.position = {
+                x: 0,
+                y: newData.globalSettings.subtitles.position,
+                bx: 0,
+                by: 0
+            };
             // newData.globalSettings = {
             //     ...values.globalSettings,
             //     fps: 5,
@@ -458,14 +455,6 @@ const VideoSetting: React.FC<{
                     // repeatEnable: false,
                     // animationEnable: false,
                     repeatRole: undefined
-                },
-                subtitles: {
-                    enable: true,
-                    font: 'PingFang',
-                    fontSize: 30,
-                    color: '#FFFFFF',
-                    bgColor: '#673ab7',
-                    position: 100
                 }
                 // videoConfig: {
                 //     mode: 'merge'
@@ -670,7 +659,7 @@ const VideoSetting: React.FC<{
                                             name={['globalSettings', 'subtitles', 'font']}
                                             label="字体选择"
                                             rules={[{ required: true }]}
-                                            initialValue="PingFang"
+                                            initialValue={fontOptions[0]?.value}
                                         >
                                             <Select style={{ width: 250 }} options={fontOptions} />
                                         </Form.Item>
@@ -689,6 +678,7 @@ const VideoSetting: React.FC<{
                                             initialValue="#FFFFFF"
                                         >
                                             <ColorPicker
+                                                allowClear
                                                 styles={{ popupOverlayInner: { width: 480 } }}
                                                 presets={presets}
                                                 panelRender={customPanelRender}
@@ -709,6 +699,7 @@ const VideoSetting: React.FC<{
                                             initialValue="#673ab7"
                                         >
                                             <ColorPicker
+                                                allowClear
                                                 styles={{ popupOverlayInner: { width: 480 } }}
                                                 presets={presets}
                                                 panelRender={customPanelRender}

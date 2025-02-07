@@ -345,6 +345,17 @@ const VideoSetting: React.FC<{
     useEffect(() => {
         if (videoConfig) {
             const config = JSON.parse(videoConfig);
+            console.log(config);
+            if (!config?.globalSettings?.subtitles) {
+                config.globalSettings.subtitles = {
+                    enable: true,
+                    font: 'PingFang',
+                    fontSize: 30,
+                    color: '#FFFFFF',
+                    bgColor: '#673ab7',
+                    position: 100
+                };
+            }
             form.setFieldsValue({
                 globalSettings: config.globalSettings
                 // videoConfig: config.videoConfig
@@ -418,12 +429,12 @@ const VideoSetting: React.FC<{
                     repeatRole: undefined
                 },
                 subtitles: {
-                    enable: false,
-                    font: undefined,
-                    fontSize: undefined,
-                    color: undefined,
-                    bgColor: undefined,
-                    position: undefined
+                    enable: true,
+                    font: 'PingFang',
+                    fontSize: 30,
+                    color: '#FFFFFF',
+                    bgColor: '#673ab7',
+                    position: 100
                 }
                 // videoConfig: {
                 //     mode: 'merge'
@@ -610,6 +621,7 @@ const VideoSetting: React.FC<{
                                             valuePropName="checked"
                                             label="开启字幕"
                                             required
+                                            initialValue={true}
                                         >
                                             <Switch />
                                         </Form.Item>
@@ -618,6 +630,7 @@ const VideoSetting: React.FC<{
                                             name={['globalSettings', 'subtitles', 'fontSize']}
                                             label="字幕大小"
                                             rules={[{ required: true }]}
+                                            initialValue={30}
                                         >
                                             <InputNumber addonAfter="像素" min={1} max={100} style={{ width: 250 }} />
                                         </Form.Item>
@@ -626,6 +639,7 @@ const VideoSetting: React.FC<{
                                             name={['globalSettings', 'subtitles', 'font']}
                                             label="字体选择"
                                             rules={[{ required: true }]}
+                                            initialValue="PingFang"
                                         >
                                             <Select style={{ width: 250 }} options={fontOptions} />
                                         </Form.Item>
@@ -641,8 +655,9 @@ const VideoSetting: React.FC<{
                                                 return value;
                                             }}
                                             rules={[{ required: true }]}
+                                            initialValue="#FFFFFF"
                                         >
-                                            <ColorPicker />
+                                            <ColorPicker disabledAlpha />
                                         </Form.Item>
 
                                         <Form.Item
@@ -655,14 +670,16 @@ const VideoSetting: React.FC<{
                                                 return value;
                                             }}
                                             rules={[{ required: true }]}
+                                            initialValue="#673ab7"
                                         >
-                                            <ColorPicker />
+                                            <ColorPicker disabledAlpha />
                                         </Form.Item>
 
                                         <Form.Item
                                             label="字幕位置"
                                             rules={[{ required: true }]}
                                             name={['globalSettings', 'subtitles', 'position']}
+                                            initialValue={100}
                                         >
                                             <InputNumber addonBefore="底部" addonAfter="像素" min={1} max={100} style={{ width: 250 }} />
                                         </Form.Item>
@@ -1135,7 +1152,9 @@ const VideoSetting: React.FC<{
                                                                                     : '单行+多行停顿'}
                                                                             </Tag>
                                                                         )}
-                                                                        {item.settings.enable && <Tag color="success">显示字幕</Tag>}
+                                                                        {item.settings.enable === false && (
+                                                                            <Tag color="success">不显示字幕</Tag>
+                                                                        )}
                                                                     </>
                                                                 ) : (
                                                                     <Tag color="success">不发音</Tag>

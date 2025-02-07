@@ -382,6 +382,10 @@ const VideoSetting: React.FC<{
     useEffect(() => {
         if (videoConfig) {
             const config = JSON.parse(videoConfig);
+            console.log(config.globalSettings);
+            if (config?.globalSettings?.subtitles?.position) {
+                config.globalSettings.subtitles.position = config?.globalSettings?.subtitles?.position?.y;
+            }
             form.setFieldsValue({
                 globalSettings: config.globalSettings
                 // videoConfig: config.videoConfig
@@ -669,8 +673,14 @@ const VideoSetting: React.FC<{
                                             name={['globalSettings', 'subtitles', 'color']}
                                             label="字幕颜色"
                                             normalize={(value) => {
+                                                console.log(value);
+
                                                 if (value?.toHexString) {
-                                                    return value.toHexString().toUpperCase();
+                                                    if (value?.cleared) {
+                                                        return undefined;
+                                                    } else {
+                                                        return value.toHexString().toUpperCase();
+                                                    }
                                                 }
                                                 return value;
                                             }}
@@ -691,7 +701,11 @@ const VideoSetting: React.FC<{
                                             label="字幕背景颜色"
                                             normalize={(value) => {
                                                 if (value?.toHexString) {
-                                                    return value.toHexString().toUpperCase();
+                                                    if (value?.cleared) {
+                                                        return undefined;
+                                                    } else {
+                                                        return value.toHexString().toUpperCase();
+                                                    }
                                                 }
                                                 return value;
                                             }}

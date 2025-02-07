@@ -450,7 +450,7 @@ const VideoModal = ({
                                         <div className="text-base text-[#000000a6] font-[500]">未生成，点击生成视频按钮</div>
                                     ) : (
                                         <div className="w-full flex flex-col items-start gap-2">
-                                            <div className="text-base w-full font-[500]">
+                                            <div className="text-base w-[calc(100%-88px)] font-[500]">
                                                 {results[index]?.status === 'completed' ? (
                                                     <div className="text-[#52c41a]">生成成功</div>
                                                 ) : results[index]?.status === 'failed' || results[index]?.status === 'unknown' ? (

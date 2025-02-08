@@ -1,4 +1,4 @@
-import { Button, Tabs, Popover, Switch, Dropdown } from 'antd';
+import { Button, Tabs, Popover, Switch, Dropdown, Form, Input, Select } from 'antd';
 import { TextField, IconButton } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { PlusOutlined, InfoCircleOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
@@ -170,7 +170,72 @@ const CreateTab = ({
                                                 }}
                                             /> */}
                                             {/* </div> */}
-
+                                            <Popover
+                                                placement="top"
+                                                trigger={['click']}
+                                                title="售卖配置"
+                                                content={
+                                                    <Form>
+                                                        <Form.Item label="开启售卖" name="enable">
+                                                            <Switch />
+                                                        </Form.Item>
+                                                        <Form.Item label="绑定到套餐" name="package">
+                                                            <Select options={[]} />
+                                                        </Form.Item>
+                                                        <Form.Item label="演示笔记 ID" name="demoNoteId">
+                                                            <Input.TextArea />
+                                                        </Form.Item>
+                                                    </Form>
+                                                }
+                                            >
+                                                <div className="cursor-pointer text-[#673ab7] text-xs flex items-center gap-1">
+                                                    <svg
+                                                        viewBox="0 0 1024 1024"
+                                                        version="1.1"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        p-id="5195"
+                                                        width="15"
+                                                        height="15"
+                                                    >
+                                                        <path
+                                                            d="M832.02048 1024H192.02048a140.98432 140.98432 0 0 1-140.82048-140.77952V243.22048A140.98432 140.98432 0 0 1 192.02048 102.4h148.23424v76.8H192.02048a64.06144 64.06144 0 0 0-63.97952 64.02048v640a64.06144 64.06144 0 0 0 64.02048 64.02048h639.95904a64.06144 64.06144 0 0 0 64.02048-63.97952V243.22048a64.06144 64.06144 0 0 0-63.97952-63.97952h-140.04224V102.4h139.96032a140.98432 140.98432 0 0 1 140.82048 140.82048v640A140.98432 140.98432 0 0 1 832.02048 1024z"
+                                                            fill="#673ab7"
+                                                            p-id="5196"
+                                                        ></path>
+                                                        <path
+                                                            d="M576.02048 281.6h-128a140.82048 140.82048 0 0 1 0-281.6h128a140.82048 140.82048 0 0 1 0 281.6z m-128-204.8a64.02048 64.02048 0 0 0 0 128h128a64.02048 64.02048 0 0 0 0-128z"
+                                                            fill="#673ab7"
+                                                            p-id="5197"
+                                                        ></path>
+                                                        <path
+                                                            d="M472.84224 492.78976a38.2976 38.2976 0 0 1-27.15648-11.22304L368.88576 404.76672a38.42048 38.42048 0 1 1 54.31296-54.31296l76.8 76.8a38.42048 38.42048 0 0 1-27.15648 65.536z"
+                                                            fill="#673ab7"
+                                                            p-id="5198"
+                                                        ></path>
+                                                        <path
+                                                            d="M551.19872 492.78976a38.42048 38.42048 0 0 1-27.15648-65.536l76.8-76.8a38.42048 38.42048 0 1 1 54.31296 54.31296l-76.8 76.8a38.2976 38.2976 0 0 1-27.15648 11.22304z"
+                                                            fill="#673ab7"
+                                                            p-id="5199"
+                                                        ></path>
+                                                        <path
+                                                            d="M678.42048 531.16928H345.62048a38.42048 38.42048 0 0 1 0-76.8h332.8a38.42048 38.42048 0 0 1 0 76.8z"
+                                                            fill="#673ab7"
+                                                            p-id="5200"
+                                                        ></path>
+                                                        <path
+                                                            d="M678.42048 684.76928H345.62048a38.42048 38.42048 0 0 1 0-76.8h332.8a38.42048 38.42048 0 0 1 0 76.8z"
+                                                            fill="#673ab7"
+                                                            p-id="5201"
+                                                        ></path>
+                                                        <path
+                                                            d="M512 838.36928a38.42048 38.42048 0 0 1-38.37952-38.37952v-281.6a38.42048 38.42048 0 0 1 76.8 0v281.6a38.42048 38.42048 0 0 1-38.42048 38.37952z"
+                                                            fill="#673ab7"
+                                                            p-id="5202"
+                                                        ></path>
+                                                    </svg>
+                                                    售卖配置
+                                                </div>
+                                            </Popover>
                                             <Dropdown
                                                 placement="bottom"
                                                 trigger={['click']}

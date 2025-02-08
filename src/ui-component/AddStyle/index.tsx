@@ -956,6 +956,97 @@ const AddStyle = React.forwardRef(
                                                                 items={templateList?.[index]?.templateList?.map(
                                                                     (item: any) => item.example || ''
                                                                 )}
+                                                                preview={{
+                                                                    // src: item.example,
+                                                                    imageRender: (originalNode: React.ReactNode) => (
+                                                                        <div className="flex gap-8 items-start bg-white p-4">
+                                                                            {/* 左侧显示原始图片 */}
+                                                                            <div className="w-[200px]">{originalNode}</div>
+
+                                                                            {/* 右侧显示升级信息 */}
+                                                                            <div className="w-[400px] flex flex-col items-start">
+                                                                                <h1 className="text-2xl font-bold mb-4">
+                                                                                    升级Canva可画高级版，开启极致体验
+                                                                                </h1>
+
+                                                                                <p className="text-gray-600 mb-6">
+                                                                                    全站资源尽在Canva可画高级版，点点鼠标，出手就是设计高手
+                                                                                </p>
+
+                                                                                <div className="space-y-6">
+                                                                                    <div className="flex">
+                                                                                        <svg
+                                                                                            className="w-6 h-6 mr-3 flex-shrink-0"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            fill="none"
+                                                                                        >
+                                                                                            <path
+                                                                                                d="M4 4h16v16H4V4z"
+                                                                                                stroke="currentColor"
+                                                                                                strokeWidth="2"
+                                                                                            />
+                                                                                        </svg>
+                                                                                        <div>
+                                                                                            <h3 className="font-semibold">
+                                                                                                尽享全站高级模板及素材
+                                                                                            </h3>
+                                                                                            <p className="text-gray-600">
+                                                                                                解锁全站7000万+设计资源、10万+设计模板，全渠道商用授权，版权无忧
+                                                                                            </p>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <div className="flex">
+                                                                                        <svg
+                                                                                            className="w-6 h-6 mr-3 flex-shrink-0"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            fill="none"
+                                                                                        >
+                                                                                            <path
+                                                                                                d="M12 4v16m-8-8h16"
+                                                                                                stroke="currentColor"
+                                                                                                strokeWidth="2"
+                                                                                            />
+                                                                                        </svg>
+                                                                                        <div>
+                                                                                            <h3 className="font-semibold">
+                                                                                                解锁高级编辑导出功能
+                                                                                            </h3>
+                                                                                            <p className="text-gray-600">
+                                                                                                无限次智能AI抠图、高清多格式导出、一图变多尺寸、批量创建等
+                                                                                            </p>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <div className="flex">
+                                                                                        <svg
+                                                                                            className="w-6 h-6 mr-3 flex-shrink-0"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            fill="none"
+                                                                                        >
+                                                                                            <circle
+                                                                                                cx="12"
+                                                                                                cy="12"
+                                                                                                r="8"
+                                                                                                stroke="currentColor"
+                                                                                                strokeWidth="2"
+                                                                                            />
+                                                                                        </svg>
+                                                                                        <div>
+                                                                                            <h3 className="font-semibold">
+                                                                                                全渠道商用版权及服务保障
+                                                                                            </h3>
+                                                                                            <p className="text-gray-600">
+                                                                                                全渠道商用授权书、提供发票可报销、专业人工客服支持
+                                                                                            </p>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ),
+                                                                    toolbarRender: () => null
+                                                                }}
                                                             >
                                                                 <Image
                                                                     style={{
@@ -985,6 +1076,22 @@ const AddStyle = React.forwardRef(
                                                                         视频生成
                                                                     </div>
                                                                 )}
+                                                                <div className="absolute bottom-[calc(50%-15px)] right-[calc(50%-15px)]">
+                                                                    <svg
+                                                                        viewBox="0 0 1024 1024"
+                                                                        version="1.1"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        p-id="6472"
+                                                                        width="30"
+                                                                        height="30"
+                                                                    >
+                                                                        <path
+                                                                            d="M605.693 867.837h-63.715v-304.621h63.715v304.621M881.428 719.652c-16.991 25.486-43.449 38.108-79.493 38.108h-73.060v110.077h-63.715v-304.621h139.325c29.491 0 52.671 8.738 69.42 26.093 16.869 17.355 25.244 41.142 25.244 71.483 0.122 21.36-5.825 41.021-17.718 58.861M186.383 867.837v-648.685c0-2.67-2.185-4.854-4.854-4.854h-49.637c-2.67 0-4.854-2.185-4.854-4.854v-49.759c0-2.67 2.185-4.854 4.854-4.854h227.92c2.67 0 4.854 2.185 4.854 4.854v292.242l297.703-295.641c0.85-0.85 2.185-1.456 3.398-1.456h221.972c4.369 0 6.432 5.219 3.398 8.253l-704.754 704.754M822.446 625.596c-8.738-6.432-23.059-9.709-42.962-9.709h-50.608v89.202h59.104c20.389 0 34.224-6.19 41.628-18.569 4.005-6.796 5.947-16.384 5.947-28.763 0-14.928-4.369-25.607-13.107-32.161M822.446 625.596z"
+                                                                            fill="#673ab7"
+                                                                            p-id="6473"
+                                                                        ></path>
+                                                                    </svg>
+                                                                </div>
                                                             </Image.PreviewGroup>
                                                         </SwiperSlide>
                                                     ))}

@@ -1057,6 +1057,155 @@ const Price1 = () => {
                             </Grid>
                         </div>
                     </div>
+                    <div className="flex justify-center">
+                        <Divider className="py-3 w-[70%]" />
+                    </div>
+                    <div className="flex w-full mt-[40px]  pb-10 justify-center flex-col items-center">
+                        <div className="xs:w-[100%] md:w-[40%]">
+                            <div className="flex justify-center mt-3 mb-5 xs:text-2xl md:text-5xl">模版加油包</div>
+                            <div className="flex justify-center mt-5 mb-7">购买后立即生效，有效期7天</div>
+                        </div>
+                        <div className="xs:w-[100%] md:w-[40%]">
+                            <Grid container spacing={gridSpacing} columns={20} className="flex justify-center">
+                                <Grid item xs={20} sm={10} md={10} className="max-w-[320px] ">
+                                    <MainCard
+                                        boxShadow
+                                        sx={{
+                                            pt: 1.75,
+                                            border: '1px solid',
+                                            borderColor: 'secondary.main'
+                                        }}
+                                    >
+                                        <Grid container textAlign="center" spacing={gridSpacing}>
+                                            <Grid item xs={12}>
+                                                <Typography
+                                                    variant="h6"
+                                                    sx={{
+                                                        fontSize: '1.5625rem',
+                                                        fontWeight: 500,
+                                                        position: 'relative',
+                                                        mb: 1.875,
+                                                        '&:after': {
+                                                            content: '""',
+                                                            position: 'absolute',
+                                                            bottom: -15,
+                                                            left: 'calc(50% - 25px)',
+                                                            width: 50,
+                                                            height: 4,
+                                                            background: theme.palette.primary.main,
+                                                            borderRadius: '3px'
+                                                        }
+                                                    }}
+                                                >
+                                                    加油包（大）
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Typography variant="body2">{`增加 20个模版额度`}</Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                {/* <div className="text-sm text-center text-[#d7d7d7] line-through">
+                                                        ￥{plan?.marketPrice / 100}/{plan?.unitName}
+                                                    </div> */}
+                                                <Typography
+                                                    component="div"
+                                                    variant="body2"
+                                                    sx={{
+                                                        fontSize: '2.1875rem',
+                                                        fontWeight: 700,
+                                                        lineHeight: '1.2em',
+                                                        '& > span': {
+                                                            fontSize: '1.25rem',
+                                                            fontWeight: 500
+                                                        }
+                                                    }}
+                                                >
+                                                    <span>￥</span>
+                                                    199
+                                                </Typography>
+                                                <div className="text-[#aaa] text-sm text-center">{'七天加油包'}</div>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button className={'w-4/5'} variant={'outlined'} onClick={() => {}} color="secondary">
+                                                    <div className="flex flex-col">
+                                                        <div>购买加油包</div>
+                                                    </div>
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </MainCard>
+                                </Grid>
+                                <Grid item xs={20} sm={10} md={10} className="max-w-[320px] ">
+                                    <MainCard
+                                        boxShadow
+                                        sx={{
+                                            pt: 1.75,
+                                            border: '1px solid',
+                                            borderColor: 'secondary.main'
+                                        }}
+                                    >
+                                        <Grid container textAlign="center" spacing={gridSpacing}>
+                                            <Grid item xs={12}>
+                                                <Typography
+                                                    variant="h6"
+                                                    sx={{
+                                                        fontSize: '1.5625rem',
+                                                        fontWeight: 500,
+                                                        position: 'relative',
+                                                        mb: 1.875,
+                                                        '&:after': {
+                                                            content: '""',
+                                                            position: 'absolute',
+                                                            bottom: -15,
+                                                            left: 'calc(50% - 25px)',
+                                                            width: 50,
+                                                            height: 4,
+                                                            background: theme.palette.primary.main,
+                                                            borderRadius: '3px'
+                                                        }
+                                                    }}
+                                                >
+                                                    加油包（小）
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Typography variant="body2">{`增加 6个模版额度`}</Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                {/* <div className="text-sm text-center text-[#d7d7d7] line-through">
+                                                        ￥{plan?.marketPrice / 100}/{plan?.unitName}
+                                                    </div> */}
+                                                <Typography
+                                                    component="div"
+                                                    variant="body2"
+                                                    sx={{
+                                                        fontSize: '2.1875rem',
+                                                        fontWeight: 700,
+                                                        lineHeight: '1.2em',
+                                                        '& > span': {
+                                                            fontSize: '1.25rem',
+                                                            fontWeight: 500
+                                                        }
+                                                    }}
+                                                >
+                                                    <span>￥</span>
+                                                    30
+                                                </Typography>
+                                                <div className="text-[#aaa] text-sm text-center">{'七天加油包'}</div>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button className={'w-4/5'} variant={'outlined'} onClick={() => {}} color="secondary">
+                                                    <div className="flex flex-col">
+                                                        <div>购买加油包</div>
+                                                    </div>
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </MainCard>
+                                </Grid>
+                            </Grid>
+                        </div>
+                    </div>
                 </div>
             </div>
             {/* <SectionWrapper sx={{ bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'dark.900', pb: 0 }}>

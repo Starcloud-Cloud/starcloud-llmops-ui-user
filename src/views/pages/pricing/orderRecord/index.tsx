@@ -27,6 +27,8 @@ import { PayModal } from '../PayModal';
 import dayjs from 'dayjs';
 import jsCookie from 'js-cookie';
 
+import { Tabs, Row, Col } from 'antd';
+
 type TableEnhancedCreateDataType = {
     id: number;
     status: number;
@@ -286,6 +288,13 @@ const Record: React.FC = () => {
 
     return (
         <MainCard content={false} title="订单记录">
+            {/* <Tabs
+                className="px-4"
+                items={[
+                    {
+                        label: '订单记录',
+                        key: '1',
+                        children: ( */}
             <TableContainer>
                 <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
                     <EnhancedTableHead
@@ -340,7 +349,25 @@ const Record: React.FC = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-
+            {/* )
+                    },
+                    {
+                        label: '高级模板',
+                        key: '2',
+                        children: (
+                            <Row className="overflow-x-hidden pb-[5px]" gutter={[16, 16]} wrap={true}>
+                                {/* {item.appList.map((el: any, i: number) => (
+                                    <Col key={el?.uid} ref={colRef} className={`xxxl-col flex-shrink-0`}>
+                                        <div ref={i === 0 && index === 0 ? step3 : null}>
+                                            <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
+                                        </div>
+                                    </Col>
+                                ))} 
+                            </Row>
+                        )
+                    }
+                ]}
+            /> */}
             {/* table pagination */}
             <TablePagination
                 rowsPerPageOptions={[5, 10]}

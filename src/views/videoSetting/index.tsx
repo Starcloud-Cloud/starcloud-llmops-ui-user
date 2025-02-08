@@ -652,7 +652,7 @@ const VideoSetting: React.FC<{
                                             valuePropName="checked"
                                             label="开启字幕"
                                             required
-                                            initialValue={true}
+                                            initialValue={false}
                                         >
                                             <Switch />
                                         </Form.Item>

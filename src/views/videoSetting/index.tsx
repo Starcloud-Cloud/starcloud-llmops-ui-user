@@ -432,7 +432,7 @@ const VideoSetting: React.FC<{
         axios.get('https://poster.mofabiji.com/api/font').then((res) => {
             const fontOption = Object.entries(res.data.data).map(([_, font]: any) => ({
                 label: font.name,
-                value: font.code,
+                value: _,
                 preview: font.preview,
                 show: font.show
             }));

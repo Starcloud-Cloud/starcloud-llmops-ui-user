@@ -700,8 +700,8 @@ const VideoSetting: React.FC<{
                                                 }
                                                 return value;
                                             }}
-                                            rules={[{ required: true }]}
-                                            initialValue="#FFFFFF"
+                                            required
+                                            initialValue="#f5222d"
                                         >
                                             <ColorPicker
                                                 allowClear
@@ -725,8 +725,7 @@ const VideoSetting: React.FC<{
                                                 }
                                                 return value;
                                             }}
-                                            rules={[{ required: true }]}
-                                            initialValue="#673ab7"
+                                            required
                                         >
                                             <ColorPicker
                                                 allowClear

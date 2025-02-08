@@ -21,6 +21,7 @@ import {
     Col,
     Divider
 } from 'antd';
+import axios from 'axios';
 import type { ColorPickerProps } from 'antd';
 import { cyan, generate, green, presetPalettes, red } from '@ant-design/colors';
 import { DeleteOutlined, PlusOutlined, SwapOutlined, MoreOutlined } from '@ant-design/icons';
@@ -428,8 +429,14 @@ const VideoSetting: React.FC<{
         dictData('', 'tts_voice_speed_all_json').then((res) => {
             setSoundSpeedOptions(JSON.parse(res.list[0]?.remark));
         });
-        dictData('', 'tts_voice_font').then((res) => {
-            setFontOptions(res.list);
+        axios.get('https://poster.mofabiji.com/api/font').then((res) => {
+            const fontOption = Object.entries(res.data.data).map(([_, font]: any) => ({
+                label: font.name,
+                value: font.code,
+                preview: font.preview,
+                show: font.show
+            }));
+            setFontOptions(fontOption);
         });
     }, []);
 
@@ -656,7 +663,7 @@ const VideoSetting: React.FC<{
                                             rules={[{ required: true }]}
                                             initialValue={30}
                                         >
-                                            <InputNumber addonAfter="像素" min={1} max={100} style={{ width: 250 }} />
+                                            <InputNumber addonAfter="像素" min={1} style={{ width: 250 }} />
                                         </Form.Item>
 
                                         <Form.Item
@@ -665,7 +672,16 @@ const VideoSetting: React.FC<{
                                             rules={[{ required: true }]}
                                             initialValue={fontOptions[0]?.value}
                                         >
-                                            <Select style={{ width: 250 }} options={fontOptions} />
+                                            <Select style={{ width: 250 }} optionLabelProp="label">
+                                                {fontOptions?.map(
+                                                    (item) =>
+                                                        item.show !== false && (
+                                                            <Select.Option label={item.label} key={item.value} value={item.value}>
+                                                                <Image src={item.preview} preview={false} />
+                                                            </Select.Option>
+                                                        )
+                                                )}
+                                            </Select>
                                         </Form.Item>
                                     </div>
                                     <div className="flex-1">
@@ -727,7 +743,7 @@ const VideoSetting: React.FC<{
                                             name={['globalSettings', 'subtitles', 'position']}
                                             initialValue={100}
                                         >
-                                            <InputNumber addonBefore="底部" addonAfter="像素" min={1} max={100} style={{ width: 250 }} />
+                                            <InputNumber addonBefore="底部" addonAfter="像素" min={1} style={{ width: 250 }} />
                                         </Form.Item>
                                     </div>
                                 </div>

@@ -435,7 +435,7 @@ const VideoSetting: React.FC<{
                 value: _,
                 preview: font.preview,
                 show: font.show
-            }))?.filter(item=> item.show!== false)
+            }))?.filter((item: any) => item.show !== false);
             setFontOptions(fontOption);
         });
     }, []);

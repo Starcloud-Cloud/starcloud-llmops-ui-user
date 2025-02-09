@@ -435,7 +435,7 @@ const VideoSetting: React.FC<{
                 value: _,
                 preview: font.preview,
                 show: font.show
-            }));
+            }))?.filter(item=> item.show!== false)
             setFontOptions(fontOption);
         });
     }, []);
@@ -674,8 +674,7 @@ const VideoSetting: React.FC<{
                                         >
                                             <Select style={{ width: 250 }} optionLabelProp="label">
                                                 {fontOptions?.map(
-                                                    (item) =>
-                                                        item.show !== false && (
+                                                    (item) => (
                                                             <Select.Option label={item.label} key={item.value} value={item.value}>
                                                                 <Image src={item.preview} preview={false} />
                                                             </Select.Option>

@@ -356,12 +356,14 @@ const VideoSetting: React.FC<{
 
             voiceUnits
         };
-        newData.globalSettings.subtitles.position = {
-            x: 0,
-            y: newData.globalSettings.subtitles.position,
-            bx: 0,
-            by: 0
-        };
+        if (newData.globalSettings?.subtitles?.position) {
+            newData.globalSettings.subtitles.position = {
+                x: 0,
+                y: newData.globalSettings?.subtitles?.position || 0,
+                bx: 0,
+                by: 0
+            };
+        }
 
         // newData.globalSettings.resolution = {
         //     width: 1286,

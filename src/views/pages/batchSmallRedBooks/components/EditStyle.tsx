@@ -216,6 +216,16 @@ const EditStyle = ({
     const imageStyleLength = useMemo(() => {
         return imageStyleData?.variableList?.filter((item: any) => item.type === 'IMAGE')?.length || 0;
     }, [imageStyleData]);
+    console.log(imageStyleData);
+
+    const textStyle = useMemo(() => {
+        if (imageStyleData?.videoConfig) {
+            const videoConfig = JSON.parse(imageStyleData?.videoConfig);
+            return videoConfig?.globalSettings?.subtitles;
+        }
+        return {};
+    }, [imageStyleData?.videoConfig]);
+
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -332,6 +342,18 @@ const EditStyle = ({
                                                     />
                                                 );
                                             })}
+                                        <div
+                                            style={{
+                                                bottom: scale * textStyle?.position?.y || 0,
+                                                fontSize: scale * textStyle?.fontSize || 16 + 'px',
+                                                color: textStyle?.color || 'transparent',
+                                                background: textStyle?.bgColor || 'transparent'
+                                                // fontFamily:local('微软雅黑'), url('https://service-oss-poster.mofaai.com.cn/font/font/%E5%BE%AE%E8%BD%AF%E9%9B%85%E9%BB%91.ttf') textStyle?.font || 'Arial'
+                                            }}
+                                            className="absolute left-[50%] translate-x-[-50%]"
+                                        >
+                                            魔法笔记字幕
+                                        </div>
                                     </div>
                                 </div>
                             </div>

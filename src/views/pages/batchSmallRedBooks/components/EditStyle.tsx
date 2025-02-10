@@ -216,6 +216,13 @@ const EditStyle = ({
     const imageStyleLength = useMemo(() => {
         return imageStyleData?.variableList?.filter((item: any) => item.type === 'IMAGE')?.length || 0;
     }, [imageStyleData]);
+    const textStyle = useMemo(() => {
+        if (imageStyleData?.videoConfig) {
+            const videoConfig = JSON.parse(imageStyleData?.videoConfig);
+            return videoConfig?.globalSettings?.subtitles;
+        }
+        return {};
+    }, [imageStyleData?.videoConfig]);
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -332,6 +339,30 @@ const EditStyle = ({
                                                     />
                                                 );
                                             })}
+                                        {textStyle?.enable && (
+                                            <div
+                                                style={{
+                                                    bottom: scale * textStyle?.position?.y || 0,
+                                                    fontSize: scale * textStyle?.fontSize || 16 + 'px',
+                                                    color: textStyle?.color || 'transparent',
+                                                    background: textStyle?.bgColor || 'transparent',
+                                                    fontFamily: textStyle?.font ? `${textStyle.font}, Arial` : 'Arial'
+                                                }}
+                                                className="absolute left-[50%] translate-x-[-50%] w-[80%] text-center"
+                                            >
+                                                <style>
+                                                    {textStyle?.font &&
+                                                        `
+            @font-face {
+                font-family: '${textStyle.font}';
+                src: local('${textStyle.font}'),
+                     url('https://service-oss-poster.mofaai.com.cn/font/font/${encodeURIComponent(textStyle.font)}.ttf') format('truetype');
+            }
+        `}
+                                                </style>
+                                                魔法笔记字幕
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

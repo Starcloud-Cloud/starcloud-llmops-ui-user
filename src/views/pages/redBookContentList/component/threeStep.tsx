@@ -352,7 +352,8 @@ const ThreeStep = ({
                 isRepeatEnable: false,
                 isRepeatRole: false,
                 isSoundEffect: false,
-                isVoiceRole: false
+                isVoiceRole: false,
+                isSubtitles: false
             });
         }
     }, [data]);

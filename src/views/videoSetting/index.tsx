@@ -356,12 +356,14 @@ const VideoSetting: React.FC<{
 
             voiceUnits
         };
-        newData.globalSettings.subtitles.position = {
-            x: 0,
-            y: newData.globalSettings.subtitles.position,
-            bx: 0,
-            by: 0
-        };
+        if (newData.globalSettings?.subtitles?.position) {
+            newData.globalSettings.subtitles.position = {
+                x: 0,
+                y: newData.globalSettings?.subtitles?.position || 0,
+                bx: 0,
+                by: 0
+            };
+        }
 
         // newData.globalSettings.resolution = {
         //     width: 1286,
@@ -400,12 +402,14 @@ const VideoSetting: React.FC<{
                 ...values,
                 voiceUnits
             };
-            newData.globalSettings.subtitles.position = {
-                x: 0,
-                y: newData.globalSettings.subtitles.position,
-                bx: 0,
-                by: 0
-            };
+            if (newData.globalSettings?.subtitles?.position) {
+                newData.globalSettings.subtitles.position = {
+                    x: 0,
+                    y: newData.globalSettings.subtitles.position,
+                    bx: 0,
+                    by: 0
+                };
+            }
             // newData.globalSettings = {
             //     ...values.globalSettings,
             //     fps: 5,
@@ -430,12 +434,14 @@ const VideoSetting: React.FC<{
             setSoundSpeedOptions(JSON.parse(res.list[0]?.remark));
         });
         axios.get('https://poster.mofabiji.com/api/font').then((res) => {
-            const fontOption = Object.entries(res.data.data).map(([_, font]: any) => ({
-                label: font.name,
-                value: _,
-                preview: font.preview,
-                show: font.show
-            }))?.filter((item: any) => item.show !== false);
+            const fontOption = Object.entries(res.data.data)
+                .map(([_, font]: any) => ({
+                    label: font.name,
+                    value: _,
+                    preview: font.preview,
+                    show: font.show
+                }))
+                ?.filter((item: any) => item.show !== false);
             setFontOptions(fontOption);
         });
     }, []);
@@ -643,6 +649,21 @@ const VideoSetting: React.FC<{
                     {
                         key: '1',
                         label: '字幕配置',
+                        extra: (
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    checked={quickConfiguration.isSubtitles}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                    onChange={(e) => {
+                                        e.stopPropagation();
+                                        setQuickConfiguration({ ...quickConfiguration, isSubtitles: !quickConfiguration.isSubtitles });
+                                    }}
+                                />
+                                <div className="text-xs">快捷配置</div>
+                            </div>
+                        ),
                         children: (
                             <div>
                                 <div className="flex items-center gap-2">
@@ -673,13 +694,11 @@ const VideoSetting: React.FC<{
                                             initialValue={fontOptions[0]?.value}
                                         >
                                             <Select style={{ width: 250 }} optionLabelProp="label">
-                                                {fontOptions?.map(
-                                                    (item) => (
-                                                            <Select.Option label={item.label} key={item.value} value={item.value}>
-                                                                <Image src={item.preview} preview={false} />
-                                                            </Select.Option>
-                                                        )
-                                                )}
+                                                {fontOptions?.map((item) => (
+                                                    <Select.Option label={item.label} key={item.value} value={item.value}>
+                                                        <Image src={item.preview} preview={false} />
+                                                    </Select.Option>
+                                                ))}
                                             </Select>
                                         </Form.Item>
                                     </div>

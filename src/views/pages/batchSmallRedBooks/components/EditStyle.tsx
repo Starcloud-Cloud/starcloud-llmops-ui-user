@@ -342,18 +342,30 @@ const EditStyle = ({
                                                     />
                                                 );
                                             })}
-                                        <div
-                                            style={{
-                                                bottom: scale * textStyle?.position?.y || 0,
-                                                fontSize: scale * textStyle?.fontSize || 16 + 'px',
-                                                color: textStyle?.color || 'transparent',
-                                                background: textStyle?.bgColor || 'transparent'
-                                                // fontFamily:local('微软雅黑'), url('https://service-oss-poster.mofaai.com.cn/font/font/%E5%BE%AE%E8%BD%AF%E9%9B%85%E9%BB%91.ttf') textStyle?.font || 'Arial'
-                                            }}
-                                            className="absolute left-[50%] translate-x-[-50%]"
-                                        >
-                                            魔法笔记字幕
-                                        </div>
+                                        {textStyle?.enable && (
+                                            <div
+                                                style={{
+                                                    bottom: scale * textStyle?.position?.y || 0,
+                                                    fontSize: scale * textStyle?.fontSize || 16 + 'px',
+                                                    color: textStyle?.color || 'transparent',
+                                                    background: textStyle?.bgColor || 'transparent',
+                                                    fontFamily: textStyle?.font ? `${textStyle.font}, Arial` : 'Arial'
+                                                }}
+                                                className="absolute left-[50%] translate-x-[-50%] w-[80%] text-center"
+                                            >
+                                                <style>
+                                                    {textStyle?.font &&
+                                                        `
+            @font-face {
+                font-family: '${textStyle.font}';
+                src: local('${textStyle.font}'),
+                     url('https://service-oss-poster.mofaai.com.cn/font/font/${encodeURIComponent(textStyle.font)}.ttf') format('truetype');
+            }
+        `}
+                                                </style>
+                                                魔法笔记字幕
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

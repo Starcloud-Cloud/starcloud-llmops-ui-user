@@ -649,21 +649,21 @@ const VideoSetting: React.FC<{
                     {
                         key: '1',
                         label: '字幕配置',
-                        extra: (
-                            <div className="flex items-center gap-2">
-                                <Checkbox
-                                    checked={quickConfiguration.isSubtitles}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                    onChange={(e) => {
-                                        e.stopPropagation();
-                                        setQuickConfiguration({ ...quickConfiguration, isSubtitles: !quickConfiguration.isSubtitles });
-                                    }}
-                                />
-                                <div className="text-xs">快捷配置</div>
-                            </div>
-                        ),
+                        // extra: (
+                        //     <div className="flex items-center gap-2">
+                        //         <Checkbox
+                        //             checked={quickConfiguration.isSubtitles}
+                        //             onClick={(e) => {
+                        //                 e.stopPropagation();
+                        //             }}
+                        //             onChange={(e) => {
+                        //                 e.stopPropagation();
+                        //                 setQuickConfiguration({ ...quickConfiguration, isSubtitles: !quickConfiguration.isSubtitles });
+                        //             }}
+                        //         />
+                        //         <div className="text-xs">快捷配置</div>
+                        //     </div>
+                        // ),
                         children: (
                             <div>
                                 <div className="flex items-center gap-2">
@@ -705,7 +705,7 @@ const VideoSetting: React.FC<{
                                     <div className="flex-1">
                                         <Form.Item
                                             name={['globalSettings', 'subtitles', 'color']}
-                                            label="字幕颜色"
+                                            label="字体颜色"
                                             normalize={(value) => {
                                                 console.log(value);
 
@@ -732,7 +732,7 @@ const VideoSetting: React.FC<{
 
                                         <Form.Item
                                             name={['globalSettings', 'subtitles', 'bgColor']}
-                                            label="字幕背景颜色"
+                                            label="背景颜色"
                                             normalize={(value) => {
                                                 if (value?.toHexString) {
                                                     if (value?.cleared) {

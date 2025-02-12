@@ -480,117 +480,117 @@ const VideoModal = ({
                         </Select>
                     </Form.Item>
                 )}
-                {/* {quickConfiguration?.isSubtitles && ( */}
-                <Collapse
-                    items={[
-                        {
-                            key: '1',
-                            label: '字幕配置',
-                            children: (
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex-1">
-                                            <Form.Item
-                                                name={['globalSettings', 'subtitles', 'enable']}
-                                                valuePropName="checked"
-                                                label="开启字幕"
-                                                required
-                                                initialValue={false}
-                                            >
-                                                <Switch />
-                                            </Form.Item>
+                {quickConfiguration?.isSubtitles && (
+                    <Collapse
+                        items={[
+                            {
+                                key: '1',
+                                label: '字幕配置',
+                                children: (
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1">
+                                                <Form.Item
+                                                    name={['globalSettings', 'subtitles', 'enable']}
+                                                    valuePropName="checked"
+                                                    label="开启字幕"
+                                                    required
+                                                    initialValue={false}
+                                                >
+                                                    <Switch />
+                                                </Form.Item>
 
-                                            <Form.Item
-                                                name={['globalSettings', 'subtitles', 'fontSize']}
-                                                label="字幕大小"
-                                                rules={[{ required: true }]}
-                                                initialValue={30}
-                                            >
-                                                <InputNumber addonAfter="像素" min={1} style={{ width: 250 }} />
-                                            </Form.Item>
+                                                <Form.Item
+                                                    name={['globalSettings', 'subtitles', 'fontSize']}
+                                                    label="字幕大小"
+                                                    rules={[{ required: true }]}
+                                                    initialValue={30}
+                                                >
+                                                    <InputNumber addonAfter="像素" min={1} style={{ width: 250 }} />
+                                                </Form.Item>
 
-                                            <Form.Item
-                                                name={['globalSettings', 'subtitles', 'font']}
-                                                label="字体选择"
-                                                rules={[{ required: true }]}
-                                            >
-                                                <Select style={{ width: 250 }} optionLabelProp="label">
-                                                    {fontOptions?.map((item) => (
-                                                        <Select.Option label={item.label} key={item.value} value={item.value}>
-                                                            <Image src={item.preview} preview={false} />
-                                                        </Select.Option>
-                                                    ))}
-                                                </Select>
-                                            </Form.Item>
-                                        </div>
-                                        <div className="flex-1">
-                                            <Form.Item
-                                                name={['globalSettings', 'subtitles', 'color']}
-                                                label="字幕颜色"
-                                                normalize={(value) => {
-                                                    console.log(value);
+                                                <Form.Item
+                                                    name={['globalSettings', 'subtitles', 'font']}
+                                                    label="字体选择"
+                                                    rules={[{ required: true }]}
+                                                >
+                                                    <Select style={{ width: 250 }} optionLabelProp="label">
+                                                        {fontOptions?.map((item) => (
+                                                            <Select.Option label={item.label} key={item.value} value={item.value}>
+                                                                <Image src={item.preview} preview={false} />
+                                                            </Select.Option>
+                                                        ))}
+                                                    </Select>
+                                                </Form.Item>
+                                            </div>
+                                            <div className="flex-1">
+                                                <Form.Item
+                                                    name={['globalSettings', 'subtitles', 'color']}
+                                                    label="字体颜色"
+                                                    normalize={(value) => {
+                                                        console.log(value);
 
-                                                    if (value?.toHexString) {
-                                                        if (value?.cleared) {
-                                                            return '';
-                                                        } else {
-                                                            return value.toHexString().toUpperCase();
+                                                        if (value?.toHexString) {
+                                                            if (value?.cleared) {
+                                                                return '';
+                                                            } else {
+                                                                return value.toHexString().toUpperCase();
+                                                            }
                                                         }
-                                                    }
-                                                    return value;
-                                                }}
-                                                required
-                                                initialValue="#f5222d"
-                                            >
-                                                <ColorPicker
-                                                    allowClear
-                                                    styles={{ popupOverlayInner: { width: 480 } }}
-                                                    presets={presets}
-                                                    panelRender={customPanelRender}
-                                                    disabledAlpha
-                                                />
-                                            </Form.Item>
+                                                        return value;
+                                                    }}
+                                                    required
+                                                    initialValue="#f5222d"
+                                                >
+                                                    <ColorPicker
+                                                        allowClear
+                                                        styles={{ popupOverlayInner: { width: 480 } }}
+                                                        presets={presets}
+                                                        panelRender={customPanelRender}
+                                                        disabledAlpha
+                                                    />
+                                                </Form.Item>
 
-                                            <Form.Item
-                                                name={['globalSettings', 'subtitles', 'bgColor']}
-                                                label="字幕背景颜色"
-                                                normalize={(value) => {
-                                                    if (value?.toHexString) {
-                                                        if (value?.cleared) {
-                                                            return '';
-                                                        } else {
-                                                            return value.toHexString().toUpperCase();
+                                                <Form.Item
+                                                    name={['globalSettings', 'subtitles', 'bgColor']}
+                                                    label="背景颜色"
+                                                    normalize={(value) => {
+                                                        if (value?.toHexString) {
+                                                            if (value?.cleared) {
+                                                                return '';
+                                                            } else {
+                                                                return value.toHexString().toUpperCase();
+                                                            }
                                                         }
-                                                    }
-                                                    return value;
-                                                }}
-                                                required
-                                            >
-                                                <ColorPicker
-                                                    allowClear
-                                                    styles={{ popupOverlayInner: { width: 480 } }}
-                                                    presets={presets}
-                                                    panelRender={customPanelRender}
-                                                    disabledAlpha
-                                                />
-                                            </Form.Item>
+                                                        return value;
+                                                    }}
+                                                    required
+                                                >
+                                                    <ColorPicker
+                                                        allowClear
+                                                        styles={{ popupOverlayInner: { width: 480 } }}
+                                                        presets={presets}
+                                                        panelRender={customPanelRender}
+                                                        disabledAlpha
+                                                    />
+                                                </Form.Item>
 
-                                            <Form.Item
-                                                label="字幕位置"
-                                                rules={[{ required: true }]}
-                                                name={['globalSettings', 'subtitles', 'position']}
-                                                initialValue={100}
-                                            >
-                                                <InputNumber addonBefore="底部" addonAfter="像素" min={1} style={{ width: 250 }} />
-                                            </Form.Item>
+                                                <Form.Item
+                                                    label="字幕位置"
+                                                    rules={[{ required: true }]}
+                                                    name={['globalSettings', 'subtitles', 'position']}
+                                                    initialValue={100}
+                                                >
+                                                    <InputNumber addonBefore="底部" addonAfter="像素" min={1} style={{ width: 250 }} />
+                                                </Form.Item>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )
-                        }
-                    ]}
-                />
-                {/* )} */}
+                                )
+                            }
+                        ]}
+                    />
+                )}
             </Form>
             <div className="text-base font-[500]">
                 视频列表{' '}

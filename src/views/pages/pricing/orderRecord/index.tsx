@@ -20,7 +20,7 @@ import MainCard from 'ui-component/cards/MainCard';
 // import { CSVExport } from 'views/forms/tables/TableExports';
 
 // assets
-import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
+import { getOrderIsPay, getOrderRecord, submitOrder, templateList } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { PayModal } from '../PayModal';
@@ -28,7 +28,6 @@ import dayjs from 'dayjs';
 import jsCookie from 'js-cookie';
 
 import { Tabs, Row, Col } from 'antd';
-import MarketTemplate from '../../../template/myTemplate/components/content/marketTemplate';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -287,6 +286,13 @@ const Record: React.FC = () => {
         };
     }, []);
 
+    const [templateLists, setTemplateLists] = useState<any>([]);
+    useEffect(() => {
+        templateList().then((res: any) => {
+            setTemplateLists(res);
+        });
+    }, []);
+
     return (
         <MainCard content={false} title="订单记录">
             <Tabs
@@ -359,9 +365,21 @@ const Record: React.FC = () => {
                         key: '2',
                         children: (
                             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
-                                {[{}].map((el: any, i: number) => (
+                                {templateLists?.map((el: any, i: number) => (
                                     <div key={el?.uid} className={`xxxl-col flex-shrink-0`}>
-                                        <MarketTemplate like="market" type="MARKET" data={el} />
+                                        <div
+                                            className="w-full aspect-[.75] overflow-hidden group rounded-[12px] cursor-pointer bg-white relative p-4 !bg-cover hover:shadow-lg"
+                                            style={{
+                                                aspectRatio: '.75',
+                                                background: `url(${el?.example})`
+                                            }}
+                                        >
+                                            <div className="bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.8))] absolute bottom-0 right-0 w-full aspect-[2]">
+                                                <div className="flex gap-2 justify-start items-center absolute left-[16px] bottom-[40px]">
+                                                    <div className="text-white text-[16px] font-bold line-clamp-2">{el.name}</div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

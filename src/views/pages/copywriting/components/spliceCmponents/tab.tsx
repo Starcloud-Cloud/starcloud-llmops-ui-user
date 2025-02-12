@@ -77,6 +77,7 @@ const CreateTab = ({
     useEffect(() => {
         setCheckStyle(imageStyleData[0]?.uuid);
     }, []);
+    const [form] = Form.useForm();
     return (
         <div className="min-h-[800px] ">
             <div className="flex items-end mb-[20px]">
@@ -175,18 +176,24 @@ const CreateTab = ({
                                                 trigger={['click']}
                                                 title="售卖配置"
                                                 content={
-                                                    <Form>
-                                                        <Form.Item label="开启售卖" name="enable">
+                                                    <Form form={form}>
+                                                        <Form.Item label="开启售卖" name="openSale">
                                                             <Switch />
                                                         </Form.Item>
-                                                        <Form.Item label="绑定到套餐" name="package">
-                                                            <Select options={[]} />
-                                                        </Form.Item>
-                                                        <Form.Item label="演示笔记 ID" name="demoNoteId">
+                                                        <Form.Item label="演示笔记 ID" name="demoId">
                                                             <Input.TextArea />
                                                         </Form.Item>
                                                     </Form>
                                                 }
+                                                onOpenChange={(data) => {
+                                                    if (data) {
+                                                        form.setFieldsValue(item?.saleConfig || {});
+                                                    } else {
+                                                        const newData = _.cloneDeep(imageStyleData);
+                                                        newData[i].saleConfig = form.getFieldsValue();
+                                                        setImageStyleData(newData);
+                                                    }
+                                                }}
                                             >
                                                 <div className="cursor-pointer text-[#673ab7] text-xs flex items-center gap-1">
                                                     <svg

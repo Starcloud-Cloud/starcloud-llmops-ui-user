@@ -126,3 +126,8 @@ export const getLickNameProduct = (data: any) => {
 export const getNewUserProduct = () => {
     return request.get({ url: '/llm/product/spu/u/special_offer' });
 };
+
+//高级模版
+export const templateList = () => {
+    return request.get({ url: '/llm/template/record/list' });
+};

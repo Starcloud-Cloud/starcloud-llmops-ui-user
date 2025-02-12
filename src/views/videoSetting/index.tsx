@@ -402,12 +402,14 @@ const VideoSetting: React.FC<{
                 ...values,
                 voiceUnits
             };
-            newData.globalSettings.subtitles.position = {
-                x: 0,
-                y: newData.globalSettings.subtitles.position,
-                bx: 0,
-                by: 0
-            };
+            if (newData.globalSettings.subtitles?.position) {
+                newData.globalSettings.subtitles.position = {
+                    x: 0,
+                    y: newData.globalSettings.subtitles.position,
+                    bx: 0,
+                    by: 0
+                };
+            }
             // newData.globalSettings = {
             //     ...values.globalSettings,
             //     fps: 5,
@@ -432,12 +434,14 @@ const VideoSetting: React.FC<{
             setSoundSpeedOptions(JSON.parse(res.list[0]?.remark));
         });
         axios.get('https://poster.mofabiji.com/api/font').then((res) => {
-            const fontOption = Object.entries(res.data.data).map(([_, font]: any) => ({
-                label: font.name,
-                value: _,
-                preview: font.preview,
-                show: font.show
-            }))?.filter((item: any) => item.show !== false);
+            const fontOption = Object.entries(res.data.data)
+                .map(([_, font]: any) => ({
+                    label: font.name,
+                    value: _,
+                    preview: font.preview,
+                    show: font.show
+                }))
+                ?.filter((item: any) => item.show !== false);
             setFontOptions(fontOption);
         });
     }, []);
@@ -675,13 +679,11 @@ const VideoSetting: React.FC<{
                                             initialValue={fontOptions[0]?.value}
                                         >
                                             <Select style={{ width: 250 }} optionLabelProp="label">
-                                                {fontOptions?.map(
-                                                    (item) => (
-                                                            <Select.Option label={item.label} key={item.value} value={item.value}>
-                                                                <Image src={item.preview} preview={false} />
-                                                            </Select.Option>
-                                                        )
-                                                )}
+                                                {fontOptions?.map((item) => (
+                                                    <Select.Option label={item.label} key={item.value} value={item.value}>
+                                                        <Image src={item.preview} preview={false} />
+                                                    </Select.Option>
+                                                ))}
                                             </Select>
                                         </Form.Item>
                                     </div>

@@ -4,21 +4,28 @@ import Goods from 'views/pages/batchSmallRedBooks/good';
 import { DetailModal } from 'views/pages/redBookContentList/component/detailModal';
 import { getContentDetail } from 'api/redBook';
 
-const Preview = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) => {
+const Preview = ({ demoId, open, setOpen }: { demoId: string; open: boolean; setOpen: (open: boolean) => void }) => {
     const [businessUid, setBusinessUid] = useState<any>(null);
     const [detailOpen, setDetailOpen] = useState<boolean>(false);
 
     const [content, setContent] = useState<any>(null);
     useEffect(() => {
-        getContentDetail('0136df58a63041d0b764a9c2b61e6d86').then((res: any) => {
-            setContent(res);
-        });
-    }, []);
+        if (demoId) {
+            console.log(demoId);
+
+            const res = demoId.split(/[,，]/).map(async (item) => {
+                return await getContentDetail(item);
+            });
+            Promise.all(res).then((res) => {
+                setContent(res);
+            });
+        }
+    }, [demoId]);
     return (
         <Modal width={800} open={open} onCancel={() => setOpen(false)} footer={null}>
             <div className="bg-white p-4">
-                <div className="flex gap-8 items-center">
-                    <div className="w-[400px] flex flex-col items-start text-left">
+                <div className="flex gap-4 items-center">
+                    <div className="flex-1 flex flex-col items-start text-left">
                         <div className="text-2xl font-bold mb-4">升级Canva可画高级版，开启极致体验</div>
 
                         <p className="text-gray-600 mb-6">全站资源尽在Canva可画高级版，点点鼠标，出手就是设计高手</p>
@@ -102,8 +109,12 @@ const Preview = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) =>
                             </Button>
                         </div>
                     </div>
-                    <div className="w-[300px]">
-                        <Goods item={content} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} show={true} />
+                    <div className="flex-1 flex gap-4">
+                        {content?.map((item: any) => (
+                            <div className="w-[250px]">
+                                <Goods item={item} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} show={true} />
+                            </div>
+                        ))}
                     </div>
                 </div>
                 <div className="w-full text-lg font-semibold mt-4 mb-2 text-left">更多相似内容</div>

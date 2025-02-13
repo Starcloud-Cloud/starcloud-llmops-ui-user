@@ -77,7 +77,7 @@ export const InviteMatrix = () => {
                             <p className="text-base">分享邀请链接，邀请新人成功注册!</p>
                             <p className="ml-2">-邀请好友需为之前从未注册过魔法笔记的新用户。</p>
                             <p className="ml-2">-用户每成功邀请1位好友注册，可获得20点魔法豆。</p>
-                            <p className="ml-2">-用户每成功邀请3位好友注册，额外获得50点魔法豆。</p>
+                            <p className="ml-2">-用户每成功邀请3位好友注册，额外获得20点魔法豆。</p>
                         </div>
                     </Card>
                 </Col>

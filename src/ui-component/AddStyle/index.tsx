@@ -303,7 +303,6 @@ const AddStyle = React.forwardRef(
                 message.warning('请选择图片模版');
                 return;
             }
-
             // 取最大的+1
             if (type === 0) {
                 const list = styleData.map((item: any) => item.name);
@@ -313,7 +312,8 @@ const AddStyle = React.forwardRef(
                 } else {
                     maxNumber = Math.max(...list.map((item: any) => parseInt(item.match(/\d+/))));
                 }
-                setStyleData([...styleData, ...selectImgs]);
+                // setStyleData([...styleData, ...selectImgs]);
+                setStyleData([...selectImgs]);
                 setVisible(false);
                 setSelectImgs([]);
                 setChooseImageIndex([]);
@@ -679,6 +679,13 @@ const AddStyle = React.forwardRef(
         };
 
         const [previewOpen, setPreviewOpen] = useState<boolean>(false);
+        const [demoId, setDemoId] = useState<string>('');
+        useEffect(() => {
+            if (visible) {
+                setChooseImageIndex(styleData?.map((item: any) => item.uuid));
+                setSelectImgs(styleData);
+            }
+        }, [visible]);
 
         return (
             <div className="addStyle">
@@ -1009,6 +1016,7 @@ const AddStyle = React.forwardRef(
                                                                 {item?.saleConfig?.openSale && (
                                                                     <div
                                                                         onClick={() => {
+                                                                            setDemoId(item.saleConfig?.demoId);
                                                                             setPreviewOpen(true);
                                                                         }}
                                                                         className=" absolute top-0 left-0 w-full h-full bg-black/50 text-white hidden group-hover:block"
@@ -1293,7 +1301,7 @@ const AddStyle = React.forwardRef(
                         </div>
                     </Modal>
                 )}
-                <Preview open={previewOpen} setOpen={setPreviewOpen} />
+                {previewOpen && <Preview demoId={demoId} open={previewOpen} setOpen={setPreviewOpen} />}
             </div>
         );
     }

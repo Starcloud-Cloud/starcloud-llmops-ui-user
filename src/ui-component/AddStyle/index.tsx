@@ -687,6 +687,10 @@ const AddStyle = React.forwardRef(
             }
         }, [visible]);
 
+        //自定义图片预览
+        const [previewIndex, setPreviewIndex] = useState<any>(null);
+        const [previewIndex1, setPreviewIndex1] = useState<any>(null);
+
         return (
             <div className="addStyle">
                 {/* <div className="flex items-center mb-2">
@@ -808,14 +812,21 @@ const AddStyle = React.forwardRef(
                                 >
                                     <div className="w-[145px] h-[200px] flex relative">
                                         {item?.templateList?.map((v: any, vi: number) => (
-                                            <SwiperSlide className="relative">
+                                            <SwiperSlide className="relative group">
                                                 <Image.PreviewGroup
+                                                    preview={{
+                                                        visible: previewIndex1?.index === index && previewIndex1?.vi === vi,
+                                                        onVisibleChange: (visible) => {
+                                                            setPreviewIndex1(null);
+                                                        }
+                                                    }}
                                                     items={styleData?.[index]?.templateList?.map((item: any) => item.example || '')}
                                                 >
                                                     <Image
                                                         style={{
                                                             width: '150px'
                                                         }}
+                                                        preview={false}
                                                         width={150}
                                                         key={vi}
                                                         height={200}
@@ -827,6 +838,44 @@ const AddStyle = React.forwardRef(
                                                         }
                                                         fallback="data:image/png;base64,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"
                                                     />
+                                                    {item?.saleConfig?.openSale && (
+                                                        <div className="absolute bottom-[calc(50%-13px)] right-[calc(50%-37px)] rounded-full bg-[#717476] text-white text-xs font-semibold flex items-center gap-1 px-2 py-1">
+                                                            <svg
+                                                                viewBox="0 0 1024 1024"
+                                                                version="1.1"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                p-id="11435"
+                                                                width="18"
+                                                                height="18"
+                                                            >
+                                                                <path
+                                                                    d="M816.49 909H211.21c-1.1 0-2-0.9-2-2v-68.18c0-1.1 0.9-2 2-2h605.28c1.1 0 2 0.9 2 2V907c0 1.1-0.9 2-2 2z"
+                                                                    fill="#FFAA22"
+                                                                    p-id="11436"
+                                                                ></path>
+                                                                <path
+                                                                    d="M910.24 316.23c-27.11 0-49.1 22.52-49.1 50.31 0 7.28 1.58 14.16 4.3 20.4l-176.13 80.21-147.2-258.57c14.56-8.73 24.46-24.74 24.46-43.28 0-27.79-21.98-50.31-49.1-50.31s-49.1 22.52-49.1 50.31c0 17.99 9.29 33.66 23.15 42.55l-158.16 259.3-176.13-80.21c2.71-6.25 4.3-13.12 4.3-20.4 0-27.78-21.98-50.31-49.1-50.31s-49.1 22.52-49.1 50.31c0 27.78 21.98 50.31 49.1 50.31 3.99 0 7.82-0.62 11.53-1.54l86.65 366.28h601.43l86.65-366.28c3.71 0.92 7.54 1.54 11.53 1.54 27.12 0 49.1-22.52 49.1-50.31 0.01-27.78-21.97-50.31-49.08-50.31z"
+                                                                    fill="#FFD68D"
+                                                                    p-id="11437"
+                                                                ></path>
+                                                            </svg>
+                                                            高级版
+                                                        </div>
+                                                    )}
+                                                    <div
+                                                        onClick={() => {
+                                                            setPreviewIndex1({
+                                                                index,
+                                                                vi
+                                                            });
+                                                        }}
+                                                        className=" absolute top-0 left-0 w-full h-full bg-black/50 text-white hidden group-hover:block"
+                                                    >
+                                                        <div className="w-full h-full flex justify-center items-center gap-1">
+                                                            <EyeOutlined />
+                                                            预览
+                                                        </div>
+                                                    </div>
                                                     {v?.openVideoMode && (
                                                         <div className="text-xs text-[#673ab7] absolute left-1 top-1 z-50 bg-white px-1 rounded-md">
                                                             视频生成
@@ -966,15 +1015,21 @@ const AddStyle = React.forwardRef(
                                                                 items={templateList?.[index]?.templateList?.map(
                                                                     (item: any) => item.example || ''
                                                                 )}
+                                                                preview={{
+                                                                    visible: index === previewIndex?.index && vi === previewIndex?.vi,
+                                                                    onVisibleChange: (visible) => {
+                                                                        setPreviewIndex(null);
+                                                                    }
+                                                                }}
                                                             >
                                                                 <Image
                                                                     style={{
                                                                         width: '100%'
                                                                     }}
-                                                                    preview={!item?.saleConfig?.openSale ? true : false}
                                                                     key={vi}
                                                                     height={200}
                                                                     width={150}
+                                                                    preview={false}
                                                                     src={`${v.example}?x-oss-process=image/resize,w_150/quality,q_80`}
                                                                     placeholder={
                                                                         <div className="w-[145px] h-[200px] flex justify-center items-center">
@@ -996,37 +1051,48 @@ const AddStyle = React.forwardRef(
                                                                     </div>
                                                                 )}
                                                                 {item?.saleConfig?.openSale && (
-                                                                    <div className="absolute bottom-[calc(50%-15px)] right-[calc(50%-15px)]">
+                                                                    <div className="absolute bottom-[calc(50%-13px)] right-[calc(50%-37px)] rounded-full bg-[#717476] text-white text-xs font-semibold flex items-center gap-1 px-2 py-1">
                                                                         <svg
                                                                             viewBox="0 0 1024 1024"
                                                                             version="1.1"
                                                                             xmlns="http://www.w3.org/2000/svg"
-                                                                            p-id="6472"
-                                                                            width="30"
-                                                                            height="30"
+                                                                            p-id="11435"
+                                                                            width="18"
+                                                                            height="18"
                                                                         >
                                                                             <path
-                                                                                d="M605.693 867.837h-63.715v-304.621h63.715v304.621M881.428 719.652c-16.991 25.486-43.449 38.108-79.493 38.108h-73.060v110.077h-63.715v-304.621h139.325c29.491 0 52.671 8.738 69.42 26.093 16.869 17.355 25.244 41.142 25.244 71.483 0.122 21.36-5.825 41.021-17.718 58.861M186.383 867.837v-648.685c0-2.67-2.185-4.854-4.854-4.854h-49.637c-2.67 0-4.854-2.185-4.854-4.854v-49.759c0-2.67 2.185-4.854 4.854-4.854h227.92c2.67 0 4.854 2.185 4.854 4.854v292.242l297.703-295.641c0.85-0.85 2.185-1.456 3.398-1.456h221.972c4.369 0 6.432 5.219 3.398 8.253l-704.754 704.754M822.446 625.596c-8.738-6.432-23.059-9.709-42.962-9.709h-50.608v89.202h59.104c20.389 0 34.224-6.19 41.628-18.569 4.005-6.796 5.947-16.384 5.947-28.763 0-14.928-4.369-25.607-13.107-32.161M822.446 625.596z"
-                                                                                fill="#673ab7"
-                                                                                p-id="6473"
+                                                                                d="M816.49 909H211.21c-1.1 0-2-0.9-2-2v-68.18c0-1.1 0.9-2 2-2h605.28c1.1 0 2 0.9 2 2V907c0 1.1-0.9 2-2 2z"
+                                                                                fill="#FFAA22"
+                                                                                p-id="11436"
+                                                                            ></path>
+                                                                            <path
+                                                                                d="M910.24 316.23c-27.11 0-49.1 22.52-49.1 50.31 0 7.28 1.58 14.16 4.3 20.4l-176.13 80.21-147.2-258.57c14.56-8.73 24.46-24.74 24.46-43.28 0-27.79-21.98-50.31-49.1-50.31s-49.1 22.52-49.1 50.31c0 17.99 9.29 33.66 23.15 42.55l-158.16 259.3-176.13-80.21c2.71-6.25 4.3-13.12 4.3-20.4 0-27.78-21.98-50.31-49.1-50.31s-49.1 22.52-49.1 50.31c0 27.78 21.98 50.31 49.1 50.31 3.99 0 7.82-0.62 11.53-1.54l86.65 366.28h601.43l86.65-366.28c3.71 0.92 7.54 1.54 11.53 1.54 27.12 0 49.1-22.52 49.1-50.31 0.01-27.78-21.97-50.31-49.08-50.31z"
+                                                                                fill="#FFD68D"
+                                                                                p-id="11437"
                                                                             ></path>
                                                                         </svg>
+                                                                        高级版
                                                                     </div>
                                                                 )}
-                                                                {item?.saleConfig?.openSale && (
-                                                                    <div
-                                                                        onClick={() => {
+                                                                <div
+                                                                    onClick={() => {
+                                                                        if (item?.saleConfig?.openSale) {
                                                                             setDemoId(item.saleConfig?.demoId);
                                                                             setPreviewOpen(true);
-                                                                        }}
-                                                                        className=" absolute top-0 left-0 w-full h-full bg-black/50 text-white hidden group-hover:block"
-                                                                    >
-                                                                        <div className="w-full h-full flex justify-center items-center gap-1">
-                                                                            <EyeOutlined />
-                                                                            预览
-                                                                        </div>
+                                                                        } else {
+                                                                            setPreviewIndex({
+                                                                                index,
+                                                                                vi
+                                                                            });
+                                                                        }
+                                                                    }}
+                                                                    className=" absolute top-0 left-0 w-full h-full bg-black/50 text-white hidden group-hover:block"
+                                                                >
+                                                                    <div className="w-full h-full flex justify-center items-center gap-1">
+                                                                        <EyeOutlined />
+                                                                        预览
                                                                     </div>
-                                                                )}
+                                                                </div>
                                                             </Image.PreviewGroup>
                                                         </SwiperSlide>
                                                     ))}

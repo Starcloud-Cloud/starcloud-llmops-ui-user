@@ -433,6 +433,12 @@ const AddStyleApp = React.forwardRef(
                         );
                     })
                     .catch((e: any) => {
+                        const uniqueData = e.data?.filter(
+                            (item: any, index: number, self: any) => index === self.findIndex((t: any) => t.demoId === item.demoId)
+                        );
+                        setDemoId(uniqueData?.map((item: any) => item.demoId)?.join(','));
+                        setPreviewOpen(true);
+                        console.log(e);
                         return;
                     });
             }
@@ -746,6 +752,11 @@ const AddStyleApp = React.forwardRef(
                     );
                 })
                 .catch((e: any) => {
+                    const uniqueData = e.data?.filter(
+                        (item: any, index: number, self: any) => index === self.findIndex((t: any) => t.demoId === item.demoId)
+                    );
+                    setDemoId(uniqueData?.map((item: any) => item.demoId)?.join(','));
+                    setPreviewOpen(true);
                     return;
                 });
         };

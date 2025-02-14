@@ -1,10 +1,12 @@
 import { Modal, Button } from 'antd';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Goods from 'views/pages/batchSmallRedBooks/good';
 import { DetailModal } from 'views/pages/redBookContentList/component/detailModal';
 import { getContentDetail } from 'api/redBook';
 
 const Preview = ({ demoId, open, setOpen }: { demoId: string; open: boolean; setOpen: (open: boolean) => void }) => {
+    const navigate = useNavigate();
     const [businessUid, setBusinessUid] = useState<any>(null);
     const [detailOpen, setDetailOpen] = useState<boolean>(false);
 
@@ -24,7 +26,7 @@ const Preview = ({ demoId, open, setOpen }: { demoId: string; open: boolean; set
     return (
         <Modal width={800} open={open} onCancel={() => setOpen(false)} footer={null}>
             <div className="bg-white p-4">
-                <div className="flex gap-4 items-center">
+                <div className="flex gap-4 justify-between items-center">
                     <div className="flex-1 flex flex-col items-start text-left">
                         <div className="text-2xl font-bold mb-4">升级Canva可画高级版，开启极致体验</div>
 
@@ -104,12 +106,12 @@ const Preview = ({ demoId, open, setOpen }: { demoId: string; open: boolean; set
                                     <p className="text-gray-600">全渠道商用授权书、提供发票可报销、专业人工客服支持</p>
                                 </div>
                             </div>
-                            <Button type="primary" className="mt-4 w-full">
+                            <Button onClick={() => navigate('/subscribe')} type="primary" className="mt-4 w-full">
                                 立即升级
                             </Button>
                         </div>
                     </div>
-                    <div className="flex-1 flex gap-4">
+                    <div className="flex-1 flex justify-center gap-4">
                         {content?.map((item: any) => (
                             <div className="w-[250px]">
                                 <Goods item={item} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} show={true} />

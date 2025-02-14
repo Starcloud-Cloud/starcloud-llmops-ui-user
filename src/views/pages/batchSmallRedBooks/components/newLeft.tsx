@@ -773,43 +773,46 @@ const Lefts = ({
             .variable.variables.find((item: any) => item.field === 'MATERIAL_USAGE_MODEL').value = data;
         const newData =
             imageRef.current?.record?.variable?.variables?.find((item: any) => item?.field === 'POSTER_STYLE_CONFIG')?.value || '[]';
-        const result: any = await appModify({
-            ...detail,
-            e: 2,
-            workflowConfig: {
-                steps: arr?.filter((item: any) => item)
-            },
-            planRequest: {
-                uid: appRef.current?.uid,
-                source: 'APP',
-                totalCount,
-                configuration: {
-                    imageStyleList: JSON.parse(newData)
-                }
-            }
-        });
-        console.log(result);
-
-        if (result && result?.data?.verificationList?.length > 0) {
-            setErrMessageList(result?.data?.verificationList);
-            setMessageOpen(true);
-            return false;
-        }
-        dispatch(
-            openSnackbar({
-                open: true,
-                message: '创作计划保存成功',
-                variant: 'alert',
-                alert: {
-                    color: 'success'
+        try {
+            const result: any = await appModify({
+                ...detail,
+                e: 2,
+                workflowConfig: {
+                    steps: arr?.filter((item: any) => item)
                 },
-                anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                close: false
-            })
-        );
-        if (execute) {
-            newSave(appRef.current);
+                planRequest: {
+                    uid: appRef.current?.uid,
+                    source: 'APP',
+                    totalCount,
+                    configuration: {
+                        imageStyleList: JSON.parse(newData)
+                    }
+                }
+            });
+            if (result && result?.data?.verificationList?.length > 0) {
+                setErrMessageList(result?.data?.verificationList);
+                setMessageOpen(true);
+                return false;
+            }
+            dispatch(
+                openSnackbar({
+                    open: true,
+                    message: '创作计划保存成功',
+                    variant: 'alert',
+                    alert: {
+                        color: 'success'
+                    },
+                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                    close: false
+                })
+            );
+            if (execute) {
+                newSave(appRef.current);
+            }
+        } catch (err) {
+            console.log(err);
         }
+
         // setExeState(true);
         // setDetail &&
         //     setDetail({

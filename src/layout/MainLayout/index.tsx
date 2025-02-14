@@ -560,18 +560,19 @@ const MainLayout = () => {
                         </div>
                     </div>
                 ) : (
-                    <Image
-                        width={'100%'}
-                        height={'50px'}
-                        src={bananer}
-                        preview={false}
-                        className="cursor-pointer"
-                        onClick={() => {
-                            window.open(
-                                'https://alidocs.dingtalk.com/notable/share/form/v01a2QnVJGx127xn4XB_dv19yqvsgs3oebp3pcjys_1qX0QQ0'
-                            );
-                        }}
-                    />
+                    ''
+                    // <Image
+                    //     width={'100%'}
+                    //     height={'50px'}
+                    //     src={bananer}
+                    //     preview={false}
+                    //     className="cursor-pointer"
+                    //     onClick={() => {
+                    //         window.open(
+                    //             'https://alidocs.dingtalk.com/notable/share/form/v01a2QnVJGx127xn4XB_dv19yqvsgs3oebp3pcjys_1qX0QQ0'
+                    //         );
+                    //     }}
+                    // />
                 )}
                 <div className="flex flex-col">
                     {timeOutObj && (
@@ -632,10 +633,10 @@ const MainLayout = () => {
                                                 getPermission(ENUM_PERMISSION.SPRING_SALE)
                                                     ? '144px'
                                                     : timeOutObj
-                                                    ? // '120px'
-                                                      '170px'
-                                                    : //  '88px'
-                                                      '139px'
+                                                    ? '120px'
+                                                    : //   '170px'
+                                                      '88px'
+                                                //   '139px'
                                             })`
                                         }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}
@@ -656,10 +657,10 @@ const MainLayout = () => {
                                                 getPermission(ENUM_PERMISSION.SPRING_SALE)
                                                     ? '144px'
                                                     : timeOutObj
-                                                    ? // '120px'
-                                                      '170px'
-                                                    : //  '88px'
-                                                      '139px'
+                                                    ? '120px'
+                                                    : //   '170px'
+                                                      '88px'
+                                                //   '139px'
                                             })`
                                         }}
                                         // {...(!container && { sx: { px: { xs: 0 } } })}

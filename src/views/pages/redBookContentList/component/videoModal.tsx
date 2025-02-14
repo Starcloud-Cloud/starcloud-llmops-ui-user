@@ -806,8 +806,8 @@ const VideoModal = ({
             </Tabs>
 
             {previewVideo && (
-                <Modal width={'448px'} open={previewVideo} title={'预览视频'} footer={null} onCancel={() => setPreviewVideo(false)}>
-                    <video src={previewVideoUrl} width={'400px'} controls />
+                <Modal width={'548px'} open={previewVideo} title={'预览视频'} footer={null} onCancel={() => setPreviewVideo(false)}>
+                    <video src={previewVideoUrl} width={'500px'} controls />
                 </Modal>
             )}
         </Modal>

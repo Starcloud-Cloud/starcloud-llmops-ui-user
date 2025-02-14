@@ -44,6 +44,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Preview from './preview';
+import { useAllDetail } from 'contexts/JWTContext';
 
 const AddStyle = React.forwardRef(
     (
@@ -65,6 +66,7 @@ const AddStyle = React.forwardRef(
         }: any,
         ref: any
     ) => {
+        const useInfo = useAllDetail();
         const [visible, setVisible] = useState(false);
 
         const [systemOPen, setSystemOPen] = useState(false);
@@ -1076,15 +1078,18 @@ const AddStyle = React.forwardRef(
                                                                 )}
                                                                 <div
                                                                     onClick={() => {
-                                                                        if (item?.saleConfig?.openSale) {
-                                                                            setDemoId(item.saleConfig?.demoId);
-                                                                            setPreviewOpen(true);
-                                                                        } else {
-                                                                            setPreviewIndex({
-                                                                                index,
-                                                                                vi
-                                                                            });
-                                                                        }
+                                                                        // const remaining = useInfo?.allDetail?.rights?.find(
+                                                                        //     (item: any) => item.type === 'TEMPLATE'
+                                                                        // )?.remaining;
+                                                                        // if (item?.saleConfig?.openSale&&remaining === 0) {
+                                                                        //     setDemoId(item.saleConfig?.demoId);
+                                                                        //     setPreviewOpen(true);
+                                                                        // } else {
+                                                                        setPreviewIndex({
+                                                                            index,
+                                                                            vi
+                                                                        });
+                                                                        // }
                                                                     }}
                                                                     className=" absolute top-0 left-0 w-full h-full bg-black/50 text-white hidden group-hover:block"
                                                                 >

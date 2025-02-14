@@ -38,6 +38,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
 import Preview from './preview';
+import { useAllDetail } from 'contexts/JWTContext';
 
 const AddStyleApp = React.forwardRef(
     (
@@ -57,6 +58,7 @@ const AddStyleApp = React.forwardRef(
         }: any,
         ref: any
     ) => {
+        const useInfo = useAllDetail();
         const [visible, setVisible] = useState(false);
         const [styleData, setStyleData] = useState<any>([]); //列表展示结果
         const [selectImgs, setSelectImgs] = useState<any>([]);
@@ -1304,7 +1306,10 @@ const AddStyleApp = React.forwardRef(
                                                     )}
                                                     <div
                                                         onClick={() => {
-                                                            if (item?.saleConfig?.openSale) {
+                                                            const remaining = useInfo?.allDetail?.rights?.find(
+                                                                (item: any) => item.type === 'TEMPLATE'
+                                                            )?.remaining;
+                                                            if (item?.saleConfig?.openSale && remaining === 0) {
                                                                 setDemoId(item.saleConfig?.demoId);
                                                                 setPreviewOpen(true);
                                                             } else {
@@ -1529,7 +1534,10 @@ const AddStyleApp = React.forwardRef(
                                                                     )}
                                                                     <div
                                                                         onClick={() => {
-                                                                            if (item?.saleConfig?.openSale) {
+                                                                            const remaining = useInfo?.allDetail?.rights?.find(
+                                                                                (item: any) => item.type === 'TEMPLATE'
+                                                                            )?.remaining;
+                                                                            if (item?.saleConfig?.openSale && remaining === 0) {
                                                                                 setDemoId(item.saleConfig?.demoId);
                                                                                 setPreviewOpen(true);
                                                                             } else {

@@ -28,6 +28,7 @@ import dayjs from 'dayjs';
 import jsCookie from 'js-cookie';
 
 import { Tabs, Row, Col } from 'antd';
+import { useAllDetail } from 'contexts/JWTContext';
 
 type TableEnhancedCreateDataType = {
     id: number;
@@ -116,6 +117,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
 let interval: any;
 
 const Record: React.FC = () => {
+    const userInfo = useAllDetail();
     const [order, setOrder] = useState<ArrangementOrder>('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState<string[]>([]);
@@ -378,7 +380,9 @@ const Record: React.FC = () => {
                         children: (
                             <>
                                 <div className="text-xs text-black/50 mb-4 font-semibold">
-                                    {`已经绑定和使用的高级模版。(已绑定模版${templateLists?.length}个, 可绑定模版3个)`}
+                                    {`已经绑定和使用的高级模版。(已绑定模版${templateLists?.length}个, 可绑定模版${
+                                        userInfo?.allDetail?.rights?.find((item: any) => item.type === 'TEMPLATE')?.totalNum || 0
+                                    }个)`}
                                 </div>
                                 <div className="mb-4 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
                                     {templateLists?.map((el: any, i: number) => (

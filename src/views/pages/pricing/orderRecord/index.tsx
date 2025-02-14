@@ -20,7 +20,7 @@ import MainCard from 'ui-component/cards/MainCard';
 // import { CSVExport } from 'views/forms/tables/TableExports';
 
 // assets
-import { getOrderIsPay, getOrderRecord, submitOrder } from 'api/vip';
+import { getOrderIsPay, getOrderRecord, submitOrder, templateList } from 'api/vip';
 import React, { useEffect, useState } from 'react';
 import { ArrangementOrder, EnhancedTableHeadProps, KeyedObject } from 'types';
 import { PayModal } from '../PayModal';
@@ -286,99 +286,129 @@ const Record: React.FC = () => {
         };
     }, []);
 
+    const [templateLists, setTemplateLists] = useState<any>([]);
+    useEffect(() => {
+        templateList().then((res: any) => {
+            setTemplateLists(res);
+        });
+    }, []);
+
     return (
         <MainCard content={false} title="订单记录">
-            {/* <Tabs
+            <Tabs
                 className="px-4"
                 items={[
                     {
                         label: '订单记录',
                         key: '1',
-                        children: ( */}
-            <TableContainer>
-                <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
-                    <EnhancedTableHead
-                        numSelected={selected.length}
-                        order={order}
-                        orderBy={orderBy}
-                        onSelectAllClick={handleSelectAllClick}
-                        onRequestSort={handleRequestSort}
-                        rowCount={rows.length}
-                    />
-                    <TableBody>
-                        {stableSort(
-                            rows.filter((row) => typeof row !== 'number'),
-                            getComparator(order, orderBy)
-                        )
-                            // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row: any, index) => {
-                                if (typeof row === 'number') {
-                                    return null; // 忽略数字类型的行
-                                }
+                        children: (
+                            <>
+                                <TableContainer>
+                                    <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
+                                        <EnhancedTableHead
+                                            numSelected={selected.length}
+                                            order={order}
+                                            orderBy={orderBy}
+                                            onSelectAllClick={handleSelectAllClick}
+                                            onRequestSort={handleRequestSort}
+                                            rowCount={rows.length}
+                                        />
+                                        <TableBody>
+                                            {stableSort(
+                                                rows.filter((row) => typeof row !== 'number'),
+                                                getComparator(order, orderBy)
+                                            )
+                                                // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                                .map((row: any, index) => {
+                                                    if (typeof row === 'number') {
+                                                        return null; // 忽略数字类型的行
+                                                    }
 
-                                return (
-                                    <TableRow hover key={row.id}>
-                                        {/* <TableCell align="center">{row.id}</TableCell> */}
-                                        <TableCell align="center">{row.no}</TableCell>
-                                        <TableCell align="center">
-                                            {row?.items?.[0]?.spuName} - {row?.items?.[0]?.properties?.[0]?.valueName}
-                                        </TableCell>
-                                        {/* <TableCell align="center">{row.body}</TableCell> */}
-                                        <TableCell align="center">{(row?.payPrice / 100).toFixed(2)}</TableCell>
-                                        <TableCell align="center">{row.payChannelCode.startsWith('wx') ? '微信' : '支付宝'}</TableCell>
-                                        <TableCell align="center">{transformValue(row.status)}</TableCell>
-                                        <TableCell align="center">
-                                            {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Button
-                                                variant="text"
-                                                color="secondary"
-                                                disabled={row.status === 30 || row.status === 40}
-                                                onClick={() => {
-                                                    setRecord(row);
-                                                    handlePay(row);
-                                                }}
-                                            >
-                                                支付
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            {/* )
+                                                    return (
+                                                        <TableRow hover key={row.id}>
+                                                            {/* <TableCell align="center">{row.id}</TableCell> */}
+                                                            <TableCell align="center">{row.no}</TableCell>
+                                                            <TableCell align="center">
+                                                                {row?.items?.[0]?.spuName} - {row?.items?.[0]?.properties?.[0]?.valueName}
+                                                            </TableCell>
+                                                            {/* <TableCell align="center">{row.body}</TableCell> */}
+                                                            <TableCell align="center">{(row?.payPrice / 100).toFixed(2)}</TableCell>
+                                                            <TableCell align="center">
+                                                                {row.payChannelCode.startsWith('wx') ? '微信' : '支付宝'}
+                                                            </TableCell>
+                                                            <TableCell align="center">{transformValue(row.status)}</TableCell>
+                                                            <TableCell align="center">
+                                                                {row.createTime && dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                            </TableCell>
+                                                            <TableCell align="center">
+                                                                <Button
+                                                                    variant="text"
+                                                                    color="secondary"
+                                                                    disabled={row.status === 30 || row.status === 40}
+                                                                    onClick={() => {
+                                                                        setRecord(row);
+                                                                        handlePay(row);
+                                                                    }}
+                                                                >
+                                                                    支付
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                })}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10]}
+                                    component="div"
+                                    count={total}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                    labelRowsPerPage="每页行数"
+                                />
+                            </>
+                        )
                     },
                     {
-                        label: '高级模板',
+                        label: '高级模版',
                         key: '2',
                         children: (
-                            <Row className="overflow-x-hidden pb-[5px]" gutter={[16, 16]} wrap={true}>
-                                {/* {item.appList.map((el: any, i: number) => (
-                                    <Col key={el?.uid} ref={colRef} className={`xxxl-col flex-shrink-0`}>
-                                        <div ref={i === 0 && index === 0 ? step3 : null}>
-                                            <MarketTemplate like="market" type="MARKET" handleDetail={handleDetail} data={el} />
+                            <>
+                                <div className="text-xs text-black/50 mb-4 font-semibold">
+                                    {`已经绑定和使用的高级模版。(已绑定模版${templateLists?.length}个, 可绑定模版3个)`}
+                                </div>
+                                <div className="mb-4 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                                    {templateLists?.map((el: any, i: number) => (
+                                        <div key={el?.uid} className={`xxxl-col flex-shrink-0`}>
+                                            <div
+                                                className="w-full aspect-[.75] overflow-hidden group rounded-[12px] cursor-pointer bg-white relative p-4 !bg-cover hover:shadow-lg"
+                                                style={{
+                                                    aspectRatio: '.75',
+                                                    background: `url(${el?.example})`
+                                                }}
+                                            >
+                                                <div className="bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.8))] absolute bottom-0 right-0 w-full aspect-[2]">
+                                                    <div className="flex flex-col gap-1 items-start absolute left-[16px] bottom-[20px]">
+                                                        <div className="text-white text-[16px] font-bold line-clamp-2">{el.name}</div>
+                                                        <div className="text-white text-xs">
+                                                            绑定时间：{dayjs(el.createTime).format('YYYY-MM-DD HH:mm:ss')}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </Col>
-                                ))} 
-                            </Row>
+                                    ))}
+                                </div>
+                            </>
                         )
                     }
                 ]}
-            /> */}
-            {/* table pagination */}
-            <TablePagination
-                rowsPerPageOptions={[5, 10]}
-                component="div"
-                count={total}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                labelRowsPerPage="每页行数"
             />
+            {/* table pagination */}
+
             <PayModal
                 open={open}
                 handleClose={() => handleClose()}

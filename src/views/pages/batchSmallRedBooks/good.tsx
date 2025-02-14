@@ -332,17 +332,17 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
         //     )}
         // </div>
         <div
-            key={item.businessUid}
+            key={item?.businessUid}
             className="w-full overflow-hidden cursor-pointer relative border border-solid border-[#CECAD5] rounded-[16px]"
         >
-            {item.status !== 'SUCCESS' ? (
+            {item?.status !== 'SUCCESS' ? (
                 <div className="relative">
                     <div className="p-[16px] aspect-[263/351] flex justify-center items-center relative gu">
                         <Skeleton.Image
                             className="!w-[100%] !h-[100%]"
-                            active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
+                            active={item?.status === 'INIT' || item?.status === 'EXECUTING' ? true : false}
                         />
-                        {item.status === 'EXECUTING' && (
+                        {item?.status === 'EXECUTING' && (
                             <div className="absolute top-0 right-0 left-0 bottom-0 flex flex-col gap-2 justify-center items-center z-1000">
                                 <Progress
                                     type="circle"
@@ -355,11 +355,11 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
                                 </Popover>
                             </div>
                         )}
-                        {item.status === 'ULTIMATE_FAILURE' && (
+                        {item?.status === 'ULTIMATE_FAILURE' && (
                             <Button
                                 disabled={loading}
                                 onClick={(e) => {
-                                    failure(item.uid);
+                                    failure(item?.uid);
                                     e.stopPropagation();
                                 }}
                                 className="absolute bottom-[100px] left-0 right-0 m-auto w-[80px]"
@@ -373,16 +373,16 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
                     <Skeleton
                         paragraph={false}
                         className="px-4"
-                        active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
+                        active={item?.status === 'INIT' || item?.status === 'EXECUTING' ? true : false}
                     />
                     <Skeleton
                         paragraph={false}
                         className="mt-[8px] mb-[16px] px-4"
-                        active={item.status === 'INIT' || item.status === 'EXECUTING' ? true : false}
+                        active={item?.status === 'INIT' || item?.status === 'EXECUTING' ? true : false}
                     />
                     <div className="absolute right-2 bottom-6">
-                        {handleTransfer(item.status, item.errorMessage)}
-                        {item.status === 'FAILURE' && <span>({item.retryCount})</span>}
+                        {handleTransfer(item?.status, item?.errorMessage)}
+                        {item?.status === 'FAILURE' && <span>({item?.retryCount})</span>}
                     </div>
                 </div>
             ) : (
@@ -390,7 +390,7 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
                     className="relative"
                     onClick={() => {
                         if (!noDetail) {
-                            setBusinessUid(item.uid);
+                            setBusinessUid(item?.uid);
                             setDetailOpen(true);
                         }
                     }}

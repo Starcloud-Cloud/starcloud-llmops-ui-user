@@ -40,6 +40,7 @@ const CreateTab = ({
         newData.push({
             name: `风格 ${digui()}`,
             index: digui(),
+            saleConfig: data?.saleConfig || null,
             system: data?.system || true,
             enable: data?.enable || true,
             isCopy: data?.isCopy || true,
@@ -191,6 +192,7 @@ const CreateTab = ({
                                                     } else {
                                                         const newData = _.cloneDeep(imageStyleData);
                                                         newData[i].saleConfig = form.getFieldsValue();
+                                                        form.resetFields();
                                                         setImageStyleData(newData);
                                                     }
                                                 }}

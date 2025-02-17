@@ -752,6 +752,12 @@ const AddStyleApp = React.forwardRef(
                             close: false
                         })
                     );
+                    setCurrentStyle(templateList[recordIndex]);
+                    currentStyleRef.current = templateList[recordIndex];
+                    setIsModalOpen(true);
+                    // setUpdIndex(index);
+                    setUpdDrawIndex(recordIndex);
+                    setAddType(3);
                 })
                 .catch((e: any) => {
                     const uniqueData = e.data?.filter(
@@ -1340,6 +1346,11 @@ const AddStyleApp = React.forwardRef(
                         );
                     })}
                 </div>
+                {styleData?.filter((item: any) => item?.saleConfig?.openSale)?.length > 0 && (
+                    <div className="text-xs text-black/50 mt-2">
+                        已经选择{styleData?.filter((item: any) => item?.saleConfig?.openSale)?.length}个高级模版
+                    </div>
+                )}
                 <Drawer
                     // zIndex={99999}
                     title="选择图片模板"
@@ -1452,9 +1463,9 @@ const AddStyleApp = React.forwardRef(
                                                     </div>
                                                 )}
                                                 <div className="absolute z-50 bottom-0 w-[150px] flex justify-around bg-[rgba(0,0,0,0.4)] py-1">
-                                                    <Tooltip title="复制">
+                                                    <Tooltip title="编辑">
                                                         <span onClick={() => handleSysCopy(index)}>
-                                                            <ContentCopyIcon className="text-sm text-white" />
+                                                            <EditIcon className="text-sm text-white" />
                                                         </span>
                                                     </Tooltip>
                                                 </div>

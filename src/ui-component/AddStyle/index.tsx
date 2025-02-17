@@ -892,6 +892,11 @@ const AddStyle = React.forwardRef(
                         );
                     })}
                 </div>
+                {styleData?.filter((item: any) => item?.saleConfig?.openSale)?.length > 0 && (
+                    <div className="text-xs text-black/50 mt-2">
+                        已经选择{styleData?.filter((item: any) => item?.saleConfig?.openSale)?.length}个高级模版
+                    </div>
+                )}
                 <Drawer
                     // zIndex={99999}
                     title="选择图片模板"

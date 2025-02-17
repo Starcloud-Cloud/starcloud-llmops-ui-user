@@ -1,5 +1,5 @@
 import { FormControl, FormHelperText, TextField } from '@mui/material';
-import { Input, Image, Menu, Switch, Button, Divider, Tooltip, Spin } from 'antd';
+import { Input, Image, Menu, Switch, Button, Divider, Tooltip, Spin, Tabs } from 'antd';
 import { ExclamationCircleOutlined, SwapOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef, useMemo, Fragment } from 'react';
 import _ from 'lodash-es';
@@ -15,6 +15,7 @@ import { openSnackbar } from 'store/slices/snackbar';
 import { useCache, CACHE_KEY } from 'hooks/web/useCache';
 import VideoSetting from 'views/videoSetting';
 import { debounce } from 'lodash-es';
+import CustomRight from 'views/template/components/customRight';
 const { wsCache } = useCache();
 const EditStyle = ({
     activeKey,
@@ -223,6 +224,17 @@ const EditStyle = ({
         }
         return {};
     }, [imageStyleData?.videoConfig]);
+
+    const [visible, setVisible] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    // 点击其他地方关闭菜单
+    useEffect(() => {
+        const handleClick = () => setVisible(false);
+        document.addEventListener('click', handleClick);
+        return () => document.removeEventListener('click', handleClick);
+    }, []);
+    const [rowId, setRowId] = useState('');
+    const [rowType, setRowType] = useState('');
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -324,7 +336,8 @@ const EditStyle = ({
                                                         onMouseEnter={() => setCurrentElementId(item.id)}
                                                         onMouseLeave={() => setCurrentElementId('')}
                                                         className={`${
-                                                            item.id === currentElementId
+                                                            item.id === currentElementId ||
+                                                            imageStyleData?.variableList?.find((el: any) => el.field === item.id)?.value
                                                                 ? 'outline outline-offset-2 outline-blue-500 w-full'
                                                                 : 'w-full'
                                                         }`}
@@ -336,9 +349,67 @@ const EditStyle = ({
                                                             position: 'absolute',
                                                             transform: `rotate(${item.angle}deg)`
                                                         }}
-                                                    />
+                                                        onContextMenu={(e) => {
+                                                            if (item.type === 'image') {
+                                                                setRowType('image');
+                                                            } else {
+                                                                setRowType('text');
+                                                            }
+                                                            e.preventDefault();
+                                                            setRowId(item.id);
+                                                            setPosition({ x: e.clientX, y: e.clientY });
+                                                            setVisible(true);
+                                                        }}
+                                                    ></div>
                                                 );
                                             })}
+                                        {visible && (
+                                            <div
+                                                style={{
+                                                    position: 'fixed',
+                                                    top: position.y + 'px',
+                                                    left: position.x + 'px',
+                                                    background: 'white',
+                                                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                                    padding: '8px 16px',
+                                                    width: '628px',
+                                                    zIndex: 1000
+                                                }}
+                                            >
+                                                <Tabs
+                                                    items={[
+                                                        {
+                                                            label: '字段选择',
+                                                            key: '1',
+                                                            children: (
+                                                                <div onClick={(e) => e.stopPropagation()}>
+                                                                    <CustomRight
+                                                                        open={visible}
+                                                                        setOpen={setVisible}
+                                                                        setData={(data) => {
+                                                                            const newData = _.cloneDeep(imageStyleData);
+                                                                            const index = newData.variableList.findIndex(
+                                                                                (item: any) => item.field === rowId
+                                                                            );
+                                                                            newData.variableList[index].value = `{{${data}}}`;
+                                                                            newData.variableList[index].uuid = uuidv4()
+                                                                                ?.split('-')
+                                                                                ?.join('');
+                                                                            setData(newData);
+                                                                            setPre(pre + 1);
+                                                                        }}
+                                                                        rowType={rowType}
+                                                                        details={appData.appReqVO}
+                                                                        stepCode="PosterActionHandler"
+                                                                    />
+                                                                </div>
+                                                            )
+                                                        },
+                                                        { label: '自定义', key: '2', children: <div>123123</div> }
+                                                    ]}
+                                                />
+                                            </div>
+                                        )}
                                         {textStyle?.enable && (
                                             <div
                                                 style={{
@@ -492,6 +563,8 @@ const EditStyle = ({
                                                                             value={el.value}
                                                                             pre={pre}
                                                                             setValue={(value) => {
+                                                                                console.log(value);
+
                                                                                 const newData = _.cloneDeep(imageStyleData);
                                                                                 newData.variableList[index].value = value;
                                                                                 newData.variableList[index].uuid = uuidv4()
@@ -595,6 +668,8 @@ const EditStyle = ({
                                                                         value={el.value}
                                                                         pre={pre}
                                                                         setValue={(value) => {
+                                                                            console.log(value);
+
                                                                             const newData = _.cloneDeep(imageStyleData);
                                                                             newData.variableList[index].value = value;
                                                                             setData(newData);

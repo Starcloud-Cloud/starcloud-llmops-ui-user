@@ -1176,7 +1176,7 @@ const VideoSetting: React.FC<{
                                                                 )}
                                                             </div>
                                                             <div className="mt-2">
-                                                                {item.settings.audioEnable ? (
+                                                                {item.settings?.audioEnable ? (
                                                                     <>
                                                                         <Tag color="success">发音</Tag>
                                                                         {item?.settings?.soundSpeed && (

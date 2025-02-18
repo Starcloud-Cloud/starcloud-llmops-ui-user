@@ -402,7 +402,10 @@ const VideoModal = ({
                             {voiceRoleOptions?.map((item) => (
                                 <Select.Option key={item.code} label={`${item.name} - ${item.language} - ${item.voice}`} value={item.code}>
                                     <div className="flex items-center justify-between">
-                                        <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                        <div>
+                                            <div>{`${item.name} - ${item.language}`}</div>
+                                            <div>{item.voice}</div>
+                                        </div>
                                         {item.demo_link && (
                                             <Button
                                                 type="text"
@@ -463,7 +466,10 @@ const VideoModal = ({
                             {voiceRoleOptions?.map((item) => (
                                 <Select.Option key={item.code} label={`${item.name} - ${item.language} - ${item.voice}`} value={item.code}>
                                     <div className="flex items-center justify-between">
-                                        <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                        <div>
+                                            <div>{`${item.name} - ${item.language}`}</div>
+                                            <div>{item.voice}</div>
+                                        </div>
                                         {item.demo_link && (
                                             <Button
                                                 type="text"

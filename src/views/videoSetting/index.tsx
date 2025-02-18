@@ -525,7 +525,7 @@ const VideoSetting: React.FC<{
                         <div className="text-xs">快捷配置</div>
                     </div> */}
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 sound">
                         <Form.Item label="发音角色" name={['globalSettings', 'voiceRole']} rules={[{ required: true }]}>
                             <Select optionLabelProp="label" style={{ width: 250 }}>
                                 {voiceRoleOptions?.map((item) => (
@@ -535,7 +535,10 @@ const VideoSetting: React.FC<{
                                         value={item.code}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                            <div>
+                                                <div>{`${item.name} - ${item.language}`}</div>
+                                                <div>{item.voice}</div>
+                                            </div>
                                             {item.demo_link && (
                                                 <Button
                                                     type="text"
@@ -571,7 +574,10 @@ const VideoSetting: React.FC<{
                                         value={item.code}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                            <div>
+                                                <div>{`${item.name} - ${item.language}`}</div>
+                                                <div>{item.voice}</div>
+                                            </div>
                                             {item.demo_link && (
                                                 <Button
                                                     type="text"
@@ -975,7 +981,10 @@ const VideoSetting: React.FC<{
                                                                                                     value={item.code}
                                                                                                 >
                                                                                                     <div className="flex items-center justify-between">
-                                                                                                        <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                                                                                        <div>
+                                                                                                            <div>{`${item.name} - ${item.language}`}</div>
+                                                                                                            <div>{item.voice}</div>
+                                                                                                        </div>
                                                                                                         {item.demo_link && (
                                                                                                             <Button
                                                                                                                 type="text"
@@ -1054,7 +1063,10 @@ const VideoSetting: React.FC<{
                                                                                                     value={item.code}
                                                                                                 >
                                                                                                     <div className="flex items-center justify-between">
-                                                                                                        <span>{`${item.name} - ${item.language} - ${item.voice}`}</span>
+                                                                                                        <div>
+                                                                                                            <div>{`${item.name} - ${item.language}`}</div>
+                                                                                                            <div>{item.voice}</div>
+                                                                                                        </div>
                                                                                                         {item.demo_link && (
                                                                                                             <Button
                                                                                                                 type="text"

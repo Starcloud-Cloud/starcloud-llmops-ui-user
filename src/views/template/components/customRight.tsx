@@ -214,6 +214,7 @@ const CustomRight = ({
                                     }
                                 } else {
                                     setData(key);
+                                    setOpen(false);
                                 }
                             }}
                             icon={

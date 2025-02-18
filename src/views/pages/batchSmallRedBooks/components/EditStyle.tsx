@@ -178,6 +178,7 @@ const EditStyle = ({
                 const newData = _.cloneDeep(imageStyleData);
                 const newList = res?.variableList?.map((item: any) => ({
                     ...item,
+                    isCustom: imageStyleData?.variableList?.find((el: any) => el?.field === item?.field)?.isCustom,
                     value: imageStyleData?.variableList?.find((el: any) => el?.field === item?.field)?.value
                 }));
                 setData({
@@ -313,7 +314,7 @@ const EditStyle = ({
                 {imageStyleData?.code && (
                     <div>
                         <div className="flex">
-                            <div className="w-[40%]">
+                            <div className={`${isVideoOpen ? '!w-[40%]' : '!w-[80%]'}`}>
                                 <div className="text-lg">图片模版示意图</div>
                                 <div className="overflow-hidden p-3">
                                     <div className="relative w-[85%] mx-auto" ref={imgRef}>
@@ -337,7 +338,9 @@ const EditStyle = ({
                                                         onMouseLeave={() => setCurrentElementId('')}
                                                         className={`${
                                                             item.id === currentElementId ||
-                                                            imageStyleData?.variableList?.find((el: any) => el.field === item.id)?.value
+                                                            (!isVideoOpen &&
+                                                                imageStyleData?.variableList?.find((el: any) => el.field === item.id)
+                                                                    ?.value)
                                                                 ? 'outline outline-offset-2 outline-blue-500 w-full'
                                                                 : 'w-full'
                                                         }`}
@@ -360,7 +363,20 @@ const EditStyle = ({
                                                             setPosition({ x: e.clientX, y: e.clientY });
                                                             setVisible(true);
                                                         }}
-                                                    ></div>
+                                                    >
+                                                        {!isVideoOpen && (
+                                                            <div className="w-full h-full relative group">
+                                                                <div className="absolute top-0 left-0 text-xs bg-white rounded-md p-1 shadow-xl">
+                                                                    {imageStyleData?.variableList?.find((el: any) => el.field === item.id)
+                                                                        ?.isCustom
+                                                                        ? '自定义'
+                                                                        : imageStyleData?.variableList?.find(
+                                                                              (el: any) => el.field === item.id
+                                                                          )?.value}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 );
                                             })}
                                         {visible && (
@@ -376,38 +392,78 @@ const EditStyle = ({
                                                     zIndex: 1000
                                                 }}
                                             >
-                                                <Tabs
-                                                    items={[
-                                                        {
-                                                            label: '字段选择',
-                                                            key: '1',
-                                                            children: (
-                                                                <div onClick={(e) => e.stopPropagation()}>
-                                                                    <CustomRight
-                                                                        open={visible}
-                                                                        setOpen={setVisible}
-                                                                        setData={(data) => {
-                                                                            const newData = _.cloneDeep(imageStyleData);
-                                                                            const index = newData.variableList.findIndex(
-                                                                                (item: any) => item.field === rowId
-                                                                            );
-                                                                            newData.variableList[index].value = `{{${data}}}`;
-                                                                            newData.variableList[index].uuid = uuidv4()
-                                                                                ?.split('-')
-                                                                                ?.join('');
-                                                                            setData(newData);
-                                                                            setPre(pre + 1);
-                                                                        }}
-                                                                        rowType={rowType}
-                                                                        details={appData.appReqVO}
-                                                                        stepCode="PosterActionHandler"
-                                                                    />
-                                                                </div>
-                                                            )
-                                                        },
-                                                        { label: '自定义', key: '2', children: <div>123123</div> }
-                                                    ]}
-                                                />
+                                                <div className="w-full h-full relative">
+                                                    <Tabs
+                                                        items={[
+                                                            {
+                                                                label: '字段选择',
+                                                                key: '1',
+                                                                children: (
+                                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                                        <CustomRight
+                                                                            open={visible}
+                                                                            setOpen={setVisible}
+                                                                            setData={(data) => {
+                                                                                const newData = _.cloneDeep(imageStyleData);
+                                                                                const index = newData.variableList.findIndex(
+                                                                                    (item: any) => item.field === rowId
+                                                                                );
+                                                                                newData.variableList[index].isCustom = false;
+                                                                                newData.variableList[index].value = `{{${data}}}`;
+                                                                                newData.variableList[index].uuid = uuidv4()
+                                                                                    ?.split('-')
+                                                                                    ?.join('');
+                                                                                setData(newData);
+                                                                                setPre(pre + 1);
+                                                                            }}
+                                                                            rowType={rowType}
+                                                                            details={appData.appReqVO}
+                                                                            stepCode="PosterActionHandler"
+                                                                        />
+                                                                    </div>
+                                                                )
+                                                            },
+                                                            {
+                                                                label: '自定义',
+                                                                key: '2',
+                                                                children: (
+                                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                                        <Input.TextArea
+                                                                            onBlur={(e) => {
+                                                                                console.log(e.target.value);
+                                                                                const newData = _.cloneDeep(imageStyleData);
+                                                                                newData.variableList.find(
+                                                                                    (el: any) => el.field === rowId
+                                                                                ).value = e.target.value;
+                                                                                newData.variableList.find(
+                                                                                    (el: any) => el.field === rowId
+                                                                                ).isCustom = true;
+                                                                                setData(newData);
+                                                                                setPre(pre + 1);
+                                                                                setVisible(false);
+                                                                            }}
+                                                                            rows={6}
+                                                                        />
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        ]}
+                                                    />
+                                                </div>
+                                                <Button
+                                                    type="primary"
+                                                    size="small"
+                                                    disabled={!imageStyleData?.variableList?.find((el: any) => el.field === rowId)?.value}
+                                                    onClick={() => {
+                                                        const newData = _.cloneDeep(imageStyleData);
+                                                        newData.variableList.find((el: any) => el.field === rowId).value = '';
+                                                        newData.variableList.find((el: any) => el.field === rowId).isCustom = false;
+                                                        setData(newData);
+                                                    }}
+                                                    className="absolute top-4 right-4 cursor-pointer"
+                                                >
+                                                    取消绑定
+                                                </Button>
                                             </div>
                                         )}
                                         {textStyle?.enable && (
@@ -434,12 +490,29 @@ const EditStyle = ({
                                                 魔法笔记字幕
                                             </div>
                                         )}
+                                        {!isVideoOpen && (
+                                            <>
+                                                <div className="w-full text-center text-xs mt-2">
+                                                    模版元素
+                                                    {currentJson?.objects?.filter(
+                                                        (item: any) => item.type === 'image' || item.type.includes('text')
+                                                    )?.length || 0}{' '}
+                                                    个
+                                                </div>
+                                                <div className="w-full text-center text-xs">
+                                                    已绑定数据{' '}
+                                                    {imageStyleData?.variableList?.filter((item: any) => item.value)?.length || 0} 个
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>
-                            <div>
-                                <Divider type="vertical" style={{ height: '100%' }} />
-                            </div>
+                            {isVideoOpen && (
+                                <div>
+                                    <Divider type="vertical" style={{ height: '100%' }} />
+                                </div>
+                            )}
                             <div className="flex-1">
                                 {isVideoOpen ? (
                                     <div className="h-full mt-4">
@@ -491,7 +564,7 @@ const EditStyle = ({
                                     </div>
                                 ) : (
                                     <div>
-                                        {materialStatus === 'default' && (
+                                        {/* {materialStatus === 'default' && (
                                             <div>
                                                 {imageStyleLength > 0 && (
                                                     <>
@@ -680,7 +753,7 @@ const EditStyle = ({
                                                     )}
                                                 </div>
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
                                 )}
                             </div>

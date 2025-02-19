@@ -424,7 +424,7 @@ const EditStyle = ({
                                                             imageStyleData?.variableList?.find((el: any) => el.field === item.id)
                                                                 ?.value && (
                                                                 <div className="w-full h-full relative">
-                                                                    <div className="absolute top-0 translate-y-[calc(-100%-3px)] left-[-3px] text-xs bg-[#673ab7]/50 group-hover:bg-[#673ab7]/80 text-white rounded-md p-1 shadow-xl">
+                                                                    <div className="absolute top-0 translate-y-[calc(-100%-3px)] left-[-3px] text-xs bg-[#673ab7]/50 group-hover:bg-[#673ab7]/80 text-white rounded-md p-1 shadow-xl cursor-default">
                                                                         {findTitleByKey(
                                                                             cutomList,
                                                                             imageStyleData?.variableList?.find(

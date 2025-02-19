@@ -394,7 +394,7 @@ const EditStyle = ({
                                                         onMouseLeave={() => setCurrentElementId('')}
                                                         className={`${
                                                             item.id === currentElementId
-                                                                ? 'outline outline-offset-2 outline-blue-500 w-full'
+                                                                ? 'outline outline-offset-2 outline-blue-500 w-full outline-1'
                                                                 : 'w-full'
                                                         } group`}
                                                         style={{
@@ -424,7 +424,7 @@ const EditStyle = ({
                                                             imageStyleData?.variableList?.find((el: any) => el.field === item.id)
                                                                 ?.value && (
                                                                 <div className="w-full h-full relative">
-                                                                    <div className="absolute top-0 translate-y-[calc(-100%-5px)] left-[-5px] text-xs bg-[#673ab7]/50 group-hover:bg-[#673ab7]/80 text-white rounded-md p-1 shadow-xl">
+                                                                    <div className="absolute top-0 translate-y-[calc(-100%-3px)] left-[-3px] text-xs bg-[#673ab7]/50 group-hover:bg-[#673ab7]/80 text-white rounded-md p-1 shadow-xl">
                                                                         {findTitleByKey(
                                                                             cutomList,
                                                                             imageStyleData?.variableList?.find(
@@ -557,6 +557,7 @@ const EditStyle = ({
                                                         const newData = _.cloneDeep(imageStyleData);
                                                         newData.variableList.find((el: any) => el.field === rowId).value = '';
                                                         setData(newData);
+                                                        setVisible(false);
                                                     }}
                                                     className="absolute top-4 right-4 cursor-pointer"
                                                 >

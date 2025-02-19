@@ -9,6 +9,78 @@ import string from 'assets/images/icons/string.svg';
 import textBox from 'assets/images/icons/textBox.svg';
 import number from 'assets/images/icons/nu.svg';
 const { SubMenu } = Menu;
+
+export function getjsonschma(json: any, name?: string, jsonType?: string) {
+    const arr: any = [];
+    const arrList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    for (const key in json.properties) {
+        const property = json.properties[key];
+        if (property.type === 'object') {
+            if (property?.properties) {
+                arr.push({
+                    key: jsonType ? name + `.list('${key}')` : name + '.' + key,
+                    label: key,
+                    title: property?.title,
+                    desc: property?.description,
+                    children: getjsonschma(property, name + '.' + key, jsonType)
+                });
+            } else {
+                const convertedProperty = getjsonschma(property, name, jsonType);
+                arr.push(convertedProperty);
+            }
+        } else if (property.type === 'array' && property?.items?.type === 'object') {
+            arr.push({
+                key: key + 'index',
+                label: key + '[*]',
+                title: property?.title,
+                desc: '元素集合',
+                children: [
+                    ...arrList.map((item: number, index: number) => ({
+                        key: `${key}[${index}]`,
+                        label: `${key}[${index}]`,
+                        title: property?.title,
+                        desc: `第 ${index} 个元素`,
+                        children: getjsonschma(property?.items, `${name}.${key}[${index}]`)
+                    }))
+                ]
+            });
+            arr.push({
+                key: name + '.' + key,
+                label: `${key}.list.(*)`,
+                title: property?.title,
+                desc: '元素内容集合',
+                type: '*',
+                children: getjsonschma(property?.items, `${name}.${key}`, '*')
+            });
+        } else {
+            arr.push({
+                key: jsonType ? name + `.list('${key}')` : name + '.' + key,
+                label: key,
+                title: property?.title,
+                desc: property?.description,
+                type: jsonType
+            });
+        }
+    }
+    return arr;
+}
+export const getJSON = (item: any) => {
+    let obj: any = {};
+    try {
+        obj = {
+            ...JSON.parse(item.inJsonSchema),
+            properties: {
+                ...JSON.parse(item.inJsonSchema).properties,
+                ...(item.code === '基础信息' || !item.outJsonSchema ? {} : JSON.parse(item.outJsonSchema).properties)
+            }
+        };
+    } catch (err) {
+        console.log(err);
+
+        obj = {};
+    }
+    return obj;
+};
 const Can = ({
     open,
     setOpen,
@@ -48,60 +120,7 @@ const Can = ({
         return newList;
     }, [details]);
     const [schemaList, setSchemaList] = useState<any[]>([]);
-    function getjsonschma(json: any, name?: string, jsonType?: string) {
-        const arr: any = [];
-        const arrList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        for (const key in json.properties) {
-            const property = json.properties[key];
-            if (property.type === 'object') {
-                if (property?.properties) {
-                    arr.push({
-                        key: jsonType ? name + `.list('${key}')` : name + '.' + key,
-                        label: key,
-                        title: property?.title,
-                        desc: property?.description,
-                        children: getjsonschma(property, name + '.' + key, jsonType)
-                    });
-                } else {
-                    const convertedProperty = getjsonschma(property, name, jsonType);
-                    arr.push(convertedProperty);
-                }
-            } else if (property.type === 'array' && property?.items?.type === 'object') {
-                arr.push({
-                    key: key + 'index',
-                    label: key + '[*]',
-                    title: property?.title,
-                    desc: '元素集合',
-                    children: [
-                        ...arrList.map((item: number, index: number) => ({
-                            key: `${key}[${index}]`,
-                            label: `${key}[${index}]`,
-                            title: property?.title,
-                            desc: `第 ${index} 个元素`,
-                            children: getjsonschma(property?.items, `${name}.${key}[${index}]`)
-                        }))
-                    ]
-                });
-                arr.push({
-                    key: name + '.' + key,
-                    label: `${key}.list.(*)`,
-                    title: property?.title,
-                    desc: '元素内容集合',
-                    type: '*',
-                    children: getjsonschma(property?.items, `${name}.${key}`, '*')
-                });
-            } else {
-                arr.push({
-                    key: jsonType ? name + `.list('${key}')` : name + '.' + key,
-                    label: key,
-                    title: property?.title,
-                    desc: property?.description,
-                    type: jsonType
-                });
-            }
-        }
-        return arr;
-    }
+
     //复选框
     const variableRef = useRef<any[]>([]);
     const [varableOpen, setVarableOpen] = useState<any[]>([]);
@@ -239,23 +258,6 @@ const Can = ({
             }
         });
     }
-    const getJSON = (item: any) => {
-        let obj: any = {};
-        try {
-            obj = {
-                ...JSON.parse(item.inJsonSchema),
-                properties: {
-                    ...JSON.parse(item.inJsonSchema).properties,
-                    ...(item.code === '基础信息' || !item.outJsonSchema ? {} : JSON.parse(item.outJsonSchema).properties)
-                }
-            };
-        } catch (err) {
-            console.log(err);
-
-            obj = {};
-        }
-        return obj;
-    };
     useEffect(() => {
         if (open) {
             schemeOptions({ stepCode, appReqVO: newDeatil, source: appUid ? 'MARKET' : 'APP', planUid: appUid ? planUid : undefined }).then(

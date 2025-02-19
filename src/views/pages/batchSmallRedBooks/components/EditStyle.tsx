@@ -2,6 +2,7 @@ import { FormControl, FormHelperText, TextField } from '@mui/material';
 import { Input, Image, Menu, Switch, Button, Divider, Tooltip, Spin, Tabs } from 'antd';
 import { ExclamationCircleOutlined, SwapOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef, useMemo, Fragment } from 'react';
+import { useLocation } from 'react-router-dom';
 import _ from 'lodash-es';
 import { SelectTemplateModal } from './SelectTemplateModal';
 import React from 'react';
@@ -16,6 +17,8 @@ import { useCache, CACHE_KEY } from 'hooks/web/useCache';
 import VideoSetting from 'views/videoSetting';
 import { debounce } from 'lodash-es';
 import CustomRight from 'views/template/components/customRight';
+import Can, { getJSON, getjsonschma } from 'views/template/components/can';
+import { schemeOptions } from 'api/redBook/copywriting';
 const { wsCache } = useCache();
 const EditStyle = ({
     activeKey,
@@ -42,6 +45,10 @@ const EditStyle = ({
     materialStatus?: string;
     canEdit?: boolean;
 }) => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const appUid = searchParams.get('appUid');
+    const planUid = searchParams.get('uid');
     const [open, setOpen] = React.useState(false);
     const [currentTemp, setCurrentTemp] = React.useState<any>(null);
     const [tempList, setTempList] = React.useState<any>([]);
@@ -178,7 +185,6 @@ const EditStyle = ({
                 const newData = _.cloneDeep(imageStyleData);
                 const newList = res?.variableList?.map((item: any) => ({
                     ...item,
-                    isCustom: imageStyleData?.variableList?.find((el: any) => el?.field === item?.field)?.isCustom,
                     value: imageStyleData?.variableList?.find((el: any) => el?.field === item?.field)?.value
                 }));
                 setData({
@@ -234,8 +240,58 @@ const EditStyle = ({
         document.addEventListener('click', handleClick);
         return () => document.removeEventListener('click', handleClick);
     }, []);
+    const canRef = useRef<any>();
     const [rowId, setRowId] = useState('');
     const [rowType, setRowType] = useState('');
+    const [canOpen, setCanOpen] = useState(false);
+    const [cutomValue, setCutomValue] = useState('');
+    const [cutomList, setCutomList] = useState<any[]>([]);
+
+    useEffect(() => {
+        schemeOptions({
+            stepCode: 'PosterActionHandler',
+            appReqVO: appData.appReqVO,
+            source: appUid ? 'MARKET' : 'APP',
+            planUid: appUid ? planUid : undefined
+        }).then((res) => {
+            const newList = res
+                ?.filter((item: any) => item.inJsonSchema || item.outJsonSchema)
+                ?.map((item: any) => ({
+                    label: item.name,
+                    key: item.code,
+                    description: item.description,
+                    children: item.inJsonSchema
+                        ? getjsonschma(getJSON(item), item.name)
+                        : item.outJsonSchema
+                        ? getjsonschma(JSON.parse(item.outJsonSchema), item.name)
+                        : []
+                }))
+                ?.filter((item: any) => item?.children?.length > 0);
+            console.log(newList);
+
+            setCutomList(newList);
+        });
+    }, []);
+    const findTitleByKey = (data: any[], targetKey: string): string | undefined => {
+        // 递归查找函数
+        const search = (items: any[]): string | undefined => {
+            for (const item of items) {
+                // 如果有 children 属性且是数组，继续递归查找
+                if (item.children && Array.isArray(item.children)) {
+                    const result = search(item.children);
+                    if (result) return result;
+                }
+                // 找到匹配的 key，返回对应的 title
+                if (`{{${item.key}}}` === targetKey) {
+                    return item.title;
+                }
+            }
+            return undefined;
+        };
+
+        return search(data);
+    };
+
     return (
         <div className="flex min-h-[250px]">
             <div className="flex-1">
@@ -314,10 +370,10 @@ const EditStyle = ({
                 {imageStyleData?.code && (
                     <div>
                         <div className="flex">
-                            <div className={`${isVideoOpen ? '!w-[40%]' : '!w-[80%]'}`}>
+                            <div className={`${isVideoOpen ? '!w-[40%]' : '!w-full !max-w-[600px]'}`}>
                                 <div className="text-lg">图片模版示意图</div>
-                                <div className="overflow-hidden p-3">
-                                    <div className="relative w-[85%] mx-auto" ref={imgRef}>
+                                <div className="p-3">
+                                    <div className="relative w-full mx-auto" ref={imgRef} onClick={(e) => e.stopPropagation()}>
                                         {currentTemp?.example ? (
                                             <Image
                                                 width={'100%'}
@@ -337,13 +393,10 @@ const EditStyle = ({
                                                         onMouseEnter={() => setCurrentElementId(item.id)}
                                                         onMouseLeave={() => setCurrentElementId('')}
                                                         className={`${
-                                                            item.id === currentElementId ||
-                                                            (!isVideoOpen &&
-                                                                imageStyleData?.variableList?.find((el: any) => el.field === item.id)
-                                                                    ?.value)
+                                                            item.id === currentElementId
                                                                 ? 'outline outline-offset-2 outline-blue-500 w-full'
                                                                 : 'w-full'
-                                                        }`}
+                                                        } group`}
                                                         style={{
                                                             width: `${item.width * item.scaleX * scale}px`,
                                                             height: `${item.height * item.scaleY * scale}px`,
@@ -352,35 +405,41 @@ const EditStyle = ({
                                                             position: 'absolute',
                                                             transform: `rotate(${item.angle}deg)`
                                                         }}
-                                                        onContextMenu={(e) => {
+                                                        onClick={(e) => {
                                                             if (item.type === 'image') {
                                                                 setRowType('image');
                                                             } else {
                                                                 setRowType('text');
                                                             }
-                                                            e.preventDefault();
                                                             setRowId(item.id);
                                                             setPosition({ x: e.clientX, y: e.clientY });
                                                             setVisible(true);
+                                                            setCutomValue(
+                                                                imageStyleData?.variableList?.find((el: any) => el.field === item.id)
+                                                                    ?.value || ''
+                                                            );
                                                         }}
                                                     >
-                                                        {!isVideoOpen && (
-                                                            <div className="w-full h-full relative group">
-                                                                <div className="absolute top-0 left-0 text-xs bg-white rounded-md p-1 shadow-xl">
-                                                                    {imageStyleData?.variableList?.find((el: any) => el.field === item.id)
-                                                                        ?.isCustom
-                                                                        ? '自定义'
-                                                                        : imageStyleData?.variableList?.find(
-                                                                              (el: any) => el.field === item.id
-                                                                          )?.value}
+                                                        {!isVideoOpen &&
+                                                            imageStyleData?.variableList?.find((el: any) => el.field === item.id)
+                                                                ?.value && (
+                                                                <div className="w-full h-full relative">
+                                                                    <div className="absolute top-0 translate-y-[calc(-100%-5px)] left-[-5px] text-xs bg-[#673ab7]/50 group-hover:bg-[#673ab7]/80 text-white rounded-md p-1 shadow-xl">
+                                                                        {findTitleByKey(
+                                                                            cutomList,
+                                                                            imageStyleData?.variableList?.find(
+                                                                                (el: any) => el.field === item.id
+                                                                            )?.value
+                                                                        ) || '自定义'}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
+                                                            )}
                                                     </div>
                                                 );
                                             })}
                                         {visible && (
                                             <div
+                                                className="rounded-lg overflow-hidden"
                                                 style={{
                                                     position: 'fixed',
                                                     top: position.y + 'px',
@@ -388,18 +447,22 @@ const EditStyle = ({
                                                     background: 'white',
                                                     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                                                     padding: '8px 16px',
-                                                    width: '628px',
+                                                    width: '378px',
                                                     zIndex: 1000
+                                                }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                 }}
                                             >
                                                 <div className="w-full h-full relative">
                                                     <Tabs
+                                                        onClick={(e) => e.stopPropagation()}
                                                         items={[
                                                             {
                                                                 label: '字段选择',
                                                                 key: '1',
                                                                 children: (
-                                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                                    <div>
                                                                         <CustomRight
                                                                             open={visible}
                                                                             setOpen={setVisible}
@@ -408,7 +471,6 @@ const EditStyle = ({
                                                                                 const index = newData.variableList.findIndex(
                                                                                     (item: any) => item.field === rowId
                                                                                 );
-                                                                                newData.variableList[index].isCustom = false;
                                                                                 newData.variableList[index].value = `{{${data}}}`;
                                                                                 newData.variableList[index].uuid = uuidv4()
                                                                                     ?.split('-')
@@ -427,23 +489,60 @@ const EditStyle = ({
                                                                 label: '自定义',
                                                                 key: '2',
                                                                 children: (
-                                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                                    <div>
+                                                                        <div className="flex justify-end mb-2">
+                                                                            <Can
+                                                                                open={canOpen}
+                                                                                setOpen={setCanOpen}
+                                                                                setData={(data) => {
+                                                                                    setCanOpen(false);
+                                                                                    let newValue = _.cloneDeep(cutomValue);
+                                                                                    if (!newValue) {
+                                                                                        newValue = '';
+                                                                                    }
+                                                                                    const part1 = newValue.slice(
+                                                                                        0,
+                                                                                        canRef.current?.resizableTextArea?.textArea
+                                                                                            ?.selectionStart
+                                                                                    );
+                                                                                    const part2 = newValue.slice(
+                                                                                        canRef.current?.resizableTextArea?.textArea
+                                                                                            ?.selectionStart
+                                                                                    );
+                                                                                    newValue = `${part1}{{${data}}}${part2}`;
+                                                                                    setCutomValue(newValue);
+                                                                                }}
+                                                                                details={appData.appReqVO}
+                                                                                stepCode="PosterActionHandler"
+                                                                            />
+                                                                        </div>
                                                                         <Input.TextArea
-                                                                            onBlur={(e) => {
-                                                                                console.log(e.target.value);
-                                                                                const newData = _.cloneDeep(imageStyleData);
-                                                                                newData.variableList.find(
-                                                                                    (el: any) => el.field === rowId
-                                                                                ).value = e.target.value;
-                                                                                newData.variableList.find(
-                                                                                    (el: any) => el.field === rowId
-                                                                                ).isCustom = true;
-                                                                                setData(newData);
-                                                                                setPre(pre + 1);
-                                                                                setVisible(false);
-                                                                            }}
+                                                                            ref={canRef}
                                                                             rows={6}
+                                                                            value={cutomValue}
+                                                                            onChange={(e) => {
+                                                                                setCutomValue(e.target.value);
+                                                                            }}
                                                                         />
+                                                                        <div className="flex justify-end mt-2">
+                                                                            <Button
+                                                                                disabled={!cutomValue}
+                                                                                onClick={() => {
+                                                                                    const newData = _.cloneDeep(imageStyleData);
+                                                                                    newData.variableList.find(
+                                                                                        (el: any) => el.field === rowId
+                                                                                    ).value = cutomValue;
+                                                                                    setData(newData);
+                                                                                    setPre(pre + 1);
+                                                                                    setVisible(false);
+                                                                                    setCutomValue('');
+                                                                                }}
+                                                                                type="primary"
+                                                                                size="small"
+                                                                            >
+                                                                                确认
+                                                                            </Button>
+                                                                        </div>
                                                                     </div>
                                                                 )
                                                             }
@@ -457,7 +556,6 @@ const EditStyle = ({
                                                     onClick={() => {
                                                         const newData = _.cloneDeep(imageStyleData);
                                                         newData.variableList.find((el: any) => el.field === rowId).value = '';
-                                                        newData.variableList.find((el: any) => el.field === rowId).isCustom = false;
                                                         setData(newData);
                                                     }}
                                                     className="absolute top-4 right-4 cursor-pointer"

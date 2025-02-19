@@ -30,8 +30,6 @@ const CustomRight = ({
     const searchParams = new URLSearchParams(location.search);
     const appUid = searchParams.get('appUid');
     const planUid = searchParams.get('uid');
-    const tipRef = useRef<any>('');
-    const [tipValue, setTipValue] = useState('');
     const newDeatil = useMemo(() => {
         const newList = _.cloneDeep(details);
         newList?.workflowConfig?.steps?.forEach((item: any) => {
@@ -155,18 +153,7 @@ const CustomRight = ({
                                         )}
                                     </div>
                                     <div className="text-xs text-black/50">{item.desc}</div>
-                                    <div
-                                        className="absolute w-full h-full left-0"
-                                        onMouseEnter={() => {
-                                            if (item.type === '*') {
-                                                tipRef.current = `${item.desc}\n会把集合中相同字段的内容显示在一起，可选择多个字段`;
-                                                setTipValue(tipRef.current);
-                                                return;
-                                            }
-                                            tipRef.current = item.desc;
-                                            setTipValue(tipRef.current);
-                                        }}
-                                    ></div>
+                                    <div className="absolute w-full h-full left-0"></div>
                                 </div>
                             }
                             icon={
@@ -238,13 +225,7 @@ const CustomRight = ({
                             }
                             key={item.key}
                         >
-                            <div
-                                onMouseEnter={() => {
-                                    tipRef.current = item.title;
-                                    setTipValue(tipRef.current);
-                                }}
-                                className="w-full flex justify-between items-center"
-                            >
+                            <div className="w-full flex justify-between items-center">
                                 <div className="flex gap-1 items-center">
                                     <div className="flex items-center gap-1">
                                         <div>{item.type === '*' && <Checkbox checked={varableOpen[i]} value={item.label}></Checkbox>}</div>
@@ -298,7 +279,7 @@ const CustomRight = ({
         );
     }, []);
     return (
-        <div className={'w-[600px] flex items-stretch gap-2'}>
+        <div className={'w-[350px] flex items-stretch gap-2'}>
             <div className="flex flex-col flex-1 h-[310px]">
                 <span className="text-sm text-gray-500 mb-2">
                     <span className="mr-2">变量选择</span>
@@ -309,9 +290,6 @@ const CustomRight = ({
                 <Menu inlineIndent={12} className="flex-1 h-[300px] overflow-y-auto" defaultSelectedKeys={[]} mode="inline">
                     {renderMenuItems(schemaList, index)}
                 </Menu>
-            </div>
-            <div className="flex-1 h-[310px] w-full border border-solid border-[#d9d9d9] rounded-lg p-4 whitespace-pre-wrap">
-                {tipValue}
             </div>
         </div>
     );

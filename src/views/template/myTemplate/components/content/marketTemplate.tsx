@@ -210,25 +210,27 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                         (marketActive ? (
                             <div
                                 onClick={(e) => {
-                                    favoriteCancel({ marketUid: data.uid, type: type === 'STYLE' ? 'TEMPLATE_MARKET' : 'APP_MARKET' }).then(
-                                        (res) => {
-                                            if (res) {
-                                                setMarketActive(false);
-                                                dispatch(
-                                                    openSnackbar({
-                                                        open: true,
-                                                        message: '取消收藏成功',
-                                                        variant: 'alert',
-                                                        alert: {
-                                                            color: 'success'
-                                                        },
-                                                        anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                                        close: false
-                                                    })
-                                                );
-                                            }
+                                    favoriteCancel({
+                                        marketUid: data.uid,
+                                        type: type === 'STYLE' ? 'TEMPLATE_MARKET' : 'APP_MARKET',
+                                        styleUid: type === 'STYLE' ? data.style?.uuid : undefined
+                                    }).then((res) => {
+                                        if (res) {
+                                            setMarketActive(false);
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '取消收藏成功',
+                                                    variant: 'alert',
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                    close: false
+                                                })
+                                            );
                                         }
-                                    );
+                                    });
                                     e.stopPropagation();
                                 }}
                             >
@@ -239,7 +241,8 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                 onClick={(e) => {
                                     favoriteCollect({
                                         marketUid: data.uid,
-                                        type: type === 'STYLE' ? 'TEMPLATE_MARKET' : 'APP_MARKET'
+                                        type: type === 'STYLE' ? 'TEMPLATE_MARKET' : 'APP_MARKET',
+                                        styleUid: type === 'STYLE' ? data.style?.uuid : undefined
                                     }).then((res) => {
                                         if (res) {
                                             setMarketActive(true);

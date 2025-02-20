@@ -9,7 +9,7 @@ import _ from 'lodash-es';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 import MarketTemplate from '../template/myTemplate/components/content/marketTemplate';
 import jsCookie from 'js-cookie';
-import { Row, Col } from 'antd';
+import { Row, Col, Spin } from 'antd';
 import '../template/market/index.scss';
 
 function StyleMarket() {
@@ -175,9 +175,9 @@ function StyleMarket() {
             });
         }
     };
-    const handleDetail = (data: { uid: string; type: string }) => {
+    const handleDetail = (data: any) => {
         if (data.type === 'MEDIA_MATRIX') {
-            navigate(`/batchSmallRedBook?appUid=${data.uid}`);
+            navigate(`/batchSmallRedBook?appUid=${data.uid}&styleUid=${data?.style?.uuid}`);
         } else {
             navigate(`/appMarketDetail/${data.uid}`);
         }
@@ -208,68 +208,74 @@ function StyleMarket() {
                 borderRadius: '8px'
             }}
         >
-            <div className="pb-2 flex gap-3 w-full overflow-x-scroll">
-                {menuList?.map((item, index) => (
-                    <div
-                        onClick={() => {
-                            changeCategory(item, index);
-                        }}
-                        key={item.name}
-                        className="h-[31px] px-3 py-1 cursor-pointer font-[600] bg-white shadow-md rounded-[6px] text-[rgb(75,74,88)] flex items-center gap-1 hover:!bg-[#2E2E3814]"
-                        style={{
-                            background: active === index ? '#ede7f6' : '#fff'
-                        }}
-                    >
-                        <img className="w-[20px] h-[20px]" src={getImage(item.icon)} />
-                        <span className="whitespace-nowrap">{item.name}</span>
+            {newList?.length === 0 ? (
+                <Spin className="w-full h-full flex justify-center items-center" />
+            ) : (
+                <>
+                    <div className="pb-2 flex gap-3 w-full overflow-x-scroll">
+                        {menuList?.map((item, index) => (
+                            <div
+                                onClick={() => {
+                                    changeCategory(item, index);
+                                }}
+                                key={item.name}
+                                className="h-[31px] px-3 py-1 cursor-pointer font-[600] bg-white shadow-md rounded-[6px] text-[rgb(75,74,88)] flex items-center gap-1 hover:!bg-[#2E2E3814]"
+                                style={{
+                                    background: active === index ? '#ede7f6' : '#fff'
+                                }}
+                            >
+                                <img className="w-[20px] h-[20px]" src={getImage(item.icon)} />
+                                <span className="whitespace-nowrap">{item.name}</span>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
-            <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-36px)] overflow-x-hidden overflow-y-scroll">
-                {newList?.map((item, index) => (
-                    <div key={index}>
-                        {item.appList?.length > 0 && (
-                            <div className="flex justify-between items-center my-4">
-                                <div className="flex items-center gap-2">
-                                    <img height="20px" src={getImage(item.icon)} alt="" />
-                                    <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
-                                </div>
-                                {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
-                                    <div
-                                        onClick={() => {
-                                            changeCategory(
-                                                item,
-                                                menuList.findIndex((value) => value.code === item.code)
-                                            );
-                                        }}
-                                        className="text-[#673ab7] cursor-pointer"
-                                    >
-                                        更多应用
-                                        <RightOutlined />
+                    <div style={{ scrollbarGutter: 'stable' }} className="h-[calc(100%-36px)] overflow-x-hidden overflow-y-scroll">
+                        {newList?.map((item, index) => (
+                            <div key={index}>
+                                {item.appList?.length > 0 && (
+                                    <div className="flex justify-between items-center my-4">
+                                        <div className="flex items-center gap-2">
+                                            <img height="20px" src={getImage(item.icon)} alt="" />
+                                            <span className="text-[20px] line-[25px] font-bold">{item.name}</span>
+                                        </div>
+                                        {queryParams.category === 'ALL' && item?.code !== 'HOT' && (
+                                            <div
+                                                onClick={() => {
+                                                    changeCategory(
+                                                        item,
+                                                        menuList.findIndex((value) => value.code === item.code)
+                                                    );
+                                                }}
+                                                className="text-[#673ab7] cursor-pointer"
+                                            >
+                                                更多应用
+                                                <RightOutlined />
+                                            </div>
+                                        )}
                                     </div>
                                 )}
+                                {item.appList.length > 0 && (
+                                    <Row
+                                        className="overflow-x-hidden pb-[5px]"
+                                        style={{
+                                            maxHeight: 'auto',
+                                            overflowY: queryParams.category === 'ALL' ? 'hidden' : 'auto'
+                                        }}
+                                        gutter={[16, 16]}
+                                        // wrap={queryParams.category === 'ALL' ? false : true}
+                                    >
+                                        {item.appList.map((el: any, i: number) => (
+                                            <Col key={el?.uid + i} className={`xxxl-col flex-shrink-0`}>
+                                                <MarketTemplate like="market" type="STYLE" handleDetail={handleDetail} data={el} />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                )}
                             </div>
-                        )}
-                        {item.appList.length > 0 && (
-                            <Row
-                                className="overflow-x-hidden pb-[5px]"
-                                style={{
-                                    maxHeight: 'auto',
-                                    overflowY: queryParams.category === 'ALL' ? 'hidden' : 'auto'
-                                }}
-                                gutter={[16, 16]}
-                                // wrap={queryParams.category === 'ALL' ? false : true}
-                            >
-                                {item.appList.map((el: any, i: number) => (
-                                    <Col key={el?.uid + i} className={`xxxl-col flex-shrink-0`}>
-                                        <MarketTemplate like="market" type="STYLE" handleDetail={handleDetail} data={el} />
-                                    </Col>
-                                ))}
-                            </Row>
-                        )}
+                        ))}
                     </div>
-                ))}
-            </div>
+                </>
+            )}
         </Box>
     );
 }

@@ -384,19 +384,21 @@ const Record: React.FC = () => {
                                         userInfo?.allDetail?.rights?.find((item: any) => item.type === 'TEMPLATE')?.totalNum || 0
                                     }个)`}
                                 </div>
-                                <div className="mb-4 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8">
+                                <div className="mb-4 grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6">
                                     {templateLists?.map((el: any, i: number) => (
                                         <div key={el?.uid} className={`xxxl-col flex-shrink-0`}>
                                             <div
                                                 className="w-full aspect-[.75] overflow-hidden group rounded-[12px] cursor-pointer bg-white relative p-4 !bg-cover hover:shadow-lg"
                                                 style={{
                                                     aspectRatio: '.75',
-                                                    background: `url(${el?.example})`
+                                                    background: `url(${el?.posterStyle?.example})`
                                                 }}
                                             >
                                                 <div className="bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.8))] absolute bottom-0 right-0 w-full aspect-[2]">
                                                     <div className="flex flex-col gap-1 items-start absolute left-[16px] bottom-[20px]">
-                                                        <div className="text-white text-[16px] font-bold line-clamp-2">{el.name}</div>
+                                                        <div className="text-white text-[16px] font-bold line-clamp-2">
+                                                            {el?.posterStyle?.name}
+                                                        </div>
                                                         <div className="text-white text-xs">
                                                             绑定时间：{dayjs(el.createTime).format('YYYY-MM-DD HH:mm:ss')}
                                                         </div>

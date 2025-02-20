@@ -197,7 +197,8 @@ const CreateVariable = ({ rows, detail, setRows }: Variable) => {
                             record: () => {
                                 return {
                                     uuid: uuidv4(),
-                                    style: 'INPUT'
+                                    style: 'INPUT',
+                                    isKeepUserValue: true
                                 };
                             }
                         }}

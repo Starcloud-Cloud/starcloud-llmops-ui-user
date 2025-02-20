@@ -370,7 +370,7 @@ const BatcSmallRedBooks = forwardRef(
                         }}
                     >
                         <div className="flex items-center gap-2">
-                            <IconButton onClick={() => navigate('/appMarket')} color="secondary">
+                            <IconButton onClick={() => navigate(-1)} color="secondary">
                                 <KeyboardBackspace fontSize="small" />
                             </IconButton>
                             <div className="flex items-end gap-2">

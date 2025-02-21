@@ -125,7 +125,12 @@ const Lefts = ({
         } else if (appUpdate) {
             if (searchParams.get('appUid')) {
                 setSelectImgLoading(true);
-                result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
+                result = await getPlan({
+                    appUid: searchParams.get('appUid'),
+                    uid: searchParams.get('uid'),
+                    source: 'MARKET',
+                    styleUid: searchParams.get('styleUid')
+                });
                 setPlanUidRef && setPlanUidRef(result?.uid);
                 setTotalCountRef && setTotalCountRef(result?.totalCount);
                 setSelectImgLoading(false);
@@ -165,16 +170,30 @@ const Lefts = ({
             });
         } else {
             setSelectImgLoading(true);
-            result = await getPlan({ appUid: searchParams.get('appUid'), uid: searchParams.get('uid'), source: 'MARKET' });
+            result = await getPlan({
+                appUid: searchParams.get('appUid'),
+                uid: searchParams.get('uid'),
+                styleUid: searchParams.get('styleUid'),
+                source: 'MARKET'
+            });
             setSelectImgLoading(false);
             newList = _.cloneDeep(result?.configuration?.appInformation);
             const collData: any = result?.configuration?.appInformation?.example;
             if (collData) {
                 setCollData && setCollData(collData.split(','));
             }
-            navigate('/batchSmallRedBook?appUid=' + searchParams.get('appUid') + '&uid=' + result.uid + '&source=' + 'MARKET', {
-                replace: true
-            });
+            navigate(
+                '/batchSmallRedBook?appUid=' +
+                    searchParams.get('appUid') +
+                    '&uid=' +
+                    result.uid +
+                    (searchParams.get('styleUid') ? '&styleUid=' + searchParams.get('styleUid') : '') +
+                    '&source=' +
+                    'MARKET',
+                {
+                    replace: true
+                }
+            );
         }
         newList?.workflowConfig?.steps?.forEach((item: any) => {
             if (item?.flowStep?.handler === 'CustomActionHandler') {
@@ -532,6 +551,7 @@ const Lefts = ({
             const result = await getPlan({
                 appUid: searchParams.get('appUid') || searchParams.get('uid'),
                 uid: searchParams.get('appUid') ? searchParams.get('uid') : undefined,
+                styleUid: searchParams.get('styleUid'),
                 source: searchParams.get('appUid') ? 'MARKET' : detail ? 'APP' : 'MARKET'
             });
             setSelectImgLoading(false);

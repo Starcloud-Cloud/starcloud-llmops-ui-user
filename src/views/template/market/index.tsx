@@ -329,9 +329,9 @@ function TemplateMarket() {
     const [newUserVipOpen, setNewUserVipOpen] = useState(false);
 
     useEffect(() => {
-        favoriteList({}).then((res) => {
-            setCollectList(res);
-        });
+        // favoriteList({}).then((res) => {
+        //     setCollectList(res);
+        // });
         appPage({
             pageNo: 1,
             pageSize: 10

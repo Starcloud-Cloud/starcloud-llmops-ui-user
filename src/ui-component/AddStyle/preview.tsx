@@ -25,9 +25,9 @@ const Preview = ({ demoId, open, setOpen }: { demoId: string; open: boolean; set
     }, [demoId]);
     return (
         <Modal width={800} open={open} onCancel={() => setOpen(false)} footer={null}>
-            <div className="bg-white p-4">
-                <div className="flex gap-4 justify-between items-center">
-                    <div className="flex-1 flex flex-col items-start text-left">
+            <div className="bg-white p-4 max-w-[800px]">
+                <div className="flex gap-4 justify-center items-center">
+                    <div className="flex flex-col items-start text-left">
                         <div className="text-2xl font-bold mb-4">升级Canva可画高级版，开启极致体验</div>
 
                         <p className="text-gray-600 mb-6">全站资源尽在Canva可画高级版，点点鼠标，出手就是设计高手</p>
@@ -111,15 +111,18 @@ const Preview = ({ demoId, open, setOpen }: { demoId: string; open: boolean; set
                             </Button>
                         </div>
                     </div>
-                    <div className="flex-1 flex justify-center gap-4">
-                        {content?.map((item: any) => (
-                            <div className="w-[250px]">
-                                <Goods item={item} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} show={true} />
-                            </div>
-                        ))}
+                    <div className="flex justify-center gap-4">
+                        {content?.map(
+                            (item: any, index: number) =>
+                                index < 3 && (
+                                    <div className="w-[250px]">
+                                        <Goods item={item} setBusinessUid={setBusinessUid} setDetailOpen={setDetailOpen} show={true} />
+                                    </div>
+                                )
+                        )}
                     </div>
                 </div>
-                <div className="w-full text-lg font-semibold mt-4 mb-2 text-left">更多相似内容</div>
+                {/* <div className="w-full text-lg font-semibold mt-4 mb-2 text-left">更多相似内容</div> */}
                 <div className="w-full flex gap-4 flex-wrap overflow-x-auto"></div>
             </div>
             {detailOpen && (

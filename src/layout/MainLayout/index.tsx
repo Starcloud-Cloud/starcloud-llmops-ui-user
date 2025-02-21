@@ -334,6 +334,7 @@ const MainLayout = () => {
             '/createApp',
             '/createChat',
             '/appMarket',
+            '/styleMarket',
             '/my-app',
             '/listingBuilder',
             '/listingBuilderOptimize',

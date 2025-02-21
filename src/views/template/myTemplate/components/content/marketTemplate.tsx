@@ -271,7 +271,11 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                         (active ? (
                             <div
                                 onClick={(e) => {
-                                    favoriteCollect({ marketUid: data.uid }).then((res) => {
+                                    favoriteCollect({
+                                        marketUid: data.uid,
+                                        type: type === 'STYLE' ? 'TEMPLATE_MARKET' : 'APP_MARKET',
+                                        styleUid: type === 'STYLE' ? data.style?.uuid : undefined
+                                    }).then((res) => {
                                         if (res) {
                                             dispatch(
                                                 openSnackbar({
@@ -290,14 +294,17 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                     setActive(false);
                                     e.stopPropagation();
                                 }}
-                                className="absolute left-[16px] bottom-[11px]"
                             >
-                                <GradeOutlinedIcon sx={{ color: '#0003' }} fontSize="small" />
+                                <GradeOutlinedIcon sx={{ color: '#fff' }} fontSize="small" />
                             </div>
                         ) : (
                             <div
                                 onClick={(e) => {
-                                    favoriteCancel({ marketUid: data.uid }).then((res) => {
+                                    favoriteCancel({
+                                        marketUid: data.uid,
+                                        type: type === 'STYLE' ? 'TEMPLATE_MARKET' : 'APP_MARKET',
+                                        styleUid: type === 'STYLE' ? data.style?.uuid : undefined
+                                    }).then((res) => {
                                         if (res) {
                                             dispatch(
                                                 openSnackbar({
@@ -316,7 +323,6 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                     setActive(true);
                                     e.stopPropagation();
                                 }}
-                                className="absolute left-[16px] bottom-[11px]"
                             >
                                 <GradeIcon sx={{ color: '#ecc94b99' }} fontSize="small" />
                             </div>

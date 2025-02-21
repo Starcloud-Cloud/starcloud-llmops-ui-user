@@ -11,7 +11,6 @@ const Collection = () => {
     const navigate = useNavigate();
     const [collectList, setCollectList] = useState<any[]>([]);
     const [newList, setNewList] = useState<any[]>([]);
-    const [collectList1, setCollectList1] = useState<any[]>([]);
     const [styleList, setStyleList] = useState<any[]>([]);
     const [value, setValue] = useState('');
     const handleDetail = (data: any) => {
@@ -25,11 +24,7 @@ const Collection = () => {
         const newData = collectList.filter(
             (item) => item.name?.toLowerCase().includes(value.toLowerCase()) || item.spell?.toLowerCase().includes(value.toLowerCase())
         );
-        const newData1 = collectList1.filter(
-            (item) => item.name?.toLowerCase().includes(value.toLowerCase()) || item.spell?.toLowerCase().includes(value.toLowerCase())
-        );
         setNewList(newData);
-        setStyleList(newData1);
     };
     const timer: any = useRef(null);
     useEffect(() => {
@@ -47,26 +42,10 @@ const Collection = () => {
         });
         favoriteList({ type: 'TEMPLATE_MARKET' }).then((res) => {
             setStyleList(res);
-            setCollectList1(res);
         });
     }, []);
     return (
         <div className="Rows">
-            <FormControl color="secondary" size="small" sx={{ width: '300px' }} variant="outlined">
-                <OutlinedInput
-                    name="name"
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton size="small" onClick={searchList} edge="end">
-                                <Search />
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                    placeholder="搜索收藏的AI应用"
-                />
-            </FormControl>
             {getTenant() !== ENUM_TENANT.AI ? (
                 <Tabs
                     items={[
@@ -74,23 +53,46 @@ const Collection = () => {
                             label: '应用市场',
                             key: 'app',
                             children: (
-                                <Row className="mt-4" gutter={[16, 16]}>
-                                    {newList.map((el: any, index: number) => (
-                                        <Col className={`xxxl-col flex-shrink-0`} key={el?.uid}>
-                                            <MarketTemplate like="collect" key={el?.uid} handleDetail={handleDetail} data={el} />
-                                        </Col>
-                                    ))}
-                                </Row>
+                                <>
+                                    <FormControl color="secondary" size="small" sx={{ width: '300px' }} variant="outlined">
+                                        <OutlinedInput
+                                            name="name"
+                                            value={value}
+                                            onChange={(e) => setValue(e.target.value)}
+                                            endAdornment={
+                                                <InputAdornment position="end">
+                                                    <IconButton size="small" onClick={searchList} edge="end">
+                                                        <Search />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            }
+                                            placeholder="搜索收藏的AI应用"
+                                        />
+                                    </FormControl>
+                                    <Row className="mt-4" gutter={[16, 16]}>
+                                        {newList.map((el: any, index: number) => (
+                                            <Col className={`xxxl-col flex-shrink-0`} key={el?.uid}>
+                                                <MarketTemplate like="collect" key={el?.uid} handleDetail={handleDetail} data={el} />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </>
                             )
                         },
                         {
                             label: '风格市场',
                             key: 'style',
                             children: (
-                                <Row className="mt-4" gutter={[16, 16]}>
+                                <Row gutter={[16, 16]}>
                                     {styleList.map((el: any, index: number) => (
                                         <Col className={`xxxl-col flex-shrink-0`} key={el?.uid}>
-                                            <MarketTemplate like="collect" key={el?.uid} handleDetail={handleDetail} data={el} />
+                                            <MarketTemplate
+                                                like="collect"
+                                                type="STYLE"
+                                                key={el?.uid}
+                                                handleDetail={handleDetail}
+                                                data={el}
+                                            />
                                         </Col>
                                     ))}
                                 </Row>

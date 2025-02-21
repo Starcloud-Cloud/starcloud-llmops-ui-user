@@ -68,7 +68,7 @@ const Collection = () => {
                                                     </IconButton>
                                                 </InputAdornment>
                                             }
-                                            placeholder="搜索收藏的AI应用"
+                                            placeholder="搜索收藏的应用"
                                         />
                                     </FormControl>
                                     <Row className="mt-4" gutter={[16, 16]}>
@@ -82,7 +82,7 @@ const Collection = () => {
                             )
                         },
                         {
-                            label: '风格市场',
+                            label: '模版市场',
                             key: 'style',
                             children: (
                                 <Row gutter={[16, 16]}>

@@ -27,7 +27,7 @@ function StyleMarket() {
     const [cateTree, setCateTree] = useState<any[]>([]);
     useEffect(() => {
         //列表
-        listGroupTemplateByCategory({ isHot: true }).then((res) => {
+        listGroupTemplateByCategory({ isHot: false }).then((res) => {
             setAppList(res);
             if (queryParams.category !== 'ALL') {
                 const newData = categoryTrees.filter((item) => {

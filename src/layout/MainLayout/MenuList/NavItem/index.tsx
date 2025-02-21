@@ -23,7 +23,11 @@ import FormatShapesIcon from '@mui/icons-material/FormatShapes';
 import GradingIcon from '@mui/icons-material/Grading';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import AbcIcon from '@mui/icons-material/Abc';
-import PermMediaIcon from '@mui/icons-material/PermMedia';
+import PermMedia from '@mui/icons-material/PermMedia';
+import SearchOff from '@mui/icons-material/SearchOff';
+import FormatShapes from '@mui/icons-material/FormatShapes';
+import FolderCopy from '@mui/icons-material/FolderCopy';
+
 import { Avatar, ButtonBase, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -66,7 +70,6 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         UpgradeIcon,
         ImageIcon,
         SmartToyIcon,
-        PermMediaIcon,
         AttachFileIcon,
         HdOutlinedIcon,
         ChatIcon,
@@ -79,7 +82,11 @@ const NavItem = ({ item, level, parentId }: NavItemProps) => {
         AutoGraphIcon,
         GradingIcon,
         AbcIcon,
-        ExtensionIcon
+        ExtensionIcon,
+        SearchOff,
+        PermMedia,
+        FormatShapes,
+        FolderCopy
     };
     const Icon = item?.icon ? obj[item.icon] || FiberManualRecordIcon : FiberManualRecordIcon;
 

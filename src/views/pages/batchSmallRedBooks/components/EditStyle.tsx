@@ -192,7 +192,7 @@ const EditStyle = ({
     }, [currentJson, windowWidth, imgRef?.current]);
     const [pre, setPre] = useState(0);
 
-    const isPageInputId = currentJson?.objects?.filter((item: any) => item.isTextPage)?.map((item: any) => item?.isTextPage?.id) || [];
+    const isPageInputId = currentJson?.objects?.filter((item: any) => item.isTextPage)?.map((item: any) => item?.id) || [];
     //  currentJson?.objects?.find((item: any) => item.isTextPage)?.id;
     useEffect(() => {
         if (selModal && selModal === imageStyleData.uuid) {

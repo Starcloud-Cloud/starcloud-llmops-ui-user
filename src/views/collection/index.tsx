@@ -15,9 +15,11 @@ const Collection = () => {
     const [value, setValue] = useState('');
     const handleDetail = (data: any) => {
         if (getTenant() === ENUM_TENANT.AI) {
+            console.log(data);
             navigate(`/appMarketDetail/${data.favoriteUid}?type=collect`);
         } else {
-            navigate(`/batchSmallRedBook?appUid=${data.uid}`);
+            console.log(data);
+            navigate(`/batchSmallRedBook?appUid=${data.uid}${data?.style?.uuid ? `&styleUid=${data?.style?.uuid}` : ''}`);
         }
     };
     const searchList = () => {
@@ -92,6 +94,7 @@ const Collection = () => {
                                                 key={el?.uid}
                                                 handleDetail={handleDetail}
                                                 data={el}
+                                                isTitle={true}
                                             />
                                         </Col>
                                     ))}

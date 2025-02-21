@@ -177,7 +177,7 @@ function StyleMarket() {
     };
     const handleDetail = (data: any) => {
         if (data.type === 'MEDIA_MATRIX') {
-            navigate(`/batchSmallRedBook?appUid=${data.uid}&styleUid=${data?.style?.uuid}`);
+            navigate(`/batchSmallRedBook?appUid=${data.uid}${data?.style?.uuid ? `&styleUid=${data?.style?.uuid}` : ''}`);
         } else {
             navigate(`/appMarketDetail/${data.uid}`);
         }

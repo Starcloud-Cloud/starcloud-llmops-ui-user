@@ -10,7 +10,7 @@ import bgImg from 'assets/images/picture/bgImg.png';
 import dayjs from 'dayjs';
 import { Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
-const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
+const MarketTemplate = ({ like, data, handleDetail, type, scene, isTitle }: any) => {
     const navigate = useNavigate();
     const getImage = (active: string) => {
         let image;
@@ -203,12 +203,12 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                     {/* <div className="z-1 p-1 rounded-md border border-solid border-slate-200 flex justify-center items-center">
                         <img className="w-[16px] h-[16px]" src={getImage(data?.icon)} />
                     </div> */}
-                    <div className="text-white text-[16px] font-bold line-clamp-2">{data.name}</div>
+                    {!isTitle && <div className="text-white text-[16px] font-bold line-clamp-2">{data.name}</div>}
                 </div>
                 <div className="absolute left-[16px] bottom-[8px] flex items-center gap-2 w-[calc(100%-32px)] overflow-x-auto whitespace-nowrap">
                     {like === 'market' &&
                         (marketActive ? (
-                            <div
+                            <GradeIcon
                                 onClick={(e) => {
                                     favoriteCancel({
                                         marketUid: data.uid,
@@ -233,11 +233,11 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                     });
                                     e.stopPropagation();
                                 }}
-                            >
-                                <GradeIcon sx={{ color: '#ecc94b99' }} fontSize="small" />
-                            </div>
+                                sx={{ color: '#ecc94b99' }}
+                                fontSize="small"
+                            />
                         ) : (
-                            <div
+                            <GradeOutlinedIcon
                                 onClick={(e) => {
                                     favoriteCollect({
                                         marketUid: data.uid,
@@ -263,13 +263,13 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
 
                                     e.stopPropagation();
                                 }}
-                            >
-                                <GradeOutlinedIcon sx={{ color: '#fff' }} fontSize="small" />
-                            </div>
+                                sx={{ color: '#fff' }}
+                                fontSize="small"
+                            />
                         ))}
                     {like === 'collect' &&
                         (active ? (
-                            <div
+                            <GradeOutlinedIcon
                                 onClick={(e) => {
                                     favoriteCollect({
                                         marketUid: data.uid,
@@ -294,11 +294,11 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                     setActive(false);
                                     e.stopPropagation();
                                 }}
-                            >
-                                <GradeOutlinedIcon sx={{ color: '#fff' }} fontSize="small" />
-                            </div>
+                                sx={{ color: '#fff' }}
+                                fontSize="small"
+                            />
                         ) : (
-                            <div
+                            <GradeIcon
                                 onClick={(e) => {
                                     favoriteCancel({
                                         marketUid: data.uid,
@@ -323,9 +323,9 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                                     setActive(true);
                                     e.stopPropagation();
                                 }}
-                            >
-                                <GradeIcon sx={{ color: '#ecc94b99' }} fontSize="small" />
-                            </div>
+                                sx={{ color: '#ecc94b99' }}
+                                fontSize="small"
+                            />
                         ))}
                     {data.pluginList && data.pluginList?.length > 0 && (
                         <div className="text-xs bg-[#673ab7] text-white font-bold py-1 px-2 flex items-center rounded-md">
@@ -346,7 +346,7 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                             智能生成
                         </div>
                     )}
-                    {data.openVideoMode && (
+                    {(data.openVideoMode || data?.style?.openVideoMode) && (
                         <div className="text-xs bg-[#673ab7] text-white font-bold py-1 px-2 flex items-center gap-1 rounded-md">
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -367,6 +367,23 @@ const MarketTemplate = ({ like, data, handleDetail, type, scene }: any) => {
                     )}
                 </div>
             </div>
+            {data?.style?.saleConfig?.openSale && (
+                <div className="absolute bottom-[calc(50%-13px)] right-[calc(50%-37px)] rounded-full bg-[#717476] text-white text-base font-semibold flex items-center gap-1 px-2 py-1">
+                    <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11435" width="20" height="20">
+                        <path
+                            d="M816.49 909H211.21c-1.1 0-2-0.9-2-2v-68.18c0-1.1 0.9-2 2-2h605.28c1.1 0 2 0.9 2 2V907c0 1.1-0.9 2-2 2z"
+                            fill="#FFAA22"
+                            p-id="11436"
+                        ></path>
+                        <path
+                            d="M910.24 316.23c-27.11 0-49.1 22.52-49.1 50.31 0 7.28 1.58 14.16 4.3 20.4l-176.13 80.21-147.2-258.57c14.56-8.73 24.46-24.74 24.46-43.28 0-27.79-21.98-50.31-49.1-50.31s-49.1 22.52-49.1 50.31c0 17.99 9.29 33.66 23.15 42.55l-158.16 259.3-176.13-80.21c2.71-6.25 4.3-13.12 4.3-20.4 0-27.78-21.98-50.31-49.1-50.31s-49.1 22.52-49.1 50.31c0 27.78 21.98 50.31 49.1 50.31 3.99 0 7.82-0.62 11.53-1.54l86.65 366.28h601.43l86.65-366.28c3.71 0.92 7.54 1.54 11.53 1.54 27.12 0 49.1-22.52 49.1-50.31 0.01-27.78-21.97-50.31-49.08-50.31z"
+                            fill="#FFD68D"
+                            p-id="11437"
+                        ></path>
+                    </svg>
+                    高级版
+                </div>
+            )}
         </div>
     );
     // ) : (

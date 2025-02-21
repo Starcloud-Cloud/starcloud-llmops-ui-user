@@ -192,7 +192,8 @@ const EditStyle = ({
     }, [currentJson, windowWidth, imgRef?.current]);
     const [pre, setPre] = useState(0);
 
-    const isPageInputId = currentJson?.objects?.find((item: any) => item.isTextPage)?.id;
+    const isPageInputId = currentJson?.objects?.filter((item: any) => item.isTextPage)?.map((item: any) => item?.isTextPage?.id) || [];
+    //  currentJson?.objects?.find((item: any) => item.isTextPage)?.id;
     useEffect(() => {
         if (selModal && selModal === imageStyleData.uuid) {
             setOpen(true);
@@ -570,8 +571,10 @@ const EditStyle = ({
                                                                     onMouseLeave={() => setCurrentElementId('')}
                                                                 >
                                                                     <VariableInput
-                                                                        row={el.field === isPageInputId ? 4 : 1}
-                                                                        isPageText={el.field === isPageInputId}
+                                                                        row={isPageInputId?.includes(el.field) ? 4 : 1}
+                                                                        isPageText={isPageInputId?.includes(el.field)}
+                                                                        // row={el.field === isPageInputId ? 4 : 1}
+                                                                        // isPageText={el.field === isPageInputId}
                                                                         disabled={canEdit}
                                                                         styles={
                                                                             currentElementId === el.field

@@ -859,12 +859,13 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                 <div className="flex items-end justify-end" style={{ flex: '0 0 210px' }}>
                     <Space>
                         {/* {!isShowField && ( */}
-                        <Button type="primary" onClick={() => setUploadOpen(true)}>
+                        <Button disabled={tableData?.length === 0} type="primary" onClick={() => setUploadOpen(true)}>
                             批量导入
                         </Button>
                         {/* )} */}
                         <Button
                             type="primary"
+                            disabled={tableData?.length === 0}
                             onClick={() => {
                                 setEditOpen(true);
                                 setTitle('新增素材');
@@ -873,6 +874,7 @@ ${JSON.stringify(JSON.parse(value), null, 2)}
                             新增素材
                         </Button>
                         <Dropdown
+                            disabled={tableData?.length === 0}
                             menu={{
                                 items: [
                                     {
@@ -2041,7 +2043,7 @@ const MaterialLibraryDetail = ({
                         <Empty
                             className="mt-[10%]"
                             description={
-                                <div className="flex flex-col">
+                                <div className="flex flex-col text-lg">
                                     <p>暂未配置素材字段</p>
                                     <a onClick={() => setColOpen(true)}>去配置</a>
                                 </div>

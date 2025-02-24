@@ -857,12 +857,38 @@ const Right = ({
             {aiRocord &&
                 (isExe ? (
                     <div className="absolute w-[400px] left-[calc(50%-200px)] bottom-10 bg-[#ede7f6] rounded-lg px-4 pt-1 pb-2 flex flex-col items-center gap-2 border-[0.5px] border-solid border-[#d9d9d9] z-[1]">
-                        <div className="w-full flex justify-between text-sm font-bold mb-2">
+                        <div className="w-full flex justify-between text-sm font-bold mb-2 relative">
                             <div>智能生成</div>
                             <CloseOutlined
                                 onClick={() => setIsExe(false)}
                                 className="text-xs cursor-pointer border border-solid border-[transparent] hover:border-[#d9d9d9] rounded-full w-[20px] h-[20px] flex justify-center items-center"
                             />
+                            <div className="absolute top-[2px] left-0 w-full text-xs text-black/50 text-center">
+                                邀请好友送魔法豆
+                                <Tooltip title="点击复制邀请链接">
+                                    <span
+                                        className="text-[#673ab7] cursor-pointer ml-1"
+                                        onClick={() => {
+                                            copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
+                                            dispatch(
+                                                openSnackbar({
+                                                    open: true,
+                                                    message: '复制成功, 快去邀请吧~',
+                                                    variant: 'alert',
+                                                    zIndex: 9999,
+                                                    alert: {
+                                                        color: 'success'
+                                                    },
+                                                    anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                                    close: false
+                                                })
+                                            );
+                                        }}
+                                    >
+                                        邀请链接
+                                    </span>
+                                </Tooltip>
+                            </div>
                         </div>
                         <div className="w-full">
                             <Input
@@ -876,31 +902,6 @@ const Right = ({
                         <Button onClick={handleAiExe} type="primary" size="small">
                             点击生成笔记
                         </Button>
-                        <div className="text-xs text-black/50 text-center">
-                            邀请好友一起体验，双方都可获得魔法豆。
-                            <span
-                                className="text-[#673ab7] cursor-pointer"
-                                onClick={() => {
-                                    copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
-                                    dispatch(
-                                        openSnackbar({
-                                            open: true,
-                                            message: '复制成功, 快去邀请吧~',
-                                            variant: 'alert',
-                                            zIndex: 9999,
-                                            alert: {
-                                                color: 'success'
-                                            },
-                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
-                                            transition: 'SlideDown',
-                                            close: false
-                                        })
-                                    );
-                                }}
-                            >
-                                点击复制邀请链接
-                            </span>
-                        </div>
                     </div>
                 ) : (
                     <Tooltip title="点击展开智能生成" placement="topLeft">

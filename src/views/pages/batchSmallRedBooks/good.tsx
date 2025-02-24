@@ -60,6 +60,8 @@ const Goods = ({ item, noDetail, setBusinessUid, setDetailOpen, show, timeFailur
                         <Tag color="error">执行失败</Tag>
                     </Popover>
                 );
+            case 'CANCELED':
+                return <Tag color="warning">已取消</Tag>;
         }
     };
     //失败重试

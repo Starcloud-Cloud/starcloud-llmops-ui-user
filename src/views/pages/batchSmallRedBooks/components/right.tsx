@@ -15,6 +15,7 @@ import JSZip from 'jszip';
 import _ from 'lodash-es';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { EditType } from 'views/materialLibrary/detail';
+import infoStore from 'store/entitlementAction';
 
 const Right = ({
     isexample,
@@ -51,6 +52,7 @@ const Right = ({
     setSeleValue: (data: any) => void;
     planUid: string;
 }) => {
+    const { use } = infoStore();
     const navigate = useNavigate();
     const location = useLocation();
     const query = new URLSearchParams(location.search);
@@ -874,6 +876,31 @@ const Right = ({
                         <Button onClick={handleAiExe} type="primary" size="small">
                             点击生成笔记
                         </Button>
+                        <div className="text-xs text-black/50 text-center">
+                            邀请好友一起体验，双方都可获得魔法豆。
+                            <span
+                                className="text-[#673ab7] cursor-pointer"
+                                onClick={() => {
+                                    copy(window.location.protocol + '//' + window.location.host + '/login?q=' + use?.inviteCode);
+                                    dispatch(
+                                        openSnackbar({
+                                            open: true,
+                                            message: '复制成功, 快去邀请吧~',
+                                            variant: 'alert',
+                                            zIndex: 9999,
+                                            alert: {
+                                                color: 'success'
+                                            },
+                                            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+                                            transition: 'SlideDown',
+                                            close: false
+                                        })
+                                    );
+                                }}
+                            >
+                                点击复制邀请链接
+                            </span>
+                        </div>
                     </div>
                 ) : (
                     <Tooltip title="点击展开智能生成" placement="topLeft">

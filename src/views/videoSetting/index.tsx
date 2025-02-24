@@ -456,6 +456,7 @@ const VideoSetting: React.FC<{
         audio.play();
         setAudioPlayer(audio);
     };
+    console.log(variableList);
 
     return (
         <Form
@@ -1181,9 +1182,13 @@ const VideoSetting: React.FC<{
                                                                                 .includes(input.toLowerCase());
                                                                         }}
                                                                     >
-                                                                        {variableList?.map((item: any) => (
-                                                                            <Select.Option value={item.field}>{item.label}</Select.Option>
-                                                                        ))}
+                                                                        {variableList
+                                                                            ?.filter((item) => item.value)
+                                                                            ?.map((item: any) => (
+                                                                                <Select.Option value={item.field}>
+                                                                                    {item.label}
+                                                                                </Select.Option>
+                                                                            ))}
                                                                     </Select>
                                                                 )}
                                                             </div>

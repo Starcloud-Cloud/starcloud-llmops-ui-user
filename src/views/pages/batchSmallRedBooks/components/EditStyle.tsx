@@ -370,7 +370,7 @@ const EditStyle = ({
                 {imageStyleData?.code && (
                     <div>
                         <div className="flex">
-                            <div className={`${isVideoOpen ? '!w-[40%]' : '!w-full !max-w-[600px]'}`}>
+                            <div className="!w-[40%]">
                                 <div className="text-lg">图片模版示意图</div>
                                 <div className="p-3">
                                     <div className="relative w-full mx-auto" ref={imgRef} onClick={(e) => e.stopPropagation()}>

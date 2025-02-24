@@ -95,7 +95,6 @@ export const InviteMatrix = () => {
                         <div className="flex justify-between items-center">
                             <div>
                                 <div>方式一：点击右边“签到”即可获得1魔法豆</div>
-                                <div>方式二：魔法笔记公众号“菜单栏--权益领取--点击签到”即可</div>
                             </div>
                             <Button onClick={handleSignIn} disabled={disabledOpen} type="primary">
                                 {disabledOpen ? '已签到' : '立即签到'}

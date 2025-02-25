@@ -324,7 +324,7 @@ function TemplateMarket() {
     const [newUserVipOpen, setNewUserVipOpen] = useState(false);
 
     useEffect(() => {
-        favoriteList({}).then((res) => {
+        favoriteList({ type: 'APP_MARKET' }).then((res) => {
             setCollectList(res);
         });
         appPage({

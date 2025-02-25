@@ -456,8 +456,6 @@ const VideoSetting: React.FC<{
         audio.play();
         setAudioPlayer(audio);
     };
-    console.log(variableList);
-
     return (
         <Form
             form={form}
